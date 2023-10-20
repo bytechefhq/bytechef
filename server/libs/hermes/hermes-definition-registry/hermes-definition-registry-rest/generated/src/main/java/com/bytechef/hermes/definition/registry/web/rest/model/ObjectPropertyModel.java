@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ObjectProperty", description = "An object property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T05:51:17.891497+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-08T21:31:51.028205+02:00[Europe/Zagreb]")
 public class ObjectPropertyModel extends ValuePropertyModel {
 
   @Valid

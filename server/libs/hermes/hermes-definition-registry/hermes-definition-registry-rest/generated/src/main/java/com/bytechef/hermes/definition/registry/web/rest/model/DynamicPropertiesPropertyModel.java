@@ -2,7 +2,7 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.PropertiesDataSourceModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.DynamicPropertiesDataSourceModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyTypeModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -28,29 +28,29 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DynamicPropertiesProperty", description = "A dynamic properties property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T05:51:17.891497+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-08T21:31:51.028205+02:00[Europe/Zagreb]")
 public class DynamicPropertiesPropertyModel extends PropertyModel {
 
-  private PropertiesDataSourceModel propertiesDataSource;
+  private DynamicPropertiesDataSourceModel dynamicPropertiesDataSource;
 
-  public DynamicPropertiesPropertyModel propertiesDataSource(PropertiesDataSourceModel propertiesDataSource) {
-    this.propertiesDataSource = propertiesDataSource;
+  public DynamicPropertiesPropertyModel dynamicPropertiesDataSource(DynamicPropertiesDataSourceModel dynamicPropertiesDataSource) {
+    this.dynamicPropertiesDataSource = dynamicPropertiesDataSource;
     return this;
   }
 
   /**
-   * Get propertiesDataSource
-   * @return propertiesDataSource
+   * Get dynamicPropertiesDataSource
+   * @return dynamicPropertiesDataSource
   */
   @Valid 
-  @Schema(name = "propertiesDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("propertiesDataSource")
-  public PropertiesDataSourceModel getPropertiesDataSource() {
-    return propertiesDataSource;
+  @Schema(name = "dynamicPropertiesDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("dynamicPropertiesDataSource")
+  public DynamicPropertiesDataSourceModel getDynamicPropertiesDataSource() {
+    return dynamicPropertiesDataSource;
   }
 
-  public void setPropertiesDataSource(PropertiesDataSourceModel propertiesDataSource) {
-    this.propertiesDataSource = propertiesDataSource;
+  public void setDynamicPropertiesDataSource(DynamicPropertiesDataSourceModel dynamicPropertiesDataSource) {
+    this.dynamicPropertiesDataSource = dynamicPropertiesDataSource;
   }
 
   public DynamicPropertiesPropertyModel advancedOption(Boolean advancedOption) {
@@ -112,13 +112,13 @@ public class DynamicPropertiesPropertyModel extends PropertyModel {
       return false;
     }
     DynamicPropertiesPropertyModel dynamicPropertiesProperty = (DynamicPropertiesPropertyModel) o;
-    return Objects.equals(this.propertiesDataSource, dynamicPropertiesProperty.propertiesDataSource) &&
+    return Objects.equals(this.dynamicPropertiesDataSource, dynamicPropertiesProperty.dynamicPropertiesDataSource) &&
         super.equals(o);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(propertiesDataSource, super.hashCode());
+    return Objects.hash(dynamicPropertiesDataSource, super.hashCode());
   }
 
   @Override
@@ -126,7 +126,7 @@ public class DynamicPropertiesPropertyModel extends PropertyModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class DynamicPropertiesPropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
-    sb.append("    propertiesDataSource: ").append(toIndentedString(propertiesDataSource)).append("\n");
+    sb.append("    dynamicPropertiesDataSource: ").append(toIndentedString(dynamicPropertiesDataSource)).append("\n");
     sb.append("}");
     return sb.toString();
   }

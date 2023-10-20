@@ -13,12 +13,14 @@ src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/Authorizati
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/BooleanPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ComponentDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ComponentDefinitionModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ComponentOperationRequestModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ConnectionDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ConnectionDefinitionModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ControlTypeModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DatePropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DatePropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DateTimePropertyModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DynamicPropertiesDataSourceModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DynamicPropertiesPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DynamicPropertiesPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/GetOAuth2AuthorizationParametersRequestModel.java
@@ -35,7 +37,6 @@ src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OneOfProper
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OneOfPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OptionModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OptionsDataSourceModel.java
-src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/PropertiesDataSourceModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/PropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/PropertyTypeModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ResourcesModel.java

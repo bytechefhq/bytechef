@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T05:51:17.891497+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-08T21:31:51.028205+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "task-dispatcher-definitions", description = "The Core Task Dispatcher Definitions API")
 public interface TaskDispatcherDefinitionsApi {
@@ -88,7 +88,7 @@ public interface TaskDispatcherDefinitionsApi {
      * GET /task-dispatcher-definitions/{taskDispatcherName}/versions : Get all task dispatcher definition versions of a task dispatcher.
      * Get all task dispatcher definition versions of a task dispatcher.
      *
-     * @param taskDispatcherName The name of a task dispatcher to get. (required)
+     * @param taskDispatcherName The name of a task dispatcher. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -108,7 +108,7 @@ public interface TaskDispatcherDefinitionsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<Flux<TaskDispatcherDefinitionBasicModel>>> getTaskDispatcherDefinitionVersions(
-        @Parameter(name = "taskDispatcherName", description = "The name of a task dispatcher to get.", required = true, in = ParameterIn.PATH) @PathVariable("taskDispatcherName") String taskDispatcherName,
+        @Parameter(name = "taskDispatcherName", description = "The name of a task dispatcher.", required = true, in = ParameterIn.PATH) @PathVariable("taskDispatcherName") String taskDispatcherName,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();

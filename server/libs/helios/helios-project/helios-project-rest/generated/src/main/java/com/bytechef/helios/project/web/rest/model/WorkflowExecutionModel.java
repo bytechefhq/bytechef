@@ -1,19 +1,25 @@
 package com.bytechef.helios.project.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.helios.project.web.rest.model.ProjectInstanceModel;
+import com.bytechef.helios.project.web.rest.model.ProjectModel;
 import com.bytechef.hermes.workflow.web.rest.model.JobModel;
 import com.bytechef.hermes.workflow.web.rest.model.TaskExecutionModel;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -22,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecution", description = "Contains information about execution of one of project workflows.")
 @JsonTypeName("WorkflowExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T12:27:26.489882+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-07T13:31:36.723257+02:00[Europe/Zagreb]")
 public class WorkflowExecutionModel {
 
   private Long id;
@@ -47,7 +53,7 @@ public class WorkflowExecutionModel {
    * The id of a workflow execution.
    * @return id
   */
-
+  
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a workflow execution.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
@@ -67,7 +73,7 @@ public class WorkflowExecutionModel {
    * Get instance
    * @return instance
   */
-  @Valid
+  @Valid 
   @Schema(name = "instance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("instance")
   public ProjectInstanceModel getInstance() {
@@ -87,7 +93,7 @@ public class WorkflowExecutionModel {
    * Get job
    * @return job
   */
-  @Valid
+  @Valid 
   @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("job")
   public JobModel getJob() {
@@ -107,7 +113,7 @@ public class WorkflowExecutionModel {
    * Get project
    * @return project
   */
-  @Valid
+  @Valid 
   @Schema(name = "project", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("project")
   public ProjectModel getProject() {
@@ -135,7 +141,7 @@ public class WorkflowExecutionModel {
    * Get taskExecutions
    * @return taskExecutions
   */
-  @Valid
+  @Valid 
   @Schema(name = "taskExecutions", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("taskExecutions")
   public List<@Valid TaskExecutionModel> getTaskExecutions() {
@@ -155,7 +161,7 @@ public class WorkflowExecutionModel {
    * Get workflow
    * @return workflow
   */
-  @Valid
+  @Valid 
   @Schema(name = "workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflow")
   public WorkflowModel getWorkflow() {
@@ -174,13 +180,13 @@ public class WorkflowExecutionModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    WorkflowExecutionModel WorkflowExecution = (WorkflowExecutionModel) o;
-    return Objects.equals(this.id, WorkflowExecution.id) &&
-        Objects.equals(this.instance, WorkflowExecution.instance) &&
-        Objects.equals(this.job, WorkflowExecution.job) &&
-        Objects.equals(this.project, WorkflowExecution.project) &&
-        Objects.equals(this.taskExecutions, WorkflowExecution.taskExecutions) &&
-        Objects.equals(this.workflow, WorkflowExecution.workflow);
+    WorkflowExecutionModel workflowExecution = (WorkflowExecutionModel) o;
+    return Objects.equals(this.id, workflowExecution.id) &&
+        Objects.equals(this.instance, workflowExecution.instance) &&
+        Objects.equals(this.job, workflowExecution.job) &&
+        Objects.equals(this.project, workflowExecution.project) &&
+        Objects.equals(this.taskExecutions, workflowExecution.taskExecutions) &&
+        Objects.equals(this.workflow, workflowExecution.workflow);
   }
 
   @Override

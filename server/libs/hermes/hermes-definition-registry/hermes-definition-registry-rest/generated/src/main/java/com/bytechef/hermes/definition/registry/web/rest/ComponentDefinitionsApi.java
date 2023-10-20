@@ -9,8 +9,11 @@ import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionBa
 import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ComponentOperationRequestModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.OptionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.TriggerDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.TriggerDefinitionModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -42,7 +45,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T05:51:17.891497+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-08T21:31:51.028205+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "action-definitions", description = "The Core Action Definitions API")
 public interface ComponentDefinitionsApi {
@@ -51,8 +54,8 @@ public interface ComponentDefinitionsApi {
      * GET /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName} : Get an action definition of a component.
      * Get an action definition of a component.
      *
-     * @param componentName The name of the component. (required)
-     * @param componentVersion The version of the component to get. (required)
+     * @param componentName The name of a component. (required)
+     * @param componentVersion The version of a component. (required)
      * @param actionName The name of the action to get. (required)
      * @return Successful operation. (status code 200)
      */
@@ -73,8 +76,8 @@ public interface ComponentDefinitionsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<ActionDefinitionModel>> getComponentActionDefinition(
-        @Parameter(name = "componentName", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
-        @Parameter(name = "componentVersion", description = "The version of the component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
+        @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "actionName", description = "The name of the action to get.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
@@ -82,7 +85,7 @@ public interface ComponentDefinitionsApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"outputSchema\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true } ], \"exampleOutput\" : \"{}\", \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true } ] }";
+                String exampleString = "{ \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"outputSchema\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true } ], \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"sampleOutput\" : \"{}\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true } ] }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -96,8 +99,8 @@ public interface ComponentDefinitionsApi {
      * GET /component-definitions/{componentName}/{componentVersion}/action-definitions : Get a list of action definitions for a component.
      * Get a list of action definitions for a component.
      *
-     * @param componentName The name of the component. (required)
-     * @param componentVersion The version of the component to get. (required)
+     * @param componentName The name of a component. (required)
+     * @param componentVersion The version of a component. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -117,8 +120,8 @@ public interface ComponentDefinitionsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<Flux<ActionDefinitionBasicModel>>> getComponentActionDefinitions(
-        @Parameter(name = "componentName", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
-        @Parameter(name = "componentVersion", description = "The version of the component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
+        @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -131,6 +134,236 @@ public interface ComponentDefinitionsApi {
             }
         }
         return result.then(Mono.empty());
+
+    }
+
+
+    /**
+     * POST /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/editor-description : Get an action description shown in the editor.
+     * Get an action description shown in the editor.
+     *
+     * @param componentName The name of a component. (required)
+     * @param componentVersion The version of a component. (required)
+     * @param actionName The name of an action. (required)
+     * @param componentOperationRequestModel  (optional)
+     * @return The editor description. (status code 200)
+     */
+    @Operation(
+        operationId = "getComponentActionEditorDescription",
+        summary = "Get an action description shown in the editor.",
+        description = "Get an action description shown in the editor.",
+        tags = { "action-definitions" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The editor description.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/editor-description",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default Mono<ResponseEntity<String>> getComponentActionEditorDescription(
+        @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
+        @Parameter(name = "actionName", description = "The name of an action.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
+        @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) Mono<ComponentOperationRequestModel> componentOperationRequestModel,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        return result.then(componentOperationRequestModel).then(Mono.empty());
+
+    }
+
+
+    /**
+     * POST /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/output-schema : Get an action output schema shown in the editor.
+     * Get an action output schema shown in the editor.
+     *
+     * @param componentName The name of a component. (required)
+     * @param componentVersion The version of a component. (required)
+     * @param actionName The name of an action. (required)
+     * @param componentOperationRequestModel  (optional)
+     * @return The output schema. (status code 200)
+     */
+    @Operation(
+        operationId = "getComponentActionOutputSchema",
+        summary = "Get an action output schema shown in the editor.",
+        description = "Get an action output schema shown in the editor.",
+        tags = { "action-definitions" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The output schema.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PropertyModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/output-schema",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default Mono<ResponseEntity<Flux<PropertyModel>>> getComponentActionOutputSchema(
+        @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
+        @Parameter(name = "actionName", description = "The name of an action.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
+        @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) Mono<ComponentOperationRequestModel> componentOperationRequestModel,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
+            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                String exampleString = "[ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true } ]";
+                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
+                break;
+            }
+        }
+        return result.then(componentOperationRequestModel).then(Mono.empty());
+
+    }
+
+
+    /**
+     * POST /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/properties/{propertyName}/dynamic-properties : Get dynamic properties for an action property shown in the editor.
+     * Get dynamic properties for an action property shown in the editor.
+     *
+     * @param componentName The name of a component. (required)
+     * @param componentVersion The version of a component. (required)
+     * @param actionName The name of an action. (required)
+     * @param propertyName The name of a property. (required)
+     * @param componentOperationRequestModel  (optional)
+     * @return The list of options. (status code 200)
+     */
+    @Operation(
+        operationId = "getComponentActionPropertyDynamicProperties",
+        summary = "Get dynamic properties for an action property shown in the editor.",
+        description = "Get dynamic properties for an action property shown in the editor.",
+        tags = { "action-definitions" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The list of options.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PropertyModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/properties/{propertyName}/dynamic-properties",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default Mono<ResponseEntity<Flux<PropertyModel>>> getComponentActionPropertyDynamicProperties(
+        @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
+        @Parameter(name = "actionName", description = "The name of an action.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
+        @Parameter(name = "propertyName", description = "The name of a property.", required = true, in = ParameterIn.PATH) @PathVariable("propertyName") String propertyName,
+        @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) Mono<ComponentOperationRequestModel> componentOperationRequestModel,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
+            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                String exampleString = "[ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true } ]";
+                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
+                break;
+            }
+        }
+        return result.then(componentOperationRequestModel).then(Mono.empty());
+
+    }
+
+
+    /**
+     * POST /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/properties/{propertyName}/options : Get an action property options shown in the editor.
+     * Get an action property options shown in the editor.
+     *
+     * @param componentName The name of a component. (required)
+     * @param componentVersion The version of a component. (required)
+     * @param actionName The name of an action. (required)
+     * @param propertyName The name of a property. (required)
+     * @param componentOperationRequestModel  (optional)
+     * @return The list of options. (status code 200)
+     */
+    @Operation(
+        operationId = "getComponentActionPropertyOptions",
+        summary = "Get an action property options shown in the editor.",
+        description = "Get an action property options shown in the editor.",
+        tags = { "action-definitions" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The list of options.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = OptionModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/properties/{propertyName}/options",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default Mono<ResponseEntity<Flux<OptionModel>>> getComponentActionPropertyOptions(
+        @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
+        @Parameter(name = "actionName", description = "The name of an action.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
+        @Parameter(name = "propertyName", description = "The name of a property.", required = true, in = ParameterIn.PATH) @PathVariable("propertyName") String propertyName,
+        @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) Mono<ComponentOperationRequestModel> componentOperationRequestModel,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
+            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                String exampleString = "[ { \"displayCondition\" : \"displayCondition\", \"name\" : \"name\", \"description\" : \"description\", \"value\" : \"\" }, { \"displayCondition\" : \"displayCondition\", \"name\" : \"name\", \"description\" : \"description\", \"value\" : \"\" } ]";
+                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
+                break;
+            }
+        }
+        return result.then(componentOperationRequestModel).then(Mono.empty());
+
+    }
+
+
+    /**
+     * POST /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/sample-output : Get an action sample output shown in the editor.
+     * Get an action sample output shown in the editor.
+     *
+     * @param componentName The name of a component. (required)
+     * @param componentVersion The version of a component. (required)
+     * @param actionName The name of an action. (required)
+     * @param componentOperationRequestModel  (optional)
+     * @return The output schema. (status code 200)
+     */
+    @Operation(
+        operationId = "getComponentActionSampleOutput",
+        summary = "Get an action sample output shown in the editor.",
+        description = "Get an action sample output shown in the editor.",
+        tags = { "action-definitions" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The output schema.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = Object.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/sample-output",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default Mono<ResponseEntity<Object>> getComponentActionSampleOutput(
+        @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
+        @Parameter(name = "actionName", description = "The name of an action.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
+        @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) Mono<ComponentOperationRequestModel> componentOperationRequestModel,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        return result.then(componentOperationRequestModel).then(Mono.empty());
 
     }
 
@@ -268,7 +501,7 @@ public interface ComponentDefinitionsApi {
      * GET /component-definitions/{componentName}/versions : Get all component definition versions of a component.
      * Get all component definition versions of a component.
      *
-     * @param componentName The name of a component to get. (required)
+     * @param componentName The name of a component. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -288,7 +521,7 @@ public interface ComponentDefinitionsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<Flux<ComponentDefinitionBasicModel>>> getComponentDefinitionVersions(
-        @Parameter(name = "componentName", description = "The name of a component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -357,8 +590,8 @@ public interface ComponentDefinitionsApi {
      * Get a trigger definition of a component.
      *
      * @param componentName The name of the component. (required)
-     * @param componentVersion The version of the component to get. (required)
-     * @param triggerName The name of the action to get. (required)
+     * @param componentVersion The version of a component. (required)
+     * @param triggerName The name of a trigger to get. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -379,15 +612,15 @@ public interface ComponentDefinitionsApi {
     )
     default Mono<ResponseEntity<TriggerDefinitionModel>> getComponentTriggerDefinition(
         @Parameter(name = "componentName", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
-        @Parameter(name = "componentVersion", description = "The version of the component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
-        @Parameter(name = "triggerName", description = "The name of the action to get.", required = true, in = ParameterIn.PATH) @PathVariable("triggerName") String triggerName,
+        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
+        @Parameter(name = "triggerName", description = "The name of a trigger to get.", required = true, in = ParameterIn.PATH) @PathVariable("triggerName") String triggerName,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"outputSchema\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true } ], \"exampleOutput\" : \"{}\", \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true } ] }";
+                String exampleString = "{ \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"outputSchema\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true } ], \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"sampleOutput\" : \"{}\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true } ] }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -401,8 +634,8 @@ public interface ComponentDefinitionsApi {
      * GET /component-definitions/{componentName}/{componentVersion}/trigger-definitions : Get a list of trigger definitionss for a component.
      * Get a list of trigger definitionss for a component.
      *
-     * @param componentName The name of the component. (required)
-     * @param componentVersion The version of the component to get. (required)
+     * @param componentName The name of a component. (required)
+     * @param componentVersion The version of a component. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -422,8 +655,8 @@ public interface ComponentDefinitionsApi {
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<Flux<TriggerDefinitionBasicModel>>> getComponentTriggerDefinitions(
-        @Parameter(name = "componentName", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
-        @Parameter(name = "componentVersion", description = "The version of the component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
+        @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -436,6 +669,236 @@ public interface ComponentDefinitionsApi {
             }
         }
         return result.then(Mono.empty());
+
+    }
+
+
+    /**
+     * POST /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/editor-description : Get an trigger description shown in the editor.
+     * Get an trigger description shown in the editor.
+     *
+     * @param componentName The name of the component. (required)
+     * @param componentVersion The version of a component. (required)
+     * @param triggerName The name of a trigger. (required)
+     * @param componentOperationRequestModel  (optional)
+     * @return The editor description. (status code 200)
+     */
+    @Operation(
+        operationId = "getComponentTriggerEditorDescription",
+        summary = "Get an trigger description shown in the editor.",
+        description = "Get an trigger description shown in the editor.",
+        tags = { "trigger-definitions" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The editor description.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/editor-description",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default Mono<ResponseEntity<String>> getComponentTriggerEditorDescription(
+        @Parameter(name = "componentName", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
+        @Parameter(name = "triggerName", description = "The name of a trigger.", required = true, in = ParameterIn.PATH) @PathVariable("triggerName") String triggerName,
+        @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) Mono<ComponentOperationRequestModel> componentOperationRequestModel,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        return result.then(componentOperationRequestModel).then(Mono.empty());
+
+    }
+
+
+    /**
+     * POST /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/output-schema : Get a trigger output schema shown in the editor.
+     * Get a trigger output schema shown in the editor.
+     *
+     * @param componentName The name of the component. (required)
+     * @param componentVersion The version of a component. (required)
+     * @param triggerName The name of a trigger. (required)
+     * @param componentOperationRequestModel  (optional)
+     * @return The output schema. (status code 200)
+     */
+    @Operation(
+        operationId = "getComponentTriggerOutputSchema",
+        summary = "Get a trigger output schema shown in the editor.",
+        description = "Get a trigger output schema shown in the editor.",
+        tags = { "trigger-definitions" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The output schema.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PropertyModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/output-schema",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default Mono<ResponseEntity<Flux<PropertyModel>>> getComponentTriggerOutputSchema(
+        @Parameter(name = "componentName", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
+        @Parameter(name = "triggerName", description = "The name of a trigger.", required = true, in = ParameterIn.PATH) @PathVariable("triggerName") String triggerName,
+        @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) Mono<ComponentOperationRequestModel> componentOperationRequestModel,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
+            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                String exampleString = "[ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true } ]";
+                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
+                break;
+            }
+        }
+        return result.then(componentOperationRequestModel).then(Mono.empty());
+
+    }
+
+
+    /**
+     * POST /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/properties/{propertyName}/dynamic-properties : Get dynamic properties for a trigger property shown in the editor.
+     * Get dynamic properties for a trigger property shown in the editor.
+     *
+     * @param componentName The name of a component. (required)
+     * @param componentVersion The version of a component. (required)
+     * @param triggerName The name of a trigger. (required)
+     * @param propertyName The name of a property. (required)
+     * @param componentOperationRequestModel  (optional)
+     * @return The list of options. (status code 200)
+     */
+    @Operation(
+        operationId = "getComponentTriggerPropertyDynamicProperties",
+        summary = "Get dynamic properties for a trigger property shown in the editor.",
+        description = "Get dynamic properties for a trigger property shown in the editor.",
+        tags = { "trigger-definitions" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The list of options.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PropertyModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/properties/{propertyName}/dynamic-properties",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default Mono<ResponseEntity<Flux<PropertyModel>>> getComponentTriggerPropertyDynamicProperties(
+        @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
+        @Parameter(name = "triggerName", description = "The name of a trigger.", required = true, in = ParameterIn.PATH) @PathVariable("triggerName") String triggerName,
+        @Parameter(name = "propertyName", description = "The name of a property.", required = true, in = ParameterIn.PATH) @PathVariable("propertyName") String propertyName,
+        @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) Mono<ComponentOperationRequestModel> componentOperationRequestModel,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
+            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                String exampleString = "[ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"expressionDisabled\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true } ]";
+                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
+                break;
+            }
+        }
+        return result.then(componentOperationRequestModel).then(Mono.empty());
+
+    }
+
+
+    /**
+     * POST /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/properties/{propertyName}/options : Get an trigger description shown in the editor.
+     * Get an trigger description shown in the editor.
+     *
+     * @param componentName The name of the component. (required)
+     * @param componentVersion The version of a component. (required)
+     * @param triggerName The name of a trigger. (required)
+     * @param propertyName The name of a property. (required)
+     * @param componentOperationRequestModel  (optional)
+     * @return The list of options. (status code 200)
+     */
+    @Operation(
+        operationId = "getComponentTriggerPropertyOptions",
+        summary = "Get an trigger description shown in the editor.",
+        description = "Get an trigger description shown in the editor.",
+        tags = { "trigger-definitions" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The list of options.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = OptionModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/properties/{propertyName}/options",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default Mono<ResponseEntity<Flux<OptionModel>>> getComponentTriggerPropertyOptions(
+        @Parameter(name = "componentName", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
+        @Parameter(name = "triggerName", description = "The name of a trigger.", required = true, in = ParameterIn.PATH) @PathVariable("triggerName") String triggerName,
+        @Parameter(name = "propertyName", description = "The name of a property.", required = true, in = ParameterIn.PATH) @PathVariable("propertyName") String propertyName,
+        @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) Mono<ComponentOperationRequestModel> componentOperationRequestModel,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
+            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                String exampleString = "[ { \"displayCondition\" : \"displayCondition\", \"name\" : \"name\", \"description\" : \"description\", \"value\" : \"\" }, { \"displayCondition\" : \"displayCondition\", \"name\" : \"name\", \"description\" : \"description\", \"value\" : \"\" } ]";
+                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
+                break;
+            }
+        }
+        return result.then(componentOperationRequestModel).then(Mono.empty());
+
+    }
+
+
+    /**
+     * POST /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/sample-output : Get a trigger sample output shown in the editor.
+     * Get a trigger sample output shown in the editor.
+     *
+     * @param componentName The name of the component. (required)
+     * @param componentVersion The version of a component. (required)
+     * @param triggerName The name of a trigger. (required)
+     * @param componentOperationRequestModel  (optional)
+     * @return The output schema. (status code 200)
+     */
+    @Operation(
+        operationId = "getComponentTriggerSampleOutput",
+        summary = "Get a trigger sample output shown in the editor.",
+        description = "Get a trigger sample output shown in the editor.",
+        tags = { "trigger-definitions" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The output schema.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = Object.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/sample-output",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default Mono<ResponseEntity<Object>> getComponentTriggerSampleOutput(
+        @Parameter(name = "componentName", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
+        @Parameter(name = "triggerName", description = "The name of a trigger.", required = true, in = ParameterIn.PATH) @PathVariable("triggerName") String triggerName,
+        @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) Mono<ComponentOperationRequestModel> componentOperationRequestModel,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        return result.then(componentOperationRequestModel).then(Mono.empty());
 
     }
 
