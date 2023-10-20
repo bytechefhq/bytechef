@@ -91,7 +91,6 @@ public class AddLeadAction {
                 .required(false),
             bool("was_seen").label("Was_seen")
                 .description("A flag indicating whether the lead was seen by someone in the Pipedrive UI")
-                .options(option("True", true), option("False", false))
                 .required(false))
             .metadata(
                 Map.of(
