@@ -40,15 +40,15 @@ public class TriggerDefinitionServiceRSocketController {
         this.triggerDefinitionService = triggerDefinitionService;
     }
 
-    @MessageMapping("TriggerDefinitionService.getComponentTriggerDefinition")
-    public Mono<TriggerDefinitionDTO> getComponentTriggerDefinition(Map<String, Object> map) {
-        return triggerDefinitionService.getComponentTriggerDefinitionMono(
-            (String) map.get("componentName"), (Integer) map.get("componentVersion"), (String) map.get("actionName"));
+    @MessageMapping("TriggerDefinitionService.getTriggerDefinition")
+    public Mono<TriggerDefinitionDTO> getTriggerDefinitionMono(Map<String, Object> map) {
+        return triggerDefinitionService.getTriggerDefinitionMono(
+            (String) map.get("componentName"), (Integer) map.get("componentVersion"), (String) map.get("triggerName"));
     }
 
-    @MessageMapping("TriggerDefinitionService.getComponentTriggerDefinitions")
-    public Mono<List<TriggerDefinitionDTO>> getComponentTriggerDefinitions(Map<String, Object> map) {
-        return triggerDefinitionService.getComponentTriggerDefinitions(
+    @MessageMapping("TriggerDefinitionService.getTriggerDefinitions")
+    public Mono<List<TriggerDefinitionDTO>> getTriggerDefinitions(Map<String, Object> map) {
+        return triggerDefinitionService.getTriggerDefinitions(
             (String) map.get("componentName"), (Integer) map.get("componentVersion"));
     }
 }

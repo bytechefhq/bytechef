@@ -21,8 +21,8 @@ package com.bytechef.atlas.coordinator;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.dto.JobParameters;
-import com.bytechef.atlas.facade.JobFacade;
-import com.bytechef.atlas.facade.JobFacadeImpl;
+import com.bytechef.atlas.job.JobFactory;
+import com.bytechef.atlas.job.JobFactoryImpl;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
@@ -89,7 +89,7 @@ public class TaskCoordinatorIntTest {
     private ContextService contextService;
 
     @Autowired
-    private JobFacade jobFacade;
+    private JobFactory jobFactory;
 
     @Autowired
     private JobService jobService;
@@ -147,8 +147,8 @@ public class TaskCoordinatorIntTest {
         }
 
         @Bean
-        JobFacade jobFactory(ContextService contextService, JobService jobService) {
-            return new JobFacadeImpl(contextService, e -> {}, jobService, new SyncMessageBroker());
+        JobFactory jobFactory(ContextService contextService, JobService jobService) {
+            return new JobFactoryImpl(contextService, e -> {}, jobService, new SyncMessageBroker());
         }
 
         @Bean

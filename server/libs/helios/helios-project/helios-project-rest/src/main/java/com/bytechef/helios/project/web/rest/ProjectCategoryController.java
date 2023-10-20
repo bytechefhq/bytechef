@@ -19,7 +19,7 @@ package com.bytechef.helios.project.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.category.web.rest.model.CategoryModel;
-import com.bytechef.helios.project.facade.ProjectFacade;
+import com.bytechef.helios.project.ProjectFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;

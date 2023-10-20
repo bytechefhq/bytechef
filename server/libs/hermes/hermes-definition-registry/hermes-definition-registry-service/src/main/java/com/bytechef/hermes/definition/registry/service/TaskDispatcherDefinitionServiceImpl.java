@@ -58,16 +58,19 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
 
     @Override
     public Mono<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitionsMono() {
-        return Mono.just(CollectionUtils.map(taskDispatcherDefinitions, this::toTaskDispatcherDefinitionDTO));
+        return Mono.just(
+            taskDispatcherDefinitions.stream()
+                .map(this::toTaskDispatcherDefinitionDTO)
+                .toList());
     }
 
     @Override
     public Mono<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitionsMono(String name) {
         return Mono.just(
             CollectionUtils.map(
-                CollectionUtils.filter(
-                    taskDispatcherDefinitions,
-                    taskDispatcherDefinition -> Objects.equals(taskDispatcherDefinition.getName(), name)),
+                taskDispatcherDefinitions.stream()
+                    .filter(taskDispatcherDefinition -> Objects.equals(taskDispatcherDefinition.getName(), name))
+                    .toList(),
                 this::toTaskDispatcherDefinitionDTO));
     }
 

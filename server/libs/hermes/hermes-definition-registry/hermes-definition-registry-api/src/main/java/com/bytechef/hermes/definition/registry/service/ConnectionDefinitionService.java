@@ -51,9 +51,9 @@ public interface ConnectionDefinitionService {
     Authorization.AuthorizationType getAuthorizationType(
         String authorizationName, String componentName, int connectionVersion);
 
-    Mono<ConnectionDefinitionDTO> getComponentConnectionDefinitionMono(String componentName, int componentVersion);
+    Mono<ConnectionDefinitionDTO> getConnectionDefinitionMono(String componentName, int componentVersion);
 
-    Mono<List<ConnectionDefinitionDTO>> getComponentConnectionDefinitionsMono(String componentName, int version);
+    Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono(String componentName, int version);
 
     Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono();
 

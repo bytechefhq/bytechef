@@ -41,7 +41,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
 /**
  * @author Ivica Cardic
  */
-public class ComponentDefinitionServiceImpl implements ComponentDefinitionService {
+public class ComponentDefinitionServiceImpl implements ComponentDefinitionService, LocalComponentDefinitionService {
 
     private static final ComponentDefinition MANUAL_COMPONENT_DEFINITION = component("manual")
         .title("Manual")
@@ -62,12 +62,12 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public Mono<ComponentDefinitionDTO> getComponentDefinitionMono(String name, Integer version) {
+    public ComponentDefinition getComponentDefinition(String name, Integer version) {
         ComponentDefinition componentDefinition;
 
-        List<ComponentDefinition> filteredComponentDefinitions = CollectionUtils.filter(
-            componentDefinitions,
-            curComponentDefinition -> name.equalsIgnoreCase(curComponentDefinition.getName()));
+        List<ComponentDefinition> filteredComponentDefinitions = componentDefinitions.stream()
+            .filter(curComponentDefinition -> name.equalsIgnoreCase(curComponentDefinition.getName()))
+            .toList();
 
         if (version == null) {
             componentDefinition = filteredComponentDefinitions.get(filteredComponentDefinitions.size() - 1);
@@ -77,21 +77,29 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
                 curComponentDefinition -> version == curComponentDefinition.getVersion());
         }
 
-        return Mono.just(toComponentDefinitionDTO(componentDefinition));
+        return componentDefinition;
+    }
+
+    @Override
+    public Mono<ComponentDefinitionDTO> getComponentDefinitionMono(String name, Integer version) {
+        return Mono.just(toComponentDefinitionDTO(getComponentDefinition(name, version)));
     }
 
     @Override
     public Mono<List<ComponentDefinitionDTO>> getComponentDefinitionsMono() {
-        return Mono.just(CollectionUtils.map(componentDefinitions, this::toComponentDefinitionDTO));
+        return Mono.just(
+            componentDefinitions.stream()
+                .map(this::toComponentDefinitionDTO)
+                .toList());
     }
 
     @Override
     public Mono<List<ComponentDefinitionDTO>> getComponentDefinitionsMono(String name) {
         return Mono.just(
             CollectionUtils.map(
-                CollectionUtils.filter(
-                    componentDefinitions,
-                    componentDefinition -> Objects.equals(componentDefinition.getName(), name)),
+                componentDefinitions.stream()
+                    .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), name))
+                    .toList(),
                 this::toComponentDefinitionDTO));
     }
 

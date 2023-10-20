@@ -63,8 +63,7 @@ public class ComponentDefinitionServiceRSocketClient implements ComponentDefinit
                 .stream()
                 .map(serviceInstance -> RSocketUtils.getRSocketRequester(serviceInstance, rSocketRequesterBuilder)
                     .route("ComponentDefinitionService.getComponentDefinitions")
-                    .retrieveMono(
-                        new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
+                    .retrieveMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
                 .toList(),
             this::toComponentDefinitions);
     }
@@ -77,8 +76,7 @@ public class ComponentDefinitionServiceRSocketClient implements ComponentDefinit
                 .map(serviceInstance -> RSocketUtils.getRSocketRequester(serviceInstance, rSocketRequesterBuilder)
                     .route("ComponentDefinitionService.getComponentDefinitionsForName")
                     .data(name)
-                    .retrieveMono(
-                        new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
+                    .retrieveMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
                 .toList(),
             this::toComponentDefinitions);
     }

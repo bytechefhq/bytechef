@@ -18,7 +18,7 @@
 package com.bytechef.helios.project.job;
 
 import com.bytechef.atlas.dto.JobParameters;
-import com.bytechef.atlas.facade.JobFacade;
+import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.job.InstanceJobFactory;
@@ -30,14 +30,14 @@ import java.util.Objects;
 @Component
 public class ProjectInstanceJobFactory implements InstanceJobFactory {
 
-    private final JobFacade jobFacade;
+    private final JobFactory jobFactory;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceJobFactory(
-        JobFacade jobFacade, ProjectInstanceWorkflowService projectInstanceWorkflowService) {
+        JobFactory jobFactory, ProjectInstanceWorkflowService projectInstanceWorkflowService) {
 
-        this.jobFacade = jobFacade;
+        this.jobFactory = jobFactory;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
     }
 
@@ -47,7 +47,7 @@ public class ProjectInstanceJobFactory implements InstanceJobFactory {
         ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
             workflowId, instanceId);
 
-        long jobId = jobFacade.create(new JobParameters(projectInstanceWorkflow.getInputs(), workflowId));
+        long jobId = jobFactory.create(new JobParameters(projectInstanceWorkflow.getInputs(), workflowId));
 
         projectInstanceWorkflowService.addJob(Objects.requireNonNull(projectInstanceWorkflow.getId()), jobId);
 

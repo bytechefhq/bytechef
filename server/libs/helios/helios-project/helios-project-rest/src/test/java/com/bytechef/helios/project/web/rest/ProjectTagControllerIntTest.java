@@ -17,8 +17,8 @@
 
 package com.bytechef.helios.project.web.rest;
 
-import com.bytechef.helios.project.facade.ProjectFacade;
-import com.bytechef.helios.project.facade.ProjectInstanceFacade;
+import com.bytechef.helios.project.ProjectFacade;
+import com.bytechef.helios.project.ProjectInstanceFacade;
 import com.bytechef.helios.project.web.rest.config.ProjectRestTestConfiguration;
 import com.bytechef.tag.domain.Tag;
 import org.junit.jupiter.api.Assertions;

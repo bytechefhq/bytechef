@@ -17,7 +17,7 @@
 
 package com.bytechef.platform.config;
 
-import com.bytechef.hermes.definition.registry.rsocket.client.facade.ComponentDefinitionFacadeRSocketClient;
+import com.bytechef.hermes.definition.registry.rsocket.client.ComponentDefinitionFacadeRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ActionDefinitionServiceRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ComponentDefinitionServiceRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ConnectionDefinitionServiceRSocketClient;
