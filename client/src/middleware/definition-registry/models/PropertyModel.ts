@@ -19,6 +19,12 @@ import {
     DisplayOptionModelFromJSONTyped,
     DisplayOptionModelToJSON,
 } from './DisplayOptionModel';
+import type { PropertyTypeModel } from './PropertyTypeModel';
+import {
+    PropertyTypeModelFromJSON,
+    PropertyTypeModelFromJSONTyped,
+    PropertyTypeModelToJSON,
+} from './PropertyTypeModel';
 
 import {
      ArrayPropertyModelFromJSONTyped,
@@ -93,6 +99,12 @@ export interface PropertyModel {
      * @memberof PropertyModel
      */
     required?: boolean;
+    /**
+     * 
+     * @type {PropertyTypeModel}
+     * @memberof PropertyModel
+     */
+    type?: PropertyTypeModel;
 }
 
 /**
@@ -113,34 +125,34 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         return json;
     }
     if (!ignoreDiscriminator) {
-        if (json['type'] === 'ARRAY') {
+        if (json['modelType'] === 'ARRAY') {
             return ArrayPropertyModelFromJSONTyped(json, true);
         }
-        if (json['type'] === 'BOOLEAN') {
+        if (json['modelType'] === 'BOOLEAN') {
             return BooleanPropertyModelFromJSONTyped(json, true);
         }
-        if (json['type'] === 'DATE') {
+        if (json['modelType'] === 'DATE') {
             return DatePropertyModelFromJSONTyped(json, true);
         }
-        if (json['type'] === 'DATE_TIME') {
+        if (json['modelType'] === 'DATE_TIME') {
             return DateTimePropertyModelFromJSONTyped(json, true);
         }
-        if (json['type'] === 'INTEGER') {
+        if (json['modelType'] === 'INTEGER') {
             return IntegerPropertyModelFromJSONTyped(json, true);
         }
-        if (json['type'] === 'NULL') {
+        if (json['modelType'] === 'NULL') {
             return NullPropertyModelFromJSONTyped(json, true);
         }
-        if (json['type'] === 'NUMBER') {
+        if (json['modelType'] === 'NUMBER') {
             return NumberPropertyModelFromJSONTyped(json, true);
         }
-        if (json['type'] === 'OBJECT') {
+        if (json['modelType'] === 'OBJECT') {
             return ObjectPropertyModelFromJSONTyped(json, true);
         }
-        if (json['type'] === 'ONE_OF') {
+        if (json['modelType'] === 'ONE_OF') {
             return OneOfPropertyModelFromJSONTyped(json, true);
         }
-        if (json['type'] === 'STRING') {
+        if (json['modelType'] === 'STRING') {
             return StringPropertyModelFromJSONTyped(json, true);
         }
     }
@@ -155,6 +167,7 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         'name': !exists(json, 'name') ? undefined : json['name'],
         'placeholder': !exists(json, 'placeholder') ? undefined : json['placeholder'],
         'required': !exists(json, 'required') ? undefined : json['required'],
+        'type': !exists(json, 'type') ? undefined : PropertyTypeModelFromJSON(json['type']),
     };
 }
 
@@ -176,6 +189,7 @@ export function PropertyModelToJSON(value?: PropertyModel | null): any {
         'name': value.name,
         'placeholder': value.placeholder,
         'required': value.required,
+        'type': PropertyTypeModelToJSON(value.type),
     };
 }
 

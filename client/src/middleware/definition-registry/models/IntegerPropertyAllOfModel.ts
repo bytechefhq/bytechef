@@ -31,12 +31,6 @@ export interface IntegerPropertyAllOfModel {
      * @memberof IntegerPropertyAllOfModel
      */
     minValue?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof IntegerPropertyAllOfModel
-     */
-    type?: string;
 }
 
 /**
@@ -60,7 +54,6 @@ export function IntegerPropertyAllOfModelFromJSONTyped(json: any, ignoreDiscrimi
         
         'maxValue': !exists(json, 'maxValue') ? undefined : json['maxValue'],
         'minValue': !exists(json, 'minValue') ? undefined : json['minValue'],
-        'type': !exists(json, 'type') ? undefined : json['type'],
     };
 }
 
@@ -75,7 +68,6 @@ export function IntegerPropertyAllOfModelToJSON(value?: IntegerPropertyAllOfMode
         
         'maxValue': value.maxValue,
         'minValue': value.minValue,
-        'type': value.type,
     };
 }
 

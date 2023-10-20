@@ -25,6 +25,10 @@ import {
     ConnectionDefinitionModelToJSON,
 } from '../models';
 
+export interface GetComponentConnectionDefinitionsRequest {
+    componentName: string;
+}
+
 export interface GetConnectionDefinitionRequest {
     componentName: string;
     componentVersion: number;
@@ -34,6 +38,38 @@ export interface GetConnectionDefinitionRequest {
  * 
  */
 export class ConnectionDefinitionsApi extends runtime.BaseAPI {
+
+    /**
+     * Get all connection definitions for a component.
+     * Get all connection definitions for a component.
+     */
+    async getComponentConnectionDefinitionsRaw(requestParameters: GetComponentConnectionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConnectionDefinitionBasicModel>>> {
+        if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
+            throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentConnectionDefinitions.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/connection-definitions/{componentName}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters.componentName))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ConnectionDefinitionBasicModelFromJSON));
+    }
+
+    /**
+     * Get all connection definitions for a component.
+     * Get all connection definitions for a component.
+     */
+    async getComponentConnectionDefinitions(requestParameters: GetComponentConnectionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ConnectionDefinitionBasicModel>> {
+        const response = await this.getComponentConnectionDefinitionsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Get a connection definition of a component definition.

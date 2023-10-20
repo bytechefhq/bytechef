@@ -38,7 +38,7 @@ export interface GetConnectionRequest {
 
 export interface GetConnectionsRequest {
     componentNames?: Array<string>;
-    tagId?: Array<number>;
+    tagIds?: Array<number>;
 }
 
 export interface PostConnectionRequest {
@@ -157,8 +157,8 @@ export class ConnectionsApi extends runtime.BaseAPI {
             queryParameters['componentNames'] = requestParameters.componentNames;
         }
 
-        if (requestParameters.tagId) {
-            queryParameters['tagId'] = requestParameters.tagId;
+        if (requestParameters.tagIds) {
+            queryParameters['tagIds'] = requestParameters.tagIds;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

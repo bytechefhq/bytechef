@@ -25,6 +25,12 @@ import {
     PropertyOptionModelFromJSONTyped,
     PropertyOptionModelToJSON,
 } from './PropertyOptionModel';
+import type { PropertyTypeModel } from './PropertyTypeModel';
+import {
+    PropertyTypeModelFromJSON,
+    PropertyTypeModelFromJSONTyped,
+    PropertyTypeModelToJSON,
+} from './PropertyTypeModel';
 import type { ValuePropertyModel } from './ValuePropertyModel';
 import {
     ValuePropertyModelFromJSON,
@@ -38,12 +44,6 @@ import {
  * @interface DatePropertyModel
  */
 export interface DatePropertyModel extends ValuePropertyModel {
-    /**
-     * 
-     * @type {string}
-     * @memberof DatePropertyModel
-     */
-    type: string;
 }
 
 /**
@@ -51,7 +51,6 @@ export interface DatePropertyModel extends ValuePropertyModel {
  */
 export function instanceOfDatePropertyModel(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "type" in value;
 
     return isInstance;
 }
@@ -61,25 +60,10 @@ export function DatePropertyModelFromJSON(json: any): DatePropertyModel {
 }
 
 export function DatePropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): DatePropertyModel {
-    if ((json === undefined) || (json === null)) {
-        return json;
-    }
-    return {
-        ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
-        'type': json['type'],
-    };
+    return json;
 }
 
 export function DatePropertyModelToJSON(value?: DatePropertyModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
-    }
-    return {
-        ...ValuePropertyModelToJSON(value),
-        'type': value.type,
-    };
+    return value;
 }
 

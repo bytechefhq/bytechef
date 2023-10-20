@@ -25,6 +25,12 @@ import {
     PropertyModelFromJSONTyped,
     PropertyModelToJSON,
 } from './PropertyModel';
+import type { PropertyTypeModel } from './PropertyTypeModel';
+import {
+    PropertyTypeModelFromJSON,
+    PropertyTypeModelFromJSONTyped,
+    PropertyTypeModelToJSON,
+} from './PropertyTypeModel';
 
 /**
  * A null property type.
@@ -32,12 +38,6 @@ import {
  * @interface NullPropertyModel
  */
 export interface NullPropertyModel extends PropertyModel {
-    /**
-     * 
-     * @type {string}
-     * @memberof NullPropertyModel
-     */
-    type: string;
 }
 
 /**
@@ -45,7 +45,6 @@ export interface NullPropertyModel extends PropertyModel {
  */
 export function instanceOfNullPropertyModel(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "type" in value;
 
     return isInstance;
 }
@@ -55,25 +54,10 @@ export function NullPropertyModelFromJSON(json: any): NullPropertyModel {
 }
 
 export function NullPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): NullPropertyModel {
-    if ((json === undefined) || (json === null)) {
-        return json;
-    }
-    return {
-        ...PropertyModelFromJSONTyped(json, ignoreDiscriminator),
-        'type': json['type'],
-    };
+    return json;
 }
 
 export function NullPropertyModelToJSON(value?: NullPropertyModel | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
-    }
-    return {
-        ...PropertyModelToJSON(value),
-        'type': value.type,
-    };
+    return value;
 }
 
