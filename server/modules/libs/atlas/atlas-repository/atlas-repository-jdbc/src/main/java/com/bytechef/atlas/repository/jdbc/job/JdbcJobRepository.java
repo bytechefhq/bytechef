@@ -181,12 +181,12 @@ public class JdbcJobRepository implements JobRepository {
     }
 
     protected MapSqlParameterSource createSqlParameterSource(Job job) {
-        SimpleJob simpleJob = new SimpleJob(job);
-
         Assert.notNull(job, "job must not be null");
         Assert.notNull(job.getId(), "job id must not be null");
         Assert.notNull(job.getCreateTime(), "job createTime must not be null");
         Assert.notNull(job.getStatus(), "job status must not be null");
+
+        SimpleJob simpleJob = new SimpleJob(job);
 
         MapSqlParameterSource sqlParameterSource = new MapSqlParameterSource();
 
