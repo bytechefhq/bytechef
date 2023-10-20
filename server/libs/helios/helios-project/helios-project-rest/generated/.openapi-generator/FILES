@@ -18,8 +18,10 @@ src/main/java/com/bytechef/helios/project/web/rest/model/ProjectExecutionBasicMo
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectExecutionModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectInstanceBasicModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectInstanceModel.java
+src/main/java/com/bytechef/helios/project/web/rest/model/ProjectInstanceProjectModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectInstanceWorkflowConnectionModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectInstanceWorkflowModel.java
+src/main/java/com/bytechef/helios/project/web/rest/model/ProjectInstanceWorkflowProjectInstanceModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/UpdateTagsRequestModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/WebhookModel.java

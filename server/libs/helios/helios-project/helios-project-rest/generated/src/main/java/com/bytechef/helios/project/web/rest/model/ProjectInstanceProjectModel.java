@@ -19,47 +19,41 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * Represents an execution of a workflow.
+ * ProjectInstanceProjectModel
  */
 
-@Schema(name = "JobBasic", description = "Represents an execution of a workflow.")
-@JsonTypeName("JobBasic")
+@JsonTypeName("ProjectInstance_project")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T12:16:52.208086+02:00[Europe/Zagreb]")
-public class JobBasicModel {
+public class ProjectInstanceProjectModel {
 
   private String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime endDate;
+  private String description;
 
-  private String id;
-
-  private String label;
+  private Long id;
 
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
+  private String name;
+
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime startDate;
+  private LocalDateTime publishedDate;
+
+  private Integer projectVersion;
 
   /**
-   * The job's status.
+   * The status of a project.
    */
   public enum StatusEnum {
-    CREATED("CREATED"),
+    PUBLISHED("PUBLISHED"),
     
-    STARTED("STARTED"),
-    
-    STOPPED("STOPPED"),
-    
-    FAILED("FAILED"),
-    
-    COMPLETED("COMPLETED");
+    UNPUBLISHED("UNPUBLISHED");
 
     private String value;
 
@@ -92,21 +86,21 @@ public class JobBasicModel {
 
   /**
    * Default constructor
-   * @deprecated Use {@link JobBasicModel#JobBasicModel(StatusEnum)}
+   * @deprecated Use {@link ProjectInstanceProjectModel#ProjectInstanceProjectModel(String)}
    */
   @Deprecated
-  public JobBasicModel() {
+  public ProjectInstanceProjectModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public JobBasicModel(StatusEnum status) {
-    this.status = status;
+  public ProjectInstanceProjectModel(String name) {
+    this.name = name;
   }
 
-  public JobBasicModel createdBy(String createdBy) {
+  public ProjectInstanceProjectModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -126,7 +120,7 @@ public class JobBasicModel {
     this.createdBy = createdBy;
   }
 
-  public JobBasicModel createdDate(LocalDateTime createdDate) {
+  public ProjectInstanceProjectModel createdDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -146,67 +140,47 @@ public class JobBasicModel {
     this.createdDate = createdDate;
   }
 
-  public JobBasicModel endDate(LocalDateTime endDate) {
-    this.endDate = endDate;
+  public ProjectInstanceProjectModel description(String description) {
+    this.description = description;
     return this;
   }
 
   /**
-   * The time execution entered end status COMPLETED, STOPPED, FAILED
-   * @return endDate
+   * The description of a project.
+   * @return description
   */
-  @Valid 
-  @Schema(name = "endDate", description = "The time execution entered end status COMPLETED, STOPPED, FAILED", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("endDate")
-  public LocalDateTime getEndDate() {
-    return endDate;
+  
+  @Schema(name = "description", description = "The description of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
   }
 
-  public void setEndDate(LocalDateTime endDate) {
-    this.endDate = endDate;
+  public void setDescription(String description) {
+    this.description = description;
   }
 
-  public JobBasicModel id(String id) {
+  public ProjectInstanceProjectModel id(Long id) {
     this.id = id;
     return this;
   }
 
   /**
-   * Id of the job.
+   * The id of a project.
    * @return id
   */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "Id of the job.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
-  public String getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
-  public JobBasicModel label(String label) {
-    this.label = label;
-    return this;
-  }
-
-  /**
-   * The job's human-readable name.
-   * @return label
-  */
-  
-  @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The job's human-readable name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("label")
-  public String getLabel() {
-    return label;
-  }
-
-  public void setLabel(String label) {
-    this.label = label;
-  }
-
-  public JobBasicModel lastModifiedBy(String lastModifiedBy) {
+  public ProjectInstanceProjectModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -226,7 +200,7 @@ public class JobBasicModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public JobBasicModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public ProjectInstanceProjectModel lastModifiedDate(LocalDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -246,37 +220,77 @@ public class JobBasicModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public JobBasicModel startDate(LocalDateTime startDate) {
-    this.startDate = startDate;
+  public ProjectInstanceProjectModel name(String name) {
+    this.name = name;
     return this;
   }
 
   /**
-   * The time of when the job began.
-   * @return startDate
+   * The name of a project.
+   * @return name
+  */
+  @NotNull 
+  @Schema(name = "name", description = "The name of a project.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("name")
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public ProjectInstanceProjectModel publishedDate(LocalDateTime publishedDate) {
+    this.publishedDate = publishedDate;
+    return this;
+  }
+
+  /**
+   * The published date.
+   * @return publishedDate
   */
   @Valid 
-  @Schema(name = "startDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time of when the job began.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("startDate")
-  public LocalDateTime getStartDate() {
-    return startDate;
+  @Schema(name = "publishedDate", description = "The published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("publishedDate")
+  public LocalDateTime getPublishedDate() {
+    return publishedDate;
   }
 
-  public void setStartDate(LocalDateTime startDate) {
-    this.startDate = startDate;
+  public void setPublishedDate(LocalDateTime publishedDate) {
+    this.publishedDate = publishedDate;
   }
 
-  public JobBasicModel status(StatusEnum status) {
+  public ProjectInstanceProjectModel projectVersion(Integer projectVersion) {
+    this.projectVersion = projectVersion;
+    return this;
+  }
+
+  /**
+   * The version of a project.
+   * @return projectVersion
+  */
+  
+  @Schema(name = "projectVersion", description = "The version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectVersion")
+  public Integer getProjectVersion() {
+    return projectVersion;
+  }
+
+  public void setProjectVersion(Integer projectVersion) {
+    this.projectVersion = projectVersion;
+  }
+
+  public ProjectInstanceProjectModel status(StatusEnum status) {
     this.status = status;
     return this;
   }
 
   /**
-   * The job's status.
+   * The status of a project.
    * @return status
   */
   
-  @Schema(name = "status", accessMode = Schema.AccessMode.READ_ONLY, description = "The job's status.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "status", description = "The status of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("status")
   public StatusEnum getStatus() {
     return status;
@@ -294,35 +308,37 @@ public class JobBasicModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    JobBasicModel jobBasic = (JobBasicModel) o;
-    return Objects.equals(this.createdBy, jobBasic.createdBy) &&
-        Objects.equals(this.createdDate, jobBasic.createdDate) &&
-        Objects.equals(this.endDate, jobBasic.endDate) &&
-        Objects.equals(this.id, jobBasic.id) &&
-        Objects.equals(this.label, jobBasic.label) &&
-        Objects.equals(this.lastModifiedBy, jobBasic.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, jobBasic.lastModifiedDate) &&
-        Objects.equals(this.startDate, jobBasic.startDate) &&
-        Objects.equals(this.status, jobBasic.status);
+    ProjectInstanceProjectModel projectInstanceProject = (ProjectInstanceProjectModel) o;
+    return Objects.equals(this.createdBy, projectInstanceProject.createdBy) &&
+        Objects.equals(this.createdDate, projectInstanceProject.createdDate) &&
+        Objects.equals(this.description, projectInstanceProject.description) &&
+        Objects.equals(this.id, projectInstanceProject.id) &&
+        Objects.equals(this.lastModifiedBy, projectInstanceProject.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, projectInstanceProject.lastModifiedDate) &&
+        Objects.equals(this.name, projectInstanceProject.name) &&
+        Objects.equals(this.publishedDate, projectInstanceProject.publishedDate) &&
+        Objects.equals(this.projectVersion, projectInstanceProject.projectVersion) &&
+        Objects.equals(this.status, projectInstanceProject.status);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, endDate, id, label, lastModifiedBy, lastModifiedDate, startDate, status);
+    return Objects.hash(createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, name, publishedDate, projectVersion, status);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class JobBasicModel {\n");
+    sb.append("class ProjectInstanceProjectModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
-    sb.append("    endDate: ").append(toIndentedString(endDate)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
-    sb.append("    startDate: ").append(toIndentedString(startDate)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    publishedDate: ").append(toIndentedString(publishedDate)).append("\n");
+    sb.append("    projectVersion: ").append(toIndentedString(projectVersion)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("}");
     return sb.toString();

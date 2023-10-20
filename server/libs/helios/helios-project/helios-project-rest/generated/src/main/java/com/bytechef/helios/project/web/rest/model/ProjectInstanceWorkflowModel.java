@@ -2,8 +2,8 @@ package com.bytechef.helios.project.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.helios.project.web.rest.model.ProjectInstanceBasicModel;
 import com.bytechef.helios.project.web.rest.model.ProjectInstanceWorkflowConnectionModel;
+import com.bytechef.helios.project.web.rest.model.ProjectInstanceWorkflowProjectInstanceModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T05:37:23.076362+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T12:16:52.208086+02:00[Europe/Zagreb]")
 public class ProjectInstanceWorkflowModel {
 
   @Valid
@@ -55,7 +55,7 @@ public class ProjectInstanceWorkflowModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
-  private ProjectInstanceBasicModel projectInstance;
+  private ProjectInstanceWorkflowProjectInstanceModel projectInstance;
 
   private Long projectInstanceId;
 
@@ -259,7 +259,7 @@ public class ProjectInstanceWorkflowModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public ProjectInstanceWorkflowModel projectInstance(ProjectInstanceBasicModel projectInstance) {
+  public ProjectInstanceWorkflowModel projectInstance(ProjectInstanceWorkflowProjectInstanceModel projectInstance) {
     this.projectInstance = projectInstance;
     return this;
   }
@@ -271,11 +271,11 @@ public class ProjectInstanceWorkflowModel {
   @Valid 
   @Schema(name = "projectInstance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectInstance")
-  public ProjectInstanceBasicModel getProjectInstance() {
+  public ProjectInstanceWorkflowProjectInstanceModel getProjectInstance() {
     return projectInstance;
   }
 
-  public void setProjectInstance(ProjectInstanceBasicModel projectInstance) {
+  public void setProjectInstance(ProjectInstanceWorkflowProjectInstanceModel projectInstance) {
     this.projectInstance = projectInstance;
   }
 
