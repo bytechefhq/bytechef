@@ -23,7 +23,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
+import static com.bytechef.hermes.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.petstore.property.PetstorePetProperties;
 import com.bytechef.hermes.component.definition.ComponentDSL;

@@ -23,8 +23,8 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
-import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
+import static com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
+import static com.bytechef.hermes.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.petstore.property.PetstoreApiResponseProperties;
 import com.bytechef.hermes.component.definition.ComponentDSL;
