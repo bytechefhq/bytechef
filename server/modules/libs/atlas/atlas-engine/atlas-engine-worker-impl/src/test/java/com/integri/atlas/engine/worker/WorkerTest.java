@@ -20,7 +20,6 @@ package com.integri.atlas.engine.worker;
 
 import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.message.broker.Queues;
-import com.integri.atlas.engine.core.message.broker.SyncMessageBroker;
 import com.integri.atlas.engine.core.task.CancelTask;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
@@ -28,6 +27,7 @@ import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
 import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolver;
 import com.integri.atlas.engine.worker.task.map.MapTaskHandlerAdapter;
+import com.integri.atlas.message.broker.sync.SyncMessageBroker;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
