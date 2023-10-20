@@ -17,11 +17,53 @@
 
 package com.bytechef.hermes.data.storage.service;
 
+import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.data.storage.domain.DataStorage;
+import com.bytechef.hermes.data.storage.domain.DataStorage.Scope;
+import com.bytechef.hermes.data.storage.repository.DataStorageRepository;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-@Service
+@Service("dataStorageService")
+@Transactional
 public class DataStorageServiceImpl implements DataStorageService {
+
+    private final DataStorageRepository dataStorageRepository;
+
+    @SuppressFBWarnings("EI")
+    public DataStorageServiceImpl(DataStorageRepository dataStorageRepository) {
+        this.dataStorageRepository = dataStorageRepository;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true)
+    public <T> Optional<T> fetchValue(Scope scope, long scopeId, String key) {
+        return dataStorageRepository.findByScopeAndScopeIdAndKey(
+            scope.getId(), scopeId, key)
+            .map(dataStorage -> (T) dataStorage.getValue());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DataStorage getDataStorage(long id) {
+        return OptionalUtils.get(dataStorageRepository.findById(id));
+    }
+
+    @Override
+    public void save(Scope scope, Long scopeId, String key, Object value) {
+        dataStorageRepository
+            .findByScopeAndScopeIdAndKey(scope.getId(), scopeId, key)
+            .ifPresentOrElse(dataStorage -> {
+                dataStorage.setValue(value);
+
+                dataStorageRepository.save(dataStorage);
+            }, () -> dataStorageRepository.save(new DataStorage(key, scope.getId(), scopeId, value)));
+    }
 }

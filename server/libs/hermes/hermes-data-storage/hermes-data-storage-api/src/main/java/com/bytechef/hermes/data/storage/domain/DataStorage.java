@@ -25,6 +25,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -32,6 +33,7 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
+@Table("data_storage")
 public class DataStorage implements Persistable<Long> {
 
     public enum Scope {
@@ -95,13 +97,20 @@ public class DataStorage implements Persistable<Long> {
     @Column("scope_id")
     private Long scopeId;
 
-    @Version
+    @Column
     private Object value;
 
     @Version
     private int version;
 
     public DataStorage() {
+    }
+
+    public DataStorage(String key, int scope, Long scopeId, Object value) {
+        this.key = key;
+        this.scope = scope;
+        this.scopeId = scopeId;
+        this.value = value;
     }
 
     public String getCreatedBy() {

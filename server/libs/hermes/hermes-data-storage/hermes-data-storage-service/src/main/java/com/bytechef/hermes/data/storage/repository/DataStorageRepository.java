@@ -18,9 +18,13 @@
 package com.bytechef.hermes.data.storage.repository;
 
 import com.bytechef.hermes.data.storage.domain.DataStorage;
+import org.springframework.data.relational.core.sql.LockMode;
+import org.springframework.data.relational.repository.Lock;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -28,4 +32,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DataStorageRepository
     extends ListPagingAndSortingRepository<DataStorage, Long>, ListCrudRepository<DataStorage, Long> {
+
+    @Lock(LockMode.PESSIMISTIC_WRITE)
+    Optional<DataStorage> findByScopeAndScopeIdAndKey(int scope, long scopeId, String key);
 }

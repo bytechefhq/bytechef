@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.component.registrar.task.handler;
 
+import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
@@ -24,28 +25,58 @@ import com.bytechef.hermes.component.ContextImpl;
 import com.bytechef.hermes.component.InputParametersImpl;
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestFunction;
 import com.bytechef.hermes.component.definition.TriggerDefinition.PollFunction;
+import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestFunction;
-import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookHeaders;
+import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
+import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookParameters;
+import com.bytechef.hermes.component.definition.WebhookBodyImpl;
+import com.bytechef.hermes.component.definition.WebhookHeadersImpl;
+import com.bytechef.hermes.component.definition.WebhookParametersImpl;
 import com.bytechef.hermes.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.data.storage.domain.DataStorage.Scope;
+import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import com.bytechef.hermes.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.excepton.TriggerExecutionException;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
+import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public class DefaultComponentTriggerTaskHandler implements TriggerHandler {
+public class DefaultComponentTriggerTaskHandler implements TriggerHandler<Object> {
+
+    static {
+        MapValueUtils.addConverter(new WebhookBodyImpl.WebhookBodyConverter());
+        MapValueUtils.addConverter(new WebhookHeadersImpl.WebhookHeadersConverter());
+        MapValueUtils.addConverter(new WebhookParametersImpl.WebhookParametersConverter());
+    }
+
+    private static final String BODY = "body";
+    private static final String HEADERS = "headers";
+    private static final String METHOD = "method";
+    private static final String PARAMETERS = "parameters";
+    private static final String PATH = "path";
 
     private final ComponentDefinitionFactory componentDefinitionFactory;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
+    private final DataStorageService datStorageService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
     private final TriggerDefinition triggerDefinition;
@@ -53,19 +84,20 @@ public class DefaultComponentTriggerTaskHandler implements TriggerHandler {
     @SuppressFBWarnings("EI")
     public DefaultComponentTriggerTaskHandler(
         ComponentDefinitionFactory componentDefinitionFactory, ConnectionDefinitionService connectionDefinitionService,
-        ConnectionService connectionService, EventPublisher eventPublisher, FileStorageService fileStorageService,
-        TriggerDefinition triggerDefinition) {
+        ConnectionService connectionService, DataStorageService datStorageService, EventPublisher eventPublisher,
+        FileStorageService fileStorageService, TriggerDefinition triggerDefinition) {
 
         this.componentDefinitionFactory = componentDefinitionFactory;
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
+        this.datStorageService = datStorageService;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
         this.triggerDefinition = triggerDefinition;
     }
 
     @Override
-    public TriggerOutput handle(TriggerExecution triggerExecution) throws TriggerExecutionException {
+    public Object handle(TriggerExecution triggerExecution) throws TriggerExecutionException {
         TriggerContext context = new ContextImpl(
             connectionDefinitionService, connectionService, eventPublisher, fileStorageService,
             triggerExecution.getParameters(), null);
@@ -74,45 +106,84 @@ public class DefaultComponentTriggerTaskHandler implements TriggerHandler {
             context, componentDefinitionFactory.getDefinition(), () -> doHandle(triggerExecution, context));
     }
 
-    private TriggerOutput doHandle(TriggerExecution triggerExecution, TriggerContext triggerContext)
+    private Object doHandle(TriggerExecution triggerExecution, TriggerContext triggerContext)
         throws TriggerExecutionException {
-
+        Object output;
         TriggerType triggerType = triggerDefinition.getType();
+        WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
         try {
             if (TriggerType.DYNAMIC_WEBHOOK == triggerType) {
                 DynamicWebhookRequestFunction dynamicWebhookRequestFunction = OptionalUtils.get(
                     triggerDefinition.getDynamicWebhookRequest());
 
-                // TODO
+                WebhookOutput webhookOutput = dynamicWebhookRequestFunction.apply(
+                    new DynamicWebhookRequestContext(
+                        triggerContext, new InputParametersImpl(triggerExecution.getParameters()),
+                        MapValueUtils.get(triggerExecution.getParameters(), HEADERS, WebhookHeaders.class),
+                        MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
+                        MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
+                        MapValueUtils.getRequiredString(triggerExecution.getParameters(), PATH),
+                        MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class),
+                        OptionalUtils.orElse(
+                            datStorageService.fetchValue(
+                                Scope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(),
+                                workflowExecutionId.toString()),
+                            null)));
 
-                return dynamicWebhookRequestFunction.apply(
-                    new DynamicWebhookRequestFunction.Context(
-                        triggerContext, new InputParametersImpl(triggerExecution.getParameters()), null, null, null,
-                        null, null, null));
+                output = webhookOutput.getValue();
             } else if (TriggerType.STATIC_WEBHOOK == triggerType) {
                 StaticWebhookRequestFunction staticWebhookRequestFunction = OptionalUtils.get(
                     triggerDefinition.getStaticWebhookRequest());
 
-                // TODO
+                WebhookOutput webhookOutput = staticWebhookRequestFunction.apply(
+                    new StaticWebhookRequestContext(
+                        triggerContext, new InputParametersImpl(triggerExecution.getParameters()),
+                        MapValueUtils.get(triggerExecution.getParameters(), HEADERS, WebhookHeaders.class),
+                        MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
+                        MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
+                        MapValueUtils.getRequiredString(triggerExecution.getParameters(), PATH),
+                        MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class)));
 
-                return staticWebhookRequestFunction.apply(
-                    new StaticWebhookRequestFunction.Context(
-                        triggerContext,
-                        new InputParametersImpl(triggerExecution.getParameters()), null, null, null, null, null));
+                output = webhookOutput.getValue();
             } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID == triggerType) {
                 PollFunction pollFunction = OptionalUtils.get(triggerDefinition.getPoll());
 
-                // TODO
+                TriggerDefinition.PollOutput pollOutput = pollFunction.apply(
+                    new TriggerDefinition.PollContext(
+                        triggerContext, new InputParametersImpl(triggerExecution.getParameters()),
+                        OptionalUtils.orElse(
+                            datStorageService.fetchValue(
+                                Scope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(),
+                                workflowExecutionId.toString()),
+                            null)));
 
-                return pollFunction.apply(
-                    new PollFunction.Context(triggerContext, new InputParametersImpl(triggerExecution.getParameters()),
-                        null));
+                List<Map<?, ?>> records = new ArrayList<>(
+                    pollOutput.records() == null ? Collections.emptyList() : pollOutput.records());
+
+                while (pollOutput.pollImmediately()) {
+                    pollOutput = pollFunction.apply(
+                        new TriggerDefinition.PollContext(
+                            triggerContext, new InputParametersImpl(triggerExecution.getParameters()),
+                            pollOutput.closureParameters()));
+
+                    records.addAll(pollOutput.records());
+                }
+
+                if (pollOutput.closureParameters() != null) {
+                    datStorageService.save(
+                        Scope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(), workflowExecutionId.toString(),
+                        pollOutput.closureParameters());
+                }
+
+                output = records;
             } else {
                 throw new TriggerExecutionException("Unknown trigger type: " + triggerType);
             }
         } catch (Exception e) {
             throw new TriggerExecutionException(e.getMessage(), e);
         }
+
+        return output;
     }
 }

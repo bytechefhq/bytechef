@@ -32,6 +32,7 @@ import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.StringPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.TimePropertyModel;
 import org.mapstruct.Mapper;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.CollectionUtils;
 
@@ -127,11 +128,15 @@ public interface PropertyMapper extends Converter<Property<?>, PropertyModel>, P
 
     TimePropertyModel map(Property.TimeProperty timeProperty);
 
-    default Boolean mapOptionalBoolean(Optional<Boolean> optional) {
+    default Boolean mapToBoolean(Optional<Boolean> optional) {
         return optional.orElse(null);
     }
 
-    default String mapOptionalString(Optional<String> optional) {
+    default JsonNullable<Object> mapToJsonNullable(Object value) {
+        return JsonNullable.of(value);
+    }
+
+    default String mapToString(Optional<String> optional) {
         return optional.orElse(null);
     }
 
