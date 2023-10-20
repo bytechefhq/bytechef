@@ -1,0 +1,152 @@
+{
+  "actions": [ {
+    "batch": false,
+    "display": {
+      "description": "Send a new RabbitMQ message.",
+      "title": "Send Message"
+    },
+    "name": "sendMessage",
+    "properties": [ {
+      "description": "The name of the queue to read from",
+      "required": true,
+      "name": "queue",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "description": "The name of the queue to read from",
+      "required": true,
+      "name": "message",
+      "type": "ONE_OF",
+      "types": [ {
+        "type": "ARRAY",
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "type": "DATE",
+        "controlType": "DATE"
+      }, {
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "type": "NUMBER",
+        "controlType": "INPUT_NUMBER"
+      }, {
+        "type": "OBJECT",
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ]
+    } ]
+  } ],
+  "connection": {
+    "authorizationRequired": false,
+    "display": {
+      "description": "RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system.",
+      "title": "RabbitMQ"
+    },
+    "name": "rabbitMQ",
+    "properties": [ {
+      "required": true,
+      "name": "hostname",
+      "type": "STRING",
+      "defaultValue": "localhost",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "required": true,
+      "name": "port",
+      "type": "INTEGER",
+      "defaultValue": 5672,
+      "controlType": "INPUT_INTEGER"
+    }, {
+      "name": "username",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "name": "password",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ],
+    "version": 1
+  },
+  "display": {
+    "description": "RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system.",
+    "title": "RabbitMQ"
+  },
+  "name": "rabbitMQ",
+  "version": 1,
+  "triggers": [ {
+    "batch": false,
+    "deduplicate": {
+      "empty": true,
+      "present": false
+    },
+    "display": {
+      "description": "Triggers on new RabbitMQ messages.",
+      "title": "New Message"
+    },
+    "dynamicWebhookDisable": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookEnable": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRefresh": {
+      "empty": true,
+      "present": false
+    },
+    "dynamicWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "executeWorkflowSynchronously": false,
+    "help": {
+      "empty": true,
+      "present": false
+    },
+    "listenerEnable": {
+      "empty": false,
+      "present": true
+    },
+    "listenerDisable": {
+      "empty": false,
+      "present": true
+    },
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    } ],
+    "name": "newMessage",
+    "poll": {
+      "empty": true,
+      "present": false
+    },
+    "properties": [ {
+      "description": "The name of the queue to read from",
+      "required": true,
+      "name": "queue",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ],
+    "staticWebhookRequest": {
+      "empty": true,
+      "present": false
+    },
+    "type": "LISTENER",
+    "webhookBodyRaw": false,
+    "webhookValidate": {
+      "empty": true,
+      "present": false
+    }
+  } ]
+}
