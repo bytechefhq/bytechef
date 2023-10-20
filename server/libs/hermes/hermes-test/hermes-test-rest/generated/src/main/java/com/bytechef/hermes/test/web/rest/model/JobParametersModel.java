@@ -1,9 +1,8 @@
-package com.bytechef.hermes.execution.web.rest.model;
+package com.bytechef.hermes.test.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.execution.web.rest.model.JobConnectionModel;
-import com.bytechef.hermes.execution.web.rest.model.WebhookModel;
+import com.bytechef.hermes.test.web.rest.model.JobConnectionModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -27,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobParameters", description = "Defines parameters used to execute a job.")
 @JsonTypeName("JobParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-05T16:00:49.491777+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T08:22:57.875357+02:00[Europe/Zagreb]")
 public class JobParametersModel {
 
   @Valid
@@ -38,14 +37,7 @@ public class JobParametersModel {
 
   private String label;
 
-  private String parentTaskExecutionId;
-
-  private Integer priority;
-
   private String workflowId;
-
-  @Valid
-  private List<@Valid WebhookModel> webhooks;
 
   /**
    * Default constructor
@@ -139,46 +131,6 @@ public class JobParametersModel {
     this.label = label;
   }
 
-  public JobParametersModel parentTaskExecutionId(String parentTaskExecutionId) {
-    this.parentTaskExecutionId = parentTaskExecutionId;
-    return this;
-  }
-
-  /**
-   * The id of the parent task that created this job. Used for sub-flows.
-   * @return parentTaskExecutionId
-  */
-  
-  @Schema(name = "parentTaskExecutionId", description = "The id of the parent task that created this job. Used for sub-flows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("parentTaskExecutionId")
-  public String getParentTaskExecutionId() {
-    return parentTaskExecutionId;
-  }
-
-  public void setParentTaskExecutionId(String parentTaskExecutionId) {
-    this.parentTaskExecutionId = parentTaskExecutionId;
-  }
-
-  public JobParametersModel priority(Integer priority) {
-    this.priority = priority;
-    return this;
-  }
-
-  /**
-   * The priority value used during execution of individual tasks.
-   * @return priority
-  */
-  
-  @Schema(name = "priority", description = "The priority value used during execution of individual tasks.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("priority")
-  public Integer getPriority() {
-    return priority;
-  }
-
-  public void setPriority(Integer priority) {
-    this.priority = priority;
-  }
-
   public JobParametersModel workflowId(String workflowId) {
     this.workflowId = workflowId;
     return this;
@@ -199,34 +151,6 @@ public class JobParametersModel {
     this.workflowId = workflowId;
   }
 
-  public JobParametersModel webhooks(List<@Valid WebhookModel> webhooks) {
-    this.webhooks = webhooks;
-    return this;
-  }
-
-  public JobParametersModel addWebhooksItem(WebhookModel webhooksItem) {
-    if (this.webhooks == null) {
-      this.webhooks = new ArrayList<>();
-    }
-    this.webhooks.add(webhooksItem);
-    return this;
-  }
-
-  /**
-   * The list of webhooks to register to receive notifications for certain events.
-   * @return webhooks
-  */
-  @Valid 
-  @Schema(name = "webhooks", description = "The list of webhooks to register to receive notifications for certain events.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("webhooks")
-  public List<@Valid WebhookModel> getWebhooks() {
-    return webhooks;
-  }
-
-  public void setWebhooks(List<@Valid WebhookModel> webhooks) {
-    this.webhooks = webhooks;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -239,15 +163,12 @@ public class JobParametersModel {
     return Objects.equals(this.connections, jobParameters.connections) &&
         Objects.equals(this.inputs, jobParameters.inputs) &&
         Objects.equals(this.label, jobParameters.label) &&
-        Objects.equals(this.parentTaskExecutionId, jobParameters.parentTaskExecutionId) &&
-        Objects.equals(this.priority, jobParameters.priority) &&
-        Objects.equals(this.workflowId, jobParameters.workflowId) &&
-        Objects.equals(this.webhooks, jobParameters.webhooks);
+        Objects.equals(this.workflowId, jobParameters.workflowId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(connections, inputs, label, parentTaskExecutionId, priority, workflowId, webhooks);
+    return Objects.hash(connections, inputs, label, workflowId);
   }
 
   @Override
@@ -257,10 +178,7 @@ public class JobParametersModel {
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
-    sb.append("    parentTaskExecutionId: ").append(toIndentedString(parentTaskExecutionId)).append("\n");
-    sb.append("    priority: ").append(toIndentedString(priority)).append("\n");
     sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
-    sb.append("    webhooks: ").append(toIndentedString(webhooks)).append("\n");
     sb.append("}");
     return sb.toString();
   }

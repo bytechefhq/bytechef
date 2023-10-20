@@ -21,10 +21,10 @@ import jakarta.annotation.Generated;
  * The blueprint that describe the execution of a job.
  */
 
-@Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
-@JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-05T16:00:42.200344+02:00[Europe/Zagreb]")
-public class WorkflowModel {
+@Schema(name = "WorkflowBasic", description = "The blueprint that describe the execution of a job.")
+@JsonTypeName("WorkflowBasic")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T08:22:56.772964+02:00[Europe/Zagreb]")
+public class WorkflowBasicModel {
 
   private String createdBy;
 
@@ -42,7 +42,7 @@ public class WorkflowModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
-  public WorkflowModel createdBy(String createdBy) {
+  public WorkflowBasicModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -62,7 +62,7 @@ public class WorkflowModel {
     this.createdBy = createdBy;
   }
 
-  public WorkflowModel createdDate(LocalDateTime createdDate) {
+  public WorkflowBasicModel createdDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -82,7 +82,7 @@ public class WorkflowModel {
     this.createdDate = createdDate;
   }
 
-  public WorkflowModel description(String description) {
+  public WorkflowBasicModel description(String description) {
     this.description = description;
     return this;
   }
@@ -102,7 +102,7 @@ public class WorkflowModel {
     this.description = description;
   }
 
-  public WorkflowModel id(String id) {
+  public WorkflowBasicModel id(String id) {
     this.id = id;
     return this;
   }
@@ -122,7 +122,7 @@ public class WorkflowModel {
     this.id = id;
   }
 
-  public WorkflowModel label(String label) {
+  public WorkflowBasicModel label(String label) {
     this.label = label;
     return this;
   }
@@ -142,7 +142,7 @@ public class WorkflowModel {
     this.label = label;
   }
 
-  public WorkflowModel lastModifiedBy(String lastModifiedBy) {
+  public WorkflowBasicModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -162,7 +162,7 @@ public class WorkflowModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public WorkflowModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public WorkflowBasicModel lastModifiedDate(LocalDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -190,14 +190,14 @@ public class WorkflowModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    WorkflowModel workflow = (WorkflowModel) o;
-    return Objects.equals(this.createdBy, workflow.createdBy) &&
-        Objects.equals(this.createdDate, workflow.createdDate) &&
-        Objects.equals(this.description, workflow.description) &&
-        Objects.equals(this.id, workflow.id) &&
-        Objects.equals(this.label, workflow.label) &&
-        Objects.equals(this.lastModifiedBy, workflow.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, workflow.lastModifiedDate);
+    WorkflowBasicModel workflowBasic = (WorkflowBasicModel) o;
+    return Objects.equals(this.createdBy, workflowBasic.createdBy) &&
+        Objects.equals(this.createdDate, workflowBasic.createdDate) &&
+        Objects.equals(this.description, workflowBasic.description) &&
+        Objects.equals(this.id, workflowBasic.id) &&
+        Objects.equals(this.label, workflowBasic.label) &&
+        Objects.equals(this.lastModifiedBy, workflowBasic.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, workflowBasic.lastModifiedDate);
   }
 
   @Override
@@ -208,7 +208,7 @@ public class WorkflowModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class WorkflowModel {\n");
+    sb.append("class WorkflowBasicModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");

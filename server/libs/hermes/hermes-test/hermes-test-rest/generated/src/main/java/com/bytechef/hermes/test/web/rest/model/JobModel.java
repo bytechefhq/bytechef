@@ -1,9 +1,9 @@
-package com.bytechef.hermes.execution.web.rest.model;
+package com.bytechef.hermes.test.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.execution.web.rest.model.ExecutionErrorModel;
-import com.bytechef.hermes.execution.web.rest.model.WebhookModel;
+import com.bytechef.hermes.test.web.rest.model.ExecutionErrorModel;
+import com.bytechef.hermes.test.web.rest.model.TaskExecutionModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -28,10 +28,10 @@ import jakarta.annotation.Generated;
  * Represents an execution of a workflow.
  */
 
-@Schema(name = "JobBasic", description = "Represents an execution of a workflow.")
-@JsonTypeName("JobBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-05T16:00:49.491777+02:00[Europe/Zagreb]")
-public class JobBasicModel {
+@Schema(name = "Job", description = "Represents an execution of a workflow.")
+@JsonTypeName("Job")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T08:22:57.875357+02:00[Europe/Zagreb]")
+public class JobModel {
 
   private String createdBy;
 
@@ -59,8 +59,6 @@ public class JobBasicModel {
 
   @Valid
   private Map<String, Object> outputs = new HashMap<>();
-
-  private Long parentTaskExecutionId;
 
   private Integer priority;
 
@@ -111,29 +109,27 @@ public class JobBasicModel {
   private StatusEnum status;
 
   @Valid
-  private List<@Valid WebhookModel> webhooks;
-
-  private String workflowId;
+  private List<@Valid TaskExecutionModel> taskExecutions;
 
   /**
    * Default constructor
-   * @deprecated Use {@link JobBasicModel#JobBasicModel(Integer, LocalDateTime, StatusEnum)}
+   * @deprecated Use {@link JobModel#JobModel(Integer, LocalDateTime, StatusEnum)}
    */
   @Deprecated
-  public JobBasicModel() {
+  public JobModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public JobBasicModel(Integer priority, LocalDateTime startDate, StatusEnum status) {
+  public JobModel(Integer priority, LocalDateTime startDate, StatusEnum status) {
     this.priority = priority;
     this.startDate = startDate;
     this.status = status;
   }
 
-  public JobBasicModel createdBy(String createdBy) {
+  public JobModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -153,7 +149,7 @@ public class JobBasicModel {
     this.createdBy = createdBy;
   }
 
-  public JobBasicModel createdDate(LocalDateTime createdDate) {
+  public JobModel createdDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -173,7 +169,7 @@ public class JobBasicModel {
     this.createdDate = createdDate;
   }
 
-  public JobBasicModel currentTask(Integer currentTask) {
+  public JobModel currentTask(Integer currentTask) {
     this.currentTask = currentTask;
     return this;
   }
@@ -193,7 +189,7 @@ public class JobBasicModel {
     this.currentTask = currentTask;
   }
 
-  public JobBasicModel endDate(LocalDateTime endDate) {
+  public JobModel endDate(LocalDateTime endDate) {
     this.endDate = endDate;
     return this;
   }
@@ -213,7 +209,7 @@ public class JobBasicModel {
     this.endDate = endDate;
   }
 
-  public JobBasicModel error(ExecutionErrorModel error) {
+  public JobModel error(ExecutionErrorModel error) {
     this.error = error;
     return this;
   }
@@ -233,7 +229,7 @@ public class JobBasicModel {
     this.error = error;
   }
 
-  public JobBasicModel id(String id) {
+  public JobModel id(String id) {
     this.id = id;
     return this;
   }
@@ -253,12 +249,12 @@ public class JobBasicModel {
     this.id = id;
   }
 
-  public JobBasicModel inputs(Map<String, Object> inputs) {
+  public JobModel inputs(Map<String, Object> inputs) {
     this.inputs = inputs;
     return this;
   }
 
-  public JobBasicModel putInputsItem(String key, Object inputsItem) {
+  public JobModel putInputsItem(String key, Object inputsItem) {
     if (this.inputs == null) {
       this.inputs = new HashMap<>();
     }
@@ -281,7 +277,7 @@ public class JobBasicModel {
     this.inputs = inputs;
   }
 
-  public JobBasicModel label(String label) {
+  public JobModel label(String label) {
     this.label = label;
     return this;
   }
@@ -301,7 +297,7 @@ public class JobBasicModel {
     this.label = label;
   }
 
-  public JobBasicModel lastModifiedBy(String lastModifiedBy) {
+  public JobModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -321,7 +317,7 @@ public class JobBasicModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public JobBasicModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public JobModel lastModifiedDate(LocalDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -341,12 +337,12 @@ public class JobBasicModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public JobBasicModel outputs(Map<String, Object> outputs) {
+  public JobModel outputs(Map<String, Object> outputs) {
     this.outputs = outputs;
     return this;
   }
 
-  public JobBasicModel putOutputsItem(String key, Object outputsItem) {
+  public JobModel putOutputsItem(String key, Object outputsItem) {
     if (this.outputs == null) {
       this.outputs = new HashMap<>();
     }
@@ -369,27 +365,7 @@ public class JobBasicModel {
     this.outputs = outputs;
   }
 
-  public JobBasicModel parentTaskExecutionId(Long parentTaskExecutionId) {
-    this.parentTaskExecutionId = parentTaskExecutionId;
-    return this;
-  }
-
-  /**
-   * The id of the parent task that created this job. Required for sub-flows.
-   * @return parentTaskExecutionId
-  */
-  
-  @Schema(name = "parentTaskExecutionId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the parent task that created this job. Required for sub-flows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("parentTaskExecutionId")
-  public Long getParentTaskExecutionId() {
-    return parentTaskExecutionId;
-  }
-
-  public void setParentTaskExecutionId(Long parentTaskExecutionId) {
-    this.parentTaskExecutionId = parentTaskExecutionId;
-  }
-
-  public JobBasicModel priority(Integer priority) {
+  public JobModel priority(Integer priority) {
     this.priority = priority;
     return this;
   }
@@ -409,7 +385,7 @@ public class JobBasicModel {
     this.priority = priority;
   }
 
-  public JobBasicModel startDate(LocalDateTime startDate) {
+  public JobModel startDate(LocalDateTime startDate) {
     this.startDate = startDate;
     return this;
   }
@@ -429,7 +405,7 @@ public class JobBasicModel {
     this.startDate = startDate;
   }
 
-  public JobBasicModel status(StatusEnum status) {
+  public JobModel status(StatusEnum status) {
     this.status = status;
     return this;
   }
@@ -449,52 +425,32 @@ public class JobBasicModel {
     this.status = status;
   }
 
-  public JobBasicModel webhooks(List<@Valid WebhookModel> webhooks) {
-    this.webhooks = webhooks;
+  public JobModel taskExecutions(List<@Valid TaskExecutionModel> taskExecutions) {
+    this.taskExecutions = taskExecutions;
     return this;
   }
 
-  public JobBasicModel addWebhooksItem(WebhookModel webhooksItem) {
-    if (this.webhooks == null) {
-      this.webhooks = new ArrayList<>();
+  public JobModel addTaskExecutionsItem(TaskExecutionModel taskExecutionsItem) {
+    if (this.taskExecutions == null) {
+      this.taskExecutions = new ArrayList<>();
     }
-    this.webhooks.add(webhooksItem);
+    this.taskExecutions.add(taskExecutionsItem);
     return this;
   }
 
   /**
-   * The list of the webhooks configured.
-   * @return webhooks
+   * Get taskExecutions
+   * @return taskExecutions
   */
   @Valid 
-  @Schema(name = "webhooks", accessMode = Schema.AccessMode.READ_ONLY, description = "The list of the webhooks configured.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("webhooks")
-  public List<@Valid WebhookModel> getWebhooks() {
-    return webhooks;
+  @Schema(name = "taskExecutions", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("taskExecutions")
+  public List<@Valid TaskExecutionModel> getTaskExecutions() {
+    return taskExecutions;
   }
 
-  public void setWebhooks(List<@Valid WebhookModel> webhooks) {
-    this.webhooks = webhooks;
-  }
-
-  public JobBasicModel workflowId(String workflowId) {
-    this.workflowId = workflowId;
-    return this;
-  }
-
-  /**
-   * Get workflowId
-   * @return workflowId
-  */
-  
-  @Schema(name = "workflowId", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("workflowId")
-  public String getWorkflowId() {
-    return workflowId;
-  }
-
-  public void setWorkflowId(String workflowId) {
-    this.workflowId = workflowId;
+  public void setTaskExecutions(List<@Valid TaskExecutionModel> taskExecutions) {
+    this.taskExecutions = taskExecutions;
   }
 
   @Override
@@ -505,35 +461,33 @@ public class JobBasicModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    JobBasicModel jobBasic = (JobBasicModel) o;
-    return Objects.equals(this.createdBy, jobBasic.createdBy) &&
-        Objects.equals(this.createdDate, jobBasic.createdDate) &&
-        Objects.equals(this.currentTask, jobBasic.currentTask) &&
-        Objects.equals(this.endDate, jobBasic.endDate) &&
-        Objects.equals(this.error, jobBasic.error) &&
-        Objects.equals(this.id, jobBasic.id) &&
-        Objects.equals(this.inputs, jobBasic.inputs) &&
-        Objects.equals(this.label, jobBasic.label) &&
-        Objects.equals(this.lastModifiedBy, jobBasic.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, jobBasic.lastModifiedDate) &&
-        Objects.equals(this.outputs, jobBasic.outputs) &&
-        Objects.equals(this.parentTaskExecutionId, jobBasic.parentTaskExecutionId) &&
-        Objects.equals(this.priority, jobBasic.priority) &&
-        Objects.equals(this.startDate, jobBasic.startDate) &&
-        Objects.equals(this.status, jobBasic.status) &&
-        Objects.equals(this.webhooks, jobBasic.webhooks) &&
-        Objects.equals(this.workflowId, jobBasic.workflowId);
+    JobModel job = (JobModel) o;
+    return Objects.equals(this.createdBy, job.createdBy) &&
+        Objects.equals(this.createdDate, job.createdDate) &&
+        Objects.equals(this.currentTask, job.currentTask) &&
+        Objects.equals(this.endDate, job.endDate) &&
+        Objects.equals(this.error, job.error) &&
+        Objects.equals(this.id, job.id) &&
+        Objects.equals(this.inputs, job.inputs) &&
+        Objects.equals(this.label, job.label) &&
+        Objects.equals(this.lastModifiedBy, job.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, job.lastModifiedDate) &&
+        Objects.equals(this.outputs, job.outputs) &&
+        Objects.equals(this.priority, job.priority) &&
+        Objects.equals(this.startDate, job.startDate) &&
+        Objects.equals(this.status, job.status) &&
+        Objects.equals(this.taskExecutions, job.taskExecutions);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, currentTask, endDate, error, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, parentTaskExecutionId, priority, startDate, status, webhooks, workflowId);
+    return Objects.hash(createdBy, createdDate, currentTask, endDate, error, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, priority, startDate, status, taskExecutions);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class JobBasicModel {\n");
+    sb.append("class JobModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    currentTask: ").append(toIndentedString(currentTask)).append("\n");
@@ -545,12 +499,10 @@ public class JobBasicModel {
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    outputs: ").append(toIndentedString(outputs)).append("\n");
-    sb.append("    parentTaskExecutionId: ").append(toIndentedString(parentTaskExecutionId)).append("\n");
     sb.append("    priority: ").append(toIndentedString(priority)).append("\n");
     sb.append("    startDate: ").append(toIndentedString(startDate)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
-    sb.append("    webhooks: ").append(toIndentedString(webhooks)).append("\n");
-    sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
+    sb.append("    taskExecutions: ").append(toIndentedString(taskExecutions)).append("\n");
     sb.append("}");
     return sb.toString();
   }

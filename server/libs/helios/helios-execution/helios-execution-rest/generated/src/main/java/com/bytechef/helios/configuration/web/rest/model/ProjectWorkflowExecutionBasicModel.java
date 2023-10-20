@@ -2,7 +2,8 @@ package com.bytechef.helios.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
+import com.bytechef.helios.configuration.web.rest.model.JobBasicModel;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowBasicModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -22,18 +23,18 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectWorkflowExecutionBasic", description = "Contains information about execution of one of project workflows.")
 @JsonTypeName("ProjectWorkflowExecutionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-05T16:00:42.200344+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T08:22:56.772964+02:00[Europe/Zagreb]")
 public class ProjectWorkflowExecutionBasicModel {
 
   private Long id;
 
   private com.bytechef.helios.configuration.web.rest.model.ProjectInstanceBasicModel instance;
 
-  private com.bytechef.hermes.execution.web.rest.model.JobBasicModel job;
+  private JobBasicModel job;
 
   private com.bytechef.helios.configuration.web.rest.model.ProjectBasicModel project;
 
-  private WorkflowModel workflow;
+  private WorkflowBasicModel workflow;
 
   public ProjectWorkflowExecutionBasicModel id(Long id) {
     this.id = id;
@@ -75,7 +76,7 @@ public class ProjectWorkflowExecutionBasicModel {
     this.instance = instance;
   }
 
-  public ProjectWorkflowExecutionBasicModel job(com.bytechef.hermes.execution.web.rest.model.JobBasicModel job) {
+  public ProjectWorkflowExecutionBasicModel job(JobBasicModel job) {
     this.job = job;
     return this;
   }
@@ -87,11 +88,11 @@ public class ProjectWorkflowExecutionBasicModel {
   @Valid 
   @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("job")
-  public com.bytechef.hermes.execution.web.rest.model.JobBasicModel getJob() {
+  public JobBasicModel getJob() {
     return job;
   }
 
-  public void setJob(com.bytechef.hermes.execution.web.rest.model.JobBasicModel job) {
+  public void setJob(JobBasicModel job) {
     this.job = job;
   }
 
@@ -115,7 +116,7 @@ public class ProjectWorkflowExecutionBasicModel {
     this.project = project;
   }
 
-  public ProjectWorkflowExecutionBasicModel workflow(WorkflowModel workflow) {
+  public ProjectWorkflowExecutionBasicModel workflow(WorkflowBasicModel workflow) {
     this.workflow = workflow;
     return this;
   }
@@ -127,11 +128,11 @@ public class ProjectWorkflowExecutionBasicModel {
   @Valid 
   @Schema(name = "workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflow")
-  public WorkflowModel getWorkflow() {
+  public WorkflowBasicModel getWorkflow() {
     return workflow;
   }
 
-  public void setWorkflow(WorkflowModel workflow) {
+  public void setWorkflow(WorkflowBasicModel workflow) {
     this.workflow = workflow;
   }
 

@@ -5,6 +5,8 @@
  */
 package com.bytechef.hermes.test.web.rest;
 
+import com.bytechef.hermes.test.web.rest.model.JobModel;
+import com.bytechef.hermes.test.web.rest.model.JobParametersModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-05T16:00:43.580506+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T08:22:57.875357+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow-tests", description = "The Core Workflow Tests API")
 public interface WorkflowTestsApi {
@@ -44,7 +46,7 @@ public interface WorkflowTestsApi {
      * POST /workflow-tests : Execute a workflow synchronously for testing purpose
      * Execute a workflow synchronously for testing purposes.
      *
-     * @param comBytechefHermesExecutionWebRestModelJobParametersModel Parameters required to run a job, for example &#39;{\&quot;workflowId\&quot;:\&quot;samples/hello\&quot;,\&quot;inputs\&quot;:{\&quot;yourName\&quot;:\&quot;Joe Jones\&quot;}}&#39; (required)
+     * @param jobParametersModel Parameters required to run a job, for example &#39;{\&quot;workflowId\&quot;:\&quot;samples/hello\&quot;,\&quot;inputs\&quot;:{\&quot;yourName\&quot;:\&quot;Joe Jones\&quot;}}&#39; (required)
      * @return The output expected by the workflow. (status code 200)
      */
     @Operation(
@@ -54,7 +56,7 @@ public interface WorkflowTestsApi {
         tags = { "workflow-tests" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The output expected by the workflow.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.hermes.execution.web.rest.model.JobModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = JobModel.class))
             })
         }
     )
@@ -64,13 +66,13 @@ public interface WorkflowTestsApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<com.bytechef.hermes.execution.web.rest.model.JobModel> testWorkflow(
-        @Parameter(name = "com.bytechef.hermes.execution.web.rest.model.JobParametersModel", description = "Parameters required to run a job, for example '{\"workflowId\":\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'", required = true) @Valid @RequestBody com.bytechef.hermes.execution.web.rest.model.JobParametersModel comBytechefHermesExecutionWebRestModelJobParametersModel
+    default ResponseEntity<JobModel> testWorkflow(
+        @Parameter(name = "JobParametersModel", description = "Parameters required to run a job, for example '{\"workflowId\":\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'", required = true) @Valid @RequestBody JobParametersModel jobParametersModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "null";
+                    String exampleString = "{ \"outputs\" : { \"key\" : \"{}\" }, \"taskExecutions\" : [ { \"endDate\" : \"2000-01-23T04:56:07.000+00:00\", \"error\" : { \"stackTrace\" : [ \"stackTrace\", \"stackTrace\" ], \"message\" : \"message\" }, \"type\" : \"type\", \"output\" : \"{}\", \"retryDelay\" : \"retryDelay\", \"retryDelayMillis\" : 2, \"id\" : \"id\", \"retryAttempts\" : 7, \"retryDelayFactor\" : 9, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"workflowTask\" : { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" }, \"priority\" : 5, \"parentId\" : \"parentId\", \"executionTime\" : 1, \"input\" : { \"key\" : \"\" }, \"jobId\" : \"jobId\", \"component\" : { \"icon\" : \"icon\", \"name\" : \"name\", \"title\" : \"title\" }, \"maxRetries\" : 2, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"progress\" : 5, \"taskNumber\" : 3, \"startDate\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"CREATED\" }, { \"endDate\" : \"2000-01-23T04:56:07.000+00:00\", \"error\" : { \"stackTrace\" : [ \"stackTrace\", \"stackTrace\" ], \"message\" : \"message\" }, \"type\" : \"type\", \"output\" : \"{}\", \"retryDelay\" : \"retryDelay\", \"retryDelayMillis\" : 2, \"id\" : \"id\", \"retryAttempts\" : 7, \"retryDelayFactor\" : 9, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"workflowTask\" : { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"timeout\" : \"timeout\" }, \"priority\" : 5, \"parentId\" : \"parentId\", \"executionTime\" : 1, \"input\" : { \"key\" : \"\" }, \"jobId\" : \"jobId\", \"component\" : { \"icon\" : \"icon\", \"name\" : \"name\", \"title\" : \"title\" }, \"maxRetries\" : 2, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"progress\" : 5, \"taskNumber\" : 3, \"startDate\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"CREATED\" } ], \"endDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"{}\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"currentTask\" : 0, \"label\" : \"label\", \"error\" : { \"stackTrace\" : [ \"stackTrace\", \"stackTrace\" ], \"message\" : \"message\" }, \"priority\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"id\" : \"id\", \"startDate\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"CREATED\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
