@@ -26,6 +26,9 @@ import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
+/**
+ * @author Ivica Cardic
+ */
 @Configuration
 @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
 @EnableJdbcRepositories(basePackages = "com.bytechef")
