@@ -32,7 +32,7 @@ import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
-import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

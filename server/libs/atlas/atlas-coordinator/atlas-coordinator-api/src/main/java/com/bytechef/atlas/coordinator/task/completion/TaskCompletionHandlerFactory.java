@@ -18,7 +18,7 @@
 package com.bytechef.atlas.coordinator.task.completion;
 
 import com.bytechef.atlas.task.Task;
-import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 
 /**
  * @author Ivica Cardic
