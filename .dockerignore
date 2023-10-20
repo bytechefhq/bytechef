@@ -1,6 +1,5 @@
 **/build
 .editorconfig
-.git
 .github
 .gradle
 .server_hash
