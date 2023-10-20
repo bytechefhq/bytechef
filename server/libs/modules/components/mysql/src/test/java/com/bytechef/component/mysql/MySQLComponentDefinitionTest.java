@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -28,9 +29,9 @@ public class MySQLComponentDefinitionTest {
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-                "definition/mysql_v1.json",
-                new JdbcComponentTaskHandler(
-                                null, new MySQLJdbcComponentDefinitionFactory().getJdbcComponentDefinition())
-                        .getDefinition());
+            "definition/mysql_v1.json",
+            new JdbcComponentTaskHandler(
+                null, new MySQLJdbcComponentDefinitionFactory().getJdbcComponentDefinition())
+                    .getDefinition());
     }
 }

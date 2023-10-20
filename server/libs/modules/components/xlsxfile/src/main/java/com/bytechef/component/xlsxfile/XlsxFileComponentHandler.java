@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -73,71 +74,71 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class XlsxFileComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition = component(XlsxFileConstants.XLSX_FILE)
-            .display(display("XLSX File").description("Reads and writes data from a XLS/XLSX file."))
-            .actions(
-                    action(XlsxFileConstants.READ)
-                            .display(display("Read from file").description("Reads data from a XLS/XLSX file."))
-                            .properties(
-                                    fileEntry(FILE_ENTRY)
-                                            .label("File")
-                                            .description(
-                                                    "The object property which contains a reference to the XLS/XLSX file to read from.")
-                                            .required(true),
-                                    bool(HEADER_ROW)
-                                            .label("Header Row")
-                                            .description("The first row of the file contains the header names.")
-                                            .defaultValue(true)
-                                            .advancedOption(true),
-                                    bool(INCLUDE_EMPTY_CELLS)
-                                            .label("Include Empty Cells")
-                                            .description(
-                                                    "When reading from file the empty cells will be filled with an empty string.")
-                                            .defaultValue(false)
-                                            .advancedOption(true),
-                                    integer(PAGE_SIZE)
-                                            .label("Page Size")
-                                            .description("The amount of child elements to return in a page.")
-                                            .advancedOption(true),
-                                    integer(PAGE_NUMBER)
-                                            .label("Page Number")
-                                            .description("The page number to get.")
-                                            .advancedOption(true),
-                                    bool(READ_AS_STRING)
-                                            .label("Read As String")
-                                            .description(
-                                                    "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
-                                            .defaultValue(false)
-                                            .advancedOption(true),
-                                    string(SHEET_NAME)
-                                            .label("Sheet Name")
-                                            .description(
-                                                    "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
-                                            .defaultValue("Sheet")
-                                            .advancedOption(true))
-                            .output(array())
-                            .perform(this::performRead),
-                    action(WRITE)
-                            .display(display("Write to file").description("Writes the data to a XLS/XLSX file."))
-                            .properties(
-                                    array(ROWS)
-                                            .label("Rows")
-                                            .description("The array of objects to write to the file.")
-                                            .required(true)
-                                            .items(object().additionalProperties(oneOf())),
-                                    string(FILENAME)
-                                            .label("Filename")
-                                            .description(
-                                                    "Filename to set for binary data. By default, \"file.xlsx\" will be used.")
-                                            .required(true)
-                                            .defaultValue("file.xlsx")
-                                            .advancedOption(true),
-                                    string(SHEET_NAME)
-                                            .label("Sheet Name")
-                                            .description("The name of the sheet to create in the spreadsheet.")
-                                            .defaultValue("Sheet")
-                                            .advancedOption(true))
-                            .output(fileEntry())
-                            .perform(this::performWrite));
+        .display(display("XLSX File").description("Reads and writes data from a XLS/XLSX file."))
+        .actions(
+            action(XlsxFileConstants.READ)
+                .display(display("Read from file").description("Reads data from a XLS/XLSX file."))
+                .properties(
+                    fileEntry(FILE_ENTRY)
+                        .label("File")
+                        .description(
+                            "The object property which contains a reference to the XLS/XLSX file to read from.")
+                        .required(true),
+                    bool(HEADER_ROW)
+                        .label("Header Row")
+                        .description("The first row of the file contains the header names.")
+                        .defaultValue(true)
+                        .advancedOption(true),
+                    bool(INCLUDE_EMPTY_CELLS)
+                        .label("Include Empty Cells")
+                        .description(
+                            "When reading from file the empty cells will be filled with an empty string.")
+                        .defaultValue(false)
+                        .advancedOption(true),
+                    integer(PAGE_SIZE)
+                        .label("Page Size")
+                        .description("The amount of child elements to return in a page.")
+                        .advancedOption(true),
+                    integer(PAGE_NUMBER)
+                        .label("Page Number")
+                        .description("The page number to get.")
+                        .advancedOption(true),
+                    bool(READ_AS_STRING)
+                        .label("Read As String")
+                        .description(
+                            "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
+                        .defaultValue(false)
+                        .advancedOption(true),
+                    string(SHEET_NAME)
+                        .label("Sheet Name")
+                        .description(
+                            "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
+                        .defaultValue("Sheet")
+                        .advancedOption(true))
+                .output(array())
+                .perform(this::performRead),
+            action(WRITE)
+                .display(display("Write to file").description("Writes the data to a XLS/XLSX file."))
+                .properties(
+                    array(ROWS)
+                        .label("Rows")
+                        .description("The array of objects to write to the file.")
+                        .required(true)
+                        .items(object().additionalProperties(oneOf())),
+                    string(FILENAME)
+                        .label("Filename")
+                        .description(
+                            "Filename to set for binary data. By default, \"file.xlsx\" will be used.")
+                        .required(true)
+                        .defaultValue("file.xlsx")
+                        .advancedOption(true),
+                    string(SHEET_NAME)
+                        .label("Sheet Name")
+                        .description("The name of the sheet to create in the spreadsheet.")
+                        .defaultValue("Sheet")
+                        .advancedOption(true))
+                .output(fileEntry())
+                .perform(this::performWrite));
 
     private enum FileFormat {
         XLS,
@@ -173,15 +174,15 @@ public class XlsxFileComponentHandler implements ComponentHandler {
             }
 
             return read(
-                    fileFormat,
-                    inputStream,
-                    new ReadConfiguration(
-                            headerRow,
-                            includeEmptyCells,
-                            rangeStartRow == null ? 0 : rangeStartRow,
-                            rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
-                            readAsString,
-                            sheetName));
+                fileFormat,
+                inputStream,
+                new ReadConfiguration(
+                    headerRow,
+                    includeEmptyCells,
+                    rangeStartRow == null ? 0 : rangeStartRow,
+                    rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
+                    readAsString,
+                    sheetName));
         } catch (IOException ioException) {
             throw new ActionExecutionException("Unable to handle task " + executionParameters, ioException);
         }
@@ -196,7 +197,7 @@ public class XlsxFileComponentHandler implements ComponentHandler {
 
         try {
             return context.storeFileContent(
-                    fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName))));
+                fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName))));
         } catch (IOException ioException) {
             throw new ActionExecutionException("Unable to handle task " + executionParameters, ioException);
         }
@@ -204,7 +205,7 @@ public class XlsxFileComponentHandler implements ComponentHandler {
 
     public List<Map<String, ?>> read(InputStream inputStream) throws IOException {
         return read(
-                FileFormat.XLSX, inputStream, new ReadConfiguration(true, true, 0, Integer.MAX_VALUE, false, "Sheet"));
+            FileFormat.XLSX, inputStream, new ReadConfiguration(true, true, 0, Integer.MAX_VALUE, false, "Sheet"));
     }
 
     private String getaDefaultFileName() {
@@ -241,7 +242,8 @@ public class XlsxFileComponentHandler implements ComponentHandler {
                     yield numericValue;
                 }
                 case STRING -> cell.getStringCellValue();
-                default -> throw new IllegalStateException("Unexpected value: " + cell.getCellType());};
+                default -> throw new IllegalStateException("Unexpected value: " + cell.getCellType());
+            };
         }
 
         if (ObjectUtils.isEmpty(value)) {
@@ -258,7 +260,7 @@ public class XlsxFileComponentHandler implements ComponentHandler {
     }
 
     private List<Map<String, ?>> read(FileFormat fileFormat, InputStream inputStream, ReadConfiguration configuration)
-            throws IOException {
+        throws IOException {
         List<Map<String, ?>> rows = new ArrayList<>();
 
         Workbook workbook = getWorkbook(fileFormat, inputStream);
@@ -308,9 +310,9 @@ public class XlsxFileComponentHandler implements ComponentHandler {
                         Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
 
                         map.computeIfAbsent(
-                                headers.get(i),
-                                key -> processValue(
-                                        cell, configuration.includeEmptyCells(), configuration.readAsString()));
+                            headers.get(i),
+                            key -> processValue(
+                                cell, configuration.includeEmptyCells(), configuration.readAsString()));
                     }
 
                     rows.add(map);
@@ -321,8 +323,8 @@ public class XlsxFileComponentHandler implements ComponentHandler {
                         Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
 
                         map.put(
-                                "column_" + (i + 1),
-                                processValue(cell, configuration.includeEmptyCells(), configuration.readAsString()));
+                            "column_" + (i + 1),
+                            processValue(cell, configuration.includeEmptyCells(), configuration.readAsString()));
                     }
 
                     rows.add(map);
@@ -393,12 +395,14 @@ public class XlsxFileComponentHandler implements ComponentHandler {
     }
 
     private record ReadConfiguration(
-            boolean headerRow,
-            boolean includeEmptyCells,
-            long rangeStartRow,
-            long rangeEndRow,
-            boolean readAsString,
-            String sheetName) {}
+        boolean headerRow,
+        boolean includeEmptyCells,
+        long rangeStartRow,
+        long rangeEndRow,
+        boolean readAsString,
+        String sheetName) {
+    }
 
-    private record WriteConfiguration(String fileName, String sheetName) {}
+    private record WriteConfiguration(String fileName, String sheetName) {
+    }
 }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -50,6 +51,6 @@ public class TaskExecutionController implements TaskExecutionsApi {
     @Override
     public Mono<ResponseEntity<TaskExecutionModel>> getTaskExecution(String id, ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(
-                conversionService.convert(taskExecutionService.getTaskExecution(id), TaskExecutionModel.class)));
+            conversionService.convert(taskExecutionService.getTaskExecution(id), TaskExecutionModel.class)));
     }
 }

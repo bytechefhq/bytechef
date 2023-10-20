@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -41,12 +42,13 @@ public class TestContainersSpringContextCustomizerFactory implements ContextCust
 
     @Override
     public ContextCustomizer createContextCustomizer(
-            Class<?> testClass, List<ContextConfigurationAttributes> configAttributes) {
+        Class<?> testClass, List<ContextConfigurationAttributes> configAttributes) {
         return (context, mergedConfig) -> {
             ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
             TestPropertyValues testValues = TestPropertyValues.empty();
 
-            List activeProfiles = Arrays.asList(context.getEnvironment().getActiveProfiles());
+            List activeProfiles = Arrays.asList(context.getEnvironment()
+                .getActiveProfiles());
 
             if (activeProfiles.contains("testint")) {
                 testValues = initPostgreSql(testClass, beanFactory, testValues);
@@ -59,7 +61,7 @@ public class TestContainersSpringContextCustomizerFactory implements ContextCust
     }
 
     private static TestPropertyValues initRedis(
-            Class<?> testClass, ConfigurableListableBeanFactory beanFactory, TestPropertyValues testValues) {
+        Class<?> testClass, ConfigurableListableBeanFactory beanFactory, TestPropertyValues testValues) {
         EmbeddedRedis embeddedRedis = AnnotatedElementUtils.findMergedAnnotation(testClass, EmbeddedRedis.class);
 
         if (null != embeddedRedis) {
@@ -75,16 +77,18 @@ public class TestContainersSpringContextCustomizerFactory implements ContextCust
             }
 
             testValues = testValues.and(
-                    "spring.redis.host=" + redisTestContainer.getTestContainer().getHost());
+                "spring.redis.host=" + redisTestContainer.getTestContainer()
+                    .getHost());
             testValues = testValues.and(
-                    "spring.redis.port=" + redisTestContainer.getTestContainer().getMappedPort(6379));
+                "spring.redis.port=" + redisTestContainer.getTestContainer()
+                    .getMappedPort(6379));
         }
 
         return testValues;
     }
 
     private static TestPropertyValues initPostgreSql(
-            Class<?> testClass, ConfigurableListableBeanFactory beanFactory, TestPropertyValues testValues) {
+        Class<?> testClass, ConfigurableListableBeanFactory beanFactory, TestPropertyValues testValues) {
         EmbeddedSql embeddedSql = AnnotatedElementUtils.findMergedAnnotation(testClass, EmbeddedSql.class);
 
         if (null != embeddedSql) {
@@ -100,11 +104,14 @@ public class TestContainersSpringContextCustomizerFactory implements ContextCust
             }
 
             testValues = testValues.and("spring.datasource.url="
-                    + postgreSqlTestContainer.getTestContainer().getJdbcUrl());
+                + postgreSqlTestContainer.getTestContainer()
+                    .getJdbcUrl());
             testValues = testValues.and("spring.datasource.username="
-                    + postgreSqlTestContainer.getTestContainer().getUsername());
+                + postgreSqlTestContainer.getTestContainer()
+                    .getUsername());
             testValues = testValues.and("spring.datasource.password="
-                    + postgreSqlTestContainer.getTestContainer().getPassword());
+                + postgreSqlTestContainer.getTestContainer()
+                    .getPassword());
         }
 
         return testValues;

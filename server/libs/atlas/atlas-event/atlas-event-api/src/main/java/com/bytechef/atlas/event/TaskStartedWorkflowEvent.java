@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -59,8 +60,8 @@ public class TaskStartedWorkflowEvent extends WorkflowEvent {
     @Override
     public String toString() {
         return "TaskStartedWorkflowEvent{" + "jobId='"
-                + jobId + '\'' + ", taskId='"
-                + taskId + '\'' + "} "
-                + super.toString();
+            + jobId + '\'' + ", taskId='"
+            + taskId + '\'' + "} "
+            + super.toString();
     }
 }

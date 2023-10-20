@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -68,73 +69,73 @@ import org.apache.commons.lang3.StringUtils;
 public class JsonFileComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition = component(JSON_FILE)
-            .display(display("JSON File").description("Reads and writes data from a JSON file."))
-            .actions(
-                    action(READ)
-                            .display(display("Read from file").description("Reads data from a JSON file."))
-                            .properties(
-                                    string(FILE_TYPE)
-                                            .label("File Type")
-                                            .description("The file type to choose.")
-                                            .options(
-                                                    option("JSON", FileType.JSON.name()),
-                                                    option("JSON Line", FileType.JSONL.name()))
-                                            .defaultValue(FileType.JSON.name())
-                                            .required(true),
-                                    fileEntry(FILE_ENTRY)
-                                            .label("File")
-                                            .description(
-                                                    "The object property which contains a reference to the JSON file to read from.")
-                                            .required(true),
-                                    bool(IS_ARRAY)
-                                            .label("Is Array")
-                                            .description("The object input is array?")
-                                            .defaultValue(true),
-                                    string(PATH)
-                                            .label("Path")
-                                            .description(
-                                                    "The path where the array is e.g 'data'. Leave blank to use the top level object.")
-                                            .displayOption(show(IS_ARRAY, true))
-                                            .advancedOption(true),
-                                    integer(PAGE_SIZE)
-                                            .label("Page Size")
-                                            .description("The amount of child elements to return in a page.")
-                                            .displayOption(show(IS_ARRAY, true))
-                                            .advancedOption(true),
-                                    integer(PAGE_NUMBER)
-                                            .label("Page Number")
-                                            .description("The page number to get.")
-                                            .displayOption(show(IS_ARRAY, true))
-                                            .advancedOption(true))
-                            .output(
-                                    array().displayOption(show(IS_ARRAY, true)),
-                                    object().displayOption(show(IS_ARRAY, false)))
-                            .perform(this::performRead),
-                    action(WRITE)
-                            .display(display("Write to file").description("Writes the data to a JSON file."))
-                            .properties(
-                                    string(FILE_TYPE)
-                                            .label("File Type")
-                                            .description("The file type to choose.")
-                                            .options(
-                                                    option("JSON", FileType.JSON.name()),
-                                                    option("JSON Line", FileType.JSONL.name()))
-                                            .defaultValue(FileType.JSON.name())
-                                            .required(true),
-                                    oneOf(SOURCE)
-                                            .label("Source")
-                                            .description("The data to write to the file.")
-                                            .required(true)
-                                            .types(array(), object()),
-                                    string(FILENAME)
-                                            .label("Filename")
-                                            .description(
-                                                    "Filename to set for binary data. By default, \"file.json\" will be used.")
-                                            .required(true)
-                                            .defaultValue("file.json")
-                                            .advancedOption(true))
-                            .output(fileEntry())
-                            .perform(this::performWrite));
+        .display(display("JSON File").description("Reads and writes data from a JSON file."))
+        .actions(
+            action(READ)
+                .display(display("Read from file").description("Reads data from a JSON file."))
+                .properties(
+                    string(FILE_TYPE)
+                        .label("File Type")
+                        .description("The file type to choose.")
+                        .options(
+                            option("JSON", FileType.JSON.name()),
+                            option("JSON Line", FileType.JSONL.name()))
+                        .defaultValue(FileType.JSON.name())
+                        .required(true),
+                    fileEntry(FILE_ENTRY)
+                        .label("File")
+                        .description(
+                            "The object property which contains a reference to the JSON file to read from.")
+                        .required(true),
+                    bool(IS_ARRAY)
+                        .label("Is Array")
+                        .description("The object input is array?")
+                        .defaultValue(true),
+                    string(PATH)
+                        .label("Path")
+                        .description(
+                            "The path where the array is e.g 'data'. Leave blank to use the top level object.")
+                        .displayOption(show(IS_ARRAY, true))
+                        .advancedOption(true),
+                    integer(PAGE_SIZE)
+                        .label("Page Size")
+                        .description("The amount of child elements to return in a page.")
+                        .displayOption(show(IS_ARRAY, true))
+                        .advancedOption(true),
+                    integer(PAGE_NUMBER)
+                        .label("Page Number")
+                        .description("The page number to get.")
+                        .displayOption(show(IS_ARRAY, true))
+                        .advancedOption(true))
+                .output(
+                    array().displayOption(show(IS_ARRAY, true)),
+                    object().displayOption(show(IS_ARRAY, false)))
+                .perform(this::performRead),
+            action(WRITE)
+                .display(display("Write to file").description("Writes the data to a JSON file."))
+                .properties(
+                    string(FILE_TYPE)
+                        .label("File Type")
+                        .description("The file type to choose.")
+                        .options(
+                            option("JSON", FileType.JSON.name()),
+                            option("JSON Line", FileType.JSONL.name()))
+                        .defaultValue(FileType.JSON.name())
+                        .required(true),
+                    oneOf(SOURCE)
+                        .label("Source")
+                        .description("The data to write to the file.")
+                        .required(true)
+                        .types(array(), object()),
+                    string(FILENAME)
+                        .label("Filename")
+                        .description(
+                            "Filename to set for binary data. By default, \"file.json\" will be used.")
+                        .required(true)
+                        .defaultValue("file.json")
+                        .advancedOption(true))
+                .output(fileEntry())
+                .perform(this::performWrite));
 
     @Override
     public ComponentDefinition getDefinition() {
@@ -143,7 +144,7 @@ public class JsonFileComponentHandler implements ComponentHandler {
 
     @SuppressWarnings("unchecked")
     protected Object performRead(Context context, ExecutionParameters executionParameters)
-            throws ActionExecutionException {
+        throws ActionExecutionException {
 
         FileType fileType = getFileType(executionParameters);
         FileEntry fileEntry = executionParameters.getRequired(FILE_ENTRY, FileEntry.class);
@@ -164,12 +165,12 @@ public class JsonFileComponentHandler implements ComponentHandler {
                     items = JsonUtils.read(inputStream, path);
                 }
             } else {
-                try (BufferedReader bufferedReader =
-                        new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+                try (BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
                     items = bufferedReader
-                            .lines()
-                            .map(line -> (Map<String, ?>) JsonUtils.read(line, Map.class))
-                            .collect(Collectors.toList());
+                        .lines()
+                        .map(line -> (Map<String, ?>) JsonUtils.read(line, Map.class))
+                        .collect(Collectors.toList());
                 } catch (IOException ioException) {
                     throw new ActionExecutionException("Unable to open json file " + executionParameters, ioException);
                 }
@@ -187,7 +188,7 @@ public class JsonFileComponentHandler implements ComponentHandler {
             }
 
             if (rangeStartIndex != null && rangeStartIndex > 0
-                    || rangeEndIndex != null && rangeEndIndex < items.size()) {
+                || rangeEndIndex != null && rangeEndIndex < items.size()) {
                 items = items.subList(rangeStartIndex, rangeEndIndex);
             }
 
@@ -201,7 +202,7 @@ public class JsonFileComponentHandler implements ComponentHandler {
 
     @SuppressWarnings("unchecked")
     protected FileEntry performWrite(Context context, ExecutionParameters executionParameters)
-            throws ActionExecutionException {
+        throws ActionExecutionException {
         FileType fileType = getFileType(executionParameters);
         Object source = executionParameters.getRequired(SOURCE);
 
@@ -221,7 +222,7 @@ public class JsonFileComponentHandler implements ComponentHandler {
 
         try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
             return context.storeFileContent(
-                    getDefaultFileName(fileType, executionParameters.getString(FILENAME)), inputStream);
+                getDefaultFileName(fileType, executionParameters.getString(FILENAME)), inputStream);
         } catch (IOException ioException) {
             throw new ActionExecutionException("Unable to create json file", ioException);
         }

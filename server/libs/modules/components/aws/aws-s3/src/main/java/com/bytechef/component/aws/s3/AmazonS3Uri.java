@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -43,7 +44,8 @@ import java.util.regex.Pattern;
 /**
  * A URI wrapper that can parse out information about an S3 URI.
  *
- * <p>Imported from Amazon's v1 SDK.
+ * <p>
+ * Imported from Amazon's v1 SDK.
  *
  * @author Arik Cohen
  */
@@ -62,8 +64,7 @@ public class AmazonS3Uri {
     private final String region;
 
     /**
-     * Creates a new AmazonS3URI by parsing the given string. String will be URL encoded before
-     * generating the URI.
+     * Creates a new AmazonS3URI by parsing the given string. String will be URL encoded before generating the URI.
      *
      * @param str the URI to parse.
      */
@@ -72,12 +73,11 @@ public class AmazonS3Uri {
     }
 
     /**
-     * Creates a new AmazonS3URI by parsing the given string. String will optionally be URL encoded
-     * before generating the URI. URL encoding is recommended if you work with bucket names or
-     * object keys with special characters. This can be disabled if you pre-encode URI strings
-     * before passing them to this class.
+     * Creates a new AmazonS3URI by parsing the given string. String will optionally be URL encoded before generating
+     * the URI. URL encoding is recommended if you work with bucket names or object keys with special characters. This
+     * can be disabled if you pre-encode URI strings before passing them to this class.
      *
-     * @param str the URI to parse.
+     * @param str       the URI to parse.
      * @param urlEncode true if string should be URL encoded
      */
     public AmazonS3Uri(final String str, final boolean urlEncode) throws ActionExecutionException {
@@ -117,7 +117,8 @@ public class AmazonS3Uri {
             } else {
                 // s3://bucket/key
                 // Remove the leading '/'.
-                this.key = uri.getPath().substring(1);
+                this.key = uri.getPath()
+                    .substring(1);
             }
             return;
         }
@@ -130,7 +131,7 @@ public class AmazonS3Uri {
         Matcher matcher = ENDPOINT_PATTERN.matcher(host);
         if (!matcher.find()) {
             throw new IllegalArgumentException(
-                    "Invalid S3 URI: hostname does not appear to be a valid S3 " + "endpoint: " + uri);
+                "Invalid S3 URI: hostname does not appear to be a valid S3 " + "endpoint: " + uri);
         }
 
         String prefix = matcher.group(1);
@@ -173,7 +174,8 @@ public class AmazonS3Uri {
                 this.key = null;
             } else {
                 // Remove the leading '/'.
-                this.key = uri.getPath().substring(1);
+                this.key = uri.getPath()
+                    .substring(1);
             }
         }
 
@@ -213,8 +215,7 @@ public class AmazonS3Uri {
     }
 
     /**
-     * @return true if the URI contains the bucket in the path, false if it contains the bucket in
-     *     the authority
+     * @return true if the URI contains the bucket in the path, false if it contains the bucket in the authority
      */
     public boolean isPathStyle() {
         return isPathStyle;
@@ -254,10 +255,9 @@ public class AmazonS3Uri {
     }
 
     /**
-     * URL encodes the given string. This allows us to pass special characters that would otherwise
-     * be rejected when building a URI instance. Because we need to retain the URI's path structure
-     * we subsequently need to replace percent encoded path delimiters back to their decoded
-     * counterparts.
+     * URL encodes the given string. This allows us to pass special characters that would otherwise be rejected when
+     * building a URI instance. Because we need to retain the URI's path structure we subsequently need to replace
+     * percent encoded path delimiters back to their decoded counterparts.
      *
      * @param str the string to encode
      * @return the encoded string
@@ -266,9 +266,9 @@ public class AmazonS3Uri {
         if (encode) {
             try {
                 return (URLEncoder.encode(str, "UTF-8")
-                        .replace("%3A", ":")
-                        .replace("%2F", "/")
-                        .replace("+", "%20"));
+                    .replace("%3A", ":")
+                    .replace("%2F", "/")
+                    .replace("+", "%20"));
             } catch (UnsupportedEncodingException e) {
                 // This should never happen unless there is something
                 // fundamentally broken with the running JVM.
@@ -301,7 +301,7 @@ public class AmazonS3Uri {
     /**
      * Percent-decodes the given string.
      *
-     * @param str the string to decode
+     * @param str          the string to decode
      * @param firstPercent the index of the first '%' character in the string
      * @return the decoded string
      */
@@ -324,12 +324,12 @@ public class AmazonS3Uri {
     }
 
     /**
-     * Decodes the percent-encoded character at the given index in the string and appends the
-     * decoded value to the given {@code StringBuilder}.
+     * Decodes the percent-encoded character at the given index in the string and appends the decoded value to the given
+     * {@code StringBuilder}.
      *
      * @param builder the string builder to append to
-     * @param str the string being decoded
-     * @param index the index of the '%' character in the string
+     * @param str     the string being decoded
+     * @param index   the index of the '%' character in the string
      */
     private static void appendDecoded(final StringBuilder builder, final String str, final int index) {
         if (index > str.length() - 3) {
@@ -352,7 +352,7 @@ public class AmazonS3Uri {
     private static int fromHex(final char c) {
         if (c < '0') {
             throw new IllegalStateException(
-                    "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence.");
+                "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence.");
         }
         if (c <= '9') {
             return (c - '0');
@@ -360,7 +360,7 @@ public class AmazonS3Uri {
 
         if (c < 'A') {
             throw new IllegalStateException(
-                    "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence.");
+                "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence.");
         }
         if (c <= 'F') {
             return (c - 'A') + 10;
@@ -368,28 +368,35 @@ public class AmazonS3Uri {
 
         if (c < 'a') {
             throw new IllegalStateException(
-                    "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence.");
+                "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence.");
         }
         if (c <= 'f') {
             return (c - 'a') + 10;
         }
 
         throw new IllegalStateException(
-                "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence.");
+            "Invalid percent-encoded string: bad character '" + c + "' in " + "escape sequence.");
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         AmazonS3Uri that = (AmazonS3Uri) o;
 
-        if (isPathStyle != that.isPathStyle) return false;
-        if (!uri.equals(that.uri)) return false;
-        if (bucket != null ? !bucket.equals(that.bucket) : that.bucket != null) return false;
-        if (key != null ? !key.equals(that.key) : that.key != null) return false;
-        if (versionId != null ? !versionId.equals(that.versionId) : that.versionId != null) return false;
+        if (isPathStyle != that.isPathStyle)
+            return false;
+        if (!uri.equals(that.uri))
+            return false;
+        if (bucket != null ? !bucket.equals(that.bucket) : that.bucket != null)
+            return false;
+        if (key != null ? !key.equals(that.key) : that.key != null)
+            return false;
+        if (versionId != null ? !versionId.equals(that.versionId) : that.versionId != null)
+            return false;
         return region != null ? region.equals(that.region) : that.region == null;
     }
 

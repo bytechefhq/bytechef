@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -63,15 +64,15 @@ public class Coordinator {
     private final TaskExecutionService taskExecutionService;
 
     public Coordinator(
-            ContextService contextService,
-            ErrorHandler errorHandler,
-            EventPublisher eventPublisher,
-            JobExecutor jobExecutor,
-            JobService jobService,
-            MessageBroker messageBroker,
-            TaskCompletionHandler taskCompletionHandler,
-            TaskDispatcher taskDispatcher,
-            TaskExecutionService taskExecutionService) {
+        ContextService contextService,
+        ErrorHandler errorHandler,
+        EventPublisher eventPublisher,
+        JobExecutor jobExecutor,
+        JobService jobService,
+        MessageBroker messageBroker,
+        TaskCompletionHandler taskCompletionHandler,
+        TaskDispatcher taskDispatcher,
+        TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.errorHandler = errorHandler;
         this.eventPublisher = eventPublisher;
@@ -133,7 +134,7 @@ public class Coordinator {
             taskExecutionService.update(currentTaskExecution);
 
             taskDispatcher.dispatch(
-                    new CancelControlTask(currentTaskExecution.getJobId(), currentTaskExecution.getId()));
+                new CancelControlTask(currentTaskExecution.getJobId(), currentTaskExecution.getId()));
         }
 
         return job;
@@ -165,7 +166,7 @@ public class Coordinator {
             TaskExecution erroredTaskExecution = new TaskExecution(taskExecution);
 
             erroredTaskExecution.setError(
-                    new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
+                new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
 
             handleError(erroredTaskExecution);
         }

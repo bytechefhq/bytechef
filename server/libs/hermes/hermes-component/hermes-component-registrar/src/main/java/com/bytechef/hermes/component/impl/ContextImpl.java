@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -45,10 +46,10 @@ public class ContextImpl implements Context {
             @Override
             public FileEntry convert(Map<?, ?> source) {
                 return new FileEntryImpl(
-                        (String) source.get("extension"),
-                        (String) source.get("mimeType"),
-                        (String) source.get("name"),
-                        (String) source.get("url"));
+                    (String) source.get("extension"),
+                    (String) source.get("mimeType"),
+                    (String) source.get("name"),
+                    (String) source.get("url"));
             }
         });
     }
@@ -60,11 +61,11 @@ public class ContextImpl implements Context {
     private final TaskExecution taskExecution;
 
     public ContextImpl(
-            ConnectionDefinition connectionDefinition,
-            ConnectionService connectionService,
-            EventPublisher eventPublisher,
-            FileStorageService fileStorageService,
-            TaskExecution taskExecution) {
+        ConnectionDefinition connectionDefinition,
+        ConnectionService connectionService,
+        EventPublisher eventPublisher,
+        FileStorageService fileStorageService,
+        TaskExecution taskExecution) {
         this.connectionDefinition = connectionDefinition;
         this.connectionService = connectionService;
         this.eventPublisher = eventPublisher;
@@ -91,13 +92,13 @@ public class ContextImpl implements Context {
     @Override
     public Connection getConnectionParameters() {
         return new ConnectionImpl(connectionService.getConnection(
-                MapUtils.getRequiredString(taskExecution.getParameters(), CONNECTION_ID)));
+            MapUtils.getRequiredString(taskExecution.getParameters(), CONNECTION_ID)));
     }
 
     @Override
     public InputStream getFileStream(FileEntry fileEntry) {
         return fileStorageService.getFileStream(new com.bytechef.hermes.file.storage.domain.FileEntry(
-                fileEntry.getName(), fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getUrl()));
+            fileEntry.getName(), fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getUrl()));
     }
 
     @Override
@@ -108,7 +109,7 @@ public class ContextImpl implements Context {
     @Override
     public String readFileToString(FileEntry fileEntry) {
         return fileStorageService.readFileToString(new com.bytechef.hermes.file.storage.domain.FileEntry(
-                fileEntry.getName(), fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getUrl()));
+            fileEntry.getName(), fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getUrl()));
     }
 
     @Override
@@ -127,6 +128,6 @@ public class ContextImpl implements Context {
 
     private static FileEntry getFileEntry(com.bytechef.hermes.file.storage.domain.FileEntry fileEntry) {
         return new FileEntryImpl(
-                fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getName(), fileEntry.getUrl());
+            fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getName(), fileEntry.getUrl());
     }
 }

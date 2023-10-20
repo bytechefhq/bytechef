@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -54,34 +55,37 @@ public class ConnectionDefinitionController {
     }
 
     /**
-     * GET /definitions/connections
-     * Returns all connection definitions
+     * GET /definitions/connections Returns all connection definitions
      *
      * @return OK (status code 200)
      */
     @Operation(
-            description = "Returns all connection definitions.",
-            operationId = "getConnectionDefinitions",
-            summary = "Returns all connection definitions.",
-            tags = {"connection-definitions"},
-            responses = {
-                @ApiResponse(
-                        responseCode = "200",
-                        description = "OK",
-                        content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))
-                        })
-            })
+        description = "Returns all connection definitions.",
+        operationId = "getConnectionDefinitions",
+        summary = "Returns all connection definitions.",
+        tags = {
+            "connection-definitions"
+        },
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "OK",
+                content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))
+                })
+        })
     @RequestMapping(
-            method = RequestMethod.GET,
-            value = "/definitions/connections",
-            produces = {"application/json"})
+        method = RequestMethod.GET,
+        value = "/definitions/connections",
+        produces = {
+            "application/json"
+        })
     public Mono<ResponseEntity<Flux<ConnectionDefinition>>> getConnectionDefinitions(
-            @Parameter(hidden = true) final ServerWebExchange exchange) {
+        @Parameter(hidden = true) final ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(Flux.fromIterable(componentDefinitionFactories.stream()
-                .map(ComponentDefinitionFactory::getDefinition)
-                .filter(componentDefinition -> componentDefinition.getConnection() != null)
-                .map(ComponentDefinition::getConnection)
-                .toList())));
+            .map(ComponentDefinitionFactory::getDefinition)
+            .filter(componentDefinition -> componentDefinition.getConnection() != null)
+            .map(ComponentDefinition::getConnection)
+            .toList())));
     }
 }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -37,25 +38,28 @@ public class Base64StorageServiceTest {
     @Test
     public void testOpenInputStream() throws IOException {
         InputStream inputStream = base64StorageService.getFileStream(
-                new FileEntry(Base64.getEncoder().encodeToString(string.getBytes(StandardCharsets.UTF_8))));
+            new FileEntry(Base64.getEncoder()
+                .encodeToString(string.getBytes(StandardCharsets.UTF_8))));
 
         Assertions.assertThat(new String(inputStream.readAllBytes(), StandardCharsets.UTF_8))
-                .isEqualTo(string);
+            .isEqualTo(string);
     }
 
     @Test
     public void testRead() {
         Assertions.assertThat(base64StorageService.readFileToString(
-                        new FileEntry(Base64.getEncoder().encodeToString(string.getBytes(StandardCharsets.UTF_8)))))
-                .isEqualTo(string);
+            new FileEntry(Base64.getEncoder()
+                .encodeToString(string.getBytes(StandardCharsets.UTF_8)))))
+            .isEqualTo(string);
     }
 
     @Test
     public void testWrite() {
         FileEntry fileEntry = base64StorageService.storeFileContent(
-                "fileEntry", new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8)));
+            "fileEntry", new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8)));
 
         Assertions.assertThat(fileEntry.getUrl())
-                .isEqualTo("base64:" + Base64.getEncoder().encodeToString(string.getBytes(StandardCharsets.UTF_8)));
+            .isEqualTo("base64:" + Base64.getEncoder()
+                .encodeToString(string.getBytes(StandardCharsets.UTF_8)));
     }
 }

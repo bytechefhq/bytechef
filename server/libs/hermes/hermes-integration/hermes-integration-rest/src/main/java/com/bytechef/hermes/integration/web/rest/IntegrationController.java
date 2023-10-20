@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -45,9 +46,9 @@ public class IntegrationController implements IntegrationsApi {
 
     @SuppressFBWarnings("EI2")
     public IntegrationController(
-            ConversionService conversionService,
-            IntegrationFacade integrationFacade,
-            IntegrationService integrationService) {
+        ConversionService conversionService,
+        IntegrationFacade integrationFacade,
+        IntegrationService integrationService) {
         this.conversionService = conversionService;
         this.integrationFacade = integrationFacade;
         this.integrationService = integrationService;
@@ -57,42 +58,44 @@ public class IntegrationController implements IntegrationsApi {
     public Mono<ResponseEntity<Void>> deleteIntegration(String id, ServerWebExchange exchange) {
         integrationService.delete(id);
 
-        return Mono.just(ResponseEntity.ok().build());
+        return Mono.just(ResponseEntity.ok()
+            .build());
     }
 
     @Override
     public Mono<ResponseEntity<IntegrationModel>> getIntegration(String id, ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(
-                conversionService.convert(integrationService.getIntegration(id), IntegrationModel.class)));
+            conversionService.convert(integrationService.getIntegration(id), IntegrationModel.class)));
     }
 
     @Override
     public Mono<ResponseEntity<Flux<IntegrationModel>>> getIntegrations(ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(integrationService.getIntegrations().stream()
-                .map(integration -> conversionService.convert(integration, IntegrationModel.class))
-                .toList())));
+        return Mono.just(ResponseEntity.ok(Flux.fromIterable(integrationService.getIntegrations()
+            .stream()
+            .map(integration -> conversionService.convert(integration, IntegrationModel.class))
+            .toList())));
     }
 
     @Override
     @Transactional
     public Mono<ResponseEntity<IntegrationModel>> postIntegration(
-            Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
+        Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
 
         return integrationModelMono.map(integrationModel -> ResponseEntity.ok(conversionService.convert(
-                integrationFacade.add(conversionService.convert(integrationModel, Integration.class)),
-                IntegrationModel.class)));
+            integrationFacade.add(conversionService.convert(integrationModel, Integration.class)),
+            IntegrationModel.class)));
     }
 
     @Override
     public Mono<ResponseEntity<IntegrationModel>> putIntegration(
-            String id, Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
+        String id, Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
         return integrationModelMono.map(integrationModel -> {
             Integration integration = conversionService.convert(integrationModel, Integration.class);
 
             integration.setId(id);
 
             return ResponseEntity.ok(
-                    conversionService.convert(integrationService.update(integration), IntegrationModel.class));
+                conversionService.convert(integrationService.update(integration), IntegrationModel.class));
         });
     }
 }

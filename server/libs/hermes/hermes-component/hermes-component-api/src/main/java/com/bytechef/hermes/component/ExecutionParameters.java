@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -47,7 +48,7 @@ public interface ExecutionParameters {
     /**
      * Return the value associated with the given key -- converting to the desired return type.
      *
-     * @param key The key associated with the desired value.
+     * @param key        The key associated with the desired value.
      * @param returnType The type to return the value as -- converting as neccessary.
      * @return The value associated with the given key.
      */
@@ -56,10 +57,9 @@ public interface ExecutionParameters {
     /**
      * Return the value associated with the given key -- converting to the desired return type.
      *
-     * @param key The key associated with the desired value.
-     * @param returnType The type to return the value as -- converting as neccessary.
-     * @param defaultValue The value to return if a value was not found for the given key or if the
-     *     value is null.
+     * @param key          The key associated with the desired value.
+     * @param returnType   The type to return the value as -- converting as neccessary.
+     * @param defaultValue The value to return if a value was not found for the given key or if the value is null.
      * @return The value associated with the given key or the default value.
      */
     <T> T get(String key, Class<T> returnType, T defaultValue);
@@ -83,7 +83,7 @@ public interface ExecutionParameters {
     /**
      * Return the {@link Boolean} value associated with the given key -- converting as necessary.
      *
-     * @param key The key associated with the desired value.
+     * @param key          The key associated with the desired value.
      * @param defaultValue The default value if no value is associated with the key
      * @return The {@link Integer} value associated with the given key -- converting as needed.
      */
@@ -100,7 +100,7 @@ public interface ExecutionParameters {
     /**
      * Return the {@link Date} value associated with the given key -- converting as necessary.
      *
-     * @param key The key associated with the desired value.
+     * @param key          The key associated with the desired value.
      * @param defaultValue The default value if no value is associated with the key
      * @return The {@link Date} value associated with the given key -- converting as needed.
      */
@@ -117,9 +117,8 @@ public interface ExecutionParameters {
     /**
      * Return the {@link Double} value associated with the given key -- converting as necessary.
      *
-     * @param key The key associated with the desired value.
-     * @param defaultValue The value to return if a value was not found for the given key or if the
-     *     value is null.
+     * @param key          The key associated with the desired value.
+     * @param defaultValue The value to return if a value was not found for the given key or if the value is null.
      * @return The {@link Double} value associated with the given key -- converting as needed.
      */
     double getDouble(String key, double defaultValue);
@@ -135,7 +134,7 @@ public interface ExecutionParameters {
     /**
      * Return the {@link Duration} value associated with the given key -- converting as necessary.
      *
-     * @param key The key associated with the desired value.
+     * @param key             The key associated with the desired value.
      * @param defaultDuration The default duration
      * @return The {@link Duration} value associated with the given key -- converting as needed.
      */
@@ -152,9 +151,8 @@ public interface ExecutionParameters {
     /**
      * Return the {@link Float} value associated with the given key -- converting as necessary.
      *
-     * @param key The key associated with the desired value.
-     * @param defaultValue The value to return if a value was not found for the given key or if the
-     *     value is null.
+     * @param key          The key associated with the desired value.
+     * @param defaultValue The value to return if a value was not found for the given key or if the value is null.
      * @return The {@link Float} value associated with the given key -- converting as needed.
      */
     float getFloat(String key, float defaultValue);
@@ -170,9 +168,8 @@ public interface ExecutionParameters {
     /**
      * Return the {@link Integer} value associated with the given key -- converting as necessary.
      *
-     * @param key The key associated with the desired value.
-     * @param defaultValue The value to return if a value was not found for the given key or if the
-     *     value is null.
+     * @param key          The key associated with the desired value.
+     * @param defaultValue The value to return if a value was not found for the given key or if the value is null.
      * @return The {@link Integer} value associated with the given key -- converting as needed.
      */
     int getInteger(String key, int defaultValue);
@@ -180,7 +177,7 @@ public interface ExecutionParameters {
     /**
      * Return the {@link List} of items associated with the given key.
      *
-     * @param key The key associated with the desired value.
+     * @param key         The key associated with the desired value.
      * @param elementType The type of the list elements.
      * @return The list of items
      */
@@ -189,10 +186,9 @@ public interface ExecutionParameters {
     /**
      * Return the {@link List} of items associated with the given key.
      *
-     * @param key The key associated with the desired value.
-     * @param elementType The type of the list elements.
-     * @param defaultValue The list value to return none was not found for the given key or if the
-     *     value is null.
+     * @param key          The key associated with the desired value.
+     * @param elementType  The type of the list elements.
+     * @param defaultValue The list value to return none was not found for the given key or if the value is null.
      * @return The list of items
      */
     <T> List<T> getList(String key, Class<T> elementType, List<T> defaultValue);
@@ -218,9 +214,8 @@ public interface ExecutionParameters {
     /**
      * Return the {@link Long} value associated with the given key -- converting as necessary.
      *
-     * @param key The key associated with the desired value.
-     * @param defaultValue The value to return if a value was not found for the given key or if the
-     *     value is null.
+     * @param key          The key associated with the desired value.
+     * @param defaultValue The value to return if a value was not found for the given key or if the value is null.
      * @return The {@link Long} value associated with the given key -- converting as needed.
      */
     long getLong(String key, long defaultValue);
@@ -236,7 +231,7 @@ public interface ExecutionParameters {
     /**
      * Return the {@link Map} value associated with the given key.
      *
-     * @param key The key associated with the desired value.
+     * @param key          The key associated with the desired value.
      * @param defaultValue The default map to return if none is associated with the key.
      * @return The {@link Map} value associated with the given key.
      */
@@ -245,8 +240,8 @@ public interface ExecutionParameters {
     Map<String, Object> getMap(String key, List<Class<?>> valueTypes, Map<String, Object> defaultValue);
 
     /**
-     * Return the value associated with the given key or throws an exception if no value is
-     * associated with the given key.
+     * Return the value associated with the given key or throws an exception if no value is associated with the given
+     * key.
      *
      * @param key The key associated with the desired value.
      * @return The value associated with the given key.
@@ -255,10 +250,10 @@ public interface ExecutionParameters {
     <T> T getRequired(String key);
 
     /**
-     * Return the value -- converting to the desired return type -- associated with the given key or
-     * throws an exception if no value is associated with the given key.
+     * Return the value -- converting to the desired return type -- associated with the given key or throws an exception
+     * if no value is associated with the given key.
      *
-     * @param key The key associated with the desired value.
+     * @param key        The key associated with the desired value.
      * @param returnType The type to return the value as -- converting as necessary.
      * @return The value associated with the given key.
      */
@@ -282,8 +277,7 @@ public interface ExecutionParameters {
      * Return the {@link String} value associated with the given key -- converting as necessary.
      *
      * @param key The key associated with the desired value.
-     * @return The string value associated with the given key -- converting to {@link String} as
-     *     needed.
+     * @return The string value associated with the given key -- converting to {@link String} as needed.
      * @throws IllegalArgumentException if no value is associated with the given key.
      */
     String getRequiredString(String key);
@@ -292,19 +286,16 @@ public interface ExecutionParameters {
      * Return the {@link String} value associated with the given key -- converting as necessary.
      *
      * @param key The key associated with the desired value.
-     * @return The string value associated with the given key -- converting to {@link String} as
-     *     needed.
+     * @return The string value associated with the given key -- converting to {@link String} as needed.
      */
     String getString(String key);
 
     /**
      * Return the {@link String} value associated with the given key -- converting as necessary.
      *
-     * @param key The key associated with the desired value.
-     * @param defaultValue The value to return if a value was not found for the given key or if the
-     *     value is null.
-     * @return The string value associated with the given key -- converting to {@link String} as
-     *     needed.
+     * @param key          The key associated with the desired value.
+     * @param defaultValue The value to return if a value was not found for the given key or if the value is null.
+     * @return The string value associated with the given key -- converting to {@link String} as needed.
      */
     String getString(String key, String defaultValue);
 }

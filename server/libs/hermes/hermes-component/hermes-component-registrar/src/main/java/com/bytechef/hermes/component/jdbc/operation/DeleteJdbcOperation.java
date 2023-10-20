@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -55,11 +56,12 @@ public class DeleteJdbcOperation implements JdbcOperation<Map<String, Integer>> 
             result = Map.of("rows", 0);
         } else {
             int[] rowsAffected = jdbcExecutor.batchUpdate(
-                    context.getConnectionParameters(),
-                    "DELETE FROM %s.%s WHERE %s=:%s".formatted(schema, table, deleteKey, deleteKey),
-                    SqlParameterSourceUtils.createBatch(rows.toArray()));
+                context.getConnectionParameters(),
+                "DELETE FROM %s.%s WHERE %s=:%s".formatted(schema, table, deleteKey, deleteKey),
+                SqlParameterSourceUtils.createBatch(rows.toArray()));
 
-            result = Map.of("rows", Arrays.stream(rowsAffected).sum());
+            result = Map.of("rows", Arrays.stream(rowsAffected)
+                .sum());
         }
 
         return result;

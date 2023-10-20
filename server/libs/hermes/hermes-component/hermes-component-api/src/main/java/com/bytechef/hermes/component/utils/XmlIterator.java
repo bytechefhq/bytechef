@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -68,7 +69,8 @@ class XmlIterator implements Iterator<Map<String, ?>> {
                 return false;
             }
 
-            value = xmlMapper.readValue(xmlStreamReader, new TypeReference<>() {});
+            value = xmlMapper.readValue(xmlStreamReader, new TypeReference<>() {
+            });
         } catch (Exception exception) {
             throw new ProcessingException("Unable to read value", exception);
         }

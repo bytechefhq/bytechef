@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -63,58 +64,58 @@ import org.apache.commons.io.FilenameUtils;
 public class FilesystemComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition = component(FILESYSTEM)
-            .display(display("Local File").description("Reads or writes a binary file from/to disk"))
-            .actions(
-                    action(READ_FILE)
-                            .display(display("Read to file"))
-                            .properties(string(FILENAME)
-                                    .label("Filename")
-                                    .description("The path of the file to read.")
-                                    .placeholder("/data/your_file.pdf")
-                                    .required(true))
-                            .output(ComponentDSL.fileEntry())
-                            .perform(this::performReadFile),
-                    action(WRITE_FILE)
-                            .display(display("Write from file"))
-                            .properties(
-                                    fileEntry(FILE_ENTRY)
-                                            .label("File")
-                                            .description(
-                                                    "The object property which contains a reference to the file to be written.")
-                                            .required(true),
-                                    string(FILENAME)
-                                            .label("Filename")
-                                            .description("The path to which the file should be written.")
-                                            .placeholder("/data/your_file.pdf")
-                                            .required(true))
-                            .output(object().properties(integer("bytes")))
-                            .perform(this::performWriteFile),
-                    action(CREATE_TEMP_DIR)
-                            .display(display("Create Temp Directory")
-                                    .description("Creates a temporary directory oon the filesystem."))
-                            .perform(this::performCreateTempDir),
-                    action(GET_FILE_PATH)
-                            .display(
-                                    display("File Path")
-                                            .description(
-                                                    "Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator."))
-                            .properties(string(FILENAME)
-                                    .label("Filename")
-                                    .description("The path to full filename.")
-                                    .placeholder("/data/your_file.pdf")
-                                    .required(true))
-                            .perform(this::performGetFilePath)
-                            .output(string())
-                            .exampleOutput("/data"),
-                    action(LS)
-                            .display(display("Lists a content of directory for the given path.")
-                                    .description("")),
-                    action(MKDIR)
-                            .display(display("Create").description("Creates a directory."))
-                            .perform(this::performCreateDir),
-                    action(RM)
-                            .display(display("Remove").description("Removes the content of a directory."))
-                            .perform(this::performDelete));
+        .display(display("Local File").description("Reads or writes a binary file from/to disk"))
+        .actions(
+            action(READ_FILE)
+                .display(display("Read to file"))
+                .properties(string(FILENAME)
+                    .label("Filename")
+                    .description("The path of the file to read.")
+                    .placeholder("/data/your_file.pdf")
+                    .required(true))
+                .output(ComponentDSL.fileEntry())
+                .perform(this::performReadFile),
+            action(WRITE_FILE)
+                .display(display("Write from file"))
+                .properties(
+                    fileEntry(FILE_ENTRY)
+                        .label("File")
+                        .description(
+                            "The object property which contains a reference to the file to be written.")
+                        .required(true),
+                    string(FILENAME)
+                        .label("Filename")
+                        .description("The path to which the file should be written.")
+                        .placeholder("/data/your_file.pdf")
+                        .required(true))
+                .output(object().properties(integer("bytes")))
+                .perform(this::performWriteFile),
+            action(CREATE_TEMP_DIR)
+                .display(display("Create Temp Directory")
+                    .description("Creates a temporary directory oon the filesystem."))
+                .perform(this::performCreateTempDir),
+            action(GET_FILE_PATH)
+                .display(
+                    display("File Path")
+                        .description(
+                            "Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator."))
+                .properties(string(FILENAME)
+                    .label("Filename")
+                    .description("The path to full filename.")
+                    .placeholder("/data/your_file.pdf")
+                    .required(true))
+                .perform(this::performGetFilePath)
+                .output(string())
+                .exampleOutput("/data"),
+            action(LS)
+                .display(display("Lists a content of directory for the given path.")
+                    .description("")),
+            action(MKDIR)
+                .display(display("Create").description("Creates a directory."))
+                .perform(this::performCreateDir),
+            action(RM)
+                .display(display("Remove").description("Removes the content of a directory."))
+                .perform(this::performDelete));
 
     @Override
     public ComponentDefinition getDefinition() {
@@ -124,7 +125,8 @@ public class FilesystemComponentHandler implements ComponentHandler {
     /**
      * Creates a directory by creating all nonexistent parent directories first.
      *
-     * <p>An exception is not thrown if the directory could not be created because it already exists.
+     * <p>
+     * An exception is not thrown if the directory could not be created because it already exists.
      */
     protected Object performCreateDir(Context context, ExecutionParameters executionParameters) {
         try {
@@ -143,14 +145,16 @@ public class FilesystemComponentHandler implements ComponentHandler {
             return file.getAbsolutePath();
         } catch (IOException ioException) {
             throw new ActionExecutionException(
-                    "Unable to create temporary directory " + executionParameters, ioException);
+                "Unable to create temporary directory " + executionParameters, ioException);
         }
     }
 
     /**
      * Deletes a file, never throwing an exception. If file is a directory, delete it and all subdirectories.
      *
-     * <p>A directory to be deleted does not have to be empty.</p>
+     * <p>
+     * A directory to be deleted does not have to be empty.
+     * </p>
      */
     protected Object performDelete(Context context, ExecutionParameters executionParameters) {
         File file = new File(executionParameters.getRequiredString("path"));
@@ -166,8 +170,9 @@ public class FilesystemComponentHandler implements ComponentHandler {
      * Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory
      * separator.
      *
-     * <p>This method will handle a file in either Unix or Windows format. The method is entirely text based and
-     * returns the text before the last forward or backslash.
+     * <p>
+     * This method will handle a file in either Unix or Windows format. The method is entirely text based and returns
+     * the text before the last forward or backslash.
      */
     protected String performGetFilePath(Context context, ExecutionParameters executionParameters) {
         return FilenameUtils.getFullPathNoEndSeparator(executionParameters.getRequiredString("filename"));
@@ -179,10 +184,11 @@ public class FilesystemComponentHandler implements ComponentHandler {
         boolean recursive = executionParameters.getBoolean("recursive", false);
 
         try (Stream<Path> stream = Files.walk(root)) {
-            return stream.filter(p -> recursive || p.getParent().equals(root))
-                    .filter(Files::isRegularFile)
-                    .map(p -> new FileInfo(root, p))
-                    .collect(Collectors.toList());
+            return stream.filter(p -> recursive || p.getParent()
+                .equals(root))
+                .filter(Files::isRegularFile)
+                .map(p -> new FileInfo(root, p))
+                .collect(Collectors.toList());
         } catch (IOException ioException) {
             throw new ActionExecutionException("Unable to list directory entries", ioException);
         }

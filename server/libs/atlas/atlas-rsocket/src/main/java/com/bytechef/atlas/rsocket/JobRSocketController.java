@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -61,7 +62,8 @@ public class JobRSocketController {
 
     @MessageMapping("fetchLatestJob")
     public Mono<Job> fetchLatestJob() {
-        return Mono.create(sink -> sink.success(jobService.fetchLatestJob().orElse(null)));
+        return Mono.create(sink -> sink.success(jobService.fetchLatestJob()
+            .orElse(null)));
     }
 
     @MessageMapping("getTaskExecutionJob")

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -31,12 +32,13 @@ public class FileSystemEncryptionKeyTest {
     public void testGetKey() throws IOException {
         Path userHomePath = Files.createTempDirectory("user.home");
 
-        Path keyPath =
-                Files.createDirectories(userHomePath.resolve(".bytechef")).resolve("key");
+        Path keyPath = Files.createDirectories(userHomePath.resolve(".bytechef"))
+            .resolve("key");
 
         Files.writeString(Files.createFile(keyPath), "tTB1/UBIbYLuCXVi4PPfzA==");
 
-        System.setProperty("user.home", userHomePath.toFile().getAbsolutePath());
+        System.setProperty("user.home", userHomePath.toFile()
+            .getAbsolutePath());
 
         FileSystemEncryptionKey encryptionKey = new FileSystemEncryptionKey();
 

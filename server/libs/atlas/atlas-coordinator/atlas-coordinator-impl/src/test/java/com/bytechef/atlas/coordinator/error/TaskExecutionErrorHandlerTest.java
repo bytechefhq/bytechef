@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -48,8 +49,8 @@ public class TaskExecutionErrorHandlerTest {
     public void test1() {
         when(jobService.getTaskExecutionJob("1234")).thenReturn(new Job("4567"));
 
-        TaskExecutionErrorHandler taskExecutionErrorHandler =
-                new TaskExecutionErrorHandler(eventPublisher, jobService, taskDispatcher, taskExecutionService);
+        TaskExecutionErrorHandler taskExecutionErrorHandler = new TaskExecutionErrorHandler(eventPublisher, jobService,
+            taskDispatcher, taskExecutionService);
 
         TaskExecution erroredTaskExecution = new TaskExecution();
 
@@ -66,8 +67,8 @@ public class TaskExecutionErrorHandlerTest {
     public void test2() {
         when(jobService.getTaskExecutionJob("1234")).thenReturn(new Job());
 
-        TaskExecutionErrorHandler taskExecutionErrorHandler =
-                new TaskExecutionErrorHandler(eventPublisher, jobService, taskDispatcher, taskExecutionService);
+        TaskExecutionErrorHandler taskExecutionErrorHandler = new TaskExecutionErrorHandler(eventPublisher, jobService,
+            taskDispatcher, taskExecutionService);
 
         TaskExecution erroredTaskExecution = new TaskExecution();
 

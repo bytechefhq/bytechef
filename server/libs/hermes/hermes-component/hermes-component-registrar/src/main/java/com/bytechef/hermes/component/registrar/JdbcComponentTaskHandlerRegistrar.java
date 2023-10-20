@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -39,10 +40,10 @@ public class JdbcComponentTaskHandlerRegistrar extends DefaultComponentTaskHandl
 
     @SuppressFBWarnings("EI2")
     public JdbcComponentTaskHandlerRegistrar(
-            ConnectionService connectionService,
-            DataSourceFactory dataSourceFactory,
-            EventPublisher eventPublisher,
-            FileStorageService fileStorageService) {
+        ConnectionService connectionService,
+        DataSourceFactory dataSourceFactory,
+        EventPublisher eventPublisher,
+        FileStorageService fileStorageService) {
         super(connectionService, eventPublisher, fileStorageService);
 
         this.dataSourceFactory = dataSourceFactory;
@@ -50,18 +51,18 @@ public class JdbcComponentTaskHandlerRegistrar extends DefaultComponentTaskHandl
 
     @Override
     public void registerTaskHandlers(ConfigurableListableBeanFactory beanFactory) {
-        for (JdbcComponentDefinitionFactory jdbcComponentDefinitionFactory :
-                ServiceLoader.load(JdbcComponentDefinitionFactory.class)) {
-            JdbcComponentDefinition jdbcComponentDefinition =
-                    jdbcComponentDefinitionFactory.getJdbcComponentDefinition();
+        for (JdbcComponentDefinitionFactory jdbcComponentDefinitionFactory : ServiceLoader
+            .load(JdbcComponentDefinitionFactory.class)) {
+            JdbcComponentDefinition jdbcComponentDefinition = jdbcComponentDefinitionFactory
+                .getJdbcComponentDefinition();
 
             JdbcExecutor jdbcExecutor = new JdbcExecutor(
-                    jdbcComponentDefinition.getDatabaseJdbcName(),
-                    dataSourceFactory,
-                    jdbcComponentDefinition.getJdbcDriverClassName());
+                jdbcComponentDefinition.getDatabaseJdbcName(),
+                dataSourceFactory,
+                jdbcComponentDefinition.getJdbcDriverClassName());
 
             registerComponentActionTaskHandlerAdapter(
-                    new JdbcComponentTaskHandler(jdbcExecutor, jdbcComponentDefinition), beanFactory);
+                new JdbcComponentTaskHandler(jdbcExecutor, jdbcComponentDefinition), beanFactory);
         }
     }
 }

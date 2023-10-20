@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -62,57 +63,57 @@ import java.util.stream.Stream;
 public class XmlFileComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition = component(XmlFileConstants.XML_FILE)
-            .display(display("XML File").description("Reads and writes data from a XML file."))
-            .actions(
-                    action(READ)
-                            .display(display("Read from file").description("Reads data from a XML file."))
-                            .properties(
-                                    fileEntry(FILE_ENTRY)
-                                            .label("File")
-                                            .description(
-                                                    "The object property which contains a reference to the XML file to read from.")
-                                            .required(true),
-                                    bool(IS_ARRAY)
-                                            .label("Is Array")
-                                            .description("The object input is array?")
-                                            .defaultValue(true),
-                                    string(PATH)
-                                            .label("Path")
-                                            .description(
-                                                    "The path where the array is e.g 'data'. Leave blank to use the top level object.")
-                                            .displayOption(show(IS_ARRAY, true))
-                                            .advancedOption(true),
-                                    integer(PAGE_SIZE)
-                                            .label("Page Size")
-                                            .description("The amount of child elements to return in a page.")
-                                            .displayOption(show(IS_ARRAY, true))
-                                            .advancedOption(true),
-                                    integer(PAGE_NUMBER)
-                                            .label("Page Number")
-                                            .description("The page number to get.")
-                                            .displayOption(show(IS_ARRAY, true))
-                                            .advancedOption(true))
-                            .output(
-                                    array().displayOption(show(IS_ARRAY, true)),
-                                    object().displayOption(show(IS_ARRAY, false)))
-                            .perform(this::performRead),
-                    action(WRITE)
-                            .display(display("Write to file").description("Writes the data to a XML file."))
-                            .properties(
-                                    oneOf(SOURCE)
-                                            .label("Source")
-                                            .description("The data to write to the file.")
-                                            .required(true)
-                                            .types(array(), object()),
-                                    string(FILENAME)
-                                            .label("Filename")
-                                            .description(
-                                                    "Filename to set for binary data. By default, \"file.xml\" will be used.")
-                                            .required(true)
-                                            .defaultValue("file.xml")
-                                            .advancedOption(true))
-                            .output(fileEntry())
-                            .perform(this::performWrite));
+        .display(display("XML File").description("Reads and writes data from a XML file."))
+        .actions(
+            action(READ)
+                .display(display("Read from file").description("Reads data from a XML file."))
+                .properties(
+                    fileEntry(FILE_ENTRY)
+                        .label("File")
+                        .description(
+                            "The object property which contains a reference to the XML file to read from.")
+                        .required(true),
+                    bool(IS_ARRAY)
+                        .label("Is Array")
+                        .description("The object input is array?")
+                        .defaultValue(true),
+                    string(PATH)
+                        .label("Path")
+                        .description(
+                            "The path where the array is e.g 'data'. Leave blank to use the top level object.")
+                        .displayOption(show(IS_ARRAY, true))
+                        .advancedOption(true),
+                    integer(PAGE_SIZE)
+                        .label("Page Size")
+                        .description("The amount of child elements to return in a page.")
+                        .displayOption(show(IS_ARRAY, true))
+                        .advancedOption(true),
+                    integer(PAGE_NUMBER)
+                        .label("Page Number")
+                        .description("The page number to get.")
+                        .displayOption(show(IS_ARRAY, true))
+                        .advancedOption(true))
+                .output(
+                    array().displayOption(show(IS_ARRAY, true)),
+                    object().displayOption(show(IS_ARRAY, false)))
+                .perform(this::performRead),
+            action(WRITE)
+                .display(display("Write to file").description("Writes the data to a XML file."))
+                .properties(
+                    oneOf(SOURCE)
+                        .label("Source")
+                        .description("The data to write to the file.")
+                        .required(true)
+                        .types(array(), object()),
+                    string(FILENAME)
+                        .label("Filename")
+                        .description(
+                            "Filename to set for binary data. By default, \"file.xml\" will be used.")
+                        .required(true)
+                        .defaultValue("file.xml")
+                        .advancedOption(true))
+                .output(fileEntry())
+                .perform(this::performWrite));
 
     @Override
     public ComponentDefinition getDefinition() {
@@ -134,7 +135,8 @@ public class XmlFileComponentHandler implements ComponentHandler {
                     items = stream.toList();
                 }
             } else {
-                items = XmlUtils.read(inputStream, path, new TypeReference<>() {});
+                items = XmlUtils.read(inputStream, path, new TypeReference<>() {
+                });
             }
 
             Integer pageSize = executionParameters.getInteger(PAGE_SIZE);
@@ -149,7 +151,7 @@ public class XmlFileComponentHandler implements ComponentHandler {
             }
 
             if (rangeStartIndex != null && rangeStartIndex > 0
-                    || rangeEndIndex != null && rangeEndIndex < items.size()) {
+                || rangeEndIndex != null && rangeEndIndex < items.size()) {
                 items = items.subList(rangeStartIndex, rangeEndIndex);
             }
 
@@ -172,10 +174,10 @@ public class XmlFileComponentHandler implements ComponentHandler {
 
         try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
             return context.storeFileContent(
-                    executionParameters.getString(FILENAME) == null
-                            ? "file.xml"
-                            : executionParameters.getString(FILENAME),
-                    inputStream);
+                executionParameters.getString(FILENAME) == null
+                    ? "file.xml"
+                    : executionParameters.getString(FILENAME),
+                inputStream);
         } catch (IOException ioException) {
             throw new ActionExecutionException("Unable to handle task " + executionParameters, ioException);
         }

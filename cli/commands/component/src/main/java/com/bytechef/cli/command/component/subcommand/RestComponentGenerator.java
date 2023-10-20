@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -70,17 +71,17 @@ import org.slf4j.LoggerFactory;
 
 public class RestComponentGenerator {
 
-    private static final ClassName AUTHORIZATION_CLASS_NAME =
-            ClassName.get("com.bytechef.hermes.component.definition", "Authorization");
+    private static final ClassName AUTHORIZATION_CLASS_NAME = ClassName.get("com.bytechef.hermes.component.definition",
+        "Authorization");
     public static final String COM_BYTECHEF_HERMES_COMPONENT_PACKAGE = "com.bytechef.hermes.component";
-    public static final ClassName COMPONENT_DEFINITION_CLASS_NAME =
-            ClassName.get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ComponentDefinition");
-    public static final ClassName COMPONENT_DSL_CLASS_NAME =
-            ClassName.get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ComponentDSL");
+    public static final ClassName COMPONENT_DEFINITION_CLASS_NAME = ClassName
+        .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ComponentDefinition");
+    public static final ClassName COMPONENT_DSL_CLASS_NAME = ClassName
+        .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ComponentDSL");
     private static final Logger logger = LoggerFactory.getLogger(RestComponentGenerator.class);
     private static final String COMPONENT_HANDLER = "ComponentHandler";
-    private static final ClassName COMPONENT_CONSTANTS_CLASS_NAME =
-            ClassName.get("com.bytechef.hermes.component.constants", "ComponentConstants");
+    private static final ClassName COMPONENT_CONSTANTS_CLASS_NAME = ClassName
+        .get("com.bytechef.hermes.component.constants", "ComponentConstants");
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final String basePackageName;
@@ -91,7 +92,7 @@ public class RestComponentGenerator {
     private final Set<String> schemas = new HashSet<>();
 
     public RestComponentGenerator(String basePackageName, String componentName, String openApiPath, String outputPath)
-            throws IOException {
+        throws IOException {
         this.basePackageName = basePackageName;
         this.componentName = componentName;
         this.openAPI = parseOpenAPIFile(openApiPath);
@@ -112,7 +113,7 @@ public class RestComponentGenerator {
 
     public void generate() throws Exception {
         Path path = Files.createDirectories(
-                Paths.get(getAbsolutePathname("src" + File.separator + "main" + File.separator + "java")));
+            Paths.get(getAbsolutePathname("src" + File.separator + "main" + File.separator + "java")));
 
         int schemaSize = schemas.size();
 
@@ -162,9 +163,9 @@ public class RestComponentGenerator {
                 List<OperationItem> curOperationItems = operationItemsEntry.getValue();
 
                 curOperationItems = curOperationItems.stream()
-                        .filter(operationItem -> operations.stream()
-                                .anyMatch(operationId -> Objects.equals(operationItem.getOperationId(), operationId)))
-                        .toList();
+                    .filter(operationItem -> operations.stream()
+                        .anyMatch(operationId -> Objects.equals(operationItem.getOperationId(), operationId)))
+                    .toList();
 
                 if (!curOperationItems.isEmpty()) {
                     filteredOperationsMap.put(operationItemsEntry.getKey(), curOperationItems);
@@ -194,23 +195,23 @@ public class RestComponentGenerator {
             CodeBlock.Builder metadataBuilder = CodeBlock.builder();
 
             metadataBuilder.add(
-                    """
+                """
                     "requestMethod", $S,
                     "path", $S
                     """,
-                    requestMethod,
-                    operationItem.path);
+                requestMethod,
+                operationItem.path);
 
             if (propertiesEntry.bodyContentType() != null) {
                 metadataBuilder.add(
-                        """
+                    """
                         ,"bodyContentType", $S
                         """,
-                        propertiesEntry.bodyContentType());
+                    propertiesEntry.bodyContentType());
             }
 
             builder.add(
-                    """
+                """
                     action($S)
                         .display(
                             display($S)
@@ -223,12 +224,12 @@ public class RestComponentGenerator {
                         )
                         .properties($L)
                     """,
-                    operation.getOperationId(),
-                    operation.getSummary(),
-                    operation.getDescription(),
-                    Map.class,
-                    metadataBuilder.build(),
-                    propertiesEntry.propertiesCodeBlock());
+                operation.getOperationId(),
+                operation.getSummary(),
+                operation.getDescription(),
+                Map.class,
+                metadataBuilder.build(),
+                propertiesEntry.propertiesCodeBlock());
 
             CodeBlock codeBlock = outputEntry == null ? null : outputEntry.outputCodeBlock();
 
@@ -245,12 +246,13 @@ public class RestComponentGenerator {
             codeBlocks.add(builder.build());
         }
 
-        return codeBlocks.stream().collect(CodeBlock.joining(","));
+        return codeBlocks.stream()
+            .collect(CodeBlock.joining(","));
     }
 
     private CodeBlock getActionsCodeBlock(Path componentHandlerDirPath, OpenAPI openAPI) throws IOException {
-        Map<String, List<OperationItem>> operationsMap =
-                filterOperationItemsMap(getOperationItemsMap(openAPI.getPaths()));
+        Map<String, List<OperationItem>> operationsMap = filterOperationItemsMap(
+            getOperationItemsMap(openAPI.getPaths()));
 
         List<CodeBlock> codeBlocks = new ArrayList<>();
 
@@ -259,8 +261,8 @@ public class RestComponentGenerator {
 
             if (generatorConfig.openApi.useTags) {
                 String prefix = Arrays.stream(StringUtils.split(operationItemsEntry.getKey(), " "))
-                        .map(StringUtils::capitalize)
-                        .collect(Collectors.joining());
+                    .map(StringUtils::capitalize)
+                    .collect(Collectors.joining());
 
                 ClassName className = ClassName.get(getPackageName() + ".action", prefix + "Actions");
 
@@ -272,7 +274,8 @@ public class RestComponentGenerator {
             }
         }
 
-        return codeBlocks.stream().collect(CodeBlock.joining(","));
+        return codeBlocks.stream()
+            .collect(CodeBlock.joining(","));
     }
 
     private CodeBlock getAuthorizationApiKeyCodeBlock(SecurityScheme securityScheme) {
@@ -281,7 +284,7 @@ public class RestComponentGenerator {
         SecurityScheme.In in = securityScheme.getIn();
 
         builder.add(
-                """
+            """
                 authorization(
                     $T.AuthorizationType.API_KEY.name().toLowerCase(),
                     $T.AuthorizationType.API_KEY
@@ -305,23 +308,23 @@ public class RestComponentGenerator {
                         .hidden($L)
                 )
                 """,
-                AUTHORIZATION_CLASS_NAME,
-                AUTHORIZATION_CLASS_NAME,
-                "API Key",
-                "Key",
-                true,
-                securityScheme.getName() == null
-                        ? CodeBlock.of("$L", "API_TOKEN")
-                        : CodeBlock.of("$S", securityScheme.getName()),
-                true,
-                "Value",
-                true,
-                "Add to",
-                true,
-                in == SecurityScheme.In.HEADER
-                        ? CodeBlock.of("$T.ApiTokenLocation.HEADER.name()", AUTHORIZATION_CLASS_NAME)
-                        : CodeBlock.of("$T.ApiTokenLocation.QUERY_PARAMETERS.name()", AUTHORIZATION_CLASS_NAME),
-                true);
+            AUTHORIZATION_CLASS_NAME,
+            AUTHORIZATION_CLASS_NAME,
+            "API Key",
+            "Key",
+            true,
+            securityScheme.getName() == null
+                ? CodeBlock.of("$L", "API_TOKEN")
+                : CodeBlock.of("$S", securityScheme.getName()),
+            true,
+            "Value",
+            true,
+            "Add to",
+            true,
+            in == SecurityScheme.In.HEADER
+                ? CodeBlock.of("$T.ApiTokenLocation.HEADER.name()", AUTHORIZATION_CLASS_NAME)
+                : CodeBlock.of("$T.ApiTokenLocation.QUERY_PARAMETERS.name()", AUTHORIZATION_CLASS_NAME),
+            true);
 
         return builder.build();
     }
@@ -330,7 +333,7 @@ public class RestComponentGenerator {
         CodeBlock.Builder builder = CodeBlock.builder();
 
         builder.add(
-                """
+            """
                 authorization(
                     $T.AuthorizationType.BASIC_AUTH.name().toLowerCase(),
                     $T.AuthorizationType.BASIC_AUTH
@@ -347,13 +350,13 @@ public class RestComponentGenerator {
                         .required($L)
                 )
                 """,
-                AUTHORIZATION_CLASS_NAME,
-                AUTHORIZATION_CLASS_NAME,
-                "Basic Auth",
-                "Username",
-                true,
-                "Password",
-                true);
+            AUTHORIZATION_CLASS_NAME,
+            AUTHORIZATION_CLASS_NAME,
+            "Basic Auth",
+            "Username",
+            true,
+            "Password",
+            true);
 
         return builder.build();
     }
@@ -362,7 +365,7 @@ public class RestComponentGenerator {
         CodeBlock.Builder builder = CodeBlock.builder();
 
         builder.add(
-                """
+            """
                 authorization(
                     $T.AuthorizationType.BEARER_TOKEN.name().toLowerCase(),
                     $T.AuthorizationType.BEARER_TOKEN
@@ -376,11 +379,11 @@ public class RestComponentGenerator {
                         .required($L)
                 )
                 """,
-                AUTHORIZATION_CLASS_NAME,
-                AUTHORIZATION_CLASS_NAME,
-                "Bearer Token",
-                "Token",
-                true);
+            AUTHORIZATION_CLASS_NAME,
+            AUTHORIZATION_CLASS_NAME,
+            "Bearer Token",
+            "Token",
+            true);
 
         return builder.build();
     }
@@ -389,7 +392,7 @@ public class RestComponentGenerator {
         CodeBlock.Builder builder = CodeBlock.builder();
 
         builder.add(
-                """
+            """
                 authorization(
                     $T.AuthorizationType.OAUTH2_AUTHORIZATION_CODE.name().toLowerCase(),
                     $T.AuthorizationType.OAUTH2_AUTHORIZATION_CODE
@@ -410,18 +413,18 @@ public class RestComponentGenerator {
                 .scopes(connection -> $T.of($L))
                 .tokenUrl(connection -> $S)
                 """,
-                AUTHORIZATION_CLASS_NAME,
-                AUTHORIZATION_CLASS_NAME,
-                "OAuth2 Authorization code",
-                "Client Id",
-                true,
-                "Client Secret",
-                true,
-                oAuthFlow.getAuthorizationUrl(),
-                oAuthFlow.getRefreshUrl(),
-                List.class,
-                getOAUth2Scopes(oAuthFlow.getScopes()),
-                oAuthFlow.getTokenUrl());
+            AUTHORIZATION_CLASS_NAME,
+            AUTHORIZATION_CLASS_NAME,
+            "OAuth2 Authorization code",
+            "Client Id",
+            true,
+            "Client Secret",
+            true,
+            oAuthFlow.getAuthorizationUrl(),
+            oAuthFlow.getRefreshUrl(),
+            List.class,
+            getOAUth2Scopes(oAuthFlow.getScopes()),
+            oAuthFlow.getTokenUrl());
 
         return builder.build();
     }
@@ -430,7 +433,7 @@ public class RestComponentGenerator {
         CodeBlock.Builder builder = CodeBlock.builder();
 
         builder.add(
-                """
+            """
                 authorization(
                     $T.AuthorizationType.OAUTH2_CLIENT_CREDENTIALS.name().toLowerCase(),
                     $T.AuthorizationType.OAUTH2_CLIENT_CREDENTIALS
@@ -450,17 +453,17 @@ public class RestComponentGenerator {
                 .scopes(connection -> $T.of($L))
                 .tokenUrl(connection -> $S)
                 """,
-                AUTHORIZATION_CLASS_NAME,
-                AUTHORIZATION_CLASS_NAME,
-                "Client Credentials",
-                "Client Id",
-                true,
-                "Client Secret",
-                true,
-                List.class,
-                oAuthFlow.getRefreshUrl(),
-                getOAUth2Scopes(oAuthFlow.getScopes()),
-                oAuthFlow.getTokenUrl());
+            AUTHORIZATION_CLASS_NAME,
+            AUTHORIZATION_CLASS_NAME,
+            "Client Credentials",
+            "Client Id",
+            true,
+            "Client Secret",
+            true,
+            List.class,
+            oAuthFlow.getRefreshUrl(),
+            getOAUth2Scopes(oAuthFlow.getScopes()),
+            oAuthFlow.getTokenUrl());
 
         return builder.build();
     }
@@ -503,26 +506,29 @@ public class RestComponentGenerator {
 
                     oAuthFlow = flows.getImplicit();
 
-                    //                    if (oAuthFlow != null) {
-                    //                        // TODO
-                    //                    }
+                    // if (oAuthFlow != null) {
+                    // // TODO
+                    // }
 
                     oAuthFlow = flows.getPassword();
 
-                    //                    if (oAuthFlow != null) {
-                    //                        // TODO
-                    //                    }
+                    // if (oAuthFlow != null) {
+                    // // TODO
+                    // }
                 } else {
                     throw new IllegalStateException(
-                            "Security scheme type %s not supported: ".formatted(securityScheme.getType()));
+                        "Security scheme type %s not supported: ".formatted(securityScheme.getType()));
                 }
             }
         }
 
-        return codeBlocks.stream().collect(CodeBlock.joining(","));
+        return codeBlocks.stream()
+            .collect(CodeBlock.joining(","));
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
     private Map<String, Schema> getAllOfSchemaProperties(String name, String description, List<Schema> allOfSchemas) {
         Map<String, Schema> allOfProperties = new HashMap<>();
 
@@ -561,14 +567,15 @@ public class RestComponentGenerator {
                 }
 
                 builder.add(
-                        """
+                    """
                         .properties(
                             string(BASE_URI)
                                 .label($S)
                                 .options($L)"
                         """,
-                        "Base URI",
-                        codeBlocks.stream().collect(CodeBlock.joining(",")));
+                    "Base URI",
+                    codeBlocks.stream()
+                        .collect(CodeBlock.joining(",")));
 
                 Server server = servers.get(0);
 
@@ -584,7 +591,7 @@ public class RestComponentGenerator {
         CodeBlock.Builder builder = CodeBlock.builder();
 
         builder.add(
-                """
+            """
                 component($S)
                     .display(
                         display($S)
@@ -592,10 +599,11 @@ public class RestComponentGenerator {
                     )
                     .actions($L)
                 """,
-                componentName,
-                StringUtils.capitalize(componentName),
-                openAPI.getInfo().getDescription(),
-                getActionsCodeBlock(componentHandlerDirPath, openAPI));
+            componentName,
+            StringUtils.capitalize(componentName),
+            openAPI.getInfo()
+                .getDescription(),
+            getActionsCodeBlock(componentHandlerDirPath, openAPI));
 
         CodeBlock codeBlock = getConnectionCodeBlock(openAPI);
 
@@ -619,13 +627,13 @@ public class RestComponentGenerator {
                 builder.add("null");
             } else {
                 builder.add(
-                        """
+                    """
                         connection()
                             $L
                             .authorizations($L)
                         """,
-                        getBaseUriCodeBlock(servers),
-                        getAuthorizationsCodeBlock(securitySchemeMap));
+                    getBaseUriCodeBlock(servers),
+                    getAuthorizationsCodeBlock(securitySchemeMap));
             }
         }
 
@@ -637,13 +645,14 @@ public class RestComponentGenerator {
 
         if (schema.getProperties() != null) {
             codeBlocks.add(getPropertiesSchemaCodeBlock(
-                    schema.getProperties(), schema.getRequired() == null ? List.of() : schema.getRequired(), openAPI));
+                schema.getProperties(), schema.getRequired() == null ? List.of() : schema.getRequired(), openAPI));
         }
 
         if (schema.getAllOf() != null) {
             codeBlocks.add(getAllOfSchemaCodeBlock(name, schema.getDescription(), schema.getAllOf(), openAPI));
         }
-        return codeBlocks.stream().collect(CodeBlock.joining(","));
+        return codeBlocks.stream()
+            .collect(CodeBlock.joining(","));
     }
 
     private String getOAUth2Scopes(Scopes scopes) {
@@ -656,7 +665,9 @@ public class RestComponentGenerator {
         }
 
         return String.join(
-                ",", scopeNames.stream().map(scope -> "\"" + scope + "\"").toList());
+            ",", scopeNames.stream()
+                .map(scope -> "\"" + scope + "\"")
+                .toList());
     }
 
     private Map<String, List<OperationItem>> getOperationItemsMap(io.swagger.v3.oas.models.Paths paths) {
@@ -694,7 +705,8 @@ public class RestComponentGenerator {
         }
 
         for (OperationItem operationItem : operationItems) {
-            List<String> tags = operationItem.operation().getTags();
+            List<String> tags = operationItem.operation()
+                .getTags();
 
             String tag = "unnamed";
 
@@ -708,8 +720,8 @@ public class RestComponentGenerator {
                 }
 
                 if (tagOperationItems.stream()
-                        .noneMatch(curOperationItem ->
-                                Objects.equals(operationItem.getOperationId(), curOperationItem.getOperationId()))) {
+                    .noneMatch(curOperationItem -> Objects.equals(operationItem.getOperationId(),
+                        curOperationItem.getOperationId()))) {
                     tagOperationItems.add(operationItem);
                 }
 
@@ -720,7 +732,9 @@ public class RestComponentGenerator {
         return operationItemsMap;
     }
 
-    @SuppressWarnings({"rawtypes"})
+    @SuppressWarnings({
+        "rawtypes"
+    })
     private OutputEntry getOutputEntry(Operation operation, OpenAPI openAPI) {
         ApiResponse apiResponse = null;
         ApiResponses apiResponses = operation.getResponses();
@@ -744,14 +758,15 @@ public class RestComponentGenerator {
 
                 // Use the first response type
 
-                String key = entries.iterator().next().getKey();
+                String key = entries.iterator()
+                    .next()
+                    .getKey();
 
-                String responseType =
-                        switch (key) {
-                            case "application/json" -> "JSON";
-                            case "application/xml" -> "XML";
-                            default -> "TEXT";
-                        };
+                String responseType = switch (key) {
+                    case "application/json" -> "JSON";
+                    case "application/xml" -> "XML";
+                    default -> "TEXT";
+                };
 
                 MediaType mediaType = content.get(key);
 
@@ -759,15 +774,15 @@ public class RestComponentGenerator {
 
                 builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, openAPI));
                 builder.add(
-                        """
+                    """
                         .metadata(
                            $T.of(
                              "responseType", $S
                            )
                         )
                         """,
-                        Map.class,
-                        responseType);
+                    Map.class,
+                    responseType);
 
                 outputEntry = new OutputEntry(builder.build(), mediaType.getExample());
             }
@@ -778,7 +793,7 @@ public class RestComponentGenerator {
 
     private String getPackageName() {
         return StringUtils.deleteWhitespace(basePackageName == null ? "" : basePackageName + ".")
-                + StringUtils.replaceChars(componentName, "-_", ".");
+            + StringUtils.replaceChars(componentName, "-_", ".");
     }
 
     private CodeBlock getParametersPropertiesCodeBlock(Operation operation, OpenAPI openAPI) {
@@ -790,28 +805,29 @@ public class RestComponentGenerator {
                 CodeBlock.Builder builder = CodeBlock.builder();
 
                 builder.add(getSchemaCodeBlock(
-                        parameter.getName(),
-                        parameter.getDescription(),
-                        parameter.getRequired(),
-                        null,
-                        parameter.getSchema(),
-                        openAPI));
+                    parameter.getName(),
+                    parameter.getDescription(),
+                    parameter.getRequired(),
+                    null,
+                    parameter.getSchema(),
+                    openAPI));
                 builder.add(CodeBlock.of(
-                        """
+                    """
                         .metadata(
                            $T.of(
                              "type", $S
                            )
                         )
                         """,
-                        Map.class,
-                        StringUtils.upperCase(parameter.getIn())));
+                    Map.class,
+                    StringUtils.upperCase(parameter.getIn())));
 
                 codeBlocks.add(builder.build());
             }
         }
 
-        return codeBlocks.stream().collect(CodeBlock.joining(","));
+        return codeBlocks.stream()
+            .collect(CodeBlock.joining(","));
     }
 
     private PropertiesEntry getPropertiesEntry(Operation operation, OpenAPI openAPI) {
@@ -834,11 +850,14 @@ public class RestComponentGenerator {
         }
 
         return new PropertiesEntry(
-                codeBlocks.stream().collect(CodeBlock.joining(",")),
-                requestBodyPropertiesEntry == null ? null : requestBodyPropertiesEntry.bodyContentType);
+            codeBlocks.stream()
+                .collect(CodeBlock.joining(",")),
+            requestBodyPropertiesEntry == null ? null : requestBodyPropertiesEntry.bodyContentType);
     }
 
-    @SuppressWarnings({"rawtypes"})
+    @SuppressWarnings({
+        "rawtypes"
+    })
     private RequestBodyPropertiesEntry getRequestBodyPropertiesItem(Operation operation, OpenAPI openAPI) {
         CodeBlock.Builder builder = CodeBlock.builder();
         RequestBody requestBody = operation.getRequestBody();
@@ -854,7 +873,9 @@ public class RestComponentGenerator {
 
                 // Use the first body content type
 
-                String key = entries.iterator().next().getKey();
+                String key = entries.iterator()
+                    .next()
+                    .getKey();
 
                 // CHECKSTYLE:OFF
                 bodyContentType = switch (key) {
@@ -864,7 +885,8 @@ public class RestComponentGenerator {
                     case "application/octet-stream" -> "BINARY";
                     case "multipart/form-data" -> "FORM_DATA";
                     default -> throw new IllegalArgumentException(
-                            String.format("Media type %s is not supported.", key));};
+                        String.format("Media type %s is not supported.", key));
+                };
                 // CHECKSTYLE:ON
 
                 MediaType mediaType = content.get(key);
@@ -873,15 +895,15 @@ public class RestComponentGenerator {
 
                 builder.add(getSchemaCodeBlock(null, null, requestBody.getRequired(), null, schema, openAPI));
                 builder.add(
-                        """
+                    """
                         .metadata(
                            $T.of(
                              "type", $S
                            )
                         )
                         """,
-                        Map.class,
-                        "BODY");
+                    Map.class,
+                    "BODY");
             }
 
             requestBodyPropertiesEntry = new RequestBodyPropertiesEntry(builder.build(), bodyContentType);
@@ -891,8 +913,8 @@ public class RestComponentGenerator {
     }
 
     private String getAdditionalPropertiesItemType(Schema additionalPropertiesSchema) {
-        String additionalPropertiesSchemaType =
-                additionalPropertiesSchema.getType() == null ? "object" : additionalPropertiesSchema.getType();
+        String additionalPropertiesSchemaType = additionalPropertiesSchema.getType() == null ? "object"
+            : additionalPropertiesSchema.getType();
 
         return switch (additionalPropertiesSchemaType) {
             case "array" -> "array";
@@ -909,17 +931,19 @@ public class RestComponentGenerator {
                     yield "date-time";
                 } else {
                     throw new IllegalArgumentException(
-                            "Unsupported schema type format: " + additionalPropertiesSchema.getFormat());
+                        "Unsupported schema type format: " + additionalPropertiesSchema.getFormat());
                 }
             }
             default -> throw new IllegalArgumentException(
-                    "Unsupported schema type: " + additionalPropertiesSchema.getType());
+                "Unsupported schema type: " + additionalPropertiesSchema.getType());
         };
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
     private CodeBlock getAllOfSchemaCodeBlock(
-            String name, String description, List<Schema> allOfSchemas, OpenAPI openAPI) {
+        String name, String description, List<Schema> allOfSchemas, OpenAPI openAPI) {
         Map<String, Schema> allOfProperties = getAllOfSchemaProperties(name, description, allOfSchemas);
         List<String> allOfRequired = new ArrayList<>();
 
@@ -934,7 +958,7 @@ public class RestComponentGenerator {
 
     @SuppressWarnings("rawtypes")
     private CodeBlock getPropertiesSchemaCodeBlock(
-            Map<String, Schema> properties, List<String> required, OpenAPI openAPI) {
+        Map<String, Schema> properties, List<String> required, OpenAPI openAPI) {
         List<CodeBlock> codeBlocks = new ArrayList<>();
 
         for (Map.Entry<String, Schema> entry : properties.entrySet()) {
@@ -943,15 +967,15 @@ public class RestComponentGenerator {
 
             if (schema.getAllOf() == null) {
                 codeBlock = getSchemaCodeBlock(
-                        entry.getKey(),
-                        schema.getDescription(),
-                        required.contains(entry.getKey()),
-                        null,
-                        schema,
-                        openAPI);
+                    entry.getKey(),
+                    schema.getDescription(),
+                    required.contains(entry.getKey()),
+                    null,
+                    schema,
+                    openAPI);
             } else {
-                codeBlock =
-                        getAllOfSchemaCodeBlock(entry.getKey(), schema.getDescription(), schema.getAllOf(), openAPI);
+                codeBlock = getAllOfSchemaCodeBlock(entry.getKey(), schema.getDescription(), schema.getAllOf(),
+                    openAPI);
             }
 
             if (codeBlock.isEmpty()) {
@@ -961,17 +985,20 @@ public class RestComponentGenerator {
             }
         }
 
-        return codeBlocks.stream().collect(CodeBlock.joining(","));
+        return codeBlocks.stream()
+            .collect(CodeBlock.joining(","));
     }
 
-    @SuppressWarnings({"rawtypes"})
+    @SuppressWarnings({
+        "rawtypes"
+    })
     private CodeBlock getSchemaCodeBlock(
-            String propertyName,
-            String propertyDescription,
-            Boolean required,
-            String schemaName,
-            Schema<?> schema,
-            OpenAPI openAPI) {
+        String propertyName,
+        String propertyDescription,
+        Boolean required,
+        String schemaName,
+        Schema<?> schema,
+        OpenAPI openAPI) {
         CodeBlock.Builder builder = CodeBlock.builder();
 
         if (schema.get$ref() == null) {
@@ -979,27 +1006,31 @@ public class RestComponentGenerator {
 
             switch (type) {
                 case "array" -> builder.add(
-                        "array($S).items($L)",
-                        propertyName,
-                        getSchemaCodeBlock(
-                                schema.getTitle(), schema.getDescription(), null, null, schema.getItems(), openAPI));
+                    "array($S).items($L)",
+                    propertyName,
+                    getSchemaCodeBlock(
+                        schema.getTitle(), schema.getDescription(), null, null, schema.getItems(), openAPI));
                 case "boolean" -> builder.add("bool($S)", propertyName);
                 case "integer" -> {
                     builder.add("integer($S)", propertyName);
                     if (schema.getMinimum() != null) {
-                        builder.add(".minValue($L)", schema.getMinimum().intValue());
+                        builder.add(".minValue($L)", schema.getMinimum()
+                            .intValue());
                     }
                     if (schema.getMaximum() != null) {
-                        builder.add(".maxValue($L)", schema.getMaximum().intValue());
+                        builder.add(".maxValue($L)", schema.getMaximum()
+                            .intValue());
                     }
                 }
                 case "number" -> {
                     builder.add("number($S)", propertyName);
                     if (schema.getMinimum() != null) {
-                        builder.add(".minValue($L)", schema.getMinimum().doubleValue());
+                        builder.add(".minValue($L)", schema.getMinimum()
+                            .doubleValue());
                     }
                     if (schema.getMaximum() != null) {
-                        builder.add(".maxValue($L)", schema.getMaximum().doubleValue());
+                        builder.add(".maxValue($L)", schema.getMaximum()
+                            .doubleValue());
                     }
                 }
                 case "object" -> {
@@ -1007,8 +1038,8 @@ public class RestComponentGenerator {
                         CodeBlock propertiesCodeBlock;
                         if (schemas.contains(schemaName)) {
                             propertiesCodeBlock = CodeBlock.of(
-                                    "$T.COMPONENT_SCHEMA",
-                                    ClassName.get(getPackageName() + ".schema", schemaName + "Schema"));
+                                "$T.COMPONENT_SCHEMA",
+                                ClassName.get(getPackageName() + ".schema", schemaName + "Schema"));
                         } else {
                             propertiesCodeBlock = getObjectPropertiesCodeBlock(propertyName, schema, openAPI);
                         }
@@ -1017,14 +1048,14 @@ public class RestComponentGenerator {
                     } else if (schema.getAdditionalProperties() != null) {
                         if (schema.getAdditionalProperties() instanceof Boolean) {
                             builder.add(
-                                    "object($S).additionalProperties($L)",
-                                    propertyName,
-                                    schema.getAdditionalProperties());
+                                "object($S).additionalProperties($L)",
+                                propertyName,
+                                schema.getAdditionalProperties());
                         } else {
                             builder.add(
-                                    "object($S).additionalProperties($L())",
-                                    propertyName,
-                                    getAdditionalPropertiesItemType((Schema) schema.getAdditionalProperties()));
+                                "object($S).additionalProperties($L())",
+                                propertyName,
+                                getAdditionalPropertiesItemType((Schema) schema.getAdditionalProperties()));
                         }
                     } else {
                         builder.add("object($S)", propertyName);
@@ -1040,7 +1071,7 @@ public class RestComponentGenerator {
                     }
                 }
                 default -> throw new IllegalArgumentException(
-                        "Parameter type %s is not supported.".formatted(schema.getType()));
+                    "Parameter type %s is not supported.".formatted(schema.getType()));
             }
 
             if (propertyName != null) {
@@ -1052,8 +1083,10 @@ public class RestComponentGenerator {
             }
 
             if (schema.getEnum() != null) {
-                List<?> enums =
-                        schema.getEnum().stream().filter(Objects::nonNull).toList();
+                List<?> enums = schema.getEnum()
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .toList();
                 List<CodeBlock> codeBlocks = new ArrayList<>();
 
                 for (Object item : enums) {
@@ -1064,7 +1097,8 @@ public class RestComponentGenerator {
                     }
                 }
 
-                builder.add(".options($L)", codeBlocks.stream().collect(CodeBlock.joining(",")));
+                builder.add(".options($L)", codeBlocks.stream()
+                    .collect(CodeBlock.joining(",")));
             }
 
             if (required != null) {
@@ -1090,7 +1124,7 @@ public class RestComponentGenerator {
             schema = schemaMap.get(curSchemaName);
 
             builder.add(getSchemaCodeBlock(
-                    propertyName, schema.getDescription(), required, curSchemaName, schema, openAPI));
+                propertyName, schema.getDescription(), required, curSchemaName, schema, openAPI));
         }
 
         return builder.build();
@@ -1111,180 +1145,180 @@ public class RestComponentGenerator {
     }
 
     private void writeActionsClass(ClassName className, CodeBlock actionsCodeBlock, Path componentHandlerDirPath)
-            throws IOException {
+        throws IOException {
 
         JavaFile javaFile = JavaFile.builder(
-                        className.packageName(),
-                        TypeSpec.classBuilder(className.simpleName())
-                                .addModifiers(Modifier.PUBLIC)
-                                .addField(FieldSpec.builder(
-                                                ParameterizedTypeName.get(
-                                                        ClassName.get("java.util", "List"),
-                                                        ClassName.get(
-                                                                "com.bytechef.hermes.component.definition",
-                                                                "ComponentDSL",
-                                                                "ModifiableActionDefinition")),
-                                                "ACTIONS")
-                                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                                        .initializer("$T.of($L)", List.class, actionsCodeBlock)
-                                        .build())
-                                .build())
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ACCESS_TOKEN")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ADD_TO")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "API_TOKEN")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "AUTHORIZATION_URL")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "BASE_URI")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_ID")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_SECRET")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "HEADER_PREFIX")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "KEY")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "PASSWORD")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "REFRESH_URL")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "SCOPES")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN_URL")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "USERNAME")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "VALUE")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
-                .build();
+            className.packageName(),
+            TypeSpec.classBuilder(className.simpleName())
+                .addModifiers(Modifier.PUBLIC)
+                .addField(FieldSpec.builder(
+                    ParameterizedTypeName.get(
+                        ClassName.get("java.util", "List"),
+                        ClassName.get(
+                            "com.bytechef.hermes.component.definition",
+                            "ComponentDSL",
+                            "ModifiableActionDefinition")),
+                    "ACTIONS")
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                    .initializer("$T.of($L)", List.class, actionsCodeBlock)
+                    .build())
+                .build())
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ACCESS_TOKEN")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ADD_TO")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "API_TOKEN")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "AUTHORIZATION_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "BASE_URI")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_ID")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_SECRET")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "HEADER_PREFIX")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "KEY")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "PASSWORD")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "REFRESH_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "SCOPES")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "USERNAME")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "VALUE")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
+            .build();
 
         javaFile.writeTo(componentHandlerDirPath);
     }
 
     private void writeAbstractComponentHandlerClass(Path componentHandlerDirPath) throws IOException {
         JavaFile javaFile = JavaFile.builder(
-                        getPackageName(),
-                        TypeSpec.classBuilder("Abstract" + StringUtils.capitalize(componentName) + COMPONENT_HANDLER)
-                                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                .addSuperinterface(
-                                        ClassName.get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE, "RestComponentHandler"))
-                                .addField(FieldSpec.builder(COMPONENT_DEFINITION_CLASS_NAME, "componentDefinition")
-                                        .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
-                                        .initializer(getComponentCodeBlock(componentHandlerDirPath))
-                                        .build())
-                                .addMethod(MethodSpec.methodBuilder("getDefinition")
-                                        .addAnnotation(Override.class)
-                                        .addModifiers(Modifier.PUBLIC)
-                                        .returns(COMPONENT_DEFINITION_CLASS_NAME)
-                                        .addStatement("return componentDefinition")
-                                        .build())
-                                .build())
-                .addStaticImport(AUTHORIZATION_CLASS_NAME, "ApiTokenLocation", "AuthorizationType")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ACCESS_TOKEN")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ADD_TO")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "API_TOKEN")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "AUTHORIZATION_URL")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "BASE_URI")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_ID")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_SECRET")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "HEADER_PREFIX")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "KEY")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "PASSWORD")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "REFRESH_URL")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "SCOPES")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN_URL")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "USERNAME")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "VALUE")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "authorization")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "component")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "connection")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
-                .build();
+            getPackageName(),
+            TypeSpec.classBuilder("Abstract" + StringUtils.capitalize(componentName) + COMPONENT_HANDLER)
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .addSuperinterface(
+                    ClassName.get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE, "RestComponentHandler"))
+                .addField(FieldSpec.builder(COMPONENT_DEFINITION_CLASS_NAME, "componentDefinition")
+                    .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
+                    .initializer(getComponentCodeBlock(componentHandlerDirPath))
+                    .build())
+                .addMethod(MethodSpec.methodBuilder("getDefinition")
+                    .addAnnotation(Override.class)
+                    .addModifiers(Modifier.PUBLIC)
+                    .returns(COMPONENT_DEFINITION_CLASS_NAME)
+                    .addStatement("return componentDefinition")
+                    .build())
+                .build())
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "ApiTokenLocation", "AuthorizationType")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ACCESS_TOKEN")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ADD_TO")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "API_TOKEN")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "AUTHORIZATION_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "BASE_URI")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_ID")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_SECRET")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "HEADER_PREFIX")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "KEY")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "PASSWORD")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "REFRESH_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "SCOPES")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "USERNAME")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "VALUE")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "authorization")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "component")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "connection")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
+            .build();
 
         javaFile.writeTo(componentHandlerDirPath);
     }
 
     private void writeComponentHandlerClass(Path componentHandlerDirPath) throws IOException {
         String filename = componentHandlerDirPath + File.separator
-                + StringUtils.replaceChars(getPackageName(), ".", File.separator) + File.separator
-                + StringUtils.capitalize(componentName) + COMPONENT_HANDLER + ".java";
+            + StringUtils.replaceChars(getPackageName(), ".", File.separator) + File.separator
+            + StringUtils.capitalize(componentName) + COMPONENT_HANDLER + ".java";
 
         if (!new File(filename).exists()) {
             JavaFile javaFile = JavaFile.builder(
-                            getPackageName(),
-                            TypeSpec.classBuilder(StringUtils.capitalize(componentName) + COMPONENT_HANDLER)
-                                    .addModifiers(Modifier.PUBLIC)
-                                    .superclass(ClassName.get(
-                                            getPackageName(),
-                                            "Abstract" + StringUtils.capitalize(componentName) + COMPONENT_HANDLER))
-                                    .build())
-                    .build();
+                getPackageName(),
+                TypeSpec.classBuilder(StringUtils.capitalize(componentName) + COMPONENT_HANDLER)
+                    .addModifiers(Modifier.PUBLIC)
+                    .superclass(ClassName.get(
+                        getPackageName(),
+                        "Abstract" + StringUtils.capitalize(componentName) + COMPONENT_HANDLER))
+                    .build())
+                .build();
             javaFile.writeTo(componentHandlerDirPath);
         }
     }
 
     private void writeComponentSchemaClass(
-            ClassName className, CodeBlock componentSchemaCodeBlock, Path componentHandlerDirPath) throws IOException {
+        ClassName className, CodeBlock componentSchemaCodeBlock, Path componentHandlerDirPath) throws IOException {
 
         JavaFile javaFile = JavaFile.builder(
-                        className.packageName(),
-                        TypeSpec.classBuilder(className.simpleName())
-                                .addModifiers(Modifier.PUBLIC)
-                                .addField(FieldSpec.builder(
-                                                ParameterizedTypeName.get(
-                                                        ClassName.get("java.util", "List"),
-                                                        ClassName.get("com.bytechef.hermes.definition", "Property")),
-                                                "COMPONENT_SCHEMA")
-                                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                                        .initializer("$T.of($L)", List.class, componentSchemaCodeBlock)
-                                        .build())
-                                .build())
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ACCESS_TOKEN")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ADD_TO")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "API_TOKEN")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "AUTHORIZATION_URL")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "BASE_URI")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_ID")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_SECRET")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "HEADER_PREFIX")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "KEY")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "PASSWORD")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "REFRESH_URL")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "SCOPES")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN_URL")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "USERNAME")
-                .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "VALUE")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
-                .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
-                .build();
+            className.packageName(),
+            TypeSpec.classBuilder(className.simpleName())
+                .addModifiers(Modifier.PUBLIC)
+                .addField(FieldSpec.builder(
+                    ParameterizedTypeName.get(
+                        ClassName.get("java.util", "List"),
+                        ClassName.get("com.bytechef.hermes.definition", "Property")),
+                    "COMPONENT_SCHEMA")
+                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                    .initializer("$T.of($L)", List.class, componentSchemaCodeBlock)
+                    .build())
+                .build())
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ACCESS_TOKEN")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ADD_TO")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "API_TOKEN")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "AUTHORIZATION_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "BASE_URI")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_ID")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_SECRET")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "HEADER_PREFIX")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "KEY")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "PASSWORD")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "REFRESH_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "SCOPES")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "USERNAME")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "VALUE")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
+            .build();
 
         javaFile.writeTo(componentHandlerDirPath);
     }
 
     private List<ClassName> writeComponentSchemaClasses(Set<String> schemas, Path componentHandlerDirPath)
-            throws IOException {
+        throws IOException {
         List<ClassName> classNames = new ArrayList<>();
 
         Components components = openAPI.getComponents();
@@ -1303,9 +1337,9 @@ public class RestComponentGenerator {
                     classNames.add(className);
 
                     writeComponentSchemaClass(
-                            className,
-                            getObjectPropertiesCodeBlock(null, entry.getValue(), openAPI),
-                            componentHandlerDirPath);
+                        className,
+                        getObjectPropertiesCodeBlock(null, entry.getValue(), openAPI),
+                        componentHandlerDirPath);
                 }
             }
         }
@@ -1315,14 +1349,14 @@ public class RestComponentGenerator {
 
     private void writeRestComponentHandlerServiceTemplate() throws IOException {
         String servicesDirPathname = getAbsolutePathname("src" + File.separator + "main" + File.separator + "resources"
-                + File.separator + "META-INF" + File.separator + "services");
+            + File.separator + "META-INF" + File.separator + "services");
 
         Files.createDirectories(Paths.get(servicesDirPathname));
 
         String serviceName = COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".Rest" + COMPONENT_HANDLER;
 
-        try (PrintWriter printWriter =
-                new PrintWriter(servicesDirPathname + File.separator + serviceName, StandardCharsets.UTF_8)) {
+        try (PrintWriter printWriter = new PrintWriter(servicesDirPathname + File.separator + serviceName,
+            StandardCharsets.UTF_8)) {
             printWriter.println(getPackageName() + "." + StringUtils.capitalize(componentName) + COMPONENT_HANDLER);
         }
     }
@@ -1333,11 +1367,14 @@ public class RestComponentGenerator {
         }
     }
 
-    private record OutputEntry(CodeBlock outputCodeBlock, Object example) {}
+    private record OutputEntry(CodeBlock outputCodeBlock, Object example) {
+    }
 
-    private record PropertiesEntry(CodeBlock propertiesCodeBlock, String bodyContentType) {}
+    private record PropertiesEntry(CodeBlock propertiesCodeBlock, String bodyContentType) {
+    }
 
-    private record RequestBodyPropertiesEntry(CodeBlock requestBodyPropertiesCodeBlock, String bodyContentType) {}
+    private record RequestBodyPropertiesEntry(CodeBlock requestBodyPropertiesCodeBlock, String bodyContentType) {
+    }
 
     private static class GeneratorConfig {
         @JsonProperty

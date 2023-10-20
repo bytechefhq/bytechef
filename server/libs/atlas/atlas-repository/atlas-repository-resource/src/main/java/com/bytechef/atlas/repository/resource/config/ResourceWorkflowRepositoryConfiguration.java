@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -32,9 +33,9 @@ public class ResourceWorkflowRepositoryConfiguration {
     @Bean
     @Order(1)
     @ConditionalOnProperty(
-            prefix = "bytechef.workflow",
-            name = "workflow-repository.classpath.enabled",
-            havingValue = "true")
+        prefix = "bytechef.workflow",
+        name = "workflow-repository.classpath.enabled",
+        havingValue = "true")
     WorkflowRepository classpathBasedWorkflowRepository(WorkflowMapper workflowMapper) {
         return new ClassPathResourceWorkflowRepository(workflowMapper);
     }
@@ -42,12 +43,12 @@ public class ResourceWorkflowRepositoryConfiguration {
     @Bean
     @Order(2)
     @ConditionalOnProperty(
-            prefix = "bytechef.workflow",
-            name = "workflow-repository.filesystem.enabled",
-            havingValue = "true")
+        prefix = "bytechef.workflow",
+        name = "workflow-repository.filesystem.enabled",
+        havingValue = "true")
     WorkflowRepository filesystemBasedWorkflowRepository(
-            @Value("${bytechef.workflow.workflow-repository.filesystem.location-pattern}") String locationPattern,
-            WorkflowMapper workflowMapper) {
+        @Value("${bytechef.workflow.workflow-repository.filesystem.location-pattern}") String locationPattern,
+        WorkflowMapper workflowMapper) {
         return new FilesystemResourceWorkflowRepository(locationPattern, workflowMapper);
     }
 }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -63,7 +64,7 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
     private final String password;
 
     public JGitWorkflowOperations(
-            String aUrl, String aBranch, String[] aSearchPaths, String aUsername, String aPassword) {
+        String aUrl, String aBranch, String[] aSearchPaths, String aUsername, String aPassword) {
         url = aUrl;
         branch = aBranch;
         searchPaths = aSearchPaths;
@@ -81,8 +82,8 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
         List<String> searchPaths = Arrays.asList(aSearchPaths);
         List<WorkflowResource> resources = new ArrayList<>();
         try (ObjectReader reader = aRepository.newObjectReader();
-                RevWalk walk = new RevWalk(reader);
-                TreeWalk treeWalk = new TreeWalk(aRepository, reader); ) {
+            RevWalk walk = new RevWalk(reader);
+            TreeWalk treeWalk = new TreeWalk(aRepository, reader);) {
             final ObjectId id = aRepository.resolve(Constants.HEAD);
             if (id == null) {
                 return List.of();
@@ -94,9 +95,10 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
             while (treeWalk.next()) {
                 String path = treeWalk.getPathString();
                 if (!path.startsWith(".")
-                        && (searchPaths == null
-                                || searchPaths.size() == 0
-                                || searchPaths.stream().anyMatch(sp -> path.startsWith(sp)))) {
+                    && (searchPaths == null
+                        || searchPaths.size() == 0
+                        || searchPaths.stream()
+                            .anyMatch(sp -> path.startsWith(sp)))) {
                     ObjectId objectId = treeWalk.getObjectId(0);
                     logger.debug("Loading {} [{}]", path, objectId.name());
                     resources.add(readBlob(aRepository, path.substring(0, path.indexOf('.')), objectId.name()));
@@ -112,8 +114,10 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
         try {
             clear();
             logger.info("Cloning {} {}", url, branch);
-            CloneCommand cmd =
-                    Git.cloneRepository().setURI(url).setBranch(branch).setDirectory(repositoryDir);
+            CloneCommand cmd = Git.cloneRepository()
+                .setURI(url)
+                .setBranch(branch)
+                .setDirectory(repositoryDir);
 
             if (username != null && password != null) {
                 cmd.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password));
@@ -152,10 +156,11 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
             }
             ObjectId objectId = aRepo.resolve(aBlobId);
             Assert.notNull(objectId, "could not find: " + aPath + ":" + aBlobId);
-            byte[] data = reader.open(objectId).getBytes();
+            byte[] data = reader.open(objectId)
+                .getBytes();
             AbbreviatedObjectId abbreviated = reader.abbreviate(objectId);
             return new WorkflowResource(
-                    aPath + ":" + abbreviated.name(), new ByteArrayResource(data), WorkflowFormat.parse(aPath));
+                aPath + ":" + abbreviated.name(), new ByteArrayResource(data), WorkflowFormat.parse(aPath));
         }
     }
 

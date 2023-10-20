@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -21,4 +22,5 @@ import org.springframework.context.annotation.ComponentScan;
 
 @ComponentScan(basePackages = "com.bytechef.hermes.connection.web.rest")
 @SpringBootConfiguration
-public class ConnectionRestTestConfiguration {}
+public class ConnectionRestTestConfiguration {
+}

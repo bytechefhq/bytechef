@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -25,6 +26,7 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  */
 @MapperConfig(componentModel = "spring", uses = ConnectionConversionServiceAdapter.class)
 @SpringMapperConfig(
-        conversionServiceAdapterPackage = "com.bytechef.hermes.connection.web.rest.adapter",
-        conversionServiceAdapterClassName = "ConnectionConversionServiceAdapter")
-public interface ConnectionMapperSpringConfig {}
+    conversionServiceAdapterPackage = "com.bytechef.hermes.connection.web.rest.adapter",
+    conversionServiceAdapterClassName = "ConnectionConversionServiceAdapter")
+public interface ConnectionMapperSpringConfig {
+}

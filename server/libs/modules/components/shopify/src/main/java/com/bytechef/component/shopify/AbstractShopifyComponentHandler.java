@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -25,10 +26,10 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
 
 public abstract class AbstractShopifyComponentHandler implements RestComponentHandler {
     private final ComponentDefinition componentDefinition = component("shopify")
-            .display(display("Shopify")
-                    .description(
-                            "The REST Admin API lets you build apps and other integrations for the Shopify admin."))
-            .actions(ProductsActions.ACTIONS);
+        .display(display("Shopify")
+            .description(
+                "The REST Admin API lets you build apps and other integrations for the Shopify admin."))
+        .actions(ProductsActions.ACTIONS);
 
     @Override
     public ComponentDefinition getDefinition() {

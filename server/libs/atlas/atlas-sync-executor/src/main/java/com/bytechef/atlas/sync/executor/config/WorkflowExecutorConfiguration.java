@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -77,7 +78,7 @@ public class WorkflowExecutorConfiguration implements InitializingBean {
     @Bean
     JobService jobService(WorkflowRepository workflowRepository, ObjectMapper objectMapper) {
         return new JobServiceImpl(
-                new InMemoryJobRepository(taskExecutionRepository(), objectMapper), workflowRepository);
+            new InMemoryJobRepository(taskExecutionRepository(), objectMapper), workflowRepository);
     }
 
     @Bean
@@ -97,21 +98,21 @@ public class WorkflowExecutorConfiguration implements InitializingBean {
 
     @Bean
     WorkflowExecutor workflowExecutor(
-            ContextService contextService,
-            CounterService counterService,
-            JobService jobService,
-            EventPublisher eventPublisher,
-            TaskExecutionService taskExecutionService,
-            @Autowired(required = false) Map<String, TaskHandler<?>> taskHandlerMap,
-            WorkflowService workflowService) {
+        ContextService contextService,
+        CounterService counterService,
+        JobService jobService,
+        EventPublisher eventPublisher,
+        TaskExecutionService taskExecutionService,
+        @Autowired(required = false) Map<String, TaskHandler<?>> taskHandlerMap,
+        WorkflowService workflowService) {
         return new WorkflowExecutor(
-                contextService,
-                counterService,
-                jobService,
-                eventPublisher,
-                taskExecutionService,
-                taskHandlerMap == null ? Map.of() : taskHandlerMap,
-                workflowService);
+            contextService,
+            counterService,
+            jobService,
+            eventPublisher,
+            taskExecutionService,
+            taskHandlerMap == null ? Map.of() : taskHandlerMap,
+            workflowService);
     }
 
     @Configuration

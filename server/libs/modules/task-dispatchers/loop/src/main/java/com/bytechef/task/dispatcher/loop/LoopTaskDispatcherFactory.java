@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -43,23 +44,24 @@ import org.springframework.stereotype.Component;
 public class LoopTaskDispatcherFactory implements TaskDispatcherFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(LOOP)
-            .display(display("Loop").description("Loops sequentially over list of items."))
-            .properties(
-                    array(LIST).label("List of items").description("List of items to iterate over."),
-                    string(ITEM_VAR)
-                            .label("Item Var")
-                            .description("The name of the item variable.")
-                            .defaultValue(ITEM),
-                    string(ITEM_INDEX)
-                            .label("Item Index")
-                            .description("The name of the index variable.")
-                            .defaultValue(ITEM_INDEX),
-                    bool(LOOP_FOREVER)
-                            .label("Loop Forever")
-                            .description("Should loop iterate until condition set by \'Loop Break\' statement is met.")
-                            .defaultValue(false))
-            .output(oneOf("item"), integer("itemIndex"))
-            .taskProperties(task(ITERATEE));
+        .display(display("Loop").description("Loops sequentially over list of items."))
+        .properties(
+            array(LIST).label("List of items")
+                .description("List of items to iterate over."),
+            string(ITEM_VAR)
+                .label("Item Var")
+                .description("The name of the item variable.")
+                .defaultValue(ITEM),
+            string(ITEM_INDEX)
+                .label("Item Index")
+                .description("The name of the index variable.")
+                .defaultValue(ITEM_INDEX),
+            bool(LOOP_FOREVER)
+                .label("Loop Forever")
+                .description("Should loop iterate until condition set by \'Loop Break\' statement is met.")
+                .defaultValue(false))
+        .output(oneOf("item"), integer("itemIndex"))
+        .taskProperties(task(ITERATEE));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -86,26 +87,27 @@ public class HttpClientUtils {
         PUT,
     }
 
-    protected HttpClientUtils() {}
+    protected HttpClientUtils() {
+    }
 
     public static Executor executor() {
         return new Executor();
     }
 
     protected Object execute(
-            Context context,
-            String urlString,
-            Map<String, List<String>> headers,
-            Map<String, List<String>> queryParameters,
-            Payload payload,
-            Configuration configuration,
-            RequestMethod requestMethod)
-            throws Exception {
+        Context context,
+        String urlString,
+        Map<String, List<String>> headers,
+        Map<String, List<String>> queryParameters,
+        Payload payload,
+        Configuration configuration,
+        RequestMethod requestMethod)
+        throws Exception {
 
         HttpClient httpClient = createHttpClient(context, headers, queryParameters, configuration);
 
-        HttpRequest httpRequest =
-                createHTTPRequest(context, urlString, requestMethod, headers, queryParameters, payload, configuration);
+        HttpRequest httpRequest = createHTTPRequest(context, urlString, requestMethod, headers, queryParameters,
+            payload, configuration);
 
         HttpResponse<?> httpResponse = httpClient.send(httpRequest, createBodyHandler(configuration));
 
@@ -130,15 +132,15 @@ public class HttpClientUtils {
     }
 
     protected HttpRequest.BodyPublisher createBodyPublisher(
-            Context context, Payload payload, Configuration configuration) {
+        Context context, Payload payload, Configuration configuration) {
         HttpRequest.BodyPublisher bodyPublisher;
 
         if (payload == null) {
             bodyPublisher = HttpRequest.BodyPublishers.noBody();
         } else {
 
-            BodyContentType bodyContentType =
-                    payload.bodyContentType == null ? BodyContentType.JSON : payload.bodyContentType;
+            BodyContentType bodyContentType = payload.bodyContentType == null ? BodyContentType.JSON
+                : payload.bodyContentType;
 
             if (payload.value instanceof FileEntry fileEntry) {
                 MediaType mediaType;
@@ -154,7 +156,7 @@ public class HttpClientUtils {
                 }
 
                 bodyPublisher = MoreBodyPublishers.ofMediaType(
-                        HttpRequest.BodyPublishers.ofInputStream(() -> context.getFileStream(fileEntry)), mediaType);
+                    HttpRequest.BodyPublishers.ofInputStream(() -> context.getFileStream(fileEntry)), mediaType);
             } else {
                 if (bodyContentType == BodyContentType.FORM_DATA) {
                     Map<?, ?> bodyParameters = (Map<?, ?>) payload.value;
@@ -162,7 +164,7 @@ public class HttpClientUtils {
                     MultipartBodyPublisher.Builder builder = MultipartBodyPublisher.newBuilder();
 
                     for (Map.Entry<?, ?> parameter : bodyParameters.entrySet()) {
-                        if (parameter.getValue() instanceof FileEntry fileEntry) {
+                        if (parameter.getValue()instanceof FileEntry fileEntry) {
                             addFileEntry(builder, (String) parameter.getKey(), fileEntry, context);
                         } else {
                             builder.textPart((String) parameter.getKey(), parameter.getValue());
@@ -182,12 +184,12 @@ public class HttpClientUtils {
                     bodyPublisher = builder.build();
                 } else if (bodyContentType == BodyContentType.JSON) {
                     bodyPublisher = MoreBodyPublishers.ofMediaType(
-                            HttpRequest.BodyPublishers.ofString(JsonUtils.write(payload.value)),
-                            MediaType.APPLICATION_JSON);
+                        HttpRequest.BodyPublishers.ofString(JsonUtils.write(payload.value)),
+                        MediaType.APPLICATION_JSON);
                 } else if (bodyContentType == BodyContentType.XML) {
                     bodyPublisher = MoreBodyPublishers.ofMediaType(
-                            HttpRequest.BodyPublishers.ofString(XmlUtils.write(payload.value)),
-                            MediaType.APPLICATION_XML);
+                        HttpRequest.BodyPublishers.ofString(XmlUtils.write(payload.value)),
+                        MediaType.APPLICATION_XML);
                 } else {
                     MediaType mediaType;
 
@@ -198,7 +200,7 @@ public class HttpClientUtils {
                     }
 
                     bodyPublisher = MoreBodyPublishers.ofMediaType(
-                            HttpRequest.BodyPublishers.ofString((String) payload.value), mediaType);
+                        HttpRequest.BodyPublishers.ofString((String) payload.value), mediaType);
                 }
             }
         }
@@ -207,17 +209,20 @@ public class HttpClientUtils {
     }
 
     protected HttpClient createHttpClient(
-            Context context,
-            Map<String, List<String>> headers,
-            Map<String, List<String>> queryParameters,
-            Configuration configuration) {
-        Methanol.Builder builder = Methanol.newBuilder().version(java.net.http.HttpClient.Version.HTTP_1_1);
+        Context context,
+        Map<String, List<String>> headers,
+        Map<String, List<String>> queryParameters,
+        Configuration configuration) {
+        Methanol.Builder builder = Methanol.newBuilder()
+            .version(java.net.http.HttpClient.Version.HTTP_1_1);
 
         if (configuration.isAllowUnauthorizedCerts()) {
             try {
                 SSLContext sslContext = SSLContext.getInstance("TLS");
 
-                sslContext.init(null, new TrustManager[] {new UnauthorizedCertsX509ExtendedTrustManager()}, null);
+                sslContext.init(null, new TrustManager[] {
+                    new UnauthorizedCertsX509ExtendedTrustManager()
+                }, null);
 
                 builder.sslContext(sslContext);
             } catch (Exception e) {
@@ -249,16 +254,16 @@ public class HttpClientUtils {
     }
 
     protected HttpRequest createHTTPRequest(
-            Context context,
-            final String urlString,
-            RequestMethod requestMethod,
-            Map<String, List<String>> headers,
-            Map<String, List<String>> queryParameters,
-            Payload payload,
-            Configuration configuration) {
+        Context context,
+        final String urlString,
+        RequestMethod requestMethod,
+        Map<String, List<String>> headers,
+        Map<String, List<String>> queryParameters,
+        Payload payload,
+        Configuration configuration) {
 
         HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
-                .method(requestMethod.name(), createBodyPublisher(context, payload, configuration));
+            .method(requestMethod.name(), createBodyPublisher(context, payload, configuration));
 
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             for (String value : entry.getValue()) {
@@ -272,7 +277,7 @@ public class HttpClientUtils {
     }
 
     protected Object handleResponse(Context context, HttpResponse<?> httpResponse, Configuration configuration)
-            throws Exception {
+        throws Exception {
         Object body = null;
 
         if (configuration.getResponseFormat() != null) {
@@ -282,8 +287,8 @@ public class HttpClientUtils {
                 String filename = configuration.getFilename();
 
                 if (StringUtils.isEmpty(filename)) {
-                    Map<String, List<String>> headersMap =
-                            httpResponse.headers().map();
+                    Map<String, List<String>> headersMap = httpResponse.headers()
+                        .map();
 
                     if (headersMap.containsKey("Content-Type")) {
                         MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
@@ -300,15 +305,19 @@ public class HttpClientUtils {
 
                 body = context.storeFileContent(filename, (InputStream) httpResponse.body());
             } else if (responseFormat == ResponseFormat.JSON) {
-                body = JsonUtils.read(httpResponse.body().toString());
+                body = JsonUtils.read(httpResponse.body()
+                    .toString());
             } else if (responseFormat == ResponseFormat.TEXT) {
-                body = httpResponse.body().toString();
+                body = httpResponse.body()
+                    .toString();
             } else {
-                body = XmlUtils.read(httpResponse.body().toString());
+                body = XmlUtils.read(httpResponse.body()
+                    .toString());
             }
 
             if (configuration.isFullResponse()) {
-                body = new HttpResponseEntry(body, httpResponse.headers().map(), httpResponse.statusCode());
+                body = new HttpResponseEntry(body, httpResponse.headers()
+                    .map(), httpResponse.statusCode());
             }
         }
 
@@ -316,14 +325,14 @@ public class HttpClientUtils {
     }
 
     private static void addFileEntry(
-            MultipartBodyPublisher.Builder builder, String name, FileEntry fileEntry, Context context) {
+        MultipartBodyPublisher.Builder builder, String name, FileEntry fileEntry, Context context) {
 
         builder.formPart(
-                name,
-                fileEntry.getName(),
-                MoreBodyPublishers.ofMediaType(
-                        HttpRequest.BodyPublishers.ofInputStream(() -> context.getFileStream(fileEntry)),
-                        MediaType.parse(fileEntry.getMimeType())));
+            name,
+            fileEntry.getName(),
+            MoreBodyPublishers.ofMediaType(
+                HttpRequest.BodyPublishers.ofInputStream(() -> context.getFileStream(fileEntry)),
+                MediaType.parse(fileEntry.getMimeType())));
     }
 
     private static URI createURI(String uriString, Map<String, List<String>> queryParameters) {
@@ -332,9 +341,12 @@ public class HttpClientUtils {
         if (queryParameters.isEmpty()) {
             uri = URI.create(uriString);
         } else {
-            String queryParametersString = queryParameters.entrySet().stream()
-                    .flatMap(entry -> entry.getValue().stream().map(value -> entry.getKey() + "=" + value))
-                    .collect(Collectors.joining("&"));
+            String queryParametersString = queryParameters.entrySet()
+                .stream()
+                .flatMap(entry -> entry.getValue()
+                    .stream()
+                    .map(value -> entry.getKey() + "=" + value))
+                .collect(Collectors.joining("&"));
 
             uri = URI.create(uriString + '?' + queryParametersString);
         }
@@ -349,38 +361,43 @@ public class HttpClientUtils {
 
         if (connectionDefinition != null) {
             finalUriString = context.fetchConnectionParameters()
-                    .map(connectionParameters ->
-                            connectionDefinition.getBaseUriFunction().apply(connectionParameters))
-                    .map(baseUri -> baseUri + uriString)
-                    .orElse(uriString);
+                .map(connectionParameters -> connectionDefinition.getBaseUriFunction()
+                    .apply(connectionParameters))
+                .map(baseUri -> baseUri + uriString)
+                .orElse(uriString);
         }
 
         return finalUriString;
     }
 
     private static void applyAuthorizationApplyConsumer(
-            Context context,
-            Methanol.Builder builder,
-            Map<String, List<String>> headers,
-            Map<String, List<String>> queryParameters) {
+        Context context,
+        Methanol.Builder builder,
+        Map<String, List<String>> headers,
+        Map<String, List<String>> queryParameters) {
 
         ConnectionDefinition connectionDefinition = context.getConnectionDefinition();
 
         if (connectionDefinition != null) {
-            context.fetchConnectionParameters().ifPresent(connectionParameters -> {
-                connectionDefinition.getAuthorizations().stream()
-                        .filter(authorization ->
-                                Objects.equals(authorization.getName(), connectionParameters.getAuthorizationName()))
+            context.fetchConnectionParameters()
+                .ifPresent(connectionParameters -> {
+                    connectionDefinition.getAuthorizations()
+                        .stream()
+                        .filter(authorization -> Objects.equals(authorization.getName(),
+                            connectionParameters.getAuthorizationName()))
                         .findFirst()
                         .map(Authorization::getApplyConsumer)
                         .ifPresent(applyConsumer -> applyConsumer.accept(
-                                new AuthorizationContextImpl(builder, headers, queryParameters), connectionParameters));
-            });
+                            new AuthorizationContextImpl(builder, headers, queryParameters), connectionParameters));
+                });
         }
     }
 
-    @SuppressFBWarnings({"EI", "EI2"})
-    public record HttpResponseEntry(Object body, Map<String, List<String>> headers, int statusCode) {}
+    @SuppressFBWarnings({
+        "EI", "EI2"
+    })
+    public record HttpResponseEntry(Object body, Map<String, List<String>> headers, int statusCode) {
+    }
 
     public static class Configuration {
 
@@ -394,7 +411,8 @@ public class HttpClientUtils {
         private ResponseFormat responseFormat;
         private Duration timeout = Duration.ofMillis(1000);
 
-        private Configuration() {}
+        private Configuration() {
+        }
 
         public static Builder builder() {
             return new Builder();
@@ -529,7 +547,8 @@ public class HttpClientUtils {
         private RequestMethod requestMethod;
         private String url;
 
-        private Executor() {}
+        private Executor() {
+        }
 
         public Executor configuration(Configuration configuration) {
             this.configuration = Objects.requireNonNull(configuration);
@@ -611,13 +630,13 @@ public class HttpClientUtils {
         public Object execute(Context context) {
             try {
                 return HTTP_CLIENT_UTILS.execute(
-                        Objects.requireNonNull(context),
-                        url,
-                        headers,
-                        queryParameters,
-                        payload,
-                        configuration,
-                        requestMethod);
+                    Objects.requireNonNull(context),
+                    url,
+                    headers,
+                    queryParameters,
+                    payload,
+                    configuration,
+                    requestMethod);
             } catch (Exception e) {
                 throw new ActionExecutionException("Unable to execute HTTP request", e);
             }
@@ -675,8 +694,8 @@ public class HttpClientUtils {
     }
 
     private record AuthorizationContextImpl(
-            Methanol.Builder builder, Map<String, List<String>> headers, Map<String, List<String>> queryParameters)
-            implements AuthorizationContext {
+        Methanol.Builder builder, Map<String, List<String>> headers, Map<String, List<String>> queryParameters)
+        implements AuthorizationContext {
 
         @Override
         public void setHeaders(Map<String, List<String>> headers) {
@@ -705,20 +724,26 @@ public class HttpClientUtils {
             return null;
         }
 
-        public void checkClientTrusted(final X509Certificate[] a_certificates, final String a_auth_type) {}
+        public void checkClientTrusted(final X509Certificate[] a_certificates, final String a_auth_type) {
+        }
 
-        public void checkServerTrusted(final X509Certificate[] a_certificates, final String a_auth_type) {}
-
-        public void checkClientTrusted(
-                final X509Certificate[] a_certificates, final String a_auth_type, final Socket a_socket) {}
-
-        public void checkServerTrusted(
-                final X509Certificate[] a_certificates, final String a_auth_type, final Socket a_socket) {}
+        public void checkServerTrusted(final X509Certificate[] a_certificates, final String a_auth_type) {
+        }
 
         public void checkClientTrusted(
-                final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine) {}
+            final X509Certificate[] a_certificates, final String a_auth_type, final Socket a_socket) {
+        }
 
         public void checkServerTrusted(
-                final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine) {}
+            final X509Certificate[] a_certificates, final String a_auth_type, final Socket a_socket) {
+        }
+
+        public void checkClientTrusted(
+            final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine) {
+        }
+
+        public void checkServerTrusted(
+            final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine) {
+        }
     }
 }

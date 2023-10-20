@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -41,9 +42,9 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
     private final CounterService counterService;
 
     public MapTaskCompletionHandler(
-            TaskExecutionService taskExecutionService,
-            TaskCompletionHandler taskCompletionHandler,
-            CounterService counterService) {
+        TaskExecutionService taskExecutionService,
+        TaskCompletionHandler taskCompletionHandler,
+        CounterService counterService) {
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.counterService = counterService;
@@ -60,15 +61,17 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
         long subtasksLeft = counterService.decrement(taskExecution.getParentId());
 
         if (subtasksLeft == 0) {
-            List<TaskExecution> childTaskExecutions =
-                    taskExecutionService.getParentTaskExecutions(taskExecution.getParentId());
-            TaskExecution mapTaskExecution =
-                    new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+            List<TaskExecution> childTaskExecutions = taskExecutionService
+                .getParentTaskExecutions(taskExecution.getParentId());
+            TaskExecution mapTaskExecution = new TaskExecution(
+                taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
             mapTaskExecution.setEndTime(LocalDateTime.now());
 
             mapTaskExecution.setOutput(
-                    childTaskExecutions.stream().map(TaskExecution::getOutput).collect(Collectors.toList()));
+                childTaskExecutions.stream()
+                    .map(TaskExecution::getOutput)
+                    .collect(Collectors.toList()));
 
             taskCompletionHandler.handle(mapTaskExecution);
             counterService.delete(taskExecution.getParentId());
@@ -80,7 +83,8 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
         String parentId = aTaskExecution.getParentId();
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
-            return parentExecution.getType().equals(MAP + "/v" + VERSION_1);
+            return parentExecution.getType()
+                .equals(MAP + "/v" + VERSION_1);
         }
         return false;
     }

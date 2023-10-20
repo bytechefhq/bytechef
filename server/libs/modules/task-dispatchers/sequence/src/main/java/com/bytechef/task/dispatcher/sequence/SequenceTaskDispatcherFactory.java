@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -34,10 +35,10 @@ import org.springframework.stereotype.Component;
 public class SequenceTaskDispatcherFactory implements TaskDispatcherFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(SEQUENCE)
-            .display(display("Sequence").description("Executes list of tasks in a sequence."))
-            .taskProperties(array(TASKS)
-                    .description("The task to use in each iteration.")
-                    .items(task()));
+        .display(display("Sequence").description("Executes list of tasks in a sequence."))
+        .taskProperties(array(TASKS)
+            .description("The task to use in each iteration.")
+            .items(task()));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

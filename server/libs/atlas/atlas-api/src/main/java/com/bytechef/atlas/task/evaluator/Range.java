@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -35,8 +36,8 @@ class Range implements MethodExecutor {
     @Override
     public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
         List<Integer> value = IntStream.rangeClosed((int) aArguments[0], (int) aArguments[1])
-                .boxed()
-                .collect(Collectors.toList());
+            .boxed()
+            .collect(Collectors.toList());
 
         return new TypedValue(value);
     }

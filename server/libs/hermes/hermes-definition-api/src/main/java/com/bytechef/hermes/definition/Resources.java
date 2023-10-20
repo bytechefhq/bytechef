@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -26,7 +27,8 @@ public sealed class Resources permits DefinitionDSL.ModifiableResources {
 
     protected String documentationUrl;
 
-    protected Resources() {}
+    protected Resources() {
+    }
 
     @Schema(name = "documentationUrl", description = "The url of available documentation.")
     public String getDocumentationUrl() {

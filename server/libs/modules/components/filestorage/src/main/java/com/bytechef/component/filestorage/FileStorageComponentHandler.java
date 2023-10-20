@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -53,45 +54,45 @@ import java.util.function.Consumer;
 public class FileStorageComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition = component(FILE_STORAGE)
-            .display(display("File Storage").description("Reads and writes data from a file"))
-            .actions(
-                    action(READ)
-                            .display(display("Read from file").description("Reads data from the file."))
-                            .properties(fileEntry(FILE_ENTRY)
-                                    .label("File")
-                                    .description(
-                                            "The object property which contains a reference to the file to read from.")
-                                    .required(true))
-                            .output(string())
-                            .perform(this::performRead),
-                    action(WRITE)
-                            .display(display("Write to file").description("Writes the data to the file."))
-                            .properties(
-                                    string(CONTENT)
-                                            .label("Content")
-                                            .description("String to write to the file.")
-                                            .required(true),
-                                    string(FILENAME)
-                                            .label("Filename")
-                                            .description(
-                                                    "Filename to set for data. By default, \"file.txt\" will be used.")
-                                            .defaultValue("file.txt"))
-                            .output(fileEntry())
-                            .perform(this::performWrite),
-                    action(DOWNLOAD)
-                            .display(display("Download file").description("Download thr file from the URL."))
-                            .properties(
-                                    string(FileStorageConstants.URL)
-                                            .label("URL")
-                                            .description("The URL to download the file from.")
-                                            .required(true),
-                                    string(FILENAME)
-                                            .label("Filename")
-                                            .description(
-                                                    "Filename to set for data. By default, \"file.txt\" will be used.")
-                                            .defaultValue("file.txt"))
-                            .output(fileEntry())
-                            .perform(this::performDownload));
+        .display(display("File Storage").description("Reads and writes data from a file"))
+        .actions(
+            action(READ)
+                .display(display("Read from file").description("Reads data from the file."))
+                .properties(fileEntry(FILE_ENTRY)
+                    .label("File")
+                    .description(
+                        "The object property which contains a reference to the file to read from.")
+                    .required(true))
+                .output(string())
+                .perform(this::performRead),
+            action(WRITE)
+                .display(display("Write to file").description("Writes the data to the file."))
+                .properties(
+                    string(CONTENT)
+                        .label("Content")
+                        .description("String to write to the file.")
+                        .required(true),
+                    string(FILENAME)
+                        .label("Filename")
+                        .description(
+                            "Filename to set for data. By default, \"file.txt\" will be used.")
+                        .defaultValue("file.txt"))
+                .output(fileEntry())
+                .perform(this::performWrite),
+            action(DOWNLOAD)
+                .display(display("Download file").description("Download thr file from the URL."))
+                .properties(
+                    string(FileStorageConstants.URL)
+                        .label("URL")
+                        .description("The URL to download the file from.")
+                        .required(true),
+                    string(FILENAME)
+                        .label("Filename")
+                        .description(
+                            "Filename to set for data. By default, \"file.txt\" will be used.")
+                        .defaultValue("file.txt"))
+                .output(fileEntry())
+                .perform(this::performDownload));
 
     @Override
     public ComponentDefinition getDefinition() {
@@ -113,8 +114,8 @@ public class FileStorageComponentHandler implements ComponentHandler {
                 int contentLength = connection.getContentLength();
 
                 try (BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream());
-                        OutputStream outputStream = new ProgressingOutputStream(
-                                new FileOutputStream(downloadedFile), contentLength, context::publishProgressEvent)) {
+                    OutputStream outputStream = new ProgressingOutputStream(
+                        new FileOutputStream(downloadedFile), contentLength, context::publishProgressEvent)) {
                     copy(inputStream, outputStream);
                 }
 

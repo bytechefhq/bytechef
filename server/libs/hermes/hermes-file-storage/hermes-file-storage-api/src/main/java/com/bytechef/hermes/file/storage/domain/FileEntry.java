@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -70,16 +71,18 @@ public class FileEntry {
     }
 
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o)
+            return true;
 
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         FileEntry fileEntry = (FileEntry) o;
 
         return Objects.equals(extension, fileEntry.extension)
-                && Objects.equals(mimeType, fileEntry.mimeType)
-                && Objects.equals(name, fileEntry.name)
-                && Objects.equals(url, fileEntry.url);
+            && Objects.equals(mimeType, fileEntry.mimeType)
+            && Objects.equals(name, fileEntry.name)
+            && Objects.equals(url, fileEntry.url);
     }
 
     @Override
@@ -89,18 +92,18 @@ public class FileEntry {
 
     public Map<String, String> toMap() {
         return Map.of(
-                "extension", getExtension(),
-                "mimeType", getMimeType(),
-                "name", getName(),
-                "url", getUrl());
+            "extension", getExtension(),
+            "mimeType", getMimeType(),
+            "name", getName(),
+            "url", getUrl());
     }
 
     @Override
     public String toString() {
         return "FileEntry{" + "extension='"
-                + extension + '\'' + ", mimeType='"
-                + mimeType + '\'' + ", name='"
-                + name + '\'' + ", url='"
-                + url + '\'' + '}';
+            + extension + '\'' + ", mimeType='"
+            + mimeType + '\'' + ", name='"
+            + name + '\'' + ", url='"
+            + url + '\'' + '}';
     }
 }

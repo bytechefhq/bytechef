@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -65,233 +66,237 @@ public class CsvFileComponentHandlerTest {
         // headerRow: true, includeEmptyCells: false, readAsString: false
 
         assertEquals(
-                new JSONArray(getJSONObjectsWithNamedColumns(false, false)),
-                new JSONArray((List) csvFileComponentHandler.performRead(
-                        context, getReadParameters(true, false, null, null, false, getFile("sample_header.csv")))),
-                true);
+            new JSONArray(getJSONObjectsWithNamedColumns(false, false)),
+            new JSONArray((List) csvFileComponentHandler.performRead(
+                context, getReadParameters(true, false, null, null, false, getFile("sample_header.csv")))),
+            true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: false
 
         assertEquals(
-                new JSONArray(getJSONObjectsWithNamedColumns(true, false)),
-                new JSONArray((List) csvFileComponentHandler.performRead(
-                        context, getReadParameters(true, true, null, null, false, getFile("sample_header.csv")))),
-                true);
+            new JSONArray(getJSONObjectsWithNamedColumns(true, false)),
+            new JSONArray((List) csvFileComponentHandler.performRead(
+                context, getReadParameters(true, true, null, null, false, getFile("sample_header.csv")))),
+            true);
 
         // headerRow: true, includeEmptyCells: false, readAsString: true
 
         assertEquals(
-                new JSONArray(getJSONObjectsWithNamedColumns(false, true)),
-                new JSONArray((List) csvFileComponentHandler.performRead(
-                        context, getReadParameters(true, false, null, null, true, getFile("sample_header.csv")))),
-                true);
+            new JSONArray(getJSONObjectsWithNamedColumns(false, true)),
+            new JSONArray((List) csvFileComponentHandler.performRead(
+                context, getReadParameters(true, false, null, null, true, getFile("sample_header.csv")))),
+            true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: true
 
         assertEquals(
-                new JSONArray(getJSONObjectsWithNamedColumns(true, true)),
-                new JSONArray((List) csvFileComponentHandler.performRead(
-                        context, getReadParameters(true, true, null, null, true, getFile("sample_header.csv")))),
-                true);
+            new JSONArray(getJSONObjectsWithNamedColumns(true, true)),
+            new JSONArray((List) csvFileComponentHandler.performRead(
+                context, getReadParameters(true, true, null, null, true, getFile("sample_header.csv")))),
+            true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: false
 
         assertEquals(
-                new JSONArray(getJSONArrayWithoutNamedColumns(false, false)),
-                new JSONArray((List) csvFileComponentHandler.performRead(
-                        context, getReadParameters(false, false, null, null, false, getFile("sample_no_header.csv")))),
-                true);
+            new JSONArray(getJSONArrayWithoutNamedColumns(false, false)),
+            new JSONArray((List) csvFileComponentHandler.performRead(
+                context, getReadParameters(false, false, null, null, false, getFile("sample_no_header.csv")))),
+            true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: true
 
         assertEquals(
-                new JSONArray(getJSONArrayWithoutNamedColumns(false, true)),
-                new JSONArray((List) csvFileComponentHandler.performRead(
-                        context, getReadParameters(false, false, null, null, true, getFile("sample_no_header.csv")))),
-                true);
+            new JSONArray(getJSONArrayWithoutNamedColumns(false, true)),
+            new JSONArray((List) csvFileComponentHandler.performRead(
+                context, getReadParameters(false, false, null, null, true, getFile("sample_no_header.csv")))),
+            true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: false
 
         assertEquals(
-                new JSONArray(getJSONArrayWithoutNamedColumns(true, false)),
-                new JSONArray((List) csvFileComponentHandler.performRead(
-                        context, getReadParameters(false, true, null, null, false, getFile("sample_no_header.csv")))),
-                true);
+            new JSONArray(getJSONArrayWithoutNamedColumns(true, false)),
+            new JSONArray((List) csvFileComponentHandler.performRead(
+                context, getReadParameters(false, true, null, null, false, getFile("sample_no_header.csv")))),
+            true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: true
 
         assertEquals(
-                new JSONArray(getJSONArrayWithoutNamedColumns(true, true)),
-                new JSONArray((List) csvFileComponentHandler.performRead(
-                        context, getReadParameters(false, true, null, null, true, getFile("sample_no_header.csv")))),
-                true);
+            new JSONArray(getJSONArrayWithoutNamedColumns(true, true)),
+            new JSONArray((List) csvFileComponentHandler.performRead(
+                context, getReadParameters(false, true, null, null, true, getFile("sample_no_header.csv")))),
+            true);
 
         // paging
 
         assertEquals(
-                new JSONArray(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
-                new JSONArray((List) csvFileComponentHandler.performRead(
-                        context, getReadParameters(true, false, 1, 3, false, getFile("sample_header.csv")))),
-                true);
+            new JSONArray(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
+            new JSONArray((List) csvFileComponentHandler.performRead(
+                context, getReadParameters(true, false, 1, 3, false, getFile("sample_header.csv")))),
+            true);
     }
 
     @Test
-    @SuppressWarnings({"raw", "unchecked"})
+    @SuppressWarnings({
+        "raw", "unchecked"
+    })
     public void testPerformWriteCSV() throws IOException {
         String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
 
         csvFileComponentHandler.performWrite(context, getWriteParameters((List) new JSONArray(jsonContent).toList()));
 
-        ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor =
-                ArgumentCaptor.forClass(ByteArrayInputStream.class);
+        ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
+            .forClass(ByteArrayInputStream.class);
         ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-        Mockito.verify(context).storeFileContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture());
+        Mockito.verify(context)
+            .storeFileContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture());
 
         assertEquals(
-                new JSONArray(jsonContent),
-                new JSONArray(csvFileComponentHandler.read(inputStreamArgumentCaptor.getValue())),
-                true);
-        Assertions.assertThat(filenameArgumentCaptor.getValue()).isEqualTo("file.csv");
+            new JSONArray(jsonContent),
+            new JSONArray(csvFileComponentHandler.read(inputStreamArgumentCaptor.getValue())),
+            true);
+        Assertions.assertThat(filenameArgumentCaptor.getValue())
+            .isEqualTo("file.csv");
     }
 
     private List<JSONObject> getJSONObjectsWithNamedColumns(boolean includeEmptyCells, boolean readAsString)
-            throws JSONException {
+        throws JSONException {
         return List.of(
-                getJSONObjectWithNamedColumns(
-                        readAsString ? "77" : 77,
-                        "A",
-                        "B",
-                        "C",
-                        readAsString ? "true" : true,
-                        "2021-12-07",
-                        readAsString ? "11.2" : 11.2),
-                getJSONObjectWithNamedColumns(
-                        readAsString ? "4" : 4,
-                        "name1",
-                        "city1",
-                        "description1",
-                        readAsString ? "false" : false,
-                        includeEmptyCells ? "" : null,
-                        readAsString ? "12" : 12),
-                getJSONObjectWithNamedColumns(
-                        readAsString ? "2" : 2,
-                        "A",
-                        "city2",
-                        includeEmptyCells ? "" : null,
-                        readAsString ? "true" : true,
-                        "2021-12-09",
-                        includeEmptyCells ? "" : null),
-                getJSONObjectWithNamedColumns(
-                        readAsString ? "5678" : 5678,
-                        "ABCD",
-                        "city3",
-                        "EFGH",
-                        readAsString ? "false" : false,
-                        "2021-12-10",
-                        readAsString ? "13.23" : 13.23));
+            getJSONObjectWithNamedColumns(
+                readAsString ? "77" : 77,
+                "A",
+                "B",
+                "C",
+                readAsString ? "true" : true,
+                "2021-12-07",
+                readAsString ? "11.2" : 11.2),
+            getJSONObjectWithNamedColumns(
+                readAsString ? "4" : 4,
+                "name1",
+                "city1",
+                "description1",
+                readAsString ? "false" : false,
+                includeEmptyCells ? "" : null,
+                readAsString ? "12" : 12),
+            getJSONObjectWithNamedColumns(
+                readAsString ? "2" : 2,
+                "A",
+                "city2",
+                includeEmptyCells ? "" : null,
+                readAsString ? "true" : true,
+                "2021-12-09",
+                includeEmptyCells ? "" : null),
+            getJSONObjectWithNamedColumns(
+                readAsString ? "5678" : 5678,
+                "ABCD",
+                "city3",
+                "EFGH",
+                readAsString ? "false" : false,
+                "2021-12-10",
+                readAsString ? "13.23" : 13.23));
     }
 
     private List<JSONObject> getJSONArrayWithoutNamedColumns(boolean includeEmptyCells, boolean readAsString)
-            throws JSONException {
+        throws JSONException {
         return List.of(
-                getJSONObjectWithoutNamedColumns(
-                        readAsString ? "77" : 77,
-                        "A",
-                        "B",
-                        "C",
-                        readAsString ? "true" : true,
-                        "2021-12-07",
-                        readAsString ? "11.2" : 11.2),
-                getJSONObjectWithoutNamedColumns(
-                        readAsString ? "4" : 4,
-                        "name1",
-                        "city1",
-                        "description1",
-                        readAsString ? "false" : false,
-                        includeEmptyCells ? "" : null,
-                        readAsString ? "12" : 12),
-                getJSONObjectWithoutNamedColumns(
-                        readAsString ? "2" : 2,
-                        "A",
-                        "city2",
-                        includeEmptyCells ? "" : null,
-                        readAsString ? "true" : true,
-                        "2021-12-09",
-                        includeEmptyCells ? "" : null),
-                getJSONObjectWithoutNamedColumns(
-                        readAsString ? "5678" : 5678,
-                        "ABCD",
-                        "city3",
-                        "EFGH",
-                        readAsString ? "false" : false,
-                        "2021-12-10",
-                        readAsString ? "13.23" : 13.23));
+            getJSONObjectWithoutNamedColumns(
+                readAsString ? "77" : 77,
+                "A",
+                "B",
+                "C",
+                readAsString ? "true" : true,
+                "2021-12-07",
+                readAsString ? "11.2" : 11.2),
+            getJSONObjectWithoutNamedColumns(
+                readAsString ? "4" : 4,
+                "name1",
+                "city1",
+                "description1",
+                readAsString ? "false" : false,
+                includeEmptyCells ? "" : null,
+                readAsString ? "12" : 12),
+            getJSONObjectWithoutNamedColumns(
+                readAsString ? "2" : 2,
+                "A",
+                "city2",
+                includeEmptyCells ? "" : null,
+                readAsString ? "true" : true,
+                "2021-12-09",
+                includeEmptyCells ? "" : null),
+            getJSONObjectWithoutNamedColumns(
+                readAsString ? "5678" : 5678,
+                "ABCD",
+                "city3",
+                "EFGH",
+                readAsString ? "false" : false,
+                "2021-12-10",
+                readAsString ? "13.23" : 13.23));
     }
 
     private JSONObject getJSONObjectWithNamedColumns(
-            Object id, String name, String city, String description, Object active, String date, Object sum)
-            throws JSONException {
+        Object id, String name, String city, String description, Object active, String date, Object sum)
+        throws JSONException {
         return getJSONObject(
-                "id",
-                id,
-                "name",
-                name,
-                "city",
-                city,
-                "description",
-                description,
-                "active",
-                active,
-                "date",
-                date,
-                "sum",
-                sum);
+            "id",
+            id,
+            "name",
+            name,
+            "city",
+            city,
+            "description",
+            description,
+            "active",
+            active,
+            "date",
+            date,
+            "sum",
+            sum);
     }
 
     private JSONObject getJSONObjectWithoutNamedColumns(
-            Object id, String name, String city, String description, Object active, String date, Object sum)
-            throws JSONException {
+        Object id, String name, String city, String description, Object active, String date, Object sum)
+        throws JSONException {
         return getJSONObject(
-                "column_1",
-                id,
-                "column_2",
-                name,
-                "column_3",
-                city,
-                "column_4",
-                description,
-                "column_5",
-                active,
-                "column_6",
-                date,
-                "column_7",
-                sum);
+            "column_1",
+            id,
+            "column_2",
+            name,
+            "column_3",
+            city,
+            "column_4",
+            description,
+            "column_5",
+            active,
+            "column_6",
+            date,
+            "column_7",
+            sum);
     }
 
     private JSONObject getJSONObject(
-            String idKey,
-            Object idValue,
-            String nameKey,
-            String nameValue,
-            String cityKey,
-            String cityValue,
-            String descriptionKey,
-            String descriptionValue,
-            String activeKey,
-            Object activeValue,
-            String dateKey,
-            Object dateValue,
-            String sumKey,
-            Object sumValue)
-            throws JSONException {
+        String idKey,
+        Object idValue,
+        String nameKey,
+        String nameValue,
+        String cityKey,
+        String cityValue,
+        String descriptionKey,
+        String descriptionValue,
+        String activeKey,
+        Object activeValue,
+        String dateKey,
+        Object dateValue,
+        String sumKey,
+        Object sumValue)
+        throws JSONException {
         JSONObject jsonObject = new JSONObject()
-                .put(idKey, idValue)
-                .put(nameKey, nameValue)
-                .put(cityKey, cityValue)
-                .put(activeKey, activeValue)
-                .put(dateKey, dateValue)
-                .put(sumKey, sumValue);
+            .put(idKey, idValue)
+            .put(nameKey, nameValue)
+            .put(cityKey, cityValue)
+            .put(activeKey, activeValue)
+            .put(dateKey, dateValue)
+            .put(sumKey, sumValue);
 
         if (descriptionValue != null) {
             jsonObject.put(descriptionKey, descriptionValue);
@@ -302,32 +307,40 @@ public class CsvFileComponentHandlerTest {
 
     private File getFile(String fileName) {
         return new File(CsvFileComponentHandlerTest.class
-                .getClassLoader()
-                .getResource("dependencies/" + fileName)
-                .getFile());
+            .getClassLoader()
+            .getResource("dependencies/" + fileName)
+            .getFile());
     }
 
     private ExecutionParameters getReadParameters(
-            boolean headerRow,
-            boolean includeEmptyCells,
-            Integer pageNumber,
-            Integer pageSize,
-            boolean readAsString,
-            File file)
-            throws FileNotFoundException {
+        boolean headerRow,
+        boolean includeEmptyCells,
+        Integer pageNumber,
+        Integer pageSize,
+        boolean readAsString,
+        File file)
+        throws FileNotFoundException {
 
         ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
-        Mockito.when(executionParameters.getString(DELIMITER, ",")).thenReturn(",");
-        Mockito.when(executionParameters.get(FILE_ENTRY, FileEntry.class)).thenReturn(Mockito.mock(FileEntry.class));
-        Mockito.when(executionParameters.getBoolean(HEADER_ROW, true)).thenReturn(headerRow);
-        Mockito.when(executionParameters.getBoolean(INCLUDE_EMPTY_CELLS, false)).thenReturn(includeEmptyCells);
-        Mockito.when(executionParameters.getInteger(PAGE_NUMBER)).thenReturn(pageNumber);
-        Mockito.when(executionParameters.getInteger(PAGE_SIZE)).thenReturn(pageSize);
-        Mockito.when(executionParameters.getBoolean(READ_AS_STRING, false)).thenReturn(readAsString);
+        Mockito.when(executionParameters.getString(DELIMITER, ","))
+            .thenReturn(",");
+        Mockito.when(executionParameters.get(FILE_ENTRY, FileEntry.class))
+            .thenReturn(Mockito.mock(FileEntry.class));
+        Mockito.when(executionParameters.getBoolean(HEADER_ROW, true))
+            .thenReturn(headerRow);
+        Mockito.when(executionParameters.getBoolean(INCLUDE_EMPTY_CELLS, false))
+            .thenReturn(includeEmptyCells);
+        Mockito.when(executionParameters.getInteger(PAGE_NUMBER))
+            .thenReturn(pageNumber);
+        Mockito.when(executionParameters.getInteger(PAGE_SIZE))
+            .thenReturn(pageSize);
+        Mockito.when(executionParameters.getBoolean(READ_AS_STRING, false))
+            .thenReturn(readAsString);
 
         if (file != null) {
-            Mockito.when(context.getFileStream(Mockito.any(FileEntry.class))).thenReturn(new FileInputStream(file));
+            Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
+                .thenReturn(new FileInputStream(file));
         }
 
         return executionParameters;
@@ -337,7 +350,8 @@ public class CsvFileComponentHandlerTest {
     private ExecutionParameters getWriteParameters(List<Map> items) {
         ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
-        Mockito.when(executionParameters.getList(ROWS, Map.class, List.of())).thenReturn(items);
+        Mockito.when(executionParameters.getList(ROWS, Map.class, List.of()))
+            .thenReturn(items);
 
         return executionParameters;
     }

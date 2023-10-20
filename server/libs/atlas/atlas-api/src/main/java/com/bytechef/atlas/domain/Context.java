@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -148,10 +149,10 @@ public final class Context implements Persistable<String> {
     @Override
     public String toString() {
         return "Context{" + "createdBy='"
-                + createdBy + '\'' + ", createdDate="
-                + createdDate + ", id='"
-                + id + '\'' + ", stackId='"
-                + stackId + '\'' + ", value="
-                + value + '}';
+            + createdBy + '\'' + ", createdDate="
+            + createdDate + ", id='"
+            + id + '\'' + ", stackId='"
+            + stackId + '\'' + ", value="
+            + value + '}';
     }
 }

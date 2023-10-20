@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -26,8 +27,7 @@ import java.util.Map;
 import org.springframework.util.Assert;
 
 /**
- * a simple, non-thread-safe implementation of the {@link MessageBroker} interface. Useful for
- * testing.
+ * a simple, non-thread-safe implementation of the {@link MessageBroker} interface. Useful for testing.
  *
  * @author Arik Cohen
  * @since Jul 10, 2016

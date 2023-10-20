@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -48,15 +49,15 @@ public class WorkflowTask implements Serializable, Task {
     public static final WorkflowTask EMPTY_WORKFLOW_TASK = new WorkflowTask();
 
     private static final List<String> STATIC_FIELDS = List.of(
-            WorkflowConstants.FINALIZE,
-            WorkflowConstants.LABEL,
-            WorkflowConstants.NAME,
-            WorkflowConstants.NODE,
-            WorkflowConstants.POST,
-            WorkflowConstants.PRE,
-            WorkflowConstants.TASK_NUMBER,
-            WorkflowConstants.TIMEOUT,
-            WorkflowConstants.TYPE);
+        WorkflowConstants.FINALIZE,
+        WorkflowConstants.LABEL,
+        WorkflowConstants.NAME,
+        WorkflowConstants.NODE,
+        WorkflowConstants.POST,
+        WorkflowConstants.PRE,
+        WorkflowConstants.TASK_NUMBER,
+        WorkflowConstants.TIMEOUT,
+        WorkflowConstants.TYPE);
 
     private List<WorkflowTask> finalize = Collections.emptyList();
     private String label;
@@ -68,24 +69,27 @@ public class WorkflowTask implements Serializable, Task {
     private String timeout;
     private String type;
 
-    public WorkflowTask() {}
+    public WorkflowTask() {
+    }
 
     public WorkflowTask(Map<String, Object> source) {
         Assert.notNull(source, "source cannot be null.");
 
-        this.finalize =
-                MapUtils.getList(source, WorkflowConstants.FINALIZE, Map.class, Collections.emptyList()).stream()
-                        .map(WorkflowTask::new)
-                        .toList();
+        this.finalize = MapUtils.getList(source, WorkflowConstants.FINALIZE, Map.class, Collections.emptyList())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
         this.label = MapUtils.getString(source, WorkflowConstants.LABEL);
         this.name = MapUtils.getString(source, WorkflowConstants.NAME);
         this.node = MapUtils.getString(source, WorkflowConstants.NODE);
-        this.post = MapUtils.getList(source, WorkflowConstants.POST, Map.class, Collections.emptyList()).stream()
-                .map(WorkflowTask::new)
-                .toList();
-        this.pre = MapUtils.getList(source, WorkflowConstants.PRE, Map.class, Collections.emptyList()).stream()
-                .map(WorkflowTask::new)
-                .toList();
+        this.post = MapUtils.getList(source, WorkflowConstants.POST, Map.class, Collections.emptyList())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
+        this.pre = MapUtils.getList(source, WorkflowConstants.PRE, Map.class, Collections.emptyList())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
         this.timeout = MapUtils.getString(source, WorkflowConstants.TIMEOUT);
         this.type = MapUtils.getString(source, WorkflowConstants.TYPE);
 
@@ -136,14 +140,14 @@ public class WorkflowTask implements Serializable, Task {
         WorkflowTask that = (WorkflowTask) o;
 
         return finalize.equals(that.finalize)
-                && Objects.equals(label, that.label)
-                && Objects.equals(name, that.name)
-                && Objects.equals(node, that.node)
-                && parameters.equals(that.parameters)
-                && post.equals(that.post)
-                && pre.equals(that.pre)
-                && Objects.equals(timeout, that.timeout)
-                && Objects.equals(type, that.type);
+            && Objects.equals(label, that.label)
+            && Objects.equals(name, that.name)
+            && Objects.equals(node, that.node)
+            && parameters.equals(that.parameters)
+            && post.equals(that.post)
+            && pre.equals(that.pre)
+            && Objects.equals(timeout, that.timeout)
+            && Objects.equals(type, that.type);
     }
 
     @Override
@@ -152,11 +156,11 @@ public class WorkflowTask implements Serializable, Task {
     }
 
     /**
-     * The (optional) list of tasks that are to be executed after execution of this task -- regardless of whether it
-     * had failed or not.
+     * The (optional) list of tasks that are to be executed after execution of this task -- regardless of whether it had
+     * failed or not.
      *
-     * @return the list of {@link WorkflowTask}s to execute after execution of this task -- regardless of whether it
-     * had failed or not. Never return a <code>null</code>
+     * @return the list of {@link WorkflowTask}s to execute after execution of this task -- regardless of whether it had
+     *         failed or not. Never return a <code>null</code>
      */
     public List<WorkflowTask> getFinalize() {
         return finalize;
@@ -172,8 +176,8 @@ public class WorkflowTask implements Serializable, Task {
     }
 
     /**
-     * Get the identifier name of the task. Task names are used for assigning the output of one task so it can be
-     * later used by subsequent tasks.
+     * Get the identifier name of the task. Task names are used for assigning the output of one task so it can be later
+     * used by subsequent tasks.
      *
      * @return String
      */
@@ -200,7 +204,7 @@ public class WorkflowTask implements Serializable, Task {
      * The (optional) list of tasks that are to be executed after the succesful execution of this task.
      *
      * @return the list of {@link WorkflowTask}s to execute after the succesful execution of this task. Never return a
-     * <code>null</code>
+     *         <code>null</code>
      */
     public List<WorkflowTask> getPost() {
         return post;
@@ -209,8 +213,8 @@ public class WorkflowTask implements Serializable, Task {
     /**
      * The (optional) list of tasks that are to be executed prior to this task.
      *
-     * @return the list of {@link WorkflowTask}s to execute prior to the execution of this task.
-     *     Never return a <code>null</code>
+     * @return the list of {@link WorkflowTask}s to execute prior to the execution of this task. Never return a
+     *         <code>null</code>
      */
     public List<WorkflowTask> getPre() {
         return pre;
@@ -219,7 +223,8 @@ public class WorkflowTask implements Serializable, Task {
     /**
      * Returns the timeout expression which describes when this task should be deemed as timed-out.
      *
-     * <p>The formats accepted are based on the ISO-8601 duration format with days considered to be exactly 24 hours.
+     * <p>
+     * The formats accepted are based on the ISO-8601 duration format with days considered to be exactly 24 hours.
      *
      * @return String
      */
@@ -236,8 +241,10 @@ public class WorkflowTask implements Serializable, Task {
         Map<String, Object> map = new HashMap<>(parameters);
 
         map.put(
-                WorkflowConstants.FINALIZE,
-                finalize.stream().map(WorkflowTask::toMap).toList());
+            WorkflowConstants.FINALIZE,
+            finalize.stream()
+                .map(WorkflowTask::toMap)
+                .toList());
 
         if (label != null) {
             map.put(WorkflowConstants.LABEL, label);
@@ -251,8 +258,12 @@ public class WorkflowTask implements Serializable, Task {
             map.put(WorkflowConstants.NODE, node);
         }
 
-        map.put(WorkflowConstants.POST, post.stream().map(WorkflowTask::toMap).toList());
-        map.put(WorkflowConstants.PRE, pre.stream().map(WorkflowTask::toMap).toList());
+        map.put(WorkflowConstants.POST, post.stream()
+            .map(WorkflowTask::toMap)
+            .toList());
+        map.put(WorkflowConstants.PRE, pre.stream()
+            .map(WorkflowTask::toMap)
+            .toList());
 
         if (timeout != null) {
             map.put(WorkflowConstants.TIMEOUT, timeout);
@@ -266,14 +277,14 @@ public class WorkflowTask implements Serializable, Task {
     @Override
     public String toString() {
         return "WorkflowTask{" + "finalize="
-                + finalize + ", label='"
-                + label + '\'' + ", name='"
-                + name + '\'' + ", node='"
-                + node + '\'' + ", post="
-                + post + ", pre="
-                + pre + ", timeout='"
-                + timeout + '\'' + ", type='"
-                + type + '\'' + ", parameters='"
-                + parameters + '\'' + '}';
+            + finalize + ", label='"
+            + label + '\'' + ", name='"
+            + name + '\'' + ", node='"
+            + node + '\'' + ", post="
+            + post + ", pre="
+            + pre + ", timeout='"
+            + timeout + '\'' + ", type='"
+            + type + '\'' + ", parameters='"
+            + parameters + '\'' + '}';
     }
 }

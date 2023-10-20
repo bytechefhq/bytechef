@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -24,5 +25,5 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 public interface TaskCompletionHandlerFactory {
 
     TaskCompletionHandler createTaskCompletionHandler(
-            TaskCompletionHandler taskCompletionHandler, TaskDispatcher<?> taskDispatcher);
+        TaskCompletionHandler taskCompletionHandler, TaskDispatcher<?> taskDispatcher);
 }

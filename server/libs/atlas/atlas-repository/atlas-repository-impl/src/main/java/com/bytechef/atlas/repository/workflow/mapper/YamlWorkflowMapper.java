@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -38,7 +39,7 @@ public class YamlWorkflowMapper extends AbstractWorkflowMapper implements Workfl
     @Override
     public WorkflowMapper resolve(WorkflowResource workflowResource) {
         return workflowResource.getWorkflowFormat() == WorkflowFormat.YML
-                        || workflowResource.getWorkflowFormat() == WorkflowFormat.YAML
+            || workflowResource.getWorkflowFormat() == WorkflowFormat.YAML
                 ? this
                 : null;
     }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -31,7 +32,8 @@ public class ExecutionError implements Serializable {
     private String message;
     private List<String> stackTrace;
 
-    public ExecutionError() {}
+    public ExecutionError() {
+    }
 
     public ExecutionError(String message, List<String> stackTrace) {
         this.message = message;
@@ -48,15 +50,13 @@ public class ExecutionError implements Serializable {
     }
 
     /**
-     * Provides programmatic access to the stack trace information. Returns an array of stack trace
-     * elements, each representing one stack frame. The zeroth element of the array (assuming the
-     * array's length is non-zero) represents the top of the stack, which is the last method
-     * invocation in the sequence. Typically, this is the point at which this throwable was created
-     * and thrown. The last element of the array (assuming the array's length is non-zero)
-     * represents the bottom of the stack, which is the first method invocation in the sequence.
+     * Provides programmatic access to the stack trace information. Returns an array of stack trace elements, each
+     * representing one stack frame. The zeroth element of the array (assuming the array's length is non-zero)
+     * represents the top of the stack, which is the last method invocation in the sequence. Typically, this is the
+     * point at which this throwable was created and thrown. The last element of the array (assuming the array's length
+     * is non-zero) represents the bottom of the stack, which is the first method invocation in the sequence.
      *
-     * @return an array of stack trace elements representing the stack trace pertaining to this
-     *     error.
+     * @return an array of stack trace elements representing the stack trace pertaining to this error.
      */
     public List<String> getStackTrace() {
         return stackTrace;

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -30,14 +31,14 @@ public class TaskDispatcherAdapterTaskHandlerResolver implements TaskHandlerReso
     private final Map<String, TaskHandler<?>> taskHandlers;
 
     public TaskDispatcherAdapterTaskHandlerResolver(
-            List<TaskDispatcherAdapterFactory> taskDispatcherAdapterTaskHandlerFactories,
-            TaskHandlerResolver taskHandlerResolver,
-            TaskEvaluator taskEvaluator) {
+        List<TaskDispatcherAdapterFactory> taskDispatcherAdapterTaskHandlerFactories,
+        TaskHandlerResolver taskHandlerResolver,
+        TaskEvaluator taskEvaluator) {
         taskHandlers = taskDispatcherAdapterTaskHandlerFactories.stream()
-                .collect(Collectors.toMap(
-                        TaskDispatcherAdapterFactory::getName,
-                        taskDispatcherAdapterFactory ->
-                                taskDispatcherAdapterFactory.create(taskHandlerResolver, taskEvaluator)));
+            .collect(Collectors.toMap(
+                TaskDispatcherAdapterFactory::getName,
+                taskDispatcherAdapterFactory -> taskDispatcherAdapterFactory.create(taskHandlerResolver,
+                    taskEvaluator)));
     }
 
     @Override

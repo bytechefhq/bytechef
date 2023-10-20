@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -43,8 +44,9 @@ public sealed class ConnectionDefinition permits ComponentDSL.ModifiableConnecti
     protected List<? extends Authorization> authorizations = Collections.emptyList();
 
     @JsonIgnore
-    protected Function<Connection, String> baseUriFunction = (connectionParameters) ->
-            connectionParameters.containsKey(BASE_URI) ? connectionParameters.getParameter(BASE_URI) : null;
+    protected Function<Connection, String> baseUriFunction = (
+        connectionParameters) -> connectionParameters.containsKey(BASE_URI)
+            ? connectionParameters.getParameter(BASE_URI) : null;
 
     protected Display display;
     protected List<? extends Property<?>> properties;
@@ -54,7 +56,8 @@ public sealed class ConnectionDefinition permits ComponentDSL.ModifiableConnecti
     @JsonIgnore
     protected Consumer<Connection> testConsumer;
 
-    protected ConnectionDefinition() {}
+    protected ConnectionDefinition() {
+    }
 
     public List<? extends Authorization> getAuthorizations() {
         return authorizations;

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -30,7 +31,8 @@ public class TaskDispatcherChain implements TaskDispatcher<Task> {
 
     private List<TaskDispatcherResolver> taskDispatcherResolvers;
 
-    public TaskDispatcherChain() {}
+    public TaskDispatcherChain() {
+    }
 
     @Override
     public void dispatch(Task task) {

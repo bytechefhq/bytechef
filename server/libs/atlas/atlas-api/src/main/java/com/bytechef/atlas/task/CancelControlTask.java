@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -30,7 +31,8 @@ public class CancelControlTask extends AbstractControlTask {
     private String jobId;
     private String taskId;
 
-    public CancelControlTask() {}
+    public CancelControlTask() {
+    }
 
     public CancelControlTask(String jobId, String taskId) {
         super(TYPE_CANCEL);

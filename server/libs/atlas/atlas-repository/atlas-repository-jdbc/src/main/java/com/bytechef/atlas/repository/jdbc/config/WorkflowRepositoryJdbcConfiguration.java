@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -49,13 +50,13 @@ public class WorkflowRepositoryJdbcConfiguration extends AbstractJdbcConfigurati
     @Override
     protected List<?> userConverters() {
         return Arrays.asList(
-                new ExecutionErrorToStringConverter(objectMapper),
-                new MapWrapperToStringConverter(objectMapper),
-                new MapListWrapperToStringConverter(objectMapper),
-                new StringToExecutionErrorConverter(objectMapper),
-                new StringToMapWrapperConverter(objectMapper),
-                new StringToMapListWrapperConverter(objectMapper),
-                new StringToWorkflowTaskConverter(objectMapper),
-                new WorkflowTaskToStringConverter(objectMapper));
+            new ExecutionErrorToStringConverter(objectMapper),
+            new MapWrapperToStringConverter(objectMapper),
+            new MapListWrapperToStringConverter(objectMapper),
+            new StringToExecutionErrorConverter(objectMapper),
+            new StringToMapWrapperConverter(objectMapper),
+            new StringToMapListWrapperConverter(objectMapper),
+            new StringToWorkflowTaskConverter(objectMapper),
+            new WorkflowTaskToStringConverter(objectMapper));
     }
 }

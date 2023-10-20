@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -46,11 +47,11 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
             Workflow workflow = new Workflow();
 
             workflow.setDefinition(
-                    """
-                {
-                    "tasks": []
-                }
-                """);
+                """
+                    {
+                        "tasks": []
+                    }
+                    """);
             workflow.setFormat(WorkflowFormat.JSON);
 
             workflow = workflowService.add(workflow);

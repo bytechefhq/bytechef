@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -56,11 +57,11 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskEvaluator taskEvaluator;
 
     public SwitchTaskCompletionHandler(
-            ContextService contextService,
-            TaskExecutionService taskExecutionService,
-            TaskCompletionHandler taskCompletionHandler,
-            TaskDispatcher taskDispatcher,
-            TaskEvaluator taskEvaluator) {
+        ContextService contextService,
+        TaskExecutionService taskExecutionService,
+        TaskCompletionHandler taskCompletionHandler,
+        TaskDispatcher taskDispatcher,
+        TaskEvaluator taskEvaluator) {
         this.contextService = contextService;
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
@@ -75,7 +76,8 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentExecution.getType().equals(SWITCH + "/v" + VERSION_1);
+            return parentExecution.getType()
+                .equals(SWITCH + "/v" + VERSION_1);
         }
 
         return false;
@@ -89,8 +91,8 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
 
         taskExecutionService.update(completedSubTaskExecution);
 
-        TaskExecution switchTaskExecution =
-                new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+        TaskExecution switchTaskExecution = new TaskExecution(
+            taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             Context context = contextService.peek(switchTaskExecution.getId());
@@ -107,11 +109,11 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
             WorkflowTask workflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
             TaskExecution subTaskExecution = new TaskExecution(
-                    workflowTask,
-                    switchTaskExecution.getJobId(),
-                    switchTaskExecution.getId(),
-                    switchTaskExecution.getPriority(),
-                    taskExecution.getTaskNumber() + 1);
+                workflowTask,
+                switchTaskExecution.getJobId(),
+                switchTaskExecution.getId(),
+                switchTaskExecution.getPriority(),
+                taskExecution.getTaskNumber() + 1);
 
             Context context = new Context(contextService.peek(switchTaskExecution.getId()));
 
@@ -133,28 +135,30 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
 
     private List<WorkflowTask> resolveCase(TaskExecution taskExecution) {
         Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
-        List<WorkflowTask> caseWorkflowTasks =
-                MapUtils.getList(taskExecution.getParameters(), CASES, Map.class, Collections.emptyList()).stream()
-                        .map(WorkflowTask::new)
-                        .toList();
+        List<WorkflowTask> caseWorkflowTasks = MapUtils
+            .getList(taskExecution.getParameters(), CASES, Map.class, Collections.emptyList())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
 
         Assert.notNull(caseWorkflowTasks, "you must specify 'cases' in a switch statement");
 
         for (WorkflowTask caseWorkflowTask : caseWorkflowTasks) {
             Object key = MapUtils.getRequired(caseWorkflowTask.getParameters(), KEY);
-            List<WorkflowTask> subWorkflowTasks =
-                    MapUtils.getList(caseWorkflowTask.getParameters(), TASKS, Map.class, Collections.emptyList())
-                            .stream()
-                            .map(WorkflowTask::new)
-                            .toList();
+            List<WorkflowTask> subWorkflowTasks = MapUtils
+                .getList(caseWorkflowTask.getParameters(), TASKS, Map.class, Collections.emptyList())
+                .stream()
+                .map(WorkflowTask::new)
+                .toList();
 
             if (key.equals(expression)) {
                 return subWorkflowTasks;
             }
         }
 
-        return MapUtils.getList(taskExecution.getParameters(), DEFAULT, Map.class, Collections.emptyList()).stream()
-                .map(WorkflowTask::new)
-                .toList();
+        return MapUtils.getList(taskExecution.getParameters(), DEFAULT, Map.class, Collections.emptyList())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
     }
 }

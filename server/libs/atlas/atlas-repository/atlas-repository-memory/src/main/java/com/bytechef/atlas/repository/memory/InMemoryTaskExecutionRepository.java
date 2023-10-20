@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -38,9 +39,10 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
     @Override
     public List<TaskExecution> findAllByJobOrderByTaskNumber(AggregateReference<Job, String> job) {
-        return taskExecutions.values().stream()
-                .filter(taskExecution -> Objects.equals(taskExecution.getJobId(), job.getId()))
-                .toList();
+        return taskExecutions.values()
+            .stream()
+            .filter(taskExecution -> Objects.equals(taskExecution.getJobId(), job.getId()))
+            .toList();
     }
 
     @Override
@@ -50,9 +52,10 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
     @Override
     public List<TaskExecution> findAllByJobOrderByCreatedDate(AggregateReference<Job, String> job) {
-        return taskExecutions.values().stream()
-                .filter(taskExecution -> Objects.equals(taskExecution.getJob(), job))
-                .toList();
+        return taskExecutions.values()
+            .stream()
+            .filter(taskExecution -> Objects.equals(taskExecution.getJob(), job))
+            .toList();
     }
 
     @Override

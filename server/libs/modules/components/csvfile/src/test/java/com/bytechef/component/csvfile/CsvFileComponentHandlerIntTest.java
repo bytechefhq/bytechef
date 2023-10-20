@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -52,63 +53,63 @@ public class CsvFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_header.csv");
 
         Job job = workflowExecutor.execute(
-                "csvfile_v1_read",
-                Map.of(
-                        "fileEntry",
-                        fileStorageService
-                                .storeFileContent(
-                                        sampleFile.getAbsolutePath(),
-                                        Files.contentOf(sampleFile, StandardCharsets.UTF_8))
-                                .toMap()));
+            "csvfile_v1_read",
+            Map.of(
+                "fileEntry",
+                fileStorageService
+                    .storeFileContent(
+                        sampleFile.getAbsolutePath(),
+                        Files.contentOf(sampleFile, StandardCharsets.UTF_8))
+                    .toMap()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
         assertEquals(
-                new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
-                new JSONArray((List<?>) outputs.get("readCsvFile")),
-                true);
+            new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
+            new JSONArray((List<?>) outputs.get("readCsvFile")),
+            true);
     }
 
     @Test
     public void testWrite() throws JSONException {
         Job job = workflowExecutor.execute(
-                "csvfile_v1_write",
-                Map.of(
-                        "rows",
-                        new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)).toList()));
+            "csvfile_v1_write",
+            Map.of(
+                "rows",
+                new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)).toList()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
         assertThat(((Map) outputs.get("writeCsvFile")).get(WorkflowConstants.NAME))
-                .isEqualTo("file.csv");
+            .isEqualTo("file.csv");
 
         File sampleFile = getFile("sample_header.csv");
 
         job = workflowExecutor.execute(
-                "csvfile_v1_read",
-                Map.of(
-                        "fileEntry",
-                        fileStorageService
-                                .storeFileContent(
-                                        sampleFile.getName(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
-                                .toMap()));
+            "csvfile_v1_read",
+            Map.of(
+                "fileEntry",
+                fileStorageService
+                    .storeFileContent(
+                        sampleFile.getName(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
+                    .toMap()));
 
         outputs = job.getOutputs();
 
         assertEquals(
-                new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
-                new JSONArray((List<?>) outputs.get("readCsvFile")),
-                true);
+            new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
+            new JSONArray((List<?>) outputs.get("readCsvFile")),
+            true);
     }
 
     private File getFile(String fileName) {
         return new File(CsvFileComponentHandlerIntTest.class
-                .getClassLoader()
-                .getResource("dependencies/" + fileName)
-                .getFile());
+            .getClassLoader()
+            .getResource("dependencies/" + fileName)
+            .getFile());
     }
 }

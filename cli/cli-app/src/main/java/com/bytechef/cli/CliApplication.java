@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -25,17 +26,21 @@ import picocli.CommandLine;
  * @author Ivica Cardic
  */
 @Command(
-        name = "bytechef",
-        description = "Executes various ByteChef related commands.",
-        mixinStandardHelpOptions = true,
-        version = "1.0",
-        subcommands = {CommandLine.HelpCommand.class, ComponentCommand.class})
+    name = "bytechef",
+    description = "Executes various ByteChef related commands.",
+    mixinStandardHelpOptions = true,
+    version = "1.0",
+    subcommands = {
+        CommandLine.HelpCommand.class, ComponentCommand.class
+    })
 public class CliApplication implements Runnable {
 
-    public CliApplication() {}
+    public CliApplication() {
+    }
 
     @Override
-    public void run() {}
+    public void run() {
+    }
 
     public static void main(String... args) {
         int exitCode = new CommandLine(new CliApplication()).execute(args);

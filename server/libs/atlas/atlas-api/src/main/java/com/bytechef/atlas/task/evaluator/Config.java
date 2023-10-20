@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -45,7 +46,7 @@ class Config implements MethodExecutor {
 
         if (value == null) {
             throw new SpelEvaluationException(
-                    SpelMessage.PROPERTY_OR_FIELD_NOT_READABLE, propertyName, Environment.class);
+                SpelMessage.PROPERTY_OR_FIELD_NOT_READABLE, propertyName, Environment.class);
         }
 
         return new TypedValue(value);

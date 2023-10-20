@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -49,13 +50,14 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     @Override
     @Transactional(readOnly = true)
     public TaskExecution getTaskExecution(String id) {
-        return taskExecutionRepository.findById(id).orElseThrow();
+        return taskExecutionRepository.findById(id)
+            .orElseThrow();
     }
 
     @Override
     public List<TaskExecution> getJobTaskExecutions(String jobId) {
         return taskExecutionRepository.findAllByJobOrderByCreatedDate(
-                new AggregateReference.IdOnlyAggregateReference<>(jobId));
+            new AggregateReference.IdOnlyAggregateReference<>(jobId));
     }
 
     @Override
@@ -66,18 +68,20 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
 
     @Override
     public TaskExecution update(TaskExecution taskExecution) {
-        Optional<TaskExecution> currentTaskExecutionOptional =
-                taskExecutionRepository.findByIdForUpdate(taskExecution.getId());
+        Optional<TaskExecution> currentTaskExecutionOptional = taskExecutionRepository
+            .findByIdForUpdate(taskExecution.getId());
 
         if (currentTaskExecutionOptional.isPresent()) {
             TaskExecution currentTaskExecution = currentTaskExecutionOptional.get();
 
-            if (currentTaskExecution.getStatus().isTerminated() && taskExecution.getStatus() == TaskStatus.STARTED) {
+            if (currentTaskExecution.getStatus()
+                .isTerminated() && taskExecution.getStatus() == TaskStatus.STARTED) {
                 taskExecution = new TaskExecution(currentTaskExecution);
 
                 taskExecution.setStartTime(taskExecution.getStartTime());
-            } else if (taskExecution.getStatus().isTerminated()
-                    && currentTaskExecution.getStatus() == TaskStatus.STARTED) {
+            } else if (taskExecution.getStatus()
+                .isTerminated()
+                && currentTaskExecution.getStatus() == TaskStatus.STARTED) {
                 taskExecution.setStartTime(currentTaskExecution.getStartTime());
             }
         }

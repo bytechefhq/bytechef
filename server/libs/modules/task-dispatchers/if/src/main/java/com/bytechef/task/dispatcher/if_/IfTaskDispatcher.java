@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -53,11 +54,11 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
     private final TaskExecutionService taskExecutionService;
 
     public IfTaskDispatcher(
-            ContextService contextService,
-            MessageBroker messageBroker,
-            TaskDispatcher taskDispatcher,
-            TaskEvaluator taskEvaluator,
-            TaskExecutionService taskExecutionService) {
+        ContextService contextService,
+        MessageBroker messageBroker,
+        TaskDispatcher taskDispatcher,
+        TaskEvaluator taskEvaluator,
+        TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
@@ -77,28 +78,28 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
         List<WorkflowTask> subWorkflowTasks;
 
         if (IfTaskUtils.resolveCase(ifTaskExecution)) {
-            subWorkflowTasks =
-                    MapUtils.getList(ifTaskExecution.getParameters(), CASE_TRUE, Map.class, Collections.emptyList())
-                            .stream()
-                            .map(WorkflowTask::new)
-                            .toList();
+            subWorkflowTasks = MapUtils
+                .getList(ifTaskExecution.getParameters(), CASE_TRUE, Map.class, Collections.emptyList())
+                .stream()
+                .map(WorkflowTask::new)
+                .toList();
         } else {
-            subWorkflowTasks =
-                    MapUtils.getList(ifTaskExecution.getParameters(), CASE_FALSE, Map.class, Collections.emptyList())
-                            .stream()
-                            .map(WorkflowTask::new)
-                            .toList();
+            subWorkflowTasks = MapUtils
+                .getList(ifTaskExecution.getParameters(), CASE_FALSE, Map.class, Collections.emptyList())
+                .stream()
+                .map(WorkflowTask::new)
+                .toList();
         }
 
         if (subWorkflowTasks.size() > 0) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
             TaskExecution subTaskExecution = new TaskExecution(
-                    subWorkflowTask,
-                    ifTaskExecution.getJobId(),
-                    ifTaskExecution.getId(),
-                    ifTaskExecution.getPriority(),
-                    1);
+                subWorkflowTask,
+                ifTaskExecution.getJobId(),
+                ifTaskExecution.getId(),
+                ifTaskExecution.getPriority(),
+                1);
 
             Context context = new Context(contextService.peek(ifTaskExecution.getId()));
 
@@ -122,7 +123,8 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(IF + "/v" + VERSION_1)) {
+        if (task.getType()
+            .equals(IF + "/v" + VERSION_1)) {
             return this;
         }
 

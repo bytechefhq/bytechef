@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -99,7 +100,7 @@ public class TaskEvaluator {
      * Evaluate the {@link TaskExecution}
      *
      * @param taskExecution The {@link TaskExecution} instance to evaluate
-     * @param context The context to evaluate the task against
+     * @param context       The context to evaluate the task against
      * @return the evaluate {@link TaskExecution}.
      */
     public TaskExecution evaluate(TaskExecution taskExecution, Context context) {
@@ -137,7 +138,8 @@ public class TaskEvaluator {
             }
 
             throw new IllegalArgumentException(
-                    "unknown expression type: " + subExpression.getClass().getName());
+                "unknown expression type: " + subExpression.getClass()
+                    .getName());
         }
 
         return stringBuilder.toString();

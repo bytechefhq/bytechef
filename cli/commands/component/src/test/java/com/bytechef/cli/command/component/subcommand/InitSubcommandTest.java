@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -31,7 +32,8 @@ public class InitSubcommandTest {
             "component",
             "init",
             "--open-api-path",
-            InitSubcommandTest.class.getResource("/dependencies/petstore.yaml").getFile(),
+            InitSubcommandTest.class.getResource("/dependencies/petstore.yaml")
+                .getFile(),
             "--output-path",
             new File("build/test/generated").getAbsolutePath(),
             "petstore"
@@ -46,7 +48,8 @@ public class InitSubcommandTest {
             "component",
             "init",
             "--open-api-path",
-            InitSubcommandTest.class.getResource("/dependencies/petstore2.yaml").getFile(),
+            InitSubcommandTest.class.getResource("/dependencies/petstore2.yaml")
+                .getFile(),
             "--output-path",
             new File("build/test/generated").getAbsolutePath(),
             "petstore"

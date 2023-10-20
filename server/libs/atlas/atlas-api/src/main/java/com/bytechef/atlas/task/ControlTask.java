@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -23,4 +24,5 @@ package com.bytechef.atlas.task;
  * @author Ivica Cardic
  * @since Apr 11, 2017
  */
-public interface ControlTask extends Task {}
+public interface ControlTask extends Task {
+}

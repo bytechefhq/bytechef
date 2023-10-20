@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -50,53 +51,61 @@ public class CoordinatorMessageBrokerConfiguration implements ApplicationContext
             Coordinator coordinator = applicationContext.getBean(Coordinator.class);
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                    listenerEndpointRegistrar,
-                    Queues.COMPLETIONS,
-                    coordinatorProperties.getSubscriptions().getCompletions(),
-                    coordinator,
-                    "complete");
+                listenerEndpointRegistrar,
+                Queues.COMPLETIONS,
+                coordinatorProperties.getSubscriptions()
+                    .getCompletions(),
+                coordinator,
+                "complete");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                    listenerEndpointRegistrar,
-                    Queues.ERRORS,
-                    coordinatorProperties.getSubscriptions().getErrors(),
-                    coordinator,
-                    "handleError");
+                listenerEndpointRegistrar,
+                Queues.ERRORS,
+                coordinatorProperties.getSubscriptions()
+                    .getErrors(),
+                coordinator,
+                "handleError");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                    listenerEndpointRegistrar,
-                    Queues.EVENTS,
-                    coordinatorProperties.getSubscriptions().getEvents(),
-                    applicationContext.getBean(EventListener.class),
-                    "onApplicationEvent");
+                listenerEndpointRegistrar,
+                Queues.EVENTS,
+                coordinatorProperties.getSubscriptions()
+                    .getEvents(),
+                applicationContext.getBean(EventListener.class),
+                "onApplicationEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                    listenerEndpointRegistrar,
-                    Queues.JOBS,
-                    coordinatorProperties.getSubscriptions().getJobs(),
-                    coordinator,
-                    "start");
+                listenerEndpointRegistrar,
+                Queues.JOBS,
+                coordinatorProperties.getSubscriptions()
+                    .getJobs(),
+                coordinator,
+                "start");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                    listenerEndpointRegistrar,
-                    Queues.RESTARTS,
-                    coordinatorProperties.getSubscriptions().getRequests(),
-                    coordinator,
-                    "resume");
+                listenerEndpointRegistrar,
+                Queues.RESTARTS,
+                coordinatorProperties.getSubscriptions()
+                    .getRequests(),
+                coordinator,
+                "resume");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                    listenerEndpointRegistrar,
-                    Queues.REQUESTS,
-                    coordinatorProperties.getSubscriptions().getRequests(),
-                    coordinator,
-                    "create");
+                listenerEndpointRegistrar,
+                Queues.REQUESTS,
+                coordinatorProperties.getSubscriptions()
+                    .getRequests(),
+                coordinator,
+                "create");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                    listenerEndpointRegistrar,
-                    Queues.STOPS,
-                    coordinatorProperties.getSubscriptions().getRequests(),
-                    coordinator,
-                    "stop");
+                listenerEndpointRegistrar,
+                Queues.STOPS,
+                coordinatorProperties.getSubscriptions()
+                    .getRequests(),
+                coordinator,
+                "stop");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                    listenerEndpointRegistrar,
-                    Queues.SUBFLOWS,
-                    coordinatorProperties.getSubscriptions().getSubflows(),
-                    coordinator,
-                    "create");
+                listenerEndpointRegistrar,
+                Queues.SUBFLOWS,
+                coordinatorProperties.getSubscriptions()
+                    .getSubflows(),
+                coordinator,
+                "create");
         };
     }
 

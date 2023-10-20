@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -24,11 +25,18 @@ import java.util.List;
 
 public class SimpleLinkSchema {
     public static final List<Property> COMPONENT_SCHEMA = List.of(
-            string("id").label("Id").required(false),
-            string("styleClass").label("StyleClass").required(false),
-            string("iconClass").label("IconClass").required(false),
-            string("label").label("Label").required(false),
-            string("title").label("Title").required(false),
-            string("href").label("Href").required(false),
-            integer("weight").label("Weight").required(false));
+        string("id").label("Id")
+            .required(false),
+        string("styleClass").label("StyleClass")
+            .required(false),
+        string("iconClass").label("IconClass")
+            .required(false),
+        string("label").label("Label")
+            .required(false),
+        string("title").label("Title")
+            .required(false),
+        string("href").label("Href")
+            .required(false),
+        integer("weight").label("Weight")
+            .required(false));
 }

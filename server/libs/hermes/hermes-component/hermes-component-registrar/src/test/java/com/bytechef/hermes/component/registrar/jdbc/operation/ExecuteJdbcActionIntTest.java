@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -68,22 +69,22 @@ public class ExecuteJdbcActionIntTest {
         ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
         Mockito.when(executionParameters.getRequiredString(JdbcConstants.EXECUTE))
-                .thenReturn(
-                        """
-                    CREATE TABLE IF NOT EXISTS test (
-                        id   varchar(256) not null primary key,
-                        name varchar(256) not null
-                    )
-                """);
+            .thenReturn(
+                """
+                        CREATE TABLE IF NOT EXISTS test (
+                            id   varchar(256) not null primary key,
+                            name varchar(256) not null
+                        )
+                    """);
 
         executeJdbcOperation.execute(Mockito.mock(Context.class), executionParameters);
 
         Assertions.assertEquals(0, jdbcTemplate.queryForObject("SELECT count(*) FROM test", Integer.class));
 
         Mockito.when(executionParameters.getMap(JdbcConstants.PARAMETERS, Map.of()))
-                .thenReturn(Map.of("id", "id1", "name", "name1"));
+            .thenReturn(Map.of("id", "id1", "name", "name1"));
         Mockito.when(executionParameters.getRequiredString(JdbcConstants.EXECUTE))
-                .thenReturn("INSERT INTO test VALUES(:id, :name)");
+            .thenReturn("INSERT INTO test VALUES(:id, :name)");
 
         executeJdbcOperation.execute(Mockito.mock(Context.class), executionParameters);
 
@@ -99,16 +100,16 @@ public class ExecuteJdbcActionIntTest {
         @Bean
         ExecuteJdbcOperation executeJdbcOperation() {
             return new ExecuteJdbcOperation(new JdbcExecutor(
-                    null,
-                    new DataSourceFactory() {
+                null,
+                new DataSourceFactory() {
 
-                        @Override
-                        public DataSource getDataSource(
-                                Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
-                            return dataSource;
-                        }
-                    },
-                    null));
+                    @Override
+                    public DataSource getDataSource(
+                        Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
+                        return dataSource;
+                    }
+                },
+                null));
         }
     }
 }

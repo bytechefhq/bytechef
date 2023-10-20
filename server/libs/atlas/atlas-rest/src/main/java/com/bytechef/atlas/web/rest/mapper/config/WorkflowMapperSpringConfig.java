@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -25,6 +26,7 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  */
 @MapperConfig(componentModel = "spring", uses = WorkflowConversionServiceAdapter.class)
 @SpringMapperConfig(
-        conversionServiceAdapterPackage = "com.bytechef.atlas.web.rest.adapter",
-        conversionServiceAdapterClassName = "WorkflowConversionServiceAdapter")
-public interface WorkflowMapperSpringConfig {}
+    conversionServiceAdapterPackage = "com.bytechef.atlas.web.rest.adapter",
+    conversionServiceAdapterClassName = "WorkflowConversionServiceAdapter")
+public interface WorkflowMapperSpringConfig {
+}

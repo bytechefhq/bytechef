@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -28,7 +29,7 @@ public class RandomHelperComponentHandlerTest {
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-                "definition/randomhelper_v1.json", new RandomHelperComponentHandler().getDefinition());
+            "definition/randomhelper_v1.json", new RandomHelperComponentHandler().getDefinition());
     }
 
     @Disabled

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -24,10 +25,14 @@ import java.util.List;
 
 public class IncludedFieldsSchema {
     public static final List<Property> COMPONENT_SCHEMA = List.of(
-            array("actuallyIncluded")
-                    .items(string(null))
-                    .label("ActuallyIncluded")
-                    .required(false),
-            array("excluded").items(string(null)).label("Excluded").required(false),
-            array("included").items(string(null)).label("Included").required(false));
+        array("actuallyIncluded")
+            .items(string(null))
+            .label("ActuallyIncluded")
+            .required(false),
+        array("excluded").items(string(null))
+            .label("Excluded")
+            .required(false),
+        array("included").items(string(null))
+            .label("Included")
+            .required(false));
 }

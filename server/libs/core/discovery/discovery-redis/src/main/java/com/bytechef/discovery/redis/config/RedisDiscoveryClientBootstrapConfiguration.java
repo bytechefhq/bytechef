@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -26,5 +27,8 @@ import org.springframework.context.annotation.Import;
  */
 @ConditionalOnProperty(value = "spring.cloud.config.discovery.enabled", matchIfMissing = false)
 @Configuration
-@Import({RedisAutoConfiguration.class, RedisRegistryAutoConfiguration.class})
-public class RedisDiscoveryClientBootstrapConfiguration {}
+@Import({
+    RedisAutoConfiguration.class, RedisRegistryAutoConfiguration.class
+})
+public class RedisDiscoveryClientBootstrapConfiguration {
+}

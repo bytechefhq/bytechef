@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -57,7 +58,8 @@ class JsonIterator implements Iterator<Map<String, ?>> {
             lastJsonToken = jsonParser.nextToken();
 
             if (lastJsonToken == JsonToken.START_OBJECT) {
-                value = objectMapper.readValue(jsonParser, new TypeReference<Map<String, Object>>() {});
+                value = objectMapper.readValue(jsonParser, new TypeReference<Map<String, Object>>() {
+                });
 
                 return true;
             }

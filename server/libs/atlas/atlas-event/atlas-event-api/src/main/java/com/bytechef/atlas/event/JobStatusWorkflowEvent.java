@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -53,8 +54,8 @@ public class JobStatusWorkflowEvent extends WorkflowEvent {
     @Override
     public String toString() {
         return "JobStatusWorkflowEvent{" + "jobId='"
-                + jobId + '\'' + ", jobStatus="
-                + jobStatus + "} "
-                + super.toString();
+            + jobId + '\'' + ", jobStatus="
+            + jobStatus + "} "
+            + super.toString();
     }
 }

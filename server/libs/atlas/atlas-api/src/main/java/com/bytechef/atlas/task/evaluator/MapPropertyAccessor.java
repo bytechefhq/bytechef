@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -36,7 +37,9 @@ class MapPropertyAccessor implements PropertyAccessor {
 
     @Override
     public Class<?>[] getSpecificTargetClasses() {
-        return new Class<?>[] {Map.class};
+        return new Class<?>[] {
+            Map.class
+        };
     }
 
     @Override
@@ -61,7 +64,7 @@ class MapPropertyAccessor implements PropertyAccessor {
 
     @Override
     public void write(EvaluationContext aContext, Object aTarget, String aName, Object aNewValue)
-            throws AccessException {
+        throws AccessException {
         throw new UnsupportedOperationException();
     }
 }

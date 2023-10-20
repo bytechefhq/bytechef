@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -38,20 +39,20 @@ public class CacheConfiguration {
 
     @Bean("workflowRepositoryCacheManager")
     @ConditionalOnProperty(
-            prefix = "bytechef.workflow",
-            name = "workflow-repository.cache.provider",
-            havingValue = "no-op")
+        prefix = "bytechef.workflow",
+        name = "workflow-repository.cache.provider",
+        havingValue = "no-op")
     public CacheManager noOpWorkflowRepositoryCacheManager() {
         return new NoOpCacheManager();
     }
 
     @Bean("workflowRepositoryCacheManager")
     @ConditionalOnProperty(
-            prefix = "bytechef.workflow",
-            name = "workflow-repository.cache.provider",
-            havingValue = "redis")
+        prefix = "bytechef.workflow",
+        name = "workflow-repository.cache.provider",
+        havingValue = "redis")
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
         return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(connectionFactory)
-                .build();
+            .build();
     }
 }

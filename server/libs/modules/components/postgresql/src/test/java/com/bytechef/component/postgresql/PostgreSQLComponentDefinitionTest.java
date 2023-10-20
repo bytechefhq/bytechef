@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -28,9 +29,9 @@ public class PostgreSQLComponentDefinitionTest {
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-                "definition/postgresql_v1.json",
-                new JdbcComponentTaskHandler(
-                                null, new PostgreSQLJdbcComponentDefinitionFactory().getJdbcComponentDefinition())
-                        .getDefinition());
+            "definition/postgresql_v1.json",
+            new JdbcComponentTaskHandler(
+                null, new PostgreSQLJdbcComponentDefinitionFactory().getJdbcComponentDefinition())
+                    .getDefinition());
     }
 }

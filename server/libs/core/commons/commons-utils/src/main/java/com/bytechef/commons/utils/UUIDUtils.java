@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class UUIDUtils {
 
     public static String generate() {
-        return UUID.randomUUID().toString();
+        return UUID.randomUUID()
+            .toString();
     }
 }

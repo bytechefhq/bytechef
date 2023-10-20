@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,4 +17,5 @@
 
 package com.bytechef.component.pipedrive;
 
-public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler {}
+public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler {
+}

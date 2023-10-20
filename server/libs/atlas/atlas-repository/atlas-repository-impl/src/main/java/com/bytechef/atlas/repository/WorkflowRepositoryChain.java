@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -83,7 +84,8 @@ public class WorkflowRepositoryChain implements WorkflowRepository {
     public Optional<Workflow> findById(String id) {
         Cache cacheOne = cacheManager.getCache(CACHE_ONE);
 
-        if (Objects.requireNonNull(cacheOne).get(id) != null) {
+        if (Objects.requireNonNull(cacheOne)
+            .get(id) != null) {
             Cache.ValueWrapper valueWrapper = Objects.requireNonNull(cacheOne.get(id));
 
             return Optional.of((Workflow) Objects.requireNonNull(valueWrapper.get()));
@@ -91,7 +93,8 @@ public class WorkflowRepositoryChain implements WorkflowRepository {
 
         Cache cacheAll = cacheManager.getCache(CACHE_ALL);
 
-        if (Objects.requireNonNull(cacheAll).get(CACHE_ALL) != null) {
+        if (Objects.requireNonNull(cacheAll)
+            .get(CACHE_ALL) != null) {
             Cache.ValueWrapper valueWrapper = Objects.requireNonNull(cacheAll.get(CACHE_ALL));
 
             List<Workflow> workflows = (List<Workflow>) Objects.requireNonNull(valueWrapper.get());
@@ -106,8 +109,8 @@ public class WorkflowRepositoryChain implements WorkflowRepository {
         for (WorkflowRepository workflowRepository : workflowRepositories) {
             try {
                 Workflow workflow = workflowRepository
-                        .findById(id)
-                        .orElseThrow(() -> new IllegalArgumentException("Unknown workflow: " + id));
+                    .findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Unknown workflow: " + id));
 
                 cacheOne.put(id, workflow);
 
@@ -131,15 +134,16 @@ public class WorkflowRepositoryChain implements WorkflowRepository {
 
         if (cacheAll.get(CACHE_ALL) == null) {
             workflows = workflowRepositories.stream()
-                    .map(WorkflowRepository::findAll)
-                    .flatMap(iterable -> StreamSupport.stream(iterable.spliterator(), false))
-                    .sorted((a, b) -> {
-                        if (a.getLabel() == null || b.getLabel() == null) {
-                            return -1;
-                        }
-                        return a.getLabel().compareTo(b.getLabel());
-                    })
-                    .collect(Collectors.toList());
+                .map(WorkflowRepository::findAll)
+                .flatMap(iterable -> StreamSupport.stream(iterable.spliterator(), false))
+                .sorted((a, b) -> {
+                    if (a.getLabel() == null || b.getLabel() == null) {
+                        return -1;
+                    }
+                    return a.getLabel()
+                        .compareTo(b.getLabel());
+                })
+                .collect(Collectors.toList());
 
             cacheAll.put(CACHE_ALL, workflows);
         } else {
@@ -172,7 +176,7 @@ public class WorkflowRepositoryChain implements WorkflowRepository {
         }
 
         throw new RuntimeException(
-                "Set bytechef.workflow.workflow-repository.jdbc.enabled=true property to create new workflow");
+            "Set bytechef.workflow.workflow-repository.jdbc.enabled=true property to create new workflow");
     }
 
     private Workflow update(Workflow workflow) {

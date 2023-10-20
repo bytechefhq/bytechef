@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -21,10 +22,10 @@ package com.bytechef.atlas.worker.task.handler;
 import com.bytechef.atlas.task.Task;
 
 /**
- * a strategy interface used for resolving a {@link TaskHandler} implementation which can handle the
- * given {@link TaskExecution} instance. Implementations are expected to return <code>null</code> if
- * unable to resolve an appropriate {@link TaskHandler} implementation to allow for chaining
- * multiple {@link TaskHandlerResolver} implementations.
+ * a strategy interface used for resolving a {@link TaskHandler} implementation which can handle the given
+ * {@link TaskExecution} instance. Implementations are expected to return <code>null</code> if unable to resolve an
+ * appropriate {@link TaskHandler} implementation to allow for chaining multiple {@link TaskHandlerResolver}
+ * implementations.
  *
  * @author Arik Cohen
  * @since Jan 28, 2017

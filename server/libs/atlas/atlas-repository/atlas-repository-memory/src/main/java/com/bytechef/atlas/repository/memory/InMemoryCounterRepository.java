@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -39,9 +40,10 @@ public class InMemoryCounterRepository implements CounterRepository {
 
     @Override
     public Iterable<Counter> findAll() {
-        return counters.entrySet().stream()
-                .map(entry -> new Counter(entry.getKey(), entry.getValue()))
-                .toList();
+        return counters.entrySet()
+            .stream()
+            .map(entry -> new Counter(entry.getKey(), entry.getValue()))
+            .toList();
     }
 
     @Override

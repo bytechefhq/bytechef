@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -35,9 +36,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * an {@link EventListener} which is used for listening to subflow job status events. When a
- * sub-flow completes/fails or stops its parent job and its parent task needs to be informed so as
- * to resume its execution.
+ * an {@link EventListener} which is used for listening to subflow job status events. When a sub-flow completes/fails or
+ * stops its parent job and its parent task needs to be informed so as to resume its execution.
  *
  * @author Arik Cohen
  * @author Ivica Cardic
@@ -53,10 +53,10 @@ public class SubflowJobStatusEventListener implements EventListener {
 
     @SuppressFBWarnings("EI2")
     public SubflowJobStatusEventListener(
-            JobService jobService,
-            TaskExecutionService taskExecutionService,
-            CoordinatorManager coordinatorManager,
-            TaskEvaluator taskEvaluator) {
+        JobService jobService,
+        TaskExecutionService taskExecutionService,
+        CoordinatorManager coordinatorManager,
+        TaskEvaluator taskEvaluator) {
         this.jobService = Objects.requireNonNull(jobService);
         this.taskExecutionService = Objects.requireNonNull(taskExecutionService);
         this.coordinatorManager = Objects.requireNonNull(coordinatorManager);
@@ -65,7 +65,8 @@ public class SubflowJobStatusEventListener implements EventListener {
 
     @Override
     public void onApplicationEvent(WorkflowEvent workflowEvent) {
-        if (workflowEvent.getType().equals(JobStatusWorkflowEvent.JOB_STATUS)) {
+        if (workflowEvent.getType()
+            .equals(JobStatusWorkflowEvent.JOB_STATUS)) {
             JobStatusWorkflowEvent jobStatusWorkflowEvent = (JobStatusWorkflowEvent) workflowEvent;
 
             JobStatus jobStatus = jobStatusWorkflowEvent.getJobStatus();
@@ -80,16 +81,16 @@ public class SubflowJobStatusEventListener implements EventListener {
                 case STARTED:
                     break;
                 case STOPPED: {
-                    TaskExecution subflowTaskExecution =
-                            taskExecutionService.getTaskExecution(job.getParentTaskExecutionId());
+                    TaskExecution subflowTaskExecution = taskExecutionService
+                        .getTaskExecution(job.getParentTaskExecutionId());
 
                     coordinatorManager.stop(subflowTaskExecution.getJobId());
 
                     break;
                 }
                 case FAILED: {
-                    TaskExecution erroredTaskExecution =
-                            new TaskExecution(taskExecutionService.getTaskExecution(job.getParentTaskExecutionId()));
+                    TaskExecution erroredTaskExecution = new TaskExecution(
+                        taskExecutionService.getTaskExecution(job.getParentTaskExecutionId()));
 
                     erroredTaskExecution.setError(new ExecutionError("An error occurred with subflow", List.of()));
 
@@ -98,14 +99,14 @@ public class SubflowJobStatusEventListener implements EventListener {
                     break;
                 }
                 case COMPLETED: {
-                    TaskExecution completionTaskExecution =
-                            new TaskExecution(taskExecutionService.getTaskExecution(job.getParentTaskExecutionId()));
+                    TaskExecution completionTaskExecution = new TaskExecution(
+                        taskExecutionService.getTaskExecution(job.getParentTaskExecutionId()));
                     Object output = job.getOutputs();
 
                     if (completionTaskExecution.getOutput() != null) {
                         // TODO check, it seems wrong
                         TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(
-                                completionTaskExecution, new Context("execution", new Context("output", output)));
+                            completionTaskExecution, new Context("execution", new Context("output", output)));
 
                         completionTaskExecution = new TaskExecution(evaluatedTaskExecution);
                     } else {

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -49,12 +50,12 @@ public class SwitchTaskDispatcherConfiguration {
     @Bean
     TaskCompletionHandlerFactory switchTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new SwitchTaskCompletionHandler(
-                contextService, taskExecutionService, taskCompletionHandler, taskDispatcher, taskEvaluator);
+            contextService, taskExecutionService, taskCompletionHandler, taskDispatcher, taskEvaluator);
     }
 
     @Bean
     TaskDispatcherResolverFactory switchTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new SwitchTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService, taskEvaluator);
+            contextService, messageBroker, taskDispatcher, taskExecutionService, taskEvaluator);
     }
 }

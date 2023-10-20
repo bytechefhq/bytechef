@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -33,7 +34,9 @@ import org.springframework.context.annotation.Import;
  */
 @ComponentScan("com.bytechef.hermes.task.dispatcher")
 @EnableAutoConfiguration(
-        exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class})
+    exclude = {
+        DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class
+    })
 @Import({
     ResourceWorkflowRepositoryConfiguration.class,
     WorkflowExecutorConfiguration.class,
@@ -44,5 +47,6 @@ public class TaskDispatcherIntTestConfiguration {
 
     @EnableCaching
     @TestConfiguration
-    public static class CacheConfiguration {}
+    public static class CacheConfiguration {
+    }
 }

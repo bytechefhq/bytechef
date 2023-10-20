@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -42,24 +43,24 @@ public class LoggerComponentHandler implements ComponentHandler {
     private static final Logger logger = LoggerFactory.getLogger(LoggerComponentHandler.class);
 
     private final ComponentDefinition componentDefinition = ComponentDSL.component(LOGGER)
-            .display(display("Logger").description("Logs a value to the system log."))
-            .actions(
-                    action(DEBUG)
-                            .display(display("Debug"))
-                            .properties(string(TEXT))
-                            .perform(this::performDebug),
-                    action(ERROR)
-                            .display(display("Error"))
-                            .properties(string(TEXT))
-                            .perform(this::performError),
-                    action(INFO)
-                            .display(display("Info"))
-                            .properties(string(TEXT))
-                            .perform(this::performInfo),
-                    action(WARN)
-                            .display(display("Warn"))
-                            .properties(string(TEXT))
-                            .perform(this::performWarn));
+        .display(display("Logger").description("Logs a value to the system log."))
+        .actions(
+            action(DEBUG)
+                .display(display("Debug"))
+                .properties(string(TEXT))
+                .perform(this::performDebug),
+            action(ERROR)
+                .display(display("Error"))
+                .properties(string(TEXT))
+                .perform(this::performError),
+            action(INFO)
+                .display(display("Info"))
+                .properties(string(TEXT))
+                .perform(this::performInfo),
+            action(WARN)
+                .display(display("Warn"))
+                .properties(string(TEXT))
+                .perform(this::performWarn));
 
     @Override
     public ComponentDefinition getDefinition() {

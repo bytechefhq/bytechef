@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -37,15 +38,18 @@ public class ContextRSocketClient implements ContextService {
     public void push(String stackId, Context context) {
         context.setStackId(stackId);
 
-        rSocketRequester.route("pushStack").data(context).send().block();
+        rSocketRequester.route("pushStack")
+            .data(context)
+            .send()
+            .block();
     }
 
     @Override
     public Context peek(String stackId) {
         return rSocketRequester
-                .route("peekStack")
-                .data(stackId)
-                .retrieveMono(Context.class)
-                .block();
+            .route("peekStack")
+            .data(stackId)
+            .retrieveMono(Context.class)
+            .block();
     }
 }

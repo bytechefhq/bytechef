@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -52,6 +53,7 @@ public abstract class AbstractEncryptionKey implements EncryptionKey {
         // Creating/Generating a key
         Key key = keyGenerator.generateKey();
 
-        return Base64.getEncoder().encodeToString(key.getEncoded());
+        return Base64.getEncoder()
+            .encodeToString(key.getEncoded());
     }
 }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -49,10 +50,12 @@ public class ExceptionTranslatorTestController {
     }
 
     @GetMapping("/missing-servlet-request-part")
-    public void missingServletRequestPartException(@RequestPart String part) {}
+    public void missingServletRequestPartException(@RequestPart String part) {
+    }
 
     @GetMapping("/missing-servlet-request-parameter")
-    public void missingServletRequestParameterException(@RequestParam String param) {}
+    public void missingServletRequestParameterException(@RequestParam String param) {
+    }
 
     @GetMapping("/access-denied")
     public void accessdenied() {
@@ -90,5 +93,6 @@ public class ExceptionTranslatorTestController {
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "test response status")
     @SuppressWarnings("serial")
-    public static class TestResponseStatusException extends RuntimeException {}
+    public static class TestResponseStatusException extends RuntimeException {
+    }
 }

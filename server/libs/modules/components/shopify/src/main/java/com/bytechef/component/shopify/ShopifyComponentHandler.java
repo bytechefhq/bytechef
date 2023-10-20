@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -16,4 +17,5 @@
 
 package com.bytechef.component.shopify;
 
-public class ShopifyComponentHandler extends AbstractShopifyComponentHandler {}
+public class ShopifyComponentHandler extends AbstractShopifyComponentHandler {
+}

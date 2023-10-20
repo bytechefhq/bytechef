@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -63,12 +64,12 @@ import org.springframework.context.annotation.Import;
  */
 @EmbeddedSql
 @SpringBootTest(
-        classes = CoordinatorIntTestConfiguration.class,
-        properties = {
-            "bytechef.workflow.context-repository.provider=jdbc",
-            "bytechef.workflow.persistence.provider=jdbc",
-            "bytechef.workflow.workflow-repository.classpath.enabled=true"
-        })
+    classes = CoordinatorIntTestConfiguration.class,
+    properties = {
+        "bytechef.workflow.context-repository.provider=jdbc",
+        "bytechef.workflow.persistence.provider=jdbc",
+        "bytechef.workflow.workflow-repository.classpath.enabled=true"
+    })
 public class CoordinatorIntTest {
 
     private static final Logger logger = LoggerFactory.getLogger(CoordinatorIntTest.class);
@@ -103,7 +104,7 @@ public class CoordinatorIntTest {
     public void testRequiredParameters() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             Coordinator coordinator = new Coordinator(
-                    contextService, null, null, null, jobService, null, null, null, taskExecutionService);
+                contextService, null, null, null, jobService, null, null, null, taskExecutionService);
 
             JobParametersDTO jobParametersDTO = new JobParametersDTO();
 
@@ -133,11 +134,12 @@ public class CoordinatorIntTest {
         taskHandlerResolver.setTaskHandlerResolvers(List.of(new DefaultTaskHandlerResolver(taskHandlerMap)));
 
         Worker worker = Worker.builder()
-                .withTaskHandlerResolver(taskHandlerResolver)
-                .withMessageBroker(messageBroker)
-                .withEventPublisher(e -> {})
-                .withTaskEvaluator(TaskEvaluator.create())
-                .build();
+            .withTaskHandlerResolver(taskHandlerResolver)
+            .withMessageBroker(messageBroker)
+            .withEventPublisher(e -> {
+            })
+            .withTaskEvaluator(TaskEvaluator.create())
+            .build();
 
         SyncMessageBroker coordinatorMessageBroker = new SyncMessageBroker();
 
@@ -146,27 +148,30 @@ public class CoordinatorIntTest {
         DefaultTaskDispatcher taskDispatcher = new DefaultTaskDispatcher(coordinatorMessageBroker, List.of());
 
         JobExecutor jobExecutor = new JobExecutor(
-                contextService, taskDispatcher, taskExecutionService, TaskEvaluator.create(), workflowService);
+            contextService, taskDispatcher, taskExecutionService, TaskEvaluator.create(), workflowService);
 
         DefaultTaskCompletionHandler taskCompletionHandler = new DefaultTaskCompletionHandler(
-                contextService,
-                e -> {},
-                jobExecutor,
-                jobService,
-                TaskEvaluator.create(),
-                taskExecutionService,
-                workflowService);
+            contextService,
+            e -> {
+            },
+            jobExecutor,
+            jobService,
+            TaskEvaluator.create(),
+            taskExecutionService,
+            workflowService);
 
         Coordinator coordinator = new Coordinator(
-                contextService,
-                e -> {},
-                e -> {},
-                jobExecutor,
-                jobService,
-                messageBroker,
-                taskCompletionHandler,
-                taskDispatcher,
-                taskExecutionService);
+            contextService,
+            e -> {
+            },
+            e -> {
+            },
+            jobExecutor,
+            jobService,
+            messageBroker,
+            taskCompletionHandler,
+            taskDispatcher,
+            taskExecutionService);
 
         messageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
         messageBroker.receive(Queues.JOBS, jobId -> coordinator.start((String) jobId));
@@ -190,7 +195,10 @@ public class CoordinatorIntTest {
         WorkflowRepositoryConfiguration.class
     })
     @ComponentScan(
-            basePackages = {"com.bytechef.atlas.repository.resource", "com.bytechef.atlas.repository.jdbc.event"})
+        basePackages = {
+            "com.bytechef.atlas.repository.resource", "com.bytechef.atlas.repository.jdbc.event"
+        })
     @TestConfiguration
-    static class CoordinatorIntTestConfiguration {}
+    static class CoordinatorIntTestConfiguration {
+    }
 }

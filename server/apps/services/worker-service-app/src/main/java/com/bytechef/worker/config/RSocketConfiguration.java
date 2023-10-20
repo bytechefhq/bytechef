@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -42,32 +43,32 @@ import reactor.util.retry.Retry;
 public class RSocketConfiguration {
 
     @Bean
-    RSocketRequester rSocketRequester(
-            RSocketStrategies rSocketStrategies, Flux<List<LoadbalanceTarget>> loadBalancedTargets) {
-        return RSocketRequester.builder()
-                .rsocketConnector(
-                        rSocketConnector -> rSocketConnector.reconnect(Retry.fixedDelay(2, Duration.ofSeconds(2))))
-                .rsocketStrategies(rSocketStrategies)
-                .dataMimeType(MimeTypeUtils.APPLICATION_JSON)
-                .transports(loadBalancedTargets, new RoundRobinLoadbalanceStrategy());
+    public Flux<List<LoadbalanceTarget>> loadBalancedTargets(DiscoveryClient discoveryClient) {
+        return Mono.fromSupplier(() -> discoveryClient.getInstances("platform-service-app"))
+            .repeatWhen(longFlux -> longFlux.delayElements(Duration.ofSeconds(2)))
+            .map(this::toLoadBalanceTarget);
     }
 
     @Bean
-    public Flux<List<LoadbalanceTarget>> loadBalancedTargets(DiscoveryClient discoveryClient) {
-        return Mono.fromSupplier(() -> discoveryClient.getInstances("platform-service-app"))
-                .repeatWhen(longFlux -> longFlux.delayElements(Duration.ofSeconds(2)))
-                .map(this::toLoadBalanceTarget);
+    RSocketRequester rSocketRequester(
+        RSocketStrategies rSocketStrategies, Flux<List<LoadbalanceTarget>> loadBalancedTargets) {
+        return RSocketRequester.builder()
+            .rsocketConnector(
+                rSocketConnector -> rSocketConnector.reconnect(Retry.fixedDelay(2, Duration.ofSeconds(2))))
+            .rsocketStrategies(rSocketStrategies)
+            .dataMimeType(MimeTypeUtils.APPLICATION_JSON)
+            .transports(loadBalancedTargets, new RoundRobinLoadbalanceStrategy());
     }
 
     private List<LoadbalanceTarget> toLoadBalanceTarget(List<ServiceInstance> rSocketServers) {
         return rSocketServers.stream()
-                .map(serviceInstance -> LoadbalanceTarget.from(
-                        serviceInstance.getHost() + serviceInstance.getPort(),
-                        WebsocketClientTransport.create(
-                                HttpClient.from(TcpClient.create()
-                                        .host(serviceInstance.getHost())
-                                        .port(serviceInstance.getPort())),
-                                "/rsocket")))
-                .collect(Collectors.toList());
+            .map(serviceInstance -> LoadbalanceTarget.from(
+                serviceInstance.getHost() + serviceInstance.getPort(),
+                WebsocketClientTransport.create(
+                    HttpClient.from(TcpClient.create()
+                        .host(serviceInstance.getHost())
+                        .port(serviceInstance.getPort())),
+                    "/rsocket")))
+            .collect(Collectors.toList());
     }
 }

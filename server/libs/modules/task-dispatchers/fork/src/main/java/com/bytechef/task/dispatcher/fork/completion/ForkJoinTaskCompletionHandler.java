@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -38,9 +39,9 @@ import java.util.Map;
  * Handles {@link TaskExecution} completions which are the child execution tasks of a parent <code>
  * fork</code> {@link TaskExecution}.
  *
- * <p>This handler will either execute the next task in the branch, or if arrived at the last task,
- * it will complete the branch and check if all branches are now complete. If so, it will complete
- * the overall <code>fork</code> task.
+ * <p>
+ * This handler will either execute the next task in the branch, or if arrived at the last task, it will complete the
+ * branch and check if all branches are now complete. If so, it will complete the overall <code>fork</code> task.
  *
  * @author Arik Cohen
  * @since May 11, 2017
@@ -55,12 +56,12 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskEvaluator taskEvaluator;
 
     public ForkJoinTaskCompletionHandler(
-            TaskExecutionService taskExecutionService,
-            TaskCompletionHandler taskCompletionHandler,
-            CounterService counterService,
-            TaskDispatcher taskDispatcher,
-            ContextService contextService,
-            TaskEvaluator taskEvaluator) {
+        TaskExecutionService taskExecutionService,
+        TaskCompletionHandler taskCompletionHandler,
+        CounterService counterService,
+        TaskDispatcher taskDispatcher,
+        ContextService contextService,
+        TaskEvaluator taskEvaluator) {
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.counterService = counterService;
@@ -79,33 +80,36 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             Context context = contextService.peek(
-                    taskExecution.getParentId() + "/" + MapUtils.getInteger(taskExecution.getParameters(), "branch"));
+                taskExecution.getParentId() + "/" + MapUtils.getInteger(taskExecution.getParameters(), "branch"));
 
             Context newContext = new Context(context);
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
             contextService.push(
-                    taskExecution.getParentId() + "/" + MapUtils.getInteger(taskExecution.getParameters(), "branch"),
-                    newContext);
+                taskExecution.getParentId() + "/" + MapUtils.getInteger(taskExecution.getParameters(), "branch"),
+                newContext);
         }
 
         TaskExecution forkTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
         @SuppressWarnings("unchecked")
-        List<List<WorkflowTask>> branchesWorkflowTasks =
-                MapUtils.getList(forkTaskExecution.getParameters(), "branches", List.class).stream()
-                        .map(curList -> ((List<Map<String, Object>>) curList)
-                                .stream().map(WorkflowTask::new).toList())
-                        .toList();
+        List<List<WorkflowTask>> branchesWorkflowTasks = MapUtils
+            .getList(forkTaskExecution.getParameters(), "branches", List.class)
+            .stream()
+            .map(curList -> ((List<Map<String, Object>>) curList)
+                .stream()
+                .map(WorkflowTask::new)
+                .toList())
+            .toList();
 
-        List<WorkflowTask> branchWorkflowTasks =
-                branchesWorkflowTasks.get(MapUtils.getInteger(taskExecution.getParameters(), "branch"));
+        List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks
+            .get(MapUtils.getInteger(taskExecution.getParameters(), "branch"));
 
         if (taskExecution.getTaskNumber() < branchWorkflowTasks.size()) {
             TaskExecution branchTaskExecution = new TaskExecution(
-                    branchWorkflowTasks.get(taskExecution.getTaskNumber()),
-                    Map.of("branch", MapUtils.getInteger(taskExecution.getParameters(), "branch")));
+                branchWorkflowTasks.get(taskExecution.getTaskNumber()),
+                Map.of("branch", MapUtils.getInteger(taskExecution.getParameters(), "branch")));
 
             branchTaskExecution.setId(UUIDUtils.generate());
             branchTaskExecution.setStatus(TaskStatus.CREATED);
@@ -115,7 +119,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
             branchTaskExecution.setPriority(taskExecution.getPriority());
 
             Context context = contextService.peek(
-                    taskExecution.getParentId() + "/" + MapUtils.getInteger(taskExecution.getParameters(), "branch"));
+                taskExecution.getParentId() + "/" + MapUtils.getInteger(taskExecution.getParameters(), "branch"));
 
             contextService.push(branchTaskExecution.getId(), context);
 
@@ -127,8 +131,8 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
         } else {
             long branchesLeft = counterService.decrement(taskExecution.getParentId());
             if (branchesLeft == 0) {
-                TaskExecution forkTask =
-                        new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+                TaskExecution forkTask = new TaskExecution(
+                    taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
                 forkTask.setEndTime(LocalDateTime.now());
 

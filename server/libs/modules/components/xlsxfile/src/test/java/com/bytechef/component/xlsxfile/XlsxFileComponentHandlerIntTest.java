@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -55,60 +56,60 @@ public class XlsxFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_header.xlsx");
 
         Job job = workflowExecutor.execute(
-                "xlsxfile_v1_read",
-                Map.of(
-                        "fileEntry",
-                        fileStorageService
-                                .storeFileContent(sampleFile.getAbsolutePath(), new FileInputStream(sampleFile))
-                                .toMap()));
+            "xlsxfile_v1_read",
+            Map.of(
+                "fileEntry",
+                fileStorageService
+                    .storeFileContent(sampleFile.getAbsolutePath(), new FileInputStream(sampleFile))
+                    .toMap()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
         JSONAssert.assertEquals(
-                new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
-                new JSONArray((List<?>) outputs.get("readXlsxFile")),
-                true);
+            new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
+            new JSONArray((List<?>) outputs.get("readXlsxFile")),
+            true);
     }
 
     @Test
     public void testWrite() throws IOException, JSONException {
         Job job = workflowExecutor.execute(
-                "xlsxfile_v1_write",
-                Map.of(
-                        "rows",
-                        new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)).toList()));
+            "xlsxfile_v1_write",
+            Map.of(
+                "rows",
+                new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)).toList()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
         assertThat(((Map) outputs.get("writeXlsxFile")).get(WorkflowConstants.NAME))
-                .isEqualTo("file.xlsx");
+            .isEqualTo("file.xlsx");
 
         File sampleFile = getFile("sample_header.xlsx");
 
         job = workflowExecutor.execute(
-                "xlsxfile_v1_read",
-                Map.of(
-                        "fileEntry",
-                        fileStorageService
-                                .storeFileContent(sampleFile.getName(), new FileInputStream(sampleFile))
-                                .toMap()));
+            "xlsxfile_v1_read",
+            Map.of(
+                "fileEntry",
+                fileStorageService
+                    .storeFileContent(sampleFile.getName(), new FileInputStream(sampleFile))
+                    .toMap()));
 
         outputs = job.getOutputs();
 
         assertEquals(
-                new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
-                new JSONArray((List<?>) outputs.get("readXlsxFile")),
-                true);
+            new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
+            new JSONArray((List<?>) outputs.get("readXlsxFile")),
+            true);
     }
 
     private File getFile(String filename) throws IOException {
         return new File(XlsxFileComponentHandlerIntTest.class
-                .getClassLoader()
-                .getResource("dependencies/" + filename)
-                .getFile());
+            .getClassLoader()
+            .getResource("dependencies/" + filename)
+            .getFile());
     }
 }

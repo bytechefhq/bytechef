@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -60,7 +61,8 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
     }
 
     @Override
-    public void setStatus(RedisRegistration registration, String status) {}
+    public void setStatus(RedisRegistration registration, String status) {
+    }
 
     @Override
     public <T> T getStatus(RedisRegistration registration) {

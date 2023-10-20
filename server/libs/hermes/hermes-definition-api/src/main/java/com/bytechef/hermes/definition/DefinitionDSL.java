@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -71,57 +72,57 @@ public class DefinitionDSL {
     }
 
     public static ModifiableDisplayOption.HideDisplayOptionCondition hide(
-            String propertyName1, List<Object> values1, String propertyName2, List<Object> values2) {
+        String propertyName1, List<Object> values1, String propertyName2, List<Object> values2) {
         return new ModifiableDisplayOption.HideDisplayOptionCondition(
-                Map.of(propertyName1, values1, propertyName2, values2));
+            Map.of(propertyName1, values1, propertyName2, values2));
     }
 
     public static ModifiableDisplayOption.HideDisplayOptionCondition hide(
-            String propertyName1,
-            List<Object> values1,
-            String propertyName2,
-            List<Object> values2,
-            String propertyName3,
-            List<Object> values3) {
+        String propertyName1,
+        List<Object> values1,
+        String propertyName2,
+        List<Object> values2,
+        String propertyName3,
+        List<Object> values3) {
         return new ModifiableDisplayOption.HideDisplayOptionCondition(
-                Map.of(propertyName1, values1, propertyName2, values2, propertyName3, values3));
+            Map.of(propertyName1, values1, propertyName2, values2, propertyName3, values3));
     }
 
     public static ModifiableDisplayOption.HideDisplayOptionCondition hide(
-            String propertyName1,
-            List<Object> values1,
-            String propertyName2,
-            List<Object> values2,
-            String propertyName3,
-            List<Object> values3,
-            String propertyName4,
-            List<Object> values4) {
+        String propertyName1,
+        List<Object> values1,
+        String propertyName2,
+        List<Object> values2,
+        String propertyName3,
+        List<Object> values3,
+        String propertyName4,
+        List<Object> values4) {
         return new ModifiableDisplayOption.HideDisplayOptionCondition(
-                Map.of(propertyName1, values1, propertyName2, values2, propertyName3, values3, propertyName4, values4));
+            Map.of(propertyName1, values1, propertyName2, values2, propertyName3, values3, propertyName4, values4));
     }
 
     public static ModifiableDisplayOption.HideDisplayOptionCondition hide(
-            String propertyName1,
-            List<Object> values1,
-            String propertyName2,
-            List<Object> values2,
-            String propertyName3,
-            List<Object> values3,
-            String propertyName4,
-            List<Object> values4,
-            String propertyName5,
-            List<Object> values5) {
+        String propertyName1,
+        List<Object> values1,
+        String propertyName2,
+        List<Object> values2,
+        String propertyName3,
+        List<Object> values3,
+        String propertyName4,
+        List<Object> values4,
+        String propertyName5,
+        List<Object> values5) {
         return new ModifiableDisplayOption.HideDisplayOptionCondition(Map.of(
-                propertyName1,
-                values1,
-                propertyName2,
-                values2,
-                propertyName3,
-                values3,
-                propertyName4,
-                values4,
-                propertyName5,
-                values5));
+            propertyName1,
+            values1,
+            propertyName2,
+            values2,
+            propertyName3,
+            values3,
+            propertyName4,
+            values4,
+            propertyName5,
+            values5));
     }
 
     public static ModifiableProperty.ModifiableIntegerProperty integer() {
@@ -233,57 +234,57 @@ public class DefinitionDSL {
     }
 
     public static ModifiableDisplayOption.ShowDisplayOptionCondition show(
-            String propertyName1, List<Object> values1, String propertyName2, List<Object> values2) {
+        String propertyName1, List<Object> values1, String propertyName2, List<Object> values2) {
         return new ModifiableDisplayOption.ShowDisplayOptionCondition(
-                Map.of(propertyName1, values1, propertyName2, values2));
+            Map.of(propertyName1, values1, propertyName2, values2));
     }
 
     public static ModifiableDisplayOption.ShowDisplayOptionCondition show(
-            String propertyName1,
-            List<Object> values1,
-            String propertyName2,
-            List<Object> values2,
-            String propertyName3,
-            List<Object> values3) {
+        String propertyName1,
+        List<Object> values1,
+        String propertyName2,
+        List<Object> values2,
+        String propertyName3,
+        List<Object> values3) {
         return new ModifiableDisplayOption.ShowDisplayOptionCondition(
-                Map.of(propertyName1, values1, propertyName2, values2, propertyName3, values3));
+            Map.of(propertyName1, values1, propertyName2, values2, propertyName3, values3));
     }
 
     public static ModifiableDisplayOption.ShowDisplayOptionCondition show(
-            String propertyName1,
-            List<Object> values1,
-            String propertyName2,
-            List<Object> values2,
-            String propertyName3,
-            List<Object> values3,
-            String propertyName4,
-            List<Object> values4) {
+        String propertyName1,
+        List<Object> values1,
+        String propertyName2,
+        List<Object> values2,
+        String propertyName3,
+        List<Object> values3,
+        String propertyName4,
+        List<Object> values4) {
         return new ModifiableDisplayOption.ShowDisplayOptionCondition(
-                Map.of(propertyName1, values1, propertyName2, values2, propertyName3, values3, propertyName4, values4));
+            Map.of(propertyName1, values1, propertyName2, values2, propertyName3, values3, propertyName4, values4));
     }
 
     public static ModifiableDisplayOption.ShowDisplayOptionCondition show(
-            String propertyName1,
-            List<Object> values1,
-            String propertyName2,
-            List<Object> values2,
-            String propertyName3,
-            List<Object> values3,
-            String propertyName4,
-            List<Object> values4,
-            String propertyName5,
-            List<Object> values5) {
+        String propertyName1,
+        List<Object> values1,
+        String propertyName2,
+        List<Object> values2,
+        String propertyName3,
+        List<Object> values3,
+        String propertyName4,
+        List<Object> values4,
+        String propertyName5,
+        List<Object> values5) {
         return new ModifiableDisplayOption.ShowDisplayOptionCondition(Map.of(
-                propertyName1,
-                values1,
-                propertyName2,
-                values2,
-                propertyName3,
-                values3,
-                propertyName4,
-                values4,
-                propertyName5,
-                values5));
+            propertyName1,
+            values1,
+            propertyName2,
+            values2,
+            propertyName3,
+            values3,
+            propertyName4,
+            values4,
+            propertyName5,
+            values5));
     }
 
     public static ModifiableProperty.ModifiableStringProperty string() {
@@ -295,18 +296,18 @@ public class DefinitionDSL {
     }
 
     protected static ModifiableProperty.ModifiableObjectProperty buildObject(
-            String name, String description, String objectType) {
+        String name, String description, String objectType) {
         return new ModifiableProperty.ModifiableObjectProperty(name)
-                .description(description)
-                .objectType(objectType);
+            .description(description)
+            .objectType(objectType);
     }
 
     protected static ModifiableProperty.ModifiableObjectProperty buildObject(
-            String name, String description, String objectType, Property<?>... properties) {
+        String name, String description, String objectType, Property<?>... properties) {
         return new ModifiableProperty.ModifiableObjectProperty(name)
-                .description(description)
-                .objectType(objectType)
-                .properties(properties);
+            .description(description)
+            .objectType(objectType)
+            .properties(properties);
     }
 
     public static final class ModifiableDisplay extends Display {
@@ -382,7 +383,8 @@ public class DefinitionDSL {
 
     public static final class ModifiablePropertyOptionDataSource extends PropertyOptionDataSource {
 
-        private ModifiablePropertyOptionDataSource() {}
+        private ModifiablePropertyOptionDataSource() {
+        }
 
         @SuppressWarnings("unchecked")
         public PropertyOptionDataSource loadOptionsDependsOn(String... propertyNames) {
@@ -425,16 +427,16 @@ public class DefinitionDSL {
             }
 
             public ModifiableOneOfProperty displayOption(
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
             }
 
             public ModifiableOneOfProperty displayOption(
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
@@ -496,16 +498,16 @@ public class DefinitionDSL {
             }
 
             public ModifiableArrayProperty displayOption(
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
             }
 
             public ModifiableArrayProperty displayOption(
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
@@ -688,16 +690,16 @@ public class DefinitionDSL {
             }
 
             public ModifiableBooleanProperty displayOption(
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
             }
 
             public ModifiableBooleanProperty displayOption(
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
@@ -763,7 +765,7 @@ public class DefinitionDSL {
             }
 
             public ModifiableBooleanProperty propertyOptionDataSource(
-                    PropertyOptionDataSource propertyOptionDataSource) {
+                PropertyOptionDataSource propertyOptionDataSource) {
                 this.optionDataSource = propertyOptionDataSource;
 
                 return this;
@@ -801,16 +803,16 @@ public class DefinitionDSL {
             }
 
             public ModifiableDateProperty displayOption(
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
             }
 
             public ModifiableDateProperty displayOption(
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
@@ -913,16 +915,16 @@ public class DefinitionDSL {
             }
 
             public ModifiableDateTimeProperty displayOption(
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
             }
 
             public ModifiableDateTimeProperty displayOption(
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
@@ -988,7 +990,7 @@ public class DefinitionDSL {
             }
 
             public ModifiableDateTimeProperty propertyOptionDataSource(
-                    PropertyOptionDataSource propertyOptionDataSource) {
+                PropertyOptionDataSource propertyOptionDataSource) {
                 this.optionDataSource = propertyOptionDataSource;
 
                 return this;
@@ -1026,16 +1028,16 @@ public class DefinitionDSL {
             }
 
             public ModifiableNumberProperty displayOption(
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
             }
 
             public ModifiableNumberProperty displayOption(
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
@@ -1137,7 +1139,7 @@ public class DefinitionDSL {
             }
 
             public ModifiableNumberProperty propertyOptionDataSource(
-                    PropertyOptionDataSource propertyOptionDataSource) {
+                PropertyOptionDataSource propertyOptionDataSource) {
                 this.optionDataSource = propertyOptionDataSource;
 
                 return this;
@@ -1193,16 +1195,16 @@ public class DefinitionDSL {
             }
 
             public ModifiableIntegerProperty displayOption(
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
             }
 
             public ModifiableIntegerProperty displayOption(
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
@@ -1268,7 +1270,7 @@ public class DefinitionDSL {
             }
 
             public ModifiableIntegerProperty propertyOptionDataSource(
-                    PropertyOptionDataSource propertyOptionDataSource) {
+                PropertyOptionDataSource propertyOptionDataSource) {
                 this.optionDataSource = propertyOptionDataSource;
 
                 return this;
@@ -1318,16 +1320,16 @@ public class DefinitionDSL {
             }
 
             public ModifiableObjectProperty displayOption(
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
             }
 
             public ModifiableObjectProperty displayOption(
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
@@ -1393,7 +1395,7 @@ public class DefinitionDSL {
             }
 
             public ModifiableObjectProperty propertyOptionDataSource(
-                    PropertyOptionDataSource propertyOptionDataSource) {
+                PropertyOptionDataSource propertyOptionDataSource) {
                 this.optionDataSource = propertyOptionDataSource;
 
                 return this;
@@ -1425,8 +1427,8 @@ public class DefinitionDSL {
             public ModifiableObjectProperty properties(List<Property> properties) {
                 if (properties != null) {
                     this.properties = properties.stream()
-                            .map(property -> (Property<?>) property)
-                            .toList();
+                        .map(property -> (Property<?>) property)
+                        .toList();
                 }
 
                 return this;
@@ -1464,16 +1466,16 @@ public class DefinitionDSL {
             }
 
             public ModifiableStringProperty displayOption(
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
             }
 
             public ModifiableStringProperty displayOption(
-                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
                 this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
@@ -1539,7 +1541,7 @@ public class DefinitionDSL {
             }
 
             public ModifiableStringProperty propertyOptionDataSource(
-                    PropertyOptionDataSource propertyOptionDataSource) {
+                PropertyOptionDataSource propertyOptionDataSource) {
                 this.optionDataSource = propertyOptionDataSource;
 
                 return this;
@@ -1582,16 +1584,16 @@ public class DefinitionDSL {
         }
 
         public ModifiablePropertyOption displayOption(
-                ModifiableDisplayOption.ShowDisplayOptionCondition show,
-                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+            ModifiableDisplayOption.ShowDisplayOptionCondition show,
+            ModifiableDisplayOption.HideDisplayOptionCondition hide) {
             this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
             return this;
         }
 
         public ModifiablePropertyOption displayOption(
-                ModifiableDisplayOption.HideDisplayOptionCondition hide,
-                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+            ModifiableDisplayOption.HideDisplayOptionCondition hide,
+            ModifiableDisplayOption.ShowDisplayOptionCondition show) {
             this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
             return this;
@@ -1600,7 +1602,8 @@ public class DefinitionDSL {
 
     public static final class ModifiableResources extends Resources {
 
-        private ModifiableResources() {}
+        private ModifiableResources() {
+        }
 
         public Resources documentationUrl(String documentationUrl) {
             this.documentationUrl = documentationUrl;

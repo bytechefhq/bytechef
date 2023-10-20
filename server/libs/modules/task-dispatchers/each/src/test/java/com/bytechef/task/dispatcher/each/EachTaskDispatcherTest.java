@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -55,12 +56,12 @@ public class EachTaskDispatcherTest {
     public void testDispatch1() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-                    taskDispatcher,
-                    taskExecutionService,
-                    messageBroker,
-                    contextService,
-                    counterService,
-                    TaskEvaluator.create());
+                taskDispatcher,
+                taskExecutionService,
+                messageBroker,
+                contextService,
+                counterService,
+                TaskEvaluator.create());
             dispatcher.dispatch(new TaskExecution());
         });
     }
@@ -69,15 +70,15 @@ public class EachTaskDispatcherTest {
     public void testDispatch2() {
         when(contextService.peek(any())).thenReturn(new Context());
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-                taskDispatcher,
-                taskExecutionService,
-                messageBroker,
-                contextService,
-                counterService,
-                TaskEvaluator.create());
+            taskDispatcher,
+            taskExecutionService,
+            messageBroker,
+            contextService,
+            counterService,
+            TaskEvaluator.create());
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
-                "list", Arrays.asList(1, 2, 3),
-                "iteratee", Collections.singletonMap("type", "print"))));
+            "list", Arrays.asList(1, 2, 3),
+            "iteratee", Collections.singletonMap("type", "print"))));
 
         taskExecution.setId("id");
         taskExecution.setJobId("jobId");
@@ -91,15 +92,15 @@ public class EachTaskDispatcherTest {
     @Test
     public void testDispatch3() {
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-                taskDispatcher,
-                taskExecutionService,
-                messageBroker,
-                contextService,
-                counterService,
-                TaskEvaluator.create());
+            taskDispatcher,
+            taskExecutionService,
+            messageBroker,
+            contextService,
+            counterService,
+            TaskEvaluator.create());
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
-                "list", List.of(),
-                "iteratee", Collections.singletonMap("type", "print"))));
+            "list", List.of(),
+            "iteratee", Collections.singletonMap("type", "print"))));
 
         dispatcher.dispatch(taskExecution);
 

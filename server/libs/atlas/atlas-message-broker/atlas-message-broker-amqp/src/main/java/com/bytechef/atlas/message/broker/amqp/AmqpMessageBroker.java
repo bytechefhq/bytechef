@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -41,13 +42,15 @@ public class AmqpMessageBroker implements MessageBroker {
             if (message instanceof Retryable) {
                 Retryable r = (Retryable) message;
 
-                m.getMessageProperties().setDelay((int) r.getRetryDelayMillis());
+                m.getMessageProperties()
+                    .setDelay((int) r.getRetryDelayMillis());
             }
 
             if (message instanceof Prioritizable) {
                 Prioritizable p = (Prioritizable) message;
 
-                m.getMessageProperties().setPriority(p.getPriority());
+                m.getMessageProperties()
+                    .setPriority(p.getPriority());
             }
 
             return m;

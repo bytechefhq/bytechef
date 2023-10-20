@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -40,7 +41,9 @@ import org.springframework.context.annotation.Import;
  */
 @ComponentScan("com.bytechef.hermes.component")
 @EnableAutoConfiguration(
-        exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class})
+    exclude = {
+        DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class
+    })
 @Import({
     ResourceWorkflowRepositoryConfiguration.class,
     WorkflowExecutorConfiguration.class,
@@ -59,7 +62,8 @@ public class ComponentTestIntConfiguration {
 
     @EnableCaching
     @TestConfiguration
-    public static class CacheConfiguration {}
+    public static class CacheConfiguration {
+    }
 
     @TestConfiguration
     public static class EncryptionIntTestConfiguration {

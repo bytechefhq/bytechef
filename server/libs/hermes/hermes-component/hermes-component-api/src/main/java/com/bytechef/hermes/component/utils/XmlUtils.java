@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -53,7 +54,8 @@ public class XmlUtils {
 
     public static Map<String, ?> read(String xml) {
         try {
-            return XML_MAPPER.convertValue(XML_MAPPER.readTree(xml), new TypeReference<>() {});
+            return XML_MAPPER.convertValue(XML_MAPPER.readTree(xml), new TypeReference<>() {
+            });
         } catch (Exception exception) {
             throw new ProcessingException("Unable to convert xml value", exception);
         }
@@ -123,7 +125,9 @@ public class XmlUtils {
 
     public static String write(Object object, String rootName) {
         try {
-            return XML_MAPPER.writer().withRootName(rootName).writeValueAsString(object);
+            return XML_MAPPER.writer()
+                .withRootName(rootName)
+                .writeValueAsString(object);
         } catch (Exception exception) {
             throw new ProcessingException("Unable to write xml", exception);
         }
@@ -153,7 +157,8 @@ public class XmlUtils {
 
             Document document = parseFunction.apply(documentBuilder);
 
-            NodeList nodeList = (NodeList) xPath.compile(path).evaluate(document, XPathConstants.NODESET);
+            NodeList nodeList = (NodeList) xPath.compile(path)
+                .evaluate(document, XPathConstants.NODESET);
 
             sb.append("<root>");
 

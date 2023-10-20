@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -41,6 +42,6 @@ public class WorkflowMapperChain implements WorkflowMapper {
         }
 
         throw new IllegalArgumentException(
-                "WorkflowMapper does not exist for format type " + workflowResource.getWorkflowFormat());
+            "WorkflowMapper does not exist for format type " + workflowResource.getWorkflowFormat());
     }
 }

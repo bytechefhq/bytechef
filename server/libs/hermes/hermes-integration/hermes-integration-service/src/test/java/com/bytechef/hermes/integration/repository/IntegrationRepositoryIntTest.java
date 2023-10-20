@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -43,7 +44,8 @@ public class IntegrationRepositoryIntTest {
         Integration integration = integrationRepository.save(getIntegration(Collections.emptyList()));
 
         Assertions.assertEquals(
-                integration, integrationRepository.findById(integration.getId()).get());
+            integration, integrationRepository.findById(integration.getId())
+                .get());
     }
 
     @Test
@@ -53,15 +55,16 @@ public class IntegrationRepositoryIntTest {
 
         integration = integrationRepository.save(integration);
 
-        Integration resultIntegration =
-                integrationRepository.findById(integration.getId()).orElseThrow();
+        Integration resultIntegration = integrationRepository.findById(integration.getId())
+            .orElseThrow();
 
         Assertions.assertEquals(resultIntegration, integration);
 
         integrationRepository.deleteById(resultIntegration.getId());
 
         Assertions.assertFalse(
-                integrationRepository.findById(integration.getId()).isPresent());
+            integrationRepository.findById(integration.getId())
+                .isPresent());
     }
 
     @Test
@@ -71,8 +74,8 @@ public class IntegrationRepositoryIntTest {
 
         integration = integrationRepository.save(integration);
 
-        Integration resultIntegration =
-                integrationRepository.findById(integration.getId()).orElseThrow();
+        Integration resultIntegration = integrationRepository.findById(integration.getId())
+            .orElseThrow();
 
         Assertions.assertEquals(resultIntegration, integration);
 
@@ -80,7 +83,8 @@ public class IntegrationRepositoryIntTest {
 
         integration = integrationRepository.save(integration);
 
-        resultIntegration = integrationRepository.findById(integration.getId()).orElseThrow();
+        resultIntegration = integrationRepository.findById(integration.getId())
+            .orElseThrow();
 
         Assertions.assertEquals(resultIntegration.getIntegrationWorkflows(), integration.getIntegrationWorkflows());
 
@@ -88,9 +92,11 @@ public class IntegrationRepositoryIntTest {
 
         integrationRepository.save(resultIntegration);
 
-        resultIntegration = integrationRepository.findById(integration.getId()).orElseThrow();
+        resultIntegration = integrationRepository.findById(integration.getId())
+            .orElseThrow();
 
-        Assertions.assertEquals(0, resultIntegration.getIntegrationWorkflows().size());
+        Assertions.assertEquals(0, resultIntegration.getIntegrationWorkflows()
+            .size());
     }
 
     @Test
@@ -103,11 +109,12 @@ public class IntegrationRepositoryIntTest {
 
         integrationRepository.save(integration);
 
-        Integration updatedIntegration =
-                integrationRepository.findById(integration.getId()).get();
+        Integration updatedIntegration = integrationRepository.findById(integration.getId())
+            .get();
 
         Assertions.assertEquals("name2", updatedIntegration.getName());
-        Assertions.assertEquals(2, updatedIntegration.getIntegrationWorkflows().size());
+        Assertions.assertEquals(2, updatedIntegration.getIntegrationWorkflows()
+            .size());
     }
 
     private static Integration getIntegration(List<String> workflowIds) {

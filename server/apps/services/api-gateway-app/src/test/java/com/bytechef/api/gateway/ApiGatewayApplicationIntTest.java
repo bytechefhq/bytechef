@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -28,5 +29,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class ApiGatewayApplicationIntTest {
 
     @Test
-    void testContextLoads() {}
+    void testContextLoads() {
+    }
 }

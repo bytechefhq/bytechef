@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -30,7 +31,7 @@ public class RedisAutoServiceRegistration extends AbstractAutoServiceRegistratio
     private RedisRegistration redisRegistration;
 
     public RedisAutoServiceRegistration(
-            ServiceRegistry<RedisRegistration> serviceRegistry, AutoServiceRegistrationProperties properties) {
+        ServiceRegistry<RedisRegistration> serviceRegistry, AutoServiceRegistrationProperties properties) {
         super(serviceRegistry, properties);
     }
 

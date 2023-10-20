@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -29,7 +30,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
  * @author Ivica Cardic
  */
 public abstract class AbstractTaskHandlerRegistrar<T extends ComponentDefinitionFactory>
-        implements TaskHandlerRegistrar {
+    implements TaskHandlerRegistrar {
 
     private final Class<T> componentFactoryClass;
 
@@ -45,7 +46,7 @@ public abstract class AbstractTaskHandlerRegistrar<T extends ComponentDefinition
     }
 
     protected void registerComponentActionTaskHandlerAdapter(
-            T componentFactory, ConfigurableListableBeanFactory beanFactory) {
+        T componentFactory, ConfigurableListableBeanFactory beanFactory) {
         ComponentDefinition componentDefinition = componentFactory.getDefinition();
 
         if (componentDefinition == null) {
@@ -54,23 +55,23 @@ public abstract class AbstractTaskHandlerRegistrar<T extends ComponentDefinition
 
         for (ActionDefinition actionDefinition : componentDefinition.getActions()) {
             beanFactory.registerSingleton(
-                    getBeanName(
-                            componentDefinition.getName(),
-                            componentDefinition.getVersion(),
-                            actionDefinition.getName()),
-                    createTaskHandler(actionDefinition, componentDefinition.getConnection(), componentFactory));
+                getBeanName(
+                    componentDefinition.getName(),
+                    componentDefinition.getVersion(),
+                    actionDefinition.getName()),
+                createTaskHandler(actionDefinition, componentDefinition.getConnection(), componentFactory));
         }
 
         beanFactory.registerSingleton(
-                getBeanName(
-                        componentDefinition.getName(),
-                        componentDefinition.getVersion(),
-                        ComponentDefinitionFactory.class.getSimpleName()),
-                componentFactory);
+            getBeanName(
+                componentDefinition.getName(),
+                componentDefinition.getVersion(),
+                ComponentDefinitionFactory.class.getSimpleName()),
+            componentFactory);
     }
 
     protected abstract TaskHandler<?> createTaskHandler(
-            ActionDefinition actionDefinition, ConnectionDefinition connectionDefinition, T componentFactory);
+        ActionDefinition actionDefinition, ConnectionDefinition connectionDefinition, T componentFactory);
 
     private String getBeanName(String componentName, int version, String typeName) {
         return componentName + "/v" + version + "/" + typeName;

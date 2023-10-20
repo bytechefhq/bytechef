@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -55,10 +56,10 @@ public class JobController implements JobsApi {
 
     @SuppressFBWarnings("EI2")
     public JobController(
-            ConversionService conversionService,
-            JobService jobService,
-            MessageBroker messageBroker,
-            TaskExecutionService taskExecutionService) {
+        ConversionService conversionService,
+        JobService jobService,
+        MessageBroker messageBroker,
+        TaskExecutionService taskExecutionService) {
         this.conversionService = conversionService;
         this.jobService = jobService;
         this.messageBroker = messageBroker;
@@ -72,31 +73,34 @@ public class JobController implements JobsApi {
 
     @Override
     public Mono<ResponseEntity<Flux<TaskExecutionModel>>> getJobTaskExecutions(
-            String jobId, ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(taskExecutionService.getJobTaskExecutions(jobId).stream()
-                .map(taskExecution -> conversionService.convert(taskExecution, TaskExecutionModel.class))
-                .toList())));
+        String jobId, ServerWebExchange exchange) {
+        return Mono.just(ResponseEntity.ok(Flux.fromIterable(taskExecutionService.getJobTaskExecutions(jobId)
+            .stream()
+            .map(taskExecution -> conversionService.convert(taskExecution, TaskExecutionModel.class))
+            .toList())));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Mono<ResponseEntity<Page>> getJobs(Integer pageNumber, ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(
-                jobService.getJobs(pageNumber).map(job -> conversionService.convert(job, JobModel.class))));
+            jobService.getJobs(pageNumber)
+                .map(job -> conversionService.convert(job, JobModel.class))));
     }
 
     @Override
     public Mono<ResponseEntity<JobModel>> getLatestJob(ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(
-                conversionService.convert(jobService.fetchLatestJob().orElse(null), JobModel.class)));
+            conversionService.convert(jobService.fetchLatestJob()
+                .orElse(null), JobModel.class)));
     }
 
     @Override
     public Mono<ResponseEntity<PostJob200ResponseModel>> postJob(
-            Mono<JobParametersModel> workflowParametersModelMono, ServerWebExchange exchange) {
+        Mono<JobParametersModel> workflowParametersModelMono, ServerWebExchange exchange) {
         return workflowParametersModelMono.map(workflowParametersModel -> {
-            JobParametersDTO jobParametersDTO =
-                    conversionService.convert(workflowParametersModel, JobParametersDTO.class);
+            JobParametersDTO jobParametersDTO = conversionService.convert(workflowParametersModel,
+                JobParametersDTO.class);
 
             String id = UUIDUtils.generate();
 

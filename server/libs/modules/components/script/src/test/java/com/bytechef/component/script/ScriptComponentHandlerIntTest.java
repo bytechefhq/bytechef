@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -53,7 +54,7 @@ public class ScriptComponentHandlerIntTest {
     @Test
     public void testPerformJavaScript() {
         Job job = workflowExecutor.execute(
-                "script_v1_javascript", Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
+            "script_v1_javascript", Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 

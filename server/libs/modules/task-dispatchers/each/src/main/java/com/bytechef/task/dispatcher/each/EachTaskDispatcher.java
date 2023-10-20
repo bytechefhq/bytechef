@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -61,12 +62,12 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     private final CounterService counterService;
 
     public EachTaskDispatcher(
-            TaskDispatcher taskDispatcher,
-            TaskExecutionService taskExecutionService,
-            MessageBroker messageBroker,
-            ContextService contextService,
-            CounterService counterService,
-            TaskEvaluator taskEvaluator) {
+        TaskDispatcher taskDispatcher,
+        TaskExecutionService taskExecutionService,
+        MessageBroker messageBroker,
+        ContextService contextService,
+        CounterService counterService,
+        TaskEvaluator taskEvaluator) {
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
         this.messageBroker = messageBroker;
@@ -96,7 +97,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
             for (int i = 0; i < list.size(); i++) {
                 Object item = list.get(i);
                 TaskExecution iterateeTaskExecution = new TaskExecution(
-                        iteratee, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), i + 1);
+                    iteratee, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), i + 1);
 
                 Context context = new Context(contextService.peek(taskExecution.getId()));
 
@@ -124,7 +125,8 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(EachTaskDispatcherConstants.EACH + "/v" + VERSION_1)) {
+        if (task.getType()
+            .equals(EachTaskDispatcherConstants.EACH + "/v" + VERSION_1)) {
             return this;
         }
         return null;

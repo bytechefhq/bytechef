@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -38,23 +39,23 @@ import org.apache.commons.lang3.RandomUtils;
 public class RandomHelperComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition = component(RANDOM_HELPER)
-            .display(display("Random Helper").description("The Random Helper allows you to generate random values."))
-            .actions(
-                    action(RANDOM_INT)
-                            .display(display("Int").description("Generates a random integer value."))
-                            .properties(
-                                    integer(START_INCLUSIVE)
-                                            .description("The minimum possible generated value.")
-                                            .required(true)
-                                            .defaultValue(0),
-                                    integer(END_INCLUSIVE)
-                                            .description("The maximum possible generated value.")
-                                            .required(true)
-                                            .defaultValue(100))
-                            .perform(this::performNextInt),
-                    action(RANDOM_FLOAT)
-                            .display(display("Float").description("Generates a random float value."))
-                            .perform(this::performNextFloat));
+        .display(display("Random Helper").description("The Random Helper allows you to generate random values."))
+        .actions(
+            action(RANDOM_INT)
+                .display(display("Int").description("Generates a random integer value."))
+                .properties(
+                    integer(START_INCLUSIVE)
+                        .description("The minimum possible generated value.")
+                        .required(true)
+                        .defaultValue(0),
+                    integer(END_INCLUSIVE)
+                        .description("The maximum possible generated value.")
+                        .required(true)
+                        .defaultValue(100))
+                .perform(this::performNextInt),
+            action(RANDOM_FLOAT)
+                .display(display("Float").description("Generates a random float value."))
+                .perform(this::performNextFloat));
 
     @Override
     public ComponentDefinition getDefinition() {

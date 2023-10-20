@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -25,7 +26,10 @@ import picocli.CommandLine;
  * @author Ivica Cardic
  */
 @Command(
-        name = "component",
-        description = "Manage, create, and publish a component",
-        subcommands = {CommandLine.HelpCommand.class, InitSubcommand.class})
-public class ComponentCommand {}
+    name = "component",
+    description = "Manage, create, and publish a component",
+    subcommands = {
+        CommandLine.HelpCommand.class, InitSubcommand.class
+    })
+public class ComponentCommand {
+}

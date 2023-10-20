@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -39,12 +40,12 @@ public class JsonFileAssert {
     public static void assertEquals(String path, Object object) {
         try {
             JSONAssert.assertEquals(
-                    Files.readString(Paths.get(JsonFileAssert.class
-                            .getClassLoader()
-                            .getResource(path)
-                            .toURI())),
-                    objectMapper.writeValueAsString(object),
-                    true);
+                Files.readString(Paths.get(JsonFileAssert.class
+                    .getClassLoader()
+                    .getResource(path)
+                    .toURI())),
+                objectMapper.writeValueAsString(object),
+                true);
         } catch (IOException | JSONException | URISyntaxException e) {
             throw new RuntimeException(e);
         }

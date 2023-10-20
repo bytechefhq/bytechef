@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -63,7 +64,8 @@ public final class IntegrationWorkflow implements Persistable<String> {
     @Column("workflow_id")
     private String workflowId;
 
-    public IntegrationWorkflow() {}
+    public IntegrationWorkflow() {
+    }
 
     public IntegrationWorkflow(String workflowId) {
         this.workflowId = workflowId;
@@ -156,13 +158,13 @@ public final class IntegrationWorkflow implements Persistable<String> {
     @Override
     public String toString() {
         return "IntegrationWorkflow{" + "createdBy='"
-                + createdBy + '\'' + ", createdDate="
-                + createdDate + ", id='"
-                + id + '\'' + ", integration="
-                + integration + ", lastModifiedBy='"
-                + lastModifiedBy + '\'' + ", lastModifiedDate="
-                + lastModifiedDate + ", version="
-                + version + ", workflowId='"
-                + workflowId + '\'' + '}';
+            + createdBy + '\'' + ", createdDate="
+            + createdDate + ", id='"
+            + id + '\'' + ", integration="
+            + integration + ", lastModifiedBy='"
+            + lastModifiedBy + '\'' + ", lastModifiedDate="
+            + lastModifiedDate + ", version="
+            + version + ", workflowId='"
+            + workflowId + '\'' + '}';
     }
 }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -29,7 +30,8 @@ public class EncryptedMapWrapper {
 
     private Map<String, Object> map = Collections.emptyMap();
 
-    public EncryptedMapWrapper() {}
+    public EncryptedMapWrapper() {
+    }
 
     public EncryptedMapWrapper(Map<String, Object> map) {
         this.map = new HashMap<>(map);

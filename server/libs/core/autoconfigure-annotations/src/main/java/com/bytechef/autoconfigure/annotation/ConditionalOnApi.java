@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -31,6 +32,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target({
+    ElementType.TYPE, ElementType.METHOD
+})
 @ConditionalOnProperty(prefix = "bytechef.workflow", name = "worker.api", havingValue = "true", matchIfMissing = true)
-public @interface ConditionalOnApi {}
+public @interface ConditionalOnApi {
+}

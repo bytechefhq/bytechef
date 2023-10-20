@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -35,7 +36,9 @@ class Join implements MethodExecutor {
     public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
         String separator = (String) aArguments[0];
         List<?> values = (List<?>) aArguments[1];
-        String str = values.stream().map(String::valueOf).collect(Collectors.joining(separator));
+        String str = values.stream()
+            .map(String::valueOf)
+            .collect(Collectors.joining(separator));
 
         return new TypedValue(str);
     }

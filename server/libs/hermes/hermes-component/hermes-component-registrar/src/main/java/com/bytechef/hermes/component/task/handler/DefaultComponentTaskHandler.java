@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -44,12 +45,12 @@ public class DefaultComponentTaskHandler implements TaskHandler<Object> {
 
     @SuppressFBWarnings("EI2")
     public DefaultComponentTaskHandler(
-            ActionDefinition actionDefinition,
-            ConnectionDefinition connectionDefinition,
-            ComponentHandler componentHandler,
-            ConnectionService connectionService,
-            EventPublisher eventPublisher,
-            FileStorageService fileStorageService) {
+        ActionDefinition actionDefinition,
+        ConnectionDefinition connectionDefinition,
+        ComponentHandler componentHandler,
+        ConnectionService connectionService,
+        EventPublisher eventPublisher,
+        FileStorageService fileStorageService) {
         this.actionDefinition = actionDefinition;
         this.connectionDefinition = connectionDefinition;
         this.componentHandler = componentHandler;
@@ -61,13 +62,13 @@ public class DefaultComponentTaskHandler implements TaskHandler<Object> {
     @Override
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
         Context context = new ContextImpl(
-                connectionDefinition, connectionService, eventPublisher, fileStorageService, taskExecution);
+            connectionDefinition, connectionService, eventPublisher, fileStorageService, taskExecution);
 
         return actionDefinition
-                .getPerformFunction()
-                .map(performFunction ->
-                        performFunction.apply(context, new ExecutionParametersImpl(taskExecution.getParameters())))
-                .orElseGet(() -> componentHandler.handle(
-                        actionDefinition, context, new ExecutionParametersImpl(taskExecution.getParameters())));
+            .getPerformFunction()
+            .map(performFunction -> performFunction.apply(context,
+                new ExecutionParametersImpl(taskExecution.getParameters())))
+            .orElseGet(() -> componentHandler.handle(
+                actionDefinition, context, new ExecutionParametersImpl(taskExecution.getParameters())));
     }
 }

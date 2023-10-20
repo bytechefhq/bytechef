@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -50,15 +51,15 @@ public class BashComponentHandler implements ComponentHandler {
     private static final Logger logger = LoggerFactory.getLogger(BashComponentHandler.class);
 
     private ComponentDefinition componentDefinition = component(BASH)
-            .display(display("Bash").description("Allows you to run arbitrary Bash scripts."))
-            .actions(action(EXECUTE)
-                    .display(display("Execute").description("Executes the script."))
-                    .properties(string(SCRIPT)
-                            .label("Script")
-                            .description("Script written in bash.")
-                            .required(true))
-                    .output(string())
-                    .perform(this::performExecute));
+        .display(display("Bash").description("Allows you to run arbitrary Bash scripts."))
+        .actions(action(EXECUTE)
+            .display(display("Execute").description("Executes the script."))
+            .properties(string(SCRIPT)
+                .label("Script")
+                .description("Script written in bash.")
+                .required(true))
+            .output(string())
+            .perform(this::performExecute));
 
     @Override
     public ComponentDefinition getDefinition() {
@@ -71,7 +72,7 @@ public class BashComponentHandler implements ComponentHandler {
             File logFile = File.createTempFile("log", null);
 
             FileUtils.writeStringToFile(
-                    scriptFile, executionParameters.getRequiredString(SCRIPT), StandardCharsets.UTF_8);
+                scriptFile, executionParameters.getRequiredString(SCRIPT), StandardCharsets.UTF_8);
 
             try (PrintStream stream = new PrintStream(logFile, StandardCharsets.UTF_8)) {
                 Runtime runtime = Runtime.getRuntime();
@@ -94,9 +95,9 @@ public class BashComponentHandler implements ComponentHandler {
                 return FileUtils.readFileToString(logFile, StandardCharsets.UTF_8);
             } catch (ExecuteException e) {
                 throw new ExecuteException(
-                        e.getMessage(),
-                        e.getExitValue(),
-                        new RuntimeException(FileUtils.readFileToString(logFile, StandardCharsets.UTF_8)));
+                    e.getMessage(),
+                    e.getExitValue(),
+                    new RuntimeException(FileUtils.readFileToString(logFile, StandardCharsets.UTF_8)));
             } finally {
                 FileUtils.deleteQuietly(logFile);
                 FileUtils.deleteQuietly(scriptFile);

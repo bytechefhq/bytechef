@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -38,26 +39,26 @@ import com.bytechef.hermes.component.utils.JsonUtils;
 public class JsonHelperComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition = component(JSON_HELPER)
-            .display(display("JSON Helper").description("JSON Helper allows you to do various operations on objects."))
-            .actions(
-                    action(JSON_PARSE)
-                            .display(display("Convert from JSON string")
-                                    .description("Converts the JSON string to object/array."))
-                            .properties(string(SOURCE)
-                                    .label("Source")
-                                    .description("The JSON string to convert to the data.")
-                                    .required(true))
-                            .output(oneOf())
-                            .perform(this::performParse),
-                    action(JSON_STRINGIFY)
-                            .display(display("Convert to JSON string")
-                                    .description("Writes the object/array to a JSON string."))
-                            .properties(oneOf(SOURCE)
-                                    .label("Source")
-                                    .description("The data to convert to JSON string.")
-                                    .required(true))
-                            .output(string())
-                            .perform(this::performStringify));
+        .display(display("JSON Helper").description("JSON Helper allows you to do various operations on objects."))
+        .actions(
+            action(JSON_PARSE)
+                .display(display("Convert from JSON string")
+                    .description("Converts the JSON string to object/array."))
+                .properties(string(SOURCE)
+                    .label("Source")
+                    .description("The JSON string to convert to the data.")
+                    .required(true))
+                .output(oneOf())
+                .perform(this::performParse),
+            action(JSON_STRINGIFY)
+                .display(display("Convert to JSON string")
+                    .description("Writes the object/array to a JSON string."))
+                .properties(oneOf(SOURCE)
+                    .label("Source")
+                    .description("The data to convert to JSON string.")
+                    .required(true))
+                .output(string())
+                .perform(this::performStringify));
 
     @Override
     public ComponentDefinition getDefinition() {

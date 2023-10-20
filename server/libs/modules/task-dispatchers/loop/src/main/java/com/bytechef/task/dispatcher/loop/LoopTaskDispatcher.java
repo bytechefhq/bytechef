@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -44,8 +45,8 @@ import java.util.List;
 import org.springframework.util.Assert;
 
 /**
- * A {@link TaskDispatcher} implementation which implements a loop construct. The dispatcher works
- * by executing the <code>iteratee</code> function on each item on the <code>stream</code>.
+ * A {@link TaskDispatcher} implementation which implements a loop construct. The dispatcher works by executing the
+ * <code>iteratee</code> function on each item on the <code>stream</code>.
  *
  * @author Ivica Cardic
  */
@@ -58,11 +59,11 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     private final TaskExecutionService taskExecutionService;
 
     public LoopTaskDispatcher(
-            ContextService contextService,
-            MessageBroker messageBroker,
-            TaskDispatcher taskDispatcher,
-            TaskEvaluator taskEvaluator,
-            TaskExecutionService taskExecutionService) {
+        ContextService contextService,
+        MessageBroker messageBroker,
+        TaskDispatcher taskDispatcher,
+        TaskEvaluator taskEvaluator,
+        TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.taskDispatcher = taskDispatcher;
         this.messageBroker = messageBroker;
@@ -74,8 +75,8 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     public void dispatch(TaskExecution taskExecution) {
         boolean loopForever = MapUtils.getBoolean(taskExecution.getParameters(), LOOP_FOREVER, false);
         WorkflowTask iteratee = new WorkflowTask(MapUtils.getMap(taskExecution.getParameters(), ITERATEE));
-        List<Object> list =
-                MapUtils.getList(taskExecution.getParameters(), LIST, Object.class, Collections.emptyList());
+        List<Object> list = MapUtils.getList(taskExecution.getParameters(), LIST, Object.class,
+            Collections.emptyList());
 
         Assert.notNull(iteratee, "'iteratee' property can't be null");
 
@@ -88,7 +89,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
         if (loopForever || !list.isEmpty()) {
             TaskExecution subTaskExecution = new TaskExecution(
-                    iteratee, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1);
+                iteratee, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1);
 
             Context context = new Context(contextService.peek(taskExecution.getId()));
 
@@ -118,7 +119,8 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(LOOP + "/v" + VERSION_1)) {
+        if (task.getType()
+            .equals(LOOP + "/v" + VERSION_1)) {
             return this;
         }
 

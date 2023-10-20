@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -42,6 +43,8 @@ public interface IntegrationModelMapper extends Converter<IntegrationModel, Inte
             return Collections.emptySet();
         }
 
-        return workflowIds.stream().map(IntegrationWorkflow::new).collect(Collectors.toSet());
+        return workflowIds.stream()
+            .map(IntegrationWorkflow::new)
+            .collect(Collectors.toSet());
     }
 }

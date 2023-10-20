@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -57,11 +58,11 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     private final TaskExecutionService taskExecutionService;
 
     public ParallelTaskDispatcher(
-            ContextService contextService,
-            CounterService counterService,
-            MessageBroker messageBroker,
-            TaskDispatcher taskDispatcher,
-            TaskExecutionService taskExecutionService) {
+        ContextService contextService,
+        CounterService counterService,
+        MessageBroker messageBroker,
+        TaskDispatcher taskDispatcher,
+        TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.counterService = counterService;
         this.messageBroker = messageBroker;
@@ -71,10 +72,11 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        List<WorkflowTask> workflowTasks =
-                MapUtils.getList(taskExecution.getParameters(), TASKS, Map.class, Collections.emptyList()).stream()
-                        .map(WorkflowTask::new)
-                        .toList();
+        List<WorkflowTask> workflowTasks = MapUtils
+            .getList(taskExecution.getParameters(), TASKS, Map.class, Collections.emptyList())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
 
         Assert.notNull(workflowTasks, "'tasks' property can't be null");
 
@@ -83,7 +85,7 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
             for (WorkflowTask workflowTask : workflowTasks) {
                 TaskExecution parallelTaskExecution = new TaskExecution(
-                        workflowTask, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority());
+                    workflowTask, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority());
 
                 Context context = new Context(contextService.peek(taskExecution.getId()));
 
@@ -105,7 +107,8 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public TaskDispatcher resolve(Task aTask) {
-        if (aTask.getType().equals(PARALLEL + "/v" + VERSION_1)) {
+        if (aTask.getType()
+            .equals(PARALLEL + "/v" + VERSION_1)) {
             return this;
         }
         return null;

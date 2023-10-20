@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -30,8 +31,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoopBreakTaskDispatcherFactory implements TaskDispatcherFactory {
 
-    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION =
-            taskDispatcher(LOOP_BREAK).display(display("Loop Break").description("Breaks the loop execution."));
+    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(LOOP_BREAK)
+        .display(display("Loop Break").description("Breaks the loop execution."));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

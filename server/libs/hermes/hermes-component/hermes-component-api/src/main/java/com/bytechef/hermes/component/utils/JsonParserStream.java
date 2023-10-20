@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -61,8 +62,8 @@ class JsonParserStream implements Stream<Map<String, ?>> {
     public JsonParserStream(InputStream inputStream, ObjectMapper objectMapper) throws IOException {
         this.jsonParser = jsonFactory.createParser(inputStream);
         this.stream = StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize(new JsonIterator(jsonParser, objectMapper), Spliterator.ORDERED),
-                false);
+            Spliterators.spliteratorUnknownSize(new JsonIterator(jsonParser, objectMapper), Spliterator.ORDERED),
+            false);
     }
 
     @Override
@@ -177,7 +178,7 @@ class JsonParserStream implements Stream<Map<String, ?>> {
 
     @Override
     public <R> R collect(
-            Supplier<R> supplier, BiConsumer<R, ? super Map<String, ?>> accumulator, BiConsumer<R, R> combiner) {
+        Supplier<R> supplier, BiConsumer<R, ? super Map<String, ?>> accumulator, BiConsumer<R, R> combiner) {
         return stream.collect(supplier, accumulator, combiner);
     }
 

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -59,13 +60,13 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private final WorkflowService workflowService;
 
     public DefaultTaskCompletionHandler(
-            ContextService contextService,
-            EventPublisher eventPublisher,
-            JobExecutor jobExecutor,
-            JobService jobService,
-            TaskEvaluator taskEvaluator,
-            TaskExecutionService taskExecutionService,
-            WorkflowService workflowService) {
+        ContextService contextService,
+        EventPublisher eventPublisher,
+        JobExecutor jobExecutor,
+        JobService jobService,
+        TaskEvaluator taskEvaluator,
+        TaskExecutionService taskExecutionService,
+        WorkflowService workflowService) {
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;
         this.jobExecutor = jobExecutor;
@@ -126,12 +127,12 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
         for (Map<String, Object> output : workflow.getOutputs()) {
             source.put(
-                    MapUtils.getRequiredString(output, WorkflowConstants.NAME),
-                    MapUtils.getRequiredString(output, WorkflowConstants.VALUE));
+                MapUtils.getRequiredString(output, WorkflowConstants.NAME),
+                MapUtils.getRequiredString(output, WorkflowConstants.VALUE));
         }
 
-        TaskExecution evaluatedTaskExecution =
-                taskEvaluator.evaluate(new TaskExecution(new WorkflowTask(source)), context);
+        TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(
+            new TaskExecution(new WorkflowTask(source)), context);
         Job updateJob = new Job(job);
 
         updateJob.setStatus(JobStatus.COMPLETED);
@@ -149,6 +150,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private boolean hasMoreTasks(Job job) {
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
-        return job.getCurrentTask() + 1 < workflow.getTasks().size();
+        return job.getCurrentTask() + 1 < workflow.getTasks()
+            .size();
     }
 }

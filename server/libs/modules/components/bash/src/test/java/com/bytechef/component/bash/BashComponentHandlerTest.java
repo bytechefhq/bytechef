@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -44,11 +45,11 @@ public class BashComponentHandlerTest {
         ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
         Mockito.when(executionParameters.getRequiredString(BashConstants.SCRIPT))
-                .thenReturn("ls -l "
-                        + BashComponentHandlerTest.class
-                                .getClassLoader()
-                                .getResource("dependencies/test.txt")
-                                .getFile());
+            .thenReturn("ls -l "
+                + BashComponentHandlerTest.class
+                    .getClassLoader()
+                    .getResource("dependencies/test.txt")
+                    .getFile());
 
         String output = bashComponentAccessor.performExecute(Mockito.mock(Context.class), executionParameters);
 

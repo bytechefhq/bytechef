@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -46,8 +47,8 @@ public class TaskProgressedEventListener implements EventListener {
         if (TaskProgressedWorkflowEvent.TASK_PROGRESSED.equals(workflowEvent.getType())) {
             TaskProgressedWorkflowEvent taskProgressedWorkflowEvent = (TaskProgressedWorkflowEvent) workflowEvent;
 
-            TaskExecution taskExecution =
-                    taskExecutionService.getTaskExecution(taskProgressedWorkflowEvent.getTaskId());
+            TaskExecution taskExecution = taskExecutionService
+                .getTaskExecution(taskProgressedWorkflowEvent.getTaskId());
 
             if (taskExecution == null) {
                 logger.error("Unknown task: {}", taskProgressedWorkflowEvent.getTaskId());

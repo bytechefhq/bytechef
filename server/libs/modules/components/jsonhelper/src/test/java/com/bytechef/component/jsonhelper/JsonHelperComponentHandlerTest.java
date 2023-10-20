@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -46,29 +47,29 @@ public class JsonHelperComponentHandlerTest {
         ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
         Mockito.when(executionParameters.getRequired(SOURCE))
-                .thenReturn("""
-            {
-                "key": 3
-            }
-            """);
+            .thenReturn("""
+                {
+                    "key": 3
+                }
+                """);
 
         assertThat(JSON_HELPER_COMPONENT_HANDLER.performParse(context, executionParameters))
-                .isEqualTo(Map.of("key", 3));
+            .isEqualTo(Map.of("key", 3));
 
         executionParameters = Mockito.mock(ExecutionParameters.class);
 
         Mockito.when(executionParameters.getRequired(SOURCE))
-                .thenReturn(
-                        """
-            [
-                {
-                    "key": 3
-                }
-            ]
-            """);
+            .thenReturn(
+                """
+                    [
+                        {
+                            "key": 3
+                        }
+                    ]
+                    """);
 
         assertThat(JSON_HELPER_COMPONENT_HANDLER.performParse(context, executionParameters))
-                .isEqualTo(List.of(Map.of("key", 3)));
+            .isEqualTo(List.of(Map.of("key", 3)));
     }
 
     @Test
@@ -77,9 +78,10 @@ public class JsonHelperComponentHandlerTest {
 
         Map<String, Integer> input = Map.of("key", 3);
 
-        Mockito.when(executionParameters.getRequired(SOURCE)).thenReturn(Map.of("key", 3));
+        Mockito.when(executionParameters.getRequired(SOURCE))
+            .thenReturn(Map.of("key", 3));
 
         assertThat(JSON_HELPER_COMPONENT_HANDLER.performStringify(context, executionParameters))
-                .isEqualTo(JsonUtils.write(input));
+            .isEqualTo(JsonUtils.write(input));
     }
 }

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -53,19 +54,20 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
         Map<String, Object> params = new HashMap<>();
 
         params.put(
-                WorkflowConstants.INPUTS,
-                MapUtils.getMap(taskExecution.getParameters(), WorkflowConstants.INPUTS, Collections.emptyMap()));
+            WorkflowConstants.INPUTS,
+            MapUtils.getMap(taskExecution.getParameters(), WorkflowConstants.INPUTS, Collections.emptyMap()));
         params.put(WorkflowConstants.PARENT_TASK_EXECUTION_ID, taskExecution.getId());
         params.put(
-                WorkflowConstants.WORKFLOW_ID,
-                MapUtils.getRequiredString(taskExecution.getParameters(), WorkflowConstants.WORKFLOW_ID));
+            WorkflowConstants.WORKFLOW_ID,
+            MapUtils.getRequiredString(taskExecution.getParameters(), WorkflowConstants.WORKFLOW_ID));
 
         messageBroker.send(Queues.SUBFLOWS, params);
     }
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(SUBFLOW + "/v" + VERSION_1)) {
+        if (task.getType()
+            .equals(SUBFLOW + "/v" + VERSION_1)) {
             return this;
         }
 

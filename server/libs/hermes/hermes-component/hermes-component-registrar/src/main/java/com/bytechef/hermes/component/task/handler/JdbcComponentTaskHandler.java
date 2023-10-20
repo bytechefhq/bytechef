@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -80,8 +81,8 @@ public class JdbcComponentTaskHandler implements ComponentHandler {
         this.insertJdbcOperation = new InsertJdbcOperation(jdbcExecutor);
         this.queryJdbcOperation = new QueryJdbcOperation(jdbcExecutor);
         this.updateJdbcOperation = new UpdateJdbcOperation(jdbcExecutor);
-        this.componentDefinition =
-                getComponentDefinition(jdbcComponentDefinition.getName(), jdbcComponentDefinition.getDisplay());
+        this.componentDefinition = getComponentDefinition(jdbcComponentDefinition.getName(),
+            jdbcComponentDefinition.getDisplay());
     }
 
     @Override
@@ -111,129 +112,133 @@ public class JdbcComponentTaskHandler implements ComponentHandler {
 
     private ComponentDefinition getComponentDefinition(String name, Display display) {
         return component(name)
-                .display(display(display.getLabel()).icon(display.getIcon()))
-                .connection(connection()
-                        .properties(
-                                string(HOST).label("Host").required(true),
-                                integer(PORT).label("Port").required(true),
-                                string(DATABASE).label("Database").required(true),
-                                string(USERNAME).label("Username").required(true),
-                                string(PASSWORD)
-                                        .label("Password")
-                                        .controlType(Property.ControlType.PASSWORD)
-                                        .required(true)))
-                .actions(
-                        action(QUERY)
-                                .display(display("Query").description("Execute an SQL query."))
-                                .properties(
-                                        string(QUERY)
-                                                .label("Query")
-                                                .description(
-                                                        "The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters.")
-                                                .placeholder(
-                                                        "SELECT id, name FROM customer WHERE age > :age AND height <= :height")
-                                                .required(true),
-                                        object(PARAMETERS)
-                                                .label("Parameters")
-                                                .description(
-                                                        "The list of properties which should be used as query parameters.")
-                                                .properties(bool(), dateTime(), number(), string()))
-                                .output(array().items(object().properties(integer())))
-                                .perform(this::performQuery),
-                        action(INSERT)
-                                .display(display("Insert").description("Insert rows in database."))
-                                .properties(
-                                        string(SCHEMA)
-                                                .label("Schema")
-                                                .description("Name of the schema the table belongs to.")
-                                                .required(true)
-                                                .defaultValue("public"),
-                                        string(TABLE)
-                                                .label("Table")
-                                                .description("Name of the table in which to insert data to.")
-                                                .required(true),
-                                        array(COLUMNS)
-                                                .label("Columns")
-                                                .description(
-                                                        "The list of the properties which should used as columns for the new rows.")
-                                                .items(string()),
-                                        array(ROWS)
-                                                .label("Rows")
-                                                .description("List of rows.")
-                                                .items(object().additionalProperties(oneOf())))
-                                .output(object().properties(integer()))
-                                .perform(this::performInsert),
-                        action(UPDATE)
-                                .display(display("Update").description("Update rows in database."))
-                                .properties(
-                                        string(SCHEMA)
-                                                .label("Schema")
-                                                .description("Name of the schema the table belongs to.")
-                                                .required(true)
-                                                .defaultValue("public"),
-                                        string(TABLE)
-                                                .label("Table")
-                                                .description("Name of the table in which to update data in.")
-                                                .required(true),
-                                        array(COLUMNS)
-                                                .label("Columns")
-                                                .description(
-                                                        "The list of the properties which should used as columns for the updated rows.")
-                                                .items(string()),
-                                        string(UPDATE_KEY)
-                                                .label("Update Key")
-                                                .description(
-                                                        "The name of the property which decides which rows in the database should be updated.")
-                                                .placeholder("id"),
-                                        array(ROWS)
-                                                .label("Rows")
-                                                .description("List of rows.")
-                                                .items(object().additionalProperties(oneOf())))
-                                .output(object().properties(integer()))
-                                .perform(this::performUpdate),
-                        action(DELETE)
-                                .display(display("Delete").description("Delete rows from database."))
-                                .properties(
-                                        string(SCHEMA)
-                                                .label("Schema")
-                                                .description("Name of the schema the table belongs to.")
-                                                .required(true)
-                                                .defaultValue("public"),
-                                        string(TABLE)
-                                                .label("Table")
-                                                .description("Name of the table in which to update data in.")
-                                                .required(true),
-                                        string(DELETE_KEY)
-                                                .label("Update Key")
-                                                .description(
-                                                        "Name of the property which decides which rows in the database should be deleted.")
-                                                .placeholder("id"),
-                                        array(ROWS)
-                                                .label("Rows")
-                                                .description("List of rows.")
-                                                .items(object().additionalProperties(oneOf())))
-                                .output(object().properties(integer()))
-                                .perform(this::performDelete),
-                        action(EXECUTE)
-                                .display(display("Execute").description("Execute an SQL DML or DML statement."))
-                                .properties(
-                                        string(EXECUTE)
-                                                .label("Execute")
-                                                .description(
-                                                        "The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters.")
-                                                .placeholder(
-                                                        "UPDATE TABLE product set name = :name WHERE product > :product AND price <= :price")
-                                                .required(true),
-                                        array(ROWS)
-                                                .label("Rows")
-                                                .description("List of rows.")
-                                                .items(object().additionalProperties(oneOf())),
-                                        object(PARAMETERS)
-                                                .label("Parameters")
-                                                .description(
-                                                        "The list of properties which should be used as parameters.")
-                                                .properties(bool(), dateTime(), number(), string()))
-                                .output(object().properties(integer()))
-                                .perform(this::performExecute));
+            .display(display(display.getLabel()).icon(display.getIcon()))
+            .connection(connection()
+                .properties(
+                    string(HOST).label("Host")
+                        .required(true),
+                    integer(PORT).label("Port")
+                        .required(true),
+                    string(DATABASE).label("Database")
+                        .required(true),
+                    string(USERNAME).label("Username")
+                        .required(true),
+                    string(PASSWORD)
+                        .label("Password")
+                        .controlType(Property.ControlType.PASSWORD)
+                        .required(true)))
+            .actions(
+                action(QUERY)
+                    .display(display("Query").description("Execute an SQL query."))
+                    .properties(
+                        string(QUERY)
+                            .label("Query")
+                            .description(
+                                "The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters.")
+                            .placeholder(
+                                "SELECT id, name FROM customer WHERE age > :age AND height <= :height")
+                            .required(true),
+                        object(PARAMETERS)
+                            .label("Parameters")
+                            .description(
+                                "The list of properties which should be used as query parameters.")
+                            .properties(bool(), dateTime(), number(), string()))
+                    .output(array().items(object().properties(integer())))
+                    .perform(this::performQuery),
+                action(INSERT)
+                    .display(display("Insert").description("Insert rows in database."))
+                    .properties(
+                        string(SCHEMA)
+                            .label("Schema")
+                            .description("Name of the schema the table belongs to.")
+                            .required(true)
+                            .defaultValue("public"),
+                        string(TABLE)
+                            .label("Table")
+                            .description("Name of the table in which to insert data to.")
+                            .required(true),
+                        array(COLUMNS)
+                            .label("Columns")
+                            .description(
+                                "The list of the properties which should used as columns for the new rows.")
+                            .items(string()),
+                        array(ROWS)
+                            .label("Rows")
+                            .description("List of rows.")
+                            .items(object().additionalProperties(oneOf())))
+                    .output(object().properties(integer()))
+                    .perform(this::performInsert),
+                action(UPDATE)
+                    .display(display("Update").description("Update rows in database."))
+                    .properties(
+                        string(SCHEMA)
+                            .label("Schema")
+                            .description("Name of the schema the table belongs to.")
+                            .required(true)
+                            .defaultValue("public"),
+                        string(TABLE)
+                            .label("Table")
+                            .description("Name of the table in which to update data in.")
+                            .required(true),
+                        array(COLUMNS)
+                            .label("Columns")
+                            .description(
+                                "The list of the properties which should used as columns for the updated rows.")
+                            .items(string()),
+                        string(UPDATE_KEY)
+                            .label("Update Key")
+                            .description(
+                                "The name of the property which decides which rows in the database should be updated.")
+                            .placeholder("id"),
+                        array(ROWS)
+                            .label("Rows")
+                            .description("List of rows.")
+                            .items(object().additionalProperties(oneOf())))
+                    .output(object().properties(integer()))
+                    .perform(this::performUpdate),
+                action(DELETE)
+                    .display(display("Delete").description("Delete rows from database."))
+                    .properties(
+                        string(SCHEMA)
+                            .label("Schema")
+                            .description("Name of the schema the table belongs to.")
+                            .required(true)
+                            .defaultValue("public"),
+                        string(TABLE)
+                            .label("Table")
+                            .description("Name of the table in which to update data in.")
+                            .required(true),
+                        string(DELETE_KEY)
+                            .label("Update Key")
+                            .description(
+                                "Name of the property which decides which rows in the database should be deleted.")
+                            .placeholder("id"),
+                        array(ROWS)
+                            .label("Rows")
+                            .description("List of rows.")
+                            .items(object().additionalProperties(oneOf())))
+                    .output(object().properties(integer()))
+                    .perform(this::performDelete),
+                action(EXECUTE)
+                    .display(display("Execute").description("Execute an SQL DML or DML statement."))
+                    .properties(
+                        string(EXECUTE)
+                            .label("Execute")
+                            .description(
+                                "The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters.")
+                            .placeholder(
+                                "UPDATE TABLE product set name = :name WHERE product > :product AND price <= :price")
+                            .required(true),
+                        array(ROWS)
+                            .label("Rows")
+                            .description("List of rows.")
+                            .items(object().additionalProperties(oneOf())),
+                        object(PARAMETERS)
+                            .label("Parameters")
+                            .description(
+                                "The list of properties which should be used as parameters.")
+                            .properties(bool(), dateTime(), number(), string()))
+                    .output(object().properties(integer()))
+                    .perform(this::performExecute));
     }
 }

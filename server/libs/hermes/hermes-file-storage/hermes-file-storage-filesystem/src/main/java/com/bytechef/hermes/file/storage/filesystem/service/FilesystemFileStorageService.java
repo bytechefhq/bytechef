@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -46,7 +47,9 @@ public class FilesystemFileStorageService implements FileStorageService {
         Path path = resolveDirectory();
         String url = fileEntry.getUrl();
 
-        path.resolve(url.replace("file:", "")).toFile().delete();
+        path.resolve(url.replace("file:", ""))
+            .toFile()
+            .delete();
     }
 
     @Override
@@ -54,7 +57,9 @@ public class FilesystemFileStorageService implements FileStorageService {
         Path path = resolveDirectory();
         String url = fileEntry.getUrl();
 
-        return path.resolve(url.replace("file:", "")).toFile().exists();
+        return path.resolve(url.replace("file:", ""))
+            .toFile()
+            .exists();
     }
 
     @Override

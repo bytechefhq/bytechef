@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -36,5 +37,6 @@ public interface WorkflowRepository {
         throw new UnsupportedOperationException();
     }
 
-    default void deleteById(String id) {}
+    default void deleteById(String id) {
+    }
 }

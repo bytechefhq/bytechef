@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -36,32 +37,32 @@ public class FileEntryTest {
     @Test
     public void testOf1() {
         Assertions.assertThat(new FileEntry("/tmp/fileName.txt"))
-                .hasFieldOrPropertyWithValue("extension", "txt")
-                .hasFieldOrPropertyWithValue("mimeType", "text/plain")
-                .hasFieldOrPropertyWithValue("name", "fileName.txt")
-                .hasFieldOrPropertyWithValue("url", "/tmp/fileName.txt");
+            .hasFieldOrPropertyWithValue("extension", "txt")
+            .hasFieldOrPropertyWithValue("mimeType", "text/plain")
+            .hasFieldOrPropertyWithValue("name", "fileName.txt")
+            .hasFieldOrPropertyWithValue("url", "/tmp/fileName.txt");
     }
 
     @Test
     public void testOf2() {
         Assertions.assertThat(new FileEntry("name.txt", "/tmp/fileName.txt"))
-                .hasFieldOrPropertyWithValue("extension", "txt")
-                .hasFieldOrPropertyWithValue("mimeType", "text/plain")
-                .hasFieldOrPropertyWithValue("name", "name.txt")
-                .hasFieldOrPropertyWithValue("url", "/tmp/fileName.txt");
+            .hasFieldOrPropertyWithValue("extension", "txt")
+            .hasFieldOrPropertyWithValue("mimeType", "text/plain")
+            .hasFieldOrPropertyWithValue("name", "name.txt")
+            .hasFieldOrPropertyWithValue("url", "/tmp/fileName.txt");
     }
 
     @Test
     public void testSpelEvaluation() {
         TaskEvaluator evaluator = TaskEvaluator.create();
-        TaskExecution taskExecution =
-                new TaskExecution(WorkflowTask.of("result", "${fileEntry.name} ${fileEntry.url}"));
+        TaskExecution taskExecution = new TaskExecution(
+            WorkflowTask.of("result", "${fileEntry.name} ${fileEntry.url}"));
 
         TaskExecution evaluatedTaskExecution = evaluator.evaluate(
-                taskExecution,
-                new Context(Collections.singletonMap("fileEntry", new FileEntry("sample.txt", "/tmp/fileName.txt"))));
+            taskExecution,
+            new Context(Collections.singletonMap("fileEntry", new FileEntry("sample.txt", "/tmp/fileName.txt"))));
 
         assertEquals(
-                "sample.txt /tmp/fileName.txt", MapUtils.getString(evaluatedTaskExecution.getParameters(), "result"));
+            "sample.txt /tmp/fileName.txt", MapUtils.getString(evaluatedTaskExecution.getParameters(), "result"));
     }
 }

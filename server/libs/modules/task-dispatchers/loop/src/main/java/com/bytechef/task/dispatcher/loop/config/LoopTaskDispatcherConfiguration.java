@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -50,7 +51,7 @@ public class LoopTaskDispatcherConfiguration {
     @Bean
     TaskCompletionHandlerFactory loopTaskCompletionHandler() {
         return (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService);
+            contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService);
     }
 
     @Bean("loopBreakTaskDispatcherFactory_v1")
@@ -61,6 +62,6 @@ public class LoopTaskDispatcherConfiguration {
     @Bean("loopTaskDispatcherFactory_v1")
     TaskDispatcherResolverFactory loopTaskDispatcherFactory() {
         return (taskDispatcher) -> new LoopTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService);
+            contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService);
     }
 }

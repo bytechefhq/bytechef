@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -46,6 +47,7 @@ public class DiscoveryServiceProviderEnvironmentPostProcessor implements Environ
 
         MapPropertySource mapPropertySource = new MapPropertySource("Custom Spring Cloud Config", source);
 
-        environment.getPropertySources().addFirst(mapPropertySource);
+        environment.getPropertySources()
+            .addFirst(mapPropertySource);
     }
 }

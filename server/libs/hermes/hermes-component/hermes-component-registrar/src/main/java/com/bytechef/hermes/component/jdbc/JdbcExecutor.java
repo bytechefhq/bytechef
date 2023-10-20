@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -53,7 +54,7 @@ public class JdbcExecutor {
     }
 
     public <T> List<T> query(Connection connection, String sql, Map<String, ?> paramMap, RowMapper<T> rowMapper)
-            throws DataAccessException {
+        throws DataAccessException {
         NamedParameterJdbcTemplate jdbcTemplate = getJdbcTemplate(connection);
 
         return jdbcTemplate.query(sql, paramMap, rowMapper);
@@ -67,6 +68,6 @@ public class JdbcExecutor {
 
     private NamedParameterJdbcTemplate getJdbcTemplate(Connection connection) {
         return new NamedParameterJdbcTemplate(
-                dataSourceFactory.getDataSource(connection, databaseJdbcName, jdbcDriverClassName));
+            dataSourceFactory.getDataSource(connection, databaseJdbcName, jdbcDriverClassName));
     }
 }

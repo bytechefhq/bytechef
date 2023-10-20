@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -59,7 +60,8 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
 
         TaskExecution taskExecution = new TaskExecution(taskExecutionService.getTaskExecution(taskExecutionId));
 
-        if (taskExecution.getType().equals(LOOP + "/v" + VERSION_1)) {
+        if (taskExecution.getType()
+            .equals(LOOP + "/v" + VERSION_1)) {
             return taskExecution;
         } else {
             if (taskExecution.getParentId() == null) {
@@ -72,7 +74,8 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(LOOP_BREAK + "/v" + VERSION_1)) {
+        if (task.getType()
+            .equals(LOOP_BREAK + "/v" + VERSION_1)) {
             return this;
         }
 

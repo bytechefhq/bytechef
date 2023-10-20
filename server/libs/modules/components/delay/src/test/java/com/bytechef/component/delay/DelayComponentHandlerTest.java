@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -44,16 +45,19 @@ public class DelayComponentHandlerTest {
 
         ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
-        Mockito.when(executionParameters.containsKey("millis")).thenReturn(false);
-        Mockito.when(executionParameters.containsKey("duration")).thenReturn(true);
-        Mockito.when(executionParameters.getDuration("duration")).thenReturn(Duration.of(1500, ChronoUnit.MILLIS));
+        Mockito.when(executionParameters.containsKey("millis"))
+            .thenReturn(false);
+        Mockito.when(executionParameters.containsKey("duration"))
+            .thenReturn(true);
+        Mockito.when(executionParameters.getDuration("duration"))
+            .thenReturn(Duration.of(1500, ChronoUnit.MILLIS));
 
         delayComponentHandler.performSleep(Mockito.mock(Context.class), executionParameters);
 
         long delta = System.currentTimeMillis() - now;
 
         Assertions.assertTrue(
-                delta >= 1500 && delta < 3000, String.format("Period %dms does not meet range [1500,1900>", delta));
+            delta >= 1500 && delta < 3000, String.format("Period %dms does not meet range [1500,1900>", delta));
     }
 
     @Test
@@ -63,15 +67,17 @@ public class DelayComponentHandlerTest {
 
         ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
-        Mockito.when(executionParameters.containsKey("millis")).thenReturn(true);
-        Mockito.when(executionParameters.getLong("millis")).thenReturn(500L);
+        Mockito.when(executionParameters.containsKey("millis"))
+            .thenReturn(true);
+        Mockito.when(executionParameters.getLong("millis"))
+            .thenReturn(500L);
 
         delayComponentHandler.performSleep(Mockito.mock(Context.class), executionParameters);
 
         long delta = System.currentTimeMillis() - now;
 
         Assertions.assertTrue(
-                delta >= 500 && delta < 600, String.format("Period %dms does not meet range [500,600>", delta));
+            delta >= 500 && delta < 600, String.format("Period %dms does not meet range [500,600>", delta));
     }
 
     @Test
@@ -84,6 +90,6 @@ public class DelayComponentHandlerTest {
         long delta = System.currentTimeMillis() - now;
 
         Assertions.assertTrue(
-                delta >= 1000 && delta < 1500, String.format("Period %dms does not meet range [1000,1500>", delta));
+            delta >= 1000 && delta < 1500, String.format("Period %dms does not meet range [1000,1500>", delta));
     }
 }

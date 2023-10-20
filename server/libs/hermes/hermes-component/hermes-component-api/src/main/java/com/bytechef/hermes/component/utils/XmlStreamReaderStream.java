@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -63,8 +64,8 @@ class XmlStreamReaderStream implements Stream<Map<String, ?>> {
         this.xmlStreamReader = xmlInputFactory.createXMLStreamReader(inputStream);
 
         this.stream = StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize(new XmlIterator(xmlStreamReader, xmlMapper), Spliterator.ORDERED),
-                false);
+            Spliterators.spliteratorUnknownSize(new XmlIterator(xmlStreamReader, xmlMapper), Spliterator.ORDERED),
+            false);
     }
 
     @Override
@@ -179,7 +180,7 @@ class XmlStreamReaderStream implements Stream<Map<String, ?>> {
 
     @Override
     public <R> R collect(
-            Supplier<R> supplier, BiConsumer<R, ? super Map<String, ?>> accumulator, BiConsumer<R, R> combiner) {
+        Supplier<R> supplier, BiConsumer<R, ? super Map<String, ?>> accumulator, BiConsumer<R, R> combiner) {
         return stream.collect(supplier, accumulator, combiner);
     }
 

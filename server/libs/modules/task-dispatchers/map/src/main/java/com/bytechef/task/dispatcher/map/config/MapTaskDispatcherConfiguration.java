@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -54,19 +55,19 @@ public class MapTaskDispatcherConfiguration {
 
     @Bean("mapTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory mapTaskCompletionHandlerFactory() {
-        return (taskCompletionHandler, taskDispatcher) ->
-                new MapTaskCompletionHandler(taskExecutionService, taskCompletionHandler, counterService);
+        return (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(taskExecutionService,
+            taskCompletionHandler, counterService);
     }
 
     @Bean("mapTaskDispatcherFactory_v1")
     TaskDispatcherResolverFactory mapTaskDispatcherFactory() {
         return (taskDispatcher) -> MapTaskDispatcher.builder()
-                .taskDispatcher(taskDispatcher)
-                .taskExecutionService(taskExecutionService)
-                .messageBroker(messageBroker)
-                .contextService(contextService)
-                .counterService(counterService)
-                .taskEvaluator(taskEvaluator)
-                .build();
+            .taskDispatcher(taskDispatcher)
+            .taskExecutionService(taskExecutionService)
+            .messageBroker(messageBroker)
+            .contextService(contextService)
+            .counterService(counterService)
+            .taskEvaluator(taskEvaluator)
+            .build();
     }
 }

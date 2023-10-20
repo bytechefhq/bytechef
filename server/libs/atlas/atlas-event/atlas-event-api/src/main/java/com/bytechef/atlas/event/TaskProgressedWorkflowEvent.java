@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -52,8 +53,8 @@ public class TaskProgressedWorkflowEvent extends WorkflowEvent {
     @Override
     public String toString() {
         return "TaskProgressedWorkflowEvent{" + "progress="
-                + progress + ", taskId='"
-                + taskId + '\'' + "} "
-                + super.toString();
+            + progress + ", taskId='"
+            + taskId + '\'' + "} "
+            + super.toString();
     }
 }

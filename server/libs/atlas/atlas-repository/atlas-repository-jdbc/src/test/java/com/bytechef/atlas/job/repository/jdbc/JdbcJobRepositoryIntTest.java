@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016-2018 the original author or authors.
  *
@@ -41,8 +42,8 @@ import org.springframework.data.domain.PageRequest;
  */
 @EmbeddedSql
 @SpringBootTest(
-        classes = WorkflowRepositoryIntTestConfiguration.class,
-        properties = "bytechef.workflow.persistence.provider=jdbc")
+    classes = WorkflowRepositoryIntTestConfiguration.class,
+    properties = "bytechef.workflow.persistence.provider=jdbc")
 public class JdbcJobRepositoryIntTest {
 
     @Autowired
@@ -51,8 +52,8 @@ public class JdbcJobRepositoryIntTest {
     @Test
     public void test1FindAll() {
         int pageTotal = jobRepository
-                .findAll(PageRequest.of(0, JobRepository.DEFAULT_PAGE_SIZE))
-                .getNumberOfElements();
+            .findAll(PageRequest.of(0, JobRepository.DEFAULT_PAGE_SIZE))
+            .getNumberOfElements();
 
         Job job = jobRepository.save(getJob(JobStatus.STARTED));
 
@@ -60,7 +61,8 @@ public class JdbcJobRepositoryIntTest {
 
         Assertions.assertEquals(pageTotal + 1, page.getNumberOfElements());
 
-        Job one = jobRepository.findById(job.getId()).orElseThrow();
+        Job one = jobRepository.findById(job.getId())
+            .orElseThrow();
 
         Assertions.assertNotNull(one);
     }
@@ -69,7 +71,8 @@ public class JdbcJobRepositoryIntTest {
     public void testFindById() {
         Job job = jobRepository.save(getJob(JobStatus.CREATED));
 
-        Job resultJob = jobRepository.findById(job.getId()).orElseThrow();
+        Job resultJob = jobRepository.findById(job.getId())
+            .orElseThrow();
 
         job = new Job(resultJob);
 
@@ -82,9 +85,11 @@ public class JdbcJobRepositoryIntTest {
 
         job = jobRepository.save(job);
 
-        resultJob = jobRepository.findById(job.getId()).orElseThrow();
+        resultJob = jobRepository.findById(job.getId())
+            .orElseThrow();
 
-        Assertions.assertEquals("FAILED", resultJob.getStatus().toString());
+        Assertions.assertEquals("FAILED", resultJob.getStatus()
+            .toString());
     }
 
     @Test
@@ -93,8 +98,10 @@ public class JdbcJobRepositoryIntTest {
 
         Job job = jobRepository.save(getJob(JobStatus.CREATED));
 
-        job.setCreatedDate(LocalDateTime.now().minus(2, DAYS));
-        job.setEndTime(Date.from(Instant.now().minus(1, DAYS)));
+        job.setCreatedDate(LocalDateTime.now()
+            .minus(2, DAYS));
+        job.setEndTime(Date.from(Instant.now()
+            .minus(1, DAYS)));
         job.setNew(false);
 
         jobRepository.save(job);
@@ -102,7 +109,8 @@ public class JdbcJobRepositoryIntTest {
         for (int i = 0; i < 5; i++) {
             Job completedJobToday = jobRepository.save(getJob(JobStatus.COMPLETED));
 
-            completedJobToday.setCreatedDate(LocalDateTime.now().minus(1, DAYS));
+            completedJobToday.setCreatedDate(LocalDateTime.now()
+                .minus(1, DAYS));
             completedJobToday.setEndTime(new Date());
             completedJobToday.setNew(false);
 
@@ -132,8 +140,10 @@ public class JdbcJobRepositoryIntTest {
         for (int i = 0; i < 5; i++) {
             Job completedJobYesterday = jobRepository.save(getJob(JobStatus.COMPLETED));
 
-            completedJobYesterday.setCreatedDate(LocalDateTime.now().minus(2, DAYS));
-            completedJobYesterday.setEndTime(Date.from(Instant.now().minus(1, DAYS)));
+            completedJobYesterday.setCreatedDate(LocalDateTime.now()
+                .minus(2, DAYS));
+            completedJobYesterday.setEndTime(Date.from(Instant.now()
+                .minus(1, DAYS)));
             completedJobYesterday.setNew(false);
 
             jobRepository.save(completedJobYesterday);
@@ -141,14 +151,16 @@ public class JdbcJobRepositoryIntTest {
 
         Job runningJobYesterday = jobRepository.save(getJob(JobStatus.STARTED));
 
-        runningJobYesterday.setCreatedDate(LocalDateTime.now().minus(1, DAYS));
+        runningJobYesterday.setCreatedDate(LocalDateTime.now()
+            .minus(1, DAYS));
         runningJobYesterday.setNew(false);
 
         jobRepository.save(runningJobYesterday);
 
         Job completedJobToday = new Job();
 
-        completedJobToday.setCreatedDate(LocalDateTime.now().minus(1, DAYS));
+        completedJobToday.setCreatedDate(LocalDateTime.now()
+            .minus(1, DAYS));
         completedJobToday.setNew(true);
         completedJobToday.setStatus(JobStatus.COMPLETED);
         completedJobToday.setWorkflowId("demo:1234");

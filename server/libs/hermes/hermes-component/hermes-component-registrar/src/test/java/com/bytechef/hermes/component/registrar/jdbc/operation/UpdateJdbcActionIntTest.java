@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -69,16 +70,16 @@ public class UpdateJdbcActionIntTest {
         jdbcTemplate = new JdbcTemplate(dataSource);
 
         jdbcTemplate.execute(
-                """
-            CREATE TABLE test (
-                id   varchar(256) not null primary key,
-                name varchar(256) not null
-            );
-            INSERT INTO test VALUES('id1', 'name1');
-            INSERT INTO test VALUES('id2', 'name2');
-            INSERT INTO test VALUES('id3', 'name3');
-            INSERT INTO test VALUES('id4', 'name4');
-        """);
+            """
+                    CREATE TABLE test (
+                        id   varchar(256) not null primary key,
+                        name varchar(256) not null
+                    );
+                    INSERT INTO test VALUES('id1', 'name1');
+                    INSERT INTO test VALUES('id2', 'name2');
+                    INSERT INTO test VALUES('id3', 'name3');
+                    INSERT INTO test VALUES('id4', 'name4');
+                """);
     }
 
     @Test
@@ -86,19 +87,22 @@ public class UpdateJdbcActionIntTest {
         ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
         Mockito.when(executionParameters.getList(COLUMNS, String.class, List.of()))
-                .thenReturn(List.of("name"));
+            .thenReturn(List.of("name"));
         Mockito.when(executionParameters.getList(ROWS, Map.class, List.of()))
-                .thenReturn(List.of(Map.of("id", "id2", "name", "name3")));
-        Mockito.when(executionParameters.getString(SCHEMA, "public")).thenReturn("public");
-        Mockito.when(executionParameters.getRequiredString(TABLE)).thenReturn("test");
-        Mockito.when(executionParameters.getString(UPDATE_KEY, "id")).thenReturn("id");
+            .thenReturn(List.of(Map.of("id", "id2", "name", "name3")));
+        Mockito.when(executionParameters.getString(SCHEMA, "public"))
+            .thenReturn("public");
+        Mockito.when(executionParameters.getRequiredString(TABLE))
+            .thenReturn("test");
+        Mockito.when(executionParameters.getString(UPDATE_KEY, "id"))
+            .thenReturn("id");
 
         Map<String, Integer> result = updateJdbcOperation.execute(Mockito.mock(Context.class), executionParameters);
 
         Assertions.assertEquals(1, result.get("rows"));
 
         Assertions.assertEquals(
-                "name3", jdbcTemplate.queryForObject("SELECT name FROM test WHERE id='id2'", String.class));
+            "name3", jdbcTemplate.queryForObject("SELECT name FROM test WHERE id='id2'", String.class));
     }
 
     @TestConfiguration
@@ -110,16 +114,16 @@ public class UpdateJdbcActionIntTest {
         @Bean
         UpdateJdbcOperation updateJdbcOperation() {
             return new UpdateJdbcOperation(new JdbcExecutor(
-                    null,
-                    new DataSourceFactory() {
+                null,
+                new DataSourceFactory() {
 
-                        @Override
-                        public DataSource getDataSource(
-                                Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
-                            return dataSource;
-                        }
-                    },
-                    null));
+                    @Override
+                    public DataSource getDataSource(
+                        Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
+                        return dataSource;
+                    }
+                },
+                null));
         }
     }
 }

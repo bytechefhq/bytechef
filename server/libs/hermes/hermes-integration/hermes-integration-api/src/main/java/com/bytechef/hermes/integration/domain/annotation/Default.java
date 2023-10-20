@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -23,4 +24,5 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.CONSTRUCTOR)
 @Retention(RetentionPolicy.CLASS)
-public @interface Default {}
+public @interface Default {
+}

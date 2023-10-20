@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -38,7 +39,8 @@ public class Encryption {
         try {
             Cipher cipher = getCipher(Cipher.ENCRYPT_MODE);
 
-            return Base64.getEncoder().encodeToString(cipher.doFinal(content.getBytes(StandardCharsets.UTF_8)));
+            return Base64.getEncoder()
+                .encodeToString(cipher.doFinal(content.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -48,7 +50,8 @@ public class Encryption {
         try {
             Cipher cipher = getCipher(Cipher.DECRYPT_MODE);
 
-            return new String(cipher.doFinal(Base64.getDecoder().decode(encryptedString)));
+            return new String(cipher.doFinal(Base64.getDecoder()
+                .decode(encryptedString)));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -57,7 +60,8 @@ public class Encryption {
     private Cipher getCipher(int encryptMode) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
 
-        byte[] decodedKey = Base64.getDecoder().decode(encryptionKey.getKey());
+        byte[] decodedKey = Base64.getDecoder()
+            .decode(encryptionKey.getKey());
 
         Key secretKey = new SecretKeySpec(Arrays.copyOf(decodedKey, 16), "AES");
 

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -50,11 +51,11 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     private final TaskExecutionService taskExecutionService;
 
     public SequenceTaskDispatcher(
-            ContextService contextService,
-            MessageBroker messageBroker,
-            TaskDispatcher taskDispatcher,
-            TaskEvaluator taskEvaluator,
-            TaskExecutionService taskExecutionService) {
+        ContextService contextService,
+        MessageBroker messageBroker,
+        TaskDispatcher taskDispatcher,
+        TaskEvaluator taskEvaluator,
+        TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
@@ -72,17 +73,17 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
         taskExecutionService.update(sequenceTaskExecution);
 
         List<WorkflowTask> subWorkflowTasks = MapUtils.getList(
-                sequenceTaskExecution.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList());
+            sequenceTaskExecution.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList());
 
         if (subWorkflowTasks.size() > 0) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
             TaskExecution subTaskExecution = new TaskExecution(
-                    subWorkflowTask,
-                    sequenceTaskExecution.getJobId(),
-                    sequenceTaskExecution.getId(),
-                    sequenceTaskExecution.getPriority(),
-                    1);
+                subWorkflowTask,
+                sequenceTaskExecution.getJobId(),
+                sequenceTaskExecution.getId(),
+                sequenceTaskExecution.getPriority(),
+                1);
 
             Context context = new Context(contextService.peek(sequenceTaskExecution.getId()));
 
@@ -106,7 +107,8 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(SEQUENCE + "/v" + VERSION_1)) {
+        if (task.getType()
+            .equals(SEQUENCE + "/v" + VERSION_1)) {
             return this;
         }
 

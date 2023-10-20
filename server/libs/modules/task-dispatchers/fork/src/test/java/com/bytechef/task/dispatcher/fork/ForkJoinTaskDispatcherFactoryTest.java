@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -27,6 +28,6 @@ public class ForkJoinTaskDispatcherFactoryTest {
     @Test
     public void testGetTaskDispatcherDefinition() {
         JsonFileAssert.assertEquals(
-                "definition/fork-join_v1.json", new ForkJoinTaskDispatcherFactory().getDefinition());
+            "definition/fork-join_v1.json", new ForkJoinTaskDispatcherFactory().getDefinition());
     }
 }

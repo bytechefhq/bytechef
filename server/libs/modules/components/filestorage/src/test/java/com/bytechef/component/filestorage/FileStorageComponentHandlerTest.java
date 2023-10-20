@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -52,13 +53,15 @@ public class FileStorageComponentHandlerTest {
 
         FileEntry fileEntry = Mockito.mock(FileEntry.class);
 
-        Mockito.when(executionParameters.get(FILE_ENTRY, FileEntry.class)).thenReturn(fileEntry);
+        Mockito.when(executionParameters.get(FILE_ENTRY, FileEntry.class))
+            .thenReturn(fileEntry);
 
         fileStorageComponentHandler.performRead(context, executionParameters);
 
         ArgumentCaptor<FileEntry> fileEntryArgumentCaptor = ArgumentCaptor.forClass(FileEntry.class);
 
-        Mockito.verify(context).readFileToString(fileEntryArgumentCaptor.capture());
+        Mockito.verify(context)
+            .readFileToString(fileEntryArgumentCaptor.capture());
 
         assertThat(fileEntryArgumentCaptor.getValue()).isEqualTo(fileEntry);
     }
@@ -76,15 +79,17 @@ public class FileStorageComponentHandlerTest {
         ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
         Mockito.when(executionParameters.getRequired(CONTENT))
-                .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
-        Mockito.when(executionParameters.getString(FILENAME, "file.txt")).thenReturn("file.txt");
+            .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
+        Mockito.when(executionParameters.getString(FILENAME, "file.txt"))
+            .thenReturn("file.txt");
 
         fileStorageComponentHandler.performWrite(context, executionParameters);
 
         ArgumentCaptor<String> contentArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-        Mockito.verify(context).storeFileContent(filenameArgumentCaptor.capture(), contentArgumentCaptor.capture());
+        Mockito.verify(context)
+            .storeFileContent(filenameArgumentCaptor.capture(), contentArgumentCaptor.capture());
 
         assertThat(contentArgumentCaptor.getValue()).isEqualTo(Files.contentOf(file, StandardCharsets.UTF_8));
         assertThat(filenameArgumentCaptor.getValue()).isEqualTo("file.txt");
@@ -92,8 +97,9 @@ public class FileStorageComponentHandlerTest {
         executionParameters = Mockito.mock(ExecutionParameters.class);
 
         Mockito.when(executionParameters.getRequired(CONTENT))
-                .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
-        Mockito.when(executionParameters.getString(FILENAME, "file.txt")).thenReturn("test.txt");
+            .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
+        Mockito.when(executionParameters.getString(FILENAME, "file.txt"))
+            .thenReturn("test.txt");
 
         Mockito.reset(context);
 
@@ -101,15 +107,16 @@ public class FileStorageComponentHandlerTest {
 
         filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-        Mockito.verify(context).storeFileContent(filenameArgumentCaptor.capture(), Mockito.anyString());
+        Mockito.verify(context)
+            .storeFileContent(filenameArgumentCaptor.capture(), Mockito.anyString());
 
         assertThat(filenameArgumentCaptor.getValue()).isEqualTo("test.txt");
     }
 
     private File getFile() {
         return new File(FileStorageComponentHandlerTest.class
-                .getClassLoader()
-                .getResource("dependencies/sample.txt")
-                .getFile());
+            .getClassLoader()
+            .getResource("dependencies/sample.txt")
+            .getFile());
     }
 }

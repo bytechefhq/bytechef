@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -54,18 +55,20 @@ public class SequenceTaskDispatcherIntTest {
     @Test
     public void testDispatch() {
         workflowExecutor.execute(
-                "sequence_v1",
-                (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) ->
-                        List.of(new SequenceTaskCompletionHandler(
-                                contextService,
-                                taskCompletionHandler,
-                                taskDispatcher,
-                                taskEvaluator,
-                                taskExecutionService)),
-                (contextService, counterService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService) ->
-                        List.of(new SequenceTaskDispatcher(
-                                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService)),
-                () -> Map.of("var", testVarTaskHandler));
+            "sequence_v1",
+            (
+                counterService, taskCompletionHandler, taskDispatcher, taskEvaluator,
+                taskExecutionService) -> List.of(new SequenceTaskCompletionHandler(
+                    contextService,
+                    taskCompletionHandler,
+                    taskDispatcher,
+                    taskEvaluator,
+                    taskExecutionService)),
+            (
+                contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
+                taskExecutionService) -> List.of(new SequenceTaskDispatcher(
+                    contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService)),
+            () -> Map.of("var", testVarTaskHandler));
 
         Assertions.assertEquals(1, (Integer) testVarTaskHandler.get("value1"));
         Assertions.assertEquals(2, (Integer) testVarTaskHandler.get("value2"));

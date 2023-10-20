@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -31,11 +32,11 @@ import org.springframework.boot.test.context.SpringBootTest;
  */
 @EmbeddedSql
 @SpringBootTest(
-        classes = WorkflowRepositoryIntTestConfiguration.class,
-        properties = {
-            "bytechef.workflow.context-repository.provider=jdbc",
-            "bytechef.workflow.persistence.provider=jdbc"
-        })
+    classes = WorkflowRepositoryIntTestConfiguration.class,
+    properties = {
+        "bytechef.workflow.context-repository.provider=jdbc",
+        "bytechef.workflow.persistence.provider=jdbc"
+    })
 public class JdbcContextRepositoryIntTest {
 
     @Autowired

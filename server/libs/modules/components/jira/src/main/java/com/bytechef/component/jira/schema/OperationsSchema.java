@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -24,10 +25,10 @@ import java.util.List;
 
 public class OperationsSchema {
     public static final List<Property> COMPONENT_SCHEMA = List.of(array("linkGroups")
-            .items(object(null)
-                    .properties(LinkGroupSchema.COMPONENT_SCHEMA)
-                    .description("Details a link group, which defines issue operations."))
-            .label("LinkGroups")
-            .description("Details of the link groups defining issue operations.")
-            .required(false));
+        .items(object(null)
+            .properties(LinkGroupSchema.COMPONENT_SCHEMA)
+            .description("Details a link group, which defines issue operations."))
+        .label("LinkGroups")
+        .description("Details of the link groups defining issue operations.")
+        .required(false));
 }

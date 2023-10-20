@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -26,18 +27,21 @@ import java.util.List;
 
 public class LinkGroupSchema {
     public static final List<Property> COMPONENT_SCHEMA = List.of(
-            string("id").label("Id").required(false),
-            string("styleClass").label("StyleClass").required(false),
-            object("header")
-                    .properties(SimpleLinkSchema.COMPONENT_SCHEMA)
-                    .label("Header")
-                    .description("Details about the operations available in this version.")
-                    .required(false),
-            integer("weight").label("Weight").required(false),
-            array("links")
-                    .items(object(null)
-                            .properties(SimpleLinkSchema.COMPONENT_SCHEMA)
-                            .description("Details about the operations available in this version."))
-                    .label("Links")
-                    .required(false));
+        string("id").label("Id")
+            .required(false),
+        string("styleClass").label("StyleClass")
+            .required(false),
+        object("header")
+            .properties(SimpleLinkSchema.COMPONENT_SCHEMA)
+            .label("Header")
+            .description("Details about the operations available in this version.")
+            .required(false),
+        integer("weight").label("Weight")
+            .required(false),
+        array("links")
+            .items(object(null)
+                .properties(SimpleLinkSchema.COMPONENT_SCHEMA)
+                .description("Details about the operations available in this version."))
+            .label("Links")
+            .required(false));
 }

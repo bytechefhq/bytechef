@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -32,8 +33,8 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 @Schema(
-        name = "TaskDispatcherDefinition",
-        description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
+    name = "TaskDispatcherDefinition",
+    description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 public sealed class TaskDispatcherDefinition permits TaskDispatcherDSL.ModifiableTaskDispatcherDefinition {
 
     protected Display display;

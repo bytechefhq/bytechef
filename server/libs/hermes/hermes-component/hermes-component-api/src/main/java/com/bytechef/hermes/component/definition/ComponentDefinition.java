@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -31,9 +32,8 @@ import java.util.Objects;
  * @author Ivica Cardic
  */
 @Schema(
-        name = "ComponentDefinition",
-        description =
-                "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers(TODO) and connections if there is a need for a connection to an outside service.")
+    name = "ComponentDefinition",
+    description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers(TODO) and connections if there is a need for a connection to an outside service.")
 public sealed class ComponentDefinition permits ComponentDSL.ModifiableComponentDefinition {
 
     protected List<? extends ActionDefinition> actions;
