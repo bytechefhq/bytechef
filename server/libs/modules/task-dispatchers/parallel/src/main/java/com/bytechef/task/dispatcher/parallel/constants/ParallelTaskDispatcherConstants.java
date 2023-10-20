@@ -18,4 +18,5 @@ package com.bytechef.task.dispatcher.parallel.constants;
 
 public class ParallelTaskDispatcherConstants {
     public static final String PARALLEL = "parallel";
+    public static final String TASKS = "tasks";
 }

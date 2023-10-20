@@ -4,5 +4,19 @@
     "label": "Parallel"
   },
   "name": "parallel",
-  "version": 1
+  "version": 1,
+  "taskProperties": [
+    {
+      "type": "ARRAY",
+      "description": "The task to use in each iteration.",
+      "name": "tasks",
+      "items": [
+        {
+          "description": "The task or task dispatcher to use.",
+          "objectType": "TASK",
+          "type": "OBJECT"
+        }
+      ]
+    }
+  ]
 }
