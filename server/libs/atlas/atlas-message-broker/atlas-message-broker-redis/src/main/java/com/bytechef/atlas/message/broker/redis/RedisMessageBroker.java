@@ -18,6 +18,7 @@
 package com.bytechef.atlas.message.broker.redis;
 
 import com.bytechef.atlas.message.broker.MessageBroker;
+import com.bytechef.atlas.message.broker.redis.config.RedisMessage;
 import com.bytechef.atlas.task.Retryable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.redis.core.ListOperations;
@@ -30,23 +31,23 @@ import java.util.concurrent.TimeUnit;
  */
 public class RedisMessageBroker implements MessageBroker {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, RedisMessage> redisTemplate;
 
     @SuppressFBWarnings("EI2")
-    public RedisMessageBroker(RedisTemplate<String, Object> redisTemplate) {
+    public RedisMessageBroker(RedisTemplate<String, RedisMessage> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
     @Override
     public void send(String routingKey, Object message) {
-        ListOperations<String, Object> listOperations = redisTemplate.opsForList();
+        ListOperations<String, RedisMessage> listOperations = redisTemplate.opsForList();
 
         if (message instanceof Retryable retryable) {
             delay(retryable.getRetryDelayMillis());
 
-            listOperations.leftPush(routingKey, message);
+            listOperations.leftPush(routingKey, new RedisMessage(message));
         } else {
-            listOperations.leftPush(routingKey, message);
+            listOperations.leftPush(routingKey, new RedisMessage(message));
         }
     }
 
