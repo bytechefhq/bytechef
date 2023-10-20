@@ -11,8 +11,8 @@ inputs:
 
 tasks:
   - type: if/v1
-    rawConditions: true
-    conditions: ${value1 == value2 or value1 gt value2}
+    rawExpression: true
+    expression: ${value1 == value2 or value1 gt value2}
     caseTrue:
       - name: equalsResult
         type: var

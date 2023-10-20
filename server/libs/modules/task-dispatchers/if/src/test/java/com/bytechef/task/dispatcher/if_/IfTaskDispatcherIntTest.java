@@ -18,22 +18,22 @@ package com.bytechef.task.dispatcher.if_;
 
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.test.workflow.WorkflowExecutor;
-import com.bytechef.hermes.test.task.handler.TestVarTaskHandler;
+import com.bytechef.atlas.sync.executor.WorkflowExecutor;
+import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.task.dispatcher.if_.completion.IfTaskCompletionHandler;
+import com.bytechef.test.task.handler.TestVarTaskHandler;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Matija Petanjek
  * @author Ivica Cardic
  */
-@SpringBootTest
+@TaskDispatcherIntTest
 public class IfTaskDispatcherIntTest {
 
     private TestVarTaskHandler<Object, Object> testVarTaskHandler;
@@ -48,7 +48,7 @@ public class IfTaskDispatcherIntTest {
     private WorkflowExecutor workflowExecutor;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         testVarTaskHandler = new TestVarTaskHandler<>(Map::put);
     }
 

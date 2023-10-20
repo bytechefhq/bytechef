@@ -21,7 +21,8 @@ package com.bytechef.task.dispatcher.if_.constants;
  */
 public class IfTaskDispatcherConstants {
 
-    public static final String RAW_CONDITIONS = "rawConditions";
+    public static final String RAW_EXPRESSION = "rawExpression";
+    public static final String EXPRESSION = "expression";
     public static final String CONDITIONS = "conditions";
     public static final String BOOLEAN = "boolean";
     public static final String VALUE_1 = "value1";
