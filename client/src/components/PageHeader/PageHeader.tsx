@@ -3,12 +3,12 @@ import {PropsWithChildren} from 'react';
 
 type Props = {
 	subTitle: string;
-	buttonTitle: string;
+	buttonLabel: string;
 };
 
 export const PageHeader: React.FC<PropsWithChildren<Props>> = ({
 	subTitle,
-	buttonTitle,
+	buttonLabel,
 }) => {
 	return (
 		<div className="mb-6 flex justify-center py-4">
@@ -17,9 +17,7 @@ export const PageHeader: React.FC<PropsWithChildren<Props>> = ({
 					{subTitle}
 				</h2>
 
-				<div>
-					<Button title={buttonTitle} />
-				</div>
+				<Button title={buttonLabel} />
 			</div>
 		</div>
 	);
