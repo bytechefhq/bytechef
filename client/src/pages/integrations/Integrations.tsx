@@ -5,7 +5,9 @@ import Modal from 'components/Modal/Modal';
 import {SidebarContentLayout} from '../../components/Layouts/SidebarContentLayout';
 import {IntegrationList} from './IntegrationList';
 import React from 'react';
-import Select from 'react-select';
+import {Input} from '../../components/Input/Input';
+import {TextArea} from '../../components/TextArea/TextArea';
+import {MultiSelect} from '../../components/MultiSelect/MultiSelect';
 
 const options = [
     {value: 'chocolate', label: 'Chocolate'},
@@ -15,51 +17,26 @@ const options = [
 
 const IntegrationModal: React.FC = () => (
     <Modal
-        cancelButtonLabel="Cancel"
         confirmButtonLabel="Create"
         description="Use this to create your integration which will contain related workflows"
         triggerLabel="Create Integration"
         title="Create Integration"
     >
-        <fieldset className="Fieldset">
-            <label className="Label" htmlFor="name">
-                Name
-            </label>
+        <Input label="Name" name="name" placeholder="My CRM Integration" />
 
-            <input className="Input" id="name" placeholder="John Doe" />
-        </fieldset>
+        <TextArea
+            label="Description"
+            name="description"
+            placeholder="Cute description of your integration"
+        />
 
-        <fieldset className="Fieldset">
-            <label className="Label" htmlFor="username">
-                Description
-            </label>
+        <Input
+            label="Category"
+            name="category"
+            placeholder="Marketing, Sales, Social Media..."
+        />
 
-            <textarea
-                className="Input"
-                id="username"
-                placeholder="Cute description of your integration"
-            />
-        </fieldset>
-
-        <fieldset className="Fieldset">
-            <label htmlFor="category" className="Label">
-                Category
-            </label>
-
-            <input
-                className="Input"
-                id="category"
-                placeholder="Marketing, Sales, Social Media..."
-            />
-        </fieldset>
-
-        <fieldset className="Fieldset">
-            <label htmlFor="category" className="Label">
-                Tags
-            </label>
-
-            <Select options={options} isMulti={true} />
-        </fieldset>
+        <MultiSelect label="Tags" name="tags" options={options} />
     </Modal>
 );
 
