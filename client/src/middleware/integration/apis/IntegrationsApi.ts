@@ -15,22 +15,16 @@
 
 import * as runtime from '../runtime';
 import type {
-  CategoryModel,
   CreateIntegrationWorkflowRequestModel,
   IntegrationModel,
-  TagModel,
   UpdateIntegrationTagsRequestModel,
   WorkflowModel,
 } from '../models';
 import {
-    CategoryModelFromJSON,
-    CategoryModelToJSON,
     CreateIntegrationWorkflowRequestModelFromJSON,
     CreateIntegrationWorkflowRequestModelToJSON,
     IntegrationModelFromJSON,
     IntegrationModelToJSON,
-    TagModelFromJSON,
-    TagModelToJSON,
     UpdateIntegrationTagsRequestModelFromJSON,
     UpdateIntegrationTagsRequestModelToJSON,
     WorkflowModelFromJSON,
@@ -212,62 +206,6 @@ export class IntegrationsApi extends runtime.BaseAPI {
      */
     async getIntegration(requestParameters: GetIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationModel> {
         const response = await this.getIntegrationRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get categories.
-     * Get categories.
-     */
-    async getIntegrationCategoriesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<CategoryModel>>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/integrations/categories`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(CategoryModelFromJSON));
-    }
-
-    /**
-     * Get categories.
-     * Get categories.
-     */
-    async getIntegrationCategories(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<CategoryModel>> {
-        const response = await this.getIntegrationCategoriesRaw(initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get integration tags.
-     * Get integration tags.
-     */
-    async getIntegrationTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagModel>>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/integrations/tags`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagModelFromJSON));
-    }
-
-    /**
-     * Get integration tags.
-     * Get integration tags.
-     */
-    async getIntegrationTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagModel>> {
-        const response = await this.getIntegrationTagsRaw(initOverrides);
         return await response.value();
     }
 

@@ -1,10 +1,11 @@
+apis/IntegrationCategoriesApi.ts
+apis/IntegrationTagsApi.ts
 apis/IntegrationsApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts
 models/CreateIntegrationWorkflowRequestModel.ts
 models/IntegrationModel.ts
-models/StatusModel.ts
 models/TagModel.ts
 models/UpdateIntegrationTagsRequestModel.ts
 models/WorkflowFormatModel.ts

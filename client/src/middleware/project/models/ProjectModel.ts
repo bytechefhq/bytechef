@@ -19,12 +19,6 @@ import {
     CategoryModelFromJSONTyped,
     CategoryModelToJSON,
 } from './CategoryModel';
-import type { StatusModel } from './StatusModel';
-import {
-    StatusModelFromJSON,
-    StatusModelFromJSONTyped,
-    StatusModelToJSON,
-} from './StatusModel';
 import type { TagModel } from './TagModel';
 import {
     TagModelFromJSON,
@@ -57,19 +51,19 @@ export interface ProjectModel {
      */
     readonly createdDate?: Date;
     /**
-     * The id of an project.
+     * The id of a project.
      * @type {number}
      * @memberof ProjectModel
      */
     readonly id?: number;
     /**
-     * The name of the project.
+     * The name of a project.
      * @type {string}
      * @memberof ProjectModel
      */
     name: string;
     /**
-     * The description of the project.
+     * The description of a project.
      * @type {string}
      * @memberof ProjectModel
      */
@@ -99,11 +93,11 @@ export interface ProjectModel {
      */
     projectVersion?: number;
     /**
-     * 
-     * @type {StatusModel}
+     * A status of a project.
+     * @type {string}
      * @memberof ProjectModel
      */
-    status?: StatusModel;
+    status?: ProjectModelStatusEnum;
     /**
      * 
      * @type {Array<TagModel>}
@@ -123,6 +117,17 @@ export interface ProjectModel {
      */
     version?: number;
 }
+
+
+/**
+ * @export
+ */
+export const ProjectModelStatusEnum = {
+    Published: 'PUBLISHED',
+    Unpublished: 'UNPUBLISHED'
+} as const;
+export type ProjectModelStatusEnum = typeof ProjectModelStatusEnum[keyof typeof ProjectModelStatusEnum];
+
 
 /**
  * Check if a given object implements the ProjectModel interface.
@@ -154,7 +159,7 @@ export function ProjectModelFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'lastPublishedDate': !exists(json, 'lastPublishedDate') ? undefined : (new Date(json['lastPublishedDate'])),
         'projectVersion': !exists(json, 'projectVersion') ? undefined : json['projectVersion'],
-        'status': !exists(json, 'status') ? undefined : StatusModelFromJSON(json['status']),
+        'status': !exists(json, 'status') ? undefined : json['status'],
         'tags': !exists(json, 'tags') ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
         'workflowIds': !exists(json, 'workflowIds') ? undefined : json['workflowIds'],
         'version': !exists(json, '__version') ? undefined : json['__version'],
@@ -175,7 +180,7 @@ export function ProjectModelToJSON(value?: ProjectModel | null): any {
         'description': value.description,
         'lastPublishedDate': value.lastPublishedDate === undefined ? undefined : (value.lastPublishedDate.toISOString()),
         'projectVersion': value.projectVersion,
-        'status': StatusModelToJSON(value.status),
+        'status': value.status,
         'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
         'workflowIds': value.workflowIds,
         '__version': value.version,
