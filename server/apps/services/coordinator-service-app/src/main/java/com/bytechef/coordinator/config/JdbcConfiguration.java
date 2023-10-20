@@ -23,6 +23,10 @@ import com.bytechef.atlas.repository.jdbc.converter.StringToWebhooksConverter;
 import com.bytechef.atlas.repository.jdbc.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.repository.jdbc.converter.WebhooksToStringConverter;
 import com.bytechef.atlas.repository.jdbc.converter.WorkflowTaskToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.MapListWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToMapListWrapperConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.annotation.Bean;
@@ -67,7 +71,11 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
     protected List<?> userConverters() {
         return Arrays.asList(
             new ExecutionErrorToStringConverter(objectMapper),
+            new MapWrapperToStringConverter(objectMapper),
+            new MapListWrapperToStringConverter(objectMapper),
             new StringToExecutionErrorConverter(objectMapper),
+            new StringToMapWrapperConverter(objectMapper),
+            new StringToMapListWrapperConverter(objectMapper),
             new StringToWebhooksConverter(objectMapper),
             new StringToWorkflowTaskConverter(objectMapper),
             new WebhooksToStringConverter(objectMapper),
