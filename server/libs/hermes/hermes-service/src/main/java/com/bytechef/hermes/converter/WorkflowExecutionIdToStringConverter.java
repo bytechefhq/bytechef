@@ -15,12 +15,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.trigger;
+package com.bytechef.hermes.converter;
 
-import com.bytechef.message.Controllable;
+import com.bytechef.hermes.workflow.WorkflowExecutionId;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.WritingConverter;
 
 /**
  * @author Ivica Cardic
  */
-public interface ControlTrigger extends Trigger, Controllable {
+@WritingConverter
+public class WorkflowExecutionIdToStringConverter implements Converter<WorkflowExecutionId, String> {
+
+    @Override
+    public String convert(WorkflowExecutionId workflowExecutionId) {
+        return workflowExecutionId.toString();
+    }
 }

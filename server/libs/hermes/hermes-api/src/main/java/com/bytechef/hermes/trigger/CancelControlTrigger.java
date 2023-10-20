@@ -17,10 +17,32 @@
 
 package com.bytechef.hermes.trigger;
 
-import com.bytechef.message.Controllable;
+import com.bytechef.message.AbstractControllable;
 
 /**
  * @author Ivica Cardic
  */
-public interface ControlTrigger extends Trigger, Controllable {
+public class CancelControlTrigger extends AbstractControllable implements ControlTrigger {
+
+    public static final String TYPE_CANCEL = "cancel";
+
+    private long triggerExecutionId;
+
+    private CancelControlTrigger() {
+    }
+
+    public CancelControlTrigger(Long triggerExecutionId) {
+        super(TYPE_CANCEL);
+
+        this.triggerExecutionId = triggerExecutionId;
+    }
+
+    public long getTriggerExecutionId() {
+        return triggerExecutionId;
+    }
+
+    @Override
+    public String toString() {
+        return "CancelControlTrigger{, triggerExecutionId='" + triggerExecutionId + '}';
+    }
 }

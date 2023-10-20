@@ -15,12 +15,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.trigger;
-
-import com.bytechef.message.Controllable;
+package com.bytechef.hermes.job;
 
 /**
  * @author Ivica Cardic
  */
-public interface ControlTrigger extends Trigger, Controllable {
+public interface InstanceJobFactory {
+
+    long createJob(String workflowId, long instanceId);
+
+    String getType();
 }

@@ -30,6 +30,10 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapListWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.encryption.Encryption;
+import com.bytechef.hermes.converter.StringToWorkflowExecutionIdConverter;
+import com.bytechef.hermes.converter.StringToWorkflowTriggerConverter;
+import com.bytechef.hermes.converter.WorkflowExecutionIdToStringConverter;
+import com.bytechef.hermes.converter.WorkflowTriggerToStringConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -84,8 +88,12 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
             new StringToMapWrapperConverter(objectMapper),
             new StringToMapListWrapperConverter(objectMapper),
             new StringToWebhooksConverter(objectMapper),
+            new StringToWorkflowExecutionIdConverter(),
             new StringToWorkflowTaskConverter(objectMapper),
+            new StringToWorkflowTriggerConverter(objectMapper),
             new WebhooksToStringConverter(objectMapper),
-            new WorkflowTaskToStringConverter(objectMapper));
+            new WorkflowExecutionIdToStringConverter(),
+            new WorkflowTaskToStringConverter(objectMapper),
+            new WorkflowTriggerToStringConverter(objectMapper));
     }
 }

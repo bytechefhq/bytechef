@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS project_instance_workflow (
     id                       BIGSERIAL    NOT NULL PRIMARY KEY,
     project_instance_id      BIGSERIAL    NOT NULL,
     workflow_id              VARCHAR(256) NOT NULL,
-    input_parameters         TEXT         NOT NULL,
+    inputs                   TEXT         NOT NULL,
     enabled                  BOOLEAN      NOT NULL,
     last_execution_date      TIMESTAMP    NULL,
     created_date             TIMESTAMP    NOT NULL,

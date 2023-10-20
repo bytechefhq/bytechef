@@ -1,0 +1,10 @@
+dependencies {
+    api project(":server:libs:hermes:hermes-api")
+
+    implementation "com.fasterxml.jackson.core:jackson-databind"
+    implementation project(":server:libs:core:commons:commons-data")
+    implementation project(":server:libs:core:commons:commons-util")
+
+    testImplementation project(":server:libs:db-migration")
+    testImplementation project(":server:libs:test:test-int-support")
+}
