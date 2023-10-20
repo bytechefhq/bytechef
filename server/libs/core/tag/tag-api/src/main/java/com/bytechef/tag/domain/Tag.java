@@ -17,7 +17,6 @@
 
 package com.bytechef.tag.domain;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -35,7 +34,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table
-public final class Tag implements Persistable<Long>, Serializable {
+public final class Tag implements Persistable<Long> {
 
     @CreatedBy
     @Column("created_by")

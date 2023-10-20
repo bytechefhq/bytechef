@@ -27,7 +27,6 @@ import com.bytechef.atlas.workflow.mapper.WorkflowReader;
 import com.bytechef.atlas.workflow.mapper.WorkflowResource;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapValueUtils;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -60,7 +59,7 @@ import org.springframework.util.Assert;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 @Table
-public final class Workflow implements Errorable, Persistable<String>, Serializable {
+public final class Workflow implements Errorable, Persistable<String> {
 
     public enum Format {
         JSON(1),
@@ -367,9 +366,9 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
             '}';
     }
 
-    public record Input(String name, String label, String type, boolean required) implements Serializable {
+    public record Input(String name, String label, String type, boolean required) {
     }
 
-    public record Output(String name, Object value) implements Serializable {
+    public record Output(String name, Object value) {
     }
 }

@@ -22,7 +22,6 @@ package com.bytechef.atlas.task;
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapValueUtils;
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +38,7 @@ import org.springframework.util.Assert;
  * @author Ivica Cardic
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class WorkflowTask implements Serializable {
+public class WorkflowTask {
 
     static {
         MapValueUtils.addConverter(new WorkflowTaskConverter());
