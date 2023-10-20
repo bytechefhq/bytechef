@@ -13,7 +13,7 @@ interface ProjectInstanceEditWorkflowDialogProps {
     onClose?: () => void;
 }
 
-export const ProjectInstanceEditWorkflowDialog = ({
+const ProjectInstanceEditWorkflowDialog = ({
     onClose,
     visible = false,
     workflow,
@@ -65,3 +65,5 @@ export const ProjectInstanceEditWorkflowDialog = ({
         </Dialog>
     );
 };
+
+export default ProjectInstanceEditWorkflowDialog;
