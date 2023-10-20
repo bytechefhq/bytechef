@@ -14,23 +14,23 @@ import {
 } from '../../../mutations/integrations.mutations';
 import {IntegrationKeys} from '../../../queries/integrations.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {twMerge} from 'tailwind-merge';
 import {Link} from 'react-router-dom';
 import IntegrationDialog from './IntegrationDialog';
-import Name from './components/Name';
 import AlertDialog from '../../../components/AlertDialog/AlertDialog';
 import TagList from '../../../components/TagList/TagList';
 import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
+import Badge from '../../../components/Badge/Badge';
+import HoverCard from '../../../components/HoverCard/HoverCard';
 
-interface IntegrationItemProps {
+interface IntegrationListItemProps {
     integration: IntegrationModel;
     remainingTags?: TagModel[];
 }
 
-const IntegrationItem = ({
+const IntegrationListItem = ({
     integration,
     remainingTags,
-}: IntegrationItemProps) => {
+}: IntegrationListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
@@ -90,82 +90,82 @@ const IntegrationItem = ({
         <>
             <div className="flex items-center">
                 <Link
-                    className="flex-1"
+                    className="flex-1 pr-8"
                     to={`/automation/integrations/${integration.id}`}
                 >
-                    <div className="flex justify-between">
-                        <div>
-                            <header className="relative mb-2 flex items-center">
-                                {integration.description ? (
-                                    <Name
-                                        description={integration.description}
-                                        name={integration.name}
-                                    />
-                                ) : (
+                    <div className="flex items-center justify-between">
+                        <div className="relative flex items-center">
+                            {integration.description ? (
+                                <HoverCard text={integration.description}>
                                     <span className="mr-2 text-base font-semibold text-gray-900">
                                         {integration.name}
                                     </span>
-                                )}
+                                </HoverCard>
+                            ) : (
+                                <span className="mr-2 text-base font-semibold text-gray-900">
+                                    {integration.name}
+                                </span>
+                            )}
 
-                                {integration.category && (
-                                    <span className="text-xs uppercase text-gray-700">
-                                        {integration.category.name}
-                                    </span>
-                                )}
-                            </header>
-
-                            <footer
-                                className="flex h-[38px] items-center"
-                                onClick={(event) => event.preventDefault()}
-                            >
-                                <div className="mr-4 text-xs font-semibold text-gray-700">
-                                    {integration.workflowIds?.length === 1
-                                        ? `${integration.workflowIds?.length} workflow`
-                                        : `${integration.workflowIds?.length} workflows`}
-                                </div>
-
-                                {integration.tags && (
-                                    <TagList
-                                        id={integration.id!}
-                                        remainingTags={remainingTags}
-                                        tags={integration.tags}
-                                        updateTagsMutation={
-                                            updateIntegrationTagsMutation
-                                        }
-                                        getRequest={(id, tags) => ({
-                                            id: id!,
-                                            updateIntegrationTagsRequestModel: {
-                                                tags: tags || [],
-                                            },
-                                        })}
-                                    />
-                                )}
-                            </footer>
+                            {integration.category && (
+                                <span className="text-xs uppercase text-gray-700">
+                                    {integration.category.name}
+                                </span>
+                            )}
                         </div>
 
-                        <aside className="flex items-center">
-                            <span
-                                className={twMerge(
-                                    'mr-4 rounded px-2.5 py-0.5 text-sm font-medium',
+                        <div className="ml-2 flex shrink-0">
+                            <Badge
+                                color={
                                     integration.status ===
-                                        IntegrationModelStatusEnum.Published
-                                        ? 'bg-green-100 text-green-800 dark:bg-green-200 dark:text-green-900'
-                                        : 'bg-gray-100 text-gray-800 dark:bg-gray-200 dark:text-gray-900'
-                                )}
-                            >
-                                {integration.status ===
-                                IntegrationModelStatusEnum.Published
-                                    ? `Published V${integration.integrationVersion}`
-                                    : 'Not Published'}
-                            </span>
+                                    IntegrationModelStatusEnum.Published
+                                        ? 'green'
+                                        : 'default'
+                                }
+                                text={
+                                    integration.status ===
+                                    IntegrationModelStatusEnum.Published
+                                        ? `Published V${integration.integrationVersion}`
+                                        : 'Not Published'
+                                }
+                            />
+                        </div>
+                    </div>
+                    <div className="mt-2 sm:flex sm:items-center sm:justify-between">
+                        <div
+                            className="flex h-[38px] items-center"
+                            onClick={(event) => event.preventDefault()}
+                        >
+                            <div className="mr-4 text-xs font-semibold text-gray-700">
+                                {integration.workflowIds?.length === 1
+                                    ? `${integration.workflowIds?.length} workflow`
+                                    : `${integration.workflowIds?.length} workflows`}
+                            </div>
 
-                            <span className="mr-4 w-[76px] text-center text-sm text-gray-500">
-                                {integration.status ===
-                                IntegrationModelStatusEnum.Published
-                                    ? integration.lastPublishedDate?.toLocaleDateString()
-                                    : '-'}
-                            </span>
-                        </aside>
+                            {integration.tags && (
+                                <TagList
+                                    id={integration.id!}
+                                    remainingTags={remainingTags}
+                                    tags={integration.tags}
+                                    updateTagsMutation={
+                                        updateIntegrationTagsMutation
+                                    }
+                                    getRequest={(id, tags) => ({
+                                        id: id!,
+                                        updateProjectTagsRequestModel: {
+                                            tags: tags || [],
+                                        },
+                                    })}
+                                />
+                            )}
+                        </div>
+
+                        <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                            {integration.status ===
+                            IntegrationModelStatusEnum.Published
+                                ? `${integration.createdDate?.toLocaleDateString()}`
+                                : '-'}
+                        </div>
                     </div>
                 </Link>
 
@@ -211,4 +211,4 @@ const IntegrationItem = ({
     );
 };
 
-export default IntegrationItem;
+export default IntegrationListItem;
