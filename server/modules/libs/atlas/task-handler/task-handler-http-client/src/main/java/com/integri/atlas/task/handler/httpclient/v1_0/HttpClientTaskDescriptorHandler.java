@@ -176,19 +176,19 @@ public class HttpClientTaskDescriptorHandler implements TaskDescriptorHandler {
         STRING_PROPERTY(BODY_PARAMETERS)
             .displayName("Raw")
             .description("The raw text to send.")
-            .displayOption(showWhen(BODY_CONTENT_TYPE).in(BodyContentType.RAW.name())),
+            .displayOption(showWhen(BODY_CONTENT_TYPE).eq(BodyContentType.RAW.name())),
         FILE_ENTRY_PROPERTY(FILE_ENTRY)
             .displayName("File")
             .description("The object property which contains a reference to the file with data to upload.")
-            .displayOption(showWhen(BODY_CONTENT_TYPE).in(BodyContentType.BINARY.name())),
+            .displayOption(showWhen(BODY_CONTENT_TYPE).eq(BodyContentType.BINARY.name())),
     };
 
     private static final TaskProperty[] OUTPUTS_PROPERTIES = {
         ANY_PROPERTY("")
             .types(ARRAY_PROPERTY(), OBJECT_PROPERTY())
             .displayOption(showWhen(RESPONSE_FORMAT).in(ResponseFormat.JSON.name(), ResponseFormat.XML.name())),
-        STRING_PROPERTY().displayOption(showWhen(RESPONSE_FORMAT).in(ResponseFormat.TEXT.name())),
-        FILE_ENTRY_PROPERTY().displayOption(showWhen(RESPONSE_FORMAT).in(ResponseFormat.FILE.name())),
+        STRING_PROPERTY().displayOption(showWhen(RESPONSE_FORMAT).eq(ResponseFormat.TEXT.name())),
+        FILE_ENTRY_PROPERTY().displayOption(showWhen(RESPONSE_FORMAT).eq(ResponseFormat.FILE.name())),
     };
 
     private static final TaskDescriptor TASK_DESCRIPTOR = createTaskDescriptor(HTTP_CLIENT)
@@ -219,8 +219,8 @@ public class HttpClientTaskDescriptorHandler implements TaskDescriptorHandler {
                         .displayOption(
                             showWhen(RESPONSE_FORMAT).in(ResponseFormat.JSON.name(), ResponseFormat.XML.name())
                         ),
-                    STRING_PROPERTY().displayOption(showWhen(RESPONSE_FORMAT).in(ResponseFormat.TEXT.name())),
-                    FILE_ENTRY_PROPERTY().displayOption(showWhen(RESPONSE_FORMAT).in(ResponseFormat.FILE.name()))
+                    STRING_PROPERTY().displayOption(showWhen(RESPONSE_FORMAT).eq(ResponseFormat.TEXT.name())),
+                    FILE_ENTRY_PROPERTY().displayOption(showWhen(RESPONSE_FORMAT).eq(ResponseFormat.FILE.name()))
                 ),
             OPERATION(POST)
                 .displayName("POST")
@@ -252,8 +252,8 @@ public class HttpClientTaskDescriptorHandler implements TaskDescriptorHandler {
                         .displayOption(
                             showWhen(RESPONSE_FORMAT).in(ResponseFormat.JSON.name(), ResponseFormat.XML.name())
                         ),
-                    STRING_PROPERTY().displayOption(showWhen(RESPONSE_FORMAT).in(ResponseFormat.TEXT.name())),
-                    FILE_ENTRY_PROPERTY().displayOption(showWhen(RESPONSE_FORMAT).in(ResponseFormat.FILE.name()))
+                    STRING_PROPERTY().displayOption(showWhen(RESPONSE_FORMAT).eq(ResponseFormat.TEXT.name())),
+                    FILE_ENTRY_PROPERTY().displayOption(showWhen(RESPONSE_FORMAT).eq(ResponseFormat.FILE.name()))
                 ),
             OPERATION(PUT)
                 .displayName("PUT")

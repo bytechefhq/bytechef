@@ -138,7 +138,7 @@ public class TaskDescriptorTest {
             displayOption
         );
 
-        displayOption = DisplayOption.build(List.of(hideWhen("name1").in(1)));
+        displayOption = DisplayOption.build(List.of(hideWhen("name1").eq(1)));
 
         jsonAssertEquals("""
         {
@@ -146,7 +146,7 @@ public class TaskDescriptorTest {
         }
         """, displayOption);
 
-        displayOption = DisplayOption.build(List.of(hideWhen("name1").in(1), hideWhen("name2").in(2)));
+        displayOption = DisplayOption.build(List.of(hideWhen("name1").eq(1), hideWhen("name2").eq(2)));
 
         jsonAssertEquals(
             """
@@ -223,7 +223,7 @@ public class TaskDescriptorTest {
             displayOption
         );
 
-        displayOption = DisplayOption.build(List.of(showWhen("name1").in(1)));
+        displayOption = DisplayOption.build(List.of(showWhen("name1").eq(1)));
 
         jsonAssertEquals("""
         {
@@ -231,7 +231,7 @@ public class TaskDescriptorTest {
         }
         """, displayOption);
 
-        displayOption = DisplayOption.build(List.of(showWhen("name1").in(1), showWhen("name2").in(2)));
+        displayOption = DisplayOption.build(List.of(showWhen("name1").eq(1), showWhen("name2").eq(2)));
 
         jsonAssertEquals(
             """
