@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OAuth2Properties")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T07:39:13.348118+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T08:31:26.598462+02:00[Europe/Zagreb]")
 public class OAuth2PropertiesModel {
 
   private String redirectUri;
