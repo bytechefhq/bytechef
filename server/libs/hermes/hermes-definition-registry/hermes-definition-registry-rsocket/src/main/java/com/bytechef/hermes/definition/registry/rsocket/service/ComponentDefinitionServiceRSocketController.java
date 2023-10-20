@@ -17,9 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.service;
 
-import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -42,41 +40,19 @@ public class ComponentDefinitionServiceRSocketController {
         this.componentDefinitionService = componentDefinitionService;
     }
 
-    @MessageMapping("Service.getComponentConnectionDefinitions")
-    public Mono<List<ConnectionDefinition>> getComponentConnectionDefinitions(String componentName) {
-        return componentDefinitionService.getConnectionDefinitions(componentName);
-    }
-
     @MessageMapping("Service.getComponentDefinitions")
     public Mono<List<ComponentDefinition>> getComponentDefinitions() {
-        return componentDefinitionService.getComponentDefinitions();
+        return componentDefinitionService.getComponentDefinitionsMono();
     }
 
     @MessageMapping("Service.getComponentDefinitionsForName")
     public Mono<List<ComponentDefinition>> getComponentDefinitions(String name) {
-        return componentDefinitionService.getComponentDefinitions(name);
+        return componentDefinitionService.getComponentDefinitionsMono(name);
     }
 
     @MessageMapping("Service.getComponentDefinition")
     public Mono<ComponentDefinition> getComponentDefinition(Map<String, Object> map) {
-        return componentDefinitionService.getComponentDefinition((String) map.get("name"),
+        return componentDefinitionService.getComponentDefinitionMono((String) map.get("name"),
             (Integer) map.get("version"));
-    }
-
-    @MessageMapping("Service.getComponentDefinitionAction")
-    public Mono<ActionDefinition> getComponentDefinitionAction(Map<String, Object> map) {
-        return componentDefinitionService.getComponentDefinitionAction(
-            (String) map.get("componentName"), (Integer) map.get("componentVersion"), (String) map.get("actionName"));
-    }
-
-    @MessageMapping("Service.getConnectionDefinition")
-    public Mono<ConnectionDefinition> getConnectionDefinition(Map<String, Object> map) {
-        return componentDefinitionService.getConnectionDefinition(
-            (String) map.get("componentName"), (Integer) map.get("componentVersion"));
-    }
-
-    @MessageMapping("Service.getConnectionDefinitions")
-    public Mono<List<ConnectionDefinition>> getConnectionDefinitions() {
-        return componentDefinitionService.getConnectionDefinitions();
     }
 }

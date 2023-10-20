@@ -7,8 +7,10 @@ dependencies {
     implementation project(":server:libs:core:commons:commons-data")
     implementation project(":server:libs:core:commons:commons-util")
     implementation project(":server:libs:core:encryption:encryption-api")
+    implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
 
     testImplementation project(":server:libs:db-migration")
     testImplementation project(":server:libs:core:tag:tag-service")
+    testImplementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
     testImplementation project(":server:libs:test:test-int-support")
 }

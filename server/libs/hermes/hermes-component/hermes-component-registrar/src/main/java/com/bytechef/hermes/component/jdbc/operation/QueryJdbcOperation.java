@@ -44,7 +44,7 @@ public class QueryJdbcOperation implements JdbcOperation<List<Map<String, Object
         String queryStatement = executionParameters.getRequiredString(JdbcConstants.QUERY);
 
         return jdbcExecutor.query(
-            context.getConnectionParameters(), queryStatement, paramMap, (ResultSet rs, int rowNum) -> {
+            context.getConnection(), queryStatement, paramMap, (ResultSet rs, int rowNum) -> {
                 Map<String, Object> row = new HashMap<>();
 
                 ResultSetMetaData rsMetaData = rs.getMetaData();

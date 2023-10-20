@@ -46,7 +46,7 @@ schemas:
         description: Properties of the connection.
         type: array
         items:
-          $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/ValueProperty'
+          $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Property'
       type:
         $ref: '#/schemas/AuthorizationType'
   AuthorizationType:
@@ -59,6 +59,7 @@ schemas:
       - CUSTOM
       - DIGEST_AUTH
       - OAUTH2_AUTHORIZATION_CODE
+      - OAUTH2_AUTHORIZATION_CODE_PKCE
       - OAUTH2_CLIENT_CREDENTIALS
       - OAUTH2_IMPLICIT_CODE
       - OAUTH2_RESOURCE_OWNER_PASSWORD
@@ -112,7 +113,7 @@ schemas:
         description: The properties of the connection.
         type: array
         items:
-          $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/ValueProperty'
+          $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Property'
       resources:
         $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Resources'
       version:

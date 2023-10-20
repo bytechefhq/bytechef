@@ -22,6 +22,7 @@ import com.bytechef.hermes.connection.facade.ConnectionFacadeImpl;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.connection.service.impl.ConnectionServiceImpl;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.tag.service.TagService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,8 +34,11 @@ import org.springframework.context.annotation.Configuration;
 public class ConnectionConfiguration {
 
     @Bean
-    ConnectionFacade connectionFacade(ConnectionService connectionService, TagService tagService) {
-        return new ConnectionFacadeImpl(connectionService, tagService);
+    ConnectionFacade connectionFacade(
+        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
+        TagService tagService) {
+
+        return new ConnectionFacadeImpl(connectionDefinitionService, connectionService, tagService);
     }
 
     @Bean

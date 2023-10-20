@@ -19,10 +19,10 @@ package com.bytechef.hermes.component.registrar;
 
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.hermes.component.RestComponentHandler;
+import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
-import com.bytechef.hermes.component.task.handler.RestComponentTaskHandler;
+import com.bytechef.hermes.component.task.handler.OpenApiComponentTaskHandler;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -32,16 +32,16 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class RestComponentTaskHandlerRegistrar extends AbstractTaskHandlerRegistrar<RestComponentHandler> {
+public class OpenApiComponentTaskHandlerRegistrar extends AbstractTaskHandlerRegistrar<OpenApiComponentHandler> {
 
     private final ConnectionService connectionService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
 
     @SuppressFBWarnings("EI2")
-    public RestComponentTaskHandlerRegistrar(
+    public OpenApiComponentTaskHandlerRegistrar(
         ConnectionService connectionService, EventPublisher eventPublisher, FileStorageService fileStorageService) {
-        super(RestComponentHandler.class);
+        super(OpenApiComponentHandler.class);
         this.connectionService = connectionService;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
@@ -50,10 +50,10 @@ public class RestComponentTaskHandlerRegistrar extends AbstractTaskHandlerRegist
     @Override
     protected TaskHandler<?> createTaskHandler(
         ActionDefinition actionDefinition, ConnectionDefinition connectionDefinition,
-        RestComponentHandler restComponentHandler) {
+        OpenApiComponentHandler openApiComponentHandler) {
 
-        return new RestComponentTaskHandler(
-            actionDefinition, connectionDefinition, connectionService, restComponentHandler, eventPublisher,
+        return new OpenApiComponentTaskHandler(
+            actionDefinition, connectionDefinition, connectionService, openApiComponentHandler, eventPublisher,
             fileStorageService);
     }
 }

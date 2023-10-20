@@ -17,32 +17,31 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.service;
 
-import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
-import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
+import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 @Controller
-@ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "coordinator-service-app")
-public class TaskDispatcherDefinitionServiceRSocketController {
+@ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
+public class ActionDefinitionServiceRSocketController {
 
-    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
+    private final ActionDefinitionService actionDefinitionService;
 
-    public TaskDispatcherDefinitionServiceRSocketController(
-        TaskDispatcherDefinitionService taskDispatcherDefinitionService) {
-
-        this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
+    public ActionDefinitionServiceRSocketController(ActionDefinitionService actionDefinitionService) {
+        this.actionDefinitionService = actionDefinitionService;
     }
 
-    @MessageMapping("getTaskDispatcherDefinitions")
-    public Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitions() {
-        return taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono();
+    @MessageMapping("Service.getComponentDefinitionAction")
+    public Mono<ActionDefinition> getComponentDefinitionAction(Map<String, Object> map) {
+        return actionDefinitionService.getComponentDefinitionActionMono(
+            (String) map.get("componentName"), (Integer) map.get("componentVersion"), (String) map.get("actionName"));
     }
 }

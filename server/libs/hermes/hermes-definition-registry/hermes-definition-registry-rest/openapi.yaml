@@ -27,7 +27,7 @@ paths:
             type: boolean
       responses:
         "200":
-          description: OK
+          description: Successful operation.
           content:
             application/json:
               schema:
@@ -50,7 +50,7 @@ paths:
             type: string
       responses:
         "200":
-          description: OK
+          description: Successful operation.
           content:
             application/json:
               schema:
@@ -79,7 +79,7 @@ paths:
             type: integer
       responses:
         "200":
-          description: OK
+          description: Successful operation.
           content:
             application/json:
               schema:
@@ -112,7 +112,7 @@ paths:
             type: string
       responses:
         "200":
-          description: OK
+          description: Successful operation.
           content:
             application/json:
               schema:
@@ -126,7 +126,7 @@ paths:
       operationId: getConnectionDefinitions
       responses:
         "200":
-          description: OK
+          description: Successful operation.
           content:
             application/json:
               schema:
@@ -149,7 +149,7 @@ paths:
             type: string
       responses:
         "200":
-          description: OK
+          description: Successful operation.
           content:
             application/json:
               schema:
@@ -178,7 +178,7 @@ paths:
             type: integer
       responses:
         "200":
-          description: OK
+          description: Successful operation.
           content:
             application/json:
               schema:
@@ -192,7 +192,7 @@ paths:
       operationId: getTaskDispatcherDefinitions
       responses:
         "200":
-          description: OK
+          description: Successful operation.
           content:
             application/json:
               schema:
@@ -256,7 +256,7 @@ components:
         resources:
           $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Resources'
         version:
-          description: The component version.
+          description: The version of a component.
           type: integer
     ConnectionDefinition:
       $ref: '../../hermes-component/hermes-component-api/component_definition_spec.yaml#/schemas/ConnectionDefinition'
@@ -274,7 +274,7 @@ components:
         display:
           $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
         version:
-          description: The component version.
+          description: The version of a component.
           type: integer
     TaskDispatcherDefinition:
       $ref: '../../hermes-task-dispatcher/hermes-task-dispatcher-api/task_dispatcher_definition_spec.yaml#/schemas/TaskDispatcherDefinition'

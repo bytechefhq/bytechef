@@ -27,12 +27,14 @@ import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.FileEntry;
+import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.springframework.core.convert.converter.Converter;
 
@@ -42,17 +44,7 @@ import org.springframework.core.convert.converter.Converter;
 public class ContextImpl implements Context {
 
     static {
-        MapValueUtils.addConverter(new Converter<Map<?, ?>, FileEntry>() {
-
-            @Override
-            public FileEntry convert(Map<?, ?> source) {
-                return new FileEntryImpl(
-                    (String) source.get("extension"),
-                    (String) source.get("mimeType"),
-                    (String) source.get("name"),
-                    (String) source.get("url"));
-            }
-        });
+        MapValueUtils.addConverter(new FileEntryConverter());
     }
 
     private final ConnectionDefinition connectionDefinition;
@@ -76,25 +68,55 @@ public class ContextImpl implements Context {
     }
 
     @Override
-    public Optional<Connection> fetchConnectionParameters() {
+    public Optional<Connection> fetchConnection() {
         Optional<Connection> connectionParametersOptional = Optional.empty();
 
         if (CollectionUtils.containsKey(taskExecution.getParameters(), CONNECTION_ID)) {
-            connectionParametersOptional = Optional.of(getConnectionParameters());
+            connectionParametersOptional = Optional.of(getConnection());
         }
 
         return connectionParametersOptional;
     }
 
     @Override
-    public ConnectionDefinition getConnectionDefinition() {
-        return connectionDefinition;
+    public Optional<Authorization> fetchConnectionAuthorization() {
+        if (connectionDefinition == null) {
+            return Optional.empty();
+        }
+
+        Optional<Connection> connectionOptional = fetchConnection();
+
+        if (connectionDefinition.isAuthorizationRequired() && connectionOptional.isEmpty()) {
+            throw new IllegalStateException(
+                "Connection for the instance of %s component is not defined".formatted(
+                    connectionDefinition.getComponentName()));
+        }
+
+        return connectionOptional
+            .flatMap(connection -> connectionDefinition.getAuthorizations()
+                .stream()
+                .filter(curAuthorization -> Objects.equals(
+                    curAuthorization.getName(), connection.getAuthorizationName()))
+                .findFirst());
     }
 
     @Override
-    public Connection getConnectionParameters() {
-        return new ConnectionImpl(connectionService.getConnection(
-            MapValueUtils.getRequired(taskExecution.getParameters(), CONNECTION_ID)));
+    public Optional<String> fetchConnectionBaseUri() {
+        if (connectionDefinition == null) {
+            return Optional.empty();
+        }
+
+        return fetchConnection()
+            .map(connection -> connectionDefinition.getBaseUriFunction()
+                .apply(connection));
+    }
+
+    @Override
+    public Connection getConnection() {
+        com.bytechef.hermes.connection.domain.Connection connection = connectionService.getConnection(
+            MapValueUtils.getRequired(taskExecution.getParameters(), CONNECTION_ID));
+
+        return connection.toComponentConnection();
     }
 
     @Override
@@ -129,6 +151,14 @@ public class ContextImpl implements Context {
     }
 
     private static FileEntry getFileEntry(com.bytechef.hermes.file.storage.domain.FileEntry fileEntry) {
-        return new FileEntryImpl(fileEntry);
+        return fileEntry.toComponentFileEntry();
+    }
+
+    private static class FileEntryConverter implements Converter<Map<?, ?>, FileEntry> {
+
+        @Override
+        public FileEntry convert(Map<?, ?> source) {
+            return com.bytechef.hermes.file.storage.domain.FileEntry.toComponentFileEntry(source);
+        }
     }
 }

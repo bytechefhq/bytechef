@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.utils;
+package com.bytechef.hermes.component.util;
 
 import com.bytechef.hermes.component.exception.ActionExecutionException;
 import com.fasterxml.jackson.core.JsonParser;
@@ -30,7 +30,7 @@ import java.util.NoSuchElementException;
 /**
  * @author Ivica Cardic
  */
-class JsonIterator implements Iterator<Map<String, ?>> {
+final class JsonIterator implements Iterator<Map<String, ?>> {
 
     private final JsonParser jsonParser;
     private final ObjectMapper objectMapper;

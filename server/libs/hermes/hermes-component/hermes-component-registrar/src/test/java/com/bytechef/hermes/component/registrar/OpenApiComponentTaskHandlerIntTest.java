@@ -30,14 +30,15 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
-import com.bytechef.hermes.component.impl.FileEntryImpl;
-import com.bytechef.hermes.component.task.handler.RestComponentTaskHandler;
-import com.bytechef.hermes.component.utils.HttpClientUtils.HttpResponseEntry;
+import com.bytechef.hermes.component.task.handler.OpenApiComponentTaskHandler;
+import com.bytechef.hermes.component.util.HttpClientUtils.HttpResponseEntry;
 import com.bytechef.hermes.connection.constant.ConnectionConstants;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.definition.registry.config.WorkerDefinitionRegistryConfiguration;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.hermes.file.storage.domain.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import com.bytechef.tag.service.TagService;
 import com.bytechef.test.annotation.EmbeddedSql;
@@ -61,6 +62,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 import java.nio.charset.StandardCharsets;
@@ -90,9 +92,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
  * @author Ivica Cardic
  */
 @EmbeddedSql
-@SpringBootTest
+@SpringBootTest(properties = {
+    "spring.application.name=server-app"
+})
 @WireMockTest(httpPort = 9999)
-public class RestComponentTaskHandlerIntTest {
+public class OpenApiComponentTaskHandlerIntTest {
 
     private static final FileStorageService FILE_STORAGE_SERVICE = new Base64FileStorageService();
     private static final PetstoreComponentHandler PETSTORE_COMPONENT_HANDLER = new PetstoreComponentHandler() {
@@ -134,11 +138,11 @@ public class RestComponentTaskHandlerIntTest {
     public void testHandleDELETE() throws Exception {
         stubFor(delete("/pet/1").willReturn(ok()));
 
-        RestComponentTaskHandler restComponentTaskHandler = createRestComponentHandler("deletePet");
+        OpenApiComponentTaskHandler openApiComponentTaskHandler = createRestComponentHandler("deletePet");
 
         TaskExecution taskExecution = getTaskExecution(Map.of("petId", 1));
 
-        HttpResponseEntry httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        HttpResponseEntry httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
 
@@ -146,11 +150,11 @@ public class RestComponentTaskHandlerIntTest {
 
         stubFor(delete("/store/order/1").willReturn(ok()));
 
-        restComponentTaskHandler = createRestComponentHandler("deleteOrder");
+        openApiComponentTaskHandler = createRestComponentHandler("deleteOrder");
 
         taskExecution = getTaskExecution(Map.of("orderId", 1));
 
-        httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
 
@@ -158,11 +162,11 @@ public class RestComponentTaskHandlerIntTest {
 
         stubFor(delete("/user/user1").willReturn(ok()));
 
-        restComponentTaskHandler = createRestComponentHandler("deleteUser");
+        openApiComponentTaskHandler = createRestComponentHandler("deleteUser");
 
         taskExecution = getTaskExecution(Map.of("username", "user1"));
 
-        httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
     }
@@ -229,11 +233,11 @@ public class RestComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        RestComponentTaskHandler restComponentTaskHandler = createRestComponentHandler("findPetsByStatus");
+        OpenApiComponentTaskHandler openApiComponentTaskHandler = createRestComponentHandler("findPetsByStatus");
 
         TaskExecution taskExecution = getTaskExecution(Map.of("status", "available"));
 
-        HttpResponseEntry httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        HttpResponseEntry httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
         JSONAssert.assertEquals(json, new JSONArray((List<?>) httpResponseEntry.body()), true);
@@ -253,11 +257,11 @@ public class RestComponentTaskHandlerIntTest {
                                         "the allowable values `[available, pending, sold]`")))
                         .withHeader("Content-Type", "application/json")));
 
-        restComponentTaskHandler = createRestComponentHandler("findPetsByStatus");
+        openApiComponentTaskHandler = createRestComponentHandler("findPetsByStatus");
 
         taskExecution = getTaskExecution(Map.of("status", "unknown"));
 
-        httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(400, httpResponseEntry.statusCode());
         Assertions.assertEquals(
@@ -277,11 +281,11 @@ public class RestComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        restComponentTaskHandler = createRestComponentHandler("findPetsByTags");
+        openApiComponentTaskHandler = createRestComponentHandler("findPetsByTags");
 
         taskExecution = getTaskExecution(Map.of("tags", List.of("tag1")));
 
-        httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
         JSONAssert.assertEquals(json, new JSONArray((List<?>) httpResponseEntry.body()), true);
@@ -321,11 +325,11 @@ public class RestComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        restComponentTaskHandler = createRestComponentHandler("getPetById");
+        openApiComponentTaskHandler = createRestComponentHandler("getPetById");
 
         taskExecution = getTaskExecution(Map.of("petId", 7));
 
-        httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
         JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
@@ -346,11 +350,11 @@ public class RestComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        restComponentTaskHandler = createRestComponentHandler("getInventory");
+        openApiComponentTaskHandler = createRestComponentHandler("getInventory");
 
         taskExecution = getTaskExecution(Collections.emptyMap());
 
-        httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
         JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
@@ -375,11 +379,11 @@ public class RestComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        restComponentTaskHandler = createRestComponentHandler("getOrderById");
+        openApiComponentTaskHandler = createRestComponentHandler("getOrderById");
 
         taskExecution = getTaskExecution(Map.of("orderId", 3));
 
-        httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
         JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
@@ -394,11 +398,11 @@ public class RestComponentTaskHandlerIntTest {
                             .withBody("Logged in user session: 7284289668658063360")
                             .withHeader("Content-Type", "text/plain")));
 
-        restComponentTaskHandler = createRestComponentHandler("loginUser");
+        openApiComponentTaskHandler = createRestComponentHandler("loginUser");
 
         taskExecution = getTaskExecution(Map.of());
 
-        httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
         Assertions.assertEquals("Logged in user session: 7284289668658063360", httpResponseEntry.body());
@@ -407,11 +411,11 @@ public class RestComponentTaskHandlerIntTest {
 
         stubFor(get(urlPathEqualTo("/user/logout")).willReturn(ok()));
 
-        restComponentTaskHandler = createRestComponentHandler("logoutUser");
+        openApiComponentTaskHandler = createRestComponentHandler("logoutUser");
 
         taskExecution = getTaskExecution(Map.of());
 
-        httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
         Assertions.assertNull(httpResponseEntry.body());
@@ -438,11 +442,11 @@ public class RestComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        restComponentTaskHandler = createRestComponentHandler("getUserByName");
+        openApiComponentTaskHandler = createRestComponentHandler("getUserByName");
 
         taskExecution = getTaskExecution(Map.of("username", "user1"));
 
-        httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
         JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
@@ -478,7 +482,7 @@ public class RestComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        RestComponentTaskHandler restComponentTaskHandler = createRestComponentHandler("addPet");
+        OpenApiComponentTaskHandler openApiComponentTaskHandler = createRestComponentHandler("addPet");
 
         TaskExecution taskExecution = getTaskExecution(
             Map.of(
@@ -493,7 +497,7 @@ public class RestComponentTaskHandlerIntTest {
                     }
                 }));
 
-        HttpResponseEntry httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        HttpResponseEntry httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
         JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
@@ -544,14 +548,13 @@ public class RestComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        restComponentTaskHandler = createRestComponentHandler("uploadFile");
+        openApiComponentTaskHandler = createRestComponentHandler("uploadFile");
 
-        taskExecution = getTaskExecution(
-            Map.of(
-                "petId", 10,
-                "fileEntry", new FileEntryImpl(FILE_STORAGE_SERVICE.storeFileContent("text.txt", "This is text"))));
+        FileEntry fileEntry = FILE_STORAGE_SERVICE.storeFileContent("text.txt", "This is text");
 
-        httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        taskExecution = getTaskExecution(Map.of("petId", 10, "fileEntry", fileEntry.toComponentFileEntry()));
+
+        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
         JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
@@ -577,7 +580,7 @@ public class RestComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        restComponentTaskHandler = createRestComponentHandler("placeOrder");
+        openApiComponentTaskHandler = createRestComponentHandler("placeOrder");
 
         taskExecution = getTaskExecution(
             Map.of(
@@ -592,7 +595,7 @@ public class RestComponentTaskHandlerIntTest {
                     }
                 }));
 
-        httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
         JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
@@ -620,7 +623,7 @@ public class RestComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        restComponentTaskHandler = createRestComponentHandler("createUser");
+        openApiComponentTaskHandler = createRestComponentHandler("createUser");
 
         taskExecution = getTaskExecution(
             Map.of(
@@ -637,7 +640,7 @@ public class RestComponentTaskHandlerIntTest {
                     }
                 }));
 
-        httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
         JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
@@ -667,7 +670,7 @@ public class RestComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        restComponentTaskHandler = createRestComponentHandler("createUsersWithListInput");
+        openApiComponentTaskHandler = createRestComponentHandler("createUsersWithListInput");
 
         taskExecution = getTaskExecution(
             Map.of(
@@ -685,7 +688,7 @@ public class RestComponentTaskHandlerIntTest {
                         }
                     })));
 
-        httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
         JSONAssert.assertEquals(json, new JSONArray((List<?>) httpResponseEntry.body()), true);
@@ -720,7 +723,7 @@ public class RestComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        RestComponentTaskHandler restComponentTaskHandler = createRestComponentHandler("updatePet");
+        OpenApiComponentTaskHandler openApiComponentTaskHandler = createRestComponentHandler("updatePet");
 
         TaskExecution taskExecution = getTaskExecution(
             Map.of(
@@ -735,7 +738,7 @@ public class RestComponentTaskHandlerIntTest {
                     }
                 }));
 
-        HttpResponseEntry httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        HttpResponseEntry httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
         JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
@@ -763,7 +766,7 @@ public class RestComponentTaskHandlerIntTest {
                         .withBody(json)
                         .withHeader("Content-Type", "application/json")));
 
-        restComponentTaskHandler = createRestComponentHandler("updateUser");
+        openApiComponentTaskHandler = createRestComponentHandler("updateUser");
 
         taskExecution = getTaskExecution(
             Map.of(
@@ -781,14 +784,14 @@ public class RestComponentTaskHandlerIntTest {
                     }
                 }));
 
-        httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
+        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, httpResponseEntry.statusCode());
         JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
     }
 
-    private RestComponentTaskHandler createRestComponentHandler(String actionName) {
-        return new RestComponentTaskHandler(
+    private OpenApiComponentTaskHandler createRestComponentHandler(String actionName) {
+        return new OpenApiComponentTaskHandler(
             getActionDefinition(actionName), getConnectionDefinition(), connectionService,
             PETSTORE_COMPONENT_HANDLER, null, FILE_STORAGE_SERVICE);
     }
@@ -830,8 +833,9 @@ public class RestComponentTaskHandlerIntTest {
             "com.bytechef.hermes.connection"
         })
     @EnableAutoConfiguration
+    @Import(WorkerDefinitionRegistryConfiguration.class)
     @Configuration
-    public static class RestComponentTaskHandlerIntTestConfiguration {
+    public static class OpenApiComponentTaskHandlerIntTestConfiguration {
 
         @Bean
         ObjectMapper objectMapper() {

@@ -17,8 +17,12 @@
 
 package com.bytechef.hermes.connection.facade;
 
+import com.bytechef.hermes.component.constant.ComponentConstants;
+import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -29,6 +33,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
 
 /**
  * @author Ivica Cardic
@@ -36,12 +41,17 @@ import java.util.Objects;
 @Transactional
 public class ConnectionFacadeImpl implements ConnectionFacade {
 
+    private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
     private final TagService tagService;
 
     @SuppressFBWarnings("EI2")
-    public ConnectionFacadeImpl(ConnectionService connectionService, TagService tagService) {
+    public ConnectionFacadeImpl(
+        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
+        TagService tagService) {
+
         this.connectionService = connectionService;
+        this.connectionDefinitionService = connectionDefinitionService;
         this.tagService = tagService;
     }
 
@@ -50,6 +60,43 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     public Connection create(Connection connection) {
         if (!CollectionUtils.isEmpty(connection.getTags())) {
             connection.setTags(tagService.save(connection.getTags()));
+        }
+
+        if (connection.getAuthorizationName() != null &&
+            connection.containsParameter(ComponentConstants.AUTHORIZATION_CODE)) {
+
+            ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionDefinitions(
+                connection.getComponentName())
+                .stream()
+                .filter(curConnectionDefinition -> curConnectionDefinition.getVersion() == connection
+                    .getConnectionVersion())
+                .findFirst()
+                .orElseThrow();
+
+            Authorization authorization = connectionDefinition.getAuthorizations()
+                .stream()
+                .filter(
+                    curAuthorization -> Objects.equals(curAuthorization.getName(), connection.getAuthorizationName()))
+                .findFirst()
+                .orElseThrow();
+
+            // TODO add support for OAUTH2_AUTHORIZATION_CODE_PKCE
+
+            Authorization.AuthorizationType authorizationType = authorization.getType();
+
+            if (authorizationType == Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
+                authorizationType == Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
+
+                BiFunction<com.bytechef.hermes.component.Connection, String, Authorization.AuthorizationCallbackResponse> authorizationCallbackFunction = authorization
+                    .getAuthorizationCallbackFunction();
+
+                Authorization.AuthorizationCallbackResponse authorizationCallbackResponse = authorizationCallbackFunction
+                    .apply(
+                        connection.toComponentConnection(),
+                        connection.getParameter(ComponentConstants.AUTHORIZATION_CODE));
+
+                connection.putAllParameters(authorizationCallbackResponse.toMap());
+            }
         }
 
         return connectionService.create(connection);

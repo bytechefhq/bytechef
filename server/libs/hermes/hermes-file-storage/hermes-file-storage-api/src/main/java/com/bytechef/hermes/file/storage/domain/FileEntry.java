@@ -75,6 +75,14 @@ public class FileEntry {
         this.url = url;
     }
 
+    public static com.bytechef.hermes.component.FileEntry toComponentFileEntry(Map<?, ?> source) {
+        return new FileEntryImpl(
+            (String) source.get("extension"),
+            (String) source.get("mimeType"),
+            (String) source.get("name"),
+            (String) source.get("url"));
+    }
+
     public String getExtension() {
         return extension;
     }
@@ -111,6 +119,10 @@ public class FileEntry {
         return Objects.hash(extension, mimeType, name, url);
     }
 
+    public com.bytechef.hermes.component.FileEntry toComponentFileEntry() {
+        return new FileEntryImpl(this);
+    }
+
     public Map<String, String> toMap() {
         return Map.of(
             "extension", getExtension(),
@@ -126,5 +138,54 @@ public class FileEntry {
             + mimeType + '\'' + ", name='"
             + name + '\'' + ", url='"
             + url + '\'' + '}';
+    }
+
+    private static class FileEntryImpl implements com.bytechef.hermes.component.FileEntry {
+
+        private final String extension;
+        private final String mimeType;
+        private final String name;
+        private final String url;
+
+        public FileEntryImpl(String extension, String mimeType, String name, String url) {
+            this.extension = extension;
+            this.mimeType = mimeType;
+            this.name = name;
+            this.url = url;
+        }
+
+        public FileEntryImpl(FileEntry fileEntry) {
+            this(fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getName(), fileEntry.getUrl());
+        }
+
+        @Override
+        public String getExtension() {
+            return extension;
+        }
+
+        @Override
+        public String getMimeType() {
+            return mimeType;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public String getUrl() {
+            return url;
+        }
+
+        @Override
+        public String toString() {
+            return "FileEntryImpl{" +
+                "extension='" + extension + '\'' +
+                ", mimeType='" + mimeType + '\'' +
+                ", name='" + name + '\'' +
+                ", url='" + url + '\'' +
+                '}';
+        }
     }
 }

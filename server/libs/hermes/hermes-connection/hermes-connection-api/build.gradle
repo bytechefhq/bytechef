@@ -2,4 +2,7 @@ dependencies {
     api "org.springframework.data:spring-data-jdbc"
     api project(":server:libs:core:commons:commons-data")
     api project(":server:libs:core:tag:tag-api")
+    api project(":server:libs:hermes:hermes-component:hermes-component-api")
+
+    implementation project(":server:libs:core:commons:commons-util")
 }

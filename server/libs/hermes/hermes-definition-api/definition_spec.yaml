@@ -110,11 +110,6 @@ schemas:
             description: The minimum property value.
             type: integer
             format: int32
-  NullProperty:
-    description: A null property type.
-    type: object
-    allOf:
-      - $ref: '#/schemas/Property'
   NumberProperty:
     description: A number property type.
     type: object
@@ -203,7 +198,6 @@ schemas:
         DATE: '#/schemas/DateProperty'
         DATE_TIME: '#/schemas/DateTimeProperty'
         INTEGER: '#/schemas/IntegerProperty'
-        "NULL": '#/schemas/NullProperty'
         NUMBER: '#/schemas/NumberProperty'
         STRING: '#/schemas/StringProperty'
         OBJECT: '#/schemas/ObjectProperty'

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.utils;
+package com.bytechef.hermes.component.util;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class ObjectUtils {
+public final class ObjectUtils {
 
     public static boolean isEmpty(final Object object) {
         if (object == null) {

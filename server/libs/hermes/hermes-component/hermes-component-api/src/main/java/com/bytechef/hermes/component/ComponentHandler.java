@@ -29,7 +29,7 @@ public interface ComponentHandler extends ComponentDefinitionFactory {
 
     /**
      * This can be useful if we still want to have only one method to handle all actions. It is called when
-     * <code>performFunction</code> of the <code>ActionDefinition</code> instance is null.
+     * <code>performFunction</code> of an <code>ActionDefinition</code> instance is null.
      *
      * @param actionDefinition
      * @param context

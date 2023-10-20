@@ -26,6 +26,7 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.impl.ContextImpl;
 import com.bytechef.hermes.component.impl.ExecutionParametersImpl;
+import com.bytechef.hermes.component.util.ContextSupplier;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -60,11 +61,13 @@ public class DefaultComponentTaskHandler implements TaskHandler<Object> {
         Context context = new ContextImpl(
             connectionDefinition, connectionService, eventPublisher, fileStorageService, taskExecution);
 
-        return actionDefinition
-            .getPerformFunction()
-            .map(performFunction -> performFunction.apply(context,
-                new ExecutionParametersImpl(taskExecution.getParameters())))
-            .orElseGet(() -> componentHandler.handle(
-                actionDefinition, context, new ExecutionParametersImpl(taskExecution.getParameters())));
+        return ContextSupplier.get(
+            context,
+            () -> actionDefinition
+                .getPerformFunction()
+                .map(performFunction -> performFunction.apply(
+                    context, new ExecutionParametersImpl(taskExecution.getParameters())))
+                .orElseGet(() -> componentHandler.handle(
+                    actionDefinition, context, new ExecutionParametersImpl(taskExecution.getParameters()))));
     }
 }

@@ -31,6 +31,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,7 +40,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Ivica Cardic
  */
 @EmbeddedSql
-@SpringBootTest(classes = ConnectionIntTestConfiguration.class)
+@SpringBootTest(classes = {
+    ConnectionIntTestConfiguration.class, ConnectionServiceIntTest.ConnectionServiceIntTestConfiguration.class
+})
 public class ConnectionServiceIntTest {
 
     @Autowired
@@ -128,5 +132,14 @@ public class ConnectionServiceIntTest {
         connection.setVersion(1);
 
         return connection;
+    }
+
+    @TestConfiguration
+    public static class ConnectionServiceIntTestConfiguration {
+
+        @Bean
+        ConnectionService connectionService(ConnectionRepository connectionRepository) {
+            return new ConnectionServiceImpl(connectionRepository);
+        }
     }
 }

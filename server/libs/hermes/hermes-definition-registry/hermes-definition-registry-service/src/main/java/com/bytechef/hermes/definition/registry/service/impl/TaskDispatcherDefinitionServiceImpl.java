@@ -41,9 +41,10 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     }
 
     @Override
-    public Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitions() {
-        return Mono.just(taskDispatcherDefinitionFactories.stream()
-            .map(TaskDispatcherDefinitionFactory::getDefinition)
-            .collect(Collectors.toList()));
+    public Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitionsMono() {
+        return Mono.just(
+            taskDispatcherDefinitionFactories.stream()
+                .map(TaskDispatcherDefinitionFactory::getDefinition)
+                .collect(Collectors.toList()));
     }
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.utils;
+package com.bytechef.hermes.component.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -40,7 +40,7 @@ import java.util.stream.Stream;
 /**
  * @author Ivica Cardic
  */
-public class JsonUtils {
+public final class JsonUtils {
 
     private static final ObjectMapper objectMapper = new ObjectMapper() {
         {

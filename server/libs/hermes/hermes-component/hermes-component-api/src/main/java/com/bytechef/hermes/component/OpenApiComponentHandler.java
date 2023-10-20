@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author Ivica Cardic
  */
-public interface RestComponentHandler extends ComponentDefinitionFactory {
+public interface OpenApiComponentHandler extends ComponentDefinitionFactory {
 
     enum PropertyType {
         BODY, PATH, HEADER, QUERY

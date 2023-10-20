@@ -41,10 +41,6 @@ public class MapWrapper {
         return new HashMap<>(map);
     }
 
-    public void put(String key, Object value) {
-        this.map.put(key, value);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {

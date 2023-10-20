@@ -1,4 +1,6 @@
 dependencies {
+    api project(":server:libs:hermes:hermes-component:hermes-component-api")
+
     implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation libs.org.apache.tika.tika.core
 

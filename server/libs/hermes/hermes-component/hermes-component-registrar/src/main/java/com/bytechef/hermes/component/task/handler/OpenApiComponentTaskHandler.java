@@ -22,11 +22,12 @@ import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.RestComponentHandler;
+import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.impl.ContextImpl;
-import com.bytechef.hermes.component.rest.RestClient;
+import com.bytechef.hermes.component.oas.OpenApiClient;
+import com.bytechef.hermes.component.util.ContextSupplier;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -34,28 +35,29 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * @author Ivica Cardic
  */
-public class RestComponentTaskHandler implements TaskHandler<Object> {
+public class OpenApiComponentTaskHandler implements TaskHandler<Object> {
 
-    private static final RestClient REST_CLIENT = new RestClient();
+    private static final OpenApiClient REST_CLIENT = new OpenApiClient();
 
     private final ActionDefinition actionDefinition;
     private final ConnectionDefinition connectionDefinition;
     private final ConnectionService connectionService;
-    private final RestComponentHandler restComponentHandler;
+    private final OpenApiComponentHandler openApiComponentHandler;
 
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
 
     @SuppressFBWarnings("EI2")
-    public RestComponentTaskHandler(
+    public OpenApiComponentTaskHandler(
         ActionDefinition actionDefinition, ConnectionDefinition connectionDefinition,
-        ConnectionService connectionService, RestComponentHandler restComponentHandler, EventPublisher eventPublisher,
+        ConnectionService connectionService, OpenApiComponentHandler openApiComponentHandler,
+        EventPublisher eventPublisher,
         FileStorageService fileStorageService) {
 
         this.actionDefinition = actionDefinition;
         this.connectionDefinition = connectionDefinition;
         this.connectionService = connectionService;
-        this.restComponentHandler = restComponentHandler;
+        this.openApiComponentHandler = openApiComponentHandler;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
     }
@@ -65,11 +67,15 @@ public class RestComponentTaskHandler implements TaskHandler<Object> {
         Context context = new ContextImpl(
             connectionDefinition, connectionService, eventPublisher, fileStorageService, taskExecution);
 
-        try {
-            return restComponentHandler.postExecute(
-                actionDefinition, REST_CLIENT.execute(actionDefinition, context, taskExecution));
-        } catch (Exception e) {
-            throw new TaskExecutionException(e.getMessage(), e);
-        }
+        return ContextSupplier.get(
+            context,
+            () -> {
+                try {
+                    return openApiComponentHandler.postExecute(
+                        actionDefinition, REST_CLIENT.execute(actionDefinition, context, taskExecution));
+                } catch (Exception e) {
+                    throw new TaskExecutionException(e.getMessage(), e);
+                }
+            });
     }
 }

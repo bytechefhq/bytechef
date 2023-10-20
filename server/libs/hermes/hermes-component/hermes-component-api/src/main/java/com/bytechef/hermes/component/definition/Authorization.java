@@ -17,9 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
-import static com.bytechef.hermes.component.constant.ComponentConstants.ACCESS_TOKEN;
 import static com.bytechef.hermes.component.constant.ComponentConstants.ADD_TO;
-import static com.bytechef.hermes.component.constant.ComponentConstants.API_TOKEN;
 import static com.bytechef.hermes.component.constant.ComponentConstants.HEADER_PREFIX;
 import static com.bytechef.hermes.component.constant.ComponentConstants.KEY;
 import static com.bytechef.hermes.component.constant.ComponentConstants.PASSWORD;
@@ -32,7 +30,9 @@ import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,6 +45,10 @@ import java.util.function.Function;
  */
 @JsonDeserialize(as = ComponentDSL.ModifiableAuthorization.class)
 public sealed interface Authorization permits ComponentDSL.ModifiableAuthorization {
+
+    String API_TOKEN = "api_token";
+    String ACCESS_TOKEN = "access_token";
+    String REFRESH_TOKEN = "refresh_token";
 
     enum AuthorizationType {
         API_KEY((AuthorizationContext authorizationContext, Connection connection) -> {
@@ -62,12 +66,15 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
             .setUsernamePassword(connection.getParameter(USERNAME), connection.getParameter(PASSWORD))),
         BEARER_TOKEN(
             (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext.setHeaders(
-                Map.of("Authorization", List.of("Bearer " + connection.getParameter(TOKEN))))),
+                Map.of(Constants.AUTHORIZATION, List.of(Constants.BEARER + " " + connection.getParameter(TOKEN))))),
         CUSTOM(null),
         DIGEST_AUTH((AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
             .setUsernamePassword(
                 connection.getParameter(USERNAME), connection.getParameter(PASSWORD))),
         OAUTH2_AUTHORIZATION_CODE(
+            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
+                .setHeaders(getOAuth2Headers(connection))),
+        OAUTH2_AUTHORIZATION_CODE_PKCE(
             (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
                 .setHeaders(getOAuth2Headers(connection))),
         OAUTH2_CLIENT_CREDENTIALS(
@@ -90,11 +97,16 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
             return defaultApplyConsumer;
         }
 
+        private static class Constants {
+            private static final String AUTHORIZATION = "Authorization";
+            private static final String BEARER = "Bearer";
+        }
+
         private static Map<String, List<String>> getOAuth2Headers(Connection connection) {
             return Map.of(
-                "Authorization",
+                Constants.AUTHORIZATION,
                 List.of(
-                    connection.getParameter(HEADER_PREFIX, "Bearer") + " " +
+                    connection.getParameter(HEADER_PREFIX, Constants.BEARER) + " " +
                         connection.getParameter(ACCESS_TOKEN)));
         }
     }
@@ -104,21 +116,29 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
         QUERY_PARAMETERS,
     }
 
+    Optional<Function<Connection, String>> getAcquireFunction();
+
     BiConsumer<AuthorizationContext, Connection> getApplyConsumer();
 
-    Optional<BiFunction<Connection, String, Object>> getAuthorizationCallbackFunction();
+    BiFunction<Connection, String, AuthorizationCallbackResponse> getAuthorizationCallbackFunction();
 
     Function<Connection, String> getAuthorizationUrlFunction();
+
+    Function<Connection, String> getCallbackUrlFunction();
 
     Function<Connection, String> getClientIdFunction();
 
     Function<Connection, String> getClientSecretFunction();
 
+    List<Object> getDetectOn();
+
     Display getDisplay();
 
     String getName();
 
-    List<Object> getOnRefresh();
+    List<Object> getRefreshOn();
+
+    BiFunction<String, String, Pkce> getPkceFunction();
 
     List<Property<?>> getProperties();
 
@@ -131,4 +151,23 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
     Function<Connection, String> getTokenUrlFunction();
 
     AuthorizationType getType();
+
+    @SuppressFBWarnings("EI")
+    record AuthorizationCallbackResponse(
+        String accessToken, String refreshToken, Map<String, Object> additionalParameters) {
+
+        public Map<String, Object> toMap() {
+            Map<String, Object> map = new HashMap<>();
+
+            map.put(ACCESS_TOKEN, accessToken);
+            map.put(REFRESH_TOKEN, refreshToken);
+
+            map.putAll(additionalParameters);
+
+            return map;
+        }
+    }
+
+    record Pkce(String verifier, String challenge, String challengeMethod) {
+    }
 }

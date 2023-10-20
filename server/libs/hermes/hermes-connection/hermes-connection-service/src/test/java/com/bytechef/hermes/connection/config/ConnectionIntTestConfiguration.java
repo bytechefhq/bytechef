@@ -29,7 +29,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 import java.util.Arrays;
@@ -38,11 +37,6 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-@ComponentScan(
-    basePackages = {
-        "com.bytechef.hermes.connection",
-        "com.bytechef.tag"
-    })
 @EnableAutoConfiguration
 @SpringBootConfiguration
 public class ConnectionIntTestConfiguration {

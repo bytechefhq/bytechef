@@ -27,5 +27,5 @@ import java.util.List;
  */
 public interface TaskDispatcherDefinitionService {
 
-    Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitions();
+    Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitionsMono();
 }

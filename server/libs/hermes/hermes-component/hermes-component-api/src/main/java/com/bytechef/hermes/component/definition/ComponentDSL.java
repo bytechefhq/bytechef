@@ -22,6 +22,7 @@ import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.constant.ComponentConstants;
+import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.definition.DefinitionDSL;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
@@ -31,7 +32,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -192,27 +192,53 @@ public final class ComponentDSL extends DefinitionDSL {
     public static final class ModifiableAuthorization implements Authorization {
 
         @JsonIgnore
+        private Optional<Function<Connection, String>> acquireFunction;
+
+        @JsonIgnore
         private BiConsumer<AuthorizationContext, Connection> applyConsumer;
 
         @JsonIgnore
-        private BiFunction<Connection, String, Object> authorizationCallbackFunction;
+        private BiFunction<Connection, String, AuthorizationCallbackResponse> authorizationCallbackFunction = (
+            connection, authorizationCode) -> {
+            Function<Connection, String> callbackUrlFunction = getCallbackUrlFunction();
+            Function<Connection, String> tokenUrlFunction = getTokenUrlFunction();
+
+            @SuppressWarnings("unchecked")
+            Map<String, Object> result = (Map<String, Object>) HttpClientUtils.get(tokenUrlFunction.apply(connection))
+                .payload(
+                    HttpClientUtils.Payload.of(Map.of(
+                        "grant_type", "authorization_code",
+                        "code", authorizationCode,
+                        "redirect_uri", callbackUrlFunction.apply(connection))))
+                .execute();
+
+            return new AuthorizationCallbackResponse(
+                (String) result.get(ACCESS_TOKEN), (String) result.get(REFRESH_TOKEN), Map.of());
+        };
 
         @JsonIgnore
-        private Function<Connection, String> authorizationUrlFunction = connectionParameters -> connectionParameters
+        private Function<Connection, String> authorizationUrlFunction = connection -> connection
             .getParameter(ComponentConstants.AUTHORIZATION_URL);
 
         @JsonIgnore
-        private Function<Connection, String> clientIdFunction = connectionParameters -> connectionParameters
+        private Function<Connection, String> callbackUrlFunction = connection -> connection
+            .getParameter(ComponentConstants.CALLBACK_URL);
+
+        @JsonIgnore
+        private Function<Connection, String> clientIdFunction = connection -> connection
             .getParameter(ComponentConstants.CLIENT_ID);
 
         @JsonIgnore
-        private Function<Connection, String> clientSecretFunction = connectionParameters -> connectionParameters
+        private Function<Connection, String> clientSecretFunction = connection -> connection
             .getParameter(ComponentConstants.CLIENT_SECRET);
+
+        @JsonIgnore
+        private List<Object> detectOn;
 
         private Display display;
 
         @JsonIgnore
-        private List<Object> onRefresh;
+        private List<Object> refreshOn;
 
         private List<Property<?>> properties;
 
@@ -220,8 +246,17 @@ public final class ComponentDSL extends DefinitionDSL {
         private Function<Connection, String> refreshFunction;
 
         @JsonIgnore
-        private Function<Connection, String> refreshUrlFunction = connectionParameters -> connectionParameters
-            .getParameter(ComponentConstants.REFRESH_URL);
+        private Function<Connection, String> refreshUrlFunction = connection -> {
+            String refreshUrl = connection.getParameter(ComponentConstants.REFRESH_URL);
+
+            if (refreshUrl == null) {
+                Function<Connection, String> tokeUrlFunction = getTokenUrlFunction();
+
+                refreshUrl = tokeUrlFunction.apply(connection);
+            }
+
+            return refreshUrl;
+        };
 
         @JsonIgnore
         private Function<Connection, List<String>> scopesFunction = connectionParameters -> connectionParameters
@@ -232,6 +267,10 @@ public final class ComponentDSL extends DefinitionDSL {
             .getParameter(ComponentConstants.TOKEN_URL);
 
         private String name;
+
+        @JsonIgnore
+        private BiFunction<String, String, Pkce> pkceFunction = (verifier, challenge) -> new Pkce(verifier, challenge,
+            "SHA256");
         private AuthorizationType type;
 
         private ModifiableAuthorization() {
@@ -243,6 +282,14 @@ public final class ComponentDSL extends DefinitionDSL {
             this.applyConsumer = type.getDefaultApplyConsumer();
         }
 
+        public ModifiableAuthorization acquire(Function<Connection, String> acquireFunction) {
+            if (acquireFunction != null) {
+                this.acquireFunction = Optional.of(acquireFunction);
+            }
+
+            return this;
+        }
+
         public ModifiableAuthorization apply(BiConsumer<AuthorizationContext, Connection> applyConsumer) {
             if (applyConsumer != null) {
                 this.applyConsumer = applyConsumer;
@@ -252,7 +299,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public ModifiableAuthorization authorizationCallback(
-            BiFunction<Connection, String, Object> authorizationCallbackFunction) {
+            BiFunction<Connection, String, AuthorizationCallbackResponse> authorizationCallbackFunction) {
             this.authorizationCallbackFunction = authorizationCallbackFunction;
 
             return this;
@@ -282,15 +329,31 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
+        public ModifiableAuthorization detectOn(Object... detectOn) {
+            if (detectOn != null) {
+                this.detectOn = List.of(detectOn);
+            }
+
+            return this;
+        }
+
         public ModifiableAuthorization display(ModifiableDisplay display) {
             this.display = display;
 
             return this;
         }
 
-        public ModifiableAuthorization onRefresh(Object... onRefresh) {
-            if (onRefresh != null) {
-                this.onRefresh = List.of(onRefresh);
+        public ModifiableAuthorization refreshOn(Object... refreshOn) {
+            if (refreshOn != null) {
+                this.refreshOn = List.of(refreshOn);
+            }
+
+            return this;
+        }
+
+        public ModifiableAuthorization pkce(BiFunction<String, String, Pkce> pkceFunction) {
+            if (pkceFunction != null) {
+                this.pkceFunction = pkceFunction;
             }
 
             return this;
@@ -335,18 +398,28 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        public Optional<Function<Connection, String>> getAcquireFunction() {
+            return acquireFunction;
+        }
+
+        @Override
         public BiConsumer<AuthorizationContext, Connection> getApplyConsumer() {
             return applyConsumer;
         }
 
         @Override
-        public Optional<BiFunction<Connection, String, Object>> getAuthorizationCallbackFunction() {
-            return Optional.ofNullable(authorizationCallbackFunction);
+        public BiFunction<Connection, String, AuthorizationCallbackResponse> getAuthorizationCallbackFunction() {
+            return authorizationCallbackFunction;
         }
 
         @Override
         public Function<Connection, String> getAuthorizationUrlFunction() {
             return authorizationUrlFunction;
+        }
+
+        @Override
+        public Function<Connection, String> getCallbackUrlFunction() {
+            return callbackUrlFunction;
         }
 
         @Override
@@ -360,6 +433,11 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        public List<Object> getDetectOn() {
+            return detectOn;
+        }
+
+        @Override
         public Display getDisplay() {
             return display;
         }
@@ -370,8 +448,13 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public List<Object> getOnRefresh() {
-            return onRefresh;
+        public List<Object> getRefreshOn() {
+            return refreshOn;
+        }
+
+        @Override
+        public BiFunction<String, String, Pkce> getPkceFunction() {
+            return pkceFunction;
         }
 
         @Override
@@ -560,12 +643,12 @@ public final class ComponentDSL extends DefinitionDSL {
 
     public static final class ModifiableConnectionDefinition implements ConnectionDefinition {
 
-        private List<? extends Authorization> authorizations = Collections.emptyList();
+        private List<? extends Authorization> authorizations;
         private String componentName;
 
         @JsonIgnore
         private Function<Connection, String> baseUriFunction = (
-            connectionParameters) -> connectionParameters.containsKey(BASE_URI)
+            connectionParameters) -> connectionParameters.containsParameter(BASE_URI)
                 ? connectionParameters.getParameter(BASE_URI) : null;
 
         private Display display;
@@ -661,8 +744,9 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Boolean isAuthorizationRequired() {
-            return authorizationRequired;
+        public boolean isAuthorizationRequired() {
+            return authorizationRequired == null ||
+                authorizationRequired && authorizations != null && !authorizations.isEmpty();
         }
 
         @Override
