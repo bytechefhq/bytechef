@@ -3,9 +3,9 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.helios.connection.web.rest;
+package com.bytechef.hermes.connection.web.rest;
 
-import com.bytechef.helios.connection.web.rest.model.OAuth2PropertiesModel;
+import com.bytechef.hermes.connection.web.rest.model.OAuth2PropertiesModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,9 +32,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-08T12:06:03.369320+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-09T06:35:25.755050+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "connection-oauth2-properties", description = "the connection-oauth2-properties API")
+@Tag(name = "connection-oauth2-properties", description = "The Core Connection OAuth2 API")
 public interface ConnectionOauth2PropertiesApi {
 
     default Optional<NativeWebRequest> getRequest() {

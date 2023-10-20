@@ -1,4 +1,4 @@
-package com.bytechef.helios.connection.web.rest.model;
+package com.bytechef.hermes.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OAuth2Properties")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-08T12:06:03.369320+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-09T06:35:25.755050+02:00[Europe/Zagreb]")
 public class OAuth2PropertiesModel {
 
   private String redirectUri;
