@@ -26,41 +26,34 @@ import com.bytechef.component.datastorage.action.DataStorageGetAllKeysAction;
 import com.bytechef.component.datastorage.action.DataStorageGetValueAction;
 import com.bytechef.component.datastorage.action.DataStorageSetValueInListAction;
 import com.bytechef.component.datastorage.action.DataStorageSetValueAction;
-import com.bytechef.hermes.component.ComponentDefinitionFactory;
+import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.data.storage.service.DataStorageService;
-import org.springframework.stereotype.Component;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
 /**
  * @author Ivica Cardic
  */
-@Component
-public class DataStorageComponentHandler implements ComponentDefinitionFactory {
+public class DataStorageComponentHandler implements ComponentHandler {
 
-    private final ComponentDefinition componentDefinition;
-
-    public DataStorageComponentHandler(DataStorageService dataStorageService) {
-        componentDefinition = component("dataStorage")
-            .title("Data Storage")
-            .description(
-                "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.")
-            .icon("path:assets/datastorage.svg")
-            .actions(
-                new DataStorageAppendValueToListAction(dataStorageService).actionDefinition,
-                new DataStorageAtomicIncrementAction(dataStorageService).actionDefinition,
-                new DataStorageAwaitGetValueAction(dataStorageService).actionDefinition,
-                new DataStorageDeleteValueAction(dataStorageService).actionDefinition,
-                new DataStorageDeleteValueFromListAction(dataStorageService).actionDefinition,
-                new DataStorageGetAllKeysAction(dataStorageService).actionDefinition,
-                new DataStorageGetValueAction(dataStorageService).actionDefinition,
-                new DataStorageSetValueAction(dataStorageService).actionDefinition,
-                new DataStorageSetValueInListAction(dataStorageService).actionDefinition);
-    }
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("dataStorage")
+        .title("Data Storage")
+        .description(
+            "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.")
+        .icon("path:assets/datastorage.svg")
+        .actions(
+            DataStorageAppendValueToListAction.ACTION_DEFINITION,
+            DataStorageAtomicIncrementAction.ACTION_DEFINITION,
+            DataStorageAwaitGetValueAction.ACTION_DEFINITION,
+            DataStorageDeleteValueAction.ACTION_DEFINITION,
+            DataStorageDeleteValueFromListAction.ACTION_DEFINITION,
+            DataStorageGetAllKeysAction.ACTION_DEFINITION,
+            DataStorageGetValueAction.ACTION_DEFINITION,
+            DataStorageSetValueAction.ACTION_DEFINITION,
+            DataStorageSetValueInListAction.ACTION_DEFINITION);;
 
     @Override
     public ComponentDefinition getDefinition() {
-        return componentDefinition;
+        return COMPONENT_DEFINITION;
     }
 }

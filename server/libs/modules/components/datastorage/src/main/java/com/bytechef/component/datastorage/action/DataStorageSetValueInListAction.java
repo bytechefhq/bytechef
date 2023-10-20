@@ -20,7 +20,6 @@ package com.bytechef.component.datastorage.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.data.storage.service.DataStorageService;
 
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.INDEX;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.KEY;
@@ -43,7 +42,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class DataStorageSetValueInListAction {
 
-    public final ActionDefinition actionDefinition = action("setValueInList")
+    public static final ActionDefinition ACTION_DEFINITION = action("setValueInList")
         .title("Set Value in List")
         .description("Set value under a specified index in a list.")
         .properties(
@@ -66,16 +65,10 @@ public class DataStorageSetValueInListAction {
                 .label("Value")
                 .description("The value to set under the specified list's key.")
                 .required(true))
-        .execute(this::execute);
+        .execute(DataStorageSetValueInListAction::execute);
 
-    private final DataStorageService dataStorageService;
-
-    public DataStorageSetValueInListAction(DataStorageService dataStorageService) {
-        this.dataStorageService = dataStorageService;
-    }
-
-    protected Object execute(ActionContext actionContext, InputParameters inputParameters) {
-        System.out.println(dataStorageService.toString());
+    protected static Object execute(ActionContext actionContext, InputParameters inputParameters) {
+        System.out.println(actionContext.toString());
 
         return null;
     }

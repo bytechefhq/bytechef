@@ -21,7 +21,6 @@ import com.bytechef.component.datastorage.constant.DataStorageConstants;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.data.storage.service.DataStorageService;
 
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE_OPTIONS;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
@@ -40,7 +39,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class DataStorageAppendValueToListAction {
 
-    public final ActionDefinition actionDefinition = action("appendValueToList")
+    public static final ActionDefinition ACTION_DEFINITION = action("appendValueToList")
         .title("Append Value to List")
         .description("Append value to the end of a list. If the list does not exist, it will be created.")
         .properties(
@@ -67,16 +66,10 @@ public class DataStorageAppendValueToListAction {
                 .label("Append a list as a single item")
                 .description(
                     "When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists."))
-        .execute(this::execute);
+        .execute(DataStorageAppendValueToListAction::execute);
 
-    private final DataStorageService dataStorageService;
-
-    public DataStorageAppendValueToListAction(DataStorageService dataStorageService) {
-        this.dataStorageService = dataStorageService;
-    }
-
-    protected Object execute(ActionContext actionContext, InputParameters inputParameters) {
-        System.out.println(dataStorageService.toString());
+    protected static Object execute(ActionContext actionContext, InputParameters inputParameters) {
+        System.out.println(actionContext);
 
         return null;
     }

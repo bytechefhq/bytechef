@@ -20,7 +20,6 @@ package com.bytechef.component.datastorage.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.data.storage.service.DataStorageService;
 
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.KEY;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE;
@@ -42,7 +41,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class DataStorageSetValueAction {
 
-    public final ActionDefinition actionDefinition = action("setValue")
+    public static final ActionDefinition ACTION_DEFINITION = action("setValue")
         .title("Set Value")
         .description("Set a value under a key, in the specified scope.")
         .properties(
@@ -61,16 +60,10 @@ public class DataStorageSetValueAction {
                 .label("Value")
                 .description("The value to set under the specified key.")
                 .required(true))
-        .execute(this::execute);
+        .execute(DataStorageSetValueAction::execute);
 
-    private final DataStorageService dataStorageService;
-
-    public DataStorageSetValueAction(DataStorageService dataStorageService) {
-        this.dataStorageService = dataStorageService;
-    }
-
-    protected Object execute(ActionContext actionContext, InputParameters inputParameters) {
-        System.out.println(dataStorageService.toString());
+    protected static Object execute(ActionContext actionContext, InputParameters inputParameters) {
+        System.out.println(actionContext.toString());
 
         return null;
     }

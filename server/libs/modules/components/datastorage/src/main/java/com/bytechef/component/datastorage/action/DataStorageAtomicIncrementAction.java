@@ -20,7 +20,6 @@ package com.bytechef.component.datastorage.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.data.storage.service.DataStorageService;
 
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.KEY;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE;
@@ -36,7 +35,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class DataStorageAtomicIncrementAction {
 
-    public final ActionDefinition actionDefinition = action("atomicIncrement")
+    public static final ActionDefinition ACTION_DEFINITION = action("atomicIncrement")
         .title("Atomic Increment")
         .description(
             "The numeric value can be incremented atomically, and the action can be used concurrently from multiple executions.")
@@ -55,16 +54,10 @@ public class DataStorageAtomicIncrementAction {
                 .description(
                     "The value that can be added to the existing numeric value, which may have a negative value.")
                 .defaultValue(1))
-        .execute(this::execute);
+        .execute(DataStorageAtomicIncrementAction::execute);
 
-    private final DataStorageService dataStorageService;
-
-    public DataStorageAtomicIncrementAction(DataStorageService dataStorageService) {
-        this.dataStorageService = dataStorageService;
-    }
-
-    protected Object execute(ActionContext actionContext, InputParameters inputParameters) {
-        System.out.println(dataStorageService.toString());
+    protected static Object execute(ActionContext actionContext, InputParameters inputParameters) {
+        System.out.println(actionContext.toString());
 
         return null;
     }

@@ -20,7 +20,6 @@ package com.bytechef.component.datastorage.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.data.storage.service.DataStorageService;
 
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.KEY;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE;
@@ -34,7 +33,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class DataStorageDeleteValueAction {
 
-    public final ActionDefinition actionDefinition = action("deleteValue")
+    public static final ActionDefinition ACTION_DEFINITION = action("deleteValue")
         .title("Delete Value")
         .description("Remove a value associated with a key in the specified scope.")
         .properties(
@@ -48,16 +47,10 @@ public class DataStorageDeleteValueAction {
                     "The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.")
                 .options(SCOPE_OPTIONS)
                 .required(true))
-        .execute(this::execute);
+        .execute(DataStorageDeleteValueAction::execute);
 
-    private final DataStorageService dataStorageService;
-
-    public DataStorageDeleteValueAction(DataStorageService dataStorageService) {
-        this.dataStorageService = dataStorageService;
-    }
-
-    protected Object execute(ActionContext actionContext, InputParameters inputParameters) {
-        System.out.println(dataStorageService.toString());
+    protected static Object execute(ActionContext actionContext, InputParameters inputParameters) {
+        System.out.println(actionContext.toString());
 
         return null;
     }
