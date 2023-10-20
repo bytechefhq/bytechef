@@ -1,5 +1,5 @@
-import {OAuth2PropertiesModel} from '@/middleware/hermes/connection';
-import {Oauth2Api} from '@/middleware/hermes/connection/apis/Oauth2Api';
+import {OAuth2PropertiesModel} from '@/middleware/hermes/configuration';
+import {Oauth2Api} from '@/middleware/hermes/configuration/apis/Oauth2Api';
 import {useQuery} from '@tanstack/react-query';
 
 export const OAuth2PropertiesKeys = {
