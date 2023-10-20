@@ -61,14 +61,13 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
 
     @Override
     public List<TaskExecution> getJobTaskExecutions(long jobId) {
-        return taskExecutionRepository.findAllByJobRefOrderByCreatedDate(
-            new AggregateReference.IdOnlyAggregateReference<>(jobId));
+        return taskExecutionRepository.findAllByJobRefOrderByCreatedDate(AggregateReference.to(jobId));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<TaskExecution> getParentTaskExecutions(long parentId) {
-        return taskExecutionRepository.findAllByParentRef(new AggregateReference.IdOnlyAggregateReference<>(parentId));
+        return taskExecutionRepository.findAllByParentRef(AggregateReference.to(parentId));
     }
 
     @Override

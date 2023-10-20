@@ -221,7 +221,17 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @SuppressFBWarnings("NP")
     private Workflow save(Workflow workflow, WorkflowCrudRepository workflowCrudRepository) {
-        workflow = workflowCrudRepository.save(workflow);
+        if (workflow.isNew()) {
+            workflow = workflowCrudRepository.save(workflow);
+        } else {
+            Workflow curWorkflow = workflowCrudRepository.findById(workflow.getId())
+                .orElseThrow();
+
+            curWorkflow.setDefinition(workflow.getDefinition());
+            curWorkflow.setVersion(workflow.getVersion());
+
+            workflow = workflowCrudRepository.save(curWorkflow);
+        }
 
         Cache cacheOne = Objects.requireNonNull(cacheManager.getCache(CACHE_ONE));
 
