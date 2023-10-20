@@ -33,6 +33,7 @@ import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -44,6 +45,7 @@ import java.util.Map;
  * @author Ivica Cardic
  * @author Matija Petanjek
  */
+@Configuration
 public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
     private final TaskExecutionService taskExecutionService;

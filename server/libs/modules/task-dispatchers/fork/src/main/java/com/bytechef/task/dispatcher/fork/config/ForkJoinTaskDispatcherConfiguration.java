@@ -28,10 +28,12 @@ import com.bytechef.task.dispatcher.fork.ForkJoinTaskDispatcher;
 import com.bytechef.task.dispatcher.fork.completion.ForkJoinTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Ivica Cardic
  */
+@Configuration
 public class ForkJoinTaskDispatcherConfiguration {
 
     @Autowired
