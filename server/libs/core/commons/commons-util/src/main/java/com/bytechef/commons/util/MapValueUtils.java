@@ -359,7 +359,7 @@ public final class MapValueUtils {
         }
 
         return Collections.unmodifiableMap(
-            map.entrySet()
+            value.entrySet()
                 .stream()
                 .collect(Collectors.toMap(entry -> (String) entry.getKey(), Map.Entry::getValue)));
     }
@@ -372,7 +372,7 @@ public final class MapValueUtils {
         }
 
         return Collections.unmodifiableMap(
-            map.entrySet()
+            value.entrySet()
                 .stream()
                 .collect(Collectors.toMap(entry -> (String) entry.getKey(), Map.Entry::getValue)));
     }
@@ -385,7 +385,7 @@ public final class MapValueUtils {
         }
 
         return Collections.unmodifiableMap(
-            map.entrySet()
+            value.entrySet()
                 .stream()
                 .collect(
                     Collectors.toMap(
