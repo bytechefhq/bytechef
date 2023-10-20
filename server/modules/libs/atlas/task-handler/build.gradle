@@ -1,10 +1,8 @@
 subprojects {
     dependencies {
         testImplementation "commons-io:commons-io"
-        testImplementation "mysql:mysql-connector-java"
         testImplementation "org.postgresql:postgresql"
         testImplementation "org.springframework.boot:spring-boot-starter-jdbc"
-        testImplementation "org.testcontainers:mysql"
         testImplementation "org.testcontainers:postgresql"
         testImplementation project(":modules:libs:atlas:engine-repository:engine-repository-jdbc")
         testImplementation project(":modules:libs:atlas:task-handler:task-handler-io")

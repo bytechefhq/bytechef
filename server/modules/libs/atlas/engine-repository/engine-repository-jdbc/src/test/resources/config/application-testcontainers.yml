@@ -12,8 +12,8 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:tc:mysql:8.0.26:///atlas?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=${user.timezone}&TC_TMPFS=/testtmpfs:rw
-    username: root
+    url: jdbc:tc:postgresql:///atlas
+    username: atlas
     password:
     hikari:
       poolName: Hikari
@@ -25,4 +25,4 @@ spring:
         useServerPrepStmts: true
   sql:
     init:
-      platform: mysql
+      platform: postgres

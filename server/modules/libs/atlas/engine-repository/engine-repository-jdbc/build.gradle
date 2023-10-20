@@ -6,13 +6,10 @@ dependencies {
     implementation project(":modules:libs:atlas:engine:engine-core-api")
 
     runtimeOnly "org.postgresql:postgresql"
-    runtimeOnly "mysql:mysql-connector-java"
 
     testImplementation "com.fasterxml.jackson.core:jackson-databind"
-    testImplementation "mysql:mysql-connector-java"
     testImplementation "org.postgresql:postgresql"
     testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
-    testImplementation "org.testcontainers:mysql"
     testImplementation "org.testcontainers:postgresql"
     testImplementation project(":modules:libs:atlas:engine:engine-core-impl")
     testImplementation project(":modules:libs:atlas:test-support")
