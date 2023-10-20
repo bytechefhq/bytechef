@@ -18,32 +18,8 @@
 
 package com.integri.atlas.engine.core.json;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+public interface JsonMapper {
+    <T> T deserialize(String value, Class<T> clazz);
 
-/**
- * @author Arik Cohen
- */
-public class JsonMapper {
-
-    private final ObjectMapper objectMapper;
-
-    public JsonMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
-    public <T> T deserialize(String value, Class<T> clazz) {
-        try {
-            return objectMapper.readValue(value, clazz);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public String serialize(Object value) {
-        try {
-            return objectMapper.writeValueAsString(value);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    String serialize(Object value);
 }
