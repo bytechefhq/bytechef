@@ -7,6 +7,7 @@ type InputProps = {
     fieldsetClassName?: string;
     error?: boolean;
     label?: string;
+    labelClassName?: string;
     type?: string;
 } & React.DetailedHTMLProps<
     React.InputHTMLAttributes<HTMLInputElement>,
@@ -19,6 +20,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             className,
             fieldsetClassName,
             label,
+            labelClassName,
             name,
             type = 'text',
             error,
@@ -30,7 +32,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             {label && (
                 <label
                     htmlFor={name}
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-400"
+                    className={cx(
+                        'block text-sm font-medium text-gray-700 dark:text-gray-400',
+                        labelClassName
+                    )}
                 >
                     {label}
                 </label>
@@ -38,7 +43,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
             <div
                 className={cx([
-                    'mt-1',
+                    label && 'mt-1',
                     error ? 'relative rounded-md shadow-sm' : null,
                 ])}
             >
