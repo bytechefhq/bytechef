@@ -125,17 +125,12 @@ public class AmqpMessageBrokerConfiguration
 
     @Override
     public void registerListenerEndpoint(
-        RabbitListenerEndpointRegistrar listenerEndpointRegistrar,
-        String queueName,
-        int concurrency,
-        Object delegate,
+        RabbitListenerEndpointRegistrar listenerEndpointRegistrar, String queueName, int concurrency, Object delegate,
         String methodName) {
-        logger.info(
-            "Registring AMQP Listener: {} -> {}:{}",
-            queueName,
-            delegate.getClass()
-                .getName(),
-            methodName);
+
+        Class<?> delegateClass = delegate.getClass();
+
+        logger.info("Registering AMQP Listener: {} -> {}:{}", queueName, delegateClass.getName(), methodName);
 
         Exchange exchange;
         Queue queue;
