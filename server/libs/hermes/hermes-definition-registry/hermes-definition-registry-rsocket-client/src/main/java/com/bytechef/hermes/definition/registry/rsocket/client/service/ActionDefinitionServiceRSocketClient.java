@@ -22,10 +22,12 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -59,5 +61,17 @@ public class ActionDefinitionServiceRSocketClient implements ActionDefinitionSer
             .data(
                 Map.of("componentName", componentName, "componentVersion", componentVersion, "actionName", actionName))
             .retrieveMono(ActionDefinition.class);
+    }
+
+    @Override
+    public Mono<List<ActionDefinition>> getComponentDefinitionActionsMono(String componentName, int componentVersion) {
+        return rSocketRequesterBuilder
+            .websocket(DiscoveryUtils.toWebSocketUri(
+                DiscoveryUtils.filterServiceInstance(
+                    discoveryClient.getInstances(WORKER_SERVICE_APP), componentName)))
+            .route("ActionDefinitionService.getComponentDefinitionAction")
+            .data(
+                Map.of("componentName", componentName, "componentVersion", componentVersion))
+            .retrieveMono(new ParameterizedTypeReference<>() {});
     }
 }
