@@ -8,7 +8,7 @@ inputs:
   type: "string"
   required: true
 tasks:
-- name: "condition-1"
+- name: "condition_1"
   type: "condition/v1"
   parameters:
     conditions:
@@ -27,7 +27,7 @@ tasks:
       type: "var"
       parameters:
         value: "false branch"
-- name: "condition-2"
+- name: "condition_2"
   type: "condition/v1"
   parameters:
     conditions:

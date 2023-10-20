@@ -1,25 +1,25 @@
 ---
 label: "Loop 6"
 tasks:
-- name: "loop-1"
+- name: "loop_1"
   type: "loop/v1"
   parameters:
     loopForever: true
     iteratee:
-      name: "sequence-1"
+      name: "sequence_1"
       type: "sequence/v1"
       parameters:
         tasks:
         - name: "sumVar1"
           type: "var"
           parameters:
-            value: "${1 + itemIndex}"
-        - name: "condition-1"
+            value: "${1 + loop_1.itemIndex}"
+        - name: "condition_1"
           type: "condition/v1"
           parameters:
             conditions:
             - number:
-                value1: "${itemIndex}"
+                value1: "${loop_1.itemIndex}"
                 operation: "GREATER"
                 value2: 5
             combineOperation: "ANY"

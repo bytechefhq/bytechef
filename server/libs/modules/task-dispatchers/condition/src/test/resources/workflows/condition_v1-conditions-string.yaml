@@ -8,7 +8,7 @@ inputs:
   type: "string"
   required: true
 tasks:
-- name: "condition-1"
+- name: "condition_1"
   type: "condition/v1"
   parameters:
     conditions:
@@ -27,7 +27,7 @@ tasks:
       type: "var"
       parameters:
         value: "false branch"
-- name: "condition-2"
+- name: "condition_2"
   type: "condition/v1"
   parameters:
     conditions:
@@ -46,7 +46,7 @@ tasks:
       type: "var"
       parameters:
         value: "false branch"
-- name: "condition-3"
+- name: "condition_3"
   type: "condition/v1"
   parameters:
     conditions:
@@ -65,7 +65,7 @@ tasks:
       type: "var"
       parameters:
         value: "false branch"
-- name: "condition-4"
+- name: "condition_4"
   type: "condition/v1"
   parameters:
     conditions:
@@ -84,7 +84,7 @@ tasks:
       type: "var"
       parameters:
         value: "false branch"
-- name: "condition-5"
+- name: "condition_5"
   type: "condition/v1"
   parameters:
     conditions:
@@ -103,7 +103,7 @@ tasks:
       type: "var"
       parameters:
         value: "false branch"
-- name: "condition-6"
+- name: "condition_6"
   type: "condition/v1"
   parameters:
     conditions:
@@ -122,7 +122,7 @@ tasks:
       type: "var"
       parameters:
         value: "false branch"
-- name: "condition-7"
+- name: "condition_7"
   type: "condition/v1"
   parameters:
     conditions:
@@ -141,7 +141,7 @@ tasks:
       type: "var"
       parameters:
         value: "false branch"
-- name: "condition-8"
+- name: "condition_8"
   type: "condition/v1"
   parameters:
     conditions:
