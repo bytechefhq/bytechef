@@ -63,6 +63,18 @@ public class BinaryFileTaskDescriptorTest {
                         ]
                     },
                     {
+                        "description":"The Binary property which contains the data for the file to be written.",
+                        "displayName":"Binary",
+                        "displayOption":{
+                            "show":{
+                                "operation":["WRITE"]
+                            }
+                        },
+                        "name":"binary",
+                        "required":true,
+                        "type":"JSON"
+                    },
+                    {
                         "defaultValue":"",
                         "description":"The path of the file to read.",
                         "displayName":"File Name",
@@ -89,18 +101,6 @@ public class BinaryFileTaskDescriptorTest {
                         "required":true,
                         "type":"STRING",
                         "placeholder":"/data/your_file.pdf"
-                    },
-                   {
-                        "description":"The Binary property which contains the data for the file to be written.",
-                        "displayName":"Binary",
-                        "displayOption":{
-                            "show":{
-                                "operation":["WRITE"]
-                            }
-                        },
-                        "name":"binaryItem",
-                        "required":true,
-                        "type":"BINARY"
                     }
                 ],
                 "version":1.0
