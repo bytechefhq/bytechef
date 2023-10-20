@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS workflow (
 
 CREATE INDEX IF NOT EXISTS idx_context_stack_id ON context (stack_id, classname_id);
 CREATE INDEX IF NOT EXISTS idx_context_stack_id_sub_stack_id ON context (stack_id, sub_stack_id, classname_id);
-CREATE INDEX IF NOT EXISTS idx_job_create_time ON job (created_date);
+CREATE INDEX IF NOT EXISTS idx_job_created_date ON job (created_date);
 CREATE INDEX IF NOT EXISTS idx_job_status ON job (status);
 CREATE INDEX IF NOT EXISTS idx_task_execution_job_id ON task_execution (job_id);
 
