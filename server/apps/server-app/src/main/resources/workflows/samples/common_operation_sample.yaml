@@ -1,0 +1,91 @@
+label: Common Operations Sample
+
+inputs:
+  - name: apiToken
+    label: Token generated with Basic Auth Algorithm
+    type: string
+    required: true
+  - name: jsonObjectSourceFileUrl
+    label: Full path of file in local file system that contains data bytes for API endpoint 1 - custom object endpoint
+    type: string
+    required: true
+  - name: jsonArraySourceFileUrl
+    label: Full path of file in local file system that contains data bytes for API endpoint 2 - batch engine endpoint
+    type: string
+    required: true
+
+outputs:
+  - name: jobResult
+    value: This would be the exit value
+
+tasks:
+  - type: logger/v1/info
+    name: loggInputs
+    description: Print received input arguments in log with INFO log level
+    text: Received paths ${jsonObjectSourceFileUrl} and ${jsonArraySourceFileUrl} to process Json content in those files
+
+  - type: filesystem/v1/readFile
+    name: jsonFileEntry1
+    description: Read file at `filename` location on local file system and create `jsonFileEntry1` object in memory
+    filename: ${jsonObjectSourceFileUrl}
+
+  - type: jsonFile/v1/read
+    name: jsonObject1
+    description: Create Json object `jsonObject1` by reading bytes of fileEntry `jsonFileEntry1`
+    fileEntry: ${jsonFileEntry1}
+    isArray: false
+
+  - type: logger/v1/info
+    name: loggJsonObject1
+    description: Print created Json object `jsonObject1` in log with INFO log level
+    text: Payload in the file ${jsonObject1}
+
+  - type: if/v1
+    conditions:
+      - string:
+          value1: ${jsonObject1.name}
+          operation: NOT_EQUALS
+          value2: "C_Stocks"
+    combineOperation: ANY
+    caseTrue:
+      - type: logger/v1/info
+        name: loggJsonObject1Property
+        description: Print json attribute content in log with INFO log level
+        text: Result ${jsonObject1.statusCode}
+    caseFalse:
+      - type: logger/v1/error
+        name: loggDefinitionExists
+        text: "Unable to locate json property"
+
+  - type: filesystem/v1/readFile
+    name: jsonFileEntry2
+    description: Read file at `filename` location on local file system and create `jsonFileEntry2` object in memory
+    filename: ${jsonArraySourceFileUrl}
+
+  - type: jsonFile/v1/read
+    name: jsonArray
+    description: Create Json object `jsonObject2` by reading bytes of fileEntry `jsonFileEntry2`
+    fileEntry: ${jsonFileEntry2}
+    isArray: true
+
+  - type: each/v1
+    list: ${jsonArray}
+    iteratee:
+      type: logger/v1/warn
+      name: loggJsonArrayElement
+      description: Print json array content in log with INFO log level
+      text: Array ${itemIndex} element ${item}
+
+  - type: loop/v1
+    list: ${jsonArray}
+    iteratee:
+      type: if/v1
+      rawExpression: true
+      expression: ${item.count > 1000 and item.count lt 20000}
+      caseTrue:
+        - type: var/v1/set
+          name: selectedJsonObject
+          value: ${item}
+        - type: logger/v1/info
+          name: loggSelectedObject
+          text: Located json object ${selectedJsonObject}
