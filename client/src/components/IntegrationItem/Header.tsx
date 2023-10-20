@@ -1,4 +1,5 @@
 import React from 'react';
+import {Description} from './Description';
 import {Dropdown} from './Dropdown';
 import {Name} from './Name';
 import {Status} from './Status';
@@ -7,16 +8,19 @@ const Header: React.FC<{
     id?: number;
     name: string;
     status: boolean;
-}> = ({id, name, status}) => {
+    description?: string;
+}> = ({id, name, status, description}) => {
     return (
-        <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2 flex flex-row space-x-4 ">
+        <div className="flex table-auto justify-between">
+            <div className="list-inside">
                 <Name name={name} />
 
                 <Status status={status} />
+
+                {description && <Description description={description} />}
             </div>
 
-            <div className="grid justify-items-end">
+            <div className="mx-4">
                 <Dropdown id={id} />
             </div>
         </div>

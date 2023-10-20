@@ -7,16 +7,21 @@ export const IntegrationItem: React.FC<{
     button: string;
     name: string;
     status: boolean;
+    description?: string;
     category?: CategoryModel;
     date?: Date;
     id?: number;
-    description?: string;
     tags?: TagModel[];
     workflowIds?: string[];
-}> = ({id, name, status, category, tags, date}) => {
+}> = ({id, name, status, description, category, tags, date}) => {
     return (
         <div>
-            <Header id={id} name={name} status={status} />
+            <Header
+                id={id}
+                name={name}
+                status={status}
+                description={description}
+            />
 
             <Footer category={category} tags={tags} date={date} />
         </div>
