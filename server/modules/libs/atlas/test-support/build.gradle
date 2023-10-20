@@ -1,6 +1,5 @@
 dependencies {
     implementation "org.springframework.boot:spring-boot-starter-jdbc"
-    implementation "org.springframework.boot:spring-boot-starter-test"
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation project(":modules:libs:atlas:engine:engine-core-impl")
     implementation project(":modules:libs:atlas:engine:engine-coordinator-impl")
