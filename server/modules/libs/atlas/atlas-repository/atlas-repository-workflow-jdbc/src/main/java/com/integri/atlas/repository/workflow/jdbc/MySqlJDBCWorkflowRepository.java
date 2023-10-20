@@ -86,6 +86,22 @@ public class MySqlJDBCWorkflowRepository implements WorkflowRepository {
         return findOne(id);
     }
 
+    @Override
+    public Workflow update(String id, String content, String format) {
+        MapSqlParameterSource sqlParameterSource = new MapSqlParameterSource();
+
+        sqlParameterSource.addValue("id", id);
+        sqlParameterSource.addValue("content", content);
+        sqlParameterSource.addValue("format", format);
+
+        jdbcTemplate.update(
+            "update workflow set content = :content, format = :format where id = :id",
+            sqlParameterSource
+        );
+
+        return findOne(id);
+    }
+
     public void setJdbcTemplate(NamedParameterJdbcTemplate aJdbcTemplate) {
         jdbcTemplate = aJdbcTemplate;
     }

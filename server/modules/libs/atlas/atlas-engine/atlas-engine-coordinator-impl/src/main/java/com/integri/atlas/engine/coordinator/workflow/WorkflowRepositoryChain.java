@@ -69,6 +69,23 @@ public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
     }
 
     @Override
+    public Workflow update(String id, String content, String format) {
+        for (WorkflowRepository repository : repositories) {
+            try {
+                Workflow workflow = repository.update(id, content, format);
+
+                Cache cache = cacheManager.getCache(CACHE_ONE);
+                cache.put(workflow.getId(), workflow);
+
+                return workflow;
+            } catch (UnsupportedOperationException e) {
+                logger.debug("Repository {} doesn't support update operation", repository);
+            }
+        }
+        throw new RuntimeException("Set atlas.workflow-repository.database.enabled=true property to update a workflow");
+    }
+
+    @Override
     public Workflow findOne(String aId) {
         Cache oneCache = cacheManager.getCache(CACHE_ONE);
         if (oneCache.get(aId) != null) {

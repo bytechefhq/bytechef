@@ -35,4 +35,8 @@ public interface WorkflowRepository {
     default Workflow create(String content, String format) {
         throw new UnsupportedOperationException();
     }
+
+    default Workflow update(String id, String content, String format) {
+        throw new UnsupportedOperationException();
+    }
 }
