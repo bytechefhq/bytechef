@@ -1,59 +1,122 @@
-/*@import url("https://rsms.me/inter/inter.css");*/
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-    @apply scroll-smooth font-display antialiased;
-    @apply h-full;
+@layer base {
+    :root {
+        --background: 0 0% 100%;
+        --foreground: 240 10% 3.9%;
+
+        --muted: 240 4.8% 95.9%;
+        --muted-foreground: 240 3.8% 46.1%;
+
+        --popover: 0 0% 100%;
+        --popover-foreground: 240 10% 3.9%;
+
+        --card: 0 0% 100%;
+        --card-foreground: 240 10% 3.9%;
+
+        --border: 240 5.9% 90%;
+        --input: 240 5.9% 90%;
+
+        --primary: 240 5.9% 10%;
+        --primary-foreground: 0 0% 98%;
+
+        --secondary: 240 4.8% 95.9%;
+        --secondary-foreground: 240 5.9% 10%;
+
+        --accent: 240 4.8% 95.9%;
+        --accent-foreground: 240 5.9% 10%;
+
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 0 0% 98%;
+
+        --ring: 240 5% 64.9%;
+
+        --radius: 0.5rem;
+    }
+
+    .dark {
+        --background: 240 10% 3.9%;
+        --foreground: 0 0% 98%;
+
+        --muted: 240 3.7% 15.9%;
+        --muted-foreground: 240 5% 64.9%;
+
+        --popover: 240 10% 3.9%;
+        --popover-foreground: 0 0% 98%;
+
+        --card: 240 10% 3.9%;
+        --card-foreground: 0 0% 98%;
+
+        --border: 240 3.7% 15.9%;
+        --input: 240 3.7% 15.9%;
+
+        --primary: 0 0% 98%;
+        --primary-foreground: 240 5.9% 10%;
+
+        --secondary: 240 3.7% 15.9%;
+        --secondary-foreground: 0 0% 98%;
+
+        --accent: 240 3.7% 15.9%;
+        --accent-foreground: 0 0% 98%;
+
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 85.7% 97.3%;
+
+        --ring: 240 3.7% 15.9%;
+    }
 }
 
-html {
-    @apply bg-white;
-    scrollbar-color: #00000080 transparent;
-    scrollbar-width: auto;
+@layer base {
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+    }
 }
 
-html[class*='dark'] {
-    @apply bg-gray-900;
-    scrollbar-color: #ffffffb3 transparent;
-    scrollbar-width: auto;
+@layer base {
+    :root {
+        /*@apply scroll-smooth font-display antialiased;*/
+        @apply h-full;
+    }
+
+    body {
+        @apply h-full;
+        @apply overflow-hidden;
+    }
+
+    body #root {
+        @apply h-full;
+    }
 }
 
-body {
-    @apply h-full;
-    @apply overflow-hidden;
-}
+/*::-webkit-scrollbar {*/
+/*    height: 8px;*/
+/*    width: 8px;*/
+/*}*/
 
-body #root {
-    @apply h-full;
-}
+/*::-webkit-scrollbar-track {*/
+/*    @apply bg-transparent;*/
+/*}*/
 
-::-webkit-scrollbar {
-    height: 8px;
-    width: 8px;
-}
+/*::-webkit-scrollbar-thumb {*/
+/*    @apply rounded-full bg-black/50 dark:bg-white/70;*/
+/*}*/
 
-::-webkit-scrollbar-track {
-    @apply bg-transparent;
-}
+/*::-webkit-scrollbar-thumb:hover {*/
+/*    @apply bg-black/60 dark:hover:bg-white/80;*/
+/*}*/
 
-::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-black/50 dark:bg-white/70;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    @apply bg-black/60 dark:hover:bg-white/80;
-}
-
-button {
-    /* Disables tap highlight color on Chrome */
-    -webkit-tap-highlight-color: transparent;
-}
+/*button {*/
+/*    !* Disables tap highlight color on Chrome *!*/
+/*    -webkit-tap-highlight-color: transparent;*/
+/*}*/
 
 /* Input darkmode fix for checkbox / radio */
-.dark [type='checkbox']:checked,
-.dark [type='radio']:checked {
-    background-color: currentColor;
-}
+/*.dark [type='checkbox']:checked,*/
+/*.dark [type='radio']:checked {*/
+/*    background-color: currentColor;*/
+/*}*/
