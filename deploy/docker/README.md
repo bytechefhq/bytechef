@@ -67,13 +67,6 @@ Use `docker-compose.dev.infra.yml` for required infrastructure(Postgres, Redis, 
 docker compose -f docker-compose.dev.infra.yml up
 ```
 
-Use `docker-compose.dev.consul.yml` for running local Consul instance when running the server side as a services
-and using Consul for the service discovery:
-
-```bash
-docker compose -f docker-compose.dev.consul.yml up
-```
-
 ## Troubleshooting
 
 ### Out of date schema
