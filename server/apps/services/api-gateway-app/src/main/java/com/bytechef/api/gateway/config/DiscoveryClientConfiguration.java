@@ -16,6 +16,7 @@
 
 package com.bytechef.api.gateway.config;
 
+import com.bytechef.autoconfigure.property.DiscoveryClientPropertyProperties;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -63,7 +64,8 @@ public class DiscoveryClientConfiguration {
             ServiceInstanceListSupplier coordinatorServiceInstanceListSupplier(
                     DiscoveryClientPropertyProperties properties) {
                 return new PropertyServiceInstanceListSupplier(
-                        properties.getCoordinatorServiceApp().getInstances(), "coordinator-service-app");
+                        properties.getProperty().get("coordinator-service-app").getInstances(),
+                        "coordinator-service-app");
             }
         }
 
@@ -73,7 +75,7 @@ public class DiscoveryClientConfiguration {
             ServiceInstanceListSupplier platformServiceInstanceListSupplier(
                     DiscoveryClientPropertyProperties properties) {
                 return new PropertyServiceInstanceListSupplier(
-                        properties.getPlatformServiceApp().getInstances(), "platform-service-app");
+                        properties.getProperty().get("platform-service-app").getInstances(), "platform-service-app");
             }
         }
 
@@ -83,7 +85,7 @@ public class DiscoveryClientConfiguration {
             ServiceInstanceListSupplier workerServiceInstanceListSupplier(
                     DiscoveryClientPropertyProperties properties) {
                 return new PropertyServiceInstanceListSupplier(
-                        properties.getWorkerServiceApp().getInstances(), "worker-service-app");
+                        properties.getProperty().get("worker-service-app").getInstances(), "worker-service-app");
             }
         }
 

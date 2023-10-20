@@ -23,3 +23,18 @@ spring:
           uri: lb://platform-service-app/
           predicates:
             - Path=/connections/**
+
+discovery-client:
+  property:
+    coordinator-service-app:
+      instances:
+        - host: localhost
+          port: 7333
+    platform-service-app:
+      instances:
+        - host: localhost
+          port: 7222
+    worker-service-app:
+      instances:
+        - host: localhost
+          port: 7444
