@@ -76,7 +76,7 @@ public class HttpClientTaskHandlerIntTest extends BaseTaskIntTest {
         return Map.of(
             "httpClient",
             new HttpClientTaskHandler(
-                new HttpBodyFactory(jsonHelper),
+                new HttpBodyFactory(fileStorageService, jsonHelper),
                 new HttpAuthenticationFactory(),
                 new HttpHeadersFactory(jsonHelper),
                 new HttpResponseHandler(fileStorageService, jsonHelper),

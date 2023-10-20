@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 public class HttpHeader {
 
     private final String name;
-    private final String value;
+    private String value;
 
     public HttpHeader(String name, String... values) {
         this.name = name;
@@ -37,5 +37,9 @@ public class HttpHeader {
 
     public String getValue() {
         return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 }

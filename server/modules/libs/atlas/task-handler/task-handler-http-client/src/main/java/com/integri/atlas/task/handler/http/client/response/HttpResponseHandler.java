@@ -22,7 +22,6 @@ import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.task.handler.http.client.HttpClientTaskConstants;
-import com.integri.atlas.task.handler.http.client.header.ContentType;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import java.io.InputStream;
 import java.net.http.HttpResponse;
@@ -44,21 +43,21 @@ public class HttpResponseHandler {
     }
 
     public Object handle(TaskExecution taskExecution, HttpResponse httpResponse) {
-        String responseFormat = taskExecution.getString(PROPERTY_RESPONSE_FORMAT);
-
-        if (responseFormat == null) {
+        if (taskExecution.getString(PROPERTY_RESPONSE_FORMAT) == null) {
             return null;
         }
 
-        ContentType contentType = ContentType.valueOf(responseFormat);
+        HttpClientTaskConstants.ResponseFormat responseFormat = HttpClientTaskConstants.ResponseFormat.valueOf(
+            taskExecution.getString(PROPERTY_RESPONSE_FORMAT)
+        );
 
         Object body = null;
 
-        if (contentType == ContentType.JSON) {
+        if (responseFormat == HttpClientTaskConstants.ResponseFormat.JSON) {
             return jsonHelper.read(httpResponse.body().toString(), Map.class);
-        } else if (contentType == ContentType.STRING) {
+        } else if (responseFormat == HttpClientTaskConstants.ResponseFormat.TEXT) {
             body = httpResponse.body().toString();
-        } else if (contentType == ContentType.BINARY) {
+        } else if (responseFormat == HttpClientTaskConstants.ResponseFormat.FILE) {
             body =
                 fileStorageService.storeFileContent(
                     taskExecution.getString(HttpClientTaskConstants.PROPERTY_RESPONSE_FILE_NAME),

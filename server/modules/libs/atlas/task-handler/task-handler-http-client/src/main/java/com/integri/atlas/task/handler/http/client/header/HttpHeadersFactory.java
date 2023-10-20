@@ -79,7 +79,7 @@ public class HttpHeadersFactory {
         }
 
         if (bodyContentType == BodyContentType.FORM_DATA) {
-            return "multipart/form-data;";
+            return "multipart/form-data; boundary=";
         }
 
         if (bodyContentType == BodyContentType.RAW) {
