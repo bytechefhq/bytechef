@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/ActionDefinitionsApi.ts
 apis/ComponentDefinitionsApi.ts
 apis/ConnectionDefinitionsApi.ts
@@ -26,7 +25,6 @@ models/DatePropertyModel.ts
 models/DateTimePropertyModel.ts
 models/DynamicPropertiesPropertyAllOfModel.ts
 models/DynamicPropertiesPropertyModel.ts
-models/GetActionDefinitionsTaskTypesParameterInnerModel.ts
 models/GetOAuth2AuthorizationParametersRequestModel.ts
 models/HelpModel.ts
 models/InputModel.ts
