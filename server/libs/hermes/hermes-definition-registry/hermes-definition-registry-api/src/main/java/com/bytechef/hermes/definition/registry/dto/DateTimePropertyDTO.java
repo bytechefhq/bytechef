@@ -31,8 +31,11 @@ import java.util.Optional;
  */
 public class DateTimePropertyDTO extends ValuePropertyDTO<LocalDateTime> {
 
-    private final List<OptionDTO> options;
-    private final OptionsDataSourceDTO optionsDataSource;
+    private List<OptionDTO> options;
+    private OptionsDataSourceDTO optionsDataSource;
+
+    private DateTimePropertyDTO() {
+    }
 
     public DateTimePropertyDTO(DateTimeProperty dateTimeProperty) {
         super(dateTimeProperty);

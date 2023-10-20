@@ -31,10 +31,13 @@ import java.util.Optional;
  */
 public class ArrayPropertyDTO extends ValuePropertyDTO<Object[]> {
 
-    private final List<? extends PropertyDTO> items;
-    private final boolean multipleValues; // Defaults to true
-    private final List<OptionDTO> options;
-    private final OptionsDataSourceDTO optionsDataSource;
+    private List<? extends PropertyDTO> items;
+    private boolean multipleValues; // Defaults to true
+    private List<OptionDTO> options;
+    private OptionsDataSourceDTO optionsDataSource;
+
+    private ArrayPropertyDTO() {
+    }
 
     public ArrayPropertyDTO(ArrayProperty arrayProperty) {
         super(arrayProperty);

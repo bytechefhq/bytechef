@@ -29,7 +29,10 @@ import java.util.List;
  */
 public class BooleanPropertyDTO extends ValuePropertyDTO<Boolean> {
 
-    private final List<OptionDTO> options;
+    private List<OptionDTO> options;
+
+    private BooleanPropertyDTO() {
+    }
 
     public BooleanPropertyDTO(BooleanProperty booleanProperty) {
         super(booleanProperty);

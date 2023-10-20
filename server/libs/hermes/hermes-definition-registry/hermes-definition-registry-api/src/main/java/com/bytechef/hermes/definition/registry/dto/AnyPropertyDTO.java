@@ -24,6 +24,9 @@ import com.bytechef.hermes.definition.Property.AnyProperty;
  */
 public class AnyPropertyDTO extends ValuePropertyDTO<Object> {
 
+    private AnyPropertyDTO() {
+    }
+
     public AnyPropertyDTO(AnyProperty anyProperty) {
         super(anyProperty);
     }

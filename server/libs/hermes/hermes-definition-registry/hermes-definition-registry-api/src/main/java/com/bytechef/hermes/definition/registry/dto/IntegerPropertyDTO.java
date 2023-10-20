@@ -30,10 +30,13 @@ import java.util.Optional;
  */
 public class IntegerPropertyDTO extends ValuePropertyDTO<Integer> {
 
-    private final Integer maxValue;
-    private final Integer minValue;
-    private final List<OptionDTO> options;
-    private final OptionsDataSourceDTO optionsDataSource;
+    private Integer maxValue;
+    private Integer minValue;
+    private List<OptionDTO> options;
+    private OptionsDataSourceDTO optionsDataSource;
+
+    private IntegerPropertyDTO() {
+    }
 
     public IntegerPropertyDTO(IntegerProperty integerProperty) {
         super(integerProperty);

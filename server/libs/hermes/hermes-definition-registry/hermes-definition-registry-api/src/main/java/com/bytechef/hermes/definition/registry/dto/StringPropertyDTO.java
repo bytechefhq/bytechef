@@ -31,9 +31,12 @@ import java.util.Optional;
  */
 public class StringPropertyDTO extends ValuePropertyDTO<String> {
 
-    private final List<OptionDTO> options;
-    private final OptionsDataSourceDTO optionsDataSource;
-    private final SampleDataType sampleDataType;
+    private List<OptionDTO> options;
+    private OptionsDataSourceDTO optionsDataSource;
+    private SampleDataType sampleDataType;
+
+    private StringPropertyDTO() {
+    }
 
     public StringPropertyDTO(StringProperty stringProperty) {
         super(stringProperty);
