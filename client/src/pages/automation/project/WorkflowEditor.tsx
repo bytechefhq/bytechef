@@ -1,4 +1,3 @@
-import {PlayIcon} from '@heroicons/react/24/outline';
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionBasicModel,
@@ -6,9 +5,7 @@ import {
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';
 import ReactFlow, {
     Controls,
-    Edge,
     MiniMap,
-    Node,
     ReactFlowProvider,
     useReactFlow,
     useStore,
@@ -17,14 +14,17 @@ import ReactFlow, {
 import NodeDetailsDialog from './components/NodeDetailsDialog';
 import PlaceholderEdge from './edges/PlaceholderEdge';
 import WorkflowEdge from './edges/WorkflowEdge';
+import defaultEdges from './edges/defaultEdges';
 import useHandleDrop from './hooks/useHandleDrop';
 import useLayout from './hooks/useLayout';
 import PlaceholderNode from './nodes/PlaceholderNode';
 import WorkflowNode from './nodes/WorkflowNode';
+import defaultNodes from './nodes/defaultNodes';
 
 import 'reactflow/dist/base.css';
 
 import './WorkflowEditor.css';
+import DataPillPanel from './components/DataPillPanel';
 import {useNodeDetailsDialogStore} from './stores/useNodeDetailsDialogStore';
 
 type WorkflowProps = {
@@ -36,35 +36,6 @@ const Workflow = ({components, flowControls}: WorkflowProps): JSX.Element => {
     const [viewportWidth, setViewportWidth] = useState(0);
 
     const {nodeDetailsOpen} = useNodeDetailsDialogStore();
-
-    const defaultEdges: Edge[] = [
-        {
-            id: '1=>2',
-            source: '1',
-            target: '2',
-            type: 'placeholder',
-        },
-    ];
-
-    const defaultNodes: Node[] = [
-        {
-            data: {
-                icon: <PlayIcon className="h-9 w-9 text-gray-700" />,
-                label: 'Manual Trigger',
-                name: 'manual',
-                type: 'trigger',
-            },
-            id: '1',
-            position: {x: 0, y: 0},
-            type: 'workflow',
-        },
-        {
-            data: {label: '+'},
-            id: '2',
-            position: {x: 0, y: 150},
-            type: 'placeholder',
-        },
-    ];
 
     const nodeTypes = useMemo(
         () => ({
@@ -184,13 +155,13 @@ type WorkflowEditorProps = WorkflowProps;
 
 function WorkflowEditor({components, flowControls}: WorkflowEditorProps) {
     return (
-        <>
-            <ReactFlowProvider>
-                <Workflow components={components} flowControls={flowControls} />
-            </ReactFlowProvider>
+        <ReactFlowProvider>
+            <Workflow components={components} flowControls={flowControls} />
 
             <NodeDetailsDialog />
-        </>
+
+            <DataPillPanel />
+        </ReactFlowProvider>
     );
 }
 

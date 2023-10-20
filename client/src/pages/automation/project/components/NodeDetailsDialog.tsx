@@ -13,6 +13,7 @@ import {twMerge} from 'tailwind-merge';
 import Select from '../../../../components/Select/Select';
 import Tooltip from '../../../../components/Tooltip/Tooltip';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
+import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import CurrentActionSelect from './CurrentActionSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
@@ -43,6 +44,9 @@ const NodeDetailsDialog = () => {
 
     const {currentNode, nodeDetailsOpen, setNodeDetailsOpen} =
         useNodeDetailsDialogStore();
+
+    const {componentActions, setComponentActions} =
+        useWorkflowDefinitionStore();
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
         connectionDefinitions: true,
@@ -105,7 +109,18 @@ const NodeDetailsDialog = () => {
     useEffect(() => {
         if (currentAction && currentActionFetched) {
             setCurrentActionName(currentAction.name);
+
+            if (componentActions && currentComponent) {
+                setComponentActions([
+                    ...componentActions,
+                    {
+                        actionName: currentAction.name,
+                        componentName: currentComponent.name,
+                    },
+                ]);
+            }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeTab, currentAction, currentActionFetched]);
 
     const componentTabs = tabs.filter((tab) => {
@@ -155,7 +170,7 @@ const NodeDetailsDialog = () => {
                                 )}
 
                                 <Button
-                                    aria-label="Close panel"
+                                    aria-label="Close the node details dialog"
                                     className="ml-auto"
                                     displayType="icon"
                                     icon={
@@ -239,7 +254,7 @@ const NodeDetailsDialog = () => {
                                 </div>
                             </div>
 
-                            <div className="mt-auto flex p-4">
+                            <footer className="mt-auto flex p-4">
                                 <Select
                                     defaultValue={currentComponent.version.toString()}
                                     options={[
@@ -248,7 +263,7 @@ const NodeDetailsDialog = () => {
                                         {label: 'v3', value: '3'},
                                     ]}
                                 />
-                            </div>
+                            </footer>
                         </div>
                     ) : (
                         <div className="flex w-full justify-center p-4">

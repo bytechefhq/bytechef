@@ -9,6 +9,7 @@ import {
     TaskDispatcherDefinitionModel,
 } from '../../../../middleware/core/workflow/configuration';
 import WorkflowNodesList from '../components/WorkflowNodesList';
+import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import getFormattedName from '../utils/getFormattedName';
 import getRandomId from '../utils/getRandomId';
 
@@ -33,6 +34,8 @@ const ContextualMenu = ({
     const [filteredFlowControls, setFilteredFlowControls] = useState<
         Array<TaskDispatcherDefinitionModel>
     >([]);
+
+    const {componentNames, setComponents} = useWorkflowDefinitionStore();
 
     const {getEdge, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 
@@ -138,6 +141,13 @@ const ContextualMenu = ({
             nodes
                 .map((node) => {
                     if (node.id === placeholderId) {
+                        const formattedNodeName = getFormattedName(
+                            clickedItem.name!,
+                            nodes
+                        );
+
+                        setComponents([...componentNames, formattedNodeName]);
+
                         return {
                             ...node,
                             data: {
@@ -154,10 +164,7 @@ const ContextualMenu = ({
                                     </>
                                 ),
                                 label: clickedItem?.title,
-                                name: getFormattedName(
-                                    clickedItem.name!,
-                                    nodes
-                                ),
+                                name: formattedNodeName,
                                 originNodeName: clickedItem.name,
                             },
                             type: 'workflow',
