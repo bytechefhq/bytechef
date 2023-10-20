@@ -31,6 +31,7 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.WildcardTypeName;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -182,25 +183,27 @@ public class OpenApiComponentGenerator {
             .addStaticImport(AUTHORIZATION_CLASS_NAME, "TOKEN_URL")
             .addStaticImport(AUTHORIZATION_CLASS_NAME, "USERNAME")
             .addStaticImport(AUTHORIZATION_CLASS_NAME, "VALUE")
-            .addStaticImport(AUTHORIZATION_CLASS_NAME, "ApiTokenLocation", "AuthorizationType")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "any")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "authorization")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "component")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "connection")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "fileEntry")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "nullable")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "oneOf")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "time")
+            .addStaticImport(CONNECTION_DEFINITION_CLASS_NAME, "BASE_URI")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "ApiTokenLocation", "AuthorizationType")
             .addStaticImport(HTTP_CLIENT_UTILS_CLASS, "BodyContentType", "ResponseFormat")
-            .addStaticImport(OPEN_API_COMPONENT_HANDLER_CLASS, "PropertyType")
-            .addStaticImport(CONNECTION_DEFINITION_CLASS_NAME, "BASE_URI");
+            .addStaticImport(OPEN_API_COMPONENT_HANDLER_CLASS, "PropertyType");
     }
 
     private static String buildPropertyName(String propertyName) {
@@ -223,7 +226,7 @@ public class OpenApiComponentGenerator {
                         continue;
                     }
 
-                    getObjectPropertiesCodeBlock(null, entry.getValue(), openAPI);
+                    getObjectPropertiesCodeBlock(null, entry.getValue(), false, openAPI);
                 }
             }
         }
@@ -898,20 +901,41 @@ public class OpenApiComponentGenerator {
         return builder.build();
     }
 
-    private CodeBlock getObjectPropertiesCodeBlock(String name, Schema<?> schema, OpenAPI openAPI) {
+    private CodeBlock getObjectPropertiesCodeBlock(
+        String name, Schema<?> schema, boolean outputSchema, OpenAPI openAPI) {
+
         List<CodeBlock> codeBlocks = new ArrayList<>();
 
         if (schema.getProperties() != null) {
             codeBlocks.add(getPropertiesSchemaCodeBlock(
-                schema.getProperties(), schema.getRequired() == null ? List.of() : schema.getRequired(), openAPI));
+                schema.getProperties(), schema.getRequired() == null ? List.of() : schema.getRequired(), outputSchema,
+                openAPI));
         }
 
         if (schema.getAllOf() != null) {
-            codeBlocks.add(getAllOfSchemaCodeBlock(name, schema.getDescription(), schema.getAllOf(), openAPI));
+            codeBlocks.add(
+                getAllOfSchemaCodeBlock(name, schema.getDescription(), schema.getAllOf(), outputSchema, openAPI));
         }
 
         return codeBlocks.stream()
             .collect(CodeBlock.joining(","));
+    }
+
+    private List<CodeBlock> getEnumOptionsCodeBlocks(Schema<?> schema) {
+        List<?> enums = schema.getEnum()
+            .stream()
+            .filter(Objects::nonNull)
+            .toList();
+        List<CodeBlock> codeBlocks = new ArrayList<>();
+
+        for (Object item : enums) {
+            if (item instanceof String) {
+                codeBlocks.add(CodeBlock.of("option($S, $S)", StringUtils.capitalize(item.toString()), item));
+            } else {
+                codeBlocks.add(CodeBlock.of("option($S, $L)", StringUtils.capitalize(item.toString()), item));
+            }
+        }
+        return codeBlocks;
     }
 
     private String getMimeType(Set<Map.Entry<String, MediaType>> entries) {
@@ -1048,7 +1072,7 @@ public class OpenApiComponentGenerator {
 
                 Schema schema = mediaType.getSchema();
 
-                builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, openAPI, true));
+                builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, true, true, openAPI));
 
                 String responseFormat;
 
@@ -1097,7 +1121,7 @@ public class OpenApiComponentGenerator {
                 builder.add(
                     getSchemaCodeBlock(
                         parameter.getName(), parameter.getDescription(), parameter.getRequired(), null,
-                        parameter.getSchema(), openAPI, false));
+                        parameter.getSchema(), false, false, openAPI));
                 builder.add(
                     CodeBlock.of(
                         """
@@ -1144,7 +1168,7 @@ public class OpenApiComponentGenerator {
     }
 
     private CodeBlock getPropertiesCodeBlock(
-        String propertyName, String schemaName, Schema<?> schema, OpenAPI openAPI) {
+        String propertyName, String schemaName, Schema<?> schema, boolean outputSchema, OpenAPI openAPI) {
 
         CodeBlock.Builder builder = CodeBlock.builder();
         CodeBlock propertiesCodeBlock;
@@ -1152,7 +1176,7 @@ public class OpenApiComponentGenerator {
         if (schemas.contains(schemaName)) {
             propertiesCodeBlock = CodeBlock.of("$T.PROPERTIES", getPropertiesClassName(schemaName));
         } else {
-            propertiesCodeBlock = getObjectPropertiesCodeBlock(propertyName, schema, openAPI);
+            propertiesCodeBlock = getObjectPropertiesCodeBlock(propertyName, schema, outputSchema, openAPI);
         }
 
         builder.add(".properties($L)", propertiesCodeBlock);
@@ -1193,7 +1217,8 @@ public class OpenApiComponentGenerator {
 
                 Schema schema = mediaType.getSchema();
 
-                builder.add(getSchemaCodeBlock(null, null, requestBody.getRequired(), null, schema, openAPI, false));
+                builder.add(
+                    getSchemaCodeBlock(null, null, requestBody.getRequired(), null, schema, false, false, openAPI));
                 builder.add(
                     """
                         .metadata(
@@ -1211,11 +1236,15 @@ public class OpenApiComponentGenerator {
         return requestBodyPropertiesEntry;
     }
 
-    private CodeBlock getAdditionalPropertiesCodeBlock(Schema<?> schema, boolean outputEntry) {
+    private CodeBlock getAdditionalPropertiesCodeBlock(String propertyName, Schema<?> schema, boolean outputSchema) {
         CodeBlock.Builder builder = CodeBlock.builder();
 
         if (schema.getAdditionalProperties() instanceof Boolean) {
-            builder.add(".additionalProperties(oneOf())");
+            builder.add(
+                """
+                    .additionalProperties(
+                        array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
+                        """);
         } else {
             Schema<?> additionalPropertiesSchema = (Schema<?>) schema.getAdditionalProperties();
 
@@ -1234,8 +1263,8 @@ public class OpenApiComponentGenerator {
             }
         }
 
-        if (!outputEntry) {
-            builder.add(".placeholder($S)", "Add");
+        if (!outputSchema) {
+            builder.add(".placeholder($S)", "Add to " + buildPropertyName(propertyName.replace("__", "")));
         }
 
         return builder.build();
@@ -1273,7 +1302,7 @@ public class OpenApiComponentGenerator {
         "rawtypes", "unchecked"
     })
     private CodeBlock getAllOfSchemaCodeBlock(
-        String name, String description, List<Schema> allOfSchemas, OpenAPI openAPI) {
+        String name, String description, List<Schema> allOfSchemas, boolean outputSchema, OpenAPI openAPI) {
 
         Map<String, Schema> allOfProperties = getAllOfSchemaProperties(name, description, allOfSchemas);
         List<String> allOfRequired = new ArrayList<>();
@@ -1284,7 +1313,7 @@ public class OpenApiComponentGenerator {
             }
         }
 
-        return getPropertiesSchemaCodeBlock(allOfProperties, allOfRequired, openAPI);
+        return getPropertiesSchemaCodeBlock(allOfProperties, allOfRequired, outputSchema, openAPI);
     }
 
     private ClassName getPropertiesClassName(String schemaName) {
@@ -1296,7 +1325,7 @@ public class OpenApiComponentGenerator {
         "rawtypes", "unchecked"
     })
     private CodeBlock getPropertiesSchemaCodeBlock(
-        Map<String, Schema> properties, List<String> required, OpenAPI openAPI) {
+        Map<String, Schema> properties, List<String> required, boolean outputSchema, OpenAPI openAPI) {
         List<CodeBlock> codeBlocks = new ArrayList<>();
 
         for (Map.Entry<String, Schema> entry : properties.entrySet()) {
@@ -1305,11 +1334,11 @@ public class OpenApiComponentGenerator {
 
             if (schema.getAllOf() == null) {
                 codeBlock = getSchemaCodeBlock(
-                    entry.getKey(), schema.getDescription(), required.contains(entry.getKey()), null, schema, openAPI,
-                    false);
+                    entry.getKey(), schema.getDescription(), required.contains(entry.getKey()), null, schema, false,
+                    outputSchema, openAPI);
             } else {
-                codeBlock = getAllOfSchemaCodeBlock(entry.getKey(), schema.getDescription(), schema.getAllOf(),
-                    openAPI);
+                codeBlock = getAllOfSchemaCodeBlock(
+                    entry.getKey(), schema.getDescription(), schema.getAllOf(), outputSchema, openAPI);
             }
 
             if (codeBlock.isEmpty()) {
@@ -1328,7 +1357,7 @@ public class OpenApiComponentGenerator {
     })
     private CodeBlock getSchemaCodeBlock(
         String propertyName, String propertyDescription, Boolean required, String schemaName, Schema<?> schema,
-        OpenAPI openAPI, boolean excludePropertyNameIfEmpty) {
+        boolean excludePropertyNameIfEmpty, boolean outputSchema, OpenAPI openAPI) {
 
         CodeBlock.Builder builder = CodeBlock.builder();
 
@@ -1341,17 +1370,21 @@ public class OpenApiComponentGenerator {
                         builder.add(
                             "array().items($L)",
                             getSchemaCodeBlock(
-                                null, schema.getDescription(), null, null, schema.getItems(), openAPI, true));
+                                null, schema.getDescription(), null, null, schema.getItems(), true, outputSchema,
+                                openAPI));
                     } else {
+                        propertyName = StringUtils.isEmpty(propertyName) ? "__items" : propertyName;
+
                         builder.add(
                             "array($S).items($L)",
-                            StringUtils.isEmpty(propertyName) ? "__items" : propertyName,
+                            propertyName,
                             getSchemaCodeBlock(
-                                null, schema.getDescription(), null, null, schema.getItems(), openAPI, true));
+                                null, schema.getDescription(), null, null, schema.getItems(), true, outputSchema,
+                                openAPI));
                     }
 
-                    if (!excludePropertyNameIfEmpty) {
-                        builder.add(".placeholder($S)", "Add");
+                    if (!outputSchema) {
+                        builder.add(".placeholder($S)", "Add to " + buildPropertyName(propertyName.replace("__", "")));
                     }
                 }
                 case "boolean" -> builder.add("bool($S)", propertyName);
@@ -1385,13 +1418,15 @@ public class OpenApiComponentGenerator {
                     if (StringUtils.isEmpty(propertyName) && excludePropertyNameIfEmpty) {
                         builder.add("object()");
                     } else {
-                        builder.add("object($S)", StringUtils.isEmpty(propertyName) ? "__item" : propertyName);
+                        propertyName = StringUtils.isEmpty(propertyName) ? "__item" : propertyName;
+
+                        builder.add("object($S)", propertyName);
                     }
 
                     if (schema.getProperties() != null || schema.getAllOf() != null) {
-                        builder.add(getPropertiesCodeBlock(propertyName, schemaName, schema, openAPI));
+                        builder.add(getPropertiesCodeBlock(propertyName, schemaName, schema, outputSchema, openAPI));
                     } else if (schema.getAdditionalProperties() != null) {
-                        builder.add(getAdditionalPropertiesCodeBlock(schema, excludePropertyNameIfEmpty));
+                        builder.add(getAdditionalPropertiesCodeBlock(propertyName, schema, outputSchema));
                     }
                 }
                 case "string" -> {
@@ -1413,8 +1448,8 @@ public class OpenApiComponentGenerator {
                     "Parameter type %s is not supported.".formatted(schema.getType()));
             }
 
-            if (propertyName != null) {
-                propertyName = buildPropertyName(propertyName);
+            if (!StringUtils.isEmpty(propertyName) && !outputSchema) {
+                propertyName = buildPropertyName(propertyName.replace("__", ""));
 
                 builder.add(".label($S)", StringUtils.capitalize(propertyName));
             }
@@ -1424,19 +1459,7 @@ public class OpenApiComponentGenerator {
             }
 
             if (schema.getEnum() != null) {
-                List<?> enums = schema.getEnum()
-                    .stream()
-                    .filter(Objects::nonNull)
-                    .toList();
-                List<CodeBlock> codeBlocks = new ArrayList<>();
-
-                for (Object item : enums) {
-                    if (item instanceof String) {
-                        codeBlocks.add(CodeBlock.of("option($S, $S)", StringUtils.capitalize(item.toString()), item));
-                    } else {
-                        codeBlocks.add(CodeBlock.of("option($S, $L)", StringUtils.capitalize(item.toString()), item));
-                    }
-                }
+                List<CodeBlock> codeBlocks = getEnumOptionsCodeBlocks(schema);
 
                 if (!Objects.equals(type, "boolean")) {
                     builder.add(".options($L)", codeBlocks.stream()
@@ -1472,7 +1495,8 @@ public class OpenApiComponentGenerator {
                     StringUtils.isEmpty(propertyName) && !excludePropertyNameIfEmpty
                         ? StringUtils.uncapitalize(curSchemaName)
                         : propertyName,
-                    schema.getDescription(), required, curSchemaName, schema, openAPI, excludePropertyNameIfEmpty));
+                    schema.getDescription(), required, curSchemaName, schema, excludePropertyNameIfEmpty, outputSchema,
+                    openAPI));
         }
 
         return builder.build();
@@ -1711,7 +1735,9 @@ public class OpenApiComponentGenerator {
                 .addField(FieldSpec.builder(
                     ParameterizedTypeName.get(
                         ClassName.get("java.util", "List"),
-                        ClassName.get("com.bytechef.hermes.definition", "Property")),
+                        ParameterizedTypeName.get(
+                            ClassName.get("com.bytechef.hermes.definition", "Property", "ValueProperty"),
+                            WildcardTypeName.subtypeOf(Object.class))),
                     "PROPERTIES")
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                     .initializer("$T.of($L)", List.class, componentSchemaCodeBlock)
@@ -1744,9 +1770,7 @@ public class OpenApiComponentGenerator {
                     ClassName className = getPropertiesClassName(entry.getKey());
 
                     writeComponentSchemaSource(
-                        className,
-                        getObjectPropertiesCodeBlock(null, schema, openAPI),
-                        sourceDirPath);
+                        className, getObjectPropertiesCodeBlock(null, schema, false, openAPI), sourceDirPath);
                 }
             }
         }
