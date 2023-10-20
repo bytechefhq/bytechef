@@ -60,7 +60,7 @@ public class TaskExecutionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/task-execution-service/get-task-execution/{id}",
+        value = "/get-task-execution/{id}",
         produces = {
             "application/json"
         })
@@ -70,7 +70,7 @@ public class TaskExecutionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/task-execution-service/get-parent-task-executions/{parentId}",
+        value = "/get-parent-task-executions/{parentId}",
         produces = {
             "application/json"
         })
@@ -80,7 +80,7 @@ public class TaskExecutionServiceController {
 
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/task-execution-service/update",
+        value = "/update",
         consumes = {
             "application/json"
         },
