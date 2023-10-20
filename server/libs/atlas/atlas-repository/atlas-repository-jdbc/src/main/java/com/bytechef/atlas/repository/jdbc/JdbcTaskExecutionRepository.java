@@ -17,7 +17,6 @@
 
 package com.bytechef.atlas.repository.jdbc;
 
-import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.repository.TaskExecutionRepository;
 
@@ -25,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -39,13 +37,17 @@ import org.springframework.stereotype.Repository;
 public interface JdbcTaskExecutionRepository
     extends PagingAndSortingRepository<TaskExecution, Long>, TaskExecutionRepository {
 
-    List<TaskExecution> findAllByJobRefOrderByCreatedDate(AggregateReference<Job, Long> jobRef);
+    @Override
+    List<TaskExecution> findAllByJobIdOrderByCreatedDate(Long jobId);
 
-    List<TaskExecution> findAllByJobRefInOrderByCreatedDate(List<AggregateReference<Job, Long>> jobRefs);
+    @Override
+    List<TaskExecution> findAllByJobIdInOrderByCreatedDate(List<Long> jobIds);
 
-    List<TaskExecution> findAllByJobRefOrderByTaskNumber(AggregateReference<Job, Long> jobRef);
+    @Override
+    List<TaskExecution> findAllByJobIdOrderByTaskNumber(Long jobId);
 
-    List<TaskExecution> findAllByParentRef(AggregateReference<TaskExecution, Long> parentRef);
+    @Override
+    List<TaskExecution> findAllByParentId(Long parentId);
 
     @Override
     @Query("SELECT * FROM task_execution WHERE id = :id FOR UPDATE")

@@ -19,7 +19,6 @@
 
 package com.bytechef.atlas.repository.memory;
 
-import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.repository.TaskExecutionRepository;
 
@@ -29,8 +28,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
-
-import org.springframework.data.jdbc.core.mapping.AggregateReference;
 
 /**
  * @author Arik Cohen
@@ -43,28 +40,28 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     private final Map<Long, TaskExecution> taskExecutions = new HashMap<>();
 
     @Override
-    public List<TaskExecution> findAllByJobRefOrderByTaskNumber(AggregateReference<Job, Long> jobRef) {
+    public List<TaskExecution> findAllByJobIdOrderByTaskNumber(Long jobId) {
         return taskExecutions.values()
             .stream()
-            .filter(taskExecution -> Objects.equals(taskExecution.getJobId(), jobRef.getId()))
+            .filter(taskExecution -> Objects.equals(taskExecution.getJobId(), jobId))
             .toList();
     }
 
     @Override
-    public List<TaskExecution> findAllByParentRef(AggregateReference<TaskExecution, Long> parentRef) {
+    public List<TaskExecution> findAllByParentId(Long parentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<TaskExecution> findAllByJobRefOrderByCreatedDate(AggregateReference<Job, Long> jobRef) {
+    public List<TaskExecution> findAllByJobIdOrderByCreatedDate(Long jobId) {
         return taskExecutions.values()
             .stream()
-            .filter(taskExecution -> Objects.equals(taskExecution.getJobRef(), jobRef))
+            .filter(taskExecution -> Objects.equals(taskExecution.getJobId(), jobId))
             .toList();
     }
 
     @Override
-    public List<TaskExecution> findAllByJobRefInOrderByCreatedDate(List<AggregateReference<Job, Long>> jobRefs) {
+    public List<TaskExecution> findAllByJobIdInOrderByCreatedDate(List<Long> jobIds) {
         throw new UnsupportedOperationException();
     }
 

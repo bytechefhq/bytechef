@@ -93,7 +93,7 @@ public final class TaskExecution
     private Long id;
 
     @Column("job_id")
-    private AggregateReference<Job, Long> jobRef;
+    private AggregateReference<Job, Long> jobId;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -107,7 +107,7 @@ public final class TaskExecution
     private MapWrapper output;
 
     @Column("parent_id")
-    private AggregateReference<TaskExecution, Long> parentRef;
+    private AggregateReference<TaskExecution, Long> parentId;
 
     @Column
     private int priority;
@@ -160,10 +160,10 @@ public final class TaskExecution
     }
 
     private TaskExecution(Long jobId, Long parentId, int priority, int taskNumber, WorkflowTask workflowTask) {
-        this.jobRef = AggregateReference.to(jobId);
+        this.jobId = AggregateReference.to(jobId);
 
         if (parentId != null) {
-            this.parentRef = AggregateReference.to(parentId);
+            this.parentId = AggregateReference.to(parentId);
         }
 
         this.priority = priority;
@@ -270,18 +270,13 @@ public final class TaskExecution
         return this.id;
     }
 
-    @JsonIgnore
-    public AggregateReference<Job, Long> getJobRef() {
-        return jobRef;
-    }
-
     /**
      * Get the id of the job for which this task belongs to.
      *
      * @return String the id of the job
      */
     public Long getJobId() {
-        return jobRef == null ? null : jobRef.getId();
+        return jobId == null ? null : jobId.getId();
     }
 
     public String getLastModifiedBy() {
@@ -324,18 +319,13 @@ public final class TaskExecution
         return workflowTask.getParameters();
     }
 
-    @JsonIgnore
-    public AggregateReference<TaskExecution, Long> getParentRef() {
-        return parentRef;
-    }
-
     /**
      * Get the id of the parent task, if this is a sub-task.
      *
      * @return String the id of the parent task.
      */
     public Long getParentId() {
-        return parentRef == null ? null : parentRef.getId();
+        return parentId == null ? null : parentId.getId();
     }
 
     @JsonIgnore
@@ -457,13 +447,9 @@ public final class TaskExecution
         this.id = id;
     }
 
-    public void setJobRef(AggregateReference<Job, Long> jobRef) {
-        this.jobRef = jobRef;
-    }
-
     public void setJobId(Long jobId) {
         if (jobId != null) {
-            this.jobRef = AggregateReference.to(jobId);
+            this.jobId = AggregateReference.to(jobId);
         }
     }
 
@@ -473,13 +459,9 @@ public final class TaskExecution
         }
     }
 
-    public void setParentRef(AggregateReference<TaskExecution, Long> parentRef) {
-        this.parentRef = parentRef;
-    }
-
     public void setParentId(Long parentId) {
         if (parentId != null) {
-            this.parentRef = AggregateReference.to(parentId);
+            this.parentId = AggregateReference.to(parentId);
         }
     }
 

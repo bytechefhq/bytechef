@@ -24,7 +24,6 @@ import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.priority.Prioritizable;
 import com.bytechef.commons.data.jdbc.wrapper.MapListWrapper;
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;
@@ -98,7 +97,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     private MapWrapper outputs = new MapWrapper();
 
     @Column("parent_task_execution_id")
-    private AggregateReference<TaskExecution, Long> parentTaskExecutionRef;
+    private AggregateReference<TaskExecution, Long> parentTaskExecutionId;
 
     private int priority = Prioritizable.DEFAULT_PRIORITY;
 
@@ -203,18 +202,13 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
         return error;
     }
 
-    @JsonIgnore
-    public AggregateReference<TaskExecution, Long> getParentTaskExecutionRef() {
-        return parentTaskExecutionRef;
-    }
-
     /**
      * For sub-flows. Return the ID of the parent task that created this job.
      *
      * @return The ID of the parent task if this is a subflow job or <code>null</code> otherwise.
      */
     public Long getParentTaskExecutionId() {
-        return parentTaskExecutionRef == null ? null : parentTaskExecutionRef.getId();
+        return parentTaskExecutionId == null ? null : parentTaskExecutionId.getId();
     }
 
     /**
@@ -312,13 +306,9 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
         this.outputs = new MapWrapper(outputs);
     }
 
-    public void setParentTaskExecutionRef(AggregateReference<TaskExecution, Long> parentTaskExecutionRef) {
-        this.parentTaskExecutionRef = parentTaskExecutionRef;
-    }
-
     public void setParentTaskExecutionId(Long parentTaskExecutionId) {
         if (parentTaskExecutionId != null) {
-            this.parentTaskExecutionRef = AggregateReference.to(parentTaskExecutionId);
+            this.parentTaskExecutionId = AggregateReference.to(parentTaskExecutionId);
         }
     }
 
