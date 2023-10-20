@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.json;
+package com.integri.atlas.test.json;
 
 import java.util.Collection;
 import java.util.List;

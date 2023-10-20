@@ -30,7 +30,7 @@ import com.integri.atlas.task.dispatcher.if_.completion.IfTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.integri.atlas.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
-import com.integri.atlas.task.handler.BaseTaskIntTest;
+import com.integri.atlas.test.task.handler.BaseTaskIntTest;
 import com.integri.atlas.task.handler.core.Var;
 import java.util.ArrayList;
 import java.util.HashMap;
