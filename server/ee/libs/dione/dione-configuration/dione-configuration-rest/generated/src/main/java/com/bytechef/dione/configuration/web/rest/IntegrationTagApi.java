@@ -33,9 +33,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-17T09:20:19.930975+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-21T12:30:41.304415+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "integration-tag", description = "The Integration Tag API")
+@Tag(name = "integration-tag", description = "The Embedded Tag API")
 public interface IntegrationTagApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -43,7 +43,7 @@ public interface IntegrationTagApi {
     }
 
     /**
-     * GET /integration-tags : Get integration tags
+     * GET /integrations/tags : Get integration tags
      * Get integration tags.
      *
      * @return A list of integration tags. (status code 200)
@@ -61,7 +61,7 @@ public interface IntegrationTagApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/integration-tags",
+        value = "/integrations/tags",
         produces = { "application/json" }
     )
     default ResponseEntity<List<TagModel>> getIntegrationTags(
@@ -82,7 +82,7 @@ public interface IntegrationTagApi {
 
 
     /**
-     * PUT /integrations/{id}/integration-tags : Updates tags of an existing integration
+     * PUT /integrations/{id}/tags : Updates tags of an existing integration
      * Updates tags of an existing integration.
      *
      * @param id The id of an integration. (required)
@@ -100,7 +100,7 @@ public interface IntegrationTagApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/integrations/{id}/integration-tags",
+        value = "/integrations/{id}/tags",
         consumes = { "application/json" }
     )
     default ResponseEntity<Void> updateIntegrationTags(
