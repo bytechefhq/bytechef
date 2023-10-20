@@ -74,7 +74,12 @@ public class ProjectFacadeIntTest {
     @Test
     @SuppressFBWarnings("NP")
     public void testAddWorkflow() {
-        Project project = projectRepository.save(new Project("name"));
+        Project project = new Project();
+
+        project.setName("name");
+        project.setStatus(Project.Status.UNPUBLISHED);
+
+        project = projectRepository.save(project);
 
         project = projectFacade.addWorkflow(project.getId(), "Workflow 1", "Description", null);
 
@@ -94,6 +99,7 @@ public class ProjectFacadeIntTest {
 
         project.setName("name1");
         project.setDescription("description");
+        project.setStatus(Project.Status.UNPUBLISHED);
 
         Category category = categoryRepository.save(new Category("name"));
 
@@ -112,6 +118,7 @@ public class ProjectFacadeIntTest {
         project = new Project();
 
         project.setName("name2");
+        project.setStatus(Project.Status.UNPUBLISHED);
         project.setWorkflowIds(List.of("workflow2"));
 
         project = projectFacade.create(project);
@@ -125,6 +132,7 @@ public class ProjectFacadeIntTest {
         Project project1 = new Project();
 
         project1.setName("name1");
+        project1.setStatus(Project.Status.UNPUBLISHED);
         project1.setTags(List.of(new Tag("tag1")));
 
         project1 = projectFacade.create(project1);
@@ -132,6 +140,7 @@ public class ProjectFacadeIntTest {
         Project project2 = new Project();
 
         project2.setName("name2");
+        project2.setStatus(Project.Status.UNPUBLISHED);
         project2.setTags(List.of(new Tag("tag1")));
 
         project2 = projectFacade.create(project2);
@@ -157,6 +166,7 @@ public class ProjectFacadeIntTest {
 
         project.setCategory(category);
         project.setName("name");
+        project.setStatus(Project.Status.UNPUBLISHED);
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
         Tag tag2 = tagRepository.save(new Tag("tag2"));
@@ -179,6 +189,7 @@ public class ProjectFacadeIntTest {
 
         project.setCategory(category);
         project.setName("name");
+        project.setStatus(Project.Status.UNPUBLISHED);
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
         Tag tag2 = tagRepository.save(new Tag("tag2"));
@@ -207,6 +218,7 @@ public class ProjectFacadeIntTest {
         Tag tag1 = tagRepository.save(new Tag("tag1"));
 
         project.setName("name");
+        project.setStatus(Project.Status.UNPUBLISHED);
         project.setTags(List.of(tag1, tagRepository.save(new Tag("tag2"))));
 
         projectRepository.save(project);
@@ -219,6 +231,7 @@ public class ProjectFacadeIntTest {
         project = new Project();
 
         project.setName("name2");
+        project.setStatus(Project.Status.UNPUBLISHED);
 
         tag1 = tagRepository.findById(tag1.getId())
             .orElseThrow();
@@ -252,7 +265,7 @@ public class ProjectFacadeIntTest {
         Project project = new Project();
 
         project.setName("name");
-
+        project.setStatus(Project.Status.UNPUBLISHED);
         project.setWorkflowIds(List.of(workflow.getId()));
 
         project = projectRepository.save(project);
@@ -267,6 +280,7 @@ public class ProjectFacadeIntTest {
         Project project = new Project();
 
         project.setName("name");
+        project.setStatus(Project.Status.UNPUBLISHED);
 
         Tag tag1 = new Tag("tag1");
 

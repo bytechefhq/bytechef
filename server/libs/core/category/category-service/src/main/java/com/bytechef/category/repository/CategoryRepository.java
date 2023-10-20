@@ -23,6 +23,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -32,4 +33,6 @@ public interface CategoryRepository
     extends PagingAndSortingRepository<Category, Long>, CrudRepository<Category, Long> {
 
     List<Category> findByIdIn(List<Long> categoryIds);
+
+    Optional<Category> findByName(String name);
 }

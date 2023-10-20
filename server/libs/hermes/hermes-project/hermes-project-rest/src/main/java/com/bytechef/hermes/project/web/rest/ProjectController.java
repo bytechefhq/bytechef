@@ -22,10 +22,9 @@ import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.category.web.rest.model.CategoryModel;
 import com.bytechef.hermes.project.domain.Project;
 import com.bytechef.hermes.project.facade.ProjectFacade;
-import com.bytechef.category.service.CategoryService;
+import com.bytechef.hermes.project.web.rest.model.CreateProjectWorkflowRequestModel;
 import com.bytechef.hermes.project.web.rest.model.ProjectModel;
-import com.bytechef.hermes.project.web.rest.model.PostProjectWorkflowRequestModel;
-import com.bytechef.hermes.project.web.rest.model.PutProjectTagsRequestModel;
+import com.bytechef.hermes.project.web.rest.model.UpdateProjectTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -48,15 +47,11 @@ import java.util.List;
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 public class ProjectController implements ProjectsApi {
 
-    private final CategoryService categoryService;
     private final ConversionService conversionService;
     private final ProjectFacade projectFacade;
 
     @SuppressFBWarnings("EI2")
-    public ProjectController(
-        CategoryService categoryService, ConversionService conversionService, ProjectFacade projectFacade) {
-
-        this.categoryService = categoryService;
+    public ProjectController(ConversionService conversionService, ProjectFacade projectFacade) {
         this.conversionService = conversionService;
         this.projectFacade = projectFacade;
     }
@@ -71,6 +66,13 @@ public class ProjectController implements ProjectsApi {
     }
 
     @Override
+    public Mono<ResponseEntity<ProjectModel>> duplicateProject(Long id, ServerWebExchange exchange) {
+        return Mono.just(
+            ResponseEntity.ok(
+                conversionService.convert(projectFacade.duplicate(id), ProjectModel.class)));
+    }
+
+    @Override
     public Mono<ResponseEntity<ProjectModel>> getProject(Long id, ServerWebExchange exchange) {
         return Mono.just(
             ResponseEntity.ok(
@@ -82,7 +84,7 @@ public class ProjectController implements ProjectsApi {
         return Mono.just(
             ResponseEntity.ok(
                 Flux.fromIterable(
-                    categoryService.getCategories()
+                    projectFacade.getProjectCategories()
                         .stream()
                         .map(category -> conversionService.convert(category, CategoryModel.class))
                         .toList())));
@@ -91,6 +93,7 @@ public class ProjectController implements ProjectsApi {
     @Override
     public Mono<ResponseEntity<Flux<ProjectModel>>> getProjects(
         List<Long> categoryIds, List<Long> tagIds, ServerWebExchange exchange) {
+
         return Mono.just(
             ResponseEntity.ok(
                 Flux.fromIterable(
@@ -124,22 +127,21 @@ public class ProjectController implements ProjectsApi {
 
     @Override
     @Transactional
-    public Mono<ResponseEntity<ProjectModel>> postProject(
+    public Mono<ResponseEntity<ProjectModel>> createProject(
         Mono<ProjectModel> projectModelMono, ServerWebExchange exchange) {
 
         return projectModelMono.map(projectModel -> ResponseEntity.ok(
             conversionService.convert(
-                projectFacade.create(
-                    conversionService.convert(projectModel, Project.class)),
+                projectFacade.create(conversionService.convert(projectModel, Project.class)),
                 ProjectModel.class)));
     }
 
     @Override
-    public Mono<ResponseEntity<ProjectModel>> postProjectWorkflow(
-        Long id, Mono<PostProjectWorkflowRequestModel> postProjectWorkflowRequestModelMono,
+    public Mono<ResponseEntity<ProjectModel>> createProjectWorkflow(
+        Long id, Mono<CreateProjectWorkflowRequestModel> createProjectWorkflowRequestModelMono,
         ServerWebExchange exchange) {
 
-        return postProjectWorkflowRequestModelMono.map(requestModel -> ResponseEntity.ok(
+        return createProjectWorkflowRequestModelMono.map(requestModel -> ResponseEntity.ok(
             conversionService.convert(
                 projectFacade.addWorkflow(
                     id, requestModel.getName(), requestModel.getDescription(), requestModel.getDefinition()),
@@ -147,7 +149,7 @@ public class ProjectController implements ProjectsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<ProjectModel>> putProject(
+    public Mono<ResponseEntity<ProjectModel>> updateProject(
         Long id, Mono<ProjectModel> projectModelMono, ServerWebExchange exchange) {
 
         return projectModelMono.map(projectModel -> ResponseEntity.ok(
@@ -157,10 +159,10 @@ public class ProjectController implements ProjectsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> putProjectTags(
-        Long id, Mono<PutProjectTagsRequestModel> putConnectionTagsRequestModelMono, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Void>> updateProjectTags(
+        Long id, Mono<UpdateProjectTagsRequestModel> updateProjectTagsRequestModelMono, ServerWebExchange exchange) {
 
-        return putConnectionTagsRequestModelMono.map(putProjectTagsRequestModel -> {
+        return updateProjectTagsRequestModelMono.map(putProjectTagsRequestModel -> {
             List<TagModel> tagModels = putProjectTagsRequestModel.getTags();
 
             projectFacade.update(

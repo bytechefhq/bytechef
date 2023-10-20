@@ -21,7 +21,6 @@ import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionModel;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -31,6 +30,5 @@ import org.springframework.core.convert.converter.Converter;
 public interface ConnectionDefinitionMapper extends Converter<ConnectionDefinition, ConnectionDefinitionModel> {
 
     @Override
-    @Mapping(target = "connectionVersion", source = "version")
     ConnectionDefinitionModel convert(ConnectionDefinition connectionDefinition);
 }

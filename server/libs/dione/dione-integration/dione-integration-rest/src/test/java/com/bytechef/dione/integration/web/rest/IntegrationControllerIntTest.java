@@ -32,7 +32,7 @@ import com.bytechef.category.service.CategoryService;
 import com.bytechef.dione.integration.web.rest.mapper.IntegrationMapper;
 import com.bytechef.dione.integration.web.rest.model.IntegrationModel;
 import com.bytechef.dione.integration.web.rest.model.PostIntegrationWorkflowRequestModel;
-import com.bytechef.dione.integration.web.rest.model.PutIntegrationTagsRequestModel;
+import com.bytechef.dione.integration.web.rest.model.UpdateIntegrationTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -137,7 +137,7 @@ public class IntegrationControllerIntTest {
     @Test
     public void testGetIntegrationCategories() {
         try {
-            when(categoryService.getCategories()).thenReturn(List.of(new Category(1, "name")));
+            when(integrationFacade.getIntegrationCategories()).thenReturn(List.of(new Category(1, "name")));
 
             this.webTestClient
                 .get()
@@ -365,7 +365,7 @@ public class IntegrationControllerIntTest {
                 .uri("/integrations/1/tags")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new PutIntegrationTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))
+                .bodyValue(new UpdateIntegrationTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful();

@@ -31,8 +31,8 @@ import com.bytechef.hermes.project.facade.ProjectFacade;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.hermes.project.web.rest.mapper.ProjectMapper;
 import com.bytechef.hermes.project.web.rest.model.ProjectModel;
-import com.bytechef.hermes.project.web.rest.model.PostProjectWorkflowRequestModel;
-import com.bytechef.hermes.project.web.rest.model.PutProjectTagsRequestModel;
+import com.bytechef.hermes.project.web.rest.model.CreateProjectWorkflowRequestModel;
+import com.bytechef.hermes.project.web.rest.model.UpdateProjectTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -137,7 +137,7 @@ public class ProjectControllerIntTest {
     @Test
     public void testGetProjectCategories() {
         try {
-            when(categoryService.getCategories()).thenReturn(List.of(new Category(1, "name")));
+            when(projectFacade.getProjectCategories()).thenReturn(List.of(new Category(1, "name")));
 
             this.webTestClient
                 .get()
@@ -278,7 +278,7 @@ public class ProjectControllerIntTest {
     @SuppressFBWarnings("NP")
     public void testPostIntegrationWorkflows() {
         Project project = getProject();
-        PostProjectWorkflowRequestModel postProjectWorkflowRequestModel = new PostProjectWorkflowRequestModel()
+        CreateProjectWorkflowRequestModel createProjectWorkflowRequestModel = new CreateProjectWorkflowRequestModel()
             .name("workflowName")
             .description("workflowDescription");
 
@@ -292,7 +292,7 @@ public class ProjectControllerIntTest {
                 .uri("/projects/1/workflows")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(postProjectWorkflowRequestModel)
+                .bodyValue(createProjectWorkflowRequestModel)
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -365,7 +365,7 @@ public class ProjectControllerIntTest {
                 .uri("/projects/1/tags")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new PutProjectTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))
+                .bodyValue(new UpdateProjectTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful();

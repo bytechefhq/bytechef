@@ -25,6 +25,7 @@ import java.util.stream.StreamSupport;
 
 import com.bytechef.hermes.project.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -44,6 +45,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project addWorkflow(long id, String workflowId) {
+        Assert.notNull(workflowId, "'workflowId' must not be null");
+
         Project project = getProject(id);
 
         project.addWorkflow(workflowId);
@@ -54,6 +57,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project create(Project project) {
         Assert.notNull(project, "'project' must not be null");
+        Assert.isNull(project.getId(), "'id' must be null");
 
         return projectRepository.save(project);
     }
@@ -74,13 +78,13 @@ public class ProjectServiceImpl implements ProjectService {
         Iterable<Project> projectIterable;
 
         if (CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
-            projectIterable = projectRepository.findAll();
+            projectIterable = projectRepository.findAllOrderByName();
         } else if (!CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
-            projectIterable = projectRepository.findByCategoryIdIn(categoryIds);
+            projectIterable = projectRepository.findByCategoryIdInOrderByName(categoryIds);
         } else if (CollectionUtils.isEmpty(categoryIds)) {
-            projectIterable = projectRepository.findByTagIdIn(tagIds);
+            projectIterable = projectRepository.findByTagIdInOrderByName(tagIds);
         } else {
-            projectIterable = projectRepository.findByCategoryIdsAndTagIds(categoryIds, tagIds);
+            projectIterable = projectRepository.findByCategoryIdsAndTagIdsOrderByName(categoryIds, tagIds);
         }
 
         return StreamSupport.stream(projectIterable.spliterator(), false)
@@ -97,10 +101,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Project update(@NonNull Project project) {
         Assert.notNull(project, "'project' must not be null");
+        Assert.notNull(project.getId(), "'id' must not be null");
         Assert.notEmpty(project.getWorkflowIds(), "'workflowIds' must not be empty");
 
-        return projectRepository.save(project);
+        Project curProject = getProject(project.getId());
+
+        return projectRepository.save(curProject.update(project));
     }
 }

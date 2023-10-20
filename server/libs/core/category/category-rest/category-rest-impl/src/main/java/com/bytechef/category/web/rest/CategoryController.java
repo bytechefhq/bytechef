@@ -69,7 +69,7 @@ public class CategoryController implements CategoriesApi {
     }
 
     @Override
-    public Mono<ResponseEntity<CategoryModel>> postCategory(
+    public Mono<ResponseEntity<CategoryModel>> createCategory(
         Mono<CategoryModel> categoryModelMono, ServerWebExchange exchange) {
 
         return categoryModelMono.map(categoryModel -> ResponseEntity.ok(
@@ -79,7 +79,7 @@ public class CategoryController implements CategoriesApi {
     }
 
     @Override
-    public Mono<ResponseEntity<CategoryModel>> putCategory(
+    public Mono<ResponseEntity<CategoryModel>> updateCategory(
         Long id, Mono<CategoryModel> categoryModelMono, ServerWebExchange exchange) {
 
         return categoryModelMono.map(tagModel -> ResponseEntity.ok(

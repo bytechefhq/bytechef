@@ -22,10 +22,9 @@ import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.category.web.rest.model.CategoryModel;
 import com.bytechef.dione.integration.domain.Integration;
 import com.bytechef.dione.integration.facade.IntegrationFacade;
-import com.bytechef.category.service.CategoryService;
+import com.bytechef.dione.integration.web.rest.model.CreateIntegrationWorkflowRequestModel;
 import com.bytechef.dione.integration.web.rest.model.IntegrationModel;
-import com.bytechef.dione.integration.web.rest.model.PostIntegrationWorkflowRequestModel;
-import com.bytechef.dione.integration.web.rest.model.PutIntegrationTagsRequestModel;
+import com.bytechef.dione.integration.web.rest.model.UpdateIntegrationTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -48,15 +47,11 @@ import java.util.List;
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 public class IntegrationController implements IntegrationsApi {
 
-    private final CategoryService categoryService;
     private final ConversionService conversionService;
     private final IntegrationFacade integrationFacade;
 
     @SuppressFBWarnings("EI2")
-    public IntegrationController(
-        CategoryService categoryService, ConversionService conversionService, IntegrationFacade integrationFacade) {
-
-        this.categoryService = categoryService;
+    public IntegrationController(ConversionService conversionService, IntegrationFacade integrationFacade) {
         this.conversionService = conversionService;
         this.integrationFacade = integrationFacade;
     }
@@ -82,7 +77,7 @@ public class IntegrationController implements IntegrationsApi {
         return Mono.just(
             ResponseEntity.ok(
                 Flux.fromIterable(
-                    categoryService.getCategories()
+                    integrationFacade.getIntegrationCategories()
                         .stream()
                         .map(category -> conversionService.convert(category, CategoryModel.class))
                         .toList())));
@@ -124,7 +119,7 @@ public class IntegrationController implements IntegrationsApi {
 
     @Override
     @Transactional
-    public Mono<ResponseEntity<IntegrationModel>> postIntegration(
+    public Mono<ResponseEntity<IntegrationModel>> createIntegration(
         Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
 
         return integrationModelMono.map(integrationModel -> ResponseEntity.ok(
@@ -135,11 +130,11 @@ public class IntegrationController implements IntegrationsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<IntegrationModel>> postIntegrationWorkflow(
-        Long id, Mono<PostIntegrationWorkflowRequestModel> postIntegrationWorkflowRequestModelMono,
+    public Mono<ResponseEntity<IntegrationModel>> createIntegrationWorkflow(
+        Long id, Mono<CreateIntegrationWorkflowRequestModel> createIntegrationWorkflowRequestModelMono,
         ServerWebExchange exchange) {
 
-        return postIntegrationWorkflowRequestModelMono.map(requestModel -> ResponseEntity.ok(
+        return createIntegrationWorkflowRequestModelMono.map(requestModel -> ResponseEntity.ok(
             conversionService.convert(
                 integrationFacade.addWorkflow(
                     id, requestModel.getName(), requestModel.getDescription(), requestModel.getDefinition()),
@@ -147,7 +142,7 @@ public class IntegrationController implements IntegrationsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<IntegrationModel>> putIntegration(
+    public Mono<ResponseEntity<IntegrationModel>> updateIntegration(
         Long id, Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
 
         return integrationModelMono.map(integrationModel -> ResponseEntity.ok(
@@ -157,10 +152,11 @@ public class IntegrationController implements IntegrationsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> putIntegrationTags(
-        Long id, Mono<PutIntegrationTagsRequestModel> putConnectionTagsRequestModelMono, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Void>> updateIntegrationTags(
+        Long id, Mono<UpdateIntegrationTagsRequestModel> updateIntegrationTagsRequestModelMono,
+        ServerWebExchange exchange) {
 
-        return putConnectionTagsRequestModelMono.map(putIntegrationTagsRequestModel -> {
+        return updateIntegrationTagsRequestModelMono.map(putIntegrationTagsRequestModel -> {
             List<TagModel> tagModels = putIntegrationTagsRequestModel.getTags();
 
             integrationFacade.update(

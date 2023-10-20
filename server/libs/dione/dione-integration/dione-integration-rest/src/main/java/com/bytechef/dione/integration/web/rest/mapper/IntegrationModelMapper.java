@@ -31,6 +31,7 @@ import org.springframework.core.convert.converter.Converter;
 public interface IntegrationModelMapper extends Converter<IntegrationModel, Integration> {
 
     @Mapping(target = "categoryId", ignore = true)
+    @Mapping(target = "update", ignore = true)
     @Mapping(target = "tagIds", ignore = true)
     Integration convert(IntegrationModel integrationModel);
 }

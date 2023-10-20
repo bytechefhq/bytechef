@@ -163,7 +163,19 @@ public class ProjectServiceIntTest {
     public void testUpdate() {
         Project project = projectRepository.save(getProject());
 
-        project = projectService.update(project);
+        Project updateProject = new Project();
+
+        updateProject.setCategory(category);
+        updateProject.setDescription(project.getDescription());
+        updateProject.setId(project.getId());
+        updateProject.setName(project.getName());
+        updateProject.setProjectVersion(project.getProjectVersion());
+        updateProject.setStatus(project.getStatus());
+        updateProject.setVersion(project.getVersion());
+        updateProject.setTags(project.getTags());
+        updateProject.setWorkflowIds(project.getWorkflowIds());
+
+        project = projectService.update(updateProject);
 
         assertThat(project)
             .hasFieldOrPropertyWithValue("category", category)
@@ -200,6 +212,8 @@ public class ProjectServiceIntTest {
         project.setCategory(category);
         project.setDescription("description");
         project.setName("name");
+        project.setProjectVersion(1);
+        project.setStatus(Project.Status.UNPUBLISHED);
 
         return project;
     }

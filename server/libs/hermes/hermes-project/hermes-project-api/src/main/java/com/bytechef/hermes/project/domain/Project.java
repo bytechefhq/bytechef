@@ -48,6 +48,10 @@ import org.springframework.util.CollectionUtils;
 @Table
 public final class Project implements Persistable<Long> {
 
+    public enum Status {
+        PUBLISHED, UNPUBLISHED
+    }
+
     @Transient
     private Category category;
 
@@ -68,12 +72,6 @@ public final class Project implements Persistable<Long> {
     @Id
     private Long id;
 
-    @MappedCollection(idColumn = "project_id")
-    private Set<ProjectTag> projectTags = new HashSet<>();
-
-    @MappedCollection(idColumn = "project_id")
-    private Set<ProjectWorkflow> projectWorkflows = new HashSet<>();
-
     @Column
     private String name;
 
@@ -85,6 +83,21 @@ public final class Project implements Persistable<Long> {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
+    @Column("last_published_date")
+    private LocalDateTime lastPublishedDate;
+
+    @MappedCollection(idColumn = "project_id")
+    private Set<ProjectTag> projectTags = new HashSet<>();
+
+    @Column
+    private int projectVersion;
+
+    @MappedCollection(idColumn = "project_id")
+    private Set<ProjectWorkflow> projectWorkflows = new HashSet<>();
+
+    @Column
+    private Status status;
+
     @Transient
     private List<Tag> tags = new ArrayList<>();
 
@@ -92,10 +105,6 @@ public final class Project implements Persistable<Long> {
     private int version;
 
     public Project() {
-    }
-
-    public Project(String name) {
-        this.name = name;
     }
 
     @PersistenceCreator
@@ -167,6 +176,10 @@ public final class Project implements Persistable<Long> {
         return id;
     }
 
+    public LocalDateTime getLastPublishedDate() {
+        return lastPublishedDate;
+    }
+
     public String getName() {
         return name;
     }
@@ -177,6 +190,14 @@ public final class Project implements Persistable<Long> {
 
     public LocalDateTime getLastModifiedDate() {
         return lastModifiedDate;
+    }
+
+    public int getProjectVersion() {
+        return projectVersion;
+    }
+
+    public Status getStatus() {
+        return status;
     }
 
     public List<Long> getTagIds() {
@@ -235,8 +256,20 @@ public final class Project implements Persistable<Long> {
         this.id = id;
     }
 
+    public void setLastPublishedDate(LocalDateTime lastPublishedDate) {
+        this.lastPublishedDate = lastPublishedDate;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setProjectVersion(int projectVersion) {
+        this.projectVersion = projectVersion;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public void setTags(List<Tag> tags) {
@@ -267,6 +300,9 @@ public final class Project implements Persistable<Long> {
         return "Project{" +
             "id=" + id +
             ", name='" + name + '\'' +
+            ", projectVersion='" + projectVersion + '\'' +
+            ", status='" + status + '\'' +
+            ", lastPublishedDate='" + lastPublishedDate + '\'' +
             ", categoryId=" + getCategoryId() +
             ", description='" + description + '\'' +
             ", projectTags=" + projectTags +
@@ -277,5 +313,18 @@ public final class Project implements Persistable<Long> {
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
             '}';
+    }
+
+    public Project update(Project project) {
+        this.category = project.category;
+        this.categoryId = project.categoryId;
+        this.description = project.description;
+        this.id = project.id;
+        this.name = project.name;
+        this.projectTags = project.projectTags;
+        this.projectWorkflows = project.projectWorkflows;
+        this.tags = project.tags;
+
+        return this;
     }
 }

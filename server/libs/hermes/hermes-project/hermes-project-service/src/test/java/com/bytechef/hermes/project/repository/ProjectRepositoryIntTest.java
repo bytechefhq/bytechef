@@ -121,6 +121,8 @@ public class ProjectRepositoryIntTest {
 
         project.setDescription("name");
         project.setName("name");
+        project.setProjectVersion(1);
+        project.setStatus(Project.Status.UNPUBLISHED);
 
         return project;
     }

@@ -226,10 +226,10 @@ components:
         display:
           $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
         name:
-          description: The component name.
+          description: The name of a component.
           type: string
         version:
-          description: The component version.
+          description: The version of a component.
           type: integer
     ComponentDefinitionWithBasicActions:
       description: A component contains a set of reusable code(actions) that accomplish specific tasks, triggers(TODO) and connections if there is a need for a connection to an outside service.
@@ -274,7 +274,7 @@ components:
         display:
           $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
         version:
-          description: The version of a component.
+          description: The version of a connection.
           type: integer
     TaskDispatcherDefinition:
       $ref: '../../hermes-task-dispatcher/hermes-task-dispatcher-api/task_dispatcher_definition_spec.yaml#/schemas/TaskDispatcherDefinition'

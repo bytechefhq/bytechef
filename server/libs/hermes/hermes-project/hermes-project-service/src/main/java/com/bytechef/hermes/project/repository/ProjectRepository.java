@@ -33,14 +33,17 @@ import java.util.List;
 public interface ProjectRepository
     extends PagingAndSortingRepository<Project, Long>, CrudRepository<Project, Long> {
 
-    Iterable<Project> findByCategoryIdIn(List<Long> categoryIds);
+    @Query("SELECT project.* FROM project ORDER BY name")
+    Iterable<Project> findAllOrderByName();
+
+    Iterable<Project> findByCategoryIdInOrderByName(List<Long> categoryIds);
 
     @Query("""
             SELECT project.* FROM project
             JOIN project_tag ON project.id = project_tag.project_id
             WHERE project_tag.tag_id in (:tagIds)
         """)
-    Iterable<Project> findByTagIdIn(@Param("tagIds") List<Long> tagIds);
+    Iterable<Project> findByTagIdInOrderByName(@Param("tagIds") List<Long> tagIds);
 
     @Query("""
             SELECT project.* FROM project
@@ -48,6 +51,6 @@ public interface ProjectRepository
             WHERE project.category_id IN (:categoryIds)
             AND project_tag.tag_id IN (:tagId)
         """)
-    Iterable<Project> findByCategoryIdsAndTagIds(
+    Iterable<Project> findByCategoryIdsAndTagIdsOrderByName(
         @Param("categoryIds") List<Long> categoryIds, @Param("tagIds") List<Long> tagIds);
 }
