@@ -2,6 +2,10 @@
 
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
+echo "Generate Airtable OpenAPI Connector"
+$SCRIPTPATH/bytechef.sh component init --open-api-path=/Volumes/data/bytechef/bytechef/server/libs/modules/components/airtable/openapi.yaml -o /Volumes/data/bytechef/bytechef/server/libs/modules/components airtable
+
+
 echo "Generate Jira OpenAPI Connector"
 $SCRIPTPATH/bytechef.sh component init --open-api-path=/Volumes/data/bytechef/bytechef/server/libs/modules/components/jira/openapi.yaml -o /Volumes/data/bytechef/bytechef/server/libs/modules/components jira
 
