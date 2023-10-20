@@ -51,6 +51,7 @@ import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -734,6 +735,7 @@ public class RestComponentGenerator {
         if (schema.getAllOf() != null) {
             codeBlocks.add(getAllOfSchemaCodeBlock(name, schema.getDescription(), schema.getAllOf(), openAPI));
         }
+
         return codeBlocks.stream()
             .collect(CodeBlock.joining(","));
     }
@@ -1101,28 +1103,33 @@ public class RestComponentGenerator {
                 case "integer" -> {
                     builder.add("integer($S)", propertyName);
                     if (schema.getMinimum() != null) {
-                        builder.add(".minValue($L)", schema.getMinimum()
-                            .intValue());
+                        BigDecimal minimum = schema.getMinimum();
+
+                        builder.add(".minValue($L)", minimum.intValue());
                     }
                     if (schema.getMaximum() != null) {
-                        builder.add(".maxValue($L)", schema.getMaximum()
-                            .intValue());
+                        BigDecimal maximum = schema.getMaximum();
+
+                        builder.add(".maxValue($L)", maximum.intValue());
                     }
                 }
                 case "number" -> {
                     builder.add("number($S)", propertyName);
                     if (schema.getMinimum() != null) {
-                        builder.add(".minValue($L)", schema.getMinimum()
-                            .doubleValue());
+                        BigDecimal minimum = schema.getMinimum();
+
+                        builder.add(".minValue($L)", minimum.doubleValue());
                     }
                     if (schema.getMaximum() != null) {
-                        builder.add(".maxValue($L)", schema.getMaximum()
-                            .doubleValue());
+                        BigDecimal maximum = schema.getMaximum();
+
+                        builder.add(".maxValue($L)", maximum.doubleValue());
                     }
                 }
                 case "object" -> {
                     if (schema.getProperties() != null || schema.getAllOf() != null) {
                         CodeBlock propertiesCodeBlock;
+
                         if (schemas.contains(schemaName)) {
                             propertiesCodeBlock = CodeBlock.of(
                                 "$T.COMPONENT_SCHEMA",
@@ -1164,6 +1171,7 @@ public class RestComponentGenerator {
                                         ClassName.get(getPackageName() + ".schema", curSchemaName + "Schema")));
                             }
                         }
+
                     } else {
                         builder.add("object($S)", propertyName);
                     }
@@ -1220,12 +1228,12 @@ public class RestComponentGenerator {
                 }
             }
         } else {
+            String $ref = schema.get$ref();
             Components components = openAPI.getComponents();
 
             Map<String, Schema> schemaMap = components.getSchemas();
 
-            String curSchemaName = schema.get$ref()
-                .replace("#/components/schemas/", "");
+            String curSchemaName = $ref.replace("#/components/schemas/", "");
 
             schemas.add(curSchemaName);
 
@@ -1330,7 +1338,7 @@ public class RestComponentGenerator {
         return javaFile.writeToPath(sourceDirPath);
     }
 
-    private Path writeAbstractComponentHandlerTest(Path testDirPath) throws IOException {
+    private void writeAbstractComponentHandlerTest(Path testDirPath) throws IOException {
         String componentHandlerClassName = getComponentHandlerClassName(componentName);
 
         JavaFile javaFile = JavaFile.builder(
@@ -1354,7 +1362,7 @@ public class RestComponentGenerator {
                 .build())
             .build();
 
-        return javaFile.writeToPath(testDirPath);
+        javaFile.writeToPath(testDirPath);
     }
 
     private void writeComponentActionsSource(
@@ -1429,8 +1437,7 @@ public class RestComponentGenerator {
         }
     }
 
-    private Path writeComponentHandlerSource(Path sourceDirPath) throws IOException {
-        Path path = null;
+    private void writeComponentHandlerSource(Path sourceDirPath) throws IOException {
         String packageName = getPackageName();
 
         String filename = sourceDirPath
@@ -1450,14 +1457,11 @@ public class RestComponentGenerator {
                         "Abstract" + getComponentHandlerClassName(componentName)))
                     .build())
                 .build();
-            path = javaFile.writeToPath(sourceDirPath);
+            javaFile.writeToPath(sourceDirPath);
         }
-
-        return path;
     }
 
-    private Path writeComponentHandlerTest(Path testDirPath) throws IOException {
-        Path path = null;
+    private void writeComponentHandlerTest(Path testDirPath) throws IOException {
         String packageName = getPackageName();
 
         String componentHandlerTestClassname = getComponentHandlerClassName(componentName) + "Test";
@@ -1479,10 +1483,8 @@ public class RestComponentGenerator {
                         "Abstract" + componentHandlerTestClassname))
                     .build())
                 .build();
-            path = javaFile.writeToPath(testDirPath);
+            javaFile.writeToPath(testDirPath);
         }
-
-        return path;
     }
 
     private void writeComponentHandlerDefinition(
