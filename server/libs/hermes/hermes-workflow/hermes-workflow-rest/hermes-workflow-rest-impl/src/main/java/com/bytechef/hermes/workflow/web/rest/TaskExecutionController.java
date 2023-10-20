@@ -19,7 +19,7 @@
 
 package com.bytechef.hermes.workflow.web.rest;
 
-import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.facade.TaskExecutionFacade;
 import com.bytechef.hermes.workflow.web.rest.model.TaskExecutionModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -40,19 +40,19 @@ import reactor.core.publisher.Mono;
 public class TaskExecutionController implements TaskExecutionsApi {
 
     private final ConversionService conversionService;
-    private final TaskExecutionService taskExecutionService;
+    private final TaskExecutionFacade taskExecutionFacade;
 
     @SuppressFBWarnings("EI2")
-    public TaskExecutionController(ConversionService conversionService, TaskExecutionService taskExecutionService) {
+    public TaskExecutionController(ConversionService conversionService, TaskExecutionFacade taskExecutionFacade) {
         this.conversionService = conversionService;
-        this.taskExecutionService = taskExecutionService;
+        this.taskExecutionFacade = taskExecutionFacade;
     }
 
     @Override
     @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<TaskExecutionModel>> getTaskExecution(Long id, ServerWebExchange exchange) {
         return Mono.just(
-            conversionService.convert(taskExecutionService.getTaskExecution(id), TaskExecutionModel.class))
+            conversionService.convert(taskExecutionFacade.getTaskExecution(id), TaskExecutionModel.class))
             .map(ResponseEntity::ok);
     }
 }

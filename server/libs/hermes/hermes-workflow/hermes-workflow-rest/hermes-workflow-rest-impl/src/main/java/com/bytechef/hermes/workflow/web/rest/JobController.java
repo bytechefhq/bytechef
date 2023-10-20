@@ -19,12 +19,12 @@
 
 package com.bytechef.hermes.workflow.web.rest;
 
+import com.bytechef.atlas.facade.TaskExecutionFacade;
 import com.bytechef.atlas.job.JobParameters;
 import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.service.JobService;
-import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.hermes.workflow.web.rest.model.CreateJob200ResponseModel;
 import com.bytechef.hermes.workflow.web.rest.model.JobModel;
 import com.bytechef.hermes.workflow.web.rest.model.JobParametersModel;
@@ -54,18 +54,18 @@ public class JobController implements JobsApi {
     private final JobFactory jobFactory;
     private final JobService jobService;
     private final MessageBroker messageBroker;
-    private final TaskExecutionService taskExecutionService;
+    private final TaskExecutionFacade taskExecutionFacade;
 
     @SuppressFBWarnings("EI2")
     public JobController(
         ConversionService conversionService, JobFactory jobFactory, JobService jobService,
-        MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
+        MessageBroker messageBroker, TaskExecutionFacade taskExecutionFacade) {
 
         this.conversionService = conversionService;
         this.jobFactory = jobFactory;
         this.jobService = jobService;
         this.messageBroker = messageBroker;
-        this.taskExecutionService = taskExecutionService;
+        this.taskExecutionFacade = taskExecutionFacade;
     }
 
     @Override
@@ -90,7 +90,7 @@ public class JobController implements JobsApi {
     @Override
     public Mono<ResponseEntity<Flux<TaskExecutionModel>>> getJobTaskExecutions(
         Long jobId, ServerWebExchange exchange) {
-        return Mono.just(Flux.fromIterable(taskExecutionService.getJobTaskExecutions(jobId)
+        return Mono.just(Flux.fromIterable(taskExecutionFacade.getJobTaskExecutions(jobId)
             .stream()
             .map(taskExecution -> conversionService.convert(taskExecution, TaskExecutionModel.class))
             .toList()))

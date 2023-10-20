@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.workflow.web.rest.mapper;
 
-import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.dto.TaskExecutionDTO;
 import com.bytechef.hermes.workflow.web.rest.mapper.config.WorkflowMapperSpringConfig;
 import com.bytechef.hermes.workflow.web.rest.model.TaskExecutionModel;
 import org.mapstruct.Mapper;
@@ -27,8 +27,8 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = WorkflowMapperSpringConfig.class)
-public interface TaskExecutionMapper extends Converter<TaskExecution, TaskExecutionModel> {
+public interface TaskExecutionMapper extends Converter<TaskExecutionDTO, TaskExecutionModel> {
 
     @Override
-    TaskExecutionModel convert(TaskExecution taskExecution);
+    TaskExecutionModel convert(TaskExecutionDTO taskExecutionDTO);
 }

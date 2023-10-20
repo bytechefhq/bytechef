@@ -15,22 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.project.dto;
+package com.bytechef.atlas.facade;
 
-import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.dto.TaskExecutionDTO;
-import com.bytechef.helios.project.domain.Project;
-import com.bytechef.helios.project.domain.ProjectInstance;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
-public record ProjectExecutionDTO(
-    long id, ProjectInstance instance, Job job, Project project, List<TaskExecutionDTO> taskExecutions,
-    Workflow workflow) {
+public interface TaskExecutionFacade {
+
+    TaskExecutionDTO getTaskExecution(long id);
+
+    List<TaskExecutionDTO> getJobTaskExecutions(long jobId);
 }
