@@ -125,25 +125,25 @@ public class LoopTaskDispatcherIntTest extends BaseTaskIntTest {
     ) {
         return List.of(
             new IfTaskCompletionHandler(
-                contextRepository,
+                contextService,
                 taskCompletionHandler,
                 taskDispatcher,
                 SpelTaskEvaluator.create(),
-                taskExecutionRepository
+                taskExecutionService
             ),
             new LoopTaskCompletionHandler(
-                contextRepository,
+                contextService,
                 taskCompletionHandler,
                 taskDispatcher,
                 SpelTaskEvaluator.create(),
-                taskExecutionRepository
+                taskExecutionService
             ),
             new SequenceTaskCompletionHandler(
-                contextRepository,
+                contextService,
                 taskCompletionHandler,
                 taskDispatcher,
                 SpelTaskEvaluator.create(),
-                taskExecutionRepository
+                taskExecutionService
             )
         );
     }
@@ -155,26 +155,26 @@ public class LoopTaskDispatcherIntTest extends BaseTaskIntTest {
     ) {
         return List.of(
             new IfTaskDispatcher(
-                contextRepository,
+                contextService,
                 coordinatorMessageBroker,
                 taskDispatcher,
                 SpelTaskEvaluator.create(),
-                taskExecutionRepository
+                taskExecutionService
             ),
-            new LoopBreakTaskDispatcher(coordinatorMessageBroker, taskExecutionRepository),
+            new LoopBreakTaskDispatcher(coordinatorMessageBroker, taskExecutionService),
             new LoopTaskDispatcher(
-                contextRepository,
+                contextService,
                 coordinatorMessageBroker,
                 taskDispatcher,
                 SpelTaskEvaluator.create(),
-                taskExecutionRepository
+                taskExecutionService
             ),
             new SequenceTaskDispatcher(
-                contextRepository,
+                contextService,
                 coordinatorMessageBroker,
                 taskDispatcher,
                 SpelTaskEvaluator.create(),
-                taskExecutionRepository
+                taskExecutionService
             )
         );
     }

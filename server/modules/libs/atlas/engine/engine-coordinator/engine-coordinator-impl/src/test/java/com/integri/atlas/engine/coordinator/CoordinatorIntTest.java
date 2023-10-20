@@ -18,20 +18,20 @@
 
 package com.integri.atlas.engine.coordinator;
 
+import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.MapObject;
-import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.coordinator.job.executor.DefaultJobExecutor;
 import com.integri.atlas.engine.coordinator.task.completion.DefaultTaskCompletionHandler;
 import com.integri.atlas.engine.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.integri.atlas.engine.job.Job;
 import com.integri.atlas.engine.job.JobStatus;
-import com.integri.atlas.engine.job.repository.JobRepository;
 import com.integri.atlas.engine.job.service.JobService;
 import com.integri.atlas.engine.message.broker.Queues;
 import com.integri.atlas.engine.message.broker.sync.SyncMessageBroker;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.engine.worker.Worker;
 import com.integri.atlas.engine.worker.WorkerImpl;
 import com.integri.atlas.engine.worker.task.handler.DefaultTaskHandlerResolver;
@@ -41,6 +41,7 @@ import com.integri.atlas.engine.workflow.repository.mapper.JsonWorkflowMapper;
 import com.integri.atlas.engine.workflow.repository.mapper.WorkflowMapper;
 import com.integri.atlas.engine.workflow.repository.mapper.YAMLWorkflowMapper;
 import com.integri.atlas.engine.workflow.repository.resource.ResourceBasedWorkflowRepository;
+import com.integri.atlas.engine.workflow.service.WorkflowService;
 import com.integri.atlas.task.handler.io.Print;
 import com.integri.atlas.task.handler.random.RandomInt;
 import com.integri.atlas.task.handler.time.Sleep;
@@ -59,13 +60,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class CoordinatorIntTest {
 
     @Autowired
-    private ContextRepository contextRepository;
-
-    @Autowired
-    private JobRepository jobRepository;
+    private ContextService contextService;
 
     @Autowired
     private JobService jobService;
+
+    @Autowired
+    private TaskExecutionService taskExecutionService;
 
     @Autowired
     private TaskExecutionRepository taskExecutionRepository;
@@ -104,7 +105,7 @@ public class CoordinatorIntTest {
             .withTaskEvaluator(SpelTaskEvaluator.create())
             .build();
 
-        coordinator.setContextRepository(contextRepository);
+        coordinator.setContextService(contextService);
         coordinator.setJobService(jobService);
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
@@ -118,23 +119,25 @@ public class CoordinatorIntTest {
 
         DefaultJobExecutor jobExecutor = new DefaultJobExecutor();
 
-        jobExecutor.setContextRepository(contextRepository);
-        jobExecutor.setTaskExecutionRepository(taskExecutionRepository);
+        jobExecutor.setContextService(contextService);
+        jobExecutor.setTaskExecutionService(taskExecutionService);
         jobExecutor.setTaskDispatcher(taskDispatcher);
         jobExecutor.setTaskEvaluator(SpelTaskEvaluator.create());
-        jobExecutor.setWorkflowRepository(new ResourceBasedWorkflowRepository(workflowMapper));
+        jobExecutor.setWorkflowService(new WorkflowService(new ResourceBasedWorkflowRepository(workflowMapper)));
 
         coordinator.setJobExecutor(jobExecutor);
 
         DefaultTaskCompletionHandler taskCompletionHandler = new DefaultTaskCompletionHandler();
 
-        taskCompletionHandler.setContextRepository(contextRepository);
+        taskCompletionHandler.setContextService(contextService);
         taskCompletionHandler.setEventPublisher(e -> {});
         taskCompletionHandler.setJobExecutor(jobExecutor);
-        taskCompletionHandler.setJobRepository(jobRepository);
-        taskCompletionHandler.setTaskExecutionRepository(taskExecutionRepository);
+        taskCompletionHandler.setJobService(jobService);
+        taskCompletionHandler.setTaskExecutionService(taskExecutionService);
         taskCompletionHandler.setTaskEvaluator(SpelTaskEvaluator.create());
-        taskCompletionHandler.setWorkflowRepository(new ResourceBasedWorkflowRepository(workflowMapper));
+        taskCompletionHandler.setWorkflowService(
+            new WorkflowService(new ResourceBasedWorkflowRepository(workflowMapper))
+        );
 
         coordinator.setMessageBroker(messageBroker);
         coordinator.setTaskCompletionHandler(taskCompletionHandler);
@@ -143,7 +146,7 @@ public class CoordinatorIntTest {
             MapObject.of(Map.of("workflowId", workflowId, "inputs", Collections.singletonMap("yourName", "me")))
         );
 
-        Job completedJob = jobRepository.getById(job.getId());
+        Job completedJob = jobService.getJob(job.getId());
 
         Assertions.assertEquals(JobStatus.COMPLETED, completedJob.getStatus());
     }
@@ -156,7 +159,11 @@ public class CoordinatorIntTest {
                 CoordinatorImpl coordinator = new CoordinatorImpl();
 
                 coordinator.setJobService(
-                    new JobService(null, new ResourceBasedWorkflowRepository(new JsonWorkflowMapper()))
+                    new JobService(
+                        null,
+                        taskExecutionRepository,
+                        new ResourceBasedWorkflowRepository(new JsonWorkflowMapper())
+                    )
                 );
 
                 coordinator.create(MapObject.of(Collections.singletonMap("workflowId", "samples/hello.json")));

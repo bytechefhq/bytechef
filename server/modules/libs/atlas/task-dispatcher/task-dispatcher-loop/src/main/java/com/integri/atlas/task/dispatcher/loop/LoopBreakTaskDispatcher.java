@@ -24,7 +24,7 @@ import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.task.dispatcher.TaskDispatcherResolver;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import java.util.Date;
 import org.springframework.util.Assert;
 
@@ -34,11 +34,11 @@ import org.springframework.util.Assert;
 public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
     private final MessageBroker messageBroker;
-    private final TaskExecutionRepository taskExecutionRepository;
+    private final TaskExecutionService taskExecutionService;
 
-    public LoopBreakTaskDispatcher(MessageBroker messageBroker, TaskExecutionRepository taskExecutionRepository) {
+    public LoopBreakTaskDispatcher(MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
         this.messageBroker = messageBroker;
-        this.taskExecutionRepository = taskExecutionRepository;
+        this.taskExecutionService = taskExecutionService;
     }
 
     @Override
@@ -56,7 +56,9 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
     private SimpleTaskExecution findLoopTaskExecution(String taskExecutionId) {
         Assert.notNull(taskExecutionId, "Cannot be null");
 
-        SimpleTaskExecution taskExecution = SimpleTaskExecution.of(taskExecutionRepository.findOne(taskExecutionId));
+        SimpleTaskExecution taskExecution = SimpleTaskExecution.of(
+            taskExecutionService.getTaskExecution(taskExecutionId)
+        );
 
         if (Constants.LOOP.equals(taskExecution.getType())) {
             return taskExecution;

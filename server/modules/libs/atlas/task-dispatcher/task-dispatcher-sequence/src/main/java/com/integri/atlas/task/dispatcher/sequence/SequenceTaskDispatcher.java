@@ -16,10 +16,10 @@
 
 package com.integri.atlas.task.dispatcher.sequence;
 
+import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.context.MapContext;
-import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.message.broker.MessageBroker;
 import com.integri.atlas.engine.message.broker.Queues;
 import com.integri.atlas.engine.task.Task;
@@ -29,7 +29,7 @@ import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.engine.uuid.UUIDGenerator;
 import java.util.Date;
 import java.util.List;
@@ -40,24 +40,24 @@ import java.util.List;
  */
 public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private final ContextRepository contextRepository;
+    private final ContextService contextService;
     private final MessageBroker messageBroker;
     private final TaskDispatcher taskDispatcher;
     private final TaskEvaluator taskEvaluator;
-    private final TaskExecutionRepository taskExecutionRepository;
+    private final TaskExecutionService taskExecutionService;
 
     public SequenceTaskDispatcher(
-        ContextRepository contextRepository,
+        ContextService contextService,
         MessageBroker messageBroker,
         TaskDispatcher taskDispatcher,
         TaskEvaluator taskEvaluator,
-        TaskExecutionRepository taskExecutionRepository
+        TaskExecutionService taskExecutionService
     ) {
-        this.contextRepository = contextRepository;
+        this.contextService = contextService;
         this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
         this.taskEvaluator = taskEvaluator;
-        this.taskExecutionRepository = taskExecutionRepository;
+        this.taskExecutionService = taskExecutionService;
     }
 
     @Override
@@ -67,7 +67,7 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
         sequenceTaskExecution.setStartTime(new Date());
         sequenceTaskExecution.setStatus(TaskStatus.STARTED);
 
-        taskExecutionRepository.merge(sequenceTaskExecution);
+        taskExecutionService.merge(sequenceTaskExecution);
 
         List<MapObject> subtaskDefinitions = sequenceTaskExecution.getList("tasks", MapObject.class);
 
@@ -84,13 +84,13 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             subTaskExecution.setParentId(sequenceTaskExecution.getId());
             subTaskExecution.setPriority(sequenceTaskExecution.getPriority());
 
-            MapContext context = new MapContext(contextRepository.peek(sequenceTaskExecution.getId()));
+            MapContext context = new MapContext(contextService.peek(sequenceTaskExecution.getId()));
 
-            contextRepository.push(subTaskExecution.getId(), context);
+            contextService.push(subTaskExecution.getId(), context);
 
             TaskExecution evaluatedSubTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-            taskExecutionRepository.create(evaluatedSubTaskExecution);
+            taskExecutionService.create(evaluatedSubTaskExecution);
             taskDispatcher.dispatch(evaluatedSubTaskExecution);
         } else {
             SimpleTaskExecution completionTaskExecution = SimpleTaskExecution.of(taskExecution);

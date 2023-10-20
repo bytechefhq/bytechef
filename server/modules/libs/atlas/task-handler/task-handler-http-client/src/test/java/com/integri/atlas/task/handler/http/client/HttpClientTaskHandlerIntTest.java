@@ -67,7 +67,7 @@ public class HttpClientTaskHandlerIntTest extends BaseTaskIntTest {
     public void testHttpClientTaskHandler() {
         Job job = startJob("samples/http-client.yaml", Collections.emptyMap());
 
-        Context context = contextRepository.peek(job.getId());
+        Context context = contextService.peek(job.getId());
 
         Assertions.assertTrue(true);
     }

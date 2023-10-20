@@ -24,7 +24,7 @@ import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.event.Events;
 import com.integri.atlas.engine.event.WorkflowEvent;
 import com.integri.atlas.engine.job.Job;
-import com.integri.atlas.engine.job.repository.JobRepository;
+import com.integri.atlas.engine.job.service.JobService;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,19 +37,19 @@ import org.springframework.web.client.RestTemplate;
  */
 public class TaskStartedWebhookEventListener implements EventListener {
 
-    private final JobRepository jobRepository;
+    private final JobService jobService;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final RestTemplate rest = new RestTemplate();
 
-    public TaskStartedWebhookEventListener(JobRepository aJobRepository) {
-        jobRepository = aJobRepository;
+    public TaskStartedWebhookEventListener(JobService jobService) {
+        this.jobService = jobService;
     }
 
     private void handleEvent(WorkflowEvent aEvent) {
         String jobId = aEvent.getRequiredString(Constants.JOB_ID);
-        Job job = jobRepository.getById(jobId);
+        Job job = jobService.getJob(jobId);
         if (job == null) {
             logger.warn("Unknown job: {}", jobId);
             return;

@@ -18,18 +18,18 @@
 
 package com.integri.atlas.task.dispatcher.switch_.completion;
 
+import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.context.Context;
 import com.integri.atlas.engine.context.MapContext;
-import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
 import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.engine.uuid.UUIDGenerator;
 import java.util.Collections;
 import java.util.Date;
@@ -43,21 +43,21 @@ import org.springframework.util.Assert;
  */
 public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
 
-    private final ContextRepository contextRepository;
-    private final TaskExecutionRepository taskExecutionRepository;
+    private final ContextService contextService;
+    private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher taskDispatcher;
     private final TaskEvaluator taskEvaluator;
 
     public SwitchTaskCompletionHandler(
-        ContextRepository contextRepository,
-        TaskExecutionRepository taskExecutionRepository,
+        ContextService contextService,
+        TaskExecutionService taskExecutionService,
         TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher taskDispatcher,
         TaskEvaluator taskEvaluator
     ) {
-        this.contextRepository = contextRepository;
-        this.taskExecutionRepository = taskExecutionRepository;
+        this.contextService = contextService;
+        this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
         this.taskEvaluator = taskEvaluator;
@@ -68,7 +68,7 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
         String parentId = taskExecution.getParentId();
 
         if (parentId != null) {
-            TaskExecution parentExecution = taskExecutionRepository.findOne(parentId);
+            TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
 
             return parentExecution.getType().equals(Constants.SWITCH);
         }
@@ -82,19 +82,19 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
 
         completedSubTaskExecution.setStatus(TaskStatus.COMPLETED);
 
-        taskExecutionRepository.merge(completedSubTaskExecution);
+        taskExecutionService.merge(completedSubTaskExecution);
 
         SimpleTaskExecution switchTaskExecution = SimpleTaskExecution.of(
-            taskExecutionRepository.findOne(taskExecution.getParentId())
+            taskExecutionService.getTaskExecution(taskExecution.getParentId())
         );
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-            Context context = contextRepository.peek(switchTaskExecution.getId());
+            Context context = contextService.peek(switchTaskExecution.getId());
             MapContext newContext = new MapContext(context.asMap());
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
-            contextRepository.push(switchTaskExecution.getId(), newContext);
+            contextService.push(switchTaskExecution.getId(), newContext);
         }
 
         List<MapObject> tasks = resolveCase(switchTaskExecution);
@@ -112,13 +112,13 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
             subTaskExecution.setParentId(switchTaskExecution.getId());
             subTaskExecution.setPriority(switchTaskExecution.getPriority());
 
-            MapContext context = new MapContext(contextRepository.peek(switchTaskExecution.getId()));
+            MapContext context = new MapContext(contextService.peek(switchTaskExecution.getId()));
 
-            contextRepository.push(subTaskExecution.getId(), context);
+            contextService.push(subTaskExecution.getId(), context);
 
             TaskExecution evaluatedSubTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-            taskExecutionRepository.create(evaluatedSubTaskExecution);
+            taskExecutionService.create(evaluatedSubTaskExecution);
             taskDispatcher.dispatch(evaluatedSubTaskExecution);
         }
         // no more tasks to execute -- complete the switch

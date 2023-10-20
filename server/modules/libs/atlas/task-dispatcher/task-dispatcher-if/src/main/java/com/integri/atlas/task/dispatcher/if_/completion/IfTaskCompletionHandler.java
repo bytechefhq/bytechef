@@ -19,18 +19,18 @@ package com.integri.atlas.task.dispatcher.if_.completion;
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_CASE_FALSE;
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_CASE_TRUE;
 
+import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.context.Context;
 import com.integri.atlas.engine.context.MapContext;
-import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
 import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.engine.uuid.UUIDGenerator;
 import com.integri.atlas.task.dispatcher.if_.util.IfTaskUtil;
 import java.util.Date;
@@ -41,24 +41,24 @@ import java.util.List;
  */
 public class IfTaskCompletionHandler implements TaskCompletionHandler {
 
-    private final ContextRepository contextRepository;
+    private final ContextService contextService;
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher taskDispatcher;
     private final TaskEvaluator taskEvaluator;
-    private final TaskExecutionRepository taskExecutionRepository;
+    private final TaskExecutionService taskExecutionService;
 
     public IfTaskCompletionHandler(
-        ContextRepository contextRepository,
+        ContextService contextService,
         TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher taskDispatcher,
         TaskEvaluator taskEvaluator,
-        TaskExecutionRepository taskExecutionRepository
+        TaskExecutionService taskExecutionService
     ) {
-        this.contextRepository = contextRepository;
+        this.contextService = contextService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
         this.taskEvaluator = taskEvaluator;
-        this.taskExecutionRepository = taskExecutionRepository;
+        this.taskExecutionService = taskExecutionService;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
         String parentId = taskExecution.getParentId();
 
         if (parentId != null) {
-            TaskExecution parentTaskExecution = taskExecutionRepository.findOne(parentId);
+            TaskExecution parentTaskExecution = taskExecutionService.getTaskExecution(parentId);
 
             return parentTaskExecution.getType().equals(Constants.IF);
         }
@@ -80,20 +80,20 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
 
         completedSubTaskExecution.setStatus(TaskStatus.COMPLETED);
 
-        taskExecutionRepository.merge(completedSubTaskExecution);
+        taskExecutionService.merge(completedSubTaskExecution);
 
         SimpleTaskExecution ifTaskExecution = SimpleTaskExecution.of(
-            taskExecutionRepository.findOne(taskExecution.getParentId())
+            taskExecutionService.getTaskExecution(taskExecution.getParentId())
         );
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-            Context context = contextRepository.peek(ifTaskExecution.getId());
+            Context context = contextService.peek(ifTaskExecution.getId());
 
             MapContext newContext = new MapContext(context.asMap());
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
-            contextRepository.push(ifTaskExecution.getId(), newContext);
+            contextService.push(ifTaskExecution.getId(), newContext);
         }
 
         List<MapObject> subtaskDefinitions;
@@ -117,13 +117,13 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
             subTaskExecution.setStatus(TaskStatus.CREATED);
             subTaskExecution.setTaskNumber(taskExecution.getTaskNumber() + 1);
 
-            MapContext context = new MapContext(contextRepository.peek(ifTaskExecution.getId()));
+            MapContext context = new MapContext(contextService.peek(ifTaskExecution.getId()));
 
-            contextRepository.push(subTaskExecution.getId(), context);
+            contextService.push(subTaskExecution.getId(), context);
 
             TaskExecution evaluatedSubTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-            taskExecutionRepository.create(evaluatedSubTaskExecution);
+            taskExecutionService.create(evaluatedSubTaskExecution);
             taskDispatcher.dispatch(evaluatedSubTaskExecution);
         }
         // no more tasks to execute -- complete the If

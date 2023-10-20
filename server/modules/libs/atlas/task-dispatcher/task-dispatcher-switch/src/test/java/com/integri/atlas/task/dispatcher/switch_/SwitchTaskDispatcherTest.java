@@ -24,14 +24,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.context.MapContext;
-import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.message.broker.MessageBroker;
 import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.evaluator.spel.SpelTaskEvaluator;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -45,20 +45,20 @@ import org.mockito.ArgumentCaptor;
  */
 public class SwitchTaskDispatcherTest {
 
-    private ContextRepository contextRepository = mock(ContextRepository.class);
+    private ContextService contextService = mock(ContextService.class);
     private MessageBroker messageBroker = mock(MessageBroker.class);
-    private TaskExecutionRepository taskExecutionRepository = mock(TaskExecutionRepository.class);
+    private TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
     private TaskDispatcher taskDispatcher = mock(TaskDispatcher.class);
 
     @Test
     public void test1() {
-        when(contextRepository.peek(any())).thenReturn(new MapContext());
+        when(contextService.peek(any())).thenReturn(new MapContext());
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
-            contextRepository,
+            contextService,
             messageBroker,
             taskDispatcher,
-            taskExecutionRepository,
+            taskExecutionService,
             SpelTaskEvaluator.create()
         );
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
@@ -76,13 +76,13 @@ public class SwitchTaskDispatcherTest {
 
     @Test
     public void test2() {
-        when(contextRepository.peek(any())).thenReturn(new MapContext());
+        when(contextService.peek(any())).thenReturn(new MapContext());
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
-            contextRepository,
+            contextService,
             messageBroker,
             taskDispatcher,
-            taskExecutionRepository,
+            taskExecutionService,
             SpelTaskEvaluator.create()
         );
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
@@ -97,13 +97,13 @@ public class SwitchTaskDispatcherTest {
 
     @Test
     public void test3() {
-        when(contextRepository.peek(any())).thenReturn(new MapContext());
+        when(contextService.peek(any())).thenReturn(new MapContext());
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
-            contextRepository,
+            contextService,
             messageBroker,
             taskDispatcher,
-            taskExecutionRepository,
+            taskExecutionService,
             SpelTaskEvaluator.create()
         );
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
@@ -127,13 +127,13 @@ public class SwitchTaskDispatcherTest {
 
     @Test
     public void test4() {
-        when(contextRepository.peek(any())).thenReturn(new MapContext());
+        when(contextService.peek(any())).thenReturn(new MapContext());
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
-            contextRepository,
+            contextService,
             messageBroker,
             taskDispatcher,
-            taskExecutionRepository,
+            taskExecutionService,
             SpelTaskEvaluator.create()
         );
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();

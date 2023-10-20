@@ -33,7 +33,7 @@ import com.integri.atlas.engine.context.Context;
 public interface ContextRepository {
     void delete(String stackId);
 
-    void push(String aStackId, Context aContext);
+    void push(String stackId, Context context);
 
-    Context peek(String aStackId);
+    Context peek(String stackId);
 }

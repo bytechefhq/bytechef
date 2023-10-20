@@ -40,10 +40,10 @@ public class JdbcWorkflowRepository implements WorkflowRepository {
     private WorkflowMapper workflowMapper;
 
     @Override
-    public Workflow findOne(String aId) {
+    public Workflow findOne(String id) {
         List<Workflow> workflows = jdbcTemplate.query(
             "select * from workflow w where w.id = :id",
-            Collections.singletonMap("id", aId),
+            Collections.singletonMap("id", id),
             this::workflowRowMapper
         );
 

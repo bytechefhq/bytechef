@@ -17,8 +17,8 @@
 package com.integri.atlas.engine;
 
 import com.integri.atlas.engine.coordinator.Coordinator;
-import com.integri.atlas.engine.job.repository.JobRepository;
-import com.integri.atlas.engine.workflow.repository.WorkflowRepository;
+import com.integri.atlas.engine.job.service.JobService;
+import com.integri.atlas.engine.workflow.service.WorkflowService;
 import com.integri.atlas.task.definition.TaskDefinitionHandler;
 import com.integri.atlas.task.definition.dsl.DSL;
 import org.springframework.boot.SpringBootConfiguration;
@@ -36,10 +36,10 @@ public class RestTestConfiguration {
     private Coordinator coordinator;
 
     @MockBean
-    private JobRepository jobRepository;
+    private JobService jobService;
 
     @MockBean
-    private WorkflowRepository workflowRepository;
+    private WorkflowService workflowService;
 
     @Bean
     TaskDefinitionHandler task1TaskDefinitionHandler() {

@@ -20,7 +20,7 @@ package com.integri.atlas.engine.web.rest;
 
 import com.integri.atlas.engine.annotation.ConditionalOnCoordinator;
 import com.integri.atlas.engine.workflow.Workflow;
-import com.integri.atlas.engine.workflow.repository.WorkflowRepository;
+import com.integri.atlas.engine.workflow.service.WorkflowService;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -42,10 +42,10 @@ import org.springframework.web.servlet.HandlerMapping;
 @ConditionalOnCoordinator
 public class WorkflowController {
 
-    private final WorkflowRepository workflowRepository;
+    private final WorkflowService workflowService;
 
-    public WorkflowController(WorkflowRepository workflowRepository) {
-        this.workflowRepository = workflowRepository;
+    public WorkflowController(WorkflowService workflowService) {
+        this.workflowService = workflowService;
     }
 
     @PostMapping(path = "/workflows", consumes = { MediaType.APPLICATION_JSON_VALUE, "application/yaml" })
@@ -53,7 +53,7 @@ public class WorkflowController {
         @RequestBody String content,
         @RequestHeader("Content-Type") String contentType
     ) {
-        Workflow workflow = workflowRepository.create(content, contentType.substring(contentType.lastIndexOf('/') + 1));
+        Workflow workflow = workflowService.create(content, contentType.substring(contentType.lastIndexOf('/') + 1));
 
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(workflow);
     }
@@ -64,7 +64,7 @@ public class WorkflowController {
         @RequestBody String content,
         @RequestHeader("Content-Type") String contentType
     ) {
-        Workflow workflow = workflowRepository.update(
+        Workflow workflow = workflowService.update(
             id,
             content,
             contentType.substring(contentType.lastIndexOf('/') + 1)
@@ -75,7 +75,7 @@ public class WorkflowController {
 
     @GetMapping(value = "/workflows", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Workflow> list() {
-        return workflowRepository.findAll();
+        return workflowService.getWorkflows();
     }
 
     @GetMapping(value = "/workflows/**", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -83,6 +83,6 @@ public class WorkflowController {
         String path = (String) aRequest.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         String workflowId = path.replaceFirst("/workflows/", "");
 
-        return workflowRepository.findOne(workflowId);
+        return workflowService.getWorkflow(workflowId);
     }
 }

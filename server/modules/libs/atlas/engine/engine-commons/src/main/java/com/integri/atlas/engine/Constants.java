@@ -75,7 +75,7 @@ public class Constants {
 
     public static final String INPUT = "input";
 
-    public static final String EXECUTION = "execution";
+    public static final String EXECUTIONS = "executions";
 
     public static final String PRIORITY = "priority";
 
@@ -131,7 +131,7 @@ public class Constants {
         END_TIME,
         STATUS,
         ERROR,
-        EXECUTION,
+        EXECUTIONS,
         PRIORITY,
         CURRENT_TASK,
         PARENT_TASK_EXECUTION_ID,

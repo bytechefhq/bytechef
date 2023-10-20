@@ -31,19 +31,21 @@ public class InMemoryCounterRepository implements CounterRepository {
     private final Map<String, Long> counters = new HashMap<>();
 
     @Override
-    public void set(String aCounterName, long aValue) {
-        counters.put(aCounterName, aValue);
+    public void set(String counterName, long value) {
+        counters.put(counterName, value);
     }
 
     @Override
-    public long decrement(String aCounterName) {
-        Long value = counters.getOrDefault(aCounterName, 0L) - 1;
-        counters.put(aCounterName, value);
+    public long decrement(String counterName) {
+        Long value = counters.getOrDefault(counterName, 0L) - 1;
+
+        counters.put(counterName, value);
+
         return value;
     }
 
     @Override
-    public void delete(String aCounterName) {
-        counters.remove(aCounterName);
+    public void delete(String counterName) {
+        counters.remove(counterName);
     }
 }

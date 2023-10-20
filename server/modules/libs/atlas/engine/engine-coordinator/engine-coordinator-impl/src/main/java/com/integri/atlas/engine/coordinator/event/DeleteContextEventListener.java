@@ -22,7 +22,7 @@ import com.integri.atlas.engine.event.Events;
 import com.integri.atlas.engine.event.WorkflowEvent;
 import com.integri.atlas.engine.job.Job;
 import com.integri.atlas.engine.job.JobStatus;
-import com.integri.atlas.engine.job.repository.JobRepository;
+import com.integri.atlas.engine.job.service.JobService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,11 +34,11 @@ public class DeleteContextEventListener implements EventListener {
     private static final Logger logger = LoggerFactory.getLogger(DeleteContextEventListener.class);
 
     private final ContextService contextService;
-    private final JobRepository jobRepository;
+    private final JobService jobService;
 
-    public DeleteContextEventListener(ContextService contextService, JobRepository jobRepository) {
+    public DeleteContextEventListener(ContextService contextService, JobService jobService) {
         this.contextService = contextService;
-        this.jobRepository = jobRepository;
+        this.jobService = jobService;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class DeleteContextEventListener implements EventListener {
     private void handleEvent(WorkflowEvent workflowEvent) {
         String jobId = workflowEvent.getRequiredString(Constants.JOB_ID);
 
-        Job job = jobRepository.getById(jobId);
+        Job job = jobService.getJob(jobId);
 
         if (job == null) {
             logger.warn("Unknown job: {}", jobId);

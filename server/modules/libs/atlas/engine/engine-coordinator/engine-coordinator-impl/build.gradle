@@ -8,12 +8,10 @@ dependencies {
     implementation "org.springframework:spring-webmvc"
     implementation "org.springframework.retry:spring-retry"
     implementation project(":modules:libs:atlas:engine:engine-context:engine-context-service")
-    implementation project(":modules:libs:atlas:engine:engine-context:engine-context-repository:engine-context-repository-api")
     implementation project(":modules:libs:atlas:engine:engine-job:engine-job-service")
-    implementation project(":modules:libs:atlas:engine:engine-job:engine-job-repository:engine-job-repository-api")
     implementation project(":modules:libs:atlas:engine:engine-message-broker:engine-message-broker-api")
-    implementation project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-repository:engine-task-execution-repository-api")
-    implementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-api")
+    implementation project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-service")
+    implementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-service")
 
     testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
     testImplementation project(":modules:libs:atlas:task-handler:task-handler-io")
@@ -22,6 +20,9 @@ dependencies {
     testImplementation project(":modules:libs:atlas:engine:engine-worker:engine-worker-impl")
     testImplementation project(":modules:libs:atlas:engine:engine-message-broker:engine-message-broker-sync")
     testImplementation project(":modules:libs:atlas:test-commons")
+    testImplementation project(":modules:libs:atlas:engine:engine-context:engine-context-repository:engine-context-repository-api")
+    testImplementation project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-repository:engine-task-execution-repository-api")
+    testImplementation project(":modules:libs:atlas:engine:engine-job:engine-job-repository:engine-job-repository-api")
     testImplementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-resource")
 
     testRuntimeOnly "org.postgresql:postgresql"

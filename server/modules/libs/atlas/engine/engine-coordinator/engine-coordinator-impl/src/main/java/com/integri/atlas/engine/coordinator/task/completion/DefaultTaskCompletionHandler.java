@@ -18,11 +18,11 @@
 
 package com.integri.atlas.engine.coordinator.task.completion;
 
+import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.Accessor;
 import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.context.Context;
 import com.integri.atlas.engine.context.MapContext;
-import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.coordinator.job.executor.JobExecutor;
 import com.integri.atlas.engine.event.EventPublisher;
 import com.integri.atlas.engine.event.Events;
@@ -30,14 +30,14 @@ import com.integri.atlas.engine.event.WorkflowEvent;
 import com.integri.atlas.engine.job.Job;
 import com.integri.atlas.engine.job.JobStatus;
 import com.integri.atlas.engine.job.SimpleJob;
-import com.integri.atlas.engine.job.repository.JobRepository;
+import com.integri.atlas.engine.job.service.JobService;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.engine.workflow.Workflow;
-import com.integri.atlas.engine.workflow.repository.WorkflowRepository;
+import com.integri.atlas.engine.workflow.service.WorkflowService;
 import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
@@ -52,10 +52,10 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultTaskCompletionHandler.class);
 
-    private JobRepository jobRepository;
-    private WorkflowRepository workflowRepository;
-    private TaskExecutionRepository taskExecutionRepository;
-    private ContextRepository contextRepository;
+    private JobService jobService;
+    private WorkflowService workflowService;
+    private TaskExecutionService taskExecutionService;
+    private ContextService contextService;
     private JobExecutor jobExecutor;
     private EventPublisher eventPublisher;
     private TaskEvaluator taskEvaluator;
@@ -69,31 +69,31 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     public void handle(TaskExecution taskExecution) {
         log.debug("Completing task {}", taskExecution.getId());
 
-        Job job = jobRepository.getByTaskId(taskExecution.getId());
+        Job job = jobService.getTaskExecutionJob(taskExecution.getId());
 
         if (job != null) {
             SimpleTaskExecution completedTaskExecution = SimpleTaskExecution.of(taskExecution);
 
             completedTaskExecution.setStatus(TaskStatus.COMPLETED);
 
-            taskExecutionRepository.merge(completedTaskExecution);
+            taskExecutionService.merge(completedTaskExecution);
 
             SimpleJob simpleJob = new SimpleJob(job);
 
             if (completedTaskExecution.getOutput() != null && completedTaskExecution.getName() != null) {
-                Context context = contextRepository.peek(job.getId());
+                Context context = contextService.peek(job.getId());
 
                 MapContext newContext = new MapContext(context.asMap());
 
                 newContext.put(completedTaskExecution.getName(), completedTaskExecution.getOutput());
 
-                contextRepository.push(job.getId(), newContext);
+                contextService.push(job.getId(), newContext);
             }
 
             if (hasMoreTasks(simpleJob)) {
                 simpleJob.setCurrentTask(simpleJob.getCurrentTask() + 1);
 
-                jobRepository.merge(simpleJob);
+                jobService.merge(simpleJob);
                 jobExecutor.execute(simpleJob);
             } else {
                 complete(simpleJob);
@@ -105,8 +105,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
     private void complete(Job job) {
         SimpleTaskExecution jobTaskExecution = new SimpleTaskExecution();
-        Context context = contextRepository.peek(job.getId());
-        Workflow workflow = workflowRepository.findOne(job.getWorkflowId());
+        Context context = contextService.peek(job.getId());
+        Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
         List<Accessor> outputs = workflow.getOutputs();
 
@@ -122,7 +122,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         simpleJob.setCurrentTask(-1);
         simpleJob.setOutputs(evaluatedJobTaskExecution);
 
-        jobRepository.merge(simpleJob);
+        jobService.merge(simpleJob);
         eventPublisher.publishEvent(
             WorkflowEvent.of(Events.JOB_STATUS, "jobId", job.getId(), "status", simpleJob.getStatus())
         );
@@ -131,13 +131,13 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     private boolean hasMoreTasks(Job job) {
-        Workflow workflow = workflowRepository.findOne(job.getWorkflowId());
+        Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
         return job.getCurrentTask() + 1 < workflow.getTasks().size();
     }
 
-    public void setContextRepository(ContextRepository contextRepository) {
-        this.contextRepository = contextRepository;
+    public void setContextService(ContextService contextService) {
+        this.contextService = contextService;
     }
 
     public void setEventPublisher(EventPublisher eventPublisher) {
@@ -148,19 +148,19 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         this.jobExecutor = jobExecutor;
     }
 
-    public void setJobRepository(JobRepository jobRepository) {
-        this.jobRepository = jobRepository;
+    public void setJobService(JobService jobService) {
+        this.jobService = jobService;
     }
 
     public void setTaskEvaluator(TaskEvaluator taskEvaluator) {
         this.taskEvaluator = taskEvaluator;
     }
 
-    public void setTaskExecutionRepository(TaskExecutionRepository taskExecutionRepository) {
-        this.taskExecutionRepository = taskExecutionRepository;
+    public void setTaskExecutionService(TaskExecutionService taskExecutionService) {
+        this.taskExecutionService = taskExecutionService;
     }
 
-    public void setWorkflowRepository(WorkflowRepository workflowRepository) {
-        this.workflowRepository = workflowRepository;
+    public void setWorkflowService(WorkflowService workflowService) {
+        this.workflowService = workflowService;
     }
 }

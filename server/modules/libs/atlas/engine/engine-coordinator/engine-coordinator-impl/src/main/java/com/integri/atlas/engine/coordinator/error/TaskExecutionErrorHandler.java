@@ -26,12 +26,12 @@ import com.integri.atlas.engine.event.WorkflowEvent;
 import com.integri.atlas.engine.job.Job;
 import com.integri.atlas.engine.job.JobStatus;
 import com.integri.atlas.engine.job.SimpleJob;
-import com.integri.atlas.engine.job.repository.JobRepository;
+import com.integri.atlas.engine.job.service.JobService;
 import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.engine.uuid.UUIDGenerator;
 import java.util.Date;
 import org.slf4j.Logger;
@@ -45,8 +45,8 @@ import org.springframework.util.Assert;
  */
 public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
 
-    private JobRepository jobRepository;
-    private TaskExecutionRepository jobTaskRepository;
+    private JobService jobService;
+    private TaskExecutionService taskExecutionService;
     private TaskDispatcher taskDispatcher;
     private EventPublisher eventPublisher;
 
@@ -62,7 +62,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
         SimpleTaskExecution mtask = SimpleTaskExecution.of(aTask);
         mtask.setStatus(TaskStatus.FAILED);
         mtask.setEndTime(new Date());
-        jobTaskRepository.merge(mtask);
+        taskExecutionService.merge(mtask);
 
         // if the task is retryable, then retry it
         if (aTask.getRetryAttempts() < aTask.getRetry()) {
@@ -72,36 +72,36 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
             retryTask.setStatus(TaskStatus.CREATED);
             retryTask.setError(null);
             retryTask.setRetryAttempts(aTask.getRetryAttempts() + 1);
-            jobTaskRepository.create(retryTask);
+            taskExecutionService.create(retryTask);
             taskDispatcher.dispatch(retryTask);
         }
         // if it's not retryable then we're gonna fail the job
         else {
             while (mtask.getParentId() != null) { // mark parent tasks as FAILED as well
-                mtask = SimpleTaskExecution.of(jobTaskRepository.findOne(mtask.getParentId()));
+                mtask = SimpleTaskExecution.of(taskExecutionService.getTaskExecution(mtask.getParentId()));
                 mtask.setStatus(TaskStatus.FAILED);
                 mtask.setEndTime(new Date());
-                jobTaskRepository.merge(mtask);
+                taskExecutionService.merge(mtask);
             }
-            Job job = jobRepository.getByTaskId(mtask.getId());
+            Job job = jobService.getTaskExecutionJob(mtask.getId());
             Assert.notNull(job, "job not found for task: " + mtask.getId());
             SimpleJob mjob = new SimpleJob(job);
             Assert.notNull(mjob, String.format("No job found for task %s ", mtask.getId()));
             mjob.setStatus(JobStatus.FAILED);
             mjob.setEndTime(new Date());
-            jobRepository.merge(mjob);
+            jobService.merge(mjob);
             eventPublisher.publishEvent(
                 WorkflowEvent.of(Events.JOB_STATUS, "jobId", mjob.getId(), "status", mjob.getStatus())
             );
         }
     }
 
-    public void setJobRepository(JobRepository aJobRepository) {
-        jobRepository = aJobRepository;
+    public void setJobService(JobService aJobRepository) {
+        jobService = aJobRepository;
     }
 
-    public void setJobTaskRepository(TaskExecutionRepository aJobTaskRepository) {
-        jobTaskRepository = aJobTaskRepository;
+    public void setTaskExecutionService(TaskExecutionService taskExecutionService) {
+        this.taskExecutionService = taskExecutionService;
     }
 
     public void setTaskDispatcher(TaskDispatcher aTaskDispatcher) {

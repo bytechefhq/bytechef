@@ -73,12 +73,12 @@ public class ResourceBasedWorkflowRepository implements WorkflowRepository {
     }
 
     @Override
-    public Workflow findOne(String aId) {
+    public Workflow findOne(String id) {
         List<Workflow> workflows = findAll();
-        Optional<Workflow> findFirst = workflows.stream().filter(p -> p.getId().equals(aId)).findFirst();
+        Optional<Workflow> findFirst = workflows.stream().filter(p -> p.getId().equals(id)).findFirst();
         if (findFirst.isPresent()) {
             return findFirst.get();
         }
-        throw new IllegalArgumentException("Unknown workflow: " + aId);
+        throw new IllegalArgumentException("Unknown workflow: " + id);
     }
 }

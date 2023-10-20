@@ -20,11 +20,11 @@ package com.integri.atlas.task.dispatcher.each.completion;
 
 import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
-import com.integri.atlas.engine.counter.repository.CounterRepository;
+import com.integri.atlas.engine.counter.service.CounterService;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import java.util.Date;
 
 /**
@@ -34,18 +34,18 @@ import java.util.Date;
  */
 public class EachTaskCompletionHandler implements TaskCompletionHandler {
 
-    private final TaskExecutionRepository taskExecutionRepository;
+    private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
-    private final CounterRepository counterRepository;
+    private final CounterService counterService;
 
     public EachTaskCompletionHandler(
-        TaskExecutionRepository taskExecutionRepository,
+        TaskExecutionService taskExecutionService,
         TaskCompletionHandler taskCompletionHandler,
-        CounterRepository counterRepository
+        CounterService counterService
     ) {
-        this.taskExecutionRepository = taskExecutionRepository;
+        this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
-        this.counterRepository = counterRepository;
+        this.counterService = counterService;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
         String parentId = taskExecution.getParentId();
 
         if (parentId != null) {
-            TaskExecution parentExecution = taskExecutionRepository.findOne(parentId);
+            TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
 
             return parentExecution.getType().equals(Constants.EACH);
         }
@@ -67,13 +67,13 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
 
         completedSubtaskExecution.setStatus(TaskStatus.COMPLETED);
 
-        taskExecutionRepository.merge(completedSubtaskExecution);
+        taskExecutionService.merge(completedSubtaskExecution);
 
-        long subtasksLeft = counterRepository.decrement(taskExecution.getParentId());
+        long subtasksLeft = counterService.decrement(taskExecution.getParentId());
 
         if (subtasksLeft == 0) {
             SimpleTaskExecution eachTaskExecution = SimpleTaskExecution.of(
-                taskExecutionRepository.findOne(taskExecution.getParentId())
+                taskExecutionService.getTaskExecution(taskExecution.getParentId())
             );
 
             eachTaskExecution.setEndTime(new Date());
@@ -82,7 +82,7 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
             );
 
             taskCompletionHandler.handle(eachTaskExecution);
-            counterRepository.delete(taskExecution.getParentId());
+            counterService.delete(taskExecution.getParentId());
         }
     }
 }

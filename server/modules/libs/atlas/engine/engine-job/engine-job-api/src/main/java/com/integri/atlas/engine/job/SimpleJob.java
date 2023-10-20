@@ -99,9 +99,13 @@ public class SimpleJob extends MapObject implements Job {
     }
 
     @Override
-    public List<TaskExecution> getExecution() {
-        List<TaskExecution> list = getList(Constants.EXECUTION, TaskExecution.class);
+    public List<TaskExecution> getExecutions() {
+        List<TaskExecution> list = getList(Constants.EXECUTIONS, TaskExecution.class);
         return list != null ? list : Collections.emptyList();
+    }
+
+    public void setExecutions(List<TaskExecution> taskExecutions) {
+        put(Constants.EXECUTIONS, taskExecutions);
     }
 
     @Override

@@ -16,6 +16,7 @@
 
 package com.integri.atlas.context.service;
 
+import com.integri.atlas.engine.context.Context;
 import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Transactional
 public class ContextService {
 
     private final ContextRepository contextRepository;
@@ -34,9 +36,8 @@ public class ContextService {
         this.taskExecutionRepository = taskExecutionRepository;
     }
 
-    @Transactional
     public void deleteJobContext(String jobId) {
-        List<TaskExecution> taskExecutions = taskExecutionRepository.findByJobId(jobId);
+        List<TaskExecution> taskExecutions = taskExecutionRepository.findAllByJobIdOrderByTaskNumber(jobId);
 
         for (TaskExecution taskExecution : taskExecutions) {
             deleteTaskExecutionContext(taskExecution);
@@ -45,8 +46,17 @@ public class ContextService {
         contextRepository.delete(jobId);
     }
 
+    public void push(String stackId, Context context) {
+        contextRepository.push(stackId, context);
+    }
+
+    @Transactional(readOnly = true)
+    public Context peek(String stackId) {
+        return contextRepository.peek(stackId);
+    }
+
     private void deleteTaskExecutionContext(TaskExecution taskExecution) {
-        List<TaskExecution> taskExecutions = taskExecutionRepository.findByParentId(taskExecution.getId());
+        List<TaskExecution> taskExecutions = taskExecutionRepository.findAllByParentId(taskExecution.getId());
 
         for (TaskExecution curTaskExecution : taskExecutions) {
             deleteTaskExecutionContext(curTaskExecution);

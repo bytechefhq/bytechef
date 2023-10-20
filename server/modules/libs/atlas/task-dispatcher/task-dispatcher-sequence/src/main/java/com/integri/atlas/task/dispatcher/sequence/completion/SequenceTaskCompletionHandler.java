@@ -16,18 +16,18 @@
 
 package com.integri.atlas.task.dispatcher.sequence.completion;
 
+import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.engine.context.Context;
 import com.integri.atlas.engine.context.MapContext;
-import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
 import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.engine.uuid.UUIDGenerator;
 import java.util.Date;
 import java.util.List;
@@ -38,24 +38,24 @@ import java.util.List;
  */
 public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
-    private final TaskExecutionRepository taskExecutionRepository;
+    private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher taskDispatcher;
-    private final ContextRepository contextRepository;
+    private final ContextService contextService;
     private final TaskEvaluator taskEvaluator;
 
     public SequenceTaskCompletionHandler(
-        ContextRepository contextRepository,
+        ContextService contextService,
         TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher taskDispatcher,
         TaskEvaluator taskEvaluator,
-        TaskExecutionRepository taskExecutionRepository
+        TaskExecutionService taskExecutionService
     ) {
-        this.contextRepository = contextRepository;
+        this.contextService = contextService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
         this.taskEvaluator = taskEvaluator;
-        this.taskExecutionRepository = taskExecutionRepository;
+        this.taskExecutionService = taskExecutionService;
     }
 
     @Override
@@ -63,7 +63,7 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
         String parentId = aTaskExecution.getParentId();
 
         if (parentId != null) {
-            TaskExecution parentTaskExecution = taskExecutionRepository.findOne(parentId);
+            TaskExecution parentTaskExecution = taskExecutionService.getTaskExecution(parentId);
 
             return parentTaskExecution.getType().equals(Constants.SEQUENCE);
         }
@@ -77,20 +77,20 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
         completedSubtaskExecution.setStatus(TaskStatus.COMPLETED);
 
-        taskExecutionRepository.merge(completedSubtaskExecution);
+        taskExecutionService.merge(completedSubtaskExecution);
 
         SimpleTaskExecution sequenceTaskExecution = SimpleTaskExecution.of(
-            taskExecutionRepository.findOne(taskExecution.getParentId())
+            taskExecutionService.getTaskExecution(taskExecution.getParentId())
         );
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-            Context context = contextRepository.peek(sequenceTaskExecution.getId());
+            Context context = contextService.peek(sequenceTaskExecution.getId());
 
             MapContext newContext = new MapContext(context.asMap());
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
-            contextRepository.push(sequenceTaskExecution.getId(), newContext);
+            contextService.push(sequenceTaskExecution.getId(), newContext);
         }
 
         List<MapObject> subtaskDefinitions = sequenceTaskExecution.getList("tasks", MapObject.class);
@@ -108,13 +108,13 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
             subTaskExecution.setStatus(TaskStatus.CREATED);
             subTaskExecution.setTaskNumber(taskExecution.getTaskNumber() + 1);
 
-            MapContext context = new MapContext(contextRepository.peek(sequenceTaskExecution.getId()));
+            MapContext context = new MapContext(contextService.peek(sequenceTaskExecution.getId()));
 
-            contextRepository.push(subTaskExecution.getId(), context);
+            contextService.push(subTaskExecution.getId(), context);
 
             TaskExecution evaluatedSubTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-            taskExecutionRepository.create(evaluatedSubTaskExecution);
+            taskExecutionService.create(evaluatedSubTaskExecution);
             taskDispatcher.dispatch(evaluatedSubTaskExecution);
         } else {
             sequenceTaskExecution.setEndTime(new Date());

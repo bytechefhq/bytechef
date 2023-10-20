@@ -40,19 +40,21 @@ public class InMemoryContextRepository implements ContextRepository {
     }
 
     @Override
-    public void push(String aStackId, Context aContext) {
-        Deque<Context> stack = contexts.get(aStackId);
+    public void push(String stackId, Context context) {
+        Deque<Context> stack = contexts.get(stackId);
         if (stack == null) {
             stack = new LinkedList<>();
-            contexts.put(aStackId, stack);
+
+            contexts.put(stackId, stack);
         }
-        stack.push(aContext);
+        stack.push(context);
     }
 
     @Override
-    public Context peek(String aStackId) {
-        Deque<Context> linkedList = contexts.get(aStackId);
-        Assert.notNull(linkedList, "unknown stack: " + aStackId);
+    public Context peek(String stackId) {
+        Deque<Context> linkedList = contexts.get(stackId);
+        Assert.notNull(linkedList, "unknown stack: " + stackId);
+
         return linkedList.peek();
     }
 }

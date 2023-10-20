@@ -107,11 +107,11 @@ public class IfTaskDispatcherIntTest extends BaseTaskIntTest {
     ) {
         return List.of(
             new IfTaskCompletionHandler(
-                contextRepository,
+                contextService,
                 taskCompletionHandler,
                 taskDispatcher,
                 SpelTaskEvaluator.create(),
-                taskExecutionRepository
+                taskExecutionService
             )
         );
     }
@@ -123,11 +123,11 @@ public class IfTaskDispatcherIntTest extends BaseTaskIntTest {
     ) {
         return List.of(
             new IfTaskDispatcher(
-                contextRepository,
+                contextService,
                 coordinatorMessageBroker,
                 taskDispatcher,
                 SpelTaskEvaluator.create(),
-                taskExecutionRepository
+                taskExecutionService
             )
         );
     }

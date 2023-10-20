@@ -16,8 +16,8 @@
 
 package com.integri.atlas.test.task.handler;
 
+import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.MapObject;
-import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.coordinator.CoordinatorImpl;
 import com.integri.atlas.engine.coordinator.error.TaskExecutionErrorHandler;
 import com.integri.atlas.engine.coordinator.job.executor.DefaultJobExecutor;
@@ -29,7 +29,6 @@ import com.integri.atlas.engine.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.integri.atlas.engine.error.Error;
 import com.integri.atlas.engine.event.EventPublisher;
 import com.integri.atlas.engine.job.Job;
-import com.integri.atlas.engine.job.repository.JobRepository;
 import com.integri.atlas.engine.job.service.JobService;
 import com.integri.atlas.engine.message.broker.MessageBroker;
 import com.integri.atlas.engine.message.broker.Queues;
@@ -38,13 +37,13 @@ import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.task.dispatcher.TaskDispatcherResolver;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.evaluator.spel.SpelTaskEvaluator;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.engine.worker.Worker;
 import com.integri.atlas.engine.worker.WorkerImpl;
 import com.integri.atlas.engine.worker.task.handler.DefaultTaskHandlerResolver;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolverChain;
-import com.integri.atlas.engine.workflow.repository.WorkflowRepository;
+import com.integri.atlas.engine.workflow.service.WorkflowService;
 import com.integri.atlas.file.storage.service.FileStorageService;
 import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import java.util.List;
@@ -62,10 +61,7 @@ public abstract class BaseTaskIntTest {
     private static final Logger logger = LoggerFactory.getLogger(BaseTaskIntTest.class);
 
     @Autowired
-    protected ContextRepository contextRepository;
-
-    @Autowired
-    protected JobRepository jobRepository;
+    protected ContextService contextService;
 
     @Autowired
     protected JobService jobService;
@@ -80,10 +76,10 @@ public abstract class BaseTaskIntTest {
     protected FileStorageService fileStorageService;
 
     @Autowired
-    protected TaskExecutionRepository taskExecutionRepository;
+    protected TaskExecutionService taskExecutionService;
 
     @Autowired
-    protected WorkflowRepository workflowRepository;
+    protected WorkflowService workflowService;
 
     protected List<TaskCompletionHandler> getTaskCompletionHandlers(
         TaskCompletionHandler taskCompletionHandler,
@@ -137,7 +133,7 @@ public abstract class BaseTaskIntTest {
             .withTaskEvaluator(SpelTaskEvaluator.create())
             .build();
 
-        coordinator.setContextRepository(contextRepository);
+        coordinator.setContextService(contextService);
         coordinator.setJobService(jobService);
 
         SyncMessageBroker coordinatorMessageBroker = new SyncMessageBroker();
@@ -160,9 +156,9 @@ public abstract class BaseTaskIntTest {
 
         DefaultJobExecutor jobExecutor = new DefaultJobExecutor();
 
-        jobExecutor.setContextRepository(contextRepository);
-        jobExecutor.setTaskExecutionRepository(taskExecutionRepository);
-        jobExecutor.setWorkflowRepository(workflowRepository);
+        jobExecutor.setContextService(contextService);
+        jobExecutor.setTaskExecutionService(taskExecutionService);
+        jobExecutor.setWorkflowService(workflowService);
         jobExecutor.setTaskDispatcher(taskDispatcherChain);
         jobExecutor.setTaskEvaluator(SpelTaskEvaluator.create());
 
@@ -170,11 +166,11 @@ public abstract class BaseTaskIntTest {
 
         DefaultTaskCompletionHandler defaultTaskCompletionHandler = new DefaultTaskCompletionHandler();
 
-        defaultTaskCompletionHandler.setContextRepository(contextRepository);
+        defaultTaskCompletionHandler.setContextService(contextService);
         defaultTaskCompletionHandler.setJobExecutor(jobExecutor);
-        defaultTaskCompletionHandler.setJobRepository(jobRepository);
-        defaultTaskCompletionHandler.setTaskExecutionRepository(taskExecutionRepository);
-        defaultTaskCompletionHandler.setWorkflowRepository(workflowRepository);
+        defaultTaskCompletionHandler.setJobService(jobService);
+        defaultTaskCompletionHandler.setTaskExecutionService(taskExecutionService);
+        defaultTaskCompletionHandler.setWorkflowService(workflowService);
         defaultTaskCompletionHandler.setEventPublisher(eventPublisher);
         defaultTaskCompletionHandler.setTaskEvaluator(SpelTaskEvaluator.create());
 
@@ -193,14 +189,14 @@ public abstract class BaseTaskIntTest {
 
         Job job = coordinator.create(MapObject.of(Map.of("workflowId", workflowId, "inputs", inputs)));
 
-        return jobRepository.getById(job.getId());
+        return jobService.getJob(job.getId());
     }
 
     private TaskExecutionErrorHandler getJobTaskErrorHandler(TaskDispatcher<?> taskDispatcher) {
         TaskExecutionErrorHandler jobTaskErrorHandler = new TaskExecutionErrorHandler();
 
-        jobTaskErrorHandler.setJobRepository(jobRepository);
-        jobTaskErrorHandler.setJobTaskRepository(taskExecutionRepository);
+        jobTaskErrorHandler.setJobService(jobService);
+        jobTaskErrorHandler.setTaskExecutionService(taskExecutionService);
         jobTaskErrorHandler.setTaskDispatcher(taskDispatcher);
         jobTaskErrorHandler.setEventPublisher(e -> {});
 

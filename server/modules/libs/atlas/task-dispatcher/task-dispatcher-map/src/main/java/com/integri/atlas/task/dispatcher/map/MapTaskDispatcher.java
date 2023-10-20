@@ -18,10 +18,10 @@
 
 package com.integri.atlas.task.dispatcher.map;
 
+import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.context.MapContext;
-import com.integri.atlas.engine.context.repository.ContextRepository;
-import com.integri.atlas.engine.counter.repository.CounterRepository;
+import com.integri.atlas.engine.counter.service.CounterService;
 import com.integri.atlas.engine.message.broker.MessageBroker;
 import com.integri.atlas.engine.message.broker.Queues;
 import com.integri.atlas.engine.task.Task;
@@ -31,7 +31,7 @@ import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.engine.uuid.UUIDGenerator;
 import java.util.Date;
 import java.util.List;
@@ -46,17 +46,17 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
 
     private final TaskDispatcher<TaskExecution> taskDispatcher;
     private final TaskEvaluator taskEvaluator;
-    private final TaskExecutionRepository taskExecutionRepo;
+    private final TaskExecutionService taskExecutionService;
     private final MessageBroker messageBroker;
-    private final ContextRepository contextRepository;
-    private final CounterRepository counterRepository;
+    private final ContextService contextService;
+    private final CounterService counterService;
 
     private MapTaskDispatcher(Builder aBuilder) {
         taskDispatcher = aBuilder.taskDispatcher;
-        taskExecutionRepo = aBuilder.taskExecutionRepo;
+        taskExecutionService = aBuilder.taskExecutionService;
         messageBroker = aBuilder.messageBroker;
-        contextRepository = aBuilder.contextRepository;
-        counterRepository = aBuilder.counterRepository;
+        contextService = aBuilder.contextService;
+        counterService = aBuilder.counterService;
         taskEvaluator = aBuilder.taskEvaluator;
     }
 
@@ -70,10 +70,10 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
         SimpleTaskExecution parentMapTask = SimpleTaskExecution.of(aTask);
         parentMapTask.setStartTime(new Date());
         parentMapTask.setStatus(TaskStatus.STARTED);
-        taskExecutionRepo.merge(parentMapTask);
+        taskExecutionService.merge(parentMapTask);
 
         if (list.size() > 0) {
-            counterRepository.set(aTask.getId(), list.size());
+            counterService.set(aTask.getId(), list.size());
             for (int i = 0; i < list.size(); i++) {
                 Object item = list.get(i);
                 SimpleTaskExecution mapTask = SimpleTaskExecution.of(iteratee);
@@ -84,12 +84,12 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
                 mapTask.setCreateTime(new Date());
                 mapTask.setPriority(aTask.getPriority());
                 mapTask.setTaskNumber(i + 1);
-                MapContext context = new MapContext(contextRepository.peek(aTask.getId()));
+                MapContext context = new MapContext(contextService.peek(aTask.getId()));
                 context.set(aTask.getString("itemVar", "item"), item);
                 context.set(aTask.getString("itemIndex", "itemIndex"), i);
-                contextRepository.push(mapTask.getId(), context);
+                contextService.push(mapTask.getId(), context);
                 TaskExecution evaluatedEachTask = taskEvaluator.evaluate(mapTask, context);
-                taskExecutionRepo.create(evaluatedEachTask);
+                taskExecutionService.create(evaluatedEachTask);
                 taskDispatcher.dispatch(evaluatedEachTask);
             }
         } else {
@@ -117,10 +117,10 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
 
         private TaskDispatcher<TaskExecution> taskDispatcher;
         private TaskEvaluator taskEvaluator;
-        private TaskExecutionRepository taskExecutionRepo;
+        private TaskExecutionService taskExecutionService;
         private MessageBroker messageBroker;
-        private ContextRepository contextRepository;
-        private CounterRepository counterRepository;
+        private ContextService contextService;
+        private CounterService counterService;
 
         public Builder taskDispatcher(TaskDispatcher<TaskExecution> aTaskDispatcher) {
             taskDispatcher = aTaskDispatcher;
@@ -132,8 +132,8 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
             return this;
         }
 
-        public Builder taskExecutionRepository(TaskExecutionRepository aTaskExecutionRepository) {
-            taskExecutionRepo = aTaskExecutionRepository;
+        public Builder taskExecutionService(TaskExecutionService taskExecutionService) {
+            this.taskExecutionService = taskExecutionService;
             return this;
         }
 
@@ -142,13 +142,13 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
             return this;
         }
 
-        public Builder contextRepository(ContextRepository aContextRepository) {
-            contextRepository = aContextRepository;
+        public Builder contextService(ContextService contextService) {
+            this.contextService = contextService;
             return this;
         }
 
-        public Builder counterRepository(CounterRepository aCounterRepository) {
-            counterRepository = aCounterRepository;
+        public Builder counterService(CounterService counterService) {
+            this.counterService = counterService;
             return this;
         }
 

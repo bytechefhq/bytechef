@@ -20,11 +20,11 @@ package com.integri.atlas.task.dispatcher.parallel.completion;
 
 import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
-import com.integri.atlas.engine.counter.repository.CounterRepository;
+import com.integri.atlas.engine.counter.service.CounterService;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
-import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
 import com.integri.atlas.task.dispatcher.parallel.ParallelTaskDispatcher;
 
 /**
@@ -41,19 +41,19 @@ import com.integri.atlas.task.dispatcher.parallel.ParallelTaskDispatcher;
  */
 public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
 
-    private TaskExecutionRepository taskExecutionRepo;
+    private TaskExecutionService taskExecutionService;
     private TaskCompletionHandler taskCompletionHandler;
-    private CounterRepository counterRepository;
+    private CounterService counterService;
 
     @Override
     public void handle(TaskExecution aTaskExecution) {
         SimpleTaskExecution mtask = SimpleTaskExecution.of(aTaskExecution);
         mtask.setStatus(TaskStatus.COMPLETED);
-        taskExecutionRepo.merge(mtask);
-        long tasksLeft = counterRepository.decrement(aTaskExecution.getParentId());
+        taskExecutionService.merge(mtask);
+        long tasksLeft = counterService.decrement(aTaskExecution.getParentId());
         if (tasksLeft == 0) {
-            taskCompletionHandler.handle(taskExecutionRepo.findOne(aTaskExecution.getParentId()));
-            counterRepository.delete(aTaskExecution.getParentId());
+            taskCompletionHandler.handle(taskExecutionService.getTaskExecution(aTaskExecution.getParentId()));
+            counterService.delete(aTaskExecution.getParentId());
         }
     }
 
@@ -61,21 +61,21 @@ public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
     public boolean canHandle(TaskExecution aTaskExecution) {
         String parentId = aTaskExecution.getParentId();
         if (parentId != null) {
-            TaskExecution parentExecution = taskExecutionRepo.findOne(parentId);
+            TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
             return parentExecution.getType().equals(Constants.PARALLEL);
         }
         return false;
     }
 
-    public void setTaskExecutionRepository(TaskExecutionRepository aTaskExecutionRepo) {
-        taskExecutionRepo = aTaskExecutionRepo;
+    public void setTaskExecutionService(TaskExecutionService taskExecutionService) {
+        this.taskExecutionService = taskExecutionService;
     }
 
-    public void setTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
-        taskCompletionHandler = aTaskCompletionHandler;
+    public void setTaskCompletionHandler(TaskCompletionHandler taskCompletionHandler) {
+        this.taskCompletionHandler = taskCompletionHandler;
     }
 
-    public void setCounterRepository(CounterRepository aCounterRepository) {
-        counterRepository = aCounterRepository;
+    public void setCounterService(CounterService counterService) {
+        this.counterService = counterService;
     }
 }
