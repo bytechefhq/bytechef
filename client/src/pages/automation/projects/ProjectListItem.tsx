@@ -28,7 +28,7 @@ interface ProjectItemProps {
     remainingTags?: TagModel[];
 }
 
-const ProjectItem = ({project, remainingTags}: ProjectItemProps) => {
+const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
@@ -36,21 +36,15 @@ const ProjectItem = ({project, remainingTags}: ProjectItemProps) => {
     const dropdownItems: IDropdownMenuItem[] = [
         {
             label: 'Edit',
-            onClick: () => {
-                setShowEditDialog(true);
-            },
+            onClick: () => setShowEditDialog(true),
         },
         {
             label: 'Duplicate',
-            onClick: () => {
-                duplicateProjectMutation.mutate(project.id!);
-            },
+            onClick: () => duplicateProjectMutation.mutate(project.id!),
         },
         {
             label: 'New Workflow',
-            onClick: () => {
-                setShowWorkflowDialog(true);
-            },
+            onClick: () => setShowWorkflowDialog(true),
         },
         {
             separator: true,
@@ -94,12 +88,16 @@ const ProjectItem = ({project, remainingTags}: ProjectItemProps) => {
         },
     });
 
+    console.log('project: ', project);
+
+    const initialWorkflowId = project.workflowIds![0];
+
     return (
         <>
             <div className="flex items-center">
                 <Link
                     className="flex-1"
-                    to={`/automation/projects/${project.id}`}
+                    to={`/automation/projects/${project.id}/workflow/${initialWorkflowId}`}
                 >
                     <div className="flex justify-between">
                         <div>
@@ -206,7 +204,7 @@ const ProjectItem = ({project, remainingTags}: ProjectItemProps) => {
                 />
             )}
 
-            {showWorkflowDialog && (
+            {showWorkflowDialog && !!project.id && (
                 <WorkflowDialog
                     id={project.id}
                     visible
@@ -219,4 +217,4 @@ const ProjectItem = ({project, remainingTags}: ProjectItemProps) => {
     );
 };
 
-export default ProjectItem;
+export default ProjectListItem;

@@ -16,14 +16,14 @@ import {
 import React from 'react';
 import Button from '../Button/Button';
 
-export interface SelectOption {
+export interface ISelectOption {
     label: string;
     value: string;
 }
 
 type SelectProps = {
     defaultValue?: string | undefined;
-    options: SelectOption[];
+    options: ISelectOption[];
     onValueChange?(value: string): void;
 };
 

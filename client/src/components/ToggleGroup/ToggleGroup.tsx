@@ -1,14 +1,14 @@
 import React from 'react';
 import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';
 
-export interface ToggleItem {
+export interface IToggleItem {
     value: string;
     label: string;
 }
 
 type ToggleGroupProps = {
     defaultValue?: string;
-    toggleItems: ToggleItem[];
+    toggleItems: IToggleItem[];
     onValueChange?(value: string): void;
 };
 

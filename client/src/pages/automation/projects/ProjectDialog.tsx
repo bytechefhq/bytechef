@@ -92,9 +92,7 @@ const ProjectDialog = ({
     const updateMutation = useUpdateProjectMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(ProjectKeys.projectCategories);
-
             queryClient.invalidateQueries(ProjectKeys.projects);
-
             queryClient.invalidateQueries(ProjectKeys.projectTags);
 
             closeDialog();
@@ -254,7 +252,7 @@ const ProjectDialog = ({
             )}
 
             <div className="mt-4 flex justify-end space-x-1">
-                <Close asChild={true}>
+                <Close asChild>
                     <Button
                         displayType="lightBorder"
                         label="Cancel"

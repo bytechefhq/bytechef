@@ -2,7 +2,7 @@ import {
     useGetProjectsQuery,
     useGetProjectTagsQuery,
 } from '../../../queries/projects.queries';
-import ProjectItem from 'pages/automation/projects/ProjectItem';
+import ProjectListItem from 'pages/automation/projects/ProjectListItem';
 import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import EmptyList from '../../../components/EmptyList/EmptyList';
@@ -61,7 +61,7 @@ const ProjectList = () => {
                             return (
                                 <div key={project.id}>
                                     <li className="group my-3 rounded-md bg-white p-2 hover:bg-gray-50">
-                                        <ProjectItem
+                                        <ProjectListItem
                                             project={project}
                                             key={project.id}
                                             remainingTags={tags?.filter(

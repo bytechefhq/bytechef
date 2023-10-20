@@ -2,7 +2,7 @@ import React from 'react';
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
 import {twMerge} from 'tailwind-merge';
 
-export interface SelectOption {
+export interface ISelectOption {
     label: string;
     value: string;
 }
@@ -13,7 +13,7 @@ type NativeSelectProps = {
     fieldsetClassName?: string;
     error?: boolean;
     label?: string;
-    options: SelectOption[];
+    options: ISelectOption[];
     placeholder?: string;
 } & React.DetailedHTMLProps<
     React.SelectHTMLAttributes<HTMLSelectElement>,

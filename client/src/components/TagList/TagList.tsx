@@ -4,7 +4,7 @@ import Button from 'components/Button/Button';
 import {useState} from 'react';
 import {OnChangeValue} from 'react-select';
 import CreatableSelect, {
-    SelectOption,
+    ISelectOption,
 } from 'components/CreatableSelect/CreatableSelect';
 import {UseMutationResult} from '@tanstack/react-query';
 
@@ -120,7 +120,7 @@ const TagList = ({
                         setIsNewTagWindowVisible(false);
                     }}
                     onChange={(
-                        selectedOption: OnChangeValue<SelectOption, false>
+                        selectedOption: OnChangeValue<ISelectOption, false>
                     ) => {
                         if (selectedOption) {
                             handleOnAddTag(selectedOption.tag);

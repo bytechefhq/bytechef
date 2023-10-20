@@ -99,9 +99,7 @@ const IntegrationDialog = ({
             queryClient.invalidateQueries(
                 IntegrationKeys.integrationCategories
             );
-
             queryClient.invalidateQueries(IntegrationKeys.integrations);
-
             queryClient.invalidateQueries(IntegrationKeys.integrationTags);
 
             closeDialog();
@@ -261,7 +259,7 @@ const IntegrationDialog = ({
             )}
 
             <div className="mt-4 flex justify-end space-x-1">
-                <Close asChild={true}>
+                <Close asChild>
                     <Button
                         displayType="lightBorder"
                         label="Cancel"
