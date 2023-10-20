@@ -16,26 +16,9 @@
 
 package com.bytechef.cli.command.component.subcommand;
 
-import com.bytechef.cli.command.component.ComponentCommand;
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Helper;
-import com.github.jknack.handlebars.Template;
-import io.swagger.parser.OpenAPIParser;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.Callable;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 /**
@@ -43,23 +26,6 @@ import picocli.CommandLine;
  */
 @CommandLine.Command(name = "init", description = "Generates project for a new component)")
 public class InitSubcommand implements Callable<Integer> {
-    private static final Logger logger = LoggerFactory.getLogger(ComponentCommand.class);
-
-    private static final String COMPONENT_HANDLER = "ComponentHandler";
-    private static final String OPEN_API = "openApi";
-    private static final String TEMPLATES_COMPONENT_REST = "templates/component/rest/";
-
-    private static Handlebars handlebars = new Handlebars();
-
-    static {
-        handlebars.registerHelper("ifEquals", (Helper<String>) (context, options) -> {
-            if (Objects.equals(context, options.param(0))) {
-                return options.fn(options.context);
-            }
-
-            return null;
-        });
-    }
 
     @CommandLine.Spec
     private transient CommandLine.Model.CommandSpec commandSpec;
@@ -74,14 +40,14 @@ public class InitSubcommand implements Callable<Integer> {
     @CommandLine.Option(
             names = {"--open-api-path"},
             description = "path to the OpenAPI specification")
-    private transient String openAPIPath;
+    private transient String openApiPath;
 
     @CommandLine.Option(
-            names = {"-o", "--output"},
+            names = {"-o", "--output-path"},
             paramLabel = "output directory",
             description = "where to write the generated files (current dir by default)",
             defaultValue = "")
-    private transient String output;
+    private transient String outputPath;
 
     @CommandLine.Option(
             names = {"--standard-component"},
@@ -95,120 +61,19 @@ public class InitSubcommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        if (StringUtils.isNotEmpty(openAPIPath)) {
+        if (StringUtils.isNotEmpty(openApiPath)) {
             generateOpenAPIComponent();
         }
 
         return null;
     }
 
-    private void generateOpenAPIComponent() throws IOException {
-        if (!openAPIPath.matches("^http(s)?://.*") && !new File(openAPIPath).exists()) {
+    private void generateOpenAPIComponent() throws Exception {
+        if (!openApiPath.matches("^http(s)?://.*") && !new File(openApiPath).exists()) {
             throw new CommandLine.ParameterException(
-                    commandSpec.commandLine(), "The OpenAPI file is not found: " + openAPIPath);
+                    commandSpec.commandLine(), "The OpenAPI file is not found: " + openApiPath);
         }
 
-        OpenAPI openAPI = parseOpenAPIFile();
-
-        String componentHandlerDirPath = getComponentHandlerDirPath();
-
-        Files.createDirectories(Paths.get(componentHandlerDirPath));
-
-        writeAbstractComponentHandlerTemplate(openAPI, componentHandlerDirPath);
-
-        writeComponentHandlerTemplate(componentHandlerDirPath);
-
-        writeOpenApiComponentHandlerServiceTemplate();
-    }
-
-    private OpenAPI parseOpenAPIFile() {
-        SwaggerParseResult result = new OpenAPIParser().readLocation(openAPIPath, null, null);
-
-        OpenAPI openAPI = result.getOpenAPI();
-
-        if (result.getMessages() != null) {
-            List<String> messages = result.getMessages();
-
-            messages.forEach(logger::error);
-        }
-
-        return openAPI;
-    }
-
-    private void writeAbstractComponentHandlerTemplate(OpenAPI openAPI, String componentHandlerDirPath)
-            throws IOException {
-        Template componentHandlerTemplate = handlebars.compile(TEMPLATES_COMPONENT_REST + "abstract_component_handler");
-
-        try (PrintWriter printWriter = new PrintWriter(
-                componentHandlerDirPath + File.separator + "Abstract" + StringUtils.capitalize(componentName)
-                        + COMPONENT_HANDLER + ".java",
-                StandardCharsets.UTF_8)) {
-            componentHandlerTemplate.apply(
-                    Map.of(
-                            "capitalizedComponentName",
-                            StringUtils.capitalize(componentName),
-                            "componentName",
-                            componentName,
-                            OPEN_API,
-                            openAPI,
-                            "packageName",
-                            getPackageName()),
-                    printWriter);
-        }
-    }
-
-    private void writeComponentHandlerTemplate(String componentHandlerDirPath) throws IOException {
-        String filename = componentHandlerDirPath + File.separator + StringUtils.capitalize(componentName)
-                + COMPONENT_HANDLER + ".java";
-
-        if (!new File(filename).exists()) {
-            Template componentHandlerTemplate = handlebars.compile(TEMPLATES_COMPONENT_REST + "component_handler");
-
-            try (PrintWriter printWriter = new PrintWriter(filename, StandardCharsets.UTF_8)) {
-                componentHandlerTemplate.apply(
-                        Map.of(
-                                "capitalizedComponentName",
-                                StringUtils.capitalize(componentName),
-                                "packageName",
-                                getPackageName()),
-                        printWriter);
-            }
-        }
-    }
-
-    private String getComponentHandlerDirPath() {
-        return getAbsolutePath("src" + File.separator + "main" + File.separator + "java" + File.separator
-                + StringUtils.replaceChars(getPackageName(), ".", File.separator));
-    }
-
-    private void writeOpenApiComponentHandlerServiceTemplate() throws IOException {
-        String servicesDirPath = getAbsolutePath("src" + File.separator + "main" + File.separator + "resources"
-                + File.separator + "META-INF" + File.separator + "services");
-
-        Files.createDirectories(Paths.get(servicesDirPath));
-
-        String serviceName = "com.bytechef.hermes.component." + StringUtils.capitalize(OPEN_API) + COMPONENT_HANDLER;
-
-        Template openApiComponentHandlerServiceTemplate = handlebars.compile(TEMPLATES_COMPONENT_REST + serviceName);
-
-        try (PrintWriter printWriter =
-                new PrintWriter(servicesDirPath + File.separator + serviceName, StandardCharsets.UTF_8)) {
-            openApiComponentHandlerServiceTemplate.apply(
-                    Map.of(
-                            OPEN_API + COMPONENT_HANDLER + "ClassImpl",
-                            getPackageName() + "." + StringUtils.capitalize(componentName) + COMPONENT_HANDLER),
-                    printWriter);
-        }
-    }
-
-    private String getPackageName() {
-        return StringUtils.deleteWhitespace(basePackageName == null ? "" : basePackageName + ".")
-                + StringUtils.replaceChars(componentName, "-_", ".");
-    }
-
-    private String getAbsolutePath(String subPath) {
-        File outputDir = new File(output);
-
-        return outputDir.getAbsolutePath() + File.separator + componentName + File.separator + subPath;
+        new RestComponentGenerator(basePackageName, componentName, openApiPath, outputPath).generate();
     }
 }
