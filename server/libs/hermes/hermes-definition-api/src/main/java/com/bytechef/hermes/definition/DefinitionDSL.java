@@ -22,6 +22,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,6 +72,14 @@ public class DefinitionDSL {
 
     public static ModifiableProperty.ModifiableIntegerProperty integer(String name) {
         return new ModifiableProperty.ModifiableIntegerProperty(name);
+    }
+
+    public static ModifiableProperty.ModifiableNullProperty nullable() {
+        return new ModifiableProperty.ModifiableNullProperty(null);
+    }
+
+    public static ModifiableProperty.ModifiableNullProperty nullable(String name) {
+        return new ModifiableProperty.ModifiableNullProperty(name);
     }
 
     public static ModifiableProperty.ModifiableNumberProperty number() {
@@ -158,11 +167,19 @@ public class DefinitionDSL {
     }
 
     public static ModifiableProperty.ModifiableStringProperty string() {
-        return new ModifiableProperty.ModifiableStringProperty(null);
+        return new ModifiableProperty.ModifiableStringProperty();
     }
 
     public static ModifiableProperty.ModifiableStringProperty string(String name) {
         return new ModifiableProperty.ModifiableStringProperty(name);
+    }
+
+    public static ModifiableProperty.ModifiableTimeProperty time() {
+        return new ModifiableProperty.ModifiableTimeProperty();
+    }
+
+    public static ModifiableProperty.ModifiableTimeProperty time(String name) {
+        return new ModifiableProperty.ModifiableTimeProperty(name);
     }
 
     protected static ModifiableProperty.ModifiableObjectProperty buildObject(
@@ -274,7 +291,9 @@ public class DefinitionDSL {
     // CHECKSTYLE:OFF
     public static sealed abstract class ModifiableProperty<M extends ModifiableProperty<M, P>, P extends Property<P>>
         implements
-        Property<P> permits ModifiableProperty.ModifiableDynamicPropertiesProperty, ModifiableProperty.ModifiableOneOfProperty, ModifiableProperty.ModifiableValueProperty {
+        Property<P>
+        permits ModifiableProperty.ModifiableDynamicPropertiesProperty, ModifiableProperty.ModifiableNullProperty,
+        ModifiableProperty.ModifiableOneOfProperty, ModifiableProperty.ModifiableValueProperty {
 
         private Boolean advancedOption;
         private String description;
@@ -843,6 +862,25 @@ public class DefinitionDSL {
             }
         }
 
+        @JsonTypeName("NULL")
+        public static final class ModifiableNullProperty
+            extends ModifiableProperty<ModifiableNullProperty, NullProperty>
+            implements Property.NullProperty {
+
+            private ModifiableNullProperty() {
+                this(null);
+            }
+
+            public ModifiableNullProperty(String name) {
+                super(name, Type.NULL);
+            }
+
+            @Override
+            public Object accept(PropertyVisitor propertyVisitor) {
+                return propertyVisitor.visit(this);
+            }
+        }
+
         @JsonTypeName("NUMBER")
         public static final class ModifiableNumberProperty
             extends ModifiableValueProperty<Double, ModifiableNumberProperty, NumberProperty>
@@ -1226,10 +1264,21 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableStringProperty options(List<ModifiableOption<String>> options) {
+                this.options = new ArrayList<>(options);
+
+                return this;
+            }
+
             public ModifiableStringProperty optionsDataSource(OptionsDataSource optionsDataSource) {
                 this.optionsDataSource = optionsDataSource;
 
                 return this;
+            }
+
+            @Override
+            public Object accept(PropertyVisitor propertyVisitor) {
+                return propertyVisitor.visit(this);
             }
 
             @Override
@@ -1247,24 +1296,82 @@ public class DefinitionDSL {
 
             @Override
             public List<Option<?>> getOptions() {
-                return options;
+                return options == null ? null : new ArrayList<>(options);
             }
 
             @Override
             public OptionsDataSource getOptionsDataSource() {
                 return optionsDataSource;
             }
+        }
+
+        @JsonTypeName("TIME")
+        public static final class ModifiableTimeProperty
+            extends ModifiableValueProperty<LocalTime, ModifiableTimeProperty, TimeProperty>
+            implements Property.TimeProperty {
+
+            private int hour;
+            private int minute;
+            private int second;
+
+            private ModifiableTimeProperty() {
+                this(null);
+            }
+
+            private ModifiableTimeProperty(String name) {
+                super(name, Type.TIME);
+            }
+
+            public ModifiableTimeProperty hour(int hour) {
+                this.hour = hour;
+
+                return this;
+            }
+
+            public ModifiableTimeProperty minute(int minute) {
+                this.minute = minute;
+
+                return this;
+            }
+
+            public ModifiableTimeProperty second(int second) {
+                this.second = second;
+
+                return this;
+            }
+
+            @Override
+            public ControlType getControlType() {
+                return ControlType.TIME;
+            }
 
             @Override
             public Object accept(PropertyVisitor propertyVisitor) {
                 return propertyVisitor.visit(this);
+            }
+
+            @Override
+            public int getHour() {
+                return hour;
+            }
+
+            @Override
+            public int getMinute() {
+                return minute;
+            }
+
+            @Override
+            public int getSecond() {
+                return second;
             }
         }
 
         public abstract static sealed class ModifiableValueProperty<V, M extends ModifiableValueProperty<V, M, P>, P extends ValueProperty<V, P>>
             extends ModifiableProperty<M, P>
             implements
-            Property.ValueProperty<V, P> permits ModifiableArrayProperty, ModifiableBooleanProperty, ModifiableDateProperty, ModifiableDateTimeProperty, ModifiableIntegerProperty, ModifiableNumberProperty, ModifiableObjectProperty, ModifiableStringProperty {
+            Property.ValueProperty<V, P> permits ModifiableArrayProperty, ModifiableBooleanProperty,
+            ModifiableDateProperty, ModifiableDateTimeProperty, ModifiableIntegerProperty, ModifiableNumberProperty,
+            ModifiableObjectProperty, ModifiableStringProperty, ModifiableTimeProperty {
 
             protected V defaultValue;
             protected V exampleValue;
@@ -1360,9 +1467,23 @@ public class DefinitionDSL {
 
     public static final class ModifiableResources implements Resources {
 
+        private Map<String, String> additionalUrls;
+        private String[] categories;
         private String documentationUrl;
 
         private ModifiableResources() {
+        }
+
+        public Resources additionalUrls(Map<String, String> additionalUrls) {
+            this.additionalUrls = new HashMap<>(additionalUrls);
+
+            return this;
+        }
+
+        public Resources categories(String[] categories) {
+            this.categories = categories.clone();
+
+            return this;
         }
 
         public Resources documentationUrl(String documentationUrl) {
@@ -1372,8 +1493,18 @@ public class DefinitionDSL {
         }
 
         @Override
+        public String[] getCategories() {
+            return categories.clone();
+        }
+
+        @Override
         public String getDocumentationUrl() {
             return documentationUrl;
+        }
+
+        @Override
+        public Map<String, String> getAdditionalUrls() {
+            return new HashMap<>(additionalUrls);
         }
     }
 }

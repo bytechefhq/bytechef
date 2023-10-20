@@ -3,7 +3,6 @@ version="1.0"
 dependencies {
     implementation "com.fasterxml.jackson.core:jackson-annotations"
     implementation "com.fasterxml.jackson.core:jackson-databind"
-    implementation libs.io.swagger.core.v3.swagger.annotations
 
     testImplementation "com.fasterxml.jackson.core:jackson-databind"
 }
