@@ -130,7 +130,7 @@ subprojects {
         jvmArgs += "-Djava.security.egd=file:/dev/./urandom -Xmx256m"
         // uncomment if the tests reports are not generated
         // ignoreFailures true
-        reports.html.getRequired().set(true)
+        reports.html.enabled = false
 
         afterSuite { desc, result ->
             if (!desc.parent) { // will match the outermost suite
@@ -160,7 +160,7 @@ subprojects {
 
         // uncomment if the tests reports are not generated
         // ignoreFailures true
-        reports.html.getRequired().set(true)
+        reports.html.enabled = false
 
         afterSuite { desc, result ->
             if (!desc.parent) { // will match the outermost suite
@@ -217,11 +217,11 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
     getExecutionData().setFrom(files(publishedProjects.jacocoTestReport.executionData))
 
     reports {
-        html.getRequired().set(true) // human readable
-        xml.getRequired().set(true) // required by codecov
+        html.enabled = true // human readable
+        xml.enabled = true // required by codecov
     }
 }
 
 wrapper {
-    gradleVersion = "8.0"
+    gradleVersion = "7.6"
 }
