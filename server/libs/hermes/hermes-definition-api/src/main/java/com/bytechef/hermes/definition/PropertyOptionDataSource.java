@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.function.Function;
@@ -24,6 +25,7 @@ import java.util.function.Function;
 /**
  * @author Ivica Cardic
  */
+@JsonDeserialize(as = DefinitionDSL.ModifiablePropertyOptionDataSource.class)
 @Schema(
     name = "PropertyOptionDataSource",
     description = "Defines function that should dynamically load options for the property.")

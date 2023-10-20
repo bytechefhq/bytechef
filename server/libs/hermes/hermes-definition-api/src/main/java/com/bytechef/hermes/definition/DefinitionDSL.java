@@ -18,8 +18,6 @@
 package com.bytechef.hermes.definition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -322,9 +320,12 @@ public class DefinitionDSL {
         private String category;
         private String description;
         private String icon;
-        private final String label;
+        private String label;
         private String subtitle;
         private String[] tags;
+
+        private ModifiableDisplay() {
+        }
 
         private ModifiableDisplay(String label) {
             this.label = label;
@@ -396,6 +397,9 @@ public class DefinitionDSL {
         private Map<String, List<Object>> hide;
         private Map<String, List<Object>> show;
 
+        private ModifiableDisplayOption() {
+        }
+
         private ModifiableDisplayOption(Map<String, List<Object>> hide, Map<String, List<Object>> show) {
             this.hide = hide;
             this.show = show;
@@ -438,21 +442,6 @@ public class DefinitionDSL {
     }
 
     // CHECKSTYLE:OFF
-    @JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "type",
-        visible = true)
-    @JsonSubTypes({
-        @JsonSubTypes.Type(value = Property.ArrayProperty.class, name = "ARRAY"),
-        @JsonSubTypes.Type(value = Property.BooleanProperty.class, name = "BOOLEAN"),
-        @JsonSubTypes.Type(value = Property.DateTimeProperty.class, name = "DATE_TIME"),
-        @JsonSubTypes.Type(value = Property.IntegerProperty.class, name = "INTEGER"),
-        @JsonSubTypes.Type(value = Property.NumberProperty.class, name = "NUMBER"),
-        @JsonSubTypes.Type(value = Property.ObjectProperty.class, name = "OBJECT"),
-        @JsonSubTypes.Type(value = Property.OneOfProperty.class, name = "ONE_OF"),
-        @JsonSubTypes.Type(value = Property.StringProperty.class, name = "STRING")
-    })
     public static sealed abstract class ModifiableProperty<M extends ModifiableProperty<M, P>, P extends Property<P>>
         implements
         Property<P>permits ModifiableProperty.ModifiableOneOfProperty,ModifiableProperty.ModifiableNullProperty,ModifiableProperty.ModifiableValueProperty {
@@ -465,8 +454,11 @@ public class DefinitionDSL {
         private Map<String, Object> metadata;
         private String placeholder;
         private Boolean required;
-        private final String name;
-        private final Property.Type type;
+        private String name;
+        private Property.Type type;
+
+        protected ModifiableProperty() {
+        }
 
         protected ModifiableProperty(String name, Property.Type type) {
             this.name = name;
@@ -624,6 +616,10 @@ public class DefinitionDSL {
             private List<Property<?>> items;
             private Boolean multipleValues; // default true
 
+            private ModifiableArrayProperty() {
+                super(null, Type.ARRAY);
+            }
+
             private ModifiableArrayProperty(String name) {
                 super(name, Type.ARRAY);
             }
@@ -742,6 +738,10 @@ public class DefinitionDSL {
             extends ModifiableValueProperty<Boolean, ModifiableBooleanProperty, BooleanProperty>
             implements Property.BooleanProperty {
 
+            private ModifiableBooleanProperty() {
+                super(null, Type.BOOLEAN);
+            }
+
             private ModifiableBooleanProperty(String name) {
                 super(name, Type.BOOLEAN);
             }
@@ -762,6 +762,10 @@ public class DefinitionDSL {
         @JsonTypeName("DATE")
         public static final class ModifiableDateProperty extends
             ModifiableValueProperty<LocalDate, ModifiableDateProperty, DateProperty> implements Property.DateProperty {
+
+            private ModifiableDateProperty() {
+                super(null, Type.DATE);
+            }
 
             private ModifiableDateProperty(String name) {
                 super(name, Type.DATE);
@@ -784,6 +788,10 @@ public class DefinitionDSL {
         public static final class ModifiableDateTimeProperty
             extends ModifiableValueProperty<LocalDateTime, ModifiableDateTimeProperty, DateTimeProperty>
             implements Property.DateTimeProperty {
+
+            private ModifiableDateTimeProperty() {
+                super(null, Type.DATE_TIME);
+            }
 
             private ModifiableDateTimeProperty(String name) {
                 super(name, Type.DATE_TIME);
@@ -809,6 +817,10 @@ public class DefinitionDSL {
 
             private Integer maxValue;
             private Integer minValue;
+
+            private ModifiableIntegerProperty() {
+                super(null, Type.INTEGER);
+            }
 
             private ModifiableIntegerProperty(String name) {
                 super(name, Type.INTEGER);
@@ -854,6 +866,10 @@ public class DefinitionDSL {
         public static final class ModifiableNullProperty
             extends ModifiableProperty<ModifiableNullProperty, NullProperty> implements Property.NullProperty {
 
+            private ModifiableNullProperty() {
+                super(null, Type.NULL);
+            }
+
             private ModifiableNullProperty(String name) {
                 super(name, Type.NULL);
             }
@@ -867,6 +883,10 @@ public class DefinitionDSL {
             private Integer maxValue;
             private Integer minValue;
             private Integer numberPrecision;
+
+            private ModifiableNumberProperty() {
+                super(null, Type.NUMBER);
+            }
 
             private ModifiableNumberProperty(String name) {
                 super(name, Type.NUMBER);
@@ -963,6 +983,10 @@ public class DefinitionDSL {
             private Boolean multipleValues; // default true
             private String objectType;
             private List<? extends Property<?>> properties;
+
+            private ModifiableObjectProperty() {
+                super(null, Type.OBJECT);
+            }
 
             private ModifiableObjectProperty(String name) {
                 super(name, Type.OBJECT);
@@ -1065,6 +1089,10 @@ public class DefinitionDSL {
                 new ModifiableObjectProperty(null),
                 new ModifiableStringProperty(null));
 
+            private ModifiableOneOfProperty() {
+                super(null, Type.ONE_OF);
+            }
+
             private ModifiableOneOfProperty(String name) {
                 super(name, Type.ONE_OF);
             }
@@ -1086,6 +1114,10 @@ public class DefinitionDSL {
             implements Property.StringProperty {
 
             private ControlType controlType;
+
+            private ModifiableStringProperty() {
+                super(null, Type.STRING);
+            }
 
             private ModifiableStringProperty(String name) {
                 super(name, Type.STRING);
@@ -1176,6 +1208,9 @@ public class DefinitionDSL {
         private DisplayOption displayOption;
         private String name;
         private Object value;
+
+        private ModifiablePropertyOption() {
+        }
 
         private ModifiablePropertyOption(String name, Object value) {
             this.name = name;
