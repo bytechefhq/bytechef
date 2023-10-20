@@ -24,6 +24,7 @@ import com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,7 +33,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Base64Utils;
 
 /**
  * @author Ivica Cardic
@@ -55,7 +55,8 @@ public class EachTaskDispatcherIntTest {
     @Test
     public void testEachTaskDispatcher() {
         workflowExecutor.execute(
-            Base64Utils.encodeToString("each_v1".getBytes(StandardCharsets.UTF_8)),
+            Base64.getEncoder()
+                .encodeToString("each_v1".getBytes(StandardCharsets.UTF_8)),
             (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) -> List.of(
                 new EachTaskCompletionHandler(taskExecutionService, taskCompletionHandler, counterService)),
             (
