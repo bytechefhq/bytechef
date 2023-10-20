@@ -17,6 +17,15 @@
 
 package com.bytechef.hermes.configuration.web.rest.config;
 
+import com.bytechef.hermes.configuration.facade.OAuth2ParameterFacade;
+import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
+import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
+import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
+import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
+import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
+import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.hermes.configuration.facade.WorkflowFacade;
@@ -24,12 +33,39 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 
-@ComponentScan(basePackages = "com.bytechef.hermes.configuration.web.rest")
+@ComponentScan(basePackages = {"com.bytechef.hermes.configuration.web.rest", "com.bytechef.hermes.definition.registry"})
 @SpringBootConfiguration
 public class WorkflowConfigurationRestTestConfiguration {
 
     @MockBean
+    private ActionDefinitionFacade actionDefinitionFacade;
+
+    @MockBean
+    private ActionDefinitionService actionDefinitionService;
+
+    @MockBean
+    private ComponentDefinitionFacade componentDefinitionFacade;
+
+    @MockBean
+    private ComponentDefinitionService componentDefinitionService;
+
+    @MockBean
+    private ConnectionDefinitionService connectionDefinitionService;
+
+    @MockBean
     private MessageBroker messageBroker;
+
+    @MockBean
+    private OAuth2ParameterFacade oAuth2ParameterFacade;
+
+    @MockBean
+    private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
+
+    @MockBean
+    private TriggerDefinitionFacade triggerDefinitionFacade;
+
+    @MockBean
+    private TriggerDefinitionService triggerDefinitionService;
 
     @MockBean
     private WorkflowService workflowService;

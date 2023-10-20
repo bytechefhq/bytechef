@@ -18,7 +18,7 @@
 package com.bytechef.atlas.execution.sync;
 
 import com.bytechef.atlas.coordinator.TaskCoordinator;
-import com.bytechef.atlas.coordinator.job.executor.JobExecutor;
+import com.bytechef.atlas.coordinator.job.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerChain;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;

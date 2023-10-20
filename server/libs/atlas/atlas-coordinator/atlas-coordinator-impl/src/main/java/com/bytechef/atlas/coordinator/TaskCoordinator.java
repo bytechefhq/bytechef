@@ -19,7 +19,7 @@
 
 package com.bytechef.atlas.coordinator;
 
-import com.bytechef.atlas.coordinator.job.executor.JobExecutor;
+import com.bytechef.atlas.coordinator.job.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
