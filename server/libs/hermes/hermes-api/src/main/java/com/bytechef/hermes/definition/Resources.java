@@ -22,15 +22,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author Ivica Cardic
  */
 @Schema(name = "Resources", description = "A set of available resources.")
-public final class Resources {
+public class Resources {
 
-    private String documentationUrl;
+    protected String documentationUrl;
 
-    public Resources documentationUrl(String documentationUrl) {
-        this.documentationUrl = documentationUrl;
-
-        return this;
-    }
+    protected Resources() {}
 
     @Schema(name = "documentationUrl", description = "The url of available documentation.")
     public String getDocumentationUrl() {

@@ -28,20 +28,8 @@ public class Display {
     protected String icon;
     protected String label;
 
-    public Display(String label) {
+    protected Display(String label) {
         this.label = label;
-    }
-
-    public Display description(String description) {
-        this.description = description;
-
-        return this;
-    }
-
-    public Display icon(String icon) {
-        this.icon = icon;
-
-        return this;
     }
 
     @Schema(name = "description", description = "The description.")

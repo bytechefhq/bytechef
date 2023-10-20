@@ -17,69 +17,27 @@
 package com.bytechef.hermes.definition;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
 @Schema(name = "PropertyOption", description = "Defines valid property value.")
-public final class PropertyOption {
+public class PropertyOption {
 
-    private String description;
-    private DisplayOption displayOption;
-    private String name;
-    private Object value;
+    protected String description;
+    protected DisplayOption displayOption;
+    protected String name;
+    protected Object value;
 
-    private PropertyOption() {}
+    protected PropertyOption(String name, Object value) {
+        this.name = name;
+        this.value = value;
+    }
 
-    public PropertyOption(String name, boolean value, String description) {
+    protected PropertyOption(String name, Object value, String description) {
         this.name = name;
         this.value = value;
         this.description = description;
-    }
-
-    public PropertyOption(String name, int value, String description) {
-        this.name = name;
-        this.value = value;
-        this.description = description;
-    }
-
-    public PropertyOption(String name, LocalDate value, String description) {
-        this.name = name;
-        this.value = value;
-        this.description = description;
-    }
-
-    public PropertyOption(String name, LocalDateTime value, String description) {
-        this.name = name;
-        this.value = value;
-        this.description = description;
-    }
-
-    public PropertyOption(String name, Object value, String description) {
-        this.name = name;
-        this.value = value;
-        this.description = description;
-    }
-
-    public PropertyOption(String name, String value, String description) {
-        this.name = name;
-        this.value = value;
-        this.description = description;
-    }
-
-    public PropertyOption description(String description) {
-        this.description = description;
-
-        return this;
-    }
-
-    public PropertyOption displayOption(DisplayOption.DisplayOptionCondition... displayOptionEntries) {
-        this.displayOption = DisplayOption.of(List.of(displayOptionEntries));
-
-        return this;
     }
 
     @Schema(name = "description", description = "Description of the option.")
