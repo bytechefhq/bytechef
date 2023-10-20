@@ -1,8 +1,10 @@
 dependencies {
     implementation "org.springframework:spring-context"
     implementation "org.springframework.data:spring-data-jdbc"
+
     implementation project(":server:libs:core:commons:commons-data")
     implementation project(":server:libs:core:commons:commons-util")
+
     implementation project(":server:ee:libs:dione:dione-configuration:dione-configuration-api")
 
     testImplementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-service")
