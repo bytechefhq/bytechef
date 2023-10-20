@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.apache.commons.lang3.Validate;
@@ -218,5 +219,11 @@ public final class CollectionUtils {
 
     public static <K, V> MultiValueMap<K, V> toMultiValueMap(Map<K, List<V>> targetMap) {
         return org.springframework.util.CollectionUtils.toMultiValueMap(targetMap);
+    }
+
+    public static String toString(Collection<?> collection) {
+        return collection.stream()
+            .map(Object::toString)
+            .collect(Collectors.joining(", ", "[", "]"));
     }
 }

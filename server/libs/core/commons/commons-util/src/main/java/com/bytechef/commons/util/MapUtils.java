@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -707,5 +708,43 @@ public final class MapUtils {
         }
 
         return value;
+    }
+
+    public static String toString(Map<String, ?> map) {
+        return map.keySet()
+            .stream()
+            .map(key -> {
+                Object value = map.get(key);
+                Class<?> valueClass = value.getClass();
+
+                if (map.get(key) instanceof Collection<?> collection) {
+                    value = com.bytechef.commons.util.CollectionUtils.toString(collection);
+                } else if (valueClass.isArray()) {
+                    value = com.bytechef.commons.util.CollectionUtils.toString(Arrays.asList(getArray(value)));
+                }
+
+                return key + "=" + value;
+            })
+            .collect(Collectors.joining(", ", "{", "}"));
+    }
+
+    private static Object[] getArray(Object value) {
+        Object[] outputArray;
+
+        if (value instanceof Object[]) {
+            outputArray = (Object[]) value;
+        } else {
+            int length = Array.getLength(value);
+
+            Object[] array = new Object[length];
+
+            for (int i = 0; i < length; ++i) {
+                array[i] = Array.get(value, i);
+            }
+
+            outputArray = array;
+        }
+
+        return outputArray;
     }
 }
