@@ -240,7 +240,7 @@ export const useEnableProjectInstanceWorkflowMutation = (
 ) =>
     useMutation({
         mutationFn: (request: EnableProjectInstanceWorkflowRequest) => {
-            return new AutomationProjectInstancesApi().enableProjectInstanceWorkflow(
+            return new AutomationProjectInstanceApi().enableProjectInstanceWorkflow(
                 request
             );
         },
