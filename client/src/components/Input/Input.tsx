@@ -40,12 +40,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             className={twMerge(type !== 'hidden' && 'mb-3', fieldsetClassName)}
         >
             {label && type !== 'hidden' && (
-                <div className="flex">
+                <div className="flex items-center">
                     <label
                         htmlFor={name}
                         className={twMerge(
                             'block text-sm font-medium text-gray-700 dark:text-gray-400',
-                            description && 'mr-0.5',
+                            description && 'mr-1',
                             labelClassName
                         )}
                     >
