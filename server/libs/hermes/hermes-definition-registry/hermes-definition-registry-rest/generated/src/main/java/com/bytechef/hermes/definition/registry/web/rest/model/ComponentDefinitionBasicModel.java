@@ -2,11 +2,12 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.ArrayList;
+import java.util.List;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -23,18 +24,27 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinitionBasic", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-15T19:47:32.550589+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-25T07:55:32.360326+02:00[Europe/Zagreb]")
 public class ComponentDefinitionBasicModel {
 
-  private DisplayModel display;
+  private String category;
+
+  private String description;
+
+  private String icon;
 
   private String name;
 
   private ResourcesModel resources;
 
+  @Valid
+  private List<String> tags;
+
+  private String title;
+
   /**
    * Default constructor
-   * @deprecated Use {@link ComponentDefinitionBasicModel#ComponentDefinitionBasicModel(DisplayModel, String)}
+   * @deprecated Use {@link ComponentDefinitionBasicModel#ComponentDefinitionBasicModel(String)}
    */
   @Deprecated
   public ComponentDefinitionBasicModel() {
@@ -44,29 +54,68 @@ public class ComponentDefinitionBasicModel {
   /**
    * Constructor with only required parameters
    */
-  public ComponentDefinitionBasicModel(DisplayModel display, String name) {
-    this.display = display;
+  public ComponentDefinitionBasicModel(String name) {
     this.name = name;
   }
 
-  public ComponentDefinitionBasicModel display(DisplayModel display) {
-    this.display = display;
+  public ComponentDefinitionBasicModel category(String category) {
+    this.category = category;
     return this;
   }
 
   /**
-   * Get display
-   * @return display
+   * The category.
+   * @return category
   */
-  @NotNull @Valid 
-  @Schema(name = "display", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("display")
-  public DisplayModel getDisplay() {
-    return display;
+  
+  @Schema(name = "category", description = "The category.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("category")
+  public String getCategory() {
+    return category;
   }
 
-  public void setDisplay(DisplayModel display) {
-    this.display = display;
+  public void setCategory(String category) {
+    this.category = category;
+  }
+
+  public ComponentDefinitionBasicModel description(String description) {
+    this.description = description;
+    return this;
+  }
+
+  /**
+   * The description.
+   * @return description
+  */
+  
+  @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public ComponentDefinitionBasicModel icon(String icon) {
+    this.icon = icon;
+    return this;
+  }
+
+  /**
+   * The icon.
+   * @return icon
+  */
+  
+  @Schema(name = "icon", description = "The icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("icon")
+  public String getIcon() {
+    return icon;
+  }
+
+  public void setIcon(String icon) {
+    this.icon = icon;
   }
 
   public ComponentDefinitionBasicModel name(String name) {
@@ -109,6 +158,54 @@ public class ComponentDefinitionBasicModel {
     this.resources = resources;
   }
 
+  public ComponentDefinitionBasicModel tags(List<String> tags) {
+    this.tags = tags;
+    return this;
+  }
+
+  public ComponentDefinitionBasicModel addTagsItem(String tagsItem) {
+    if (this.tags == null) {
+      this.tags = new ArrayList<>();
+    }
+    this.tags.add(tagsItem);
+    return this;
+  }
+
+  /**
+   * Tags for categorization.
+   * @return tags
+  */
+  
+  @Schema(name = "tags", description = "Tags for categorization.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("tags")
+  public List<String> getTags() {
+    return tags;
+  }
+
+  public void setTags(List<String> tags) {
+    this.tags = tags;
+  }
+
+  public ComponentDefinitionBasicModel title(String title) {
+    this.title = title;
+    return this;
+  }
+
+  /**
+   * The title
+   * @return title
+  */
+  
+  @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("title")
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -118,23 +215,31 @@ public class ComponentDefinitionBasicModel {
       return false;
     }
     ComponentDefinitionBasicModel componentDefinitionBasic = (ComponentDefinitionBasicModel) o;
-    return Objects.equals(this.display, componentDefinitionBasic.display) &&
+    return Objects.equals(this.category, componentDefinitionBasic.category) &&
+        Objects.equals(this.description, componentDefinitionBasic.description) &&
+        Objects.equals(this.icon, componentDefinitionBasic.icon) &&
         Objects.equals(this.name, componentDefinitionBasic.name) &&
-        Objects.equals(this.resources, componentDefinitionBasic.resources);
+        Objects.equals(this.resources, componentDefinitionBasic.resources) &&
+        Objects.equals(this.tags, componentDefinitionBasic.tags) &&
+        Objects.equals(this.title, componentDefinitionBasic.title);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(display, name, resources);
+    return Objects.hash(category, description, icon, name, resources, tags, title);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ComponentDefinitionBasicModel {\n");
-    sb.append("    display: ").append(toIndentedString(display)).append("\n");
+    sb.append("    category: ").append(toIndentedString(category)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
+    sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
+    sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("}");
     return sb.toString();
   }

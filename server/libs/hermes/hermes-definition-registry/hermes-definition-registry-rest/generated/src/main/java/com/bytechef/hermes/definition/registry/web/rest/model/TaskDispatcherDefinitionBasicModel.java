@@ -2,7 +2,6 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -23,18 +22,22 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinitionBasic", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-15T19:47:32.550589+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-25T07:55:32.360326+02:00[Europe/Zagreb]")
 public class TaskDispatcherDefinitionBasicModel {
 
-  private DisplayModel display;
+  private String description;
+
+  private String icon;
 
   private String name;
 
   private ResourcesModel resources;
 
+  private String title;
+
   /**
    * Default constructor
-   * @deprecated Use {@link TaskDispatcherDefinitionBasicModel#TaskDispatcherDefinitionBasicModel(DisplayModel, String)}
+   * @deprecated Use {@link TaskDispatcherDefinitionBasicModel#TaskDispatcherDefinitionBasicModel(String)}
    */
   @Deprecated
   public TaskDispatcherDefinitionBasicModel() {
@@ -44,29 +47,48 @@ public class TaskDispatcherDefinitionBasicModel {
   /**
    * Constructor with only required parameters
    */
-  public TaskDispatcherDefinitionBasicModel(DisplayModel display, String name) {
-    this.display = display;
+  public TaskDispatcherDefinitionBasicModel(String name) {
     this.name = name;
   }
 
-  public TaskDispatcherDefinitionBasicModel display(DisplayModel display) {
-    this.display = display;
+  public TaskDispatcherDefinitionBasicModel description(String description) {
+    this.description = description;
     return this;
   }
 
   /**
-   * Get display
-   * @return display
+   * The description.
+   * @return description
   */
-  @NotNull @Valid 
-  @Schema(name = "display", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("display")
-  public DisplayModel getDisplay() {
-    return display;
+  
+  @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
   }
 
-  public void setDisplay(DisplayModel display) {
-    this.display = display;
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public TaskDispatcherDefinitionBasicModel icon(String icon) {
+    this.icon = icon;
+    return this;
+  }
+
+  /**
+   * The icon.
+   * @return icon
+  */
+  
+  @Schema(name = "icon", description = "The icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("icon")
+  public String getIcon() {
+    return icon;
+  }
+
+  public void setIcon(String icon) {
+    this.icon = icon;
   }
 
   public TaskDispatcherDefinitionBasicModel name(String name) {
@@ -109,6 +131,26 @@ public class TaskDispatcherDefinitionBasicModel {
     this.resources = resources;
   }
 
+  public TaskDispatcherDefinitionBasicModel title(String title) {
+    this.title = title;
+    return this;
+  }
+
+  /**
+   * The title
+   * @return title
+  */
+  
+  @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("title")
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -118,23 +160,27 @@ public class TaskDispatcherDefinitionBasicModel {
       return false;
     }
     TaskDispatcherDefinitionBasicModel taskDispatcherDefinitionBasic = (TaskDispatcherDefinitionBasicModel) o;
-    return Objects.equals(this.display, taskDispatcherDefinitionBasic.display) &&
+    return Objects.equals(this.description, taskDispatcherDefinitionBasic.description) &&
+        Objects.equals(this.icon, taskDispatcherDefinitionBasic.icon) &&
         Objects.equals(this.name, taskDispatcherDefinitionBasic.name) &&
-        Objects.equals(this.resources, taskDispatcherDefinitionBasic.resources);
+        Objects.equals(this.resources, taskDispatcherDefinitionBasic.resources) &&
+        Objects.equals(this.title, taskDispatcherDefinitionBasic.title);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(display, name, resources);
+    return Objects.hash(description, icon, name, resources, title);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TaskDispatcherDefinitionBasicModel {\n");
-    sb.append("    display: ").append(toIndentedString(display)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
+    sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("}");
     return sb.toString();
   }

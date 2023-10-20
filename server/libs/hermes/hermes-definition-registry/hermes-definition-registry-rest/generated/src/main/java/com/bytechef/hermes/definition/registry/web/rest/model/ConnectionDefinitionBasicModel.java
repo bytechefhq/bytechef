@@ -2,8 +2,6 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -23,20 +21,20 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinitionBasic", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-15T19:47:32.550589+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-25T07:55:32.360326+02:00[Europe/Zagreb]")
 public class ConnectionDefinitionBasicModel {
 
-  private DisplayModel display;
+  private String description;
 
   private String name;
 
-  private ResourcesModel resources;
+  private String title;
 
   private Integer version;
 
   /**
    * Default constructor
-   * @deprecated Use {@link ConnectionDefinitionBasicModel#ConnectionDefinitionBasicModel(DisplayModel, String, Integer)}
+   * @deprecated Use {@link ConnectionDefinitionBasicModel#ConnectionDefinitionBasicModel(String, Integer)}
    */
   @Deprecated
   public ConnectionDefinitionBasicModel() {
@@ -46,30 +44,29 @@ public class ConnectionDefinitionBasicModel {
   /**
    * Constructor with only required parameters
    */
-  public ConnectionDefinitionBasicModel(DisplayModel display, String name, Integer version) {
-    this.display = display;
+  public ConnectionDefinitionBasicModel(String name, Integer version) {
     this.name = name;
     this.version = version;
   }
 
-  public ConnectionDefinitionBasicModel display(DisplayModel display) {
-    this.display = display;
+  public ConnectionDefinitionBasicModel description(String description) {
+    this.description = description;
     return this;
   }
 
   /**
-   * Get display
-   * @return display
+   * The description.
+   * @return description
   */
-  @NotNull @Valid 
-  @Schema(name = "display", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("display")
-  public DisplayModel getDisplay() {
-    return display;
+  
+  @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
   }
 
-  public void setDisplay(DisplayModel display) {
-    this.display = display;
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public ConnectionDefinitionBasicModel name(String name) {
@@ -92,24 +89,24 @@ public class ConnectionDefinitionBasicModel {
     this.name = name;
   }
 
-  public ConnectionDefinitionBasicModel resources(ResourcesModel resources) {
-    this.resources = resources;
+  public ConnectionDefinitionBasicModel title(String title) {
+    this.title = title;
     return this;
   }
 
   /**
-   * Get resources
-   * @return resources
+   * The title
+   * @return title
   */
-  @Valid 
-  @Schema(name = "resources", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("resources")
-  public ResourcesModel getResources() {
-    return resources;
+  
+  @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("title")
+  public String getTitle() {
+    return title;
   }
 
-  public void setResources(ResourcesModel resources) {
-    this.resources = resources;
+  public void setTitle(String title) {
+    this.title = title;
   }
 
   public ConnectionDefinitionBasicModel version(Integer version) {
@@ -141,24 +138,24 @@ public class ConnectionDefinitionBasicModel {
       return false;
     }
     ConnectionDefinitionBasicModel connectionDefinitionBasic = (ConnectionDefinitionBasicModel) o;
-    return Objects.equals(this.display, connectionDefinitionBasic.display) &&
+    return Objects.equals(this.description, connectionDefinitionBasic.description) &&
         Objects.equals(this.name, connectionDefinitionBasic.name) &&
-        Objects.equals(this.resources, connectionDefinitionBasic.resources) &&
+        Objects.equals(this.title, connectionDefinitionBasic.title) &&
         Objects.equals(this.version, connectionDefinitionBasic.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(display, name, resources, version);
+    return Objects.hash(description, name, title, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ConnectionDefinitionBasicModel {\n");
-    sb.append("    display: ").append(toIndentedString(display)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
+    sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();

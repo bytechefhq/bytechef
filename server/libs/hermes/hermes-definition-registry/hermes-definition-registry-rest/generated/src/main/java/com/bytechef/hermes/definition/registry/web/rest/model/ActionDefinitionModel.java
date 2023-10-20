@@ -2,9 +2,8 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.HelpModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -26,12 +25,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-15T19:47:32.550589+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-25T07:55:32.360326+02:00[Europe/Zagreb]")
 public class ActionDefinitionModel {
 
-  private DisplayModel display;
+  private String description;
 
   private Object exampleOutput;
+
+  private HelpModel help;
 
   private String name;
 
@@ -41,11 +42,11 @@ public class ActionDefinitionModel {
   @Valid
   private List<@Valid PropertyModel> properties;
 
-  private ResourcesModel resources;
+  private String title;
 
   /**
    * Default constructor
-   * @deprecated Use {@link ActionDefinitionModel#ActionDefinitionModel(DisplayModel, String)}
+   * @deprecated Use {@link ActionDefinitionModel#ActionDefinitionModel(String)}
    */
   @Deprecated
   public ActionDefinitionModel() {
@@ -55,29 +56,28 @@ public class ActionDefinitionModel {
   /**
    * Constructor with only required parameters
    */
-  public ActionDefinitionModel(DisplayModel display, String name) {
-    this.display = display;
+  public ActionDefinitionModel(String name) {
     this.name = name;
   }
 
-  public ActionDefinitionModel display(DisplayModel display) {
-    this.display = display;
+  public ActionDefinitionModel description(String description) {
+    this.description = description;
     return this;
   }
 
   /**
-   * Get display
-   * @return display
+   * The description.
+   * @return description
   */
-  @NotNull @Valid 
-  @Schema(name = "display", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("display")
-  public DisplayModel getDisplay() {
-    return display;
+  
+  @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
   }
 
-  public void setDisplay(DisplayModel display) {
-    this.display = display;
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public ActionDefinitionModel exampleOutput(Object exampleOutput) {
@@ -98,6 +98,26 @@ public class ActionDefinitionModel {
 
   public void setExampleOutput(Object exampleOutput) {
     this.exampleOutput = exampleOutput;
+  }
+
+  public ActionDefinitionModel help(HelpModel help) {
+    this.help = help;
+    return this;
+  }
+
+  /**
+   * Get help
+   * @return help
+  */
+  @Valid 
+  @Schema(name = "help", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("help")
+  public HelpModel getHelp() {
+    return help;
+  }
+
+  public void setHelp(HelpModel help) {
+    this.help = help;
   }
 
   public ActionDefinitionModel name(String name) {
@@ -176,24 +196,24 @@ public class ActionDefinitionModel {
     this.properties = properties;
   }
 
-  public ActionDefinitionModel resources(ResourcesModel resources) {
-    this.resources = resources;
+  public ActionDefinitionModel title(String title) {
+    this.title = title;
     return this;
   }
 
   /**
-   * Get resources
-   * @return resources
+   * The title
+   * @return title
   */
-  @Valid 
-  @Schema(name = "resources", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("resources")
-  public ResourcesModel getResources() {
-    return resources;
+  
+  @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("title")
+  public String getTitle() {
+    return title;
   }
 
-  public void setResources(ResourcesModel resources) {
-    this.resources = resources;
+  public void setTitle(String title) {
+    this.title = title;
   }
 
   @Override
@@ -205,29 +225,31 @@ public class ActionDefinitionModel {
       return false;
     }
     ActionDefinitionModel actionDefinition = (ActionDefinitionModel) o;
-    return Objects.equals(this.display, actionDefinition.display) &&
+    return Objects.equals(this.description, actionDefinition.description) &&
         Objects.equals(this.exampleOutput, actionDefinition.exampleOutput) &&
+        Objects.equals(this.help, actionDefinition.help) &&
         Objects.equals(this.name, actionDefinition.name) &&
         Objects.equals(this.outputSchema, actionDefinition.outputSchema) &&
         Objects.equals(this.properties, actionDefinition.properties) &&
-        Objects.equals(this.resources, actionDefinition.resources);
+        Objects.equals(this.title, actionDefinition.title);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(display, exampleOutput, name, outputSchema, properties, resources);
+    return Objects.hash(description, exampleOutput, help, name, outputSchema, properties, title);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ActionDefinitionModel {\n");
-    sb.append("    display: ").append(toIndentedString(display)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    exampleOutput: ").append(toIndentedString(exampleOutput)).append("\n");
+    sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
-    sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
+    sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -2,9 +2,8 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.HelpModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.TriggerTypeModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -28,12 +27,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-15T19:47:32.550589+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-25T07:55:32.360326+02:00[Europe/Zagreb]")
 public class TriggerDefinitionModel {
 
-  private DisplayModel display;
+  private String description;
 
   private Object exampleOutput;
+
+  private HelpModel help;
 
   private String name;
 
@@ -43,13 +44,13 @@ public class TriggerDefinitionModel {
   @Valid
   private List<@Valid PropertyModel> properties;
 
-  private ResourcesModel resources;
+  private String title;
 
   private TriggerTypeModel type;
 
   /**
    * Default constructor
-   * @deprecated Use {@link TriggerDefinitionModel#TriggerDefinitionModel(DisplayModel, String, TriggerTypeModel)}
+   * @deprecated Use {@link TriggerDefinitionModel#TriggerDefinitionModel(String, TriggerTypeModel)}
    */
   @Deprecated
   public TriggerDefinitionModel() {
@@ -59,30 +60,29 @@ public class TriggerDefinitionModel {
   /**
    * Constructor with only required parameters
    */
-  public TriggerDefinitionModel(DisplayModel display, String name, TriggerTypeModel type) {
-    this.display = display;
+  public TriggerDefinitionModel(String name, TriggerTypeModel type) {
     this.name = name;
     this.type = type;
   }
 
-  public TriggerDefinitionModel display(DisplayModel display) {
-    this.display = display;
+  public TriggerDefinitionModel description(String description) {
+    this.description = description;
     return this;
   }
 
   /**
-   * Get display
-   * @return display
+   * The description.
+   * @return description
   */
-  @NotNull @Valid 
-  @Schema(name = "display", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("display")
-  public DisplayModel getDisplay() {
-    return display;
+  
+  @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
   }
 
-  public void setDisplay(DisplayModel display) {
-    this.display = display;
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public TriggerDefinitionModel exampleOutput(Object exampleOutput) {
@@ -103,6 +103,26 @@ public class TriggerDefinitionModel {
 
   public void setExampleOutput(Object exampleOutput) {
     this.exampleOutput = exampleOutput;
+  }
+
+  public TriggerDefinitionModel help(HelpModel help) {
+    this.help = help;
+    return this;
+  }
+
+  /**
+   * Get help
+   * @return help
+  */
+  @Valid 
+  @Schema(name = "help", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("help")
+  public HelpModel getHelp() {
+    return help;
+  }
+
+  public void setHelp(HelpModel help) {
+    this.help = help;
   }
 
   public TriggerDefinitionModel name(String name) {
@@ -181,24 +201,24 @@ public class TriggerDefinitionModel {
     this.properties = properties;
   }
 
-  public TriggerDefinitionModel resources(ResourcesModel resources) {
-    this.resources = resources;
+  public TriggerDefinitionModel title(String title) {
+    this.title = title;
     return this;
   }
 
   /**
-   * Get resources
-   * @return resources
+   * The title
+   * @return title
   */
-  @Valid 
-  @Schema(name = "resources", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("resources")
-  public ResourcesModel getResources() {
-    return resources;
+  
+  @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("title")
+  public String getTitle() {
+    return title;
   }
 
-  public void setResources(ResourcesModel resources) {
-    this.resources = resources;
+  public void setTitle(String title) {
+    this.title = title;
   }
 
   public TriggerDefinitionModel type(TriggerTypeModel type) {
@@ -230,30 +250,32 @@ public class TriggerDefinitionModel {
       return false;
     }
     TriggerDefinitionModel triggerDefinition = (TriggerDefinitionModel) o;
-    return Objects.equals(this.display, triggerDefinition.display) &&
+    return Objects.equals(this.description, triggerDefinition.description) &&
         Objects.equals(this.exampleOutput, triggerDefinition.exampleOutput) &&
+        Objects.equals(this.help, triggerDefinition.help) &&
         Objects.equals(this.name, triggerDefinition.name) &&
         Objects.equals(this.outputSchema, triggerDefinition.outputSchema) &&
         Objects.equals(this.properties, triggerDefinition.properties) &&
-        Objects.equals(this.resources, triggerDefinition.resources) &&
+        Objects.equals(this.title, triggerDefinition.title) &&
         Objects.equals(this.type, triggerDefinition.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(display, exampleOutput, name, outputSchema, properties, resources, type);
+    return Objects.hash(description, exampleOutput, help, name, outputSchema, properties, title, type);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TriggerDefinitionModel {\n");
-    sb.append("    display: ").append(toIndentedString(display)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    exampleOutput: ").append(toIndentedString(exampleOutput)).append("\n");
+    sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
-    sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
+    sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OAuth2AuthorizationParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-17T21:20:25.683401+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-25T07:55:35.277357+02:00[Europe/Zagreb]")
 public class OAuth2AuthorizationParametersModel {
 
   private String authorizationUrl;

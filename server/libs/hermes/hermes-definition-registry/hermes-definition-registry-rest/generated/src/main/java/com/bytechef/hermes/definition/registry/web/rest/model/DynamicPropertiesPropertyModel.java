@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DynamicPropertiesProperty", description = "A dynamic properties property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-15T19:47:32.550589+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-25T07:55:32.360326+02:00[Europe/Zagreb]")
 public class DynamicPropertiesPropertyModel extends PropertyModel {
 
   private PropertiesDataSourceModel propertiesDataSource;
@@ -70,8 +70,8 @@ public class DynamicPropertiesPropertyModel extends PropertyModel {
     return this;
   }
 
-  public DynamicPropertiesPropertyModel expressionEnabled(Boolean expressionEnabled) {
-    super.setExpressionEnabled(expressionEnabled);
+  public DynamicPropertiesPropertyModel expressionDisabled(Boolean expressionDisabled) {
+    super.setExpressionDisabled(expressionDisabled);
     return this;
   }
 

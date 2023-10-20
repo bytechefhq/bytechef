@@ -18,9 +18,9 @@ src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ControlType
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DatePropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DatePropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DateTimePropertyModel.java
-src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DisplayModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DynamicPropertiesPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DynamicPropertiesPropertyModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/HelpModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/IntegerPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/IntegerPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/NullPropertyModel.java

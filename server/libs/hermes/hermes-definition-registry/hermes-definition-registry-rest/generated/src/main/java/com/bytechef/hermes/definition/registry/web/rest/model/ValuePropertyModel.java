@@ -49,7 +49,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = TimePropertyModel.class, name = "TimeProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-15T19:47:32.550589+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-25T07:55:32.360326+02:00[Europe/Zagreb]")
 public class ValuePropertyModel extends PropertyModel {
 
   private ControlTypeModel controlType;
@@ -133,8 +133,8 @@ public class ValuePropertyModel extends PropertyModel {
     return this;
   }
 
-  public ValuePropertyModel expressionEnabled(Boolean expressionEnabled) {
-    super.setExpressionEnabled(expressionEnabled);
+  public ValuePropertyModel expressionDisabled(Boolean expressionDisabled) {
+    super.setExpressionDisabled(expressionDisabled);
     return this;
   }
 

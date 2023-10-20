@@ -7,3 +7,4 @@ src/main/java/com/bytechef/dione/integration/web/rest/model/InputModel.java
 src/main/java/com/bytechef/dione/integration/web/rest/model/IntegrationModel.java
 src/main/java/com/bytechef/dione/integration/web/rest/model/OutputModel.java
 src/main/java/com/bytechef/dione/integration/web/rest/model/UpdateTagsRequestModel.java
+src/main/java/com/bytechef/dione/integration/web/rest/model/WorkflowConnectionModel.java

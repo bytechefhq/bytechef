@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionBasicModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.TriggerDefinitionBasicModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,19 +27,28 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-15T19:47:32.550589+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-25T07:55:32.360326+02:00[Europe/Zagreb]")
 public class ComponentDefinitionModel {
 
   @Valid
   private List<@Valid ActionDefinitionBasicModel> actions;
 
+  private String category;
+
   private ConnectionDefinitionBasicModel connection;
 
-  private DisplayModel display;
+  private String description;
+
+  private String icon;
 
   private String name;
 
   private ResourcesModel resources;
+
+  @Valid
+  private List<String> tags;
+
+  private String title;
 
   @Valid
   private List<@Valid TriggerDefinitionBasicModel> triggers;
@@ -49,7 +57,7 @@ public class ComponentDefinitionModel {
 
   /**
    * Default constructor
-   * @deprecated Use {@link ComponentDefinitionModel#ComponentDefinitionModel(DisplayModel, String, Integer)}
+   * @deprecated Use {@link ComponentDefinitionModel#ComponentDefinitionModel(String, Integer)}
    */
   @Deprecated
   public ComponentDefinitionModel() {
@@ -59,8 +67,7 @@ public class ComponentDefinitionModel {
   /**
    * Constructor with only required parameters
    */
-  public ComponentDefinitionModel(DisplayModel display, String name, Integer version) {
-    this.display = display;
+  public ComponentDefinitionModel(String name, Integer version) {
     this.name = name;
     this.version = version;
   }
@@ -93,6 +100,26 @@ public class ComponentDefinitionModel {
     this.actions = actions;
   }
 
+  public ComponentDefinitionModel category(String category) {
+    this.category = category;
+    return this;
+  }
+
+  /**
+   * The category.
+   * @return category
+  */
+  
+  @Schema(name = "category", description = "The category.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("category")
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
+  }
+
   public ComponentDefinitionModel connection(ConnectionDefinitionBasicModel connection) {
     this.connection = connection;
     return this;
@@ -113,24 +140,44 @@ public class ComponentDefinitionModel {
     this.connection = connection;
   }
 
-  public ComponentDefinitionModel display(DisplayModel display) {
-    this.display = display;
+  public ComponentDefinitionModel description(String description) {
+    this.description = description;
     return this;
   }
 
   /**
-   * Get display
-   * @return display
+   * The description.
+   * @return description
   */
-  @NotNull @Valid 
-  @Schema(name = "display", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("display")
-  public DisplayModel getDisplay() {
-    return display;
+  
+  @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
   }
 
-  public void setDisplay(DisplayModel display) {
-    this.display = display;
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public ComponentDefinitionModel icon(String icon) {
+    this.icon = icon;
+    return this;
+  }
+
+  /**
+   * The icon.
+   * @return icon
+  */
+  
+  @Schema(name = "icon", description = "The icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("icon")
+  public String getIcon() {
+    return icon;
+  }
+
+  public void setIcon(String icon) {
+    this.icon = icon;
   }
 
   public ComponentDefinitionModel name(String name) {
@@ -171,6 +218,54 @@ public class ComponentDefinitionModel {
 
   public void setResources(ResourcesModel resources) {
     this.resources = resources;
+  }
+
+  public ComponentDefinitionModel tags(List<String> tags) {
+    this.tags = tags;
+    return this;
+  }
+
+  public ComponentDefinitionModel addTagsItem(String tagsItem) {
+    if (this.tags == null) {
+      this.tags = new ArrayList<>();
+    }
+    this.tags.add(tagsItem);
+    return this;
+  }
+
+  /**
+   * Tags for categorization.
+   * @return tags
+  */
+  
+  @Schema(name = "tags", description = "Tags for categorization.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("tags")
+  public List<String> getTags() {
+    return tags;
+  }
+
+  public void setTags(List<String> tags) {
+    this.tags = tags;
+  }
+
+  public ComponentDefinitionModel title(String title) {
+    this.title = title;
+    return this;
+  }
+
+  /**
+   * The title
+   * @return title
+  */
+  
+  @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("title")
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
   }
 
   public ComponentDefinitionModel triggers(List<@Valid TriggerDefinitionBasicModel> triggers) {
@@ -231,17 +326,21 @@ public class ComponentDefinitionModel {
     }
     ComponentDefinitionModel componentDefinition = (ComponentDefinitionModel) o;
     return Objects.equals(this.actions, componentDefinition.actions) &&
+        Objects.equals(this.category, componentDefinition.category) &&
         Objects.equals(this.connection, componentDefinition.connection) &&
-        Objects.equals(this.display, componentDefinition.display) &&
+        Objects.equals(this.description, componentDefinition.description) &&
+        Objects.equals(this.icon, componentDefinition.icon) &&
         Objects.equals(this.name, componentDefinition.name) &&
         Objects.equals(this.resources, componentDefinition.resources) &&
+        Objects.equals(this.tags, componentDefinition.tags) &&
+        Objects.equals(this.title, componentDefinition.title) &&
         Objects.equals(this.triggers, componentDefinition.triggers) &&
         Objects.equals(this.version, componentDefinition.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(actions, connection, display, name, resources, triggers, version);
+    return Objects.hash(actions, category, connection, description, icon, name, resources, tags, title, triggers, version);
   }
 
   @Override
@@ -249,10 +348,14 @@ public class ComponentDefinitionModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class ComponentDefinitionModel {\n");
     sb.append("    actions: ").append(toIndentedString(actions)).append("\n");
+    sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    connection: ").append(toIndentedString(connection)).append("\n");
-    sb.append("    display: ").append(toIndentedString(display)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
+    sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
+    sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    triggers: ").append(toIndentedString(triggers)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");

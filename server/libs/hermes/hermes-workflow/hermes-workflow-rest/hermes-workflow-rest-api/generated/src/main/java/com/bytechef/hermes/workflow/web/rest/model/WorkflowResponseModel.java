@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("WorkflowResponse")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-18T15:32:47.160250+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-25T07:55:35.670148+02:00[Europe/Zagreb]")
 public class WorkflowResponseModel {
 
   private JobModel job;
