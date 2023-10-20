@@ -21,6 +21,7 @@ import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants
 
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.file.storage.FileStorageService;
+import com.integri.atlas.task.handler.http.client.HttpClientTaskConstants;
 import com.integri.atlas.task.handler.http.client.header.ContentType;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import java.io.InputStream;
@@ -43,8 +44,6 @@ public class HttpResponseHandler {
     }
 
     public Object handle(TaskExecution taskExecution, HttpResponse httpResponse) {
-        boolean fullResponse = taskExecution.getBoolean(PROPERTY_FULL_RESPONSE);
-
         String responseFormat = taskExecution.getString(PROPERTY_RESPONSE_FORMAT);
 
         if (responseFormat == null) {
@@ -53,14 +52,26 @@ public class HttpResponseHandler {
 
         ContentType contentType = ContentType.valueOf(responseFormat);
 
+        Object body = null;
+
         if (contentType == ContentType.JSON) {
             return jsonHelper.read(httpResponse.body().toString(), Map.class);
         } else if (contentType == ContentType.STRING) {
-            return httpResponse.body().toString();
+            body = httpResponse.body().toString();
         } else if (contentType == ContentType.BINARY) {
-            return fileStorageService.storeFileContent("Moj-File", (InputStream) httpResponse.body());
+            body =
+                fileStorageService.storeFileContent(
+                    taskExecution.getString(HttpClientTaskConstants.PROPERTY_RESPONSE_FILE_NAME),
+                    (InputStream) httpResponse.body()
+                );
         }
 
-        throw new IllegalArgumentException("Invalid response format " + responseFormat);
+        boolean fullResponse = taskExecution.getBoolean(PROPERTY_FULL_RESPONSE, false);
+
+        if (fullResponse) {
+            return new HttpResponseEntry(body, httpResponse);
+        }
+
+        return body;
     }
 }
