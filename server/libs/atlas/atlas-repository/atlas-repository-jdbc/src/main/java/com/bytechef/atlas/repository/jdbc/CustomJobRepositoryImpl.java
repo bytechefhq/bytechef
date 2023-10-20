@@ -116,7 +116,8 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
         if (StringUtils.hasText(status)) {
             query += "status = ? ";
 
-            arguments.add(status);
+            arguments.add(Job.Status.valueOf(status)
+                .getId());
         }
 
         if (startDate != null && StringUtils.hasText(status)) {
