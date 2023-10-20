@@ -20,7 +20,7 @@ package com.bytechef.component.jira.property;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
@@ -29,7 +29,7 @@ import java.util.List;
  * @generated
  */
 public class JiraIssueUpdateDetailsProperties {
-    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
         object("transition").properties(JiraIssueTransitionProperties.PROPERTIES)
             .label("Transition")
             .description("Details of an issue transition.")

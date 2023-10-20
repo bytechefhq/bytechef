@@ -21,7 +21,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
@@ -30,9 +30,10 @@ import java.util.List;
  * @generated
  */
 public class JiraIssueTransitionProperties {
-    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("id").label("Id")
-        .description("The ID of the issue transition. Required when specifying a transition to undertake.")
-        .required(false),
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        string("id").label("Id")
+            .description("The ID of the issue transition. Required when specifying a transition to undertake.")
+            .required(false),
         string("name").label("Name")
             .description("The name of the issue transition.")
             .required(false),

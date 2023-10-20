@@ -20,7 +20,7 @@ package com.bytechef.component.jira.property;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
@@ -29,9 +29,10 @@ import java.util.List;
  * @generated
  */
 public class JiraCreatedIssueProperties {
-    public static final List<Property.ValueProperty<?>> PROPERTIES = List.of(string("id").label("Id")
-        .description("The ID of the created issue or subtask.")
-        .required(false),
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        string("id").label("Id")
+            .description("The ID of the created issue or subtask.")
+            .required(false),
         string("key").label("Key")
             .description("The key of the created issue or subtask.")
             .required(false),
