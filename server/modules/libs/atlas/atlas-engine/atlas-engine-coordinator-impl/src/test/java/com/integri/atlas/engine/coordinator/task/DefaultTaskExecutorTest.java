@@ -26,11 +26,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Arik Cohen
  */
-public class WorkTaskExecutorTest {
+public class DefaultTaskExecutorTest {
 
     @Test
     public void test1() {
-        WorkTaskDispatcher executor = new WorkTaskDispatcher((k, m) -> Assertions.assertEquals(Queues.TASKS, k));
+        DefaultTaskDispatcher executor = new DefaultTaskDispatcher((k, m) -> Assertions.assertEquals(Queues.TASKS, k));
         executor.dispatch(new SimpleTaskExecution());
     }
 
@@ -38,7 +38,7 @@ public class WorkTaskExecutorTest {
     public void test2() {
         SimpleTaskExecution task = new SimpleTaskExecution();
         task.setNode("encoder");
-        WorkTaskDispatcher executor = new WorkTaskDispatcher((k, m) -> Assertions.assertEquals("encoder", k));
+        DefaultTaskDispatcher executor = new DefaultTaskDispatcher((k, m) -> Assertions.assertEquals("encoder", k));
         executor.dispatch(task);
     }
 
@@ -46,7 +46,7 @@ public class WorkTaskExecutorTest {
     public void test3() {
         SimpleTaskExecution task = new SimpleTaskExecution();
         task.setNode("encoder.xlarge");
-        WorkTaskDispatcher executor = new WorkTaskDispatcher((k, m) -> Assertions.assertEquals("encoder.xlarge", k));
+        DefaultTaskDispatcher executor = new DefaultTaskDispatcher((k, m) -> Assertions.assertEquals("encoder.xlarge", k));
         executor.dispatch(task);
     }
 }
