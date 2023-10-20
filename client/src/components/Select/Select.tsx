@@ -106,25 +106,25 @@ const Select = ({
 
                     <Viewport className="rounded-lg border border-gray-100 bg-white p-2 shadow-lg dark:bg-gray-800">
                         <Group>
-                            {options.map((selectItem) => (
+                            {options.map((option) => (
                                 <Item
-                                    key={selectItem.value}
-                                    value={selectItem.value}
-                                    className="relative flex cursor-pointer select-none items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none radix-disabled:opacity-50 dark:text-gray-300 dark:focus:bg-gray-900"
+                                    key={option.value}
+                                    value={option.value}
+                                    className="radix-disabled:opacity-50 relative cursor-pointer select-none items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none dark:text-gray-300 dark:focus:bg-gray-900"
                                 >
                                     <ItemIndicator className="absolute left-2 inline-flex items-center">
                                         <CheckIcon />
                                     </ItemIndicator>
 
                                     <div className="flex flex-col">
-                                        <ItemText>{selectItem.label}</ItemText>
+                                        <ItemText>{option.label}</ItemText>
 
-                                        {selectItem.description && (
+                                        {option.description && (
                                             <span
-                                                className="mt-1 line-clamp-2 text-xs text-gray-500"
-                                                title={selectItem.description}
+                                                className="mt-1 line-clamp-2 w-full text-xs text-gray-500"
+                                                title={option.description}
                                             >
-                                                {selectItem.description}
+                                                {option.description}
                                             </span>
                                         )}
                                     </div>

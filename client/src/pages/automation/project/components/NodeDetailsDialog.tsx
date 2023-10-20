@@ -166,7 +166,7 @@ const NodeDetailsDialog = () => {
                                                         {firstAction.title}
                                                     </span>
 
-                                                    <p className="mt-1 line-clamp-2 w-full overflow-hidden text-xs font-medium text-gray-500">
+                                                    <p className="mt-1 line-clamp-2 w-full text-xs font-medium text-gray-500">
                                                         {
                                                             firstAction.description
                                                         }
