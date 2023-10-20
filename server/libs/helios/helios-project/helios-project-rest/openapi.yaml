@@ -197,6 +197,60 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProjectInstance"
+  /project-instances/{id}/enable/{enable}:
+    post:
+      description: "Enable/disable a project instance."
+      summary: "Enable/disable a project instance."
+      tags:
+      - "project-instances"
+      operationId: "enableProjectInstance"
+      parameters:
+      - name: "id"
+        description: "The id of a project instance."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "enable"
+        description: "Enable/disable the project instance."
+        in: "path"
+        required: true
+        schema:
+          type: "boolean"
+      responses:
+        "200":
+          description: "Successful operation."
+  /project-instances/{id}/workflows/{workflowId}/enable/{enable}:
+    post:
+      description: "Enable/disable a workflow of a project instance."
+      summary: "Enable/disable a workflow of a project instance."
+      tags:
+      - "project-instances"
+      operationId: "enableProjectInstanceWorkflow"
+      parameters:
+      - name: "id"
+        description: "The id of a project instance."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "workflowId"
+        description: "The id of a project workflow."
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      - name: "enable"
+        description: "Enable/disable the workflow of a project instance."
+        in: "path"
+        required: true
+        schema:
+          type: "boolean"
+      responses:
+        "200":
+          description: "Successful operation."
   /project-instances/{id}/jobs:
     post:
       description: "Create a request for running a new job."
