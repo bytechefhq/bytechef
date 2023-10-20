@@ -48,14 +48,14 @@ public class HttpClientComponentHandler implements ComponentHandler {
             HttpClientPutAction.ACTION_DEFINITION,
             HttpClientPatchAction.ACTION_DEFINITION,
             HttpClientDeleteAction.ACTION_DEFINITION,
-            HttpClientHeadAction.ACTION_DEFINITION)
+            HttpClientHeadAction.ACTION_DEFINITION);
 // Each http based connector supports custom actions, so maybe there is no need to connect to unsupported endpoints
 // via httpclient connector but instead use custom actions feature
 //        .filterCompatibleConnectionDefinitions(
 //            (componentDefinition, connectionDefinitions) -> connectionDefinitions.stream()
 //                .filter(ConnectionDefinition::containsAuthorizations)
 //                .toList())
-    ;
+//    ;
 
     @Override
     public ComponentDefinition getDefinition() {
