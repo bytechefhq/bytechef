@@ -254,7 +254,7 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                                 .defaultValue("")
                         )
                 ),
-            JSON_PROPERTY("bodyBinary ")
+            JSON_PROPERTY("bodyBinary")
                 .displayName("Binary")
                 .description("The Binary property that represents binary data.")
                 .displayOption(

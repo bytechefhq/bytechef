@@ -39,10 +39,10 @@ public class BinaryFileTaskHandler implements TaskHandler<Object> {
         WRITE,
     }
 
-    private final BinaryHelper binaryNodeHelper;
+    private final BinaryHelper binaryHelper;
 
-    public BinaryFileTaskHandler(BinaryHelper binaryNodeHelper) {
-        this.binaryNodeHelper = binaryNodeHelper;
+    public BinaryFileTaskHandler(BinaryHelper binaryHelper) {
+        this.binaryHelper = binaryHelper;
     }
 
     @Override
@@ -54,12 +54,12 @@ public class BinaryFileTaskHandler implements TaskHandler<Object> {
 
         if (operation == Operation.READ) {
             try (InputStream inputStream = new FileInputStream(fileName)) {
-                result = binaryNodeHelper.writeBinaryData(fileName, inputStream);
+                result = binaryHelper.writeBinaryData(fileName, inputStream);
             }
         } else {
             Binary binary = taskExecution.getRequired("binary", Binary.class);
 
-            try (InputStream inputStream = binaryNodeHelper.openDataInputStream(binary)) {
+            try (InputStream inputStream = binaryHelper.openDataInputStream(binary)) {
                 result =
                     Map.of("bytes", Files.copy(inputStream, Path.of(fileName), StandardCopyOption.REPLACE_EXISTING));
             }
