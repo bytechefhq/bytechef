@@ -1,0 +1,25 @@
+logging:
+  level:
+    ROOT: INFO
+    com.bytechef: DEBUG
+
+server:
+  port: 7222
+
+spring:
+  devtools:
+    restart:
+      enabled: true
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://localhost:5432/bytechef
+    username: postgres
+    password: postgres
+    hikari:
+      poolName: Hikari
+  h2:
+    console:
+      enabled: false
+  jackson:
+    serialization:
+      indent-output: true

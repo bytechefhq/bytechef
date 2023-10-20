@@ -1,0 +1,32 @@
+logging:
+  level:
+    ROOT: INFO
+    com.bytechef: INFO
+
+management:
+  metrics:
+    export:
+      prometheus:
+        enabled: false
+
+server:
+  port: 8080
+  shutdown: graceful # see https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-graceful-shutdown
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css, application/javascript, application/json
+    min-response-size: 1024
+
+spring:
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://localhost:5432/bytechef
+    username: root
+    password:
+    hikari:
+      poolName: Hikari
