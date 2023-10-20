@@ -28,6 +28,7 @@ import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
 import com.bytechef.hermes.definition.DynamicOptionsProperty;
 import com.bytechef.hermes.definition.OptionsDataSource;
 import com.bytechef.hermes.definition.PropertiesDataSource;
@@ -77,7 +78,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         DynamicWebhookDisableConsumer dynamicWebhookDisableConsumer = OptionalUtils.get(
             triggerDefinition.getDynamicWebhookDisable());
 
-        TriggerDefinition.DynamicWebhookDisableContext context = new TriggerDefinition.DynamicWebhookDisableContext(
+        DynamicWebhookDisableContext context = new DynamicWebhookDisableContext(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
             triggerParameters, output, workflowExecutionId);

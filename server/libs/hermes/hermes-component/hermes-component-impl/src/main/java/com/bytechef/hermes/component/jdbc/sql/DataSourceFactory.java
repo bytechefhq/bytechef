@@ -42,15 +42,15 @@ public class DataSourceFactory {
         Assert.notNull(databaseJdbcName, "'databaseJdbcName' must not be null");
         Assert.notNull(jdbcDriverClassName, "'jdbcDriverClassName' must not be null");
 
-        Map<String, Object> connectionInputParameters = connection.getParameters();
+        Map<String, Object> connectionParameters = connection.getParameters();
 
         String url = "jdbc:" + databaseJdbcName + "://"
-            + MapValueUtils.getString(connectionInputParameters, JdbcConstants.HOST)
+            + MapValueUtils.getString(connectionParameters, JdbcConstants.HOST)
             + ":"
-            + MapValueUtils.getString(connectionInputParameters, JdbcConstants.PORT)
+            + MapValueUtils.getString(connectionParameters, JdbcConstants.PORT)
             + "/"
-            + MapValueUtils.getString(connectionInputParameters, JdbcConstants.DATABASE);
-        String username = MapValueUtils.getString(connectionInputParameters, JdbcConstants.USERNAME);
+            + MapValueUtils.getString(connectionParameters, JdbcConstants.DATABASE);
+        String username = MapValueUtils.getString(connectionParameters, JdbcConstants.USERNAME);
 
         return dataSourceMap.computeIfAbsent(url + username, key -> {
             DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
@@ -58,7 +58,7 @@ public class DataSourceFactory {
             dataSourceBuilder.driverClassName(jdbcDriverClassName);
             dataSourceBuilder.url(url);
             dataSourceBuilder.username(username);
-            dataSourceBuilder.password(MapValueUtils.getString(connectionInputParameters, JdbcConstants.PASSWORD));
+            dataSourceBuilder.password(MapValueUtils.getString(connectionParameters, JdbcConstants.PASSWORD));
 
             return dataSourceBuilder.build();
         });

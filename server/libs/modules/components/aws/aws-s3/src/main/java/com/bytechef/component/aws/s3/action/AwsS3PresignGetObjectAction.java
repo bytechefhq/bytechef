@@ -60,17 +60,17 @@ public class AwsS3PresignGetObjectAction {
     protected static String perform(Map<String, ?> inputParameters, Context context) {
         Connection connection = context.getConnection();
 
-        Map<String, Object> connectionInputParameters = connection.getParameters();
+        Map<String, Object> connectionParameters = connection.getParameters();
 
         try (S3Presigner s3Presigner = AwsS3Utils.buildS3Presigner(connection)) {
             PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(
                 presignedObjectBuilder -> presignedObjectBuilder
                     .signatureDuration(
                         Duration.parse(
-                            "PT" + MapValueUtils.getRequiredString(connectionInputParameters, SIGNATURE_DURATION)))
+                            "PT" + MapValueUtils.getRequiredString(connectionParameters, SIGNATURE_DURATION)))
                     .getObjectRequest(
                         requestBuilder -> requestBuilder
-                            .bucket(MapValueUtils.getRequiredString(connectionInputParameters, BUCKET_NAME))
+                            .bucket(MapValueUtils.getRequiredString(connectionParameters, BUCKET_NAME))
                             .key(MapValueUtils.getRequiredString(inputParameters, KEY))));
 
             URL url = presignedGetObjectRequest.url();

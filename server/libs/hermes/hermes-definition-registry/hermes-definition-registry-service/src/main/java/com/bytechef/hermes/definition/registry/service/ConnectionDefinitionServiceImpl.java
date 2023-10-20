@@ -27,6 +27,9 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition.BaseUriFunction;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.HttpClientUtils;
+import com.bytechef.hermes.component.util.HttpClientUtils.Body;
+import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
+import com.bytechef.hermes.component.util.HttpClientUtils.Response;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackFunction;
@@ -120,46 +123,6 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             verifier);
     }
 
-    private AuthorizationCallbackFunction getDefaultAuthorizationCallback(
-        ClientIdFunction clientIdFunction, ClientSecretFunction clientSecretFunction,
-        TokenUrlFunction tokenUrlFunction) {
-
-        return (connectionParameters, code, redirectUri, codeVerifier) -> {
-            Map<String, Object> payload = new HashMap<>() {
-                {
-                    put("client_id", clientIdFunction.apply(connectionParameters));
-                    put("client_secret", clientSecretFunction.apply(connectionParameters));
-                    put("code", code);
-                    put("grant_type", "authorization_code");
-                    put("redirect_uri", redirectUri);
-                }
-            };
-
-            if (codeVerifier != null) {
-                payload.put("code_verifier", codeVerifier);
-            }
-
-            HttpClientUtils.Response response = HttpClientUtils.post(tokenUrlFunction.apply(connectionParameters))
-                .body(
-                    HttpClientUtils.Body.of(payload, HttpClientUtils.BodyContentType.FORM_URL_ENCODED))
-                .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
-                .execute();
-
-            if (response.statusCode() != 200) {
-                throw new ComponentExecutionException("Invalid claim");
-            }
-
-            if (response.body() == null) {
-                throw new ComponentExecutionException("Invalid claim");
-            }
-
-            Map<?, ?> body = (Map<?, ?>) response.body();
-
-            return new AuthorizationCallbackResponse(
-                (String) body.get(Authorization.ACCESS_TOKEN), (String) body.get(Authorization.REFRESH_TOKEN));
-        };
-    }
-
     @Override
     public Optional<String> fetchBaseUri(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters) {
@@ -205,7 +168,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     @Override
     public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
-        String componentName, int connectionVersion, Map<String, ?> connectionInputParameters,
+        String componentName, int connectionVersion, Map<String, ?> connectionParameters,
         String authorizationName) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
@@ -219,9 +182,9 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             authorization.getScopes(), AuthorizationUtils::getDefaultScopes);
 
         return new OAuth2AuthorizationParametersDTO(
-            authorizationUrlFunction.apply(connectionInputParameters),
-            clientIdFunction.apply(connectionInputParameters),
-            scopesFunction.apply(connectionInputParameters));
+            authorizationUrlFunction.apply(connectionParameters),
+            clientIdFunction.apply(connectionParameters),
+            scopesFunction.apply(connectionParameters));
     }
 
     @Override
@@ -230,6 +193,45 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             .stream()
             .map(this::toConnectionDefinitionDTO)
             .toList();
+    }
+
+    private AuthorizationCallbackFunction getDefaultAuthorizationCallback(
+        ClientIdFunction clientIdFunction, ClientSecretFunction clientSecretFunction,
+        TokenUrlFunction tokenUrlFunction) {
+
+        return (connectionParameters, code, redirectUri, codeVerifier) -> {
+            Map<String, Object> payload = new HashMap<>() {
+                {
+                    put("client_id", clientIdFunction.apply(connectionParameters));
+                    put("client_secret", clientSecretFunction.apply(connectionParameters));
+                    put("code", code);
+                    put("grant_type", "authorization_code");
+                    put("redirect_uri", redirectUri);
+                }
+            };
+
+            if (codeVerifier != null) {
+                payload.put("code_verifier", codeVerifier);
+            }
+
+            Response response = HttpClientUtils.post(tokenUrlFunction.apply(connectionParameters))
+                .body(Body.of(payload, BodyContentType.FORM_URL_ENCODED))
+                .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
+                .execute();
+
+            if (response.statusCode() != 200) {
+                throw new ComponentExecutionException("Invalid claim");
+            }
+
+            if (response.body() == null) {
+                throw new ComponentExecutionException("Invalid claim");
+            }
+
+            Map<?, ?> body = (Map<?, ?>) response.body();
+
+            return new AuthorizationCallbackResponse(
+                (String) body.get(Authorization.ACCESS_TOKEN), (String) body.get(Authorization.REFRESH_TOKEN));
+        };
     }
 
     private ConnectionDefinitionDTO toConnectionDefinitionDTO(ConnectionDefinition connectionDefinition) {

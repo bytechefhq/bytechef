@@ -54,9 +54,9 @@ public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler
 
     @Override
     public ModifiableConnectionDefinition modifyConnection(ModifiableConnectionDefinition connectionDefinition) {
-        return connectionDefinition.baseUri(connectionInputParameters -> "https://%s.api.mailchimp.com/3.0".formatted(
+        return connectionDefinition.baseUri(connectionParameters -> "https://%s.api.mailchimp.com/3.0".formatted(
             MailchimpUtils.getMailChimpServer(
-                MapValueUtils.getRequiredString(connectionInputParameters, ACCESS_TOKEN))));
+                MapValueUtils.getRequiredString(connectionParameters, ACCESS_TOKEN))));
     }
 
     @Override
