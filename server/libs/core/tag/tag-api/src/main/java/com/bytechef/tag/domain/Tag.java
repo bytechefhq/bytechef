@@ -104,7 +104,7 @@ public class Tag implements Persistable<Long>, Serializable {
 
     @Override
     public boolean isNew() {
-        return id == null || id < 0;
+        return id == null;
     }
 
     public void setId(Long id) {

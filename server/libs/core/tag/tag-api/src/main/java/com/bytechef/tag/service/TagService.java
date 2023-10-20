@@ -18,16 +18,17 @@
 package com.bytechef.tag.service;
 
 import com.bytechef.tag.domain.Tag;
-import java.util.Set;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
 public interface TagService {
 
-    Set<Tag> save(Set<Tag> tags);
+    List<Tag> save(List<Tag> tags);
 
     void delete(Long id);
 
-    Set<Tag> getTags(Set<Long> ids);
+    List<Tag> getTags(List<Long> ids);
 }

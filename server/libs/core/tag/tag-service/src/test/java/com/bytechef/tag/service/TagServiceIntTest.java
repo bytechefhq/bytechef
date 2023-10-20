@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,14 +66,14 @@ class TagServiceIntTest {
     @Test
     @SuppressFBWarnings("NP")
     public void testGetTags() {
-        assertThat(tagService.getTags(Set.of(tag.getId()))).isEqualTo(Set.of(tag));
+        assertThat(tagService.getTags(List.of(tag.getId()))).isEqualTo(List.of(tag));
     }
 
     @Test
     public void testSave() {
         tag.setName("name1");
 
-        assertThat(tagService.save(Set.of(tag, new Tag(-1, "name2"), new Tag(-2, "name3")))).hasSize(3);
+        assertThat(tagService.save(List.of(tag, new Tag("name2"), new Tag("name3")))).hasSize(3);
         assertThat(StreamSupport.stream(tagRepository.findAll()
             .spliterator(), false)
             .map(Tag::getName)
