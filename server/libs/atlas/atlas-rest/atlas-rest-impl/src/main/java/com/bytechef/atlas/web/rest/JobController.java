@@ -83,6 +83,7 @@ public class JobController implements JobsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<JobModel>> getJob(Long id, ServerWebExchange exchange) {
         return Mono.just(conversionService.convert(jobService.getJob(id), JobModel.class))
             .map(ResponseEntity::ok);
@@ -108,6 +109,7 @@ public class JobController implements JobsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<JobModel>> getLatestJob(ServerWebExchange exchange) {
         return Mono.just(
             conversionService.convert(jobService.fetchLatestJob()

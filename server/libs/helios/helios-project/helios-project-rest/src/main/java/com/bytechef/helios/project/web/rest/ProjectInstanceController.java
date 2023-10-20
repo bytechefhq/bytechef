@@ -53,6 +53,7 @@ public class ProjectInstanceController implements ProjectInstancesApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<ProjectInstanceModel>> createProjectInstance(
         Mono<ProjectInstanceModel> projectInstanceModelMono, ServerWebExchange exchange) {
 
@@ -73,6 +74,7 @@ public class ProjectInstanceController implements ProjectInstancesApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<ProjectInstanceModel>> getProjectInstance(Long id, ServerWebExchange exchange) {
         return Mono.just(
             conversionService.convert(projectFacade.getProjectInstance(id), ProjectInstanceModel.class))
@@ -93,6 +95,7 @@ public class ProjectInstanceController implements ProjectInstancesApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<ProjectInstanceModel>> updateProjectInstance(
         Long id, Mono<ProjectInstanceModel> projectInstanceModelMono, ServerWebExchange exchange) {
 

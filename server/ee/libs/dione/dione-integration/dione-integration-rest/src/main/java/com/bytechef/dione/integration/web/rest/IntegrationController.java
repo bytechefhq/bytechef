@@ -29,7 +29,6 @@ import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
@@ -65,6 +64,7 @@ public class IntegrationController implements IntegrationsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<IntegrationModel>> getIntegration(Long id, ServerWebExchange exchange) {
         return Mono.just(conversionService.convert(integrationFacade.getIntegration(id), IntegrationModel.class))
             .map(ResponseEntity::ok);
@@ -94,7 +94,7 @@ public class IntegrationController implements IntegrationsApi {
     }
 
     @Override
-    @Transactional
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<IntegrationModel>> createIntegration(
         Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
 
@@ -106,6 +106,7 @@ public class IntegrationController implements IntegrationsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<WorkflowModel>> createIntegrationWorkflow(
         Long id, Mono<CreateIntegrationWorkflowRequestModel> createIntegrationWorkflowRequestModelMono,
         ServerWebExchange exchange) {
@@ -118,6 +119,7 @@ public class IntegrationController implements IntegrationsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<IntegrationModel>> updateIntegration(
         Long id, Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
 
