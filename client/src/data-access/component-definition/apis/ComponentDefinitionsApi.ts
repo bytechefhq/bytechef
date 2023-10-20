@@ -22,6 +22,11 @@ import {
     ComponentDefinitionModelToJSON,
 } from '../models';
 
+export interface GetComponentDefinitionsRequest {
+    authenticationDefinitions?: boolean;
+    authenticationInstances?: boolean;
+}
+
 /**
  * 
  */
@@ -30,8 +35,16 @@ export class ComponentDefinitionsApi extends runtime.BaseAPI {
     /**
      * Returns all component definitions.
      */
-    async getComponentDefinitionsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionModel>>> {
+    async getComponentDefinitionsRaw(requestParameters: GetComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionModel>>> {
         const queryParameters: any = {};
+
+        if (requestParameters.authenticationDefinitions !== undefined) {
+            queryParameters['authenticationDefinitions'] = requestParameters.authenticationDefinitions;
+        }
+
+        if (requestParameters.authenticationInstances !== undefined) {
+            queryParameters['authenticationInstances'] = requestParameters.authenticationInstances;
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -48,8 +61,8 @@ export class ComponentDefinitionsApi extends runtime.BaseAPI {
     /**
      * Returns all component definitions.
      */
-    async getComponentDefinitions(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionModel>> {
-        const response = await this.getComponentDefinitionsRaw(initOverrides);
+    async getComponentDefinitions(requestParameters: GetComponentDefinitionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionModel>> {
+        const response = await this.getComponentDefinitionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

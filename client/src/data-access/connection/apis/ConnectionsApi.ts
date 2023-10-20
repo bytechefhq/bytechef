@@ -16,10 +16,16 @@
 import * as runtime from '../runtime';
 import type {
   ConnectionModel,
+  PutConnectionTagsRequestModel,
+  TagModel,
 } from '../models';
 import {
     ConnectionModelFromJSON,
     ConnectionModelToJSON,
+    PutConnectionTagsRequestModelFromJSON,
+    PutConnectionTagsRequestModelToJSON,
+    TagModelFromJSON,
+    TagModelToJSON,
 } from '../models';
 
 export interface DeleteConnectionRequest {
@@ -30,6 +36,11 @@ export interface GetConnectionRequest {
     id: number;
 }
 
+export interface GetConnectionsRequest {
+    componentNames?: Array<string>;
+    tagId?: Array<number>;
+}
+
 export interface PostConnectionRequest {
     connectionModel: ConnectionModel;
 }
@@ -37,6 +48,11 @@ export interface PostConnectionRequest {
 export interface PutConnectionRequest {
     id: number;
     connectionModel: ConnectionModel;
+}
+
+export interface PutConnectionTagsRequest {
+    id: number;
+    putConnectionTagsRequestModel: PutConnectionTagsRequestModel;
 }
 
 /**
@@ -104,10 +120,46 @@ export class ConnectionsApi extends runtime.BaseAPI {
     }
 
     /**
+     * Get connection tags.
+     * Get connection tags.
+     */
+    async getConnectionTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagModel>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/connections/tags`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagModelFromJSON));
+    }
+
+    /**
+     * Get connection tags.
+     * Get connection tags.
+     */
+    async getConnectionTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagModel>> {
+        const response = await this.getConnectionTagsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
      * TODO
      */
-    async getConnectionsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConnectionModel>>> {
+    async getConnectionsRaw(requestParameters: GetConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConnectionModel>>> {
         const queryParameters: any = {};
+
+        if (requestParameters.componentNames) {
+            queryParameters['componentNames'] = requestParameters.componentNames;
+        }
+
+        if (requestParameters.tagId) {
+            queryParameters['tagId'] = requestParameters.tagId;
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -124,8 +176,8 @@ export class ConnectionsApi extends runtime.BaseAPI {
     /**
      * TODO
      */
-    async getConnections(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ConnectionModel>> {
-        const response = await this.getConnectionsRaw(initOverrides);
+    async getConnections(requestParameters: GetConnectionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ConnectionModel>> {
+        const response = await this.getConnectionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -197,6 +249,44 @@ export class ConnectionsApi extends runtime.BaseAPI {
     async putConnection(requestParameters: PutConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectionModel> {
         const response = await this.putConnectionRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Updates tags of an existing connection.
+     * Updates tags of an existing connection.
+     */
+    async putConnectionTagsRaw(requestParameters: PutConnectionTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling putConnectionTags.');
+        }
+
+        if (requestParameters.putConnectionTagsRequestModel === null || requestParameters.putConnectionTagsRequestModel === undefined) {
+            throw new runtime.RequiredError('putConnectionTagsRequestModel','Required parameter requestParameters.putConnectionTagsRequestModel was null or undefined when calling putConnectionTags.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/connections/{id}/tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: PutConnectionTagsRequestModelToJSON(requestParameters.putConnectionTagsRequestModel),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Updates tags of an existing connection.
+     * Updates tags of an existing connection.
+     */
+    async putConnectionTags(requestParameters: PutConnectionTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.putConnectionTagsRaw(requestParameters, initOverrides);
     }
 
 }

@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { TagModel } from './TagModel';
+import {
+    TagModelFromJSON,
+    TagModelFromJSONTyped,
+    TagModelToJSON,
+} from './TagModel';
+
 /**
  * TODO
  * @export
@@ -81,6 +88,12 @@ export interface ConnectionModel {
     readonly parameters: { [key: string]: object; };
     /**
      * 
+     * @type {Array<TagModel>}
+     * @memberof ConnectionModel
+     */
+    tags?: Array<TagModel>;
+    /**
+     * 
      * @type {number}
      * @memberof ConnectionModel
      */
@@ -120,6 +133,7 @@ export function ConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boo
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'parameters': json['parameters'],
+        'tags': !exists(json, 'tags') ? undefined : ((json['tags'] as Array<any>).map(TagModelFromJSON)),
         'version': !exists(json, 'version') ? undefined : json['version'],
     };
 }
@@ -134,6 +148,7 @@ export function ConnectionModelToJSON(value?: ConnectionModel | null): any {
     return {
         
         'name': value.name,
+        'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
         'version': value.version,
     };
 }
