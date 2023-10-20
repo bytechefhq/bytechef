@@ -61,4 +61,13 @@ public class ConnectionImpl implements Connection {
     public <T> T getParameter(String name, T defaultValue) {
         return MapUtils.get(parameters, name, new ParameterizedTypeReference<>() {}, defaultValue);
     }
+
+    @Override
+    public String toString() {
+        return "ConnectionImpl{" +
+            "authorizationName='" + authorizationName + '\'' +
+            ", name='" + name + '\'' +
+            ", parameters=" + parameters +
+            '}';
+    }
 }

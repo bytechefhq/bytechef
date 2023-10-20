@@ -243,4 +243,11 @@ public class ExecutionParametersImpl implements ExecutionParameters {
     public String getString(String key, String defaultValue) {
         return MapUtils.getString(parameters, key, defaultValue);
     }
+
+    @Override
+    public String toString() {
+        return "ExecutionParametersImpl{" +
+            "parameters=" + parameters +
+            '}';
+    }
 }

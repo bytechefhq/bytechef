@@ -33,7 +33,6 @@ import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,15 +56,13 @@ public class InsertJdbcActionIntTest {
     @Autowired
     private InsertJdbcOperation insertJdbcOperation;
 
+    @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @AfterEach
-    public void afterEach() {
-        jdbcTemplate.execute("DROP TABLE IF EXISTS test;");
-    }
 
     @BeforeEach
     public void beforeEach() {
+        jdbcTemplate.execute("DROP TABLE IF EXISTS test;");
+
         jdbcTemplate = new JdbcTemplate(dataSource);
 
         jdbcTemplate.execute(
