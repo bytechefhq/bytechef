@@ -75,7 +75,7 @@ const Dialog = ({
                             {title}
                         </Title>
 
-                        <Description className="my-2 text-sm font-normal text-gray-700 dark:text-gray-400">
+                        <Description className="my-4 text-sm font-normal text-gray-700 dark:text-gray-400">
                             {description}
                         </Description>
 

@@ -29,6 +29,7 @@ import NativeSelect from '../../../components/NativeSelect/NativeSelect';
 import Properties from '../../../components/Properties/Properties';
 import {timeout} from 'd3-timer';
 import OAuth2Button from './components/OAuth2Button';
+import {AuthTokenPayload, AuthorizationCodePayload} from './oauth2/useOAuth2';
 
 interface FormProps {
     authorizationName: string;
@@ -36,12 +37,15 @@ interface FormProps {
     name: string;
     parameters: {[key: string]: object};
     tags: TagModel[];
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    [key: string]: any;
 }
 
 const ConnectionDialog = () => {
     const [authorizationName, setAuthorizationName] = useState<string>();
     const [componentDefinition, setComponentDefinition] =
         useState<ComponentDefinitionBasicModel>();
+    const [oAuth2Error, setOAuth2Error] = useState<string>();
     const [isOpen, setIsOpen] = useState(false);
 
     const {
@@ -64,7 +68,6 @@ const ConnectionDialog = () => {
         componentDefinition
             ? {
                   componentName: componentDefinition.name,
-                  componentVersion: componentDefinition.version,
               }
             : undefined
     );
@@ -151,20 +154,35 @@ const ConnectionDialog = () => {
         }, 1000);
     }
 
-    function createConnection() {
+    function createConnection(additionalParameters?: {[key: string]: object}) {
         const {authorizationName, componentName, name, parameters, tags} =
             getValues();
 
         const connectionModel = {
             authorizationName: authorizationName,
             componentName: componentName?.value,
-            connectionVersion: 1,
             name: name,
-            parameters: parameters,
+            parameters: {
+                ...parameters,
+                ...additionalParameters,
+            },
             tags: tags,
         } as ConnectionModel;
 
         createConnectionMutation.mutate(connectionModel);
+    }
+
+    function handleOnAuth2Success(
+        payload: AuthTokenPayload & AuthorizationCodePayload
+    ) {
+        if (payload.access_token || payload.code) {
+            /* eslint-disable @typescript-eslint/no-explicit-any */
+            createConnection(payload as any);
+        }
+    }
+
+    function handleOnOAuth2Error(error: string) {
+        setOAuth2Error(error);
     }
 
     function getAuthorizationType(): string {
@@ -198,15 +216,28 @@ const ConnectionDialog = () => {
             title="Create Connection"
             triggerLabel="Create Connection"
         >
-            {componentDefinitionsError &&
-                !componentDefinitionsIsLoading &&
-                `An error has occurred: ${componentDefinitionsError.message}`}
-            {connectionDefinitionError &&
-                !connectionDefinitionIsLoading &&
-                `An error has occurred: ${connectionDefinitionError.message}`}
-            {tagsError &&
-                !tagsIsLoading &&
-                `An error has occurred: ${tagsError.message}`}
+            {componentDefinitionsError && !componentDefinitionsIsLoading && (
+                <div className="my-4 rounded-md bg-red-50 p-4 text-sm text-red-700">
+                    `An error has occurred: ${componentDefinitionsError.message}
+                    `
+                </div>
+            )}
+            {connectionDefinitionError && !connectionDefinitionIsLoading && (
+                <div className="my-4 rounded-md bg-red-50 p-4 text-sm text-red-700">
+                    `An error has occurred: ${connectionDefinitionError.message}
+                    `
+                </div>
+            )}
+            {tagsError && !tagsIsLoading && (
+                <div className="my-4 rounded-md bg-red-50 p-4 text-sm text-red-700">
+                    `An error has occurred: ${tagsError.message}`
+                </div>
+            )}
+            {oAuth2Error && (
+                <div className="my-4 rounded-md bg-red-50 p-4 text-sm text-red-700">
+                    `An OAuth2 error has occurred: ${oAuth2Error}`
+                </div>
+            )}
 
             {!componentDefinitionsIsLoading && (
                 <Controller
@@ -237,6 +268,7 @@ const ConnectionDialog = () => {
                                 if (value) {
                                     setValue('componentName', value);
 
+                                    setAuthorizationName(undefined);
                                     setComponentDefinition(
                                         value.componentDefinition
                                     );
@@ -280,21 +312,25 @@ const ConnectionDialog = () => {
                         onChange: (event) =>
                             setAuthorizationName(event.target.value),
                     })}
+                    value={authorizationName || authorizationOptions[0].value}
                 />
             )}
 
-            {authorizationsExists && authorizationName && (
-                <Properties
-                    formState={formState}
-                    properties={
-                        connectionDefinition?.authorizations?.filter(
-                            (authorization) =>
-                                authorization.name === authorizationName
-                        )[0]?.properties
-                    }
-                    register={register}
-                />
-            )}
+            {authorizationsExists &&
+                (authorizationName || authorizationOptions[0].value) && (
+                    <Properties
+                        formState={formState}
+                        properties={
+                            connectionDefinition?.authorizations?.filter(
+                                (authorization) =>
+                                    authorization.name ===
+                                    (authorizationName ||
+                                        authorizationOptions[0].value)
+                            )[0]?.properties
+                        }
+                        register={register}
+                    />
+                )}
 
             {!tagsIsLoading && (
                 <Controller
@@ -329,7 +365,7 @@ const ConnectionDialog = () => {
                 />
             )}
 
-            <div className="mt-4 flex justify-end space-x-1">
+            <div className="mt-8 flex justify-end space-x-1">
                 <Button
                     displayType="lightBorder"
                     label="Cancel"
@@ -342,6 +378,8 @@ const ConnectionDialog = () => {
                         onClick={(getAuth: () => void) =>
                             handleSubmit(() => getAuth())()
                         }
+                        onSuccess={handleOnAuth2Success}
+                        onError={handleOnOAuth2Error}
                     />
                 ) : (
                     <Button
