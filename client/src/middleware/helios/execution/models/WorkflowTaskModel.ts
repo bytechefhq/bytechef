@@ -13,12 +13,25 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { WorkflowConnectionModel } from './WorkflowConnectionModel';
+import {
+    WorkflowConnectionModelFromJSON,
+    WorkflowConnectionModelFromJSONTyped,
+    WorkflowConnectionModelToJSON,
+} from './WorkflowConnectionModel';
+
 /**
- * Represents a definition of the task.
+ * Represents a definition of a workflow task.
  * @export
  * @interface WorkflowTaskModel
  */
 export interface WorkflowTaskModel {
+    /**
+     * 
+     * @type {Array<WorkflowConnectionModel>}
+     * @memberof WorkflowTaskModel
+     */
+    connections?: Array<WorkflowConnectionModel>;
     /**
      * The (optional) list of tasks that are to be executed after execution of a task -- regardless of whether it had failed or not.
      * @type {Array<WorkflowTaskModel>}
@@ -68,7 +81,7 @@ export interface WorkflowTaskModel {
      */
     timeout?: string;
     /**
-     * Type of the task.
+     * The type of a task.
      * @type {string}
      * @memberof WorkflowTaskModel
      */
@@ -96,6 +109,7 @@ export function WorkflowTaskModelFromJSONTyped(json: any, ignoreDiscriminator: b
     }
     return {
         
+        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(WorkflowConnectionModelFromJSON)),
         'finalize': !exists(json, 'finalize') ? undefined : ((json['finalize'] as Array<any>).map(WorkflowTaskModelFromJSON)),
         'label': !exists(json, 'label') ? undefined : json['label'],
         'name': json['name'],
@@ -117,6 +131,7 @@ export function WorkflowTaskModelToJSON(value?: WorkflowTaskModel | null): any {
     }
     return {
         
+        'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(WorkflowConnectionModelToJSON)),
         'finalize': value.finalize === undefined ? undefined : ((value.finalize as Array<any>).map(WorkflowTaskModelToJSON)),
         'label': value.label,
         'name': value.name,
