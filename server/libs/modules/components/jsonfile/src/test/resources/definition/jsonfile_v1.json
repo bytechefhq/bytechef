@@ -1,213 +1,217 @@
 {
-  "actions": [
-    {
-      "display": {
-        "description": "Reads data from a JSON file.",
-        "label": "Read from file"
-      },
-      "name": "read",
-      "output": [
+    "actions": [
         {
-          "displayOption": {
-            "show": {
-              "isArray": [
-                true
-              ]
-            }
-          },
-          "type": "ARRAY"
+            "display": {
+                "description": "Reads data from a JSON file.",
+                "label": "Read from file"
+            },
+            "name": "read",
+            "output": [
+                {
+                    "displayOption": {
+                        "show": {
+                            "isArray": [
+                                true
+                            ]
+                        }
+                    },
+                    "type": "ARRAY"
+                },
+                {
+                    "displayOption": {
+                        "show": {
+                            "isArray": [
+                                false
+                            ]
+                        }
+                    },
+                    "type": "OBJECT"
+                }
+            ],
+            "properties": [
+                {
+                    "description": "The file type to choose.",
+                    "label": "File Type",
+                    "required": true,
+                    "name": "fileType",
+                    "type": "STRING",
+                    "defaultValue": "JSON",
+                    "options": [
+                        {
+                            "name": "JSON",
+                            "value": "JSON"
+                        },
+                        {
+                            "name": "JSON Line",
+                            "value": "JSONL"
+                        }
+                    ]
+                },
+                {
+                    "description": "The object property which contains a reference to the JSON file to read from.",
+                    "label": "File",
+                    "required": true,
+                    "name": "fileEntry",
+                    "type": "OBJECT",
+                    "objectType": "FILE_ENTRY",
+                    "properties": [
+                        {
+                            "required": true,
+                            "name": "extension",
+                            "type": "STRING"
+                        },
+                        {
+                            "required": true,
+                            "name": "mimeType",
+                            "type": "STRING"
+                        },
+                        {
+                            "required": true,
+                            "name": "name",
+                            "type": "STRING"
+                        },
+                        {
+                            "required": true,
+                            "name": "url",
+                            "type": "STRING"
+                        }
+                    ]
+                },
+                {
+                    "description": "The object input is array?",
+                    "label": "Is Array",
+                    "name": "isArray",
+                    "type": "BOOLEAN",
+                    "defaultValue": true
+                },
+                {
+                    "advancedOption": true,
+                    "description": "The path where the array is e.g 'data'. Leave blank to use the top level object.",
+                    "displayOption": {
+                        "show": {
+                            "isArray": [
+                                true
+                            ]
+                        }
+                    },
+                    "label": "Path",
+                    "name": "path",
+                    "type": "STRING"
+                },
+                {
+                    "advancedOption": true,
+                    "description": "The amount of child elements to return in a page.",
+                    "displayOption": {
+                        "show": {
+                            "isArray": [
+                                true
+                            ]
+                        }
+                    },
+                    "label": "Page Size",
+                    "name": "pageSize",
+                    "type": "INTEGER"
+                },
+                {
+                    "advancedOption": true,
+                    "description": "The page number to get.",
+                    "displayOption": {
+                        "show": {
+                            "isArray": [
+                                true
+                            ]
+                        }
+                    },
+                    "label": "Page Number",
+                    "name": "pageNumber",
+                    "type": "INTEGER"
+                }
+            ]
         },
         {
-          "displayOption": {
-            "show": {
-              "isArray": [
-                false
-              ]
-            }
-          },
-          "type": "OBJECT"
+            "display": {
+                "description": "Writes the data to a JSON file.",
+                "label": "Write to file"
+            },
+            "name": "write",
+            "output": [
+                {
+                    "type": "OBJECT",
+                    "objectType": "FILE_ENTRY",
+                    "properties": [
+                        {
+                            "required": true,
+                            "name": "extension",
+                            "type": "STRING"
+                        },
+                        {
+                            "required": true,
+                            "name": "mimeType",
+                            "type": "STRING"
+                        },
+                        {
+                            "required": true,
+                            "name": "name",
+                            "type": "STRING"
+                        },
+                        {
+                            "required": true,
+                            "name": "url",
+                            "type": "STRING"
+                        }
+                    ]
+                }
+            ],
+            "properties": [
+                {
+                    "description": "The file type to choose.",
+                    "label": "File Type",
+                    "required": true,
+                    "name": "fileType",
+                    "type": "STRING",
+                    "defaultValue": "JSON",
+                    "options": [
+                        {
+                            "name": "JSON",
+                            "value": "JSON"
+                        },
+                        {
+                            "name": "JSON Line",
+                            "value": "JSONL"
+                        }
+                    ]
+                },
+                {
+                    "description": "The data to write to the file.",
+                    "label": "Source",
+                    "required": true,
+                    "name": "source",
+                    "type": "ONE_OF",
+                    "types": [
+                        {
+                            "type": "ARRAY"
+                        },
+                        {
+                            "type": "OBJECT"
+                        }
+                    ]
+                },
+                {
+                    "advancedOption": true,
+                    "description": "Filename to set for binary data. By default, \"file.json\" will be used.",
+                    "label": "Filename",
+                    "required": true,
+                    "name": "filename",
+                    "type": "STRING",
+                    "defaultValue": "file.json"
+                }
+            ]
         }
-      ],
-      "properties": [
-        {
-          "description": "The file type to choose.",
-          "label": "File Type",
-          "required": true,
-          "name": "fileType",
-          "type": "STRING",
-          "defaultValue": "JSON",
-          "options": [
-            {
-              "name": "JSON",
-              "value": "JSON"
-            },
-            {
-              "name": "JSON Line",
-              "value": "JSONL"
-            }
-          ]
-        },
-        {
-          "description": "The object property which contains a reference to the JSON file to read from.",
-          "label": "File",
-          "required": true,
-          "name": "fileEntry",
-          "type": "OBJECT",
-          "objectType": "FILE_ENTRY",
-          "properties": [
-            {
-              "required": true,
-              "name": "extension",
-              "type": "STRING"
-            },
-            {
-              "required": true,
-              "name": "mimeType",
-              "type": "STRING"
-            },
-            {
-              "required": true,
-              "name": "name",
-              "type": "STRING"
-            },
-            {
-              "required": true,
-              "name": "url",
-              "type": "STRING"
-            }
-          ]
-        },
-        {
-          "description": "The object input is array?",
-          "label": "Is Array",
-          "name": "isArray",
-          "type": "BOOLEAN",
-          "defaultValue": true
-        },
-        {
-          "description": "The path where the array is e.g 'data'. Leave blank to use the top level object.",
-          "displayOption": {
-            "show": {
-              "isArray": [
-                true
-              ]
-            }
-          },
-          "label": "Path",
-          "name": "path",
-          "type": "STRING"
-        },
-        {
-          "description": "The amount of child elements to return in a page.",
-          "displayOption": {
-            "show": {
-              "isArray": [
-                true
-              ]
-            }
-          },
-          "label": "Page Size",
-          "name": "pageSize",
-          "type": "INTEGER"
-        },
-        {
-          "description": "The page number to get.",
-          "displayOption": {
-            "show": {
-              "isArray": [
-                true
-              ]
-            }
-          },
-          "label": "Page Number",
-          "name": "pageNumber",
-          "type": "INTEGER"
-        }
-      ]
+    ],
+    "display": {
+        "description": "Reads and writes data from a JSON file.",
+        "label": "JSON File"
     },
-    {
-      "display": {
-        "description": "Writes the data to a JSON file.",
-        "label": "Write to file"
-      },
-      "name": "write",
-      "output": [
-        {
-          "type": "OBJECT",
-          "objectType": "FILE_ENTRY",
-          "properties": [
-            {
-              "required": true,
-              "name": "extension",
-              "type": "STRING"
-            },
-            {
-              "required": true,
-              "name": "mimeType",
-              "type": "STRING"
-            },
-            {
-              "required": true,
-              "name": "name",
-              "type": "STRING"
-            },
-            {
-              "required": true,
-              "name": "url",
-              "type": "STRING"
-            }
-          ]
-        }
-      ],
-      "properties": [
-        {
-          "description": "The file type to choose.",
-          "label": "File Type",
-          "required": true,
-          "name": "fileType",
-          "type": "STRING",
-          "defaultValue": "JSON",
-          "options": [
-            {
-              "name": "JSON",
-              "value": "JSON"
-            },
-            {
-              "name": "JSON Line",
-              "value": "JSONL"
-            }
-          ]
-        },
-        {
-          "description": "The data to write to the file.",
-          "label": "Source",
-          "required": true,
-          "name": "source",
-          "type": "ONE_OF",
-          "types": [
-            {
-              "type": "ARRAY"
-            },
-            {
-              "type": "OBJECT"
-            }
-          ]
-        },
-        {
-          "description": "Filename to set for binary data. By default, \"file.json\" will be used.",
-          "label": "Filename",
-          "required": true,
-          "name": "filename",
-          "type": "STRING",
-          "defaultValue": "file.json"
-        }
-      ]
-    }
-  ],
-  "display": {
-    "description": "Reads and writes data from a JSON file.",
-    "label": "JSON File"
-  },
-  "name": "jsonFile",
-  "version": 1
+    "name": "jsonFile",
+    "version": 1
 }
