@@ -1,0 +1,9 @@
+dependencies {
+    api project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
+
+    implementation "org.springframework:spring-webflux"
+    implementation libs.org.springframework.cloud.spring.cloud.commons
+    implementation project(":server:libs:core:commons:commons-discovery")
+    implementation project(":server:libs:core:commons:commons-reactor")
+    implementation project(":server:libs:core:commons:commons-util")
+}

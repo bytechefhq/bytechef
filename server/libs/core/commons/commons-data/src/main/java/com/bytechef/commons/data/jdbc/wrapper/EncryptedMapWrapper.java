@@ -34,7 +34,7 @@ public class EncryptedMapWrapper {
     public EncryptedMapWrapper() {
     }
 
-    public EncryptedMapWrapper(Map<String, Object> map) {
+    public EncryptedMapWrapper(Map<String, ?> map) {
         this.map = new HashMap<>(map);
     }
 

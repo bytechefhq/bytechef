@@ -17,19 +17,19 @@
 
 package com.bytechef.platform.config;
 
-import com.bytechef.hermes.definition.registry.rsocket.client.facade.ActionDefinitionFacadeRSocketClient;
-import com.bytechef.hermes.definition.registry.rsocket.client.facade.ComponentDefinitionFacadeRSocketClient;
-import com.bytechef.hermes.definition.registry.rsocket.client.facade.TriggerDefinitionFacadeRSocketClient;
-import com.bytechef.hermes.definition.registry.rsocket.client.service.ActionDefinitionServiceRSocketClient;
-import com.bytechef.hermes.definition.registry.rsocket.client.service.ComponentDefinitionServiceRSocketClient;
-import com.bytechef.hermes.definition.registry.rsocket.client.service.ConnectionDefinitionServiceRSocketClient;
-import com.bytechef.hermes.definition.registry.rsocket.client.service.TaskDispatcherDefinitionServiceRSocketClient;
-import com.bytechef.hermes.definition.registry.rsocket.client.service.TriggerDefinitionServiceRSocketClient;
+import com.bytechef.hermes.definition.registry.service.web.rest.client.facade.ActionDefinitionFacadeClient;
+import com.bytechef.hermes.definition.registry.service.web.rest.client.facade.ComponentDefinitionFacadeClient;
+import com.bytechef.hermes.definition.registry.service.web.rest.client.facade.TriggerDefinitionFacadeClient;
+import com.bytechef.hermes.definition.registry.service.web.rest.client.service.ActionDefinitionServiceClient;
+import com.bytechef.hermes.definition.registry.service.web.rest.client.service.ComponentDefinitionServiceClient;
+import com.bytechef.hermes.definition.registry.service.web.rest.client.service.ConnectionDefinitionServiceClient;
+import com.bytechef.hermes.definition.registry.service.web.rest.client.service.TaskDispatcherDefinitionServiceClient;
+import com.bytechef.hermes.definition.registry.service.web.rest.client.service.TriggerDefinitionServiceClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.rsocket.RSocketRequester;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * @author Ivica Cardic
@@ -38,65 +38,52 @@ import org.springframework.messaging.rsocket.RSocketRequester;
 public class DefinitionRegistryConfiguration {
 
     @Bean
-    ActionDefinitionFacadeRSocketClient actionDefinitionFacadeRSocketClient(
-        DiscoveryClient discoveryClient,
-        @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
+    ActionDefinitionFacadeClient actionDefinitionFacadeClient(
+        DiscoveryClient discoveryClient) {
 
-        return new ActionDefinitionFacadeRSocketClient(discoveryClient, rSocketRequesterBuilder);
+        return new ActionDefinitionFacadeClient(discoveryClient);
     }
 
     @Bean
-    ActionDefinitionServiceRSocketClient actionDefinitionServiceRSocketClient(
-        DiscoveryClient discoveryClient,
-        @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
+    ActionDefinitionServiceClient actionDefinitionServiceClient(
+        DiscoveryClient discoveryClient) {
 
-        return new ActionDefinitionServiceRSocketClient(discoveryClient, rSocketRequesterBuilder);
+        return new ActionDefinitionServiceClient(discoveryClient);
     }
 
     @Bean
-    ComponentDefinitionFacadeRSocketClient componentDefinitionFacadeRSocketClient(
-        DiscoveryClient discoveryClient,
-        @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
-
-        return new ComponentDefinitionFacadeRSocketClient(discoveryClient, rSocketRequesterBuilder);
+    ComponentDefinitionFacadeClient componentDefinitionFacadeClient(DiscoveryClient discoveryClient) {
+        return new ComponentDefinitionFacadeClient(discoveryClient);
     }
 
     @Bean
-    ComponentDefinitionServiceRSocketClient componentDefinitionServiceRSocketClient(
-        DiscoveryClient discoveryClient,
-        @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
+    ComponentDefinitionServiceClient componentDefinitionServiceClient(
+        DiscoveryClient discoveryClient) {
 
-        return new ComponentDefinitionServiceRSocketClient(discoveryClient, rSocketRequesterBuilder);
+        return new ComponentDefinitionServiceClient(discoveryClient);
     }
 
     @Bean
-    ConnectionDefinitionServiceRSocketClient connectionDefinitionServiceRSocketClient(
-        DiscoveryClient discoveryClient,
-        @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
+    ConnectionDefinitionServiceClient connectionDefinitionServiceClient(
+        DiscoveryClient discoveryClient) {
 
-        return new ConnectionDefinitionServiceRSocketClient(discoveryClient, rSocketRequesterBuilder);
+        return new ConnectionDefinitionServiceClient(discoveryClient);
     }
 
     @Bean
-    TaskDispatcherDefinitionServiceRSocketClient taskDispatcherDefinitionServiceRSocketClient(
-        @Qualifier("coordinatorRSocketRequester") RSocketRequester rSocketRequester) {
+    TaskDispatcherDefinitionServiceClient taskDispatcherDefinitionServiceClient(
+        @Qualifier("coordinatorWebClientBuilder") WebClient.Builder coordinatorWebClientBuilder) {
 
-        return new TaskDispatcherDefinitionServiceRSocketClient(rSocketRequester);
+        return new TaskDispatcherDefinitionServiceClient(coordinatorWebClientBuilder);
     }
 
     @Bean
-    TriggerDefinitionFacadeRSocketClient triggerDefinitionFacadeRSocketClient(
-        DiscoveryClient discoveryClient,
-        @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
-
-        return new TriggerDefinitionFacadeRSocketClient(discoveryClient, rSocketRequesterBuilder);
+    TriggerDefinitionFacadeClient triggerDefinitionFacadeClient(DiscoveryClient discoveryClient) {
+        return new TriggerDefinitionFacadeClient(discoveryClient);
     }
 
     @Bean
-    TriggerDefinitionServiceRSocketClient triggerDefinitionServiceRSocketClient(
-        DiscoveryClient discoveryClient,
-        @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
-
-        return new TriggerDefinitionServiceRSocketClient(discoveryClient, rSocketRequesterBuilder);
+    TriggerDefinitionServiceClient triggerDefinitionServiceClient(DiscoveryClient discoveryClient) {
+        return new TriggerDefinitionServiceClient(discoveryClient);
     }
 }

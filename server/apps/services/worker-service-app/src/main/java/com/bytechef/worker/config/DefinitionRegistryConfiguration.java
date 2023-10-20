@@ -35,10 +35,10 @@ import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacadeImpl;
-import com.bytechef.hermes.definition.registry.rsocket.client.facade.ComponentDefinitionFacadeRSocketClient;
-import com.bytechef.hermes.definition.registry.rsocket.client.service.ActionDefinitionServiceRSocketClient;
-import com.bytechef.hermes.definition.registry.rsocket.client.service.ComponentDefinitionServiceRSocketClient;
-import com.bytechef.hermes.definition.registry.rsocket.client.service.ConnectionDefinitionServiceRSocketClient;
+import com.bytechef.hermes.definition.registry.service.web.rest.client.facade.ComponentDefinitionFacadeClient;
+import com.bytechef.hermes.definition.registry.service.web.rest.client.service.ActionDefinitionServiceClient;
+import com.bytechef.hermes.definition.registry.service.web.rest.client.service.ComponentDefinitionServiceClient;
+import com.bytechef.hermes.definition.registry.service.web.rest.client.service.ConnectionDefinitionServiceClient;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
@@ -49,11 +49,9 @@ import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.component.factory.ContextConnectionFactory;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.rsocket.RSocketRequester;
 
 import java.util.List;
 import java.util.Map;
@@ -77,11 +75,10 @@ public class DefinitionRegistryConfiguration {
     }
 
     @Bean
-    ActionDefinitionServiceRSocketClient actionDefinitionServiceRSocketClient(
-        DiscoveryClient discoveryClient,
-        @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
+    ActionDefinitionServiceClient actionDefinitionServiceClient(
+        DiscoveryClient discoveryClient) {
 
-        return new ActionDefinitionServiceRSocketClient(discoveryClient, rSocketRequesterBuilder);
+        return new ActionDefinitionServiceClient(discoveryClient);
     }
 
     @Bean
@@ -92,11 +89,8 @@ public class DefinitionRegistryConfiguration {
     }
 
     @Bean
-    ComponentDefinitionFacadeRSocketClient componentDefinitionFacadeRSocketClient(
-        DiscoveryClient discoveryClient,
-        @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
-
-        return new ComponentDefinitionFacadeRSocketClient(discoveryClient, rSocketRequesterBuilder);
+    ComponentDefinitionFacadeClient componentDefinitionFacadeClient(DiscoveryClient discoveryClient) {
+        return new ComponentDefinitionFacadeClient(discoveryClient);
     }
 
     @Bean
@@ -112,28 +106,26 @@ public class DefinitionRegistryConfiguration {
     }
 
     @Bean
-    ComponentDefinitionServiceRSocketClient componentDefinitionServiceRSocketClient(
-        DiscoveryClient discoveryClient,
-        @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
+    ComponentDefinitionServiceClient componentDefinitionServiceClient(
+        DiscoveryClient discoveryClient) {
 
-        return new ComponentDefinitionServiceRSocketClient(discoveryClient, rSocketRequesterBuilder);
+        return new ComponentDefinitionServiceClient(discoveryClient);
     }
 
     @Bean
     ConnectionDefinitionService connectionDefinitionService(
         ComponentDefinitionRegistry componentDefinitionRegistry,
-        ConnectionDefinitionServiceRSocketClient connectionDefinitionServiceRSocketClient) {
+        ConnectionDefinitionServiceClient connectionDefinitionServiceClient) {
 
         return new WorkerConnectionDefinitionService(
-            new ConnectionDefinitionServiceImpl(componentDefinitionRegistry), connectionDefinitionServiceRSocketClient);
+            new ConnectionDefinitionServiceImpl(componentDefinitionRegistry), connectionDefinitionServiceClient);
     }
 
     @Bean
-    ConnectionDefinitionServiceRSocketClient connectionDefinitionServiceRSocketClient(
-        DiscoveryClient discoveryClient,
-        @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
+    ConnectionDefinitionServiceClient connectionDefinitionServiceClient(
+        DiscoveryClient discoveryClient) {
 
-        return new ConnectionDefinitionServiceRSocketClient(discoveryClient, rSocketRequesterBuilder);
+        return new ConnectionDefinitionServiceClient(discoveryClient);
     }
 
     @Bean
@@ -174,14 +166,14 @@ public class DefinitionRegistryConfiguration {
     private static class WorkerConnectionDefinitionService implements ConnectionDefinitionService {
 
         private final ConnectionDefinitionService connectionDefinitionService;
-        private final ConnectionDefinitionServiceRSocketClient connectionDefinitionServiceRSocketClient;
+        private final ConnectionDefinitionServiceClient connectionDefinitionServiceClient;
 
         public WorkerConnectionDefinitionService(
             ConnectionDefinitionService connectionDefinitionService,
-            ConnectionDefinitionServiceRSocketClient connectionDefinitionServiceRSocketClient) {
+            ConnectionDefinitionServiceClient connectionDefinitionServiceClient) {
 
             this.connectionDefinitionService = connectionDefinitionService;
-            this.connectionDefinitionServiceRSocketClient = connectionDefinitionServiceRSocketClient;
+            this.connectionDefinitionServiceClient = connectionDefinitionServiceClient;
         }
 
         @Override
@@ -194,14 +186,14 @@ public class DefinitionRegistryConfiguration {
          */
         @Override
         public void executeAuthorizationApply(
-            String componentName, int connectionVersion, Map<String, Object> connectionParameters,
+            String componentName, int connectionVersion, Map<String, ?> connectionParameters,
             String authorizationName, AuthorizationContext authorizationContext) {
 
             if (connectionDefinitionService.connectionExists(componentName, connectionVersion)) {
                 connectionDefinitionService.executeAuthorizationApply(
                     componentName, connectionVersion, connectionParameters, authorizationName, authorizationContext);
             } else {
-                connectionDefinitionServiceRSocketClient.executeAuthorizationApply(
+                connectionDefinitionServiceClient.executeAuthorizationApply(
                     componentName, connectionVersion, connectionParameters, authorizationName, authorizationContext);
             }
         }
@@ -211,7 +203,7 @@ public class DefinitionRegistryConfiguration {
          */
         @Override
         public Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
-            String componentName, int connectionVersion, Map<String, Object> connectionParameters,
+            String componentName, int connectionVersion, Map<String, ?> connectionParameters,
             String authorizationName, String redirectUri) {
 
             return connectionDefinitionService.executeAuthorizationCallback(
@@ -223,12 +215,12 @@ public class DefinitionRegistryConfiguration {
          */
         @Override
         public Optional<String> fetchBaseUri(
-            String componentName, int connectionVersion, Map<String, Object> connectionParameters) {
+            String componentName, int connectionVersion, Map<String, ?> connectionParameters) {
             if (connectionDefinitionService.connectionExists(componentName, connectionVersion)) {
                 return connectionDefinitionService.fetchBaseUri(
                     componentName, connectionVersion, connectionParameters);
             } else {
-                return connectionDefinitionServiceRSocketClient.fetchBaseUri(
+                return connectionDefinitionServiceClient.fetchBaseUri(
                     componentName, connectionVersion, connectionParameters);
             }
         }
@@ -258,7 +250,7 @@ public class DefinitionRegistryConfiguration {
 
         @Override
         public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
-            String componentName, int connectionVersion, Map<String, Object> connectionParameters,
+            String componentName, int connectionVersion, Map<String, ?> connectionParameters,
             String authorizationName) {
 
             return connectionDefinitionService.getOAuth2Parameters(

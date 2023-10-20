@@ -1,0 +1,145 @@
+
+/*
+ * Copyright 2021 <your company/name>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.hermes.definition.registry.service.web.rest.client.facade;
+
+import com.bytechef.commons.reactor.util.MonoUtils;
+import com.bytechef.hermes.definition.registry.dto.OptionDTO;
+import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
+import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
+import com.bytechef.hermes.definition.registry.service.web.rest.client.AbstractWorkerClient;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.core.ParameterizedTypeReference;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author Ivica Cardic
+ */
+public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implements TriggerDefinitionFacade {
+
+    public TriggerDefinitionFacadeClient(DiscoveryClient discoveryClient) {
+        super(discoveryClient);
+    }
+
+    @Override
+    public String executeEditorDescription(
+        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        long connectionId) {
+
+        return MonoUtils.get(
+            WORKER_WEB_CLIENT
+                .post()
+                .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/editor-description"))
+                .bodyValue(
+                    new EditorDescription(
+                        triggerName, triggerParameters, componentName, componentVersion, connectionId))
+                .retrieve()
+                .bodyToMono(String.class));
+    }
+
+    @Override
+    public List<OptionDTO> executeOptions(
+        String propertyName, String triggerName, String componentName, int componentVersion,
+        Map<String, Object> triggerParameters, long connectionId) {
+
+        return MonoUtils.get(
+            WORKER_WEB_CLIENT
+                .post()
+                .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/options"))
+                .bodyValue(
+                    new Options(
+                        triggerName, propertyName, triggerParameters, componentName, componentVersion, connectionId))
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {}));
+    }
+
+    @Override
+    public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
+        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        long connectionId) {
+
+        return MonoUtils.get(
+            WORKER_WEB_CLIENT
+                .post()
+                .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/output-schema"))
+                .bodyValue(
+                    new OutputSchema(
+                        triggerName, triggerParameters, componentName, componentVersion, connectionId))
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {}));
+    }
+
+    @Override
+    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
+        String propertyName, String triggerName, String componentName, int componentVersion,
+        Map<String, Object> triggerParameters, long connectionId) {
+
+        return MonoUtils.get(
+            WORKER_WEB_CLIENT
+                .post()
+                .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/properties"))
+                .bodyValue(
+                    new Properties(
+                        triggerName, triggerParameters, componentName, componentVersion, connectionId, propertyName))
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<>() {}));
+    }
+
+    @Override
+    public Object executeSampleOutput(
+        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
+        long connectionId) {
+
+        return MonoUtils.get(
+            WORKER_WEB_CLIENT
+                .post()
+                .uri(uriBuilder -> toUri(uriBuilder, componentName, "/trigger-definitions/sample-output"))
+                .bodyValue(
+                    new SampleOutput(
+                        triggerName, triggerParameters, componentName, componentVersion, connectionId))
+                .retrieve()
+                .bodyToMono(Object.class));
+    }
+
+    private record EditorDescription(
+        String triggerName, Map<String, Object> triggerParameters, String componentName, int componentVersion,
+        long connectionId) {
+    }
+
+    private record Options(
+        String triggerName, String propertyName, Map<String, Object> triggerParameters,
+        String componentName, int componentVersion, long connectionId) {
+    }
+
+    private record OutputSchema(
+        String triggerName, Map<String, Object> triggerParameters, String componentName, int componentVersion,
+        long connectionId) {
+
+    }
+
+    private record Properties(
+        String triggerName, Map<String, Object> triggerParameters, String componentName, int componentVersion,
+        long connectionId, String propertyName) {
+    }
+
+    private record SampleOutput(
+        String triggerName, Map<String, Object> triggerParameters, String componentName, int componentVersion,
+        long connectionId) {
+    }
+}

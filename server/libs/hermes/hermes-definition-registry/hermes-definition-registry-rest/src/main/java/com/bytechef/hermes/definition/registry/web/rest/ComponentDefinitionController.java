@@ -248,10 +248,8 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
     public Mono<ResponseEntity<TriggerDefinitionModel>> getComponentTriggerDefinition(
         String componentName, Integer componentVersion, String triggerName, ServerWebExchange exchange) {
 
-        return Mono.just(
-            conversionService.convert(
-                triggerDefinitionService.getTriggerDefinition(triggerName, componentName, componentVersion),
-                TriggerDefinitionModel.class))
+        return triggerDefinitionService.getTriggerDefinitionMono(triggerName, componentName, componentVersion)
+            .map(triggerDefinitionDTO -> conversionService.convert(triggerDefinitionDTO, TriggerDefinitionModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -259,11 +257,10 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
     public Mono<ResponseEntity<Flux<TriggerDefinitionBasicModel>>> getComponentTriggerDefinitions(
         String componentName, Integer componentVersion, ServerWebExchange exchange) {
 
-        return Mono.just(
-            triggerDefinitionService.getTriggerDefinitions(componentName, componentVersion)
-                .stream()
-                .map(triggerDefinition -> conversionService.convert(
-                    triggerDefinition, TriggerDefinitionBasicModel.class))
+        return triggerDefinitionService.getTriggerDefinitionsMono(componentName, componentVersion)
+            .map(triggerDefinitionDTOs -> triggerDefinitionDTOs.stream()
+                .map(triggerDefinitionDTO -> conversionService.convert(
+                    triggerDefinitionDTO, TriggerDefinitionBasicModel.class))
                 .toList())
             .map(Flux::fromIterable)
             .map(ResponseEntity::ok);

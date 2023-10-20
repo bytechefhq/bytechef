@@ -19,7 +19,7 @@ package com.bytechef.hermes.definition.registry.dto;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.registry.util.DefinitionUtils;
+import com.bytechef.commons.util.IconUtils;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -59,7 +59,7 @@ public record TaskDispatcherDefinitionDTO(
 
     private static Optional<String> getIcon(TaskDispatcherDefinition taskDispatcherDefinition) {
         return taskDispatcherDefinition.getIcon()
-            .map(DefinitionUtils::readIcon);
+            .map(IconUtils::readIcon);
     }
 
     private static Optional<ResourcesDTO> getResources(TaskDispatcherDefinition taskDispatcherDefinition) {

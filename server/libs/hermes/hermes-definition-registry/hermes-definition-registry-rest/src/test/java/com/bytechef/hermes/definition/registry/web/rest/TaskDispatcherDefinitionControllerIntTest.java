@@ -39,6 +39,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Ivica Cardic
@@ -79,11 +80,11 @@ public class TaskDispatcherDefinitionControllerIntTest {
 
     @Test
     public void testGetTaskDispatcherDefinitions() {
-        Mockito.when(taskDispatcherDefinitionService.getTaskDispatcherDefinitions())
+        Mockito.when(taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono())
             .thenReturn(
-                List.of(
+                Mono.just(List.of(
                     new TaskDispatcherDefinitionDTO("task-dispatcher1"),
-                    new TaskDispatcherDefinitionDTO("task-dispatcher2")));
+                    new TaskDispatcherDefinitionDTO("task-dispatcher2"))));
 
         try {
             webTestClient
