@@ -74,6 +74,10 @@ public class XMLFileTaskDeclaration implements TaskDeclaration {
                         .description("File name to set for binary data. By default, \"file.xml\" will be used.")
                         .displayOption(show("operation", "WRITE"))
                         .defaultValue("file.xml"),
+                    STRING_PROPERTY("path")
+                        .displayName("Path")
+                        .description("The path where the array is e.g 'data'. Leave blank to use the top level object.")
+                        .displayOption(show("operation", parameterValues("READ"), "isArray", parameterValues(true))),
                     INTEGER_PROPERTY("pageSize")
                         .displayName("Page Size")
                         .description("The amount of child elements to return in a page.")

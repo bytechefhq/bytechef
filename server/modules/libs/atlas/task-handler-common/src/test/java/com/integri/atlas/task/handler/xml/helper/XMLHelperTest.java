@@ -16,6 +16,7 @@
 
 package com.integri.atlas.task.handler.xml.helper;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
@@ -64,7 +65,10 @@ public class XMLHelperTest {
                     Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark")))
                 )
             );
+    }
 
+    @Test
+    public void testReadList() {
         Assertions
             .assertThat(
                 xmlHelper.read(
@@ -104,6 +108,60 @@ public class XMLHelperTest {
                         Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark")))
                     ),
                     Map.of("name", "Rose", "color", "YELLOW", "petals", "5", "id", "46")
+                )
+            );
+    }
+
+    @Test
+    public void testReadListFromPath() {
+        Assertions
+            .assertThat(
+                xmlHelper.read(
+                    """
+                    <Flowers>
+                        <Red>
+                            <Flower id="45">
+                                <name>Poppy</name>
+                                <color>RED</color>
+                                <petals>9</petals>
+                                <Florists>
+                                     <Florist>
+                                         <name>Joe</name>
+                                     </Florist>
+                                     <Florist>
+                                         <name>Mark</name>
+                                     </Florist>
+                                </Florists>
+                            </Flower>
+                            <Flower id="46"><name>Rose</name><color>RED</color><petals>5</petals></Flower>
+                        </Red>
+                    </Flowers>
+                    """,
+                    "/Flowers/Red/Flower",
+                    new TypeReference<List<Map<String, ?>>>() {}
+                )
+            )
+            .isEqualTo(
+                xmlHelper.read(
+                    """
+                    <Flowers>
+                        <Flower id="45">
+                            <name>Poppy</name>
+                            <color>RED</color>
+                            <petals>9</petals>
+                            <Florists>
+                                 <Florist>
+                                     <name>Joe</name>
+                                 </Florist>
+                                 <Florist>
+                                     <name>Mark</name>
+                                 </Florist>
+                            </Florists>
+                        </Flower>
+                        <Flower id="46"><name>Rose</name><color>RED</color><petals>5</petals></Flower>
+                    </Flowers>
+                    """,
+                    new TypeReference<List<Map<String, ?>>>() {}
                 )
             );
     }
@@ -149,7 +207,10 @@ public class XMLHelperTest {
                     """
                 )
             );
+    }
 
+    @Test
+    public void testWriteList() {
         Assertions
             .assertThat(
                 xmlHelper.read(
