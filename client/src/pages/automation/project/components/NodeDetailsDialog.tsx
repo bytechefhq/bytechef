@@ -112,7 +112,10 @@ const NodeDetailsDialog = () => {
 
             if (componentActions && currentComponent) {
                 setComponentActions([
-                    ...componentActions,
+                    ...componentActions.filter(
+                        (action) =>
+                            action.componentName !== currentComponent.name
+                    ),
                     {
                         actionName: currentAction.name,
                         componentName: currentComponent.name,
