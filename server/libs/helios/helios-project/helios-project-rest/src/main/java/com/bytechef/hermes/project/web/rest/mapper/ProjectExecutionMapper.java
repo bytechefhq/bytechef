@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.project.web.rest.mapper;
 
-import com.bytechef.hermes.project.dto.ProjectExecution;
+import com.bytechef.hermes.project.dto.ProjectExecutionDTO;
 import com.bytechef.hermes.project.web.rest.mapper.config.ProjectMapperSpringConfig;
 import com.bytechef.hermes.project.web.rest.model.ProjectExecutionModel;
 import org.mapstruct.Mapper;
@@ -27,8 +27,8 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = ProjectMapperSpringConfig.class)
-public interface ProjectExecutionMapper extends Converter<ProjectExecution, ProjectExecutionModel> {
+public interface ProjectExecutionMapper extends Converter<ProjectExecutionDTO, ProjectExecutionModel> {
 
     @Override
-    ProjectExecutionModel convert(ProjectExecution projectExecution);
+    ProjectExecutionModel convert(ProjectExecutionDTO projectExecutionDTO);
 }

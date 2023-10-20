@@ -21,7 +21,7 @@ import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.category.domain.Category;
 import com.bytechef.hermes.project.domain.Project;
 import com.bytechef.hermes.project.domain.ProjectInstance;
-import com.bytechef.hermes.project.dto.ProjectExecution;
+import com.bytechef.hermes.project.dto.ProjectExecutionDTO;
 import com.bytechef.tag.domain.Tag;
 import org.springframework.data.domain.Page;
 
@@ -57,7 +57,7 @@ public interface ProjectFacade {
 
     List<Workflow> getProjectWorkflows(Long id);
 
-    Page<ProjectExecution> searchProjectExecutions(
+    Page<ProjectExecutionDTO> searchProjectExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber);
 

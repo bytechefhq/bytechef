@@ -22,9 +22,9 @@ import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.rsocket.client.util.ServiceInstanceUtils;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
-import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParameters;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
@@ -154,13 +154,13 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
     }
 
     @Override
-    public OAuth2AuthorizationParameters getOAuth2Parameters(Connection connection) {
+    public OAuth2AuthorizationParametersDTO getOAuth2Parameters(Connection connection) {
         return MonoUtils.get(
             rSocketRequesterBuilder
                 .websocket(getWebsocketUri(connection))
                 .route("ConnectionDefinitionService.getOAuth2Parameters")
                 .data(connection)
-                .retrieveMono(OAuth2AuthorizationParameters.class));
+                .retrieveMono(OAuth2AuthorizationParametersDTO.class));
     }
 
     private URI getWebsocketUri(Connection connection) {

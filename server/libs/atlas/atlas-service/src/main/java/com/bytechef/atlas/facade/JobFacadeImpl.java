@@ -19,7 +19,7 @@ package com.bytechef.atlas.facade;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.dto.JobParameters;
+import com.bytechef.atlas.dto.JobParametersDTO;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
 import com.bytechef.atlas.message.broker.MessageBroker;
@@ -52,8 +52,8 @@ public class JobFacadeImpl implements JobFacade {
     }
 
     @SuppressFBWarnings("NP")
-    public long create(JobParameters jobParameters) {
-        Job job = jobService.create(jobParameters);
+    public long create(JobParametersDTO jobParametersDTO) {
+        Job job = jobService.create(jobParametersDTO);
 
         Assert.notNull(job.getId(), "'job.id' must not be null");
 

@@ -29,7 +29,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.project.domain.Project;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.hermes.project.domain.ProjectInstance;
-import com.bytechef.hermes.project.dto.ProjectExecution;
+import com.bytechef.hermes.project.dto.ProjectExecutionDTO;
 import com.bytechef.hermes.project.service.ProjectInstanceService;
 import com.bytechef.hermes.project.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
@@ -247,7 +247,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectExecution> searchProjectExecutions(
+    public Page<ProjectExecutionDTO> searchProjectExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber) {
 
@@ -284,7 +284,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         List<Workflow> workflows = workflowService.getWorkflows(
             CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
 
-        return jobsPage.map(job -> new ProjectExecution(
+        return jobsPage.map(job -> new ProjectExecutionDTO(
             null,
             job,
             CollectionUtils.findFirst(

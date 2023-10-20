@@ -23,7 +23,7 @@ import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParameters;
+import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
@@ -122,7 +122,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public OAuth2AuthorizationParameters getOAuth2Parameters(Connection connection) {
+    public OAuth2AuthorizationParametersDTO getOAuth2Parameters(Connection connection) {
         Authorization authorization = getAuthorization(
             connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion());
 
@@ -130,7 +130,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Function<Context.Connection, String> clientIdFunction = authorization.getClientIdFunction();
         Function<Context.Connection, List<String>> scopesFunction = authorization.getScopesFunction();
 
-        return new OAuth2AuthorizationParameters(
+        return new OAuth2AuthorizationParametersDTO(
             authorizationUrlFunction.apply(connection.toContextConnection()),
             clientIdFunction.apply(connection.toContextConnection()),
             scopesFunction.apply(connection.toContextConnection()));
