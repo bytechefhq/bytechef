@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.repository.jdbc.counter;
 
-import com.integri.atlas.engine.core.task.repository.CounterRepository;
+import com.integri.atlas.engine.core.counter.repository.CounterRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.transaction.annotation.Transactional;

@@ -20,6 +20,7 @@ package com.integri.atlas.task.dispatcher.fork;
 
 import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
+import com.integri.atlas.engine.core.counter.repository.CounterRepository;
 import com.integri.atlas.engine.core.message.broker.MessageBroker;
 import com.integri.atlas.engine.core.message.broker.Queues;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
@@ -29,7 +30,6 @@ import com.integri.atlas.engine.core.task.TaskStatus;
 import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcherResolver;
 import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
 import com.integri.atlas.task.dispatcher.fork.completion.ForkTaskCompletionHandler;

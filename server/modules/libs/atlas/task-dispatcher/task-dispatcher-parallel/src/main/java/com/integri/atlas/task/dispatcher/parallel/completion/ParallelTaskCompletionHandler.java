@@ -20,10 +20,10 @@ package com.integri.atlas.task.dispatcher.parallel.completion;
 
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
 import com.integri.atlas.engine.core.DSL;
+import com.integri.atlas.engine.core.counter.repository.CounterRepository;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.TaskStatus;
-import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.task.dispatcher.parallel.ParallelTaskDispatcher;
 

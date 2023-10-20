@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.worker.task.repository;
+package com.integri.atlas.engine.repository.memory.task;
 
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;

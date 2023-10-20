@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.core.task.repository;
+package com.integri.atlas.engine.core.counter.repository;
 
 /**
  * A repository that can be used to atomically set

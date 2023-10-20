@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.worker.task.repository;
+package com.integri.atlas.engine.repository.memory.context;
 
 import com.integri.atlas.engine.core.context.Context;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
