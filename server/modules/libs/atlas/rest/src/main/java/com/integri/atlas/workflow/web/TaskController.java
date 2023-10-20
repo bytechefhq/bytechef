@@ -41,14 +41,14 @@ public class TaskController {
 
     @GetMapping(value = "/tasks")
     public List<TaskSpecification> getTaskDescriptors() {
-        return taskDescriptors.stream().map(TaskDefinition::getSpecification).collect(Collectors.toList());
+        return taskDescriptors.stream().map(TaskDefinition::getTaskSpecification).collect(Collectors.toList());
     }
 
     @GetMapping(value = "/tasks/{name}")
     public TaskSpecification getTaskDescriptors(@PathVariable("name") String name) {
         return taskDescriptors
             .stream()
-            .map(TaskDefinition::getSpecification)
+            .map(TaskDefinition::getTaskSpecification)
             .filter(taskDescription -> Objects.equals(taskDescription.getName(), name))
             .findFirst()
             .orElseThrow();
