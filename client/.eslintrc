@@ -30,6 +30,7 @@
         "bytechef",
         "react",
         "react-hooks",
+        "sort-destructure-keys",
         "tailwindcss"
     ],
     "rules": {
@@ -48,6 +49,8 @@
         "react-hooks/exhaustive-deps": "warn",
         "react/prop-types": "off",
         "react/react-in-jsx-scope": "off",
+        "sort-destructure-keys/sort-destructure-keys": 2,
+        "sort-keys": ["error", "asc", {"caseSensitive": true, "natural": true}],
         "tailwindcss/classnames-order": "warn",
         "tailwindcss/no-custom-classname": [
             "warn",
