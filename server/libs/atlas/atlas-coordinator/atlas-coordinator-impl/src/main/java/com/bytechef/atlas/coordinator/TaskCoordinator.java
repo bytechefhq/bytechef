@@ -78,6 +78,36 @@ public class TaskCoordinator {
     }
 
     /**
+     * Complete a task of a given job.
+     *
+     * @param taskExecution The task to complete.
+     */
+    public void complete(TaskExecution taskExecution) {
+        try {
+            taskCompletionHandler.handle(taskExecution);
+        } catch (Exception e) {
+            taskExecution.setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
+
+            messageBroker.send(SystemMessageRoute.ERRORS, taskExecution);
+        }
+    }
+
+    /**
+     * Resume a stopped or failed job.
+     *
+     * @param jobId The id of the job to resume.
+     */
+    public void resume(Long jobId) {
+        Job job = jobService.resumeToStatusStarted(jobId);
+
+        jobExecutor.execute(job);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Job id={}, label='{}' resumed", job.getId(), job.getLabel());
+        }
+    }
+
+    /**
      * Start a running job.
      *
      * @param jobId The id of the job to start
@@ -124,36 +154,6 @@ public class TaskCoordinator {
 
         if (logger.isDebugEnabled()) {
             logger.debug("Job id={}, label='{}' stopped", job.getId(), job.getLabel());
-        }
-    }
-
-    /**
-     * Resume a stopped or failed job.
-     *
-     * @param jobId The id of the job to resume.
-     */
-    public void resume(Long jobId) {
-        Job job = jobService.resumeToStatusStarted(jobId);
-
-        jobExecutor.execute(job);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Job id={}, label='{}' resumed", job.getId(), job.getLabel());
-        }
-    }
-
-    /**
-     * Complete a task of a given job.
-     *
-     * @param taskExecution The task to complete.
-     */
-    public void complete(TaskExecution taskExecution) {
-        try {
-            taskCompletionHandler.handle(taskExecution);
-        } catch (Exception e) {
-            taskExecution.setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
-
-            messageBroker.send(SystemMessageRoute.ERRORS, taskExecution);
         }
     }
 
