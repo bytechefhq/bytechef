@@ -1,0 +1,97 @@
+.quill.focused .ql-editor {
+    @apply shadow-lg shadow-blue-200;
+    @apply ring ring-blue-500;
+}
+
+.ql-editor.ql-blank::before {
+    @apply content-[attr(data-placeholder)];
+    @apply absolute;
+    @apply pointer-events-none;
+    @apply opacity-100;
+    @apply text-gray-400;
+}
+
+.ql-clipboard {
+    @apply invisible;
+    @apply h-0;
+}
+
+.ql-editor {
+    @apply border;
+    @apply rounded-md;
+    @apply p-2;
+    @apply text-sm;
+    @apply leading-8;
+    @apply focus:outline-none focus:ring focus:ring-blue-500;
+}
+
+.ql-mention-list-container {
+    @apply bg-gray-100;
+    @apply border;
+    @apply shadow-lg;
+    @apply z-50;
+    @apply m-4 mt-6;
+    @apply rounded-md;
+    @apply max-h-96;
+    @apply overflow-y-auto;
+}
+
+.ql-mention-list {
+    @apply rounded-md;
+    @apply space-y-2;
+    @apply p-2;
+}
+
+.ql-mention-list-item {
+    @apply px-2 py-1;
+    @apply text-sm;
+    @apply bg-white;
+    @apply rounded-md;
+    @apply cursor-pointer;
+    @apply border-2 border-transparent;
+    @apply hover:border-2 hover:border-gray-400;
+    @apply flex;
+}
+
+.ql-mention-list-item div {
+    @apply flex;
+    @apply items-center;
+    @apply space-x-2;
+}
+
+.ql-mention-list-item svg {
+    @apply h-4;
+    @apply w-4;
+}
+
+.mention {
+    @apply border;
+    @apply bg-gray-100;
+    @apply px-2 py-1;
+    @apply rounded-full;
+}
+
+.mention::before {
+    @apply bg-[url(data-icon)];
+    @apply content-[''];
+    @apply h-4 w-4;
+}
+
+.bytechef-mention {
+    @apply inline-flex;
+    @apply items-center;
+}
+
+.bytechef-mention > span {
+    @apply inline-flex;
+    @apply items-center;
+    @apply border;
+    @apply bg-gray-100;
+    @apply px-2;
+    @apply rounded-full;
+}
+
+.bytechef-mention svg {
+    @apply mr-1;
+    @apply h-4 w-4;
+}

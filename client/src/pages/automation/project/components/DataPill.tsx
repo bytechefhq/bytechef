@@ -1,16 +1,37 @@
+import {ComponentDefinitionModel} from '@/middleware/helios/execution/models';
 import {MouseEvent} from 'react';
 import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
 import {PropertyType} from 'types/projectTypes';
 
+import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
+
 const DataPill = ({
-    onClick,
+    component,
     property,
 }: {
-    onClick: (event: MouseEvent<HTMLDivElement>) => void;
+    component: ComponentDefinitionModel;
+    onClick?: (event: MouseEvent<HTMLDivElement>) => void;
     property: PropertyType;
 }) => {
+    const {focusedInput} = useNodeDetailsDialogStore();
+
     const subProperties = property.properties || property.items;
+
+    const mentionInput = focusedInput?.getEditor().getModule('mention');
+
+    const addDataPillToInput = (property: PropertyType) => {
+        mentionInput.insertItem(
+            {
+                component,
+                icon: component.icon,
+                id: property.label || property.name,
+                value: property.name,
+            },
+            true,
+            {blotName: 'bytechef-mention'}
+        );
+    };
 
     return (
         <li
@@ -29,8 +50,9 @@ const DataPill = ({
                     <ul className="flex flex-col space-y-2">
                         {subProperties?.map((subProperty, index) => (
                             <DataPill
+                                component={component}
                                 key={`${subProperty.name}-${index}`}
-                                onClick={onClick}
+                                onClick={() => addDataPillToInput(subProperty)}
                                 property={subProperty}
                             />
                         ))}
@@ -38,15 +60,13 @@ const DataPill = ({
                 </fieldset>
             ) : (
                 <div
-                    className={twMerge(
-                        'mr-auto flex cursor-pointer items-center rounded-full border border-gray-300 bg-white px-2 py-1 text-sm hover:bg-gray-50'
-                    )}
+                    className="mr-auto flex cursor-pointer items-center rounded-full border border-gray-300 bg-white px-2 py-1 text-sm hover:bg-gray-50"
                     data-name={property.name}
                     draggable
                     onDragStart={(event) =>
                         event.dataTransfer.setData('name', property.name!)
                     }
-                    onClick={onClick}
+                    onClick={() => addDataPillToInput(property)}
                 >
                     <span className="mr-2" title={property.type}>
                         {TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}

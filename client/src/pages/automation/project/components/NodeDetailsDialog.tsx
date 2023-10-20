@@ -4,11 +4,17 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {PropertyType} from '@/types/projectTypes';
+import {DataPillType} from '@/types/types';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
 import Properties from 'components/Properties/Properties';
-import {useGetActionDefinitionQuery} from 'queries/actionDefinitions.queries';
+import {PanelRightClose, PanelRightOpen} from 'lucide-react';
+import {
+    useGetActionDefinitionQuery,
+    useGetActionDefinitionsQuery,
+} from 'queries/actionDefinitions.queries';
 import {
     useGetComponentDefinitionQuery,
     useGetComponentDefinitionsQuery,
@@ -17,8 +23,10 @@ import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import Select from '../../../../components/Select/Select';
+import {useDataPillPanelStore} from '../stores/useDataPillPanelStore';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
+import getSubProperties from '../utils/getSubProperties';
 import CurrentActionSelect from './CurrentActionSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
@@ -50,8 +58,14 @@ const NodeDetailsDialog = () => {
     const {currentNode, nodeDetailsDialogOpen, setNodeDetailsDialogOpen} =
         useNodeDetailsDialogStore();
 
-    const {componentActions, setComponentActions} =
-        useWorkflowDefinitionStore();
+    const {
+        componentActions,
+        componentNames,
+        setComponentActions,
+        setDataPills,
+    } = useWorkflowDefinitionStore();
+
+    const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
         connectionDefinitions: true,
@@ -84,6 +98,108 @@ const NodeDetailsDialog = () => {
     const componentDefinitionNames = componentDefinitions?.map(
         (component) => component.name
     );
+
+    const taskTypes = componentActions?.map(
+        (componentAction) =>
+            `${componentAction.componentName}/1/${componentAction.actionName}`
+    );
+
+    const currentNodeIndex = componentNames.indexOf(currentNode.name);
+
+    const previousComponentNames =
+        componentNames.length > 1
+            ? componentNames.slice(0, currentNodeIndex)
+            : componentNames;
+
+    const {data: previousComponents} = useGetComponentDefinitionsQuery(
+        {
+            include: previousComponentNames,
+        },
+        !!componentNames.length
+    );
+
+    const {data: actionData} = useGetActionDefinitionsQuery(
+        {taskTypes},
+        !!componentActions?.length
+    );
+
+    const componentProperties = previousComponents?.map((component, index) => {
+        if (!actionData?.length) {
+            return;
+        }
+
+        const outputSchema: PropertyType | undefined =
+            actionData[index]?.outputSchema;
+
+        const properties = outputSchema?.properties?.length
+            ? outputSchema.properties
+            : outputSchema?.items;
+
+        return {
+            component,
+            properties,
+        };
+    });
+
+    const getExistingProperties = (
+        properties: PropertyType[]
+    ): PropertyType[] =>
+        properties.filter((property) => {
+            if (property.properties) {
+                return getExistingProperties(property.properties);
+            } else if (property.items) {
+                return getExistingProperties(property.items);
+            }
+
+            return !!property.name;
+        });
+
+    const availableDataPills: Array<DataPillType> = [];
+
+    componentProperties?.forEach((componentProperty) => {
+        if (!componentProperty || !componentProperty.properties?.length) {
+            return;
+        }
+
+        const existingProperties = getExistingProperties(
+            componentProperty.properties
+        );
+
+        const formattedProperties: DataPillType[] = existingProperties.map(
+            (property) => {
+                if (property.properties) {
+                    return getSubProperties({
+                        component: componentProperty.component!,
+                        properties: property.properties,
+                        propertyName: property.name!,
+                    });
+                } else if (property.items) {
+                    return getSubProperties({
+                        component: componentProperty.component!,
+                        properties: property.items,
+                        propertyName: property.name!,
+                    });
+                }
+
+                return {
+                    component: JSON.stringify(componentProperty.component),
+                    id: property.name,
+                    value: property.label || property.name,
+                };
+            }
+        );
+
+        if (existingProperties.length && formattedProperties.length) {
+            availableDataPills.push(...formattedProperties);
+        }
+    });
+
+    useEffect(() => {
+        if (availableDataPills) {
+            setDataPills(availableDataPills.flat(Infinity));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [availableDataPills.length]);
 
     useEffect(() => {
         if (currentActionFetched) {
@@ -165,6 +281,26 @@ const NodeDetailsDialog = () => {
                     {currentComponent ? (
                         <div className="flex h-full flex-col divide-y divide-gray-100 bg-white shadow-xl">
                             <Dialog.Title className="flex content-center items-center p-4 text-lg font-medium text-gray-900">
+                                <Button
+                                    aria-label={
+                                        dataPillPanelOpen
+                                            ? 'Close the data pill panel'
+                                            : 'Open the data pill panel'
+                                    }
+                                    className="mr-auto p-0"
+                                    displayType="icon"
+                                    icon={
+                                        dataPillPanelOpen ? (
+                                            <PanelRightOpen className="h-6 w-6 cursor-pointer text-gray-900" />
+                                        ) : (
+                                            <PanelRightClose className="h-6 w-6 cursor-pointer text-gray-900" />
+                                        )
+                                    }
+                                    onClick={() =>
+                                        setDataPillPanelOpen(!dataPillPanelOpen)
+                                    }
+                                />
+
                                 {currentNode.label}
 
                                 <span className="mx-2 text-sm text-gray-500">
@@ -250,6 +386,7 @@ const NodeDetailsDialog = () => {
                                                     properties={
                                                         currentAction.properties
                                                     }
+                                                    mention
                                                 />
                                             )}
 
