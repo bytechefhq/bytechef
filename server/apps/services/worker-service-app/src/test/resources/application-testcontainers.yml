@@ -8,10 +8,6 @@
 # More information on database containers: https://www.testcontainers.org/modules/databases/
 # ===================================================================
 
-spring:
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:tc:postgresql:14:///bytechef
-    username: postgres
-    password:
+workflow:
+  message-broker:
+    provider: jms
