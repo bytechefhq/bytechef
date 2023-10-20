@@ -35,6 +35,7 @@ import com.bytechef.hermes.definition.Property.Type;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @JsonTypeInfo(
@@ -86,6 +87,24 @@ public abstract class PropertyDTO {
         this.type = property.getType();
     }
 
+    @SuppressWarnings("unchecked")
+    public static <P extends PropertyDTO> P toPropertyDTO(Property property) {
+        return switch (property.getType()) {
+            case ANY -> (P) toAnyPropertyDTO((AnyProperty) property);
+            case ARRAY -> (P) toArrayPropertyDTO((ArrayProperty) property);
+            case BOOLEAN -> (P) toBooleanPropertyDTO((BooleanProperty) property);
+            case DATE -> (P) toDatePropertyDTO((DateProperty) property);
+            case DATE_TIME -> (P) toDateTimePropertyDTO((DateTimeProperty) property);
+            case DYNAMIC_PROPERTIES -> (P) toDynamicPropertiesPropertyDTO((DynamicPropertiesProperty) property);
+            case INTEGER -> (P) toIntegerPropertyDTO((IntegerProperty) property);
+            case NULL -> (P) toNullPropertyDTO((NullProperty) property);
+            case NUMBER -> (P) toNumberPropertyDTO((NumberProperty) property);
+            case OBJECT -> (P) toObjectPropertyDTO((ObjectProperty) property);
+            case STRING -> (P) toStringPropertyDTO((StringProperty) property);
+            case TIME -> (P) toTimePropertyDTO((TimeProperty) property);
+        };
+    }
+
     public abstract Object accept(PropertyVisitor propertyVisitor);
 
     public boolean getAdvancedOption() {
@@ -128,22 +147,38 @@ public abstract class PropertyDTO {
         return type;
     }
 
-    @SuppressWarnings("unchecked")
-    public static <P extends PropertyDTO> P toPropertyDTO(Property property) {
-        return switch (property.getType()) {
-            case ANY -> (P) toAnyPropertyDTO((AnyProperty) property);
-            case ARRAY -> (P) toArrayPropertyDTO((ArrayProperty) property);
-            case BOOLEAN -> (P) toBooleanPropertyDTO((BooleanProperty) property);
-            case DATE -> (P) toDatePropertyDTO((DateProperty) property);
-            case DATE_TIME -> (P) toDateTimePropertyDTO((DateTimeProperty) property);
-            case DYNAMIC_PROPERTIES -> (P) toDynamicPropertiesPropertyDTO((DynamicPropertiesProperty) property);
-            case INTEGER -> (P) toIntegerPropertyDTO((IntegerProperty) property);
-            case NULL -> (P) toNullPropertyDTO((NullProperty) property);
-            case NUMBER -> (P) toNumberPropertyDTO((NumberProperty) property);
-            case OBJECT -> (P) toObjectPropertyDTO((ObjectProperty) property);
-            case STRING -> (P) toStringPropertyDTO((StringProperty) property);
-            case TIME -> (P) toTimePropertyDTO((TimeProperty) property);
-        };
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof PropertyDTO that))
+            return false;
+        return advancedOption == that.advancedOption && expressionEnabled == that.expressionEnabled
+            && hidden == that.hidden && required == that.required && Objects.equals(description, that.description)
+            && Objects.equals(displayCondition, that.displayCondition) && Objects.equals(label, that.label)
+            && Objects.equals(placeholder, that.placeholder) && Objects.equals(name, that.name) && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(advancedOption, description, displayCondition, expressionEnabled, hidden, label,
+            placeholder, required, name, type);
+    }
+
+    @Override
+    public String toString() {
+        return "PropertyDTO{" +
+            "advancedOption=" + advancedOption +
+            ", description='" + description + '\'' +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", expressionEnabled=" + expressionEnabled +
+            ", hidden=" + hidden +
+            ", label='" + label + '\'' +
+            ", placeholder='" + placeholder + '\'' +
+            ", required=" + required +
+            ", name='" + name + '\'' +
+            ", type=" + type +
+            '}';
     }
 
     private static AnyPropertyDTO toAnyPropertyDTO(AnyProperty anyProperty) {

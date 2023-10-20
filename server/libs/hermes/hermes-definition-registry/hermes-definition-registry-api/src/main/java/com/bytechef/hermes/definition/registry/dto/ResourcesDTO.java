@@ -23,16 +23,57 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record ResourcesDTO(Map<String, String> additionalUrls, List<String> categories, String documentationUrl) {
+public class ResourcesDTO {
+
+    private final Map<String, String> additionalUrls;
+    private final List<String> categories;
+    private final String documentationUrl;
 
     public ResourcesDTO(Resources resources) {
-        this(
-            OptionalUtils.orElse(resources.getAdditionalUrls(), Map.of()),
-            OptionalUtils.orElse(resources.getCategories(), List.of()), resources.getDocumentationUrl());
+        this.additionalUrls = OptionalUtils.orElse(resources.getAdditionalUrls(), Map.of());
+        this.categories = OptionalUtils.orElse(resources.getCategories(), List.of());
+        this.documentationUrl = Objects.requireNonNull(resources.getDocumentationUrl());
+    }
+
+    public Map<String, String> getAdditionalUrls() {
+        return additionalUrls;
+    }
+
+    public List<String> getCategories() {
+        return categories;
+    }
+
+    public String getDocumentationUrl() {
+        return documentationUrl;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof ResourcesDTO that))
+            return false;
+        return Objects.equals(additionalUrls, that.additionalUrls) && Objects.equals(categories, that.categories)
+            && Objects.equals(documentationUrl, that.documentationUrl);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(additionalUrls, categories, documentationUrl);
+    }
+
+    @Override
+    public String toString() {
+        return "ResourcesDTO{" +
+            "additionalUrls=" + additionalUrls +
+            ", categories=" + categories +
+            ", documentationUrl='" + documentationUrl + '\'' +
+            '}';
     }
 }

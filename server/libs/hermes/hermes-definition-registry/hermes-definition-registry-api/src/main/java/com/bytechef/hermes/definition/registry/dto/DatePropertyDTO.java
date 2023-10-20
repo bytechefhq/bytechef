@@ -24,6 +24,7 @@ import com.bytechef.hermes.definition.Property.DateProperty;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -56,5 +57,30 @@ public class DatePropertyDTO extends ValuePropertyDTO<LocalDate> {
 
     public Optional<OptionsDataSourceDTO> getOptionsDataSource() {
         return Optional.ofNullable(optionsDataSource);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof DatePropertyDTO that))
+            return false;
+        return Objects.equals(options, that.options) && Objects.equals(optionsDataSource, that.optionsDataSource);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(options, optionsDataSource);
+    }
+
+    @Override
+    public String toString() {
+        return "DatePropertyDTO{" +
+            "options=" + options +
+            ", optionsDataSource=" + optionsDataSource +
+            ", controlType=" + controlType +
+            ", defaultValue=" + defaultValue +
+            ", exampleValue=" + exampleValue +
+            "} " + super.toString();
     }
 }

@@ -17,17 +17,81 @@
 
 package com.bytechef.hermes.definition.registry.dto;
 
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record AuthorizationDTO(
-    Optional<String> description, String name, List<? extends PropertyDTO> properties, String title,
-    AuthorizationType type) {
+public class AuthorizationDTO {
+
+    private final String description;
+    private final String name;
+    private final List<? extends PropertyDTO> properties;
+    private final String title;
+    private final AuthorizationType type;
+
+    public AuthorizationDTO(Authorization authorization) {
+        this.description = OptionalUtils.orElse(authorization.getDescription(), null);
+        this.name = authorization.getName();
+        this.properties = CollectionUtils.map(
+            OptionalUtils.orElse(authorization.getProperties(), List.of()),
+            valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty));
+        this.title = OptionalUtils.orElse(authorization.getTitle(), authorization.getName());
+        this.type = authorization.getType();
+    }
+
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(description);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<? extends PropertyDTO> getProperties() {
+        return properties;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public AuthorizationType getType() {
+        return type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof AuthorizationDTO that))
+            return false;
+        return Objects.equals(description, that.description) && Objects.equals(name, that.name)
+            && Objects.equals(properties, that.properties) && Objects.equals(title, that.title) && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(description, name, properties, title, type);
+    }
+
+    @Override
+    public String toString() {
+        return "AuthorizationDTO{" +
+            "description='" + description + '\'' +
+            ", name='" + name + '\'' +
+            ", properties=" + properties +
+            ", title='" + title + '\'' +
+            ", type=" + type +
+            '}';
+    }
 }

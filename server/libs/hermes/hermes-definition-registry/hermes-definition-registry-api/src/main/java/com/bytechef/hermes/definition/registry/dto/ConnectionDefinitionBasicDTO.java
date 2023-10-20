@@ -18,28 +18,78 @@
 package com.bytechef.hermes.definition.registry.dto;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record ConnectionDefinitionBasicDTO(
-    boolean authorizationRequired, Optional<String> componentDescription, String componentName, String componentTitle,
-    int version) {
+public class ConnectionDefinitionBasicDTO {
 
-    public ConnectionDefinitionBasicDTO(
-        ConnectionDefinition connectionDefinition, ComponentDefinition componentDefinition) {
+    protected final boolean authorizationRequired;
+    protected final String componentDescription;
+    protected final String componentName;
+    protected final String componentTitle;
+    protected final int version;
 
-        this(
-            OptionalUtils.orElse(connectionDefinition.getAuthorizationRequired(), true),
-            componentDefinition.getDescription(), componentDefinition.getName(),
-            ComponentDefinitionDTO.getTitle(
-                componentDefinition.getName(), OptionalUtils.orElse(componentDefinition.getTitle(), null)),
-            connectionDefinition.getVersion());
+    public ConnectionDefinitionBasicDTO(ConnectionDefinition connectionDefinition) {
+        this.authorizationRequired = OptionalUtils.orElse(connectionDefinition.getAuthorizationRequired(), true);
+        this.componentDescription =
+            OptionalUtils.orElse(connectionDefinition.getComponentDescription(), null);
+        this.componentName = connectionDefinition.getComponentName();
+        this.componentTitle = OptionalUtils.orElse(
+            connectionDefinition.getComponentTitle(), connectionDefinition.getComponentName());
+        this.version = connectionDefinition.getVersion();
+    }
+
+    public boolean isAuthorizationRequired() {
+        return authorizationRequired;
+    }
+
+    public Optional<String> getComponentDescription() {
+        return Optional.ofNullable(componentDescription);
+    }
+
+    public String getComponentName() {
+        return componentName;
+    }
+
+    public String getComponentTitle() {
+        return componentTitle;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof ConnectionDefinitionBasicDTO that))
+            return false;
+        return authorizationRequired == that.authorizationRequired && version == that.version
+            && Objects.equals(componentDescription, that.componentDescription)
+            && Objects.equals(componentName, that.componentName) && Objects.equals(componentTitle, that.componentTitle);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(authorizationRequired, componentDescription, componentName, componentTitle, version);
+    }
+
+    @Override
+    public String toString() {
+        return "ConnectionDefinitionBasicDTO{" +
+            "authorizationRequired=" + authorizationRequired +
+            ", componentDescription='" + componentDescription + '\'' +
+            ", componentName='" + componentName + '\'' +
+            ", componentTitle='" + componentTitle + '\'' +
+            ", version=" + version +
+            '}';
     }
 }

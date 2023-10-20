@@ -19,6 +19,8 @@ package com.bytechef.hermes.definition.registry.dto;
 
 import com.bytechef.hermes.definition.Property;
 
+import java.util.Objects;
+
 /**
  * @author Ivica Cardic
  */
@@ -42,5 +44,26 @@ public class DynamicPropertiesPropertyDTO extends PropertyDTO {
 
     public PropertiesDataSourceDTO getPropertiesDataSource() {
         return propertiesDataSource;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof DynamicPropertiesPropertyDTO that))
+            return false;
+        return Objects.equals(propertiesDataSource, that.propertiesDataSource);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(propertiesDataSource);
+    }
+
+    @Override
+    public String toString() {
+        return "DynamicPropertiesPropertyDTO{" +
+            "propertiesDataSource=" + propertiesDataSource +
+            "} " + super.toString();
     }
 }

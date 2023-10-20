@@ -24,6 +24,7 @@ import com.bytechef.hermes.definition.Property.StringProperty.SampleDataType;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -63,5 +64,34 @@ public class StringPropertyDTO extends ValuePropertyDTO<String> {
 
     public SampleDataType getSampleDataType() {
         return sampleDataType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof StringPropertyDTO that))
+            return false;
+        if (!super.equals(o))
+            return false;
+        return Objects.equals(options, that.options) && Objects.equals(optionsDataSource, that.optionsDataSource)
+            && sampleDataType == that.sampleDataType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), options, optionsDataSource, sampleDataType);
+    }
+
+    @Override
+    public String toString() {
+        return "StringPropertyDTO{" +
+            "options=" + options +
+            ", optionsDataSource=" + optionsDataSource +
+            ", sampleDataType=" + sampleDataType +
+            ", controlType=" + controlType +
+            ", defaultValue=" + defaultValue +
+            ", exampleValue=" + exampleValue +
+            "} ";
     }
 }

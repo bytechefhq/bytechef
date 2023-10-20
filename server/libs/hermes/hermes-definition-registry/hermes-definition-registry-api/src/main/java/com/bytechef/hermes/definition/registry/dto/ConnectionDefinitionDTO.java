@@ -25,40 +25,67 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record ConnectionDefinitionDTO(
-    boolean authorizationRequired, List<AuthorizationDTO> authorizations, Optional<String> componentDescription,
-    String componentName, String componentTitle, List<? extends PropertyDTO> properties, int version) {
+public class ConnectionDefinitionDTO extends ConnectionDefinitionBasicDTO {
+
+    private final List<AuthorizationDTO> authorizations;
+    private final List<? extends PropertyDTO> properties;
 
     public ConnectionDefinitionDTO(ConnectionDefinition connectionDefinition) {
-        this(
-            OptionalUtils.orElse(connectionDefinition.getAuthorizationRequired(), true),
-            toAuthorizationDTOs(
-                OptionalUtils.orElse(connectionDefinition.getAuthorizations(), Collections.emptyList())),
-            connectionDefinition.getComponentDescription(), connectionDefinition.getComponentName(),
-            ComponentDefinitionDTO.getTitle(
-                connectionDefinition.getComponentName(),
-                OptionalUtils.orElse(connectionDefinition.getComponentTitle(), null)),
-            CollectionUtils.map(
-                OptionalUtils.orElse(connectionDefinition.getProperties(), Collections.emptyList()),
-                valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty)),
-            connectionDefinition.getVersion());
+        super(connectionDefinition);
+
+        this.authorizations = toAuthorizationDTOs(
+            OptionalUtils.orElse(connectionDefinition.getAuthorizations(), Collections.emptyList()));
+        this.properties = CollectionUtils.map(
+            OptionalUtils.orElse(connectionDefinition.getProperties(), Collections.emptyList()),
+            valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty));
+    }
+
+    public List<AuthorizationDTO> getAuthorizations() {
+        return authorizations;
+    }
+
+    public List<? extends PropertyDTO> getProperties() {
+        return properties;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof ConnectionDefinitionDTO that))
+            return false;
+        if (!super.equals(o))
+            return false;
+        return Objects.equals(authorizations, that.authorizations) && Objects.equals(properties, that.properties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), authorizations, properties);
+    }
+
+    @Override
+    public String toString() {
+        return "ConnectionDefinitionDTO{" +
+            "authorizations=" + authorizations +
+            ", properties=" + properties +
+            ", authorizationRequired=" + authorizationRequired +
+            ", componentDescription='" + componentDescription + '\'' +
+            ", componentName='" + componentName + '\'' +
+            ", componentTitle='" + componentTitle + '\'' +
+            ", version=" + version +
+            "} ";
     }
 
     private static List<AuthorizationDTO> toAuthorizationDTOs(List<? extends Authorization> authorizations) {
         return authorizations.stream()
-            .map(authorization -> new AuthorizationDTO(
-                authorization.getDescription(), authorization.getName(),
-                CollectionUtils.map(
-                    OptionalUtils.orElse(authorization.getProperties(), List.of()),
-                    valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty)),
-                OptionalUtils.orElse(authorization.getTitle(), authorization.getName()),
-                authorization.getType()))
+            .map(AuthorizationDTO::new)
             .toList();
     }
 }

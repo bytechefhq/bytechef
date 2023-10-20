@@ -23,6 +23,7 @@ import com.bytechef.hermes.definition.Property.BooleanProperty;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -48,5 +49,29 @@ public class BooleanPropertyDTO extends ValuePropertyDTO<Boolean> {
 
     public List<OptionDTO> getOptions() {
         return Collections.unmodifiableList(options);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof BooleanPropertyDTO that))
+            return false;
+        return Objects.equals(options, that.options);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(options);
+    }
+
+    @Override
+    public String toString() {
+        return "BooleanPropertyDTO{" +
+            "options=" + options +
+            ", controlType=" + controlType +
+            ", defaultValue=" + defaultValue +
+            ", exampleValue=" + exampleValue +
+            "} ";
     }
 }
