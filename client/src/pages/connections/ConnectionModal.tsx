@@ -22,14 +22,13 @@ import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
 } from '../../queries/connections';
-import {useConnectionCreateMutation} from '../../mutations/connections.mutations';
+import {useCreateConnectionMutation} from '../../mutations/connections.mutations';
 import {OnChangeValue} from 'react-select';
 import {useGetConnectionDefinitionQuery} from '../../queries/connectionDefinitions';
 import NativeSelect from '../../components/NativeSelect/NativeSelect';
 import Properties from '../../components/Properties/Properties';
 import {timeout} from 'd3-timer';
-import useOAuth2 from './oauth2/useOAuth2';
-import {UseFormHandleSubmit} from 'react-hook-form/dist/types/form';
+import OAuth2Button from './components/OAuth2Button';
 
 interface FormProps {
     authorizationName: string;
@@ -72,7 +71,7 @@ const ConnectionModal = () => {
 
     const queryClient = useQueryClient();
 
-    const mutation = useConnectionCreateMutation({
+    const createConnectionMutation = useCreateConnectionMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(
                 ComponentDefinitionKeys.componentDefinitions({
@@ -82,7 +81,7 @@ const ConnectionModal = () => {
             queryClient.invalidateQueries(ConnectionKeys.connections);
             queryClient.invalidateQueries(ConnectionKeys.connectionTags);
 
-            closeForm();
+            closeModal();
         },
     });
 
@@ -141,7 +140,7 @@ const ConnectionModal = () => {
             'OAUTH2_IMPLICIT_CODE',
         ].includes(getAuthorizationType());
 
-    function closeForm() {
+    function closeModal() {
         setIsOpen(false);
 
         timeout(() => {
@@ -165,7 +164,7 @@ const ConnectionModal = () => {
             tags: tags,
         } as ConnectionModel;
 
-        mutation.mutate(connectionModel);
+        createConnectionMutation.mutate(connectionModel);
     }
 
     function getAuthorizationType(): string {
@@ -187,15 +186,17 @@ const ConnectionModal = () => {
 
     return (
         <Modal
-            confirmButtonLabel="Create Connection"
             description="Create your connection to connect to the chosen service"
-            form
             isOpen={isOpen}
-            setIsOpen={setIsOpen}
+            setIsOpen={(isOpen) => {
+                if (isOpen) {
+                    setIsOpen(isOpen);
+                } else {
+                    closeModal();
+                }
+            }}
             title="Create Connection"
             triggerLabel="Create Connection"
-            onCloseClick={closeForm}
-            onConfirmButtonClick={handleSubmit(createConnection)}
         >
             {componentDefinitionsError &&
                 !componentDefinitionsIsLoading &&
@@ -217,7 +218,6 @@ const ConnectionModal = () => {
                             error={!!error}
                             field={field}
                             label="Component"
-                            name="componentName"
                             options={componentDefinitions!.map(
                                 (
                                     componentDefinition: ComponentDefinitionBasicModel
@@ -305,7 +305,6 @@ const ConnectionModal = () => {
                             field={field}
                             isMulti={true}
                             label="Tags"
-                            name="tags"
                             options={tags!.map((tag: TagModel) => ({
                                 label: `${tag.name
                                     .charAt(0)
@@ -335,16 +334,20 @@ const ConnectionModal = () => {
                     displayType="lightBorder"
                     label="Cancel"
                     type="button"
-                    onClick={closeForm}
+                    onClick={closeModal}
                 />
 
                 {isOAuth2AuthorizationType ? (
-                    <OAuth2Button handleSubmit={handleSubmit} />
+                    <OAuth2Button
+                        onClick={(getAuth: () => void) =>
+                            handleSubmit(() => getAuth())()
+                        }
+                    />
                 ) : (
                     <Button
-                        label="Create"
-                        onClick={handleSubmit(createConnection)}
+                        label="Save"
                         type="submit"
+                        onClick={handleSubmit(createConnection)}
                     />
                 )}
             </div>
