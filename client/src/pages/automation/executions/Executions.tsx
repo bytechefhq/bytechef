@@ -1,7 +1,5 @@
 import LayoutContainer from 'layouts/LayoutContainer/LayoutContainer';
 import PageHeader from 'components/PageHeader/PageHeader';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import {useState} from 'react';
 import FilterableSelect, {
     ISelectOption,
@@ -13,21 +11,18 @@ import {
 import {GetProjectExecutionsJobStatusEnum} from 'middleware/project/apis/ProjectExecutionsApi';
 import {OnChangeValue} from 'react-select';
 import {useGetWorkflowsQuery} from 'queries/workflows.queries';
-import {useGetInstancesQuery} from 'queries/instances,queries';
+import {useGetInstancesQuery} from 'queries/instances.queries';
 import {ProjectExecutionModelFromJSON} from 'middleware/project';
+import Input from 'components/Input/Input';
 
 export const Executions = () => {
     const [filterStatus, setFilterStatus] =
         useState<GetProjectExecutionsJobStatusEnum>();
 
-    const [filterStartDate, setFilterStartDate] = useState<Date>(new Date());
-
-    const [filterEndDate, setFilterEndDate] = useState<Date>(new Date());
-
+    const [filterStartDate] = useState<Date>(new Date());
+    const [filterEndDate] = useState<Date>(new Date());
     const [filterProjectId, setFilterProjectId] = useState<number>();
-
     const [filterWorkflows, setFilterWorkflows] = useState<number>();
-
     const [filterInstances, setFilterInstances] = useState<number>();
 
     const {
@@ -74,7 +69,7 @@ export const Executions = () => {
 
                     <div className="p-4">
                         <FilterableSelect
-                            name="Status"
+                            name="jobStatus"
                             label="Status"
                             options={[
                                 {
@@ -113,44 +108,22 @@ export const Executions = () => {
                             }}
                         />
 
-                        <div className="mb-3">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Start Time
-                            </label>
+                        <Input
+                            type="date"
+                            name="jobStartTime"
+                            label="Start time"
+                        />
 
-                            <DatePicker
-                                className="block w-full rounded-md border focus:outline-none focus:ring-1 dark:bg-gray-800"
-                                title="Start Time"
-                                selected={filterStartDate}
-                                onChange={(date) =>
-                                    setFilterStartDate(date || new Date())
-                                }
-                            />
-                        </div>
-
-                        <div className="mb-3">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                End Time
-                            </label>
-
-                            <DatePicker
-                                className="block w-full rounded-md border focus:outline-none focus:ring-1 dark:bg-gray-800"
-                                name="End time"
-                                selected={filterEndDate}
-                                onChange={(date) =>
-                                    setFilterEndDate(date || new Date())
-                                }
-                            />
-                        </div>
+                        <Input type="date" name="jobEndTime" label="End time" />
 
                         {!isLoadingProjects && !errorInProjects && (
                             <FilterableSelect
-                                name="Projects"
+                                name="project"
                                 label="Projects"
                                 options={
-                                    projects?.map((x) => ({
-                                        label: x.name,
-                                        value: (x.id || 0).toString(),
+                                    projects?.map((project) => ({
+                                        label: project.name,
+                                        value: (project.id || 0).toString(),
                                     })) || []
                                 }
                                 onChange={(
@@ -166,12 +139,13 @@ export const Executions = () => {
 
                         {!isLoadingWorkflows && !errorInWorkflows && (
                             <FilterableSelect
-                                name="Workflows"
-                                label="Workflows"
+                                name="workflows"
+                                label="Worflows"
                                 options={
-                                    workflows?.map((x) => ({
-                                        label: x.label || 'undefined label',
-                                        value: (x.id || 0).toString(),
+                                    workflows?.map((workflow) => ({
+                                        label:
+                                            workflow.label || 'undefined label',
+                                        value: (workflow.id || 0).toString(),
                                     })) || []
                                 }
                                 onChange={(
@@ -187,12 +161,12 @@ export const Executions = () => {
 
                         {!isLoadingInstances && !errorInInstances && (
                             <FilterableSelect
-                                name="Instances"
+                                name="instances"
                                 label="Instances"
                                 options={
-                                    instances?.map((x) => ({
-                                        label: x.name,
-                                        value: (x.id || 0).toString(),
+                                    instances?.map((instance) => ({
+                                        label: instance.name,
+                                        value: (instance.id || 0).toString(),
                                     })) || []
                                 }
                                 onChange={(
