@@ -25,6 +25,9 @@ import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
+import com.bytechef.hermes.definition.registry.component.definition.WebhookBodyImpl;
+import com.bytechef.hermes.definition.registry.component.definition.WebhookHeadersImpl;
+import com.bytechef.hermes.definition.registry.component.definition.WebhookParametersImpl;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -43,6 +46,9 @@ public class ContextImpl implements ActionContext, TriggerContext {
 
     static {
         MapValueUtils.addConverter(new ContextFileEntryConverter());
+        MapValueUtils.addConverter(new WebhookBodyImpl.WebhookBodyConverter());
+        MapValueUtils.addConverter(new WebhookHeadersImpl.WebhookHeadersConverter());
+        MapValueUtils.addConverter(new WebhookParametersImpl.WebhookParametersConverter());
     }
 
     private final ConnectionDefinitionService connectionDefinitionService;
