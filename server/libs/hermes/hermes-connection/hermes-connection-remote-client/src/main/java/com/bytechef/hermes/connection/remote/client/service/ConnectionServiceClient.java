@@ -86,7 +86,7 @@ public class ConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public List<Connection> search(List<String> componentNames, List<Long> tagIds) {
+    public List<Connection> getConnections(List<String> componentNames, List<Long> tagIds) {
         throw new UnsupportedOperationException();
     }
 

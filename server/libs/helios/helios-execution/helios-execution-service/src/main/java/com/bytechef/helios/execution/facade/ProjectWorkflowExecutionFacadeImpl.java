@@ -78,7 +78,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     @Override
     @Transactional(readOnly = true)
     @SuppressFBWarnings("NP")
-    public Page<ProjectWorkflowExecutionDTO> searchProjectWorkflowExecutions(
+    public Page<ProjectWorkflowExecutionDTO> getProjectWorkflowExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber) {
 

@@ -29,7 +29,7 @@ public interface ProjectWorkflowExecutionFacade {
 
     ProjectWorkflowExecutionDTO getProjectWorkflowExecution(long id);
 
-    Page<ProjectWorkflowExecutionDTO> searchProjectWorkflowExecutions(
+    Page<ProjectWorkflowExecutionDTO> getProjectWorkflowExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber);
 

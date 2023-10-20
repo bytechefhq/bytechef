@@ -82,7 +82,7 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> search(List<String> componentNames, List<Long> tagIds) {
+    public List<Connection> getConnections(List<String> componentNames, List<Long> tagIds) {
         Iterable<Connection> connectionIterable;
 
         if (CollectionUtils.isEmpty(componentNames) && CollectionUtils.isEmpty(tagIds)) {
