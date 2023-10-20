@@ -24,6 +24,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 import com.bytechef.component.mailchimp.util.MailchimpUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.Context.Http.Body;
 import com.bytechef.hermes.component.definition.ParameterMap;
@@ -77,7 +78,7 @@ public class MailchimpSubscribeTrigger {
 
     protected static void dynamicWebhookDisable(
         ParameterMap inputParameters, ParameterMap connectionParameters, ParameterMap outputParameters,
-        String workflowExecutionId, TriggerContext context) {
+        String workflowExecutionId, Context context) {
 
         String server = MailchimpUtils.getMailChimpServer(
             connectionParameters.getRequiredString(ACCESS_TOKEN), context);
@@ -90,7 +91,7 @@ public class MailchimpSubscribeTrigger {
 
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
         ParameterMap inputParameters, ParameterMap connectionParameters, String webhookUrl,
-        String workflowExecutionId, TriggerContext context) {
+        String workflowExecutionId, Context context) {
 
         String server = MailchimpUtils.getMailChimpServer(
             connectionParameters.getRequiredString(ACCESS_TOKEN), context);

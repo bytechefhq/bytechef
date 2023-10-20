@@ -35,10 +35,10 @@ public class InstanceAccessorRegistry {
             .stream()
             .collect(
                 Collectors.toMap(
-                    InstanceAccessor::getInstanceType, instanceWorkflowAccessor -> instanceWorkflowAccessor));
+                    InstanceAccessor::getType, instanceWorkflowAccessor -> instanceWorkflowAccessor));
     }
 
-    public InstanceAccessor getInstanceAccessor(int instanceType) {
-        return Validate.notNull(instanceAccessorMap.get(instanceType), "instanceAccessor");
+    public InstanceAccessor getInstanceAccessor(int type) {
+        return Validate.notNull(instanceAccessorMap.get(type), "instanceAccessor");
     }
 }

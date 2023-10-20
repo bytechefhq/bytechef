@@ -17,6 +17,7 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.file.storage.service.FileStorageService;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.Context.Http.Configuration;
 import com.bytechef.hermes.component.definition.Context.Http.Configuration.ConfigurationBuilder;
@@ -55,7 +56,7 @@ import org.mockito.Mockito;
  */
 public class HttpClientExecutorTest {
 
-    private final Context context = Mockito.mock(Context.class);
+    private final ActionContext context = Mockito.mock(ActionContext.class);
     private final Configuration configuration = Configuration.newConfiguration()
         .build();
     private final Base64.Encoder encoder = Base64.getEncoder();
@@ -90,7 +91,7 @@ public class HttpClientExecutorTest {
 
     @Test
     public void testCreateBodyPublisher() {
-        Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
+        ActionContext.FileEntry fileEntry = Mockito.mock(ActionContext.FileEntry.class);
 
         Mockito.when(fileEntry.getName())
             .thenReturn("fileName");
@@ -157,7 +158,7 @@ public class HttpClientExecutorTest {
 
         //
 
-        fileEntry = Mockito.mock(Context.FileEntry.class);
+        fileEntry = Mockito.mock(ActionContext.FileEntry.class);
 
         Mockito.when(fileEntry.getMimeType())
             .thenReturn("text/plain");
@@ -378,7 +379,7 @@ public class HttpClientExecutorTest {
 
         //
 
-        Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
+        ActionContext.FileEntry fileEntry = Mockito.mock(ActionContext.FileEntry.class);
 
         Mockito.when(context.file(file -> file.storeContent(Mockito.anyString(), (InputStream) Mockito.any())))
             .thenReturn(fileEntry);

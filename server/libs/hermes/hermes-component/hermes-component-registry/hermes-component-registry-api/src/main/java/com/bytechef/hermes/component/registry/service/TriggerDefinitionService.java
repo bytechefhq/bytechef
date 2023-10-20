@@ -16,6 +16,7 @@
 
 package com.bytechef.hermes.component.registry.service;
 
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.registry.ComponentOperation;
@@ -40,52 +41,48 @@ public interface TriggerDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
         @NonNull Map<String, ?> outputParameters, @Nullable ComponentConnection connection,
-        @NonNull TriggerContext context);
+        @NonNull Context context);
 
     List<? extends ValueProperty<?>> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName,
-        @Nullable ComponentConnection connection, @NonNull TriggerContext context);
+        @Nullable ComponentConnection connection, @NonNull Context context);
 
     DynamicWebhookEnableOutput executeDynamicWebhookEnable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @NonNull String webhookUrl,
-        @NonNull String workflowExecutionId, @Nullable ComponentConnection connection,
-        @NonNull TriggerContext context);
+        @NonNull Map<String, ?> inputParameters, @NonNull String webhookUrl, @NonNull String workflowExecutionId,
+        @Nullable ComponentConnection connection, @NonNull Context context);
 
     DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> outputParameters, @NonNull TriggerContext context);
+        @NonNull Map<String, ?> outputParameters, @NonNull Context context);
 
     String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, @Nullable ComponentConnection connection,
-        @NonNull TriggerContext context);
+        @NonNull Map<String, ?> triggerParameters, @Nullable ComponentConnection connection, @NonNull Context context);
 
     void executeListenerDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
-        @Nullable ComponentConnection connection, @NonNull TriggerContext context);
+        @Nullable ComponentConnection connection, @NonNull Context context);
 
     void executeOnEnableListener(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
-        @Nullable ComponentConnection connection, @NonNull TriggerContext context);
+        @Nullable ComponentConnection connection, @NonNull Context context);
 
     List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, @Nullable String searchText,
-        @Nullable ComponentConnection connection, @NonNull TriggerContext context);
+        @Nullable ComponentConnection connection, @NonNull Context context);
 
     List<? extends ValueProperty<?>> executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
-        @NonNull TriggerContext context);
+        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection, @NonNull Context context);
 
     Object executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
-        @NonNull TriggerContext context);
+        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection, @NonNull Context context);
 
     TriggerOutput executeTrigger(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
@@ -95,7 +92,7 @@ public interface TriggerDefinitionService {
     boolean executeWebhookValidate(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest,
-        @Nullable ComponentConnection connection, @NonNull TriggerContext context);
+        @Nullable ComponentConnection connection, @NonNull Context context);
 
     TriggerDefinition getTriggerDefinition(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName);

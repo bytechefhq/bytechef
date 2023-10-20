@@ -16,16 +16,11 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
-import com.bytechef.data.storage.service.DataStorageService;
-import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
-import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -33,54 +28,26 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
-import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Ivica Cardic
  */
-public class ContextImpl implements ActionContext, TriggerContext {
+public class ContextImpl implements TriggerContext {
 
-    private final Data data;
-    private final Event event;
-    private final File file;
     private final Http http;
     private final Json json;
     private final Xml xml;
 
     @SuppressFBWarnings("EI")
     public ContextImpl(
-        ApplicationEventPublisher eventPublisher, String componentName, ComponentConnection connection,
-        DataStorageService dataStorageService, ObjectMapper objectMapper, FileStorageService fileStorageService,
-        HttpClientExecutor httpClientExecutor, Long taskExecutionId, XmlMapper xmlMapper) {
+        String componentName, ComponentConnection connection, HttpClientExecutor httpClientExecutor,
+        ObjectMapper objectMapper, XmlMapper xmlMapper) {
 
-        this.data = new DataImpl(dataStorageService);
-        this.event = taskExecutionId == null ? null : new EventImpl(eventPublisher, taskExecutionId);
-        this.file = new FileImpl(fileStorageService);
         this.http = new HttpImpl(componentName, connection, this, httpClientExecutor);
         this.json = new JsonImpl(objectMapper);
         this.xml = new XmlImpl(xmlMapper);
-    }
-
-    @Override
-    public <R> R data(ContextFunction<Data, R> dataFunction) {
-        try {
-            return dataFunction.apply(data);
-        } catch (Exception e) {
-            throw new ComponentExecutionException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public <R> R file(ContextFunction<File, R> fileFunction) {
-        try {
-            return fileFunction.apply(file);
-        } catch (Exception e) {
-            throw new ComponentExecutionException(e.getMessage(), e);
-        }
     }
 
     @Override
@@ -110,76 +77,13 @@ public class ContextImpl implements ActionContext, TriggerContext {
         }
     }
 
-    @Override
-    public void event(Consumer<Event> eventConsumer) {
-        eventConsumer.accept(event);
-    }
-
-    private record DataImpl(DataStorageService dataStorageService) implements Data {
-
-        @Override
-        public <T> Optional<T> fetchValue(String context, Scope scope, long scopeId, String key) {
-            return dataStorageService.fetch(context, scope.getId(), scopeId, key);
-        }
-
-        @Override
-        public <T> T getValue(String context, Scope scope, long scopeId, String key) {
-            return dataStorageService.get(context, scope.getId(), scopeId, key);
-        }
-
-        @Override
-        public void setValue(String context, Scope scope, long scopeId, String key, Object value) {
-            dataStorageService.put(context, scope.getId(), scopeId, key, value);
-        }
-    }
-
-    private record EventImpl(ApplicationEventPublisher eventPublisher, long taskExecutionId) implements Event {
-
-        @Override
-        public void publishActionProgressEvent(int progress) {
-            eventPublisher.publishEvent(new TaskProgressedApplicationEvent(taskExecutionId, progress));
-        }
-    }
-
-    private record FileImpl(FileStorageService fileStorageService) implements File {
-
-        @Override
-        public InputStream getStream(FileEntry fileEntry) {
-            return fileStorageService.getFileStream(
-                FileEntryConstants.FILES_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry());
-        }
-
-        @Override
-        public String readToString(FileEntry fileEntry) {
-            return fileStorageService.readFileToString(
-                FileEntryConstants.FILES_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry());
-        }
-
-        @Override
-        public FileEntry storeContent(String fileName, String data) {
-            return new ContextFileEntryImpl(
-                fileStorageService.storeFileContent(FileEntryConstants.FILES_DIR, fileName, data));
-        }
-
-        @Override
-        public FileEntry storeContent(String fileName, InputStream inputStream) {
-            try {
-                return new ContextFileEntryImpl(
-                    fileStorageService.storeFileContent(FileEntryConstants.FILES_DIR, fileName, inputStream));
-            } catch (Exception exception) {
-                throw new ComponentExecutionException("Unable to store file " + fileName, exception);
-            }
-        }
-    }
-
     private record HttpImpl(
         String componentName, ComponentConnection connection, Context context, HttpClientExecutor httpClientExecutor)
         implements Http {
 
         @Override
         public Executor delete(String url) {
-            return new ExecutorImpl(
-                url, RequestMethod.DELETE, componentName, connection, context, httpClientExecutor);
+            return new ExecutorImpl(url, RequestMethod.DELETE, componentName, connection, context, httpClientExecutor);
         }
 
         @Override

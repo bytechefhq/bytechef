@@ -42,7 +42,7 @@ public class ObjectHelperParseAction {
         .perform(ObjectHelperParseAction::perform);
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap getConnectionParameters, Context context) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, Context context) {
 
         Object input = inputParameters.getRequired(SOURCE);
 

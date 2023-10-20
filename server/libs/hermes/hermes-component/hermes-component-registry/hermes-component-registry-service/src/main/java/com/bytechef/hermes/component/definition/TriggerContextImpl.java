@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.data.storage.service;
+package com.bytechef.hermes.component.definition;
 
-import java.util.Optional;
+import com.bytechef.hermes.component.registry.dto.ComponentConnection;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 /**
  * @author Ivica Cardic
  */
-public interface DataStorageService {
+public class TriggerContextImpl extends ContextImpl implements TriggerDefinition.TriggerContext {
 
-    <T> Optional<T> fetch(
-        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
-        int type);
+    public TriggerContextImpl(
+        String componentName, ComponentConnection connection, HttpClientExecutor httpClientExecutor,
+        ObjectMapper objectMapper, XmlMapper xmlMapper) {
 
-    <T> T get(
-        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key, int type);
-
-    void put(
-        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
-        int type, Object value);
+        super(componentName, connection, httpClientExecutor, objectMapper, xmlMapper);
+    }
 }

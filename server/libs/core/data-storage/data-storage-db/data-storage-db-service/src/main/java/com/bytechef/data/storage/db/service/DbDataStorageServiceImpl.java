@@ -40,26 +40,38 @@ public class DbDataStorageServiceImpl implements DataStorageService, DbDataStora
     @Override
     @SuppressWarnings("unchecked")
     @Transactional
-    public <T> Optional<T> fetch(String context, int scope, long scopeId, String key) {
-        return dataStorageRepository.findByContextAndScopeAndScopeIdAndKey(context, scope, scopeId, key)
+    public <T> Optional<T> fetch(
+        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
+        int type) {
+
+        return dataStorageRepository.findByComponentNameAndComponentVersionAndActionNameAndScopeAndScopeIdAndKeyAndType(
+            componentName, componentVersion, actionName, scope, scopeId, key, type)
             .map(dataEntry -> (T) dataEntry.getValue());
     }
 
     @Override
-    public <T> T get(String context, int scope, long scopeId, String key) {
-        return OptionalUtils.get(fetch(context, scope, scopeId, key));
+    public <T> T get(
+        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
+        int type) {
+
+        return OptionalUtils.get(fetch(componentName, componentVersion, actionName, scope, scopeId, key, type));
     }
 
     @Override
-    public void put(String context, int scope, long scopeId, String key, Object value) {
+    public void put(
+        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
+        int type, Object value) {
+
         dataStorageRepository
-            .findByContextAndScopeAndScopeIdAndKey(context, scope, scopeId, key)
+            .findByComponentNameAndComponentVersionAndActionNameAndScopeAndScopeIdAndKeyAndType(
+                componentName, componentVersion, actionName, scope, scopeId, key, type)
             .ifPresentOrElse(
                 dataEntry -> {
                     dataEntry.setValue(value);
 
                     dataStorageRepository.save(dataEntry);
                 },
-                () -> dataStorageRepository.save(new DataEntry(context, scope, scopeId, key, value)));
+                () -> dataStorageRepository.save(
+                    new DataEntry(componentName, componentVersion, actionName, scope, scopeId, key, value, type)));
     }
 }

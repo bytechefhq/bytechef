@@ -68,8 +68,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     @Override
     public List<? extends ValueProperty<?>> executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, Object> actionParameters,
-        Long connectionId) {
+        @NonNull Map<String, Object> actionParameters, Long connectionId) {
 
         return defaultWebClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-output-schema"),
@@ -92,14 +91,15 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public Object executePerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, long taskExecutionId,
-        @NonNull Map<String, ?> inputParameters, Long connectionId) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, int type, Long instanceId,
+        @NonNull String workflowId, long taskExecutionId, @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
         return defaultWebClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-perform"),
             new PerformRequest(
-                componentName, componentVersion, actionName, taskExecutionId, inputParameters, connectionId),
+                componentName, componentVersion, actionName, type, instanceId, workflowId, taskExecutionId,
+                inputParameters, connectionId),
             Object.class);
     }
 
@@ -130,8 +130,8 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     private record PerformRequest(
-        String componentName, int componentVersion, String actionName, long taskExecutionId,
-        Map<String, ?> actionParameters, Long connectionId) {
+        String componentName, int componentVersion, String actionName, int type, Long instanceId, String workflowId,
+        long taskExecutionId, Map<String, ?> actionParameters, Long connectionId) {
     }
 
     private record PropertiesRequest(

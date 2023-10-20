@@ -16,6 +16,7 @@
 
 package com.bytechef.hermes.component.definition;
 
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext.FileEntry;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -57,7 +58,7 @@ public interface ParameterMap extends Map<String, Object> {
 
     Duration getDuration(String key, Duration defaultDuration);
 
-    Context.FileEntry getFileEntry(String key);
+    FileEntry getFileEntry(String key);
 
     Float getFloat(String key);
 
@@ -129,7 +130,7 @@ public interface ParameterMap extends Map<String, Object> {
 
     double getRequiredDouble(String key);
 
-    Context.FileEntry getRequiredFileEntry(String key);
+    FileEntry getRequiredFileEntry(String key);
 
     float getRequiredFloat(String key);
 

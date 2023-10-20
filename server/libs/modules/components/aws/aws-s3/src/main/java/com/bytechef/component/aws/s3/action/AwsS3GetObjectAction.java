@@ -25,9 +25,9 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -54,8 +54,9 @@ public class AwsS3GetObjectAction {
         .outputSchema(fileEntry())
         .perform(AwsS3GetObjectAction::perform);
 
-    protected static FileEntry
-        perform(ParameterMap inputParameters, ParameterMap connectionParameters, Context context) {
+    protected static FileEntry perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connectionParameters)) {
             return context.file(file -> file.storeContent(inputParameters.getRequiredString(FILENAME),
                 s3Client.getObject(

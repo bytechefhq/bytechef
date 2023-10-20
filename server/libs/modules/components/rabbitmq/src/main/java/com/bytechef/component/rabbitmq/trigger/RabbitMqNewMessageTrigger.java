@@ -27,9 +27,9 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
-import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.rabbitmq.client.Channel;
@@ -61,7 +61,7 @@ public class RabbitMqNewMessageTrigger {
 
     protected static void listenerDisable(
         ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
-        TriggerContext context) {
+        Context context) {
 
         Connection rabbitmqConnection = CONNECTION_MAP.remove(workflowExecutionId);
 
@@ -74,7 +74,7 @@ public class RabbitMqNewMessageTrigger {
 
     protected static void listenerEnable(
         ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
-        ListenerEmitter listenerEmitter, TriggerContext context) {
+        ListenerEmitter listenerEmitter, Context context) {
 
         try {
             Connection rabbitMqConnection = RabbitMqUtils.getConnection(

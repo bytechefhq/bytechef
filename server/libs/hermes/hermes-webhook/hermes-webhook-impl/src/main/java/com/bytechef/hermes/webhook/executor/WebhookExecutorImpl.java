@@ -69,7 +69,7 @@ public class WebhookExecutorImpl implements WebhookExecutor {
         Map<String, ?> inputMap = getInputMap(workflowExecutionId);
         Map<String, ?> metadata = Map.of(
             MetadataConstants.INSTANCE_ID, workflowExecutionId.getInstanceId(),
-            MetadataConstants.INSTANCE_TYPE, workflowExecutionId.getInstanceType());
+            MetadataConstants.TYPE, workflowExecutionId.getType());
 
         if (!triggerOutput.batch() && triggerOutput.value() instanceof Collection<?> collectionOutput) {
             List<Map<String, ?>> outputsList = new ArrayList<>();
@@ -121,7 +121,7 @@ public class WebhookExecutorImpl implements WebhookExecutor {
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
         InstanceAccessor instanceAccessor = instanceAccessorRegistry
-            .getInstanceAccessor(workflowExecutionId.getInstanceType());
+            .getInstanceAccessor(workflowExecutionId.getType());
 
         return instanceAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());

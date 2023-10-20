@@ -87,13 +87,13 @@ public class TriggerCompletionHandler {
         }
 
         InstanceAccessor instanceAccessor =
-            instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getInstanceType());
+            instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
 
         Map<String, Object> inputMap = (Map<String, Object>) instanceAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
         Map<String, ?> metadata = Map.of(
             MetadataConstants.INSTANCE_ID, workflowExecutionId.getInstanceId(),
-            MetadataConstants.INSTANCE_TYPE, workflowExecutionId.getInstanceType());
+            MetadataConstants.TYPE, workflowExecutionId.getType());
 
         Object output = triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput());
 

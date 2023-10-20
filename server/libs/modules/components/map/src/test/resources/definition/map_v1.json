@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": null,
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "map",
@@ -28,8 +27,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The name of the item variable.",
@@ -67,12 +66,13 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": null,
+    "editorDescriptionDataSource": null,
     "perform": null,
     "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": null,
@@ -81,11 +81,11 @@
   "description": "Produces a new collection of values by mapping each value in `list` through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source `list`.",
   "icon": "path:assets/map.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "map",
   "resources": null,
   "version": 1,
   "title": "Map",
-  "triggers": null
+  "triggers": null,
+  "filterCompatibleConnections": null
 }

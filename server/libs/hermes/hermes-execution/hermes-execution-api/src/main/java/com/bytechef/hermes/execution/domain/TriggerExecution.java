@@ -92,12 +92,6 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     @Id
     private Long id;
 
-    @Column("instance_id")
-    private long instanceId;
-
-    @Column("instance_type")
-    private int instanceType;
-
     @Column("last_modified_by")
     @LastModifiedBy
     private String lastModifiedBy;
@@ -228,15 +222,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         return this.id;
     }
 
-    public long getInstanceId() {
-        return instanceId;
-    }
-
-    public int getInstanceType() {
-        return instanceType;
-    }
-
-    public Map<String, Object> getMetadata() {
+    public Map<String, ?> getMetadata() {
         return Collections.unmodifiableMap(metadata);
     }
 
@@ -382,8 +368,6 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     public void setWorkflowExecutionId(WorkflowExecutionId workflowExecutionId) {
         this.workflowExecutionId = workflowExecutionId;
 
-        this.instanceId = workflowExecutionId.getInstanceId();
-        this.instanceType = workflowExecutionId.getInstanceType();
         this.workflowId = workflowExecutionId.getWorkflowId();
     }
 

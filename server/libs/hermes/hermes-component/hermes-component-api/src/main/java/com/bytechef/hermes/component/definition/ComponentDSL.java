@@ -104,7 +104,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private Help help;
         private Map<String, Object> metadata;
         private final String name;
-        private ModifiableOutputProperty<?> outputSchema;
+        private ModifiableOutputProperty<?> outputSchemaProperty;
         private OutputSchemaFunction outputSchemaFunction;
         private List<? extends ModifiableInputProperty> properties;
         private Object sampleOutput;
@@ -185,7 +185,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public <P extends ModifiableOutputProperty<?>> ModifiableActionDefinition outputSchema(P outputSchema) {
-            this.outputSchema = outputSchema;
+            this.outputSchemaProperty = outputSchema;
 
             return this;
         }
@@ -324,7 +324,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         public Optional<OutputProperty<?>> getOutputSchema() {
-            return Optional.ofNullable(outputSchema);
+            return Optional.ofNullable(outputSchemaProperty);
         }
 
         @Override
@@ -1097,7 +1097,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private ListenerDisableConsumer listenerDisableConsumer;
         private ListenerEnableConsumer listenerEnableConsumer;
         private String name;
-        private ModifiableOutputProperty<?> outputSchema;
+        private ModifiableOutputProperty<?> outputSchemaProperty;
         private OutputSchemaFunction outputSchemaFunction;
         private PollFunction pollFunction;
         private List<? extends ModifiableInputProperty> properties;
@@ -1200,7 +1200,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public <P extends ModifiableOutputProperty<?>> ModifiableTriggerDefinition outputSchema(P outputSchema) {
-            this.outputSchema = outputSchema;
+            this.outputSchemaProperty = outputSchema;
 
             return this;
         }
@@ -1406,7 +1406,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         public Optional<OutputProperty<?>> getOutputSchema() {
-            return Optional.ofNullable(outputSchema);
+            return Optional.ofNullable(outputSchemaProperty);
         }
 
         @Override
@@ -1474,13 +1474,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
     }
 
-    private static final class EditorDescriptionDataSourceImpl implements EditorDescriptionDataSource {
-
-        private final EditorDescriptionFunction editorDescription;
-
-        private EditorDescriptionDataSourceImpl(EditorDescriptionFunction editorDescription) {
-            this.editorDescription = editorDescription;
-        }
+    private record EditorDescriptionDataSourceImpl(
+        EditorDescriptionFunction editorDescription) implements EditorDescriptionDataSource {
 
         @Override
         public EditorDescriptionFunction getEditorDescription() {
@@ -1488,13 +1483,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
     }
 
-    private static final class OutputSchemaDataSourceImpl implements OutputSchemaDataSource {
-
-        private final OutputSchemaFunction outputSchema;
-
-        private OutputSchemaDataSourceImpl(OutputSchemaFunction outputSchema) {
-            this.outputSchema = outputSchema;
-        }
+    private record OutputSchemaDataSourceImpl(OutputSchemaFunction outputSchema) implements OutputSchemaDataSource {
 
         @Override
         public OutputSchemaFunction getOutputSchema() {
@@ -1515,13 +1504,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
     }
 
-    private static final class SampleOutputDataSourceImpl implements SampleOutputDataSource {
-
-        private final SampleOutputFunction sampleOutputFunction;
-
-        private SampleOutputDataSourceImpl(SampleOutputFunction sampleOutputFunction) {
-            this.sampleOutputFunction = sampleOutputFunction;
-        }
+    private record SampleOutputDataSourceImpl(
+        SampleOutputFunction sampleOutputFunction) implements SampleOutputDataSource {
 
         @Override
         public SampleOutputFunction getSampleOutput() {

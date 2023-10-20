@@ -159,7 +159,6 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         return triggerDefinitionService.executeOutputSchema(
             componentName, componentVersion, triggerName, triggerParameters, componentConnection,
             contextFactory.createTriggerContext(componentName, componentConnection));
-
     }
 
     @Override
@@ -172,7 +171,6 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         return triggerDefinitionService.executeSampleOutput(
             componentName, componentVersion, triggerName, triggerParameters, componentConnection,
             contextFactory.createTriggerContext(componentName, componentConnection));
-
     }
 
     @Override

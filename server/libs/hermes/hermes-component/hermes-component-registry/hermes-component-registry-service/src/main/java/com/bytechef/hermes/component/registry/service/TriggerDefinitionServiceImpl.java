@@ -21,6 +21,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.EditorDescriptionDataSource;
 import com.bytechef.hermes.component.definition.EditorDescriptionDataSource.EditorDescriptionFunction;
 import com.bytechef.hermes.component.definition.HttpHeadersImpl;
@@ -92,7 +93,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     public List<? extends ValueProperty<?>> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName,
-        @Nullable ComponentConnection connection, @NonNull TriggerContext context) {
+        @Nullable ComponentConnection connection, @NonNull Context context) {
 
         ComponentPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
             componentName, componentVersion, triggerName, propertyName);
@@ -112,7 +113,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     public void executeDynamicWebhookDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
-        @NonNull Map<String, ?> outputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
+        @NonNull Map<String, ?> outputParameters, ComponentConnection connection, @NonNull Context context) {
 
         DynamicWebhookDisableConsumer dynamicWebhookDisableConsumer = getDynamicWebhookDisableConsumer(
             componentName, componentVersion, triggerName);
@@ -127,7 +128,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String webhookUrl, @NonNull String workflowExecutionId,
-        ComponentConnection connection, @NonNull TriggerContext context) {
+        ComponentConnection connection, @NonNull Context context) {
 
         DynamicWebhookEnableFunction dynamicWebhookEnableFunction = getDynamicWebhookEnableFunction(
             componentName, componentVersion, triggerName);
@@ -141,7 +142,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> outputParameters, @NonNull TriggerContext context) {
+        @NonNull Map<String, ?> outputParameters, @NonNull Context context) {
 
         DynamicWebhookRefreshFunction dynamicWebhookRefreshFunction = getDynamicWebhookRefreshFunction(
             componentName, componentVersion, triggerName);
@@ -153,7 +154,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
+        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull Context context) {
 
         EditorDescriptionFunction editorDescriptionFunction = getEditorDescriptionFunction(
             componentName, componentVersion, triggerName);
@@ -167,7 +168,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     public void executeListenerDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, ComponentConnection connection,
-        @NonNull TriggerContext context) {
+        @NonNull Context context) {
 
         ListenerDisableConsumer listenerDisableConsumer = getListenerDisableConsumer(
             componentName, componentVersion, triggerName);
@@ -181,7 +182,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     public void executeOnEnableListener(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, ComponentConnection connection,
-        @NonNull TriggerContext context) {
+        @NonNull Context context) {
 
         ListenerEnableConsumer listenerEnableConsumer = getListenerEnableConsumer(
             componentName, componentVersion, triggerName);
@@ -201,7 +202,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, String searchText,
-        ComponentConnection connection, @NonNull TriggerContext context) {
+        ComponentConnection connection, @NonNull Context context) {
 
         ComponentOptionsFunction optionsFunction = getComponentOptionsFunction(
             componentName, componentVersion, triggerName, propertyName);
@@ -216,7 +217,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public List<? extends ValueProperty<?>> executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
+        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull Context context) {
 
         OutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(
             componentName, componentVersion, triggerName);
@@ -230,7 +231,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public Object executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
+        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull Context context) {
 
         SampleOutputFunction sampleOutputFunction = getSampleOutputFunction(
             componentName, componentVersion, triggerName);
@@ -288,7 +289,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     public boolean executeWebhookValidate(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest,
-        ComponentConnection connection, @NonNull TriggerContext context) {
+        ComponentConnection connection, @NonNull Context context) {
 
         com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
@@ -395,13 +396,13 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     private boolean executeWebhookValidate(
         com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition, ParameterMap inputParameters,
-        WebhookRequest webhookRequest, TriggerContext triggerContext) {
+        WebhookRequest webhookRequest, Context context) {
 
         return triggerDefinition.getWebhookValidate()
             .map(webhookValidateFunction -> webhookValidateFunction.apply(
                 inputParameters, new HttpHeadersImpl(webhookRequest.headers()),
                 new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
-                triggerContext))
+                context))
             .orElse(true);
     }
 

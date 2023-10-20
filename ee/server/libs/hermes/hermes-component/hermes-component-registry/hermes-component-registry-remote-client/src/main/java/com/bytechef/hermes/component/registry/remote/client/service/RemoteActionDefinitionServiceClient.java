@@ -10,6 +10,7 @@ package com.bytechef.hermes.component.registry.remote.client.service;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.component.registry.domain.ActionDefinition;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
@@ -45,48 +46,53 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
 
     @Override
     public List<? extends ValueProperty<?>> executeDynamicProperties(
-        String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> inputParameters, ComponentConnection connection, ActionContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
+        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public String executeEditorDescription(
-        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        ComponentConnection connection, ActionContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters,
+        ComponentConnection connection, @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Option> executeOptions(
-        String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> inputParameters, String searchText, ComponentConnection connection, ActionContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
+        @NonNull Map<String, ?> inputParameters, String searchText, ComponentConnection connection,
+        @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<? extends ValueProperty<?>> executeOutputSchema(
-        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        ComponentConnection connection, ActionContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters,
+        ComponentConnection connection, @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Object executePerform(
-        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        ComponentConnection connection, ActionContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters,
+        ComponentConnection connection, @NonNull ActionContext context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Object executeSampleOutput(
-        String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,
-        ComponentConnection connection, ActionContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> actionParameters,
+        ComponentConnection connection, @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }

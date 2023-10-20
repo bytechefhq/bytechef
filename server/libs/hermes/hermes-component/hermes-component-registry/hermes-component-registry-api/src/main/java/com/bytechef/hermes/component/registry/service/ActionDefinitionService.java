@@ -17,6 +17,7 @@
 package com.bytechef.hermes.component.registry.service;
 
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.component.registry.domain.ActionDefinition;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
@@ -35,22 +36,22 @@ public interface ActionDefinitionService {
     List<? extends ValueProperty<?>> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
-        @NonNull ActionContext context);
+        @NonNull Context context);
 
     String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
-        @NonNull ActionContext context);
+        @NonNull Context context);
 
     List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, String searchText, @Nullable ComponentConnection connection,
-        @NonNull ActionContext context);
+        @NonNull Context context);
 
     List<? extends ValueProperty<?>> executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
-        @NonNull ActionContext context);
+        @NonNull Context context);
 
     Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
@@ -59,8 +60,7 @@ public interface ActionDefinitionService {
 
     Object executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> actionParameters, @Nullable ComponentConnection connection,
-        @NonNull ActionContext context);
+        @NonNull Map<String, ?> actionParameters, @Nullable ComponentConnection connection, @NonNull Context context);
 
     ActionDefinition getActionDefinition(
         @NonNull String componentName, int componentVersion, @NonNull String actionName);

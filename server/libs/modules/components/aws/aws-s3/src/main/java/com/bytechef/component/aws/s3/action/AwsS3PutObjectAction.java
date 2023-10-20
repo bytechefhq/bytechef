@@ -27,9 +27,9 @@ import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.io.IOException;
@@ -72,8 +72,10 @@ public class AwsS3PutObjectAction {
         .outputSchema(string())
         .perform(AwsS3PutObjectAction::perform);
 
-    protected static Object perform(ParameterMap inputParameters, ParameterMap connectionParameters, Context context)
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
         throws ComponentExecutionException {
+
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
 
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connectionParameters)) {

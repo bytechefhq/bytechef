@@ -35,8 +35,14 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("data_entry")
 public class DataEntry implements Persistable<Long> {
 
-    @Column("context")
-    private String context;
+    @Column("action_name")
+    private String actionName;
+
+    @Column("component_name")
+    private String componentName;
+
+    @Column("component_version")
+    private int componentVersion = 1;
 
     @CreatedBy
     @Column("created_by")
@@ -64,10 +70,13 @@ public class DataEntry implements Persistable<Long> {
     private int scope;
 
     @Column("scope_id")
-    private Long scopeId;
+    private String scopeId;
 
     @Column
     private ValueWrapper value;
+
+    @Column
+    private int type;
 
     @Version
     private int version;
@@ -75,16 +84,30 @@ public class DataEntry implements Persistable<Long> {
     public DataEntry() {
     }
 
-    public DataEntry(String context, int scope, long scopeId, String key, Object value) {
-        this.context = context;
+    public DataEntry(
+        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
+        Object value, int type) {
+
+        this.actionName = actionName;
+        this.componentName = componentName;
+        this.componentVersion = componentVersion;
         this.key = key;
         this.scope = scope;
         this.scopeId = scopeId;
+        this.type = type;
         this.value = new ValueWrapper(value, value.getClass());
     }
 
-    public String getContext() {
-        return context;
+    public String getActionName() {
+        return actionName;
+    }
+
+    public String getComponentName() {
+        return componentName;
+    }
+
+    public int getComponentVersion() {
+        return componentVersion;
     }
 
     public String getCreatedBy() {
@@ -116,8 +139,12 @@ public class DataEntry implements Persistable<Long> {
         return scope;
     }
 
-    public Long getScopeId() {
+    public String getScopeId() {
         return scopeId;
+    }
+
+    public int getType() {
+        return type;
     }
 
     public Object getValue() {
@@ -167,11 +194,14 @@ public class DataEntry implements Persistable<Long> {
     public String toString() {
         return "DataEntry{" +
             "id=" + id +
-            ", context='" + context + '\'' +
-            ", scope='" + scope + '\'' +
+            ", componentName='" + componentName + '\'' +
+            ", actionName='" + actionName + '\'' +
+            ", componentVersion=" + componentVersion +
+            ", scope=" + scope +
             ", scopeId='" + scopeId + '\'' +
             ", key='" + key + '\'' +
-            ", value='" + value + '\'' +
+            ", value=" + value +
+            ", type=" + type +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +

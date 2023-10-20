@@ -26,8 +26,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.component.xlsxfile.XlsxFileComponentHandlerTest;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.FileEntry;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
@@ -141,7 +140,7 @@ public class XlsxFileReadActionTest {
     @SuppressFBWarnings("OBL")
     private ParameterMap getReadParameters(
         String extension, boolean headerRow, boolean includeEmptyCells, Integer pageNumber, Integer pageSize,
-        boolean readAsString, File file, ParameterMap parameterMap, Context context)
+        boolean readAsString, File file, ParameterMap parameterMap, ActionContext context)
         throws FileNotFoundException {
 
         FileEntry fileEntry = Mockito.mock(FileEntry.class);

@@ -32,7 +32,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 import static com.bytechef.hermes.definition.DefinitionDSL.time;
 
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
 import java.util.Arrays;
 import java.util.Collections;
@@ -101,16 +101,17 @@ public class HttpClientConstants {
                 .description("The object property which contains a reference to the file to upload.")
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))));
 
-    public static final OutputSchemaDataSource.OutputSchemaFunction OUTPUT_PROPERTIES =
-        (inputParameters, connection, context) -> {
-            if (inputParameters.getBoolean(FULL_RESPONSE, false)) {
-                return object()
-                    .properties(any("body"), object("headers"), integer("status"));
-            } else {
-                return any()
-                    .displayCondition("%s === true".formatted(FULL_RESPONSE));
-            }
-        };
+    public static final OutputSchemaFunction OUTPUT_PROPERTIES =
+        // TODO
+        (inputParameters, connection, context) -> null;
+//        {
+//            if (inputParameters.getBoolean(FULL_RESPONSE, false)) {
+//                return object()
+//                    .properties(any("body"), object("headers"), integer("status"));
+//            } else {
+//                return any();
+//            }
+//        };
 
     public static final List<? extends ModifiableInputProperty> COMMON_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(

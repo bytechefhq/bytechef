@@ -50,7 +50,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
             uriBuilder -> toUri(
                 uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-editor-description"),
             new EditorDescriptionRequest(
-                triggerName, triggerParameters, componentName, componentVersion, connectionId),
+                componentName, componentVersion, triggerName, triggerParameters, connectionId),
             String.class);
     }
 
@@ -98,7 +98,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         return defaultWebClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-options"),
             new OptionsRequest(
-                triggerName, propertyName, triggerParameters, componentName, componentVersion, connectionId,
+                componentName, componentVersion, triggerName, propertyName, triggerParameters, connectionId,
                 searchText),
             new ParameterizedTypeReference<List<Option>>() {});
     }
@@ -110,7 +110,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
         return defaultWebClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-output-schema"),
-            new OutputSchemaRequest(triggerName, triggerParameters, componentName, componentVersion, connectionId),
+            new OutputSchemaRequest(componentName, componentVersion, triggerName, triggerParameters, connectionId),
             new ParameterizedTypeReference<List<? extends ValueProperty<?>>>() {});
     }
 
@@ -122,7 +122,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         return defaultWebClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-properties"),
             new PropertiesRequest(
-                triggerName, triggerParameters, componentName, componentVersion, connectionId, propertyName),
+                componentName, componentVersion, triggerName, propertyName, triggerParameters, connectionId),
             new ParameterizedTypeReference<List<? extends ValueProperty<?>>>() {});
     }
 
@@ -163,7 +163,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
         return defaultWebClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-sample-output"),
-            new SampleOutputRequest(triggerName, triggerParameters, componentName, componentVersion, connectionId),
+            new SampleOutputRequest(componentName, componentVersion, triggerName, triggerParameters, connectionId),
             Object.class);
     }
 
@@ -197,27 +197,27 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     }
 
     private record EditorDescriptionRequest(
-        String triggerName, Map<String, ?> triggerParameters, String componentName, int componentVersion,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         Long connectionId) {
     }
 
     private record OptionsRequest(
-        String triggerName, String propertyName, Map<String, ?> triggerParameters,
-        String componentName, int componentVersion, Long connectionId, String searchText) {
+        String componentName, int componentVersion, String triggerName, String propertyName,
+        Map<String, ?> triggerParameters, Long connectionId, String searchText) {
     }
 
     private record OutputSchemaRequest(
-        String triggerName, Map<String, ?> triggerParameters, String componentName, int componentVersion,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         Long connectionId) {
     }
 
     private record PropertiesRequest(
-        String triggerName, Map<String, ?> triggerParameters, String componentName, int componentVersion,
-        Long connectionId, String propertyName) {
+        String componentName, int componentVersion, String triggerName, String propertyName,
+        Map<String, ?> triggerParameters, Long connectionId) {
     }
 
     private record SampleOutputRequest(
-        String triggerName, Map<String, ?> triggerParameters, String componentName, int componentVersion,
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         Long connectionId) {
     }
 

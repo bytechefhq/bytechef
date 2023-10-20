@@ -215,7 +215,7 @@ public class TriggerCoordinator {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
         InstanceAccessor instanceAccessor = instanceAccessorRegistry
-            .getInstanceAccessor(workflowExecutionId.getInstanceType());
+            .getInstanceAccessor(workflowExecutionId.getType());
 
         triggerExecution = triggerExecutionService.create(
             triggerExecution.evaluate(

@@ -27,29 +27,12 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
  * @author Ivica Cardic
  */
 public interface Context {
-
-    /**
-     *
-     * @param dataFunction
-     * @return
-     * @param <R>
-     */
-    <R> R data(ContextFunction<Data, R> dataFunction);
-
-    /**
-     *
-     * @param fileFunction
-     * @return
-     * @param <R>
-     */
-    <R> R file(ContextFunction<File, R> fileFunction);
 
     /**
      *
@@ -85,14 +68,14 @@ public interface Context {
          * @param fileEntry
          * @return
          */
-        InputStream getStream(FileEntry fileEntry);
+        InputStream getStream(ActionDefinition.ActionContext.FileEntry fileEntry);
 
         /**
          *
          * @param fileEntry
          * @return
          */
-        String readToString(FileEntry fileEntry);
+        String readToString(ActionDefinition.ActionContext.FileEntry fileEntry);
 
         /**
          *
@@ -100,7 +83,8 @@ public interface Context {
          * @param inputStream
          * @return
          */
-        FileEntry storeContent(String fileName, InputStream inputStream) throws IOException;
+        ActionDefinition.ActionContext.FileEntry storeContent(String fileName, InputStream inputStream)
+            throws IOException;
 
         /**
          *
@@ -108,113 +92,13 @@ public interface Context {
          * @param data
          * @return
          */
-        FileEntry storeContent(String fileName, String data) throws IOException;
+        ActionDefinition.ActionContext.FileEntry storeContent(String fileName, String data) throws IOException;
     }
 
     @FunctionalInterface
     interface ContextFunction<T, R> {
 
         R apply(T t) throws Exception;
-    }
-
-    /**
-     *
-     */
-    interface Data {
-
-        enum Scope {
-            ACCOUNT(4, "Account"),
-            CURRENT_EXECUTION(1, "Current Execution"),
-            WORKFLOW(2, "Workflow"),
-            INSTANCE(3, "Instance");
-
-            private final int id;
-            private final String label;
-
-            Scope(int id, String label) {
-                this.id = id;
-                this.label = label;
-            }
-
-            public static Scope valueOf(int id) {
-                return switch (id) {
-                    case 1 -> Scope.CURRENT_EXECUTION;
-                    case 2 -> Scope.WORKFLOW;
-                    case 3 -> Scope.INSTANCE;
-                    case 4 -> Scope.ACCOUNT;
-                    default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
-                };
-            }
-
-            public int getId() {
-                return id;
-            }
-
-            public String getLabel() {
-                return label;
-            }
-        }
-
-        /**
-         *
-         *
-         * @param context
-         * @param scope
-         * @param scopeId
-         * @param key
-         * @return
-         * @param <T>
-         */
-        <T> Optional<T> fetchValue(String context, Scope scope, long scopeId, String key);
-
-        /**
-         *
-         * @param context
-         * @param scope
-         * @param scopeId
-         * @param key
-         * @return
-         * @param <T>
-         */
-        <T> T getValue(String context, Scope scope, long scopeId, String key);
-
-        /**
-         * @param scope
-         * @param scopeId
-         * @param key
-         * @param data
-         */
-        void setValue(String context, Scope scope, long scopeId, String key, Object data);
-    }
-
-    /**
-     *
-     */
-    interface FileEntry {
-
-        /**
-         *
-         * @return
-         */
-        String getExtension();
-
-        /**
-         *
-         * @return
-         */
-        String getMimeType();
-
-        /**
-         *
-         * @return
-         */
-        String getName();
-
-        /**
-         *
-         * @return
-         */
-        String getUrl();
     }
 
     /**
@@ -421,7 +305,7 @@ public interface Context {
              * @param content
              * @return
              */
-            public static Body of(FileEntry content) {
+            public static Body of(ActionDefinition.ActionContext.FileEntry content) {
                 return new Body(content, BodyContentType.BINARY);
             }
 
@@ -431,7 +315,7 @@ public interface Context {
              * @param mimeType
              * @return
              */
-            public static Body of(FileEntry content, String mimeType) {
+            public static Body of(ActionDefinition.ActionContext.FileEntry content, String mimeType) {
                 Objects.requireNonNull(content);
 
                 return new Body(content, BodyContentType.BINARY, mimeType);

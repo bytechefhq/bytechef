@@ -16,6 +16,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -91,6 +92,7 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executePerform(
                 performRequest.componentName, performRequest.componentVersion, performRequest.actionName,
+                performRequest.type, performRequest.instanceId, performRequest.workflowId,
                 performRequest.taskExecutionId, performRequest.actionParameters, performRequest.connectionId));
     }
 
@@ -154,7 +156,8 @@ public class RemoteActionDefinitionFacadeController {
 
     @SuppressFBWarnings("EI")
     public record PerformRequest(
-        @NotNull String componentName, int componentVersion, @NotNull String actionName, long taskExecutionId,
-        @NotNull Map<String, ?> actionParameters, Long connectionId) {
+        @NotNull String componentName, int componentVersion, @NotNull String actionName, int type,
+        Long instanceId, @NonNull String workflowId, long taskExecutionId, @NotNull Map<String, ?> actionParameters,
+        Long connectionId) {
     }
 }

@@ -38,8 +38,11 @@ public class WorkerHandlerConfiguration {
 
             return actionDefinitionFacade.executePerform(
                 componentOperation.componentName(), componentOperation.componentVersion(),
-                componentOperation.operationName(), Validate.notNull(taskExecution.getId(), "id"),
-                taskExecution.getParameters(),
+                componentOperation.operationName(),
+                MapUtils.getInteger(taskExecution.getMetadata(), MetadataConstants.TYPE),
+                MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.INSTANCE_ID),
+                MapUtils.getString(taskExecution.getMetadata(), MetadataConstants.WORKFLOW_ID),
+                Validate.notNull(taskExecution.getId(), "id"), taskExecution.getParameters(),
                 OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
         };
     }

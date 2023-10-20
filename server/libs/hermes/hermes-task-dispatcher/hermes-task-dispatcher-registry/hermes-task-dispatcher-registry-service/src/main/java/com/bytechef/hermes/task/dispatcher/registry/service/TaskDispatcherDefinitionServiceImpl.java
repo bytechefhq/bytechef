@@ -16,10 +16,17 @@
 
 package com.bytechef.hermes.task.dispatcher.registry.service;
 
+import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.registry.domain.Property;
+import com.bytechef.hermes.registry.domain.ValueProperty;
+import com.bytechef.hermes.task.dispatcher.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.task.dispatcher.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.task.dispatcher.registry.TaskDispatcherDefinitionRegistry;
 import com.bytechef.hermes.task.dispatcher.registry.domain.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 /**
@@ -33,6 +40,15 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     @SuppressFBWarnings("EI2")
     public TaskDispatcherDefinitionServiceImpl(TaskDispatcherDefinitionRegistry taskDispatcherDefinitionRegistry) {
         this.taskDispatcherDefinitionRegistry = taskDispatcherDefinitionRegistry;
+    }
+
+    @Override
+    public List<? extends ValueProperty<?>> executeOutputSchema(
+        @NonNull String name, int version, @NonNull Map<String, Object> inputParameters) {
+
+        OutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(name, version);
+
+        return Property.toProperty(outputSchemaFunction.apply(inputParameters));
     }
 
     @Override
@@ -55,5 +71,15 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
             .stream()
             .map(TaskDispatcherDefinition::new)
             .toList();
+    }
+
+    private OutputSchemaFunction getOutputSchemaFunction(String name, int version) {
+        com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition =
+            taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version);
+
+        OutputSchemaDataSource outputSchemaDataSource = OptionalUtils.get(
+            taskDispatcherDefinition.getOutputSchemaDataSource());
+
+        return outputSchemaDataSource.getOutputSchema();
     }
 }
