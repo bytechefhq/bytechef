@@ -1508,12 +1508,11 @@ components:
     TriggerType:
       type: "string"
       enum:
-      - "HYBRID_DYNAMIC"
-      - "HYBRID_STATIC"
+      - "STATIC_WEBHOOK"
+      - "HYBRID"
       - "LISTENER"
       - "POLLING"
-      - "WEBHOOK_DYNAMIC"
-      - "WEBHOOK_STATIC"
+      - "DYNAMIC_WEBHOOK"
     ValueProperty:
       description: "A base property for all value based properties."
       type: "object"
