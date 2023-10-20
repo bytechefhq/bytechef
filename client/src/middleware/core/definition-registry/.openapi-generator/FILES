@@ -14,12 +14,14 @@ models/AuthorizationTypeModel.ts
 models/BooleanPropertyModel.ts
 models/ComponentDefinitionBasicModel.ts
 models/ComponentDefinitionModel.ts
+models/ComponentOperationRequestModel.ts
 models/ConnectionDefinitionBasicModel.ts
 models/ConnectionDefinitionModel.ts
 models/ControlTypeModel.ts
 models/DatePropertyAllOfModel.ts
 models/DatePropertyModel.ts
 models/DateTimePropertyModel.ts
+models/DynamicPropertiesDataSourceModel.ts
 models/DynamicPropertiesPropertyAllOfModel.ts
 models/DynamicPropertiesPropertyModel.ts
 models/GetOAuth2AuthorizationParametersRequestModel.ts
@@ -36,7 +38,6 @@ models/OneOfPropertyAllOfModel.ts
 models/OneOfPropertyModel.ts
 models/OptionModel.ts
 models/OptionsDataSourceModel.ts
-models/PropertiesDataSourceModel.ts
 models/PropertyModel.ts
 models/PropertyTypeModel.ts
 models/ResourcesModel.ts

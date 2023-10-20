@@ -1,10 +1,11 @@
 src/main/java/com/bytechef/helios/project/web/rest/ApiUtil.java
 src/main/java/com/bytechef/helios/project/web/rest/ProjectCategoriesApi.java
-src/main/java/com/bytechef/helios/project/web/rest/ProjectExecutionsApi.java
 src/main/java/com/bytechef/helios/project/web/rest/ProjectInstanceTagsApi.java
 src/main/java/com/bytechef/helios/project/web/rest/ProjectInstancesApi.java
 src/main/java/com/bytechef/helios/project/web/rest/ProjectTagsApi.java
 src/main/java/com/bytechef/helios/project/web/rest/ProjectsApi.java
+src/main/java/com/bytechef/helios/project/web/rest/WorkflowExecutionsApi.java
+src/main/java/com/bytechef/helios/project/web/rest/model/ComponentDefinitionModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/ConnectionModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/CreateProjectInstanceJob200ResponseModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/CreateProjectInstanceJobRequestModel.java
@@ -14,8 +15,6 @@ src/main/java/com/bytechef/helios/project/web/rest/model/JobBasicModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/OAuth2AuthorizationParametersModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/OutputModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectBasicModel.java
-src/main/java/com/bytechef/helios/project/web/rest/model/ProjectExecutionBasicModel.java
-src/main/java/com/bytechef/helios/project/web/rest/model/ProjectExecutionModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectInstanceBasicModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectInstanceModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectInstanceProjectModel.java
@@ -27,3 +26,5 @@ src/main/java/com/bytechef/helios/project/web/rest/model/WebhookModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/WebhookRetryModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/WorkflowBasicModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/WorkflowConnectionModel.java
+src/main/java/com/bytechef/helios/project/web/rest/model/WorkflowExecutionBasicModel.java
+src/main/java/com/bytechef/helios/project/web/rest/model/WorkflowExecutionModel.java

@@ -1,12 +1,13 @@
 apis/ProjectCategoriesApi.ts
-apis/ProjectExecutionsApi.ts
 apis/ProjectInstanceTagsApi.ts
 apis/ProjectInstancesApi.ts
 apis/ProjectTagsApi.ts
 apis/ProjectsApi.ts
+apis/WorkflowExecutionsApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts
+models/ComponentDefinitionModel.ts
 models/ConnectionModel.ts
 models/CreateProjectInstanceJob200ResponseModel.ts
 models/CreateProjectInstanceJobRequestModel.ts
@@ -19,8 +20,6 @@ models/OAuth2AuthorizationParametersModel.ts
 models/OutputModel.ts
 models/PageModel.ts
 models/ProjectBasicModel.ts
-models/ProjectExecutionBasicModel.ts
-models/ProjectExecutionModel.ts
 models/ProjectInstanceBasicModel.ts
 models/ProjectInstanceModel.ts
 models/ProjectInstanceProjectModel.ts
@@ -34,6 +33,8 @@ models/WebhookModel.ts
 models/WebhookRetryModel.ts
 models/WorkflowBasicModel.ts
 models/WorkflowConnectionModel.ts
+models/WorkflowExecutionBasicModel.ts
+models/WorkflowExecutionModel.ts
 models/WorkflowFormatModel.ts
 models/WorkflowModel.ts
 models/WorkflowTaskModel.ts

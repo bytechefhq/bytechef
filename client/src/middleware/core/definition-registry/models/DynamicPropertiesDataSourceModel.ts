@@ -16,31 +16,31 @@ import { exists, mapValues } from '../runtime';
 /**
  * Defines function that should load properties.
  * @export
- * @interface PropertiesDataSourceModel
+ * @interface DynamicPropertiesDataSourceModel
  */
-export interface PropertiesDataSourceModel {
+export interface DynamicPropertiesDataSourceModel {
     /**
      * The list of property names on which value change the properties should load/reload.
      * @type {Array<string>}
-     * @memberof PropertiesDataSourceModel
+     * @memberof DynamicPropertiesDataSourceModel
      */
     loadPropertiesDependsOn?: Array<string>;
 }
 
 /**
- * Check if a given object implements the PropertiesDataSourceModel interface.
+ * Check if a given object implements the DynamicPropertiesDataSourceModel interface.
  */
-export function instanceOfPropertiesDataSourceModel(value: object): boolean {
+export function instanceOfDynamicPropertiesDataSourceModel(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function PropertiesDataSourceModelFromJSON(json: any): PropertiesDataSourceModel {
-    return PropertiesDataSourceModelFromJSONTyped(json, false);
+export function DynamicPropertiesDataSourceModelFromJSON(json: any): DynamicPropertiesDataSourceModel {
+    return DynamicPropertiesDataSourceModelFromJSONTyped(json, false);
 }
 
-export function PropertiesDataSourceModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): PropertiesDataSourceModel {
+export function DynamicPropertiesDataSourceModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): DynamicPropertiesDataSourceModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -50,7 +50,7 @@ export function PropertiesDataSourceModelFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function PropertiesDataSourceModelToJSON(value?: PropertiesDataSourceModel | null): any {
+export function DynamicPropertiesDataSourceModelToJSON(value?: DynamicPropertiesDataSourceModel | null): any {
     if (value === undefined) {
         return undefined;
     }

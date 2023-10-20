@@ -1,5 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
+export * from './ComponentDefinitionModel';
 export * from './CreateJob200ResponseModel';
 export * from './ExecutionErrorModel';
 export * from './InputModel';
