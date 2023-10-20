@@ -45,7 +45,7 @@ include("modules:libs:atlas:atlas-workflow-repository:atlas-workflow-repository-
 include("modules:libs:atlas:atlas-workflow-repository:atlas-workflow-repository-resource")
 include("modules:libs:atlas:atlas-rest")
 include("modules:libs:atlas:atlas-storage:atlas-storage-base64")
-include("modules:libs:atlas:atlas-storage:atlas-storage-file-system")
+include("modules:libs:atlas:atlas-storage:atlas-storage-file")
 include("modules:libs:atlas:atlas-task-dispatcher:atlas-task-dispatcher-each")
 include("modules:libs:atlas:atlas-task-dispatcher:atlas-task-dispatcher-fork")
 include("modules:libs:atlas:atlas-task-dispatcher:atlas-task-dispatcher-if")
