@@ -1,0 +1,27 @@
+{
+  "label": "Spreadsheet File - READ operation",
+  "inputs": [
+    {
+      "name": "binary",
+      "label": "Binary property",
+      "type": "JSON",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "readFromSpreadsheet",
+      "value": "${readFromSpreadsheet}"
+    }
+  ],
+  "tasks": [
+    {
+      "name": "readFromSpreadsheet",
+      "label": "Read from the spreadsheet file",
+      "type": "spreadsheetFile",
+      "operation": "READ",
+      "binary": "${binary}",
+      "includeEmptyCells": true
+    }
+  ]
+}
