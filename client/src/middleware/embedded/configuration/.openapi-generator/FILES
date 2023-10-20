@@ -1,5 +1,5 @@
-.openapi-generator-ignore
 apis/IntegrationsApi.ts
+apis/WorkflowsApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts

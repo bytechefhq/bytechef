@@ -1,3 +1,4 @@
+.openapi-generator-ignore
 apis/WorkflowTestsApi.ts
 apis/index.ts
 index.ts

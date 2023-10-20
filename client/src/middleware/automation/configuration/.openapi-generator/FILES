@@ -1,6 +1,6 @@
-.openapi-generator-ignore
 apis/ProjectInstancesApi.ts
 apis/ProjectsApi.ts
+apis/WorkflowsApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts
@@ -8,7 +8,6 @@ models/ConnectionModel.ts
 models/CreateProjectInstanceWorkflowJob200ResponseModel.ts
 models/CreateProjectWorkflowRequestModel.ts
 models/InputModel.ts
-models/OAuth2AuthorizationParametersModel.ts
 models/OutputModel.ts
 models/PageModel.ts
 models/ProjectBasicModel.ts
