@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -29,5 +30,6 @@ import java.time.LocalDateTime;
 public interface CustomJobRepository {
 
     Page<Job> findAll(
-        String status, LocalDateTime startTime, LocalDateTime endTime, Long workflowId, Pageable pageable);
+        String status, LocalDateTime startTime, LocalDateTime endTime, String workflowId, List<String> workflowIds,
+        Pageable pageable);
 }
