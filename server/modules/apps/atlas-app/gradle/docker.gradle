@@ -16,7 +16,7 @@ jib {
         user = 1000
     }
     extraDirectories {
-      paths = file("modules/apps/atlas-app/docker/jib")
-      permissions = ["/entrypoint.sh": "755"]
+        paths = file("modules/apps/atlas-app/docker/jib")
+        permissions = ["/entrypoint.sh": "755"]
     }
 }
