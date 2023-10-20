@@ -17,6 +17,7 @@
 
 package com.bytechef.component.airtable.util;
 
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
 import com.bytechef.hermes.component.util.HttpClientUtils;
@@ -27,6 +28,7 @@ import com.bytechef.hermes.definition.DefinitionDSL.ModifiableOption;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableValueProperty;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Property.ControlType;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +54,7 @@ public class AirtableUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(AirtableUtils.class);
 
-    private static final List<String> AirtableEnterpriseFields = List.of("singleCollaborator", "multipleCollaborators");
+    private static final List<String> SKIP_FIELDS = List.of("singleCollaborator", "multipleCollaborators");
 
     public static ComponentOptionsFunction getBaseIdOptions() {
         return (connection, inputParameters, searchText) -> {
@@ -66,7 +68,7 @@ public class AirtableUtils {
                 logger.debug("Response for url='https://api.airtable.com/v0/meta/bases': " + response);
             }
 
-            return getOptions(response);
+            return getOptions(response, "bases");
         };
     }
 
@@ -77,16 +79,19 @@ public class AirtableUtils {
             String url = "https://api.airtable.com/v0/meta/bases/%s/tables".formatted(
                 MapValueUtils.getRequiredString(inputParameters, BASE_ID));
 
-            List<AirtableTable> tables = JsonUtils.read(
+            Map<String, List<AirtableTable>> tablesMap = JsonUtils.read(
                 HttpClientUtils
                     .get(url)
                     .configuration(responseFormat(ResponseFormat.TEXT))
                     .execute()
-                    .getBody());
+                    .getBody(),
+                new TypeReference<>() {});
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Response for url='%s': %s".formatted(url, tables));
+                logger.debug("Response for url='%s': %s".formatted(url, tablesMap));
             }
+
+            List<AirtableTable> tables = MapValueUtils.getList(tablesMap, "tables", AirtableTable.class);
 
             AirtableTable table = tables
                 .stream()
@@ -96,7 +101,7 @@ public class AirtableUtils {
                 .orElseThrow(() -> new IllegalStateException("Request Airtable table does not exist"));
 
             for (AirtableField field : table.fields()) {
-                if (AirtableEnterpriseFields.contains(field.type())) {
+                if (SKIP_FIELDS.contains(field.type())) {
                     continue;
                 }
 
@@ -132,7 +137,14 @@ public class AirtableUtils {
                                 : field.description()));
             }
 
-            return properties;
+            return List.of(
+                ComponentDSL.object("__item")
+                    .label("Record")
+                    .properties(
+                        ComponentDSL.object("fields")
+                            .label("Fields")
+                            .properties(properties)
+                            .required(false)));
         };
     }
 
@@ -151,14 +163,14 @@ public class AirtableUtils {
                 logger.debug("Response for url='%s': %s".formatted(url, response));
             }
 
-            return getOptions(response);
+            return getOptions(response, "tables");
         };
     }
 
-    private static List<Option<?>> getOptions(Map<String, ?> response) {
+    private static List<Option<?>> getOptions(Map<String, ?> response, String name) {
         List<Option<?>> options = new ArrayList<>();
 
-        for (Map<?, ?> list : MapValueUtils.getRequiredList(response, "lists", Map.class)) {
+        for (Map<?, ?> list : MapValueUtils.getRequiredList(response, name, Map.class)) {
             options.add(option((String) list.get("name"), list.get("id")));
         }
 
@@ -184,13 +196,30 @@ public class AirtableUtils {
     }
 
     private record AirtableChoice(String id, String name, String color) {
+//        AirtableChoice(Map<String, ?> map) {
+//
+//        }
     }
 
     private record AirtableField(
         String id, String name, String description, String type, AirtableOptions options) {
+
+//        AirtableField(Map<String, Object> map) {
+//            this(
+//                MapValueUtils.getString(map, "id"), MapValueUtils.getString(map, "name"),
+//                MapValueUtils.getString(map, "description"), MapValueUtils.getString(map, "type"),
+//                new AirtableOptions(MapValueUtils.getMap(map, "options")));
+//        }
     }
 
     private record AirtableOptions(List<AirtableChoice> choices) {
+//        AirtableOptions(Map<String, ?> map) {
+//            this(
+//                MapValueUtils.getList(map, "choices", Map.class)
+//                    .stream()
+//                    .map(AirtableChoice::new)
+//                    .toList());
+//        }
     }
 
     private record AirtableTable(
@@ -199,5 +228,10 @@ public class AirtableUtils {
     }
 
     private record AirtableTableView(String id, String name, String type) {
+//        AirtableTableView(Map<String, Object> map) {
+//            this(
+//                MapValueUtils.getString(map, "id"), MapValueUtils.getString(map, "name"),
+//                MapValueUtils.getString(map, "type"));
+//        }
     }
 }

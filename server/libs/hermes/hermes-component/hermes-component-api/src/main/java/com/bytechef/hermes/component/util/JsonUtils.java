@@ -17,6 +17,8 @@
 
 package com.bytechef.hermes.component.util;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import java.io.InputStream;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -51,6 +53,28 @@ public final class JsonUtils {
      */
     public static <T> T read(String json) {
         return jsonMapper.read(json);
+    }
+
+    /**
+     *
+     * @param json
+     * @param valueType
+     * @return
+     * @param <T>
+     */
+    public static <T> T read(String json, Class<T> valueType) {
+        return jsonMapper.read(json, valueType);
+    }
+
+    /**
+     *
+     * @param json
+     * @param valueTypeRef
+     * @return
+     * @param <T>
+     */
+    public static <T> T read(String json, TypeReference<T> valueTypeRef) {
+        return jsonMapper.read(json, valueTypeRef);
     }
 
     /**
@@ -99,6 +123,10 @@ public final class JsonUtils {
     interface JsonMapper {
 
         <T> T read(String json);
+
+        <T> T read(String json, Class<T> valueType);
+
+        <T> T read(String json, TypeReference<T> valueTypeRef);
 
         <T> T read(InputStream inputStream, String path);
 

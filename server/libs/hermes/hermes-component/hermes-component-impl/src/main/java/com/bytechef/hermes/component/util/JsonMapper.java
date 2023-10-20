@@ -87,6 +87,24 @@ public class JsonMapper implements JsonUtils.JsonMapper {
     }
 
     @Override
+    public <T> T read(String json, Class<T> valueType) {
+        try {
+            return objectMapper.readValue(json, valueType);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public <T> T read(String json, TypeReference<T> valueTypeRef) {
+        try {
+            return objectMapper.readValue(json, valueTypeRef);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public <T> T read(InputStream inputStream, String path) {
         DocumentContext documentContext = JsonPath.parse(inputStream);
 

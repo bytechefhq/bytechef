@@ -17,6 +17,8 @@
 
 package com.bytechef.hermes.component.util;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import java.io.InputStream;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -63,6 +65,28 @@ public final class XmlUtils {
 
     /**
      *
+     * @param xml
+     * @param valueType
+     * @return
+     * @param <T>
+     */
+    public static <T> T read(String xml, Class<T> valueType) {
+        return xmlMapper.read(xml, valueType);
+    }
+
+    /**
+     *
+     * @param xml
+     * @param valueTypeRef
+     * @return
+     * @param <T>
+     */
+    public static <T> T read(String xml, TypeReference<T> valueTypeRef) {
+        return xmlMapper.read(xml, valueTypeRef);
+    }
+
+    /**
+     *
      * @param inputStream
      * @param path
      * @return
@@ -104,6 +128,10 @@ public final class XmlUtils {
         Map<String, ?> read(InputStream inputStream);
 
         Map<String, ?> read(String xml);
+
+        <T> T read(String xml, Class<T> valueType);
+
+        <T> T read(String xml, TypeReference<T> valueTypeRef);
 
         <T> T read(InputStream inputStream, String path);
 
