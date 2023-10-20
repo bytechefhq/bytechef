@@ -37,6 +37,7 @@ public class SequenceTaskDispatcherDefinitionFactory implements TaskDispatcherDe
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(SEQUENCE)
         .title("Sequence")
         .description("Executes list of tasks in a sequence.")
+        .icon("path:assets/sequence.svg")
         .taskProperties(array(TASKS)
             .description("The task to use in each iteration.")
             .items(task()));

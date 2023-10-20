@@ -57,6 +57,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(CONDITION)
         .title("Condition")
         .description("Directs a stream based on true/false results of comparisons.")
+        .icon("path:assets/condition.svg")
         .properties(
             bool(RAW_EXPRESSION)
                 .label("Raw expression")

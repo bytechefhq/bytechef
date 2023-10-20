@@ -1,6 +1,6 @@
 {
   "description": "Run collection of tasks in parallel, without waiting until the previous function has completed.",
-  "icon": null,
+  "icon": "path:assets/parallel.svg",
   "name": "parallel",
   "outputSchema": null,
   "properties": null,

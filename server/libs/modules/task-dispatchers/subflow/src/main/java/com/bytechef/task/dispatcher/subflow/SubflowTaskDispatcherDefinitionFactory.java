@@ -37,6 +37,7 @@ public class SubflowTaskDispatcherDefinitionFactory implements TaskDispatcherDef
             .title("Subflow")
             .description(
                 "Starts a new job as a sub-flow of the current job. Output of the sub-flow job is the output of the task.")
+            .icon("path:assets/subflow.svg")
             .properties(string(WorkflowConstants.WORKFLOW_ID)
                 .label("Workflow Id")
                 .description("The id of sub-workflow to execute."));

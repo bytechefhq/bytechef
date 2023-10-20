@@ -45,6 +45,7 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
         .title("Each")
         .description(
             "Iterates over each item in `list`, in parallel. Note, that since it iterates over each item in parallel, there is no guarantee of completion order.")
+        .icon("path:assets/each.svg")
         .properties(
             array(LIST)
                 .label("List of items")

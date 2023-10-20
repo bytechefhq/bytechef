@@ -1,6 +1,6 @@
 {
   "description": "Executes each branch in the branches as a separate and isolated sub-flow. Branches are executed internally in sequence.",
-  "icon": null,
+  "icon": "path:assets/forkjoin.svg",
   "name": "fork-join",
   "outputSchema": null,
   "properties": null,
