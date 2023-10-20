@@ -1,6 +1,6 @@
 dependencies {
+    api "com.fasterxml.jackson.core:jackson-databind"
     api project(":server:libs:core:encryption:encryption-api")
 
-    implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "org.springframework:spring-core"
 }
