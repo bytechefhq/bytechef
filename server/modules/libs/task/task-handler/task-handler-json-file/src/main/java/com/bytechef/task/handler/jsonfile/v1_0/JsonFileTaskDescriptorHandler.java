@@ -26,11 +26,22 @@ import static com.bytechef.hermes.descriptor.model.DSL.OPERATION;
 import static com.bytechef.hermes.descriptor.model.DSL.OPTIONS;
 import static com.bytechef.hermes.descriptor.model.DSL.STRING_PROPERTY;
 import static com.bytechef.hermes.descriptor.model.DSL.showWhen;
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_ENTRY;
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_NAME;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.FILE_TYPE;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.IS_ARRAY;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.JSON_FILE;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.PAGE_NUMBER;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.PAGE_SIZE;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.PATH;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.SOURCE;
+import static com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.VERSION_1_0;
 
 import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandler;
 import com.bytechef.hermes.descriptor.model.DSL;
 import com.bytechef.hermes.descriptor.model.TaskDescriptor;
 import com.bytechef.task.handler.jsonfile.JsonFileTaskConstants;
+import com.bytechef.task.handler.jsonfile.JsonFileTaskConstants.FileType;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,30 +50,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class JsonFileTaskDescriptorHandler implements TaskDescriptorHandler {
 
-    private static final TaskDescriptor TASK_DESCRIPTOR = DSL.createTaskDescriptor(JsonFileTaskConstants.JSON_FILE)
+    private static final TaskDescriptor TASK_DESCRIPTOR = DSL.createTaskDescriptor(JSON_FILE)
             .displayName("JSON File")
             .description("Reads and writes data from a JSON file.")
-            .version(JsonFileTaskConstants.VERSION_1_0)
+            .version(VERSION_1_0)
             .operations(
                     OPERATION(JsonFileTaskConstants.READ)
                             .displayName("Read from file")
                             .description("Reads data from a JSON file.")
                             .inputs(
-                                    STRING_PROPERTY(JsonFileTaskConstants.FILE_TYPE)
+                                    STRING_PROPERTY(FILE_TYPE)
                                             .displayName("File Type")
                                             .description("The file type to choose.")
                                             .options(
-                                                    DSL.option("JSON", JsonFileTaskConstants.FileType.JSON.name()),
-                                                    DSL.option(
-                                                            "JSON Line", JsonFileTaskConstants.FileType.JSONL.name()))
-                                            .defaultValue(JsonFileTaskConstants.FileType.JSON.name())
+                                                    DSL.option("JSON", FileType.JSON.name()),
+                                                    DSL.option("JSON Line", FileType.JSONL.name()))
+                                            .defaultValue(FileType.JSON.name())
                                             .required(true),
-                                    FILE_ENTRY_PROPERTY(JsonFileTaskConstants.FILE_ENTRY)
+                                    FILE_ENTRY_PROPERTY(FILE_ENTRY)
                                             .displayName("File")
                                             .description(
                                                     "The object property which contains a reference to the JSON file to read from.")
                                             .required(true),
-                                    BOOLEAN_PROPERTY(JsonFileTaskConstants.IS_ARRAY)
+                                    BOOLEAN_PROPERTY(IS_ARRAY)
                                             .displayName("Is Array")
                                             .description("The object input is array?")
                                             .defaultValue(true),
@@ -70,43 +80,42 @@ public class JsonFileTaskDescriptorHandler implements TaskDescriptorHandler {
                                             .displayName("Options")
                                             .placeholder("Add Option")
                                             .options(
-                                                    STRING_PROPERTY(JsonFileTaskConstants.PATH)
+                                                    STRING_PROPERTY(PATH)
                                                             .displayName("Path")
                                                             .description(
                                                                     "The path where the array is e.g 'data'. Leave blank to use the top level object.")
-                                                            .displayOption(showWhen(JsonFileTaskConstants.IS_ARRAY)
+                                                            .displayOption(showWhen(IS_ARRAY)
                                                                     .eq(true)),
-                                                    INTEGER_PROPERTY(JsonFileTaskConstants.PAGE_SIZE)
+                                                    INTEGER_PROPERTY(PAGE_SIZE)
                                                             .displayName("Page Size")
                                                             .description(
                                                                     "The amount of child elements to return in a page.")
-                                                            .displayOption(showWhen(JsonFileTaskConstants.IS_ARRAY)
+                                                            .displayOption(showWhen(IS_ARRAY)
                                                                     .eq(true)),
-                                                    INTEGER_PROPERTY(JsonFileTaskConstants.PAGE_NUMBER)
+                                                    INTEGER_PROPERTY(PAGE_NUMBER)
                                                             .displayName("Page Number")
                                                             .description("The page number to get.")
-                                                            .displayOption(showWhen(JsonFileTaskConstants.IS_ARRAY)
+                                                            .displayOption(showWhen(IS_ARRAY)
                                                                     .eq(true))))
                             .outputs(ARRAY_PROPERTY(), OBJECT_PROPERTY()),
                     OPERATION(JsonFileTaskConstants.WRITE)
                             .displayName("Write to file")
                             .description("Writes the data to a JSON file.")
                             .inputs(
-                                    STRING_PROPERTY(JsonFileTaskConstants.FILE_TYPE)
+                                    STRING_PROPERTY(FILE_TYPE)
                                             .displayName("File Type")
                                             .description("The file type to choose.")
                                             .options(
-                                                    DSL.option("JSON", JsonFileTaskConstants.FileType.JSON.name()),
-                                                    DSL.option(
-                                                            "JSON Line", JsonFileTaskConstants.FileType.JSONL.name()))
-                                            .defaultValue(JsonFileTaskConstants.FileType.JSON.name())
+                                                    DSL.option("JSON", FileType.JSON.name()),
+                                                    DSL.option("JSON Line", FileType.JSONL.name()))
+                                            .defaultValue(FileType.JSON.name())
                                             .required(true),
-                                    ANY_PROPERTY(JsonFileTaskConstants.SOURCE)
+                                    ANY_PROPERTY(SOURCE)
                                             .displayName("Source")
                                             .description("The data to write to the file.")
                                             .required(true)
                                             .types(ARRAY_PROPERTY(), OBJECT_PROPERTY()),
-                                    STRING_PROPERTY(JsonFileTaskConstants.FILE_NAME)
+                                    STRING_PROPERTY(FILE_NAME)
                                             .displayName("File Name")
                                             .description(
                                                     "File name to set for binary data. By default, \"file.json\" will be used.")

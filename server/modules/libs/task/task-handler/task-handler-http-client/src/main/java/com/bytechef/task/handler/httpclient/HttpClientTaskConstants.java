@@ -39,7 +39,6 @@ public class HttpClientTaskConstants {
     public static final String VALUE = "value";
     public static final String QUERY_PARAMETERS = "queryParameters";
     public static final String BODY_PARAMETERS = "bodyParameters";
-    public static final String FILE_ENTRY = "fileEntry";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String HTTP_CLIENT = "httpClient";

@@ -19,7 +19,7 @@ package com.bytechef.task.handler.csvfile.v1_0;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.file.storage.FileStorageHelper;
 import com.bytechef.task.commons.util.MapUtils;
 import com.bytechef.task.commons.util.ValueUtils;
 import com.bytechef.task.handler.csvfile.CSVFileTaskConstants;
@@ -49,10 +49,10 @@ class CSVFileTaskHandler {
 
         private static final Logger logger = LoggerFactory.getLogger(CSVFileReadTaskHandler.class);
 
-        private final FileStorageService fileStorageService;
+        private final FileStorageHelper fileStorageHelper;
 
-        public CSVFileReadTaskHandler(FileStorageService fileStorageService) {
-            this.fileStorageService = fileStorageService;
+        public CSVFileReadTaskHandler(FileStorageHelper fileStorageHelper) {
+            this.fileStorageHelper = fileStorageHelper;
         }
 
         @Override
@@ -60,14 +60,13 @@ class CSVFileTaskHandler {
             List<Map<String, ?>> result;
 
             String delimiter = taskExecution.getString(CSVFileTaskConstants.DELIMITER, ",");
-            FileEntry fileEntry = taskExecution.getRequired(CSVFileTaskConstants.FILE_ENTRY, FileEntry.class);
             boolean headerRow = taskExecution.getBoolean(CSVFileTaskConstants.HEADER_ROW, true);
             boolean includeEmptyCells = taskExecution.getBoolean(CSVFileTaskConstants.INCLUDE_EMPTY_CELLS, false);
             Integer pageSize = taskExecution.getInteger(CSVFileTaskConstants.PAGE_SIZE);
             Integer pageNumber = taskExecution.getInteger(CSVFileTaskConstants.AGE_NUMBER);
             boolean readAsString = taskExecution.getBoolean(CSVFileTaskConstants.READ_AS_STRING, false);
 
-            try (InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl())) {
+            try (InputStream inputStream = fileStorageHelper.getFileContentStream(taskExecution)) {
                 Integer rangeStartRow = null;
                 Integer rangeEndRow = null;
 
@@ -192,20 +191,17 @@ class CSVFileTaskHandler {
     @Component(CSVFileTaskConstants.CSV_FILE + "/" + CSVFileTaskConstants.VERSION + "/" + CSVFileTaskConstants.WRITE)
     public static class CSVFileWriteTaskHandler implements TaskHandler<FileEntry> {
 
-        private static final Logger logger = LoggerFactory.getLogger(CSVFileWriteTaskHandler.class);
+        private final FileStorageHelper fileStorageHelper;
 
-        private final FileStorageService fileStorageService;
-
-        public CSVFileWriteTaskHandler(FileStorageService fileStorageService) {
-            this.fileStorageService = fileStorageService;
+        public CSVFileWriteTaskHandler(FileStorageHelper fileStorageHelper) {
+            this.fileStorageHelper = fileStorageHelper;
         }
 
         @Override
-        public FileEntry handle(TaskExecution taskExecution) throws Exception {
-            String fileName = taskExecution.get(CSVFileTaskConstants.FILE_NAME, String.class, "file.csv");
+        public FileEntry handle(TaskExecution taskExecution) {
             List<Map<String, ?>> rows = taskExecution.getRequired(CSVFileTaskConstants.ROWS);
 
-            return fileStorageService.storeFileContent(fileName, new ByteArrayInputStream(write(rows)));
+            return fileStorageHelper.storeFileContent(taskExecution, "file.csv", new ByteArrayInputStream(write(rows)));
         }
 
         private byte[] write(List<Map<String, ?>> rows) {

@@ -30,7 +30,7 @@ import static com.bytechef.task.jdbc.JdbcTaskConstants.USERNAME;
 
 import com.bytechef.atlas.Accessor;
 import com.bytechef.hermes.auth.domain.Authentication;
-import com.bytechef.hermes.auth.service.AuthenticationService;
+import com.bytechef.task.commons.authentication.AuthenticationHelper;
 import com.bytechef.task.handler.mysql.MySQLTaskConstants;
 import com.bytechef.task.jdbc.DataSourceFactory;
 import com.bytechef.task.jdbc.DeleteJdbcTaskHandler;
@@ -54,7 +54,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class MySQLConfiguration {
 
     @Autowired
-    private AuthenticationService authenticationService;
+    private AuthenticationHelper authenticationHelper;
 
     private final Map<String, DataSource> dataSourceMap = new HashMap<>();
 
@@ -86,12 +86,10 @@ public class MySQLConfiguration {
     @Bean(MySQLTaskConstants.MYSQL + "DataSourceFactory")
     DataSourceFactory dataSourceFactory() {
         return taskExecution -> {
+            Authentication authentication = authenticationHelper.fetchAuthentication(taskExecution);
             DataSource dataSource = null;
 
-            if (taskExecution.containsKey(AUTHENTICATION_ID)) {
-                Authentication authentication =
-                        authenticationService.fetchAuthentication(taskExecution.getString(AUTHENTICATION_ID));
-
+            if (authentication != null) {
                 Accessor authenticationAccessor = authentication.getProperties();
 
                 String url = "jdbc:mysql://"

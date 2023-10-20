@@ -22,7 +22,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.file.storage.FileStorageHelper;
 import com.bytechef.test.json.JsonArrayUtils;
 import com.bytechef.test.json.JsonObjectUtils;
 import java.io.File;
@@ -42,11 +42,11 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class XLSXFileTaskHandlerTest {
 
-    private static final FileStorageService fileStorageService = new Base64FileStorageService();
+    private static final FileStorageHelper fileStorageHelper = new FileStorageHelper(new Base64FileStorageService());
     private static final XLSXFileTaskHandler.XLSXFileReadTaskHandler xlsxFileReadTaskHandler =
-            new XLSXFileTaskHandler.XLSXFileReadTaskHandler(fileStorageService);
+            new XLSXFileTaskHandler.XLSXFileReadTaskHandler(fileStorageHelper);
     private static final XLSXFileTaskHandler.XLSXFileWriteTaskHandler xlsxFileWriteTaskHandler =
-            new XLSXFileTaskHandler.XLSXFileWriteTaskHandler(fileStorageService);
+            new XLSXFileTaskHandler.XLSXFileWriteTaskHandler(fileStorageHelper);
 
     @Test
     public void testReadXLS() throws Exception {
@@ -243,7 +243,7 @@ public class XLSXFileTaskHandlerTest {
                 pageNumber,
                 pageSize,
                 readAsString,
-                file == null ? null : fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
+                file == null ? null : fileStorageHelper.storeFileContent(file.getName(), new FileInputStream(file)));
     }
 
     private SimpleTaskExecution getReadSimpleTaskExecution(

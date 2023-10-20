@@ -16,17 +16,16 @@
 
 package com.bytechef.task.handler.file.v1_0;
 
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_NAME;
 import static com.bytechef.task.handler.file.FileTaskConstants.CONTENT;
 import static com.bytechef.task.handler.file.FileTaskConstants.FILE;
-import static com.bytechef.task.handler.file.FileTaskConstants.FILE_ENTRY;
-import static com.bytechef.task.handler.file.FileTaskConstants.FILE_NAME;
 import static com.bytechef.task.handler.file.FileTaskConstants.READ;
 import static com.bytechef.task.handler.file.FileTaskConstants.WRITE;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.file.storage.FileStorageHelper;
 import com.bytechef.task.handler.file.FileTaskConstants;
 import org.springframework.stereotype.Component;
 
@@ -38,27 +37,25 @@ public class FileTaskHandler {
     @Component(FILE + "/" + READ + "/" + FileTaskConstants.VERSION)
     public static class FileReadTaskHandler implements TaskHandler<String> {
 
-        private final FileStorageService fileStorageService;
+        private final FileStorageHelper fileStorageHelper;
 
-        public FileReadTaskHandler(FileStorageService fileStorageService) {
-            this.fileStorageService = fileStorageService;
+        public FileReadTaskHandler(FileStorageHelper fileStorageHelper) {
+            this.fileStorageHelper = fileStorageHelper;
         }
 
         @Override
         public String handle(TaskExecution taskExecution) {
-            FileEntry fileEntry = taskExecution.getRequired(FILE_ENTRY, FileEntry.class);
-
-            return fileStorageService.readFileContent(fileEntry.getUrl());
+            return fileStorageHelper.readFileContent(taskExecution);
         }
     }
 
     @Component(FILE + "/" + WRITE + "/" + FileTaskConstants.VERSION)
     public static class FileWriteTaskHandler implements TaskHandler<Object> {
 
-        private final FileStorageService fileStorageService;
+        private final FileStorageHelper fileStorageHelper;
 
-        public FileWriteTaskHandler(FileStorageService fileStorageService) {
-            this.fileStorageService = fileStorageService;
+        public FileWriteTaskHandler(FileStorageHelper fileStorageHelper) {
+            this.fileStorageHelper = fileStorageHelper;
         }
 
         @Override
@@ -66,7 +63,7 @@ public class FileTaskHandler {
             Object content = taskExecution.getRequired(CONTENT);
             String fileName = taskExecution.get(FILE_NAME, String.class, "file.txt");
 
-            return fileStorageService.storeFileContent(
+            return fileStorageHelper.storeFileContent(
                     fileName, content instanceof String ? (String) content : content.toString());
         }
     }

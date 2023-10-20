@@ -16,12 +16,11 @@
 
 package com.bytechef.task.handler.httpclient.v1_0.http;
 
-import static com.bytechef.hermes.auth.AuthenticationConstants.AUTHENTICATION_ID;
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_ENTRY;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.ALLOW_UNAUTHORIZED_CERTS;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.AuthType;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.BODY_CONTENT_TYPE;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.BODY_PARAMETERS;
-import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.FILE_ENTRY;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.FOLLOW_ALL_REDIRECTS;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.FOLLOW_REDIRECT;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.FULL_RESPONSE;
@@ -39,9 +38,9 @@ import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.VALUE
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.hermes.auth.domain.Authentication;
-import com.bytechef.hermes.auth.service.AuthenticationService;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.authentication.AuthenticationHelper;
+import com.bytechef.task.commons.file.storage.FileStorageHelper;
 import com.bytechef.task.commons.json.JsonHelper;
 import com.bytechef.task.commons.xml.XmlHelper;
 import com.bytechef.task.handler.httpclient.HttpClientTaskConstants.BodyContentType;
@@ -83,18 +82,18 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class HttpClientHelper {
-    private final AuthenticationService authenticationService;
-    private final FileStorageService fileStorageService;
+    private final AuthenticationHelper authenticationHelper;
+    private final FileStorageHelper fileStorageHelper;
     private final JsonHelper jsonHelper;
     private final XmlHelper xmlHelper;
 
     public HttpClientHelper(
-            AuthenticationService authenticationService,
-            FileStorageService fileStorageService,
+            AuthenticationHelper authenticationHelper,
+            FileStorageHelper fileStorageHelper,
             JsonHelper jsonHelper,
             XmlHelper xmlHelper) {
-        this.authenticationService = authenticationService;
-        this.fileStorageService = fileStorageService;
+        this.authenticationHelper = authenticationHelper;
+        this.fileStorageHelper = fileStorageHelper;
         this.jsonHelper = jsonHelper;
         this.xmlHelper = xmlHelper;
     }
@@ -154,7 +153,7 @@ public class HttpClientHelper {
                                 fileEntry.getName(),
                                 MoreBodyPublishers.ofMediaType(
                                         HttpRequest.BodyPublishers.ofInputStream(
-                                                () -> fileStorageService.getFileContentStream(fileEntry.getUrl())),
+                                                () -> fileStorageHelper.getFileContentStream(fileEntry)),
                                         MediaType.parse(fileEntry.getMimeType())));
                     } else {
                         builder.textPart((String) parameter.get(KEY), parameter.get(VALUE));
@@ -207,8 +206,7 @@ public class HttpClientHelper {
             }
 
             bodyPublisher = MoreBodyPublishers.ofMediaType(
-                    HttpRequest.BodyPublishers.ofInputStream(
-                            () -> fileStorageService.getFileContentStream(fileEntry.getUrl())),
+                    HttpRequest.BodyPublishers.ofInputStream(() -> fileStorageHelper.getFileContentStream(fileEntry)),
                     mediaType);
         } else {
             bodyPublisher = HttpRequest.BodyPublishers.noBody();
@@ -233,16 +231,13 @@ public class HttpClientHelper {
             }
         }
 
-        if (taskExecution.containsKey(AUTHENTICATION_ID)) {
-            Authentication authentication =
-                    authenticationService.fetchAuthentication(taskExecution.getString(AUTHENTICATION_ID));
+        Authentication authentication = authenticationHelper.fetchAuthentication(taskExecution);
 
-            if (authentication != null) {
-                AuthResolver authResolver =
-                        AuthResolverRegistry.get(AuthType.valueOf(StringUtils.upperCase(authentication.getType())));
+        if (authentication != null) {
+            AuthResolver authResolver =
+                    AuthResolverRegistry.get(AuthType.valueOf(StringUtils.upperCase(authentication.getType())));
 
-                authResolver.apply(builder, headers, queryParams, authentication);
-            }
+            authResolver.apply(builder, headers, queryParams, authentication);
         }
 
         if (taskExecution.getBoolean(FOLLOW_REDIRECT, false)) {
@@ -312,7 +307,7 @@ public class HttpClientHelper {
                     }
                 }
 
-                body = fileStorageService.storeFileContent(filename, (InputStream) httpResponse.body());
+                body = fileStorageHelper.storeFileContent(filename, (InputStream) httpResponse.body());
             } else if (responseFormat == ResponseFormat.JSON) {
                 body = jsonHelper.read(httpResponse.body().toString());
             } else if (responseFormat == ResponseFormat.TEXT) {

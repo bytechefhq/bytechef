@@ -17,13 +17,13 @@
 package com.bytechef.task.handler.httpclient.v1_0.http;
 
 import static com.bytechef.hermes.auth.AuthenticationConstants.*;
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_ENTRY;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.ACCESS_TOKEN;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.ADD_TO;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.ALLOW_UNAUTHORIZED_CERTS;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.BODY_CONTENT_TYPE;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.BODY_PARAMETERS;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.BodyContentType;
-import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.FILE_ENTRY;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.FOLLOW_ALL_REDIRECTS;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.FOLLOW_REDIRECT;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.FULL_RESPONSE;
@@ -41,11 +41,11 @@ import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.VALUE
 import com.bytechef.atlas.MapObject;
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.hermes.auth.domain.Authentication;
-import com.bytechef.hermes.auth.service.AuthenticationService;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.converter.FileEntryConverter;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.authentication.AuthenticationHelper;
+import com.bytechef.task.commons.file.storage.FileStorageHelper;
 import com.bytechef.task.commons.json.JsonHelper;
 import com.bytechef.task.commons.xml.XmlHelper;
 import com.bytechef.task.handler.httpclient.HttpClientTaskConstants.AuthType;
@@ -79,10 +79,10 @@ import org.mockito.Mockito;
  */
 public class HttpClientHelperTest {
 
-    private final AuthenticationService authenticationService = Mockito.mock(AuthenticationService.class);
-    private final FileStorageService fileStorageService = new Base64FileStorageService();
+    private final AuthenticationHelper authenticationHelper = Mockito.mock(AuthenticationHelper.class);
+    private final FileStorageHelper fileStorageHelper = new FileStorageHelper(new Base64FileStorageService());
     private final HttpClientHelper httpClientHelper = new HttpClientHelper(
-            authenticationService, fileStorageService, new JsonHelper(new ObjectMapper()), new XmlHelper());
+            authenticationHelper, fileStorageHelper, new JsonHelper(new ObjectMapper()), new XmlHelper());
 
     @BeforeAll
     public static void beforeAll() {
@@ -257,8 +257,7 @@ public class HttpClientHelperTest {
         authentication.setProperties(Map.of(KEY, "api_token", VALUE, "value"));
         authentication.setType(AuthType.API_KEY.name());
 
-        Mockito.when(authenticationService.fetchAuthentication(Mockito.anyString()))
-                .thenReturn(authentication);
+        Mockito.when(authenticationHelper.fetchAuthentication(Mockito.any())).thenReturn(authentication);
 
         Map<String, List<String>> headers = new HashMap<>();
 
@@ -317,6 +316,8 @@ public class HttpClientHelperTest {
         httpClientHelper.createHTTPClient(taskExecution, headers, Map.of());
 
         Assertions.assertEquals(Map.of("Authorization", List.of("Bearer access_token")), headers);
+
+        Mockito.reset(authenticationHelper);
 
         //
 

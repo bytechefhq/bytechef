@@ -22,7 +22,7 @@ import com.bytechef.atlas.Accessor;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.job.domain.Job;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.file.storage.FileStorageHelper;
 import com.bytechef.test.task.BaseTaskIntTest;
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +41,7 @@ import org.springframework.core.io.ClassPathResource;
 public class LocalFileTaskHandlerIntTest extends BaseTaskIntTest {
 
     @Autowired
-    private FileStorageService fileStorageService;
+    private FileStorageHelper fileStorageHelper;
 
     @Test
     public void testRead() throws IOException {
@@ -54,7 +54,7 @@ public class LocalFileTaskHandlerIntTest extends BaseTaskIntTest {
         Accessor outputs = job.getOutputs();
 
         FileEntry fileEntry =
-                fileStorageService.storeFileContent("sample.txt", Files.contentOf(getFile(), Charset.defaultCharset()));
+                fileStorageHelper.storeFileContent("sample.txt", Files.contentOf(getFile(), Charset.defaultCharset()));
 
         assertThat(outputs.get("readLocalFile", FileEntry.class))
                 .hasFieldOrPropertyWithValue("extension", "txt")
@@ -72,7 +72,7 @@ public class LocalFileTaskHandlerIntTest extends BaseTaskIntTest {
                 "samples/v1_0/localFile_WRITE.json",
                 Map.of(
                         "fileEntry",
-                        fileStorageService.storeFileContent(
+                        fileStorageHelper.storeFileContent(
                                 sampleFile.getAbsolutePath(), Files.contentOf(getFile(), Charset.defaultCharset())),
                         "fileName",
                         tempFile.getAbsolutePath()));

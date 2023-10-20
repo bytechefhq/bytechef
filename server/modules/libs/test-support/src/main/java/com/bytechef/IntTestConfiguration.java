@@ -30,6 +30,7 @@ import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.converter.FileEntryConverter;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
@@ -40,8 +41,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
-
-import javax.annotation.PostConstruct;
 
 /**
  * @author Ivica Cardic
@@ -54,8 +53,7 @@ public class IntTestConfiguration {
     @EnableCaching
     @EnableConfigurationProperties(CacheProperties.class)
     @TestConfiguration
-    public class CacheConfiguration {
-    }
+    public class CacheConfiguration {}
 
     @TestConfiguration
     public static class EncryptionKeyConfiguration {
@@ -110,9 +108,9 @@ public class IntTestConfiguration {
         @Bean
         TaskEvaluator taskEvaluator(Environment environment) {
             return SpelTaskEvaluator.builder()
-                .environment(environment)
-                .methodExecutor("tempDir", new TempDir())
-                .build();
+                    .environment(environment)
+                    .methodExecutor("tempDir", new TempDir())
+                    .build();
         }
     }
 }

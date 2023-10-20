@@ -1,10 +1,10 @@
 dependencies {
     api "com.jayway.jsonpath:json-path"
     api "com.fasterxml.jackson.dataformat:jackson-dataformat-xml"
+    api project(":modules:libs:hermes:hermes-auth:hermes-auth-api")
+    api project(":modules:libs:hermes:hermes-file-storage:hermes-file-storage-api")
 
     implementation "org.apache.commons:commons-lang3"
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-context"
-    compileOnly project(":modules:libs:hermes:hermes-auth:hermes-auth-api")
-    compileOnly project(":modules:libs:hermes:hermes-file-storage:hermes-file-storage-api")
 }

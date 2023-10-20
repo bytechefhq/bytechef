@@ -26,6 +26,8 @@ import static com.bytechef.hermes.descriptor.model.DSL.OBJECT_PROPERTY;
 import static com.bytechef.hermes.descriptor.model.DSL.OPERATION;
 import static com.bytechef.hermes.descriptor.model.DSL.OPTIONS;
 import static com.bytechef.hermes.descriptor.model.DSL.STRING_PROPERTY;
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_ENTRY;
+import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_NAME;
 
 import com.bytechef.hermes.descriptor.model.DSL;
 import com.bytechef.hermes.descriptor.model.TaskDescriptor;
@@ -35,9 +37,7 @@ import com.bytechef.hermes.descriptor.model.TaskDescriptor;
  */
 public class XLSXFileTaskConstants {
 
-    public static final String FILE_ENTRY = "fileEntry";
     public static final String ROWS = "rows";
-    public static final String FILE_NAME = "fileName";
     public static final String PROPERTY_HEADER_ROW = "headerRow";
     public static final String PAGE_SIZE = "pageSize";
     public static final String PAGE_NUMBER = "pageNumber";

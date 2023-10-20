@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.file.storage.FileStorageHelper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -36,11 +36,11 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class LocalFileTaskHandlerTest {
 
-    private static final FileStorageService fileStorageService = new Base64FileStorageService();
+    private static final FileStorageHelper fileStorageHelper = new FileStorageHelper(new Base64FileStorageService());
     private static final LocalFileTaskHandler.LocalFileReadTaskHandler localFileReadTaskHandler =
-            new LocalFileTaskHandler.LocalFileReadTaskHandler(fileStorageService);
+            new LocalFileTaskHandler.LocalFileReadTaskHandler(fileStorageHelper);
     private static final LocalFileTaskHandler.LocalFileWriteTaskHandler localFileWriteTaskHandler =
-            new LocalFileTaskHandler.LocalFileWriteTaskHandler(fileStorageService);
+            new LocalFileTaskHandler.LocalFileWriteTaskHandler(fileStorageHelper);
 
     @Test
     public void testReadOperation() throws Exception {
@@ -49,7 +49,7 @@ public class LocalFileTaskHandlerTest {
         SimpleTaskExecution taskExecution = getSimpleTaskExecution(file.getAbsolutePath(), null);
 
         FileEntry fileEntry =
-                fileStorageService.storeFileContent(file.getName(), Files.contentOf(file, Charset.defaultCharset()));
+                fileStorageHelper.storeFileContent(file.getName(), Files.contentOf(file, Charset.defaultCharset()));
 
         assertThat(localFileReadTaskHandler.handle(taskExecution))
                 .hasFieldOrPropertyWithValue("extension", FilenameUtils.getExtension(file.getAbsolutePath()))
@@ -63,7 +63,7 @@ public class LocalFileTaskHandlerTest {
         File file = getFile();
 
         SimpleTaskExecution taskExecution = getSimpleTaskExecution(
-                file.getAbsolutePath(), fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
+                file.getAbsolutePath(), fileStorageHelper.storeFileContent(file.getName(), new FileInputStream(file)));
 
         assertThat(localFileWriteTaskHandler.handle(taskExecution)).hasFieldOrPropertyWithValue("bytes", 5L);
     }

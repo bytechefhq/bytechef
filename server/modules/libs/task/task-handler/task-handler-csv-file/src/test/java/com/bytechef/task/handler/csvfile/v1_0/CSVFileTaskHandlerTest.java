@@ -22,7 +22,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.file.storage.FileStorageHelper;
 import com.bytechef.test.json.JsonArrayUtils;
 import com.bytechef.test.json.JsonObjectUtils;
 import java.io.File;
@@ -42,11 +42,11 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class CSVFileTaskHandlerTest {
 
-    private static final FileStorageService fileStorageService = new Base64FileStorageService();
+    private static final FileStorageHelper fileStorageHelper = new FileStorageHelper(new Base64FileStorageService());
     private static final CSVFileTaskHandler.CSVFileReadTaskHandler csvFileReadTaskHandler =
-            new CSVFileTaskHandler.CSVFileReadTaskHandler(fileStorageService);
+            new CSVFileTaskHandler.CSVFileReadTaskHandler(fileStorageHelper);
     private static final CSVFileTaskHandler.CSVFileWriteTaskHandler csvFileWriteTaskHandler =
-            new CSVFileTaskHandler.CSVFileWriteTaskHandler(fileStorageService);
+            new CSVFileTaskHandler.CSVFileWriteTaskHandler(fileStorageHelper);
 
     @Test
     public void testReadCSV() throws Exception {
@@ -308,7 +308,7 @@ public class CSVFileTaskHandlerTest {
                 pageNumber,
                 pageSize,
                 readAsString,
-                file == null ? null : fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
+                file == null ? null : fileStorageHelper.storeFileContent(file.getName(), new FileInputStream(file)));
     }
 
     private SimpleTaskExecution getReadSimpleTaskExecution(
