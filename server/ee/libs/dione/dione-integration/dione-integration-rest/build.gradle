@@ -44,10 +44,10 @@ dependencies {
     annotationProcessor libs.org.mapstruct.mapstruct.processor
     annotationProcessor libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions
 
+    api project(":server:ee:libs:dione:dione-integration:dione-integration-api")
     api project(":server:libs:atlas:atlas-rest:atlas-rest-api")
     api project(":server:libs:core:category:category-rest:category-rest-api")
     api project(":server:libs:core:tag:tag-rest:tag-rest-api")
-    api project(":server:libs:dione:dione-integration:dione-integration-api")
 
     implementation libs.org.openapitools.jackson.databind.nullable
     implementation "jakarta.annotation:jakarta.annotation-api"

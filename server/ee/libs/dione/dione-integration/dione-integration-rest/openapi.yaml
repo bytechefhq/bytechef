@@ -75,7 +75,7 @@ paths:
                 description: The response object that contains the array of categories.
                 type: array
                 items:
-                  $ref: '../../../core/category/category-rest/category-rest-impl/openapi.yaml#/components/schemas/Category'
+                  $ref: '../../../../../libs/core/category/category-rest/category-rest-impl/openapi.yaml#/components/schemas/Category'
   /integrations/tags:
     get:
       description: Get integration tags.
@@ -92,7 +92,7 @@ paths:
                 description: The response object that contains the array of tags.
                 type: array
                 items:
-                  $ref: '../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
+                  $ref: '../../../../../libs/core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
   /integrations/{id}:
     delete:
       description: Delete an integration.
@@ -182,7 +182,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow'
+                  $ref: '../../../../../libs/atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow'
     post:
       description: Create new workflow and adds it to an existing integration.
       summary: Create new workflow and adds it to an existing integration.
@@ -247,7 +247,7 @@ paths:
                 tags:
                   type: array
                   items:
-                    $ref: '../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
+                    $ref: '../../../../../libs/core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
         required: true
       responses:
         "200":
@@ -261,7 +261,7 @@ components:
         - name
       properties:
         category:
-          $ref: '../../../core/category/category-rest/category-rest-impl/openapi.yaml#/components/schemas/Category'
+          $ref: '../../../../../libs/core/category/category-rest/category-rest-impl/openapi.yaml#/components/schemas/Category'
         createdBy:
           description: The created by.
           type: string
@@ -299,11 +299,15 @@ components:
           description: The version of an integration.
           type: integer
         status:
-          $ref: '#/components/schemas/Status'
+          description: A status of an integration.
+          type: string
+          enum:
+            - PUBLISHED
+            - UNPUBLISHED
         tags:
           type: array
           items:
-            $ref: '../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
+            $ref: '../../../../../libs/core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
         workflowIds:
           description: The workflow ids belonging to this integration.
           type: array
@@ -312,9 +316,3 @@ components:
             readOnly: true
         __version:
           type: integer
-    Status:
-      description: A status of an integration.
-      type: string
-      enum:
-        - PUBLISHED
-        - UNPUBLISHED
