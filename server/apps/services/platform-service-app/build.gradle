@@ -27,6 +27,8 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-upgrade")
     implementation project(":server:libs:core:encryption:encryption-filesystem")
     implementation project(":server:libs:core:rest:rest-impl")
+    implementation project(":server:libs:core:tag:tag-service")
+    implementation project(":server:libs:core:tag:tag-upgrade")
     implementation project(":server:libs:core:discovery:discovery-config")
     implementation project(":server:libs:core:discovery:discovery-redis")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rest")
