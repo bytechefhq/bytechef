@@ -73,7 +73,7 @@ public class SpreadsheetFileTaskHandlerIntTest extends BaseTaskIntTest {
     public void testWrite() throws IOException {
         Job job = startJob(
             "samples/spreadsheetFile_WRITE.json",
-            Map.of("input", JSONArrayUtil.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())))
+            Map.of("items", JSONArrayUtil.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())))
         );
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);

@@ -95,14 +95,14 @@ public class JSONFileTaskDefinitionTest {
                         "type":"JSON"
                     },
                     {
-                        "description":"Object or array of objects to write to the file.",
-                        "displayName":"Input",
+                        "description":"The data to write to the file.",
+                        "displayName":"Source",
                         "displayOption":{
                             "show":{
                                 "operation":["WRITE"]
                             }
                         },
-                        "name":"input",
+                        "name":"source",
                         "required":true,
                         "type":"JSON"
                     },

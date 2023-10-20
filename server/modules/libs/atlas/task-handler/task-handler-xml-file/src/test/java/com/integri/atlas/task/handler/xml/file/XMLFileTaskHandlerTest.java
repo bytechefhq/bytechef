@@ -92,7 +92,7 @@ public class XMLFileTaskHandlerTest {
 
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
-        taskExecution.put("input", xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), Map.class));
+        taskExecution.put("source", xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), Map.class));
         taskExecution.put("operation", "WRITE");
 
         FileEntry fileEntry = (FileEntry) xmlFileTaskHandler.handle(taskExecution);
@@ -103,7 +103,7 @@ public class XMLFileTaskHandlerTest {
         assertThat(fileEntry.getName()).isEqualTo("file.xml");
 
         taskExecution.put("fileName", "test.xml");
-        taskExecution.put("input", xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), Map.class));
+        taskExecution.put("source", xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), Map.class));
         taskExecution.put("operation", "WRITE");
 
         fileEntry = (FileEntry) xmlFileTaskHandler.handle(taskExecution);
@@ -117,7 +117,7 @@ public class XMLFileTaskHandlerTest {
 
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
-        taskExecution.put("input", xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), List.class));
+        taskExecution.put("source", xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), List.class));
         taskExecution.put("operation", "WRITE");
 
         FileEntry fileEntry = (FileEntry) xmlFileTaskHandler.handle(taskExecution);
@@ -128,7 +128,7 @@ public class XMLFileTaskHandlerTest {
         assertThat(fileEntry.getName()).isEqualTo("file.xml");
 
         taskExecution.put("fileName", "test.xml");
-        taskExecution.put("input", xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), List.class));
+        taskExecution.put("source", xmlHelper.read(Files.contentOf(file, Charset.defaultCharset()), List.class));
         taskExecution.put("operation", "WRITE");
 
         fileEntry = (FileEntry) xmlFileTaskHandler.handle(taskExecution);

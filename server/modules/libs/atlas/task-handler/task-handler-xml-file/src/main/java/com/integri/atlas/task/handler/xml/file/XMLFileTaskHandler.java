@@ -18,11 +18,11 @@ package com.integri.atlas.task.handler.xml.file;
 
 import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_FILE_ENTRY;
 import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_FILE_NAME;
-import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_INPUT;
 import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_IS_ARRAY;
 import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_OPERATION;
 import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_PAGE_NUMBER;
 import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_PAGE_SIZE;
+import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_SOURCE;
 import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.TASK_XML_FILE;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -111,12 +111,12 @@ public class XMLFileTaskHandler implements TaskHandler<Object> {
             }
         } else {
             String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, "file.xml");
-            Object input = jsonHelper.check(taskExecution.getRequired(PROPERTY_INPUT));
+            Object source = jsonHelper.check(taskExecution.getRequired(PROPERTY_SOURCE));
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
             try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
-                printWriter.println(xmlHelper.write(input));
+                printWriter.println(xmlHelper.write(source));
             }
 
             try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
