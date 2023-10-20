@@ -17,6 +17,7 @@
 
 package com.bytechef.helios.configuration.web.rest;
 
+import com.bytechef.helios.configuration.web.rest.model.CategoryModel;
 import com.bytechef.helios.configuration.web.rest.model.TagModel;
 import com.bytechef.hermes.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.helios.configuration.web.rest.model.CreateProjectWorkflowRequestModel;
@@ -91,6 +92,23 @@ public class ProjectController implements ProjectsApi {
     @SuppressFBWarnings("NP")
     public ResponseEntity<ProjectModel> getProject(Long id) {
         return ResponseEntity.ok(conversionService.convert(projectFacade.getProject(id), ProjectModel.class));
+    }
+
+    @Override
+    public ResponseEntity<List<CategoryModel>> getProjectCategories() {
+        return ResponseEntity.ok(
+            projectFacade.getProjectCategories()
+                .stream()
+                .map(category -> conversionService.convert(category, CategoryModel.class))
+                .toList());
+    }
+
+    @Override
+    public ResponseEntity<List<TagModel>> getProjectTags() {
+        return ResponseEntity.ok(projectFacade.getProjectTags()
+            .stream()
+            .map(tag -> conversionService.convert(tag, TagModel.class))
+            .toList());
     }
 
     @Override
