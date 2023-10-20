@@ -36,7 +36,7 @@ import java.util.Map;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/context-service")
+@RequestMapping("/internal/context-service")
 public class ContextServiceController {
 
     private final ContextService contextService;

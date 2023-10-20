@@ -43,7 +43,7 @@ import java.util.Map;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/connection-definition-service")
+@RequestMapping("/internal/connection-definition-service")
 @ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
 public class ConnectionDefinitionServiceController {
 

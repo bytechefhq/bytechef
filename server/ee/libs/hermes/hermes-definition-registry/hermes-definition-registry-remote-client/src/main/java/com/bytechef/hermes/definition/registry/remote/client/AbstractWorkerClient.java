@@ -80,6 +80,6 @@ public abstract class AbstractWorkerClient {
             .scheme("http")
             .host(serviceInstance.getHost())
             .port(serviceInstance.getPort())
-            .path("/api/internal" + path);
+            .path("/internal" + path);
     }
 }

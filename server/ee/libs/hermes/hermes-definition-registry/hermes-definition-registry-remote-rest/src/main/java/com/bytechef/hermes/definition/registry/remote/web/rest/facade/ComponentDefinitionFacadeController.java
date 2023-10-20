@@ -32,7 +32,7 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/component-definition-facade")
+@RequestMapping("/internal/component-definition-facade")
 @ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
 public class ComponentDefinitionFacadeController {
 

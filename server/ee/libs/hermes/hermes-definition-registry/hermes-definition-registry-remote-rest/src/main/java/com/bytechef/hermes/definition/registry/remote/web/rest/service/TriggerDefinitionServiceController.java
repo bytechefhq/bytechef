@@ -42,7 +42,7 @@ import java.util.Map;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/trigger-definition-service")
+@RequestMapping("/internal/trigger-definition-service")
 @ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
 public class TriggerDefinitionServiceController {
 

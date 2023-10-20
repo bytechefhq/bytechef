@@ -56,7 +56,7 @@ public class ConnectionServiceClient implements ConnectionService {
             loadBalancedWebClient.get(
                 uriBuilder -> uriBuilder
                     .host("connection-service-app")
-                    .path("/api/internal/connection-service/fetch-connection/{id}")
+                    .path("/internal/connection-service/fetch-connection/{id}")
                     .build(id),
                 Connection.class));
     }
@@ -71,7 +71,7 @@ public class ConnectionServiceClient implements ConnectionService {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("connection-service-app")
-                .path("/api/internal/connection-service/get-connections")
+                .path("/internal/connection-service/get-connections")
                 .build(),
             new ParameterizedTypeReference<List<Connection>>() {});
     }

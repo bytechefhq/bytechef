@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/data-storage-service")
+@RequestMapping("/internal/data-storage-service")
 public class DataStorageServiceController {
 
     private final DataStorageService dataStorageService;

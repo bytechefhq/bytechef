@@ -55,7 +55,7 @@ public class ProjectInstanceServiceClient implements ProjectInstanceService {
             loadBalancedWebClient.get(
                 uriBuilder -> uriBuilder
                     .host("configuration-service-app")
-                    .path("/api/internal/project-instance-service/fetch-workflow-project-instance/{workflowId}")
+                    .path("/internal/project-instance-service/fetch-workflow-project-instance/{workflowId}")
                     .build(workflowId),
                 ProjectInstance.class));
     }
@@ -96,7 +96,7 @@ public class ProjectInstanceServiceClient implements ProjectInstanceService {
             uriBuilder -> uriBuilder
                 .host("configuration-service-app")
                 .path(
-                    "/api/internal/project-instance-service/update-enabled/{id}/{enable}")
+                    "/internal/project-instance-service/update-enabled/{id}/{enable}")
                 .build(id, enabled));
     }
 }

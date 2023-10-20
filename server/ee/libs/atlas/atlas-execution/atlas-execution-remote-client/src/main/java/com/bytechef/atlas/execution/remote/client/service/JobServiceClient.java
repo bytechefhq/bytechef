@@ -68,7 +68,7 @@ public class JobServiceClient implements JobService {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/job-service/get-job/{id}")
+                .path("/internal/job-service/get-job/{id}")
                 .build(id),
             Job.class);
     }
@@ -78,7 +78,7 @@ public class JobServiceClient implements JobService {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/job-service/get-task-execution-job/{taskExecutionId}")
+                .path("/internal/job-service/get-task-execution-job/{taskExecutionId}")
                 .build(taskExecutionId),
             Job.class);
     }
@@ -88,7 +88,7 @@ public class JobServiceClient implements JobService {
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/job-service/resume-to-status-started/{id}")
+                .path("/internal/job-service/resume-to-status-started/{id}")
                 .build(id),
             null, Job.class);
     }
@@ -106,7 +106,7 @@ public class JobServiceClient implements JobService {
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/job-service/set-status-to-started/{id}")
+                .path("/internal/job-service/set-status-to-started/{id}")
                 .build(id),
             null, Job.class);
     }
@@ -116,7 +116,7 @@ public class JobServiceClient implements JobService {
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/job-service/set-status-to-stopped/{id}")
+                .path("/internal/job-service/set-status-to-stopped/{id}")
                 .build(id),
             null, Job.class);
     }
@@ -126,7 +126,7 @@ public class JobServiceClient implements JobService {
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
-                .path("/api/internal/job-service/update")
+                .path("/internal/job-service/update")
                 .build(),
             job, Job.class);
     }

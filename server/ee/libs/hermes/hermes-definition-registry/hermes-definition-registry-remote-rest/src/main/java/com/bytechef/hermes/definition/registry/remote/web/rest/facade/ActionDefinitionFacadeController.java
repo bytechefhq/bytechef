@@ -37,7 +37,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/action-definition-facade")
+@RequestMapping("/internal/action-definition-facade")
 @ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
 public class ActionDefinitionFacadeController {
 

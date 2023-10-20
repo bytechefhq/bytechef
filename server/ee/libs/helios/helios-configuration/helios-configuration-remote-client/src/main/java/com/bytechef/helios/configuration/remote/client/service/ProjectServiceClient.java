@@ -70,7 +70,7 @@ public class ProjectServiceClient implements ProjectService {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("configuration-service-app")
-                .path("/api/internal/project-service/get-workflow-project/{workflowId}")
+                .path("/internal/project-service/get-workflow-project/{workflowId}")
                 .build(workflowId),
             Project.class);
     }
@@ -80,7 +80,7 @@ public class ProjectServiceClient implements ProjectService {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("configuration-service-app")
-                .path("/api/internal/project-service/get-project/{id}")
+                .path("/internal/project-service/get-project/{id}")
                 .build(id),
             Project.class);
     }
@@ -90,7 +90,7 @@ public class ProjectServiceClient implements ProjectService {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("configuration-service-app")
-                .path("/api/internal/project-service/get-projects")
+                .path("/internal/project-service/get-projects")
                 .build(),
             new ParameterizedTypeReference<List<Project>>() {});
     }

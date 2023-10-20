@@ -60,7 +60,7 @@ public class ProjectInstanceWorkflowServiceClient implements ProjectInstanceWork
             uriBuilder -> uriBuilder
                 .host("configuration-service-app")
                 .path(
-                    "/api/internal/project-instance-workflow-service/get-project-instance-workflow-connection-id" +
+                    "/internal/project-instance-workflow-service/get-project-instance-workflow-connection-id" +
                         "/{operationName}/{key}")
                 .build(workflowConnectionOperationName, workflowConnectionKey),
             Long.class);
@@ -92,7 +92,7 @@ public class ProjectInstanceWorkflowServiceClient implements ProjectInstanceWork
             uriBuilder -> uriBuilder
                 .host("configuration-service-app")
                 .path(
-                    "/api/internal/project-instance-workflow-service/update-enabled/{id}/{enabled}")
+                    "/internal/project-instance-workflow-service/update-enabled/{id}/{enabled}")
                 .build(id, enabled));
     }
 }
