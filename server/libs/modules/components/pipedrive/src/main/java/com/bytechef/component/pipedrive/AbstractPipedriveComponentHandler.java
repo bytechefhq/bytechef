@@ -92,7 +92,7 @@ public abstract class AbstractPipedriveComponentHandler implements RestComponent
                         .toLowerCase(),
                     AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                         .display(
-                            display("OAuth2 Authorization code"))
+                            display("Authorization Code"))
                         .properties(
                             string(CLIENT_ID)
                                 .label("Client Id")
