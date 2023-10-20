@@ -30,7 +30,7 @@
     "lint": "eslint src --max-warnings=0",
     "typecheck": "tsc --project tsconfig.json --noEmit",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check": "prettier --check \"**/*.{ts,tsx,md}\" && eslint src --max-warnings=0 && tsc --project tsconfig.json --noEmit && vitest run",
+    "check": "prettier --check \"**/*.{ts,tsx,md}\" && eslint src --max-warnings=0 && tsc --project tsconfig.json --noEmit && vitest run --coverage",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
