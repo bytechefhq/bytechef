@@ -18,7 +18,7 @@
 package com.bytechef.hermes.integration.facade;
 
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.repository.WorkflowRepository;
+import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.hermes.integration.config.IntegrationIntTestConfiguration;
 import com.bytechef.hermes.integration.domain.Category;
 import com.bytechef.hermes.integration.domain.Integration;
@@ -65,7 +65,7 @@ public class IntegrationFacadeIntTest {
     TagRepository tagRepository;
 
     @Autowired
-    private WorkflowRepository workflowRepository;
+    private WorkflowCrudRepository workflowRepository;
 
     @BeforeAll
     public void beforeAll() {
@@ -180,7 +180,7 @@ public class IntegrationFacadeIntTest {
 
         integration.setTags(List.of(tag1, tagRepository.save(new Tag("tag3"))));
 
-        integrationFacade.create(integration);
+        integrationRepository.save(integration);
 
         assertThat(integrationFacade.getIntegrationTags()
             .stream()
@@ -193,6 +193,28 @@ public class IntegrationFacadeIntTest {
             .stream()
             .map(Tag::getName)
             .collect(Collectors.toSet())).contains("tag1", "tag2");
+    }
+
+    @Test
+    @SuppressFBWarnings("NP")
+    public void testGetIntegrationWorkflows() {
+        Workflow workflow = new Workflow("{}", Workflow.Format.JSON);
+
+        workflow.setNew(true);
+
+        workflow = workflowRepository.save(workflow);
+
+        Integration integration = new Integration();
+
+        integration.setName("name");
+
+        integration.setWorkflowIds(List.of(workflow.getId()));
+
+        integration = integrationRepository.save(integration);
+
+        List<Workflow> workflows = integrationFacade.getIntegrationWorkflows(integration.getId());
+
+        assertThat(workflows).contains(workflow);
     }
 
     @Test
@@ -212,7 +234,7 @@ public class IntegrationFacadeIntTest {
 
         integration.setTags(List.of(tag1));
 
-        integrationFacade.create(integration);
+        integrationRepository.save(integration);
 
         integration = integrationFacade.update(integration);
 
