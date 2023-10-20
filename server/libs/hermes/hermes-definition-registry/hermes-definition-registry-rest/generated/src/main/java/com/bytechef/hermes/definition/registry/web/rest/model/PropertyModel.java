@@ -46,7 +46,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = ValuePropertyModel.class, name = "ValueProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-10T17:56:08.674559+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-12T08:51:58.173412+02:00[Europe/Zagreb]")
 public class PropertyModel {
 
   private Boolean advancedOption;
@@ -55,7 +55,7 @@ public class PropertyModel {
 
   private String displayCondition;
 
-  private Boolean expressionDisabled;
+  private Boolean expressionEnabled;
 
   private Boolean hidden;
 
@@ -129,24 +129,24 @@ public class PropertyModel {
     this.displayCondition = displayCondition;
   }
 
-  public PropertyModel expressionDisabled(Boolean expressionDisabled) {
-    this.expressionDisabled = expressionDisabled;
+  public PropertyModel expressionEnabled(Boolean expressionEnabled) {
+    this.expressionEnabled = expressionEnabled;
     return this;
   }
 
   /**
-   * Defines if the property can contain expressions or only constant values.
-   * @return expressionDisabled
+   * Defines if the property can contain expressions or only constant values. Defaults to true.
+   * @return expressionEnabled
   */
   
-  @Schema(name = "expressionDisabled", description = "Defines if the property can contain expressions or only constant values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("expressionDisabled")
-  public Boolean getExpressionDisabled() {
-    return expressionDisabled;
+  @Schema(name = "expressionEnabled", description = "Defines if the property can contain expressions or only constant values. Defaults to true.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("expressionEnabled")
+  public Boolean getExpressionEnabled() {
+    return expressionEnabled;
   }
 
-  public void setExpressionDisabled(Boolean expressionDisabled) {
-    this.expressionDisabled = expressionDisabled;
+  public void setExpressionEnabled(Boolean expressionEnabled) {
+    this.expressionEnabled = expressionEnabled;
   }
 
   public PropertyModel hidden(Boolean hidden) {
@@ -281,7 +281,7 @@ public class PropertyModel {
     return Objects.equals(this.advancedOption, property.advancedOption) &&
         Objects.equals(this.description, property.description) &&
         Objects.equals(this.displayCondition, property.displayCondition) &&
-        Objects.equals(this.expressionDisabled, property.expressionDisabled) &&
+        Objects.equals(this.expressionEnabled, property.expressionEnabled) &&
         Objects.equals(this.hidden, property.hidden) &&
         Objects.equals(this.label, property.label) &&
         Objects.equals(this.name, property.name) &&
@@ -292,7 +292,7 @@ public class PropertyModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(advancedOption, description, displayCondition, expressionDisabled, hidden, label, name, placeholder, required, type);
+    return Objects.hash(advancedOption, description, displayCondition, expressionEnabled, hidden, label, name, placeholder, required, type);
   }
 
   @Override
@@ -302,7 +302,7 @@ public class PropertyModel {
     sb.append("    advancedOption: ").append(toIndentedString(advancedOption)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    displayCondition: ").append(toIndentedString(displayCondition)).append("\n");
-    sb.append("    expressionDisabled: ").append(toIndentedString(expressionDisabled)).append("\n");
+    sb.append("    expressionEnabled: ").append(toIndentedString(expressionEnabled)).append("\n");
     sb.append("    hidden: ").append(toIndentedString(hidden)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
