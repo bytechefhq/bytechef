@@ -326,6 +326,10 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         this.definition = definition;
     }
 
+    public void setFormat(Format format) {
+        this.format = format.getId();
+    }
+
     public void setId(String id) {
         this.id = id;
     }
