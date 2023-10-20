@@ -19,32 +19,31 @@
 package com.integri.atlas.engine.core.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Throwables;
 
 /**
  * @author Arik Cohen
  */
-public class Json {
+public class JsonMapper {
 
-    private static final ObjectMapper defaultObjectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
-    public static <T> T deserialize(ObjectMapper aObjectMapper, String aValue, Class<T> aClass) {
+    public JsonMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    public <T> T deserialize(String value, Class<T> clazz) {
         try {
-            return aObjectMapper.readValue(aValue, aClass);
+            return objectMapper.readValue(value, clazz);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
-    public static String serialize(Object aValue) {
-        return serialize(defaultObjectMapper, aValue);
-    }
-
-    public static String serialize(ObjectMapper aObjectMapper, Object aValue) {
+    public String serialize(Object value) {
         try {
-            return aObjectMapper.writeValueAsString(aValue);
+            return objectMapper.writeValueAsString(value);
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 }
