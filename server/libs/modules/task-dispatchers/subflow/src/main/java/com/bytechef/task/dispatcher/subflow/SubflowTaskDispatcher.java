@@ -25,7 +25,8 @@ import static com.bytechef.task.dispatcher.subflow.constant.SubflowTaskDispatche
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.dto.JobParametersDTO;
-import com.bytechef.atlas.facade.JobFacade;
+import com.bytechef.atlas.message.broker.MessageBroker;
+import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
@@ -42,10 +43,10 @@ import java.util.Objects;
  */
 public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private final JobFacade jobFacade;
+    private final MessageBroker messageBroker;
 
-    public SubflowTaskDispatcher(JobFacade jobFacade) {
-        this.jobFacade = jobFacade;
+    public SubflowTaskDispatcher(MessageBroker messageBroker) {
+        this.messageBroker = messageBroker;
     }
 
     @Override
@@ -55,7 +56,7 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
             taskExecution.getId(),
             MapValueUtils.getRequiredString(taskExecution.getParameters(), WorkflowConstants.WORKFLOW_ID));
 
-        jobFacade.create(jobParametersDTO);
+        messageBroker.send(Queues.SUBFLOWS, jobParametersDTO);
     }
 
     @Override

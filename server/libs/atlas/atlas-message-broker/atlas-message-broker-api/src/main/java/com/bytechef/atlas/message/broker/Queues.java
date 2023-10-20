@@ -23,6 +23,7 @@ import java.util.UUID;
 
 /**
  * @author Arik Cohen
+ * @author Ivica Cardic
  */
 public interface Queues {
 
@@ -33,6 +34,7 @@ public interface Queues {
     String EVENTS = "events";
     String JOBS = "jobs";
     String RESTARTS = "restarts";
+    String SUBFLOWS = "subflows";
     String STOPS = "stops";
     String TASKS = "tasks";
 }
