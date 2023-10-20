@@ -16,22 +16,22 @@
 
 package com.bytechef.task.dispatcher.sequence;
 
-import com.bytechef.atlas.Constants;
-import com.bytechef.atlas.MapObject;
-import com.bytechef.atlas.context.domain.MapContext;
+import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.sequence.constants.SequenceTaskDispatcherConstants.SEQUENCE;
+
+import com.bytechef.atlas.domain.Context;
+import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
-import com.bytechef.atlas.service.context.ContextService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
+import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
+import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
-import com.bytechef.atlas.uuid.UUIDGenerator;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -61,41 +61,39 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        SimpleTaskExecution sequenceTaskExecution = SimpleTaskExecution.of(taskExecution);
+        TaskExecution sequenceTaskExecution = new TaskExecution(taskExecution);
 
-        sequenceTaskExecution.setStartTime(new Date());
+        sequenceTaskExecution.setStartTime(LocalDateTime.now());
         sequenceTaskExecution.setStatus(TaskStatus.STARTED);
 
-        taskExecutionService.merge(sequenceTaskExecution);
+        taskExecutionService.update(sequenceTaskExecution);
 
-        List<MapObject> subtaskDefinitions = sequenceTaskExecution.getList("tasks", MapObject.class);
+        List<WorkflowTask> subWorkflowTasks = sequenceTaskExecution.getWorkflowTasks("tasks");
 
-        if (subtaskDefinitions.size() > 0) {
-            MapObject taskDefinition = subtaskDefinitions.get(0);
+        if (subWorkflowTasks.size() > 0) {
+            WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
-            SimpleTaskExecution subTaskExecution = SimpleTaskExecution.of(taskDefinition);
+            TaskExecution subTaskExecution = TaskExecution.of(
+                    subWorkflowTask,
+                    sequenceTaskExecution.getJobId(),
+                    sequenceTaskExecution.getId(),
+                    sequenceTaskExecution.getPriority(),
+                    1);
 
-            subTaskExecution.setId(UUIDGenerator.generate());
-            subTaskExecution.setStatus(TaskStatus.CREATED);
-            subTaskExecution.setCreateTime(new Date());
-            subTaskExecution.setTaskNumber(1);
-            subTaskExecution.setJobId(sequenceTaskExecution.getJobId());
-            subTaskExecution.setParentId(sequenceTaskExecution.getId());
-            subTaskExecution.setPriority(sequenceTaskExecution.getPriority());
-
-            MapContext context = new MapContext(contextService.peek(sequenceTaskExecution.getId()));
+            Context context = new Context(contextService.peek(sequenceTaskExecution.getId()));
 
             contextService.push(subTaskExecution.getId(), context);
 
-            TaskExecution evaluatedSubTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+            TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-            taskExecutionService.create(evaluatedSubTaskExecution);
-            taskDispatcher.dispatch(evaluatedSubTaskExecution);
+            evaluatedTaskExecution = taskExecutionService.add(evaluatedTaskExecution);
+
+            taskDispatcher.dispatch(evaluatedTaskExecution);
         } else {
-            SimpleTaskExecution completionTaskExecution = SimpleTaskExecution.of(taskExecution);
+            TaskExecution completionTaskExecution = new TaskExecution(taskExecution);
 
-            completionTaskExecution.setStartTime(new Date());
-            completionTaskExecution.setEndTime(new Date());
+            completionTaskExecution.setStartTime(LocalDateTime.now());
+            completionTaskExecution.setEndTime(LocalDateTime.now());
             completionTaskExecution.setExecutionTime(0);
 
             messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
@@ -104,7 +102,7 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public TaskDispatcher resolve(Task task) {
-        if (task.getType().equals(Constants.SEQUENCE)) {
+        if (task.getType().equals(SEQUENCE + "/v" + VERSION_1)) {
             return this;
         }
 
