@@ -3,7 +3,7 @@ import {
     GetProjectWorkflowExecutionsRequest,
     ProjectWorkflowExecutionModel,
     ProjectWorkflowExecutionsApi,
-} from '@/middleware/automation/execution';
+} from '@/middleware/helios/execution';
 import {useQuery} from '@tanstack/react-query';
 import {
     CategoryModel,
@@ -15,7 +15,7 @@ import {
     TagModel,
     WorkflowModel,
     WorkflowsApi,
-} from 'middleware/automation/configuration';
+} from 'middleware/helios/configuration';
 
 export const ProjectKeys = {
     project: (id: number) => ['project', id],

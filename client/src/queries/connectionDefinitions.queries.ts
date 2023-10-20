@@ -1,11 +1,10 @@
-import {useQuery} from '@tanstack/react-query';
-
 import {
     ConnectionDefinitionModel,
     ConnectionDefinitionsApi,
     GetComponentConnectionDefinitionRequest,
     GetComponentConnectionDefinitionsRequest,
-} from '../middleware/core/workflow/configuration';
+} from '@/middleware/hermes/configuration';
+import {useQuery} from '@tanstack/react-query';
 
 export const ConnectDefinitionKeys = {
     connectionDefinition: ['connectionDefinition'],

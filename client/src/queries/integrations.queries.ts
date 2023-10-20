@@ -5,7 +5,7 @@ import {
     IntegrationsApi,
     TagModel,
     WorkflowModel,
-} from 'middleware/embedded/configuration';
+} from 'middleware/dione/configuration';
 
 export const IntegrationKeys = {
     integration: (id: number) => ['integration', id],

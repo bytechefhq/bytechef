@@ -2,7 +2,7 @@ import {
     ProjectModel,
     ProjectModelStatusEnum,
     TagModel,
-} from '@/middleware/automation/configuration';
+} from '@/middleware/helios/configuration';
 import {
     useCreateProjectWorkflowRequestMutation,
     useDeleteProjectMutation,

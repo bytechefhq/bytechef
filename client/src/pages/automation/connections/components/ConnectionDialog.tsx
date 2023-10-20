@@ -18,12 +18,12 @@ import Label from 'components/Label/Label';
 import NativeSelect from 'components/NativeSelect/NativeSelect';
 import Properties, {PropertyFormProps} from 'components/Properties/Properties';
 import useCopyToClipboard from 'hooks/useCopyToClipboard';
-import {ConnectionModel, TagModel} from 'middleware/automation/connection';
+import {ConnectionModel, TagModel} from 'middleware/helios/connection';
 import {
     AuthorizationModel,
     ComponentDefinitionBasicModel,
     ComponentDefinitionModel,
-} from 'middleware/core/workflow/configuration';
+} from 'middleware/hermes/configuration';
 import {
     useCreateConnectionMutation,
     useUpdateConnectionMutation,

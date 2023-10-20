@@ -3,7 +3,7 @@ import {
     ProjectInstanceModel,
     ProjectModel,
     TagModel,
-} from '@/middleware/automation/configuration';
+} from '@/middleware/helios/configuration';
 import {
     useDeleteProjectInstanceMutation,
     useUpdateProjectInstanceTagsMutation,

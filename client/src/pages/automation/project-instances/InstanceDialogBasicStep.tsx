@@ -4,7 +4,7 @@ import {
 } from '@/queries/projects.queries';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import Input from 'components/Input/Input';
-import {ProjectInstanceModel} from 'middleware/automation/configuration';
+import {ProjectInstanceModel} from 'middleware/helios/configuration';
 import {
     Control,
     Controller,

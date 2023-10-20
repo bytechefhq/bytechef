@@ -2,7 +2,7 @@ import {
     CategoryModel,
     ProjectModel,
     TagModel,
-} from '@/middleware/automation/configuration';
+} from '@/middleware/helios/configuration';
 import {
     useCreateProjectMutation,
     useUpdateProjectMutation,

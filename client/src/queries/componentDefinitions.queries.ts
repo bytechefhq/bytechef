@@ -1,12 +1,11 @@
-import {useQuery} from '@tanstack/react-query';
-
 import {
     ComponentDefinitionBasicModel,
     ComponentDefinitionModel,
     ComponentDefinitionsApi,
     GetComponentDefinitionRequest,
     GetComponentDefinitionsRequest,
-} from '../middleware/core/workflow/configuration';
+} from '@/middleware/hermes/configuration';
+import {useQuery} from '@tanstack/react-query';
 
 export const ComponentDefinitionKeys = {
     componentDefinition: (request: GetComponentDefinitionRequest) => [

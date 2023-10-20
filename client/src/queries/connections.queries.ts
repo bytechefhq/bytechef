@@ -3,12 +3,12 @@ import {
     ConnectionsApi,
     GetConnectionsRequest,
     TagModel,
-} from '@/middleware/automation/connection';
+} from '@/middleware/helios/connection';
 import {
     ConnectionDefinitionsApi,
     GetOAuth2AuthorizationParametersRequestModel,
     OAuth2AuthorizationParametersModel,
-} from '@/middleware/core/workflow/configuration';
+} from '@/middleware/hermes/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const ConnectionKeys = {

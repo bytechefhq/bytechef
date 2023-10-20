@@ -4,7 +4,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import {TagModel} from '@/middleware/automation/configuration';
+import {TagModel} from '@/middleware/helios/configuration';
 
 /// <reference types="vite-plugin-svgr/client" />
 

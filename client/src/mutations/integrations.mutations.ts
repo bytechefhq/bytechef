@@ -6,7 +6,7 @@ import {
     IntegrationsApi,
     UpdateIntegrationTagsRequest,
     WorkflowModel,
-} from 'middleware/embedded/configuration';
+} from 'middleware/dione/configuration';
 
 type CreateIntegrationMutationProps = {
     onSuccess?: (result: IntegrationModel, variables: IntegrationModel) => void;
