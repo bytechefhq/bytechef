@@ -1,18 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {useLoaderData, useParams} from 'react-router-dom';
+import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
 import Button from 'components/Button/Button';
-import {
-    RocketIcon,
-    BookmarkFilledIcon,
-    DashboardIcon,
-    MagicWandIcon,
-    PlusIcon,
-} from '@radix-ui/react-icons';
+import {PlusIcon} from '@radix-ui/react-icons';
 import LeftSidebar from './components/LeftSidebar';
-import RightSlideOver from './components/RightSlideOver';
 import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
 import ToggleGroup, {
-    ToggleItem,
+    IToggleItem,
 } from '../../../components/ToggleGroup/ToggleGroup';
 import Select from '../../../components/Select/Select';
 import {WorkflowModel} from '../../../middleware/workflow';
@@ -23,7 +16,6 @@ import {
 import WorkflowEditor from './WorkflowEditor';
 import Input from 'components/Input/Input';
 import {ProjectModel} from '../../../middleware/project';
-import useRightSlideOverStore from './stores/useRightSlideOverStore';
 import useLeftSidebarStore from './stores/useLeftSidebarStore';
 import {useGetComponentDefinitionsQuery} from '../../../queries/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '../../../queries/taskDispatcherDefinitions.queries';
@@ -35,8 +27,9 @@ import {
 import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
 import {useCreateProjectWorkflowRequestMutation} from '../../../mutations/projects.mutations';
 import {useQueryClient} from '@tanstack/react-query';
+import getCreatedWorkflow from 'utils/getCreatedWorkflow';
 
-const headerToggleItems: ToggleItem[] = [
+const headerToggleItems: IToggleItem[] = [
     {
         value: 'designer',
         label: 'Designer',
@@ -48,24 +41,17 @@ const headerToggleItems: ToggleItem[] = [
 ];
 
 const Project: React.FC = () => {
-    const {projectId} = useParams<{projectId: string}>();
-    const {rightSlideOverOpen, setRightSlideOverOpen} =
-        useRightSlideOverStore();
-    const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
     const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowModel>({});
     const [view, setView] = useState('designer');
     const [filter, setFilter] = useState('');
+    const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
+
+    const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
+
+    const {projectId, workflowId} = useParams();
+    const navigate = useNavigate();
 
     const queryClient = useQueryClient();
-
-    const createProjectWorkflowRequestMutation =
-        useCreateProjectWorkflowRequestMutation({
-            onSuccess: () => {
-                queryClient.invalidateQueries(ProjectKeys.projects);
-
-                setShowWorkflowDialog(false);
-            },
-        });
 
     const {data: project} = useGetProjectQuery(
         parseInt(projectId!),
@@ -90,180 +76,141 @@ const Project: React.FC = () => {
         error: projectWorkflowsError,
     } = useGetProjectWorkflowsQuery(project?.id as number);
 
+    const createWorkflowMutation = useCreateProjectWorkflowRequestMutation({
+        onSuccess: (project) => {
+            queryClient.invalidateQueries(
+                ProjectKeys.projectWorkflows(parseInt(projectId!))
+            );
+
+            if (projectWorkflows) {
+                const createdWorkflow = getCreatedWorkflow(
+                    projectWorkflows,
+                    project
+                );
+
+                if (createdWorkflow) {
+                    setCurrentWorkflow(createdWorkflow);
+                }
+            }
+
+            setShowWorkflowDialog(false);
+        },
+    });
+
     useEffect(() => {
-        if (!projectWorkflowsLoading && !projectWorkflowsError) {
-            setCurrentWorkflow(projectWorkflows[0]);
+        if (currentWorkflow.id) {
+            navigate(
+                `/automation/projects/${projectId}/workflow/${currentWorkflow.id}`
+            );
         }
-    }, [
-        projectWorkflows,
-        projectWorkflowsError,
-        projectWorkflowsLoading,
-        project,
-    ]);
+    }, [currentWorkflow, navigate, projectId]);
 
-    const [showWorkflowDialog, setShowWorkflowDialog] =
-        useState<boolean>(false);
+    if (
+        !componentsLoading &&
+        !flowControlsLoading &&
+        !projectWorkflowsLoading &&
+        !componentsError &&
+        !flowControlsError &&
+        !projectWorkflowsError
+    ) {
+        return (
+            <LayoutContainer
+                className="border-l border-gray-200 bg-gray-100"
+                header={
+                    <header className="flex items-center">
+                        <Button
+                            className="p-4"
+                            icon={
+                                leftSidebarOpen ? (
+                                    <ArrowLeftOnRectangleIcon className="h-6 w-6" />
+                                ) : (
+                                    <ArrowRightOnRectangleIcon className="h-6 w-6" />
+                                )
+                            }
+                            onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
+                            displayType="icon"
+                        />
 
-    return (
-        <>
-            {!componentsLoading &&
-            !flowControlsLoading &&
-            !projectWorkflowsLoading &&
-            !componentsError &&
-            !flowControlsError &&
-            !projectWorkflowsError ? (
-                <LayoutContainer
-                    className="border-l border-gray-200 bg-gray-100"
-                    header={
-                        <header className="flex items-center">
-                            <Button
-                                className="p-4"
-                                icon={
-                                    leftSidebarOpen ? (
-                                        <ArrowLeftOnRectangleIcon className="h-6 w-6" />
-                                    ) : (
-                                        <ArrowRightOnRectangleIcon className="h-6 w-6" />
-                                    )
-                                }
-                                onClick={() =>
-                                    setLeftSidebarOpen(!leftSidebarOpen)
-                                }
-                                displayType="icon"
-                            />
+                        <h1 className="mr-6 py-4 pr-4">{project?.name}</h1>
 
-                            <h1 className="mr-6 py-4 pr-4">{project?.name}</h1>
+                        <div className="my-4 mx-2 flex rounded-md bg-white">
+                            {currentWorkflow && (
+                                <Select
+                                    defaultValue={workflowId}
+                                    onValueChange={(value) => {
+                                        setCurrentWorkflow(
+                                            projectWorkflows.find(
+                                                (workflow: WorkflowModel) =>
+                                                    workflow.id === value
+                                            )!
+                                        );
 
-                            <div className="flex py-4 px-2">
-                                <div className="flex rounded-md bg-white">
-                                    {currentWorkflow && (
-                                        <Select
-                                            defaultValue={
-                                                projectWorkflows[0].id
-                                            }
-                                            options={projectWorkflows.map(
-                                                (workflow: WorkflowModel) => ({
-                                                    label: workflow.label!,
-                                                    value: workflow.id!,
-                                                })
-                                            )}
-                                            onValueChange={(value: string) => {
-                                                setCurrentWorkflow(
-                                                    projectWorkflows.find(
-                                                        (
-                                                            workflow: WorkflowModel
-                                                        ) =>
-                                                            workflow.id ===
-                                                            value
-                                                    )!
-                                                );
-                                            }}
-                                        />
+                                        navigate(
+                                            `/automation/projects/${projectId}/workflow/${value}`
+                                        );
+                                    }}
+                                    options={projectWorkflows.map(
+                                        (workflow) => ({
+                                            label: workflow.label!,
+                                            value: workflow.id!,
+                                        })
                                     )}
-
-                                    <div className="flex border-l border-gray-100 align-middle">
-                                        <Button
-                                            displayType="light"
-                                            icon={
-                                                <PlusIcon className="h-5 w-5" />
-                                            }
-                                            size="small"
-                                            onClick={() =>
-                                                setShowWorkflowDialog(true)
-                                            }
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {showWorkflowDialog && (
-                                <WorkflowDialog
-                                    id={project?.id}
-                                    visible
-                                    createWorkflowRequestMutation={
-                                        createProjectWorkflowRequestMutation
-                                    }
+                                    value={currentWorkflow.id!}
                                 />
                             )}
 
-                            <div>
-                                <ToggleGroup
-                                    defaultValue="designer"
-                                    toggleItems={headerToggleItems}
-                                    onValueChange={(value) => setView(value)}
+                            <div className="flex border-l border-gray-100 align-middle">
+                                <Button
+                                    displayType="light"
+                                    icon={<PlusIcon className="h-5 w-5" />}
+                                    size="small"
+                                    onClick={() => setShowWorkflowDialog(true)}
                                 />
                             </div>
-                        </header>
-                    }
-                    leftSidebarHeader={
-                        <>
-                            <Input
-                                fieldsetClassName="p-4 mb-0"
-                                name="workflowElementsFilter"
-                                onChange={(event) =>
-                                    setFilter(event.target.value)
-                                }
-                                placeholder="Filter workflow nodes"
-                                value={filter}
-                            />
-                        </>
-                    }
-                    leftSidebarBody={
-                        <LeftSidebar
-                            data={{components, flowControls}}
-                            filter={filter}
-                        />
-                    }
-                    leftSidebarOpen={leftSidebarOpen}
-                    rightToolbarBody={
-                        <div className="flex flex-col items-center divide-y-8 py-4">
-                            <Button
-                                displayType="icon"
-                                onClick={() => setRightSlideOverOpen(true)}
-                            >
-                                <RocketIcon className="h-6 w-6" />
-                            </Button>
-
-                            <Button
-                                displayType="icon"
-                                onClick={() => setRightSlideOverOpen(true)}
-                            >
-                                <BookmarkFilledIcon className="h-6 w-6" />
-                            </Button>
-
-                            <Button
-                                displayType="icon"
-                                onClick={() => setRightSlideOverOpen(true)}
-                            >
-                                <DashboardIcon className="h-6 w-6" />
-                            </Button>
-
-                            <Button
-                                displayType="icon"
-                                onClick={() => setRightSlideOverOpen(true)}
-                            >
-                                <MagicWandIcon className="h-6 w-6" />
-                            </Button>
                         </div>
-                    }
-                >
-                    <>
-                        <WorkflowEditor />
 
-                        {rightSlideOverOpen && (
-                            <RightSlideOver
-                                open={rightSlideOverOpen}
-                                closeSidebar={() =>
-                                    setRightSlideOverOpen(false)
+                        {showWorkflowDialog && !!projectId && (
+                            <WorkflowDialog
+                                createWorkflowRequestMutation={
+                                    createWorkflowMutation
                                 }
+                                id={projectId}
+                                visible
                             />
                         )}
-                    </>
-                </LayoutContainer>
-            ) : (
-                <h1>Loading current view: {view}</h1>
-            )}
-        </>
-    );
+
+                        <div>
+                            <ToggleGroup
+                                defaultValue="designer"
+                                toggleItems={headerToggleItems}
+                                onValueChange={(value) => setView(value)}
+                            />
+                        </div>
+                    </header>
+                }
+                leftSidebarHeader={
+                    <Input
+                        fieldsetClassName="p-4 mb-0"
+                        name="workflowElementsFilter"
+                        onChange={(event) => setFilter(event.target.value)}
+                        placeholder="Filter workflow nodes"
+                        value={filter}
+                    />
+                }
+                leftSidebarBody={
+                    <LeftSidebar
+                        data={{components, flowControls}}
+                        filter={filter}
+                    />
+                }
+                leftSidebarOpen={leftSidebarOpen}
+            >
+                <WorkflowEditor />
+            </LayoutContainer>
+        );
+    } else {
+        return <h1>Loading current view: {view}</h1>;
+    }
 };
 
 export default Project;
