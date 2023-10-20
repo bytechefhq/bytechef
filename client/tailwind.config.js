@@ -80,6 +80,8 @@ module.exports = {
             },
             maxWidth: {
                 'select-trigger-width': 'var(--radix-select-trigger-width)',
+                'tooltip-lg': '500px',
+                'tooltip-sm': '250px',
             },
             minWidth: {
                 'select-trigger-width': 'var(--radix-select-trigger-width)',
