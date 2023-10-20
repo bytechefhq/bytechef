@@ -30,6 +30,7 @@ import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
@@ -50,7 +51,8 @@ public class SwitchTaskDispatcherTest {
     private final ContextService contextService = mock(ContextService.class);
     private final MessageBroker messageBroker = mock(MessageBroker.class);
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
-    private final TaskDispatcher taskDispatcher = mock(TaskDispatcher.class);
+    @SuppressWarnings("unchecked")
+    private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
 
     @Test
     public void test1() {

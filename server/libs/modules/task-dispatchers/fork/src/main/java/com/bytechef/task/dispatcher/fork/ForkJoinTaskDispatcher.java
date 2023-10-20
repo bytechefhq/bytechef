@@ -20,6 +20,7 @@
 package com.bytechef.task.dispatcher.fork;
 
 import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.fork.constants.ForkJoinTaskDispatcherConstants.BRANCH;
 import static com.bytechef.task.dispatcher.fork.constants.ForkJoinTaskDispatcherConstants.BRANCHES;
 import static com.bytechef.task.dispatcher.fork.constants.ForkJoinTaskDispatcherConstants.FORK_JOIN;
 
@@ -43,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.Assert;
 
 /**
@@ -109,26 +111,25 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        @SuppressWarnings("unchecked")
-        List<List<WorkflowTask>> branchesWorkflowTasks = MapUtils
-            .getList(taskExecution.getParameters(), BRANCHES, List.class)
-            .stream()
-            .map(curList -> ((List<Map<String, Object>>) curList)
+        List<List<Map<String, Object>>> branches = MapUtils.getRequiredList(
+            taskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
+
+        List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
+            .map(curList -> curList
                 .stream()
                 .map(WorkflowTask::new)
                 .toList())
             .toList();
 
-        Assert.notNull(branchesWorkflowTasks, "'branches' property can't be null");
+        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.STARTED, LocalDateTime.now(), null);
 
-        TaskExecution forkTaskExecution = new TaskExecution(taskExecution);
+        if (branchesWorkflowTasks.isEmpty()) {
+            taskExecution.setStartTime(LocalDateTime.now());
+            taskExecution.setEndTime(LocalDateTime.now());
+            taskExecution.setExecutionTime(0);
 
-        forkTaskExecution.setStartTime(LocalDateTime.now());
-        forkTaskExecution.setStatus(TaskStatus.STARTED);
-
-        taskExecutionService.update(forkTaskExecution);
-
-        if (branchesWorkflowTasks.size() > 0) {
+            messageBroker.send(Queues.COMPLETIONS, taskExecution);
+        } else {
             counterService.set(taskExecution.getId(), branchesWorkflowTasks.size());
 
             for (int i = 0; i < branchesWorkflowTasks.size(); i++) {
@@ -136,7 +137,8 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
                 Assert.isTrue(branchWorkflowTask.size() > 0, "branch " + i + " does not contain any tasks");
 
-                TaskExecution branchTaskExecution = new TaskExecution(branchWorkflowTask.get(0), Map.of("branch", i));
+                TaskExecution branchTaskExecution = new TaskExecution(
+                    WorkflowTask.of(Map.of(BRANCH, i), branchWorkflowTask.get(0)));
 
                 branchTaskExecution.setId(UUIDUtils.generate());
                 branchTaskExecution.setJobId(taskExecution.getJobId());
@@ -145,25 +147,17 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
                 branchTaskExecution.setStatus(TaskStatus.CREATED);
                 branchTaskExecution.setTaskNumber(1);
 
-                Context context = new Context(contextService.peek(taskExecution.getId()));
+                Context context = contextService.peek(taskExecution.getId());
 
                 contextService.push(taskExecution.getId() + "/" + i, context);
                 contextService.push(branchTaskExecution.getId(), context);
 
-                TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(branchTaskExecution, context);
+                branchTaskExecution.evaluate(taskEvaluator, context);
 
-                evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
+                branchTaskExecution = taskExecutionService.create(branchTaskExecution);
 
-                taskDispatcher.dispatch(evaluatedTaskExecution);
+                taskDispatcher.dispatch(branchTaskExecution);
             }
-        } else {
-            TaskExecution completionTaskExecution = new TaskExecution(taskExecution);
-
-            completionTaskExecution.setStartTime(LocalDateTime.now());
-            completionTaskExecution.setEndTime(LocalDateTime.now());
-            completionTaskExecution.setExecutionTime(0);
-
-            messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
         }
     }
 

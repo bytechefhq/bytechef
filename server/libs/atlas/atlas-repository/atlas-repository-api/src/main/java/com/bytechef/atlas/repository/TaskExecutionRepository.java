@@ -21,9 +21,14 @@ package com.bytechef.atlas.repository;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import com.bytechef.atlas.task.execution.TaskStatus;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
+import org.springframework.data.repository.query.Param;
 
 /**
  * @author Arik Cohen
@@ -32,34 +37,34 @@ public interface TaskExecutionRepository {
     /**
      * Returns the execution steps of the given job
      *
-     * @param job
+     * @param jobRef
      * @return List<TaskExecution>
      */
-    List<TaskExecution> findAllByJobOrderByCreatedDate(AggregateReference<Job, String> job);
+    List<TaskExecution> findAllByJobRefOrderByCreatedDate(AggregateReference<Job, String> jobRef);
 
     /**
      * Returns the execution steps of the given jobs
      *
-     * @param jobs
+     * @param jobRefs
      * @return List<TaskExecution>
      */
-    List<TaskExecution> findAllByJobInOrderByCreatedDate(List<AggregateReference<Job, String>> jobs);
+    List<TaskExecution> findAllByJobRefInOrderByCreatedDate(List<AggregateReference<Job, String>> jobRefs);
 
     /**
      * Returns a collection of {@link TaskExecution} instances which belong to the job of the given id.
      *
-     * @param job
+     * @param jobRef
      * @return
      */
-    List<TaskExecution> findAllByJobOrderByTaskNumber(AggregateReference<Job, String> job);
+    List<TaskExecution> findAllByJobRefOrderByTaskNumber(AggregateReference<Job, String> jobRef);
 
     /**
      * Returns a collection of {@link TaskExecution} instances which are the children of the given parent id.
      *
-     * @param parentId
+     * @param parentRef
      * @return
      */
-    List<TaskExecution> findAllByParent(AggregateReference<TaskExecution, String> parentId);
+    List<TaskExecution> findAllByParentRef(AggregateReference<TaskExecution, String> parentRef);
 
     /**
      * Find a single {@link TaskExecution} instance by its id.
@@ -77,4 +82,12 @@ public interface TaskExecutionRepository {
      * @param taskExecution
      */
     TaskExecution save(TaskExecution taskExecution);
+
+    void updateStatus(String id, TaskStatus taskStatus);
+
+    void updateStatusAndStartTime(
+        @Param("id") String id, @Param("status") TaskStatus status, @Param("startTime") LocalDateTime startTime);
+
+    void updateStatusAndEndTime(
+        @Param("id") String id, @Param("status") TaskStatus status, @Param("endTime") LocalDateTime endTime);
 }

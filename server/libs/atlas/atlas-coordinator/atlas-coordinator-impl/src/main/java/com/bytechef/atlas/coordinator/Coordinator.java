@@ -43,6 +43,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 /**
@@ -52,6 +53,7 @@ import org.springframework.util.Assert;
  * @author Ivica Cardic
  * @since Jun 12, 2016
  */
+@Transactional
 public class Coordinator {
 
     private final ContextService contextService;
@@ -91,7 +93,7 @@ public class Coordinator {
      * @param jobParameters The Key-Value map representing the workflow parameters
      */
     public void create(JobParameters jobParameters) {
-        Assert.notNull(jobParameters, "request can't be null");
+        Assert.notNull(jobParameters, "'jobParameters' must not be null.");
 
         Job job = jobService.create(jobParameters);
 
@@ -126,10 +128,10 @@ public class Coordinator {
         List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
 
         if (taskExecutions.size() > 0) {
-            TaskExecution currentTaskExecution = new TaskExecution(taskExecutions.get(taskExecutions.size() - 1));
+            TaskExecution currentTaskExecution = taskExecutions.get(taskExecutions.size() - 1);
 
-            currentTaskExecution.setStatus(TaskStatus.CANCELLED);
             currentTaskExecution.setEndTime(LocalDateTime.now());
+            currentTaskExecution.setStatus(TaskStatus.CANCELLED);
 
             taskExecutionService.update(currentTaskExecution);
 
@@ -163,12 +165,10 @@ public class Coordinator {
         try {
             taskCompletionHandler.handle(taskExecution);
         } catch (Exception e) {
-            TaskExecution erroredTaskExecution = new TaskExecution(taskExecution);
-
-            erroredTaskExecution.setError(
+            taskExecution.setError(
                 new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
 
-            handleError(erroredTaskExecution);
+            handleError(taskExecution);
         }
     }
 

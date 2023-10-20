@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.util.Assert;
 
 /**
@@ -73,6 +74,7 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
         List<WorkflowTask> workflowTasks = MapUtils
             .getList(taskExecution.getParameters(), TASKS, Map.class, Collections.emptyList())
@@ -82,28 +84,26 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
         Assert.notNull(workflowTasks, "'tasks' property can't be null");
 
-        if (workflowTasks.size() > 0) {
+        if (workflowTasks.isEmpty()) {
+            taskExecution.setStartTime(LocalDateTime.now());
+            taskExecution.setEndTime(LocalDateTime.now());
+            taskExecution.setExecutionTime(0);
+
+            messageBroker.send(Queues.COMPLETIONS, taskExecution);
+        } else {
             counterService.set(taskExecution.getId(), workflowTasks.size());
 
             for (WorkflowTask workflowTask : workflowTasks) {
-                TaskExecution parallelTaskExecution = new TaskExecution(
-                    workflowTask, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority());
+                TaskExecution parallelTaskExecution = TaskExecution.of(
+                    taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), workflowTask);
 
-                Context context = new Context(contextService.peek(taskExecution.getId()));
+                Context context = contextService.peek(taskExecution.getId());
 
                 TaskExecution evaluatedTaskExecution = taskExecutionService.create(parallelTaskExecution);
 
                 contextService.push(evaluatedTaskExecution.getId(), context);
                 taskDispatcher.dispatch(evaluatedTaskExecution);
             }
-        } else {
-            TaskExecution completionTaskExecution = new TaskExecution(taskExecution);
-
-            completionTaskExecution.setStartTime(LocalDateTime.now());
-            completionTaskExecution.setEndTime(LocalDateTime.now());
-            completionTaskExecution.setExecutionTime(0);
-
-            messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
         }
     }
 

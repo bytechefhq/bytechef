@@ -32,6 +32,7 @@ import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
@@ -41,6 +42,8 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.util.Assert;
 
 /**
@@ -53,14 +56,14 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
     private final ContextService contextService;
     private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
-    private final TaskDispatcher taskDispatcher;
+    private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskEvaluator taskEvaluator;
 
     public SwitchTaskCompletionHandler(
         ContextService contextService,
         TaskExecutionService taskExecutionService,
         TaskCompletionHandler taskCompletionHandler,
-        TaskDispatcher taskDispatcher,
+        TaskDispatcher<? super Task> taskDispatcher,
         TaskEvaluator taskEvaluator) {
         this.contextService = contextService;
         this.taskExecutionService = taskExecutionService;
@@ -84,19 +87,14 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
-        TaskExecution completedSubTaskExecution = new TaskExecution(taskExecution);
+        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
 
-        completedSubTaskExecution.setStatus(TaskStatus.COMPLETED);
-
-        taskExecutionService.update(completedSubTaskExecution);
-
-        TaskExecution switchTaskExecution = new TaskExecution(
-            taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+        TaskExecution switchTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-            Context context = contextService.peek(switchTaskExecution.getId());
-            Context newContext = new Context(context);
+            Context newContext = contextService.peek(switchTaskExecution.getId());
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
@@ -108,22 +106,22 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
             WorkflowTask workflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
-            TaskExecution subTaskExecution = new TaskExecution(
-                workflowTask,
+            TaskExecution subTaskExecution = TaskExecution.of(
                 switchTaskExecution.getJobId(),
                 switchTaskExecution.getId(),
                 switchTaskExecution.getPriority(),
-                taskExecution.getTaskNumber() + 1);
+                taskExecution.getTaskNumber() + 1,
+                workflowTask);
 
-            Context context = new Context(contextService.peek(switchTaskExecution.getId()));
+            Context context = contextService.peek(switchTaskExecution.getId());
 
             contextService.push(subTaskExecution.getId(), context);
 
-            TaskExecution evaluatedSubTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+            subTaskExecution.evaluate(taskEvaluator, context);
 
-            evaluatedSubTaskExecution = taskExecutionService.create(evaluatedSubTaskExecution);
+            subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-            taskDispatcher.dispatch(evaluatedSubTaskExecution);
+            taskDispatcher.dispatch(subTaskExecution);
         }
         // no more tasks to execute -- complete the switch
         else {

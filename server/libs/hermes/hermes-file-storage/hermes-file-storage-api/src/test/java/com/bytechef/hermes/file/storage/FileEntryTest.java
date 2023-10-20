@@ -58,11 +58,11 @@ public class FileEntryTest {
         TaskExecution taskExecution = new TaskExecution(
             WorkflowTask.of("result", "${fileEntry.name} ${fileEntry.url}"));
 
-        TaskExecution evaluatedTaskExecution = evaluator.evaluate(
-            taskExecution,
+        taskExecution.evaluate(
+            evaluator,
             new Context(Collections.singletonMap("fileEntry", new FileEntry("sample.txt", "/tmp/fileName.txt"))));
 
         assertEquals(
-            "sample.txt /tmp/fileName.txt", MapUtils.getString(evaluatedTaskExecution.getParameters(), "result"));
+            "sample.txt /tmp/fileName.txt", MapUtils.getString(taskExecution.getParameters(), "result"));
     }
 }

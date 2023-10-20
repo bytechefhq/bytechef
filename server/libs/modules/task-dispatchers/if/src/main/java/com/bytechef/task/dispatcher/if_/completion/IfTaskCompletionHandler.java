@@ -27,12 +27,15 @@ import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.MapUtils;
 import com.bytechef.task.dispatcher.if_.util.IfTaskUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -45,14 +48,14 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
 
     private final ContextService contextService;
     private final TaskCompletionHandler taskCompletionHandler;
-    private final TaskDispatcher taskDispatcher;
+    private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
 
     public IfTaskCompletionHandler(
         ContextService contextService,
         TaskCompletionHandler taskCompletionHandler,
-        TaskDispatcher taskDispatcher,
+        TaskDispatcher<? super Task> taskDispatcher,
         TaskEvaluator taskEvaluator,
         TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
@@ -77,20 +80,14 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
-        TaskExecution completedSubTaskExecution = new TaskExecution(taskExecution);
+        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
 
-        completedSubTaskExecution.setStatus(TaskStatus.COMPLETED);
-
-        taskExecutionService.update(completedSubTaskExecution);
-
-        TaskExecution ifTaskExecution = new TaskExecution(
-            taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+        TaskExecution ifTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-            Context context = contextService.peek(ifTaskExecution.getId());
-
-            Context newContext = new Context(context);
+            Context newContext = contextService.peek(ifTaskExecution.getId());
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
@@ -108,22 +105,22 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
-            TaskExecution subTaskExecution = new TaskExecution(
-                subWorkflowTask,
+            TaskExecution subTaskExecution = TaskExecution.of(
                 ifTaskExecution.getJobId(),
                 ifTaskExecution.getId(),
                 ifTaskExecution.getPriority(),
-                taskExecution.getTaskNumber() + 1);
+                taskExecution.getTaskNumber() + 1,
+                subWorkflowTask);
 
-            Context context = new Context(contextService.peek(ifTaskExecution.getId()));
+            Context context = contextService.peek(ifTaskExecution.getId());
 
             contextService.push(subTaskExecution.getId(), context);
 
-            TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+            subTaskExecution.evaluate(taskEvaluator, context);
 
-            evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
+            subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-            taskDispatcher.dispatch(evaluatedTaskExecution);
+            taskDispatcher.dispatch(subTaskExecution);
         }
         // no more tasks to execute -- complete the If
         else {

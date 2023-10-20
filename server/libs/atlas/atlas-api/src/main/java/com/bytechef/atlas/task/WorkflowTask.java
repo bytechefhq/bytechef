@@ -34,12 +34,13 @@ import org.springframework.util.Assert;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-public class WorkflowTask implements Serializable, Task {
+public class WorkflowTask implements Serializable {
 
     static {
         MapUtils.addConverter(new Converter<Map, WorkflowTask>() {
 
             @Override
+            @SuppressWarnings("unchecked")
             public WorkflowTask convert(Map source) {
                 return new WorkflowTask(source);
             }
@@ -73,7 +74,7 @@ public class WorkflowTask implements Serializable, Task {
     }
 
     public WorkflowTask(Map<String, Object> source) {
-        Assert.notNull(source, "source cannot be null.");
+        Assert.notNull(source, "'source' must not be null.");
 
         this.finalize = MapUtils.getList(source, WorkflowConstants.FINALIZE, Map.class, Collections.emptyList())
             .stream()
@@ -102,29 +103,27 @@ public class WorkflowTask implements Serializable, Task {
         }
     }
 
-    public WorkflowTask(WorkflowTask workflowTask) {
-        Assert.notNull(workflowTask, "workflowTask cannot be null.");
-
-        this.finalize = workflowTask.getFinalize();
-        this.label = workflowTask.getLabel();
-        this.name = workflowTask.getName();
-        this.node = workflowTask.getNode();
-        this.parameters = new HashMap<>(workflowTask.getParameters());
-        this.post = workflowTask.getPost();
-        this.pre = workflowTask.getPre();
-        this.timeout = workflowTask.getTimeout();
-        this.type = workflowTask.getType();
-    }
-
     /**
      * Creates a {@link WorkflowTask} instance for the given Key-Value pair.
      *
      * @return The new {@link WorkflowTask}.
      */
     public static WorkflowTask of(String key, Object value) {
-        Assert.notNull(key, "key cannot be null");
+        Assert.notNull(key, "'key' must not be null.");
 
         return new WorkflowTask(Collections.singletonMap(key, value));
+    }
+
+    public static WorkflowTask of(Map<String, Object> source, WorkflowTask workflowTask) {
+        Assert.notNull(workflowTask, "'workflowTask' must not be null.");
+        Assert.notNull(source, "'source' must not be null");
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.putAll(workflowTask.toMap());
+        map.putAll(source);
+
+        return new WorkflowTask(map);
     }
 
     @Override
@@ -163,7 +162,7 @@ public class WorkflowTask implements Serializable, Task {
      *         failed or not. Never return a <code>null</code>
      */
     public List<WorkflowTask> getFinalize() {
-        return finalize;
+        return Collections.unmodifiableList(finalize);
     }
 
     /**
@@ -207,7 +206,7 @@ public class WorkflowTask implements Serializable, Task {
      *         <code>null</code>
      */
     public List<WorkflowTask> getPost() {
-        return post;
+        return Collections.unmodifiableList(post);
     }
 
     /**
@@ -217,7 +216,7 @@ public class WorkflowTask implements Serializable, Task {
      *         <code>null</code>
      */
     public List<WorkflowTask> getPre() {
-        return pre;
+        return Collections.unmodifiableList(pre);
     }
 
     /**
@@ -232,7 +231,6 @@ public class WorkflowTask implements Serializable, Task {
         return timeout;
     }
 
-    @Override
     public String getType() {
         return type;
     }

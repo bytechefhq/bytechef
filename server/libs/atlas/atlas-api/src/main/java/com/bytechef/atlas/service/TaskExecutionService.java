@@ -18,6 +18,9 @@
 package com.bytechef.atlas.service;
 
 import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.task.execution.TaskStatus;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -34,4 +37,6 @@ public interface TaskExecutionService {
     List<TaskExecution> getParentTaskExecutions(String parentId);
 
     TaskExecution update(TaskExecution taskExecution);
+
+    void updateStatus(String id, TaskStatus taskStatus, LocalDateTime startTime, LocalDateTime endTime);
 }

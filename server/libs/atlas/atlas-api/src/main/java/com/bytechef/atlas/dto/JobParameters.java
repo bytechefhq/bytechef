@@ -143,13 +143,15 @@ public class JobParameters {
 
     @Override
     public String toString() {
-        return "WorkflowParametersDTO{" + "inputs="
-            + inputs + ", label='"
-            + label + '\'' + ", outputs="
-            + outputs + ", parentTaskExecutionId='"
-            + parentTaskExecutionId + '\'' + ", priority="
-            + priority + ", workflowId='"
-            + workflowId + '\'' + ", webhooks="
-            + webhooks + '}';
+        return "JobParameters{" +
+            "jobId='" + jobId + '\'' +
+            ", inputs=" + inputs +
+            ", label='" + label + '\'' +
+            ", outputs=" + outputs +
+            ", parentTaskExecutionId='" + parentTaskExecutionId + '\'' +
+            ", priority=" + priority +
+            ", workflowId='" + workflowId + '\'' +
+            ", webhooks=" + webhooks +
+            '}';
     }
 }

@@ -31,14 +31,18 @@ import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.MapUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -46,7 +50,7 @@ import java.util.List;
 public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
     private final ContextService contextService;
-    private final TaskDispatcher taskDispatcher;
+    private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
@@ -54,7 +58,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
     public LoopTaskCompletionHandler(
         ContextService contextService,
         TaskCompletionHandler taskCompletionHandler,
-        TaskDispatcher taskDispatcher,
+        TaskDispatcher<? super Task> taskDispatcher,
         TaskEvaluator taskEvaluator,
         TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
@@ -79,31 +83,28 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
-        TaskExecution completedSubTaskExecution = new TaskExecution(taskExecution);
+        taskExecution.setStatus(TaskStatus.COMPLETED);
 
-        completedSubTaskExecution.setStatus(TaskStatus.COMPLETED);
+        taskExecutionService.update(taskExecution);
 
-        taskExecutionService.update(completedSubTaskExecution);
-
-        TaskExecution loopTaskExecution = new TaskExecution(
-            taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+        TaskExecution loopTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
         boolean loopForever = MapUtils.getBoolean(loopTaskExecution.getParameters(), LOOP_FOREVER, false);
-        WorkflowTask iterateeWorkflowTask = new WorkflowTask(
-            MapUtils.getMap(loopTaskExecution.getParameters(), ITERATEE));
-        List<Object> list = MapUtils.getList(loopTaskExecution.getParameters(), LIST, Object.class,
-            Collections.emptyList());
+        Map<String, Object> iteratee = MapUtils.getRequiredMap(loopTaskExecution.getParameters(), ITERATEE);
+        List<Object> list = MapUtils.getList(
+            loopTaskExecution.getParameters(), LIST, Object.class, Collections.emptyList());
 
         if (loopForever || taskExecution.getTaskNumber() < list.size()) {
-            TaskExecution subTaskExecution = new TaskExecution(
-                iterateeWorkflowTask,
+            TaskExecution subTaskExecution = TaskExecution.of(
                 loopTaskExecution.getJobId(),
                 loopTaskExecution.getId(),
                 loopTaskExecution.getPriority(),
-                taskExecution.getTaskNumber() + 1);
+                taskExecution.getTaskNumber() + 1,
+                new WorkflowTask(iteratee));
 
-            Context context = new Context(contextService.peek(loopTaskExecution.getId()));
+            Context context = contextService.peek(loopTaskExecution.getId());
 
             if (!list.isEmpty()) {
                 context.put(
@@ -117,11 +118,11 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
             contextService.push(subTaskExecution.getId(), context);
 
-            TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+            subTaskExecution.evaluate(taskEvaluator, context);
 
-            evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
+            subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-            taskDispatcher.dispatch(evaluatedTaskExecution);
+            taskDispatcher.dispatch(subTaskExecution);
         } else {
             loopTaskExecution.setEndTime(LocalDateTime.now());
 

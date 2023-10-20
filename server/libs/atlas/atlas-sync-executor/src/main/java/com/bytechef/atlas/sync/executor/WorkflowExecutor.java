@@ -245,7 +245,7 @@ public class WorkflowExecutor {
         List<TaskCompletionHandler> apply(
             CounterService counterService,
             TaskCompletionHandler taskCompletionHandler,
-            TaskDispatcher<?> taskDispatcher,
+            TaskDispatcher<? super Task> taskDispatcher,
             TaskEvaluator taskEvaluator,
             TaskExecutionService taskExecutionService);
     }

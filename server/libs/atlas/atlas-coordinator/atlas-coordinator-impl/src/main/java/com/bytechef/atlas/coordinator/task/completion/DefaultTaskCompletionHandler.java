@@ -27,7 +27,6 @@ import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
-import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
@@ -87,35 +86,27 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
         Job job = jobService.getTaskExecutionJob(taskExecution.getId());
 
-        if (job != null) {
-            TaskExecution completedTaskExecution = new TaskExecution(taskExecution);
+        if (job == null) {
+            log.error("Unknown job: {}", taskExecution.getJobId());
+        } else {
+            taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
 
-            completedTaskExecution.setStatus(TaskStatus.COMPLETED);
+            if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
+                Context newContext = contextService.peek(job.getId());
 
-            taskExecutionService.update(completedTaskExecution);
-
-            Job updateJob = new Job(job);
-
-            if (completedTaskExecution.getOutput() != null && completedTaskExecution.getName() != null) {
-                Context context = contextService.peek(job.getId());
-
-                Context newContext = new Context(context);
-
-                newContext.put(completedTaskExecution.getName(), completedTaskExecution.getOutput());
+                newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
                 contextService.push(job.getId(), newContext);
             }
 
-            if (hasMoreTasks(updateJob)) {
-                updateJob.setCurrentTask(updateJob.getCurrentTask() + 1);
+            if (hasMoreTasks(job)) {
+                job.setCurrentTask(job.getCurrentTask() + 1);
 
-                jobService.update(updateJob);
-                jobExecutor.execute(updateJob);
+                jobService.update(job);
+                jobExecutor.execute(job);
             } else {
-                complete(updateJob);
+                complete(job);
             }
-        } else {
-            log.error("Unknown job: {}", taskExecution.getJobId());
         }
     }
 
@@ -131,18 +122,17 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
                 MapUtils.getRequiredString(output, WorkflowConstants.VALUE));
         }
 
-        TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(
-            new TaskExecution(new WorkflowTask(source)), context);
-        Job updateJob = new Job(job);
+        TaskExecution evaluatedTaskExecution = new TaskExecution(
+            taskEvaluator.evaluate(new WorkflowTask(source), context));
 
-        updateJob.setStatus(JobStatus.COMPLETED);
-        updateJob.setEndTime(new Date());
-        updateJob.setCurrentTask(-1);
+        job.setStatus(Job.Status.COMPLETED);
+        job.setEndTime(new Date());
+        job.setCurrentTask(-1);
 
-        updateJob.setOutputs(evaluatedTaskExecution.getParameters());
+        job.setOutputs(evaluatedTaskExecution.getParameters());
 
-        jobService.update(updateJob);
-        eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), updateJob.getStatus()));
+        jobService.update(job);
+        eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
 
         log.debug("Job {} completed successfully", job.getId());
     }

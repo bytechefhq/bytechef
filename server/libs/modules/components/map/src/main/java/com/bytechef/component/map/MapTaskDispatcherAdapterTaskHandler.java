@@ -28,6 +28,7 @@ import com.bytechef.atlas.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.repository.memory.InMemoryCounterRepository;
 import com.bytechef.atlas.repository.memory.InMemoryTaskExecutionRepository;
 import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.impl.ContextServiceImpl;
 import com.bytechef.atlas.service.impl.CounterServiceImpl;
 import com.bytechef.atlas.service.impl.TaskExecutionServiceImpl;
@@ -91,12 +92,16 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
         contextService.push(taskExecution.getId(), new Context());
 
+        TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository());
+
+        taskExecutionService.create(taskExecution);
+
         MapTaskDispatcher dispatcher = MapTaskDispatcher.builder()
             .contextService(contextService)
             .counterService(new CounterServiceImpl(new InMemoryCounterRepository()))
             .messageBroker(messageBroker)
             .taskDispatcher(worker::handle)
-            .taskExecutionService(new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository()))
+            .taskExecutionService(taskExecutionService)
             .taskEvaluator(taskEvaluator)
             .build();
 

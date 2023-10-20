@@ -53,11 +53,9 @@ public class TaskProgressedEventListener implements EventListener {
             if (taskExecution == null) {
                 logger.error("Unknown task: {}", taskProgressedWorkflowEvent.getTaskId());
             } else {
-                TaskExecution progressTaskExecution = new TaskExecution(taskExecution);
+                taskExecution.setProgress(taskProgressedWorkflowEvent.getProgress());
 
-                progressTaskExecution.setProgress(taskProgressedWorkflowEvent.getProgress());
-
-                taskExecutionService.update(progressTaskExecution);
+                taskExecutionService.update(taskExecution);
             }
         }
     }

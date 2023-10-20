@@ -89,8 +89,8 @@ public class SubflowJobStatusEventListener implements EventListener {
                     break;
                 }
                 case FAILED: {
-                    TaskExecution erroredTaskExecution = new TaskExecution(
-                        taskExecutionService.getTaskExecution(job.getParentTaskExecutionId()));
+                    TaskExecution erroredTaskExecution = taskExecutionService
+                        .getTaskExecution(job.getParentTaskExecutionId());
 
                     erroredTaskExecution.setError(new ExecutionError("An error occurred with subflow", List.of()));
 
@@ -99,19 +99,18 @@ public class SubflowJobStatusEventListener implements EventListener {
                     break;
                 }
                 case COMPLETED: {
-                    TaskExecution completionTaskExecution = new TaskExecution(
-                        taskExecutionService.getTaskExecution(job.getParentTaskExecutionId()));
+                    TaskExecution completionTaskExecution = taskExecutionService
+                        .getTaskExecution(job.getParentTaskExecutionId());
                     Object output = job.getOutputs();
 
-                    if (completionTaskExecution.getOutput() != null) {
-                        // TODO check, it seems wrong
-                        TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(
-                            completionTaskExecution, new Context("execution", new Context("output", output)));
-
-                        completionTaskExecution = new TaskExecution(evaluatedTaskExecution);
-                    } else {
+                    if (completionTaskExecution.getOutput() == null) {
                         completionTaskExecution.setOutput(output);
+                    } else {
+                        // TODO check, it seems wrong
+                        completionTaskExecution.evaluate(
+                            taskEvaluator, new Context("execution", new Context("output", output)));
                     }
+
                     coordinatorManager.complete(completionTaskExecution);
 
                     break;
