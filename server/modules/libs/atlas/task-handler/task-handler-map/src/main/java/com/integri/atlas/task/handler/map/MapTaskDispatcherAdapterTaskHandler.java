@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.worker.task.map;
+package com.integri.atlas.task.handler.map;
 
 import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.error.Error;
@@ -27,7 +27,7 @@ import com.integri.atlas.engine.repository.memory.context.InMemoryContextReposit
 import com.integri.atlas.engine.repository.memory.counter.InMemoryCounterRepository;
 import com.integri.atlas.engine.repository.memory.task.InMemoryTaskExecutionRepository;
 import com.integri.atlas.engine.worker.Worker;
-import com.integri.atlas.engine.worker.task.concurrency.CurrentThreadExecutorService;
+import com.integri.atlas.engine.worker.concurrency.CurrentThreadExecutorService;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolver;
 import com.integri.atlas.message.broker.sync.SyncMessageBroker;
@@ -42,14 +42,20 @@ import java.util.Objects;
  * @author Arik Cohen
  * @since Feb, 21 2020
  */
-public class MapTaskHandlerAdapter implements TaskHandler<List<?>> {
+public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>> {
 
     private final TaskHandlerResolver taskHandlerResolver;
     private final TaskEvaluator taskEvaluator;
+    private final Worker.Builder builder;
 
-    public MapTaskHandlerAdapter(TaskHandlerResolver aResolver, TaskEvaluator aTaskEvaluator) {
+    public MapTaskDispatcherAdapterTaskHandler(
+        TaskHandlerResolver aResolver,
+        TaskEvaluator aTaskEvaluator,
+        Worker.Builder builder
+    ) {
         taskHandlerResolver = Objects.requireNonNull(aResolver);
         taskEvaluator = Objects.requireNonNull(aTaskEvaluator);
+        this.builder = builder;
     }
 
     @Override
@@ -77,8 +83,7 @@ public class MapTaskHandlerAdapter implements TaskHandler<List<?>> {
             }
         );
 
-        Worker worker = Worker
-            .builder()
+        Worker worker = builder
             .withTaskHandlerResolver(taskHandlerResolver)
             .withMessageBroker(messageBroker)
             .withEventPublisher(e -> {})

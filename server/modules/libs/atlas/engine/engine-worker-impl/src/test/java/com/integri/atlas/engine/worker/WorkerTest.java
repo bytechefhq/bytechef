@@ -23,11 +23,8 @@ import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
-import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolver;
-import com.integri.atlas.engine.worker.task.map.MapTaskHandlerAdapter;
 import com.integri.atlas.message.broker.sync.SyncMessageBroker;
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -48,7 +45,7 @@ public class WorkerTest {
         );
         messageBroker.receive(Queues.EVENTS, t -> {});
 
-        Worker worker = Worker
+        Worker worker = WorkerImpl
             .builder()
             .withTaskHandlerResolver(jt -> t -> "done")
             .withMessageBroker(messageBroker)
@@ -70,7 +67,7 @@ public class WorkerTest {
             t -> Assertions.assertTrue(((TaskExecution) t).getError().getMessage().equals("bad input"))
         );
         messageBroker.receive(Queues.EVENTS, t -> {});
-        Worker worker = Worker
+        Worker worker = WorkerImpl
             .builder()
             .withTaskHandlerResolver(jt ->
                 t -> {
@@ -95,7 +92,7 @@ public class WorkerTest {
             t -> Assertions.assertEquals("done", (((TaskExecution) t).getOutput()))
         );
         messageBroker.receive(Queues.EVENTS, t -> {});
-        Worker worker = Worker
+        Worker worker = WorkerImpl
             .builder()
             .withTaskHandlerResolver(t1 -> {
                 String type = t1.getType();
@@ -132,7 +129,7 @@ public class WorkerTest {
         );
         messageBroker.receive(Queues.EVENTS, t -> {});
 
-        Worker worker = Worker
+        Worker worker = WorkerImpl
             .builder()
             .withTaskHandlerResolver(t1 -> {
                 String type = t1.getType();
@@ -179,7 +176,7 @@ public class WorkerTest {
         );
         messageBroker.receive(Queues.EVENTS, t -> {});
 
-        Worker worker = Worker
+        Worker worker = WorkerImpl
             .builder()
             .withTaskHandlerResolver(t1 -> {
                 String type = t1.getType();
@@ -215,105 +212,11 @@ public class WorkerTest {
     }
 
     @Test
-    public void test9() {
-        SyncMessageBroker messageBroker = new SyncMessageBroker();
-        messageBroker.receive(
-            Queues.COMPLETIONS,
-            t -> {
-                TaskExecution te = (TaskExecution) t;
-                Assertions.assertNull(te.getOutput());
-            }
-        );
-        messageBroker.receive(Queues.EVENTS, t -> {});
-
-        MapTaskHandlerAdapter[] taskHandlerAdapterRef = new MapTaskHandlerAdapter[1];
-
-        TaskHandlerResolver thr = t1 -> {
-            String type = t1.getType();
-            if ("var".equals(type)) {
-                return t2 -> t2.getRequired("value");
-            }
-            if ("pass".equals(type)) {
-                return t2 -> null;
-            }
-            if ("map".equals(type)) {
-                return taskHandlerAdapterRef[0];
-            } else {
-                throw new IllegalArgumentException("unknown type: " + type);
-            }
-        };
-
-        Worker worker = Worker
-            .builder()
-            .withTaskHandlerResolver(thr)
-            .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {})
-            .withTaskEvaluator(SpelTaskEvaluator.create())
-            .build();
-
-        taskHandlerAdapterRef[0] = new MapTaskHandlerAdapter(thr, SpelTaskEvaluator.create());
-
-        SimpleTaskExecution task = new SimpleTaskExecution();
-
-        task.setId("1234");
-        task.setJobId("4567");
-        task.set("type", "pass");
-
-        task.set(
-            "pre",
-            List.of(
-                Map.of(
-                    "name",
-                    "output",
-                    "type",
-                    "map",
-                    "list",
-                    Arrays.asList(1, 2, 3),
-                    "iteratee",
-                    Map.of("type", "var", "value", "${item}")
-                )
-            )
-        );
-        task.set(
-            "post",
-            List.of(
-                Map.of(
-                    "name",
-                    "output",
-                    "type",
-                    "map",
-                    "list",
-                    Arrays.asList(1, 2, 3),
-                    "iteratee",
-                    Map.of("type", "var", "value", "${item}")
-                )
-            )
-        );
-        task.set(
-            "finalize",
-            List.of(
-                Map.of(
-                    "name",
-                    "output",
-                    "type",
-                    "map",
-                    "list",
-                    Arrays.asList(1, 2, 3),
-                    "iteratee",
-                    Map.of("type", "var", "value", "${item}")
-                )
-            )
-        );
-
-        worker.handle(task);
-    }
-
-    @Test
     public void test6() throws InterruptedException {
         ExecutorService executors = Executors.newSingleThreadExecutor();
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
-        Worker worker = Worker
+        WorkerImpl worker = (WorkerImpl) WorkerImpl
             .builder()
             .withTaskHandlerResolver(jt ->
                 t -> {
@@ -348,7 +251,7 @@ public class WorkerTest {
         ExecutorService executors = Executors.newFixedThreadPool(2);
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
-        Worker worker = Worker
+        WorkerImpl worker = (WorkerImpl) WorkerImpl
             .builder()
             .withTaskHandlerResolver(jt ->
                 t -> {
@@ -390,7 +293,7 @@ public class WorkerTest {
     public void test8() throws InterruptedException {
         ExecutorService executors = Executors.newFixedThreadPool(2);
         SyncMessageBroker messageBroker = new SyncMessageBroker();
-        Worker worker = Worker
+        WorkerImpl worker = (WorkerImpl) WorkerImpl
             .builder()
             .withTaskHandlerResolver(jt ->
                 t -> {

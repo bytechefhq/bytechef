@@ -19,10 +19,6 @@
 package com.integri.atlas.engine.worker.task.handler;
 
 import com.integri.atlas.engine.core.task.Task;
-import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolver;
-import com.integri.atlas.engine.worker.task.map.MapTaskHandlerAdapter;
 import java.util.Map;
 
 /**
@@ -33,8 +29,8 @@ public class TaskDispatcherAdapterTaskHandlerResolver implements TaskHandlerReso
 
     private final Map<String, TaskHandler<?>> taskHandlers;
 
-    public TaskDispatcherAdapterTaskHandlerResolver(TaskHandlerResolver aResolver, TaskEvaluator aTaskEvaluator) {
-        taskHandlers = Map.of("map", new MapTaskHandlerAdapter(aResolver, aTaskEvaluator));
+    public TaskDispatcherAdapterTaskHandlerResolver(Map<String, TaskHandler<?>> taskDispatcherTaskHandlerAdapters) {
+        taskHandlers = taskDispatcherTaskHandlerAdapters;
     }
 
     @Override

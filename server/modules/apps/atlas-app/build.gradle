@@ -42,6 +42,7 @@ dependencies {
     implementation project(":modules:libs:atlas:task-handler:task-handler-local-file")
     implementation project(":modules:libs:atlas:task-handler:task-handler-spreadsheet-file")
     implementation project(":modules:libs:atlas:task-handler:task-handler-io")
+    implementation project(":modules:libs:atlas:task-handler:task-handler-map")
     implementation project(":modules:libs:atlas:task-handler:task-handler-media")
     implementation project(":modules:libs:atlas:task-handler:task-handler-random")
     implementation project(":modules:libs:atlas:task-handler:task-handler-s3")

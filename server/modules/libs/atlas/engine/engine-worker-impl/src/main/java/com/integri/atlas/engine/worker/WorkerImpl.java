@@ -54,10 +54,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>The class responsible for executing tasks spawned by the {@link com.integri.atlas.workflow.coordinator.Coordinator}.</p>
+ * <p>The class responsible for executing tasks spawned by the
+ * {@link com.integri.atlas.engine.coordinator.Coordinator}.</p>
  *
  * <p>Worker threads typically execute on a different
- * process than the {@link com.integri.atlas.workflow.coordinator.Coordinator} process and most likely
+ * process than the {@link com.integri.atlas.engine.coordinator.Coordinator} process and most likely
  * on a seperate node altogether.</p>
  *
  * <p>Communication between the two is decoupled through the
@@ -67,7 +68,7 @@ import org.slf4j.LoggerFactory;
  * @since Jun 12, 2016
  *
  */
-public class Worker {
+public class WorkerImpl implements Worker {
 
     private final Map<String, TaskExecutionFuture<?>> taskExecutions = new ConcurrentHashMap<>();
     private final TaskEvaluator taskEvaluator;
@@ -81,7 +82,7 @@ public class Worker {
 
     private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
-    private Worker(Builder aBuilder) {
+    private WorkerImpl(BuilderImpl aBuilder) {
         taskHandlerResolver = Objects.requireNonNull(aBuilder.taskHandlerResolver);
         messageBroker = Objects.requireNonNull(aBuilder.messageBroker);
         eventPublisher = Objects.requireNonNull(aBuilder.eventPublisher);
@@ -97,6 +98,7 @@ public class Worker {
      *          The task to execute.
      * @throws InterruptedException
      */
+    @Override
     public void handle(TaskExecution aTask) {
         CountDownLatch latch = new CountDownLatch(1);
         Future<?> future = executors.submit(() -> {
@@ -220,10 +222,10 @@ public class Worker {
     }
 
     public static Builder builder() {
-        return new Builder();
+        return new BuilderImpl();
     }
 
-    public static class Builder {
+    public static class BuilderImpl implements Worker.Builder {
 
         private TaskHandlerResolver taskHandlerResolver;
         private MessageBroker messageBroker;
@@ -256,8 +258,8 @@ public class Worker {
             return this;
         }
 
-        public Worker build() {
-            return new Worker(this);
+        public WorkerImpl build() {
+            return new WorkerImpl(this);
         }
     }
 

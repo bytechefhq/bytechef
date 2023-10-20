@@ -40,6 +40,7 @@ import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcherResolver;
 import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.worker.Worker;
+import com.integri.atlas.engine.worker.WorkerImpl;
 import com.integri.atlas.engine.worker.task.handler.DefaultTaskHandlerResolver;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolverChain;
@@ -117,11 +118,13 @@ public abstract class BaseTaskIntTest {
 
         coordinator.setMessageBroker(messageBroker);
 
-        TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain(
+        TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain();
+
+        taskHandlerResolverChain.setTaskHandlerResolvers(
             List.of(new DefaultTaskHandlerResolver(getTaskHandlerResolverMap()))
         );
 
-        Worker worker = Worker
+        Worker worker = WorkerImpl
             .builder()
             .withTaskHandlerResolver(taskHandlerResolverChain)
             .withMessageBroker(messageBroker)

@@ -34,6 +34,7 @@ import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.worker.Worker;
+import com.integri.atlas.engine.worker.WorkerImpl;
 import com.integri.atlas.engine.worker.task.handler.DefaultTaskHandlerResolver;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.message.broker.sync.SyncMessageBroker;
@@ -88,7 +89,7 @@ public class CoordinatorIntTest {
 
         DefaultTaskHandlerResolver taskHandlerResolver = new DefaultTaskHandlerResolver(handlers);
 
-        Worker worker = Worker
+        Worker worker = WorkerImpl
             .builder()
             .withTaskHandlerResolver(taskHandlerResolver)
             .withMessageBroker(messageBroker)

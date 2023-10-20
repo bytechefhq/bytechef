@@ -1,0 +1,5 @@
+dependencies {
+    implementation project(":modules:libs:atlas:engine-repository:engine-repository-memory")
+    implementation project(":modules:libs:atlas:message-broker:message-broker-sync")
+    implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-map")
+}
