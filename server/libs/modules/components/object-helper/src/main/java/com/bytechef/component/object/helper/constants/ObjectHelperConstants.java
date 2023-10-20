@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.objecthelpers;
+package com.bytechef.component.object.helper.constants;
 
 /**
  * @author Ivica Cardic
  */
-public class ObjectHelpersTaskConstants {
+public class ObjectHelperConstants {
 
     public static final String SOURCE = "source";
-    public static final String OBJECT_HELPERS = "objectHelpers";
-    public static final float VERSION_1_0 = 1.0f;
+    public static final String OBJECT_HELPER = "objectHelper";
     public static final String JSON_STRINGIFY = "jsonStringify";
     public static final String JSON_PARSE = "jsonParse";
 }
