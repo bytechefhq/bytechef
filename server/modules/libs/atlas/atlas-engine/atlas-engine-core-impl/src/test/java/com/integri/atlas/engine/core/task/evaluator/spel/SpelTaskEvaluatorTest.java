@@ -30,15 +30,18 @@ import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.storage.base64.Base64StorageService;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.core.util.MapUtil;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 
 /**
@@ -438,6 +441,20 @@ public class SpelTaskEvaluatorTest {
             .hasFieldOrPropertyWithValue("mimeType", "text/plain")
             .hasFieldOrPropertyWithValue("name", "sample.txt");
     }
+
+    @Test
+    public void test44() {
+        SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
+        TaskExecution taskExecution = SimpleTaskExecution.of("result", "${map.column_1} ${map.column_2}");
+
+        TaskExecution evaluated = evaluator.evaluate(
+            taskExecution,
+            new MapContext(Collections.singletonMap("map", MapUtil.of(List.of("name", "test"))))
+        );
+
+        assertEquals("name test", evaluated.getString("result"));
+    }
+
     @Test
     public void test45() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
