@@ -17,6 +17,7 @@
 
 package com.bytechef.dione.integration.repository;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.dione.integration.config.IntegrationIntTestConfiguration;
 import com.bytechef.dione.integration.domain.Integration;
 import com.bytechef.test.annotation.EmbeddedSql;
@@ -51,8 +52,7 @@ public class IntegrationRepositoryIntTest {
     public void testCreate() {
         Integration integration = integrationRepository.save(getIntegration(Collections.emptyList()));
 
-        assertThat(integration).isEqualTo(integrationRepository.findById(integration.getId())
-            .get());
+        assertThat(integration).isEqualTo(OptionalUtils.get(integrationRepository.findById(integration.getId())));
     }
 
     @Test
@@ -60,8 +60,7 @@ public class IntegrationRepositoryIntTest {
     public void testDelete() {
         Integration integration = integrationRepository.save(getIntegration(Collections.emptyList()));
 
-        Integration resultIntegration = integrationRepository.findById(integration.getId())
-            .orElseThrow();
+        Integration resultIntegration = OptionalUtils.get(integrationRepository.findById(integration.getId()));
 
         assertThat(resultIntegration).isEqualTo(integration);
 
@@ -75,8 +74,7 @@ public class IntegrationRepositoryIntTest {
     public void testFindById() {
         Integration integration = integrationRepository.save(getIntegration(Collections.emptyList()));
 
-        Integration resultIntegration = integrationRepository.findById(integration.getId())
-            .orElseThrow();
+        Integration resultIntegration = OptionalUtils.get(integrationRepository.findById(integration.getId()));
 
         assertThat(resultIntegration).isEqualTo(integration);
 
@@ -86,8 +84,7 @@ public class IntegrationRepositoryIntTest {
 
         integration = integrationRepository.save(integration);
 
-        resultIntegration = integrationRepository.findById(integration.getId())
-            .orElseThrow();
+        resultIntegration = OptionalUtils.get(integrationRepository.findById(integration.getId()));
 
         assertThat(resultIntegration.getWorkflowIds()).isEqualTo(integration.getWorkflowIds());
 
@@ -95,8 +92,7 @@ public class IntegrationRepositoryIntTest {
 
         integrationRepository.save(resultIntegration);
 
-        resultIntegration = integrationRepository.findById(integration.getId())
-            .orElseThrow();
+        resultIntegration = OptionalUtils.get(integrationRepository.findById(integration.getId()));
 
         assertThat(resultIntegration.getWorkflowIds()).isEmpty();
     }
@@ -106,7 +102,7 @@ public class IntegrationRepositoryIntTest {
     public void testUpdate() {
         Integration integration = integrationRepository.save(getIntegration(List.of("workflow1")));
 
-        integration.addWorkflow("workflow2");
+        integration.addWorkflowId("workflow2");
         integration.setName("name2");
 
         integrationRepository.save(integration);
@@ -115,15 +111,12 @@ public class IntegrationRepositoryIntTest {
     }
 
     private static Integration getIntegration(List<String> workflowIds) {
-        Integration integration = new Integration();
-
-        integration.setWorkflowIds(workflowIds);
-
-        integration.setDescription("name");
-        integration.setIntegrationVersion(1);
-        integration.setName("name");
-        integration.setStatus(Integration.Status.UNPUBLISHED);
-
-        return integration;
+        return Integration.Builder.builder()
+            .description("description")
+            .integrationVersion(1)
+            .name("name")
+            .status(Integration.Status.UNPUBLISHED)
+            .workflowIds(workflowIds)
+            .build();
     }
 }

@@ -17,7 +17,7 @@
 
 package com.bytechef.dione.integration.web.rest.mapper;
 
-import com.bytechef.dione.integration.domain.Integration;
+import com.bytechef.dione.integration.dto.IntegrationDTO;
 import com.bytechef.dione.integration.web.rest.mapper.config.IntegrationMapperSpringConfiguration;
 import com.bytechef.dione.integration.web.rest.model.IntegrationModel;
 import org.mapstruct.Mapper;
@@ -27,7 +27,8 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = IntegrationMapperSpringConfiguration.class)
-public interface IntegrationMapper extends Converter<Integration, IntegrationModel> {
+public interface IntegrationMapper extends Converter<IntegrationDTO, IntegrationModel> {
 
-    IntegrationModel convert(Integration integration);
+    @Override
+    IntegrationModel convert(IntegrationDTO integrationDTO);
 }

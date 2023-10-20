@@ -43,8 +43,8 @@ public final class IntegrationTag implements Persistable<Long> {
     }
 
     @SuppressFBWarnings("NP")
-    public IntegrationTag(Tag tag) {
-        this.tagId = tag.isNew() ? null : AggregateReference.to(tag.getId());
+    public IntegrationTag(Long tagId) {
+        this.tagId = tagId == null ? null : AggregateReference.to(tagId);
     }
 
     @Override
@@ -86,7 +86,7 @@ public final class IntegrationTag implements Persistable<Long> {
 
     @Override
     public String toString() {
-        return "IntegrationTag{" + ", id='"
+        return "IntegrationTag{id='"
             + id + '\'' + ", tagId='"
             + getTagId() + '\'' + '}';
     }

@@ -19,7 +19,6 @@ package com.bytechef.dione.integration.config;
 
 import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
-import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.service.WorkflowServiceImpl;
 
@@ -33,7 +32,6 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
@@ -45,9 +43,6 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
         "com.bytechef.tag"
     })
 @EnableAutoConfiguration
-@Import({
-    WorkflowMapperConfiguration.class
-})
 @SpringBootConfiguration
 public class IntegrationIntTestConfiguration {
 

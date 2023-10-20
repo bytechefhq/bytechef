@@ -18,14 +18,13 @@
 package com.bytechef.dione.integration.domain;
 
 import com.bytechef.category.domain.Category;
-import com.bytechef.tag.domain.Tag;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -33,7 +32,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.PersistenceCreator;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
@@ -51,9 +49,6 @@ public final class Integration implements Persistable<Long> {
     public enum Status {
         PUBLISHED, UNPUBLISHED
     }
-
-    @Transient
-    private Category category;
 
     @Column("category_id")
     private AggregateReference<Category, Long> categoryId;
@@ -79,10 +74,10 @@ public final class Integration implements Persistable<Long> {
     private Set<IntegrationWorkflow> integrationWorkflows = new HashSet<>();
 
     @Column
-    private String name;
+    private int integrationVersion;
 
     @Column
-    private int integrationVersion;
+    private String name;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -97,9 +92,6 @@ public final class Integration implements Persistable<Long> {
 
     @Column
     private Status status;
-
-    @Transient
-    private List<Tag> tags = new ArrayList<>();
 
     @Version
     private int version;
@@ -119,15 +111,7 @@ public final class Integration implements Persistable<Long> {
         this.integrationWorkflows.addAll(integrationWorkflows);
     }
 
-    public void addTag(Tag tag) {
-        if (tag.getId() != null) {
-            integrationTags.add(new IntegrationTag(tag));
-        }
-
-        tags.add(tag);
-    }
-
-    public void addWorkflow(String workflowId) {
+    public void addWorkflowId(String workflowId) {
         integrationWorkflows.add(new IntegrationWorkflow(workflowId));
     }
 
@@ -153,11 +137,6 @@ public final class Integration implements Persistable<Long> {
 
     public Long getCategoryId() {
         return categoryId == null ? null : categoryId.getId();
-    }
-
-    @SuppressFBWarnings("EI")
-    public Category getCategory() {
-        return category;
     }
 
     public String getCreatedBy() {
@@ -208,10 +187,6 @@ public final class Integration implements Persistable<Long> {
             .toList();
     }
 
-    public List<Tag> getTags() {
-        return List.copyOf(tags);
-    }
-
     public List<String> getWorkflowIds() {
         return integrationWorkflows.stream()
             .map(IntegrationWorkflow::getWorkflowId)
@@ -234,19 +209,15 @@ public final class Integration implements Persistable<Long> {
             .ifPresent(integrationWorkflows::remove);
     }
 
-    @SuppressFBWarnings({
-        "EI", "NP"
-    })
+    @SuppressFBWarnings("NP")
     public void setCategory(Category category) {
-        this.category = category;
-
-        if (category != null && !category.isNew()) {
-            this.categoryId = AggregateReference.to(category.getId());
-        }
+        this.categoryId = category == null
+            ? null
+            : category.getId() == null ? null : AggregateReference.to(category.getId());
     }
 
     public void setCategoryId(Long categoryId) {
-        this.categoryId = AggregateReference.to(categoryId);
+        this.categoryId = categoryId == null ? null : AggregateReference.to(categoryId);
     }
 
     public void setDescription(String description) {
@@ -273,14 +244,19 @@ public final class Integration implements Persistable<Long> {
         this.status = status;
     }
 
-    public void setTags(List<Tag> tags) {
+    public void setTagIds(List<Long> tagIds) {
         this.integrationTags = new HashSet<>();
-        this.tags = new ArrayList<>();
 
-        if (!CollectionUtils.isEmpty(tags)) {
-            for (Tag tag : tags) {
-                addTag(tag);
+        if (!CollectionUtils.isEmpty(tagIds)) {
+            for (Long tagId : tagIds) {
+                integrationTags.add(new IntegrationTag(tagId));
             }
+        }
+    }
+
+    public void setTags(List<Tag> tags) {
+        if (!CollectionUtils.isEmpty(tags)) {
+            setTagIds(com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId));
         }
     }
 
@@ -291,8 +267,10 @@ public final class Integration implements Persistable<Long> {
     public void setWorkflowIds(List<String> workflowIds) {
         integrationWorkflows = new HashSet<>();
 
-        for (String workflowId : workflowIds) {
-            addWorkflow(workflowId);
+        if (!CollectionUtils.isEmpty(workflowIds)) {
+            for (String workflowId : workflowIds) {
+                addWorkflowId(workflowId);
+            }
         }
     }
 
@@ -316,16 +294,95 @@ public final class Integration implements Persistable<Long> {
             '}';
     }
 
-    public Integration update(Integration integration) {
-        this.category = integration.category;
-        this.categoryId = integration.categoryId;
-        this.description = integration.description;
-        this.id = integration.id;
-        this.integrationTags = integration.integrationTags;
-        this.integrationWorkflows = integration.integrationWorkflows;
-        this.name = integration.name;
-        this.tags = integration.tags;
+    @SuppressFBWarnings("EI")
+    public static final class Builder {
+        private Long categoryId;
+        private String description;
+        private Long id;
+        private int integrationVersion;
+        private String name;
+        private LocalDateTime publishedDate;
+        private Status status;
+        private List<Long> tagIds;
+        private int version;
+        private List<String> workflowIds;
 
-        return this;
+        private Builder() {
+        }
+
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        public Builder categoryId(Long categoryId) {
+            this.categoryId = categoryId;
+            return this;
+        }
+
+        public Builder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder integrationVersion(int integrationVersion) {
+            this.integrationVersion = integrationVersion;
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder publishedDate(LocalDateTime publishedDate) {
+            this.publishedDate = publishedDate;
+            return this;
+        }
+
+        public Builder status(Status status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder tagIds(List<Long> tagIds) {
+            this.tagIds = tagIds;
+            return this;
+        }
+
+        public Builder version(int version) {
+            this.version = version;
+            return this;
+        }
+
+        public Builder workflowIds(List<String> workflowIds) {
+            this.workflowIds = workflowIds;
+
+            return this;
+        }
+
+        public Integration build() {
+            Integration integration = new Integration();
+
+            if (categoryId != null) {
+                integration.setCategoryId(categoryId);
+            }
+
+            integration.setDescription(description);
+            integration.setId(id);
+            integration.setIntegrationVersion(integrationVersion);
+            integration.setName(name);
+            integration.setPublishedDate(publishedDate);
+            integration.setStatus(status);
+            integration.setTagIds(tagIds);
+            integration.setVersion(version);
+            integration.setWorkflowIds(workflowIds);
+
+            return integration;
+        }
     }
 }

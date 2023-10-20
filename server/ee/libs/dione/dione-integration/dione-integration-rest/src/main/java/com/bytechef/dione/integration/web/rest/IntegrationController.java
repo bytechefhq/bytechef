@@ -19,7 +19,7 @@ package com.bytechef.dione.integration.web.rest;
 
 import com.bytechef.atlas.web.rest.model.WorkflowModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.dione.integration.domain.Integration;
+import com.bytechef.dione.integration.dto.IntegrationDTO;
 import com.bytechef.dione.integration.facade.IntegrationFacade;
 import com.bytechef.dione.integration.web.rest.model.CreateIntegrationWorkflowRequestModel;
 import com.bytechef.dione.integration.web.rest.model.IntegrationModel;
@@ -102,20 +102,20 @@ public class IntegrationController implements IntegrationsApi {
         return integrationModelMono.map(integrationModel -> ResponseEntity.ok(
             conversionService.convert(
                 integrationFacade.create(
-                    conversionService.convert(integrationModel, Integration.class)),
+                    conversionService.convert(integrationModel, IntegrationDTO.class)),
                 IntegrationModel.class)));
     }
 
     @Override
-    public Mono<ResponseEntity<IntegrationModel>> createIntegrationWorkflow(
+    public Mono<ResponseEntity<WorkflowModel>> createIntegrationWorkflow(
         Long id, Mono<CreateIntegrationWorkflowRequestModel> createIntegrationWorkflowRequestModelMono,
         ServerWebExchange exchange) {
 
         return createIntegrationWorkflowRequestModelMono.map(requestModel -> ResponseEntity.ok(
             conversionService.convert(
                 integrationFacade.addWorkflow(
-                    id, requestModel.getName(), requestModel.getDescription(), requestModel.getDefinition()),
-                IntegrationModel.class)));
+                    id, requestModel.getLabel(), requestModel.getDescription(), requestModel.getDefinition()),
+                WorkflowModel.class)));
     }
 
     @Override
@@ -124,7 +124,7 @@ public class IntegrationController implements IntegrationsApi {
 
         return integrationModelMono.map(integrationModel -> ResponseEntity.ok(
             conversionService.convert(
-                integrationFacade.update(conversionService.convert(integrationModel.id(id), Integration.class)),
+                integrationFacade.update(conversionService.convert(integrationModel.id(id), IntegrationDTO.class)),
                 IntegrationModel.class)));
     }
 

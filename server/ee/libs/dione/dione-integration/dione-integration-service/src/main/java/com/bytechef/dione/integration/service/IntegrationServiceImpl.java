@@ -23,10 +23,8 @@ import com.bytechef.dione.integration.repository.IntegrationRepository;
 
 import java.util.List;
 
-import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -49,7 +47,7 @@ public class IntegrationServiceImpl implements IntegrationService {
 
         Integration integration = getIntegration(id);
 
-        integration.addWorkflow(workflowId);
+        integration.addWorkflowId(workflowId);
 
         return integrationRepository.save(integration);
     }
@@ -57,7 +55,9 @@ public class IntegrationServiceImpl implements IntegrationService {
     @Override
     public Integration create(Integration integration) {
         Assert.notNull(integration, "'integration' must not be null");
+
         Assert.isNull(integration.getId(), "'id' must be null");
+        Assert.notNull(integration.getName(), "'name' must not be null");
 
         integration.setIntegrationVersion(1);
         integration.setStatus(Integration.Status.UNPUBLISHED);
@@ -93,22 +93,30 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public Integration update(long id, List<Tag> tags) {
+    public Integration update(long id, List<Long> tagIds) {
         Integration integration = getIntegration(id);
 
-        integration.setTags(tags);
+        integration.setTagIds(tagIds);
 
         return integrationRepository.save(integration);
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Integration update(@NonNull Integration integration) {
-        Assert.notNull(integration, "'integration' must not be null");
-        Assert.notNull(integration.getId(), "'id' must not be null");
+    public Integration update(
+        long id, Long categoryId, String description, String name, List<Long> tagIds, List<String> workflowIds) {
 
-        Integration curIntegration = getIntegration(integration.getId());
+        Assert.notNull(name, "'name' must not be null");
 
-        return integrationRepository.save(curIntegration.update(integration));
+        Integration integration = getIntegration(id);
+
+        integration.setCategoryId(categoryId);
+        integration.setDescription(description);
+        integration.setId(id);
+        integration.setName(name);
+        integration.setTagIds(tagIds);
+        integration.setWorkflowIds(workflowIds);
+
+        return integrationRepository.save(integration);
     }
 }

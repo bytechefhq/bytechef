@@ -17,21 +17,18 @@
 
 package com.bytechef.dione.integration.web.rest.mapper;
 
-import com.bytechef.dione.integration.domain.Integration;
+import com.bytechef.dione.integration.dto.IntegrationDTO;
 import com.bytechef.dione.integration.web.rest.mapper.config.IntegrationMapperSpringConfiguration;
 import com.bytechef.dione.integration.web.rest.model.IntegrationModel;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
 @Mapper(config = IntegrationMapperSpringConfiguration.class)
-public interface IntegrationModelMapper extends Converter<IntegrationModel, Integration> {
+public interface IntegrationModelMapper extends Converter<IntegrationModel, IntegrationDTO> {
 
-    @Mapping(target = "categoryId", ignore = true)
-    @Mapping(target = "update", ignore = true)
-    @Mapping(target = "tagIds", ignore = true)
-    Integration convert(IntegrationModel integrationModel);
+    @Override
+    IntegrationDTO convert(IntegrationModel integrationModel);
 }

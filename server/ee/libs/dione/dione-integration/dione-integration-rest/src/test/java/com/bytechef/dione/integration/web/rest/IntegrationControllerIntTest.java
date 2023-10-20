@@ -25,12 +25,12 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.category.domain.Category;
-import com.bytechef.dione.integration.domain.Integration;
+import com.bytechef.dione.integration.dto.IntegrationDTO;
 import com.bytechef.dione.integration.facade.IntegrationFacade;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.dione.integration.web.rest.mapper.IntegrationMapper;
+import com.bytechef.dione.integration.web.rest.model.CreateIntegrationWorkflowRequestModel;
 import com.bytechef.dione.integration.web.rest.model.IntegrationModel;
-import com.bytechef.dione.integration.web.rest.model.PostIntegrationWorkflowRequestModel;
 import com.bytechef.dione.integration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
@@ -40,10 +40,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -93,9 +91,9 @@ public class IntegrationControllerIntTest {
     @SuppressFBWarnings("NP")
     public void testGetIntegration() {
         try {
-            Integration integration = getIntegration();
+            IntegrationDTO integrationDTO = getIntegrationDTO();
 
-            when(integrationFacade.getIntegration(1L)).thenReturn(integration);
+            when(integrationFacade.getIntegration(1L)).thenReturn(integrationDTO);
 
             this.webTestClient
                 .get()
@@ -105,7 +103,7 @@ public class IntegrationControllerIntTest {
                 .expectStatus()
                 .isOk()
                 .expectBody(IntegrationModel.class)
-                .isEqualTo(integrationMapper.convert(integration));
+                .isEqualTo(integrationMapper.convert(integrationDTO));
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -114,7 +112,7 @@ public class IntegrationControllerIntTest {
     @Test
     public void testGetIntegrationWorkflows() {
         try {
-            Workflow workflow = new Workflow("workflow1", "{}", Workflow.Format.JSON, Map.of());
+            Workflow workflow = new Workflow("{}", Workflow.Format.JSON, "workflow1", Map.of());
 
             when(integrationFacade.getIntegrationWorkflows(1L)).thenReturn(List.of(workflow));
 
@@ -135,9 +133,9 @@ public class IntegrationControllerIntTest {
 
     @Test
     public void testGetIntegrations() {
-        Integration integration = getIntegration();
+        IntegrationDTO integrationDTO = getIntegrationDTO();
 
-        when(integrationFacade.searchIntegrations(null, null)).thenReturn(List.of(integration));
+        when(integrationFacade.searchIntegrations(null, null)).thenReturn(List.of(integrationDTO));
 
         this.webTestClient
             .get()
@@ -147,10 +145,10 @@ public class IntegrationControllerIntTest {
             .expectStatus()
             .isOk()
             .expectBodyList(IntegrationModel.class)
-            .contains(integrationMapper.convert(integration))
+            .contains(integrationMapper.convert(integrationDTO))
             .hasSize(1);
 
-        when(integrationFacade.searchIntegrations(List.of(1L), null)).thenReturn(List.of(integration));
+        when(integrationFacade.searchIntegrations(List.of(1L), null)).thenReturn(List.of(integrationDTO));
 
         this.webTestClient
             .get()
@@ -162,7 +160,7 @@ public class IntegrationControllerIntTest {
             .expectBodyList(IntegrationModel.class)
             .hasSize(1);
 
-        when(integrationFacade.searchIntegrations(null, List.of(1L))).thenReturn(List.of(integration));
+        when(integrationFacade.searchIntegrations(null, List.of(1L))).thenReturn(List.of(integrationDTO));
 
         this.webTestClient
             .get()
@@ -174,7 +172,7 @@ public class IntegrationControllerIntTest {
             .expectBodyList(IntegrationModel.class)
             .hasSize(1);
 
-        when(integrationFacade.searchIntegrations(List.of(1L), List.of(1L))).thenReturn(List.of(integration));
+        when(integrationFacade.searchIntegrations(List.of(1L), List.of(1L))).thenReturn(List.of(integrationDTO));
 
         this.webTestClient
             .get()
@@ -188,15 +186,15 @@ public class IntegrationControllerIntTest {
     @Test
     @SuppressFBWarnings("NP")
     public void testPostIntegration() {
-        Integration integration = getIntegration();
+        IntegrationDTO integrationDTO = getIntegrationDTO();
         IntegrationModel integrationModel = new IntegrationModel()
             .name("name")
             .description("description");
 
-        when(integrationFacade.create(any())).thenReturn(integration);
+        when(integrationFacade.create(any())).thenReturn(integrationDTO);
 
         try {
-            assert integration.getId() != null;
+            assert integrationDTO.id() != null;
             this.webTestClient
                 .post()
                 .uri("/integrations")
@@ -208,58 +206,57 @@ public class IntegrationControllerIntTest {
                 .isOk()
                 .expectBody()
                 .jsonPath("$.description")
-                .isEqualTo(integration.getDescription())
+                .isEqualTo(integrationDTO.description())
                 .jsonPath("$.id")
-                .isEqualTo(integration.getId())
+                .isEqualTo(integrationDTO.id())
                 .jsonPath("$.name")
-                .isEqualTo(integration.getName())
+                .isEqualTo(integrationDTO.name())
                 .jsonPath("$.workflowIds[0]")
                 .isEqualTo("workflow1");
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
 
-        ArgumentCaptor<Integration> integrationArgumentCaptor = ArgumentCaptor.forClass(Integration.class);
+        ArgumentCaptor<IntegrationDTO> integrationDTOArgumentCaptor = ArgumentCaptor.forClass(IntegrationDTO.class);
 
-        verify(integrationFacade).create(integrationArgumentCaptor.capture());
+        verify(integrationFacade).create(integrationDTOArgumentCaptor.capture());
 
-        Integration capturedIntegration = integrationArgumentCaptor.getValue();
+        IntegrationDTO capturedIntegrationDTO = integrationDTOArgumentCaptor.getValue();
 
-        Assertions.assertEquals(capturedIntegration.getName(), "name");
-        Assertions.assertEquals(capturedIntegration.getDescription(), "description");
+        Assertions.assertEquals(capturedIntegrationDTO.name(), "name");
+        Assertions.assertEquals(capturedIntegrationDTO.description(), "description");
     }
 
     @Test
     @SuppressFBWarnings("NP")
-    public void testPostIntegrationWorkflows() {
-        Integration integration = getIntegration();
-        PostIntegrationWorkflowRequestModel postIntegrationWorkflowRequestModel = new PostIntegrationWorkflowRequestModel()
-            .name("workflowName")
+    public void testPostIntegrationWorkflows() throws Exception {
+        CreateIntegrationWorkflowRequestModel createIntegrationWorkflowRequestModel = new CreateIntegrationWorkflowRequestModel()
+            .label("workflowLabel")
             .description("workflowDescription");
+        Workflow workflow = new Workflow(
+            "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}", "id",
+            Workflow.Format.JSON);
 
-        when(integrationFacade.addWorkflow(1L, "workflowName", "workflowDescription", null))
-            .thenReturn(integration);
+        when(integrationFacade.addWorkflow(anyLong(), any(), any(), any()))
+            .thenReturn(workflow);
 
         try {
-            assert integration.getId() != null;
             this.webTestClient
                 .post()
                 .uri("/integrations/1/workflows")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(postIntegrationWorkflowRequestModel)
+                .bodyValue(createIntegrationWorkflowRequestModel)
                 .exchange()
                 .expectStatus()
                 .isOk()
                 .expectBody()
                 .jsonPath("$.description")
-                .isEqualTo(integration.getDescription())
+                .isEqualTo("My description")
                 .jsonPath("$.id")
-                .isEqualTo(integration.getId())
-                .jsonPath("$.name")
-                .isEqualTo(integration.getName())
-                .jsonPath("$.workflowIds[0]")
-                .isEqualTo("workflow1");
+                .isEqualTo(workflow.getId())
+                .jsonPath("$.label")
+                .isEqualTo("New Workflow");
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -267,24 +264,29 @@ public class IntegrationControllerIntTest {
         ArgumentCaptor<String> nameArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> descriptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-        verify(integrationFacade).addWorkflow(anyLong(), nameArgumentCaptor.capture(),
-            descriptionArgumentCaptor.capture(), isNull());
+        verify(integrationFacade).addWorkflow(
+            anyLong(), nameArgumentCaptor.capture(), descriptionArgumentCaptor.capture(), isNull());
 
-        Assertions.assertEquals("workflowName", nameArgumentCaptor.getValue());
+        Assertions.assertEquals("workflowLabel", nameArgumentCaptor.getValue());
         Assertions.assertEquals("workflowDescription", descriptionArgumentCaptor.getValue());
     }
 
     @Test
     @SuppressFBWarnings("NP")
     public void testPutIntegration() {
-        Integration integration = getIntegration();
+        IntegrationDTO integrationDTO = IntegrationDTO.builder()
+            .category(new Category(1L, "category"))
+            .description("description")
+            .id(1L)
+            .name("name2")
+            .tags(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")))
+            .workflowIds(List.of("workflow1"))
+            .build();
         IntegrationModel integrationModel = new IntegrationModel()
             .id(1L)
             .name("name2");
 
-        integration.setName("name2");
-
-        when(integrationFacade.update(integration)).thenReturn(integration);
+        when(integrationFacade.update(any(IntegrationDTO.class))).thenReturn(integrationDTO);
 
         try {
             this.webTestClient
@@ -298,9 +300,9 @@ public class IntegrationControllerIntTest {
                 .isOk()
                 .expectBody()
                 .jsonPath("$.id")
-                .isEqualTo(integration.getId())
+                .isEqualTo(integrationDTO.id())
                 .jsonPath("$.description")
-                .isEqualTo(integration.getDescription())
+                .isEqualTo(integrationDTO.description())
                 .jsonPath("$.name")
                 .isEqualTo("name2")
                 .jsonPath("$.workflowIds[0]")
@@ -341,27 +343,15 @@ public class IntegrationControllerIntTest {
         Assertions.assertEquals("tag1", capturedTag.getName());
     }
 
-    private static Integration getIntegration() {
-        Integration integration = new Integration();
-
-        integration.addWorkflow("workflow1");
-
-        integration.setCategory(new Category(1L, "category"));
-        integration.setDescription("description");
-        integration.setId(1L);
-        integration.setName("name");
-        integration.setTags(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
-
-        return integration;
+    private static IntegrationDTO getIntegrationDTO() {
+        return IntegrationDTO.builder()
+            .category(new Category(1L, "category"))
+            .description("description")
+            .id(1L)
+            .name("name")
+            .tags(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")))
+            .workflowIds(List.of("workflow1"))
+            .build();
     }
 
-    @ComponentScan(basePackages = {
-        "com.bytechef.atlas.web.rest.mapper",
-        "com.bytechef.category.web.rest.mapper",
-        "com.bytechef.dione.integration.web.rest",
-        "com.bytechef.tag.web.rest.mapper"
-    })
-    @SpringBootConfiguration
-    public static class IntegrationRestTestConfiguration {
-    }
 }
