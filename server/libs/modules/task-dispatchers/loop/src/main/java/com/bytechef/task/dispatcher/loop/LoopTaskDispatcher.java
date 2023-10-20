@@ -17,7 +17,6 @@
 
 package com.bytechef.task.dispatcher.loop;
 
-import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM_INDEX;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM_VAR;
@@ -118,7 +117,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     @Override
     public TaskDispatcher<? extends Task> resolve(Task task) {
-        if (Objects.equals(task.getType(), LOOP + "/v" + VERSION_1)) {
+        if (Objects.equals(task.getType(), LOOP + "/v1")) {
             return this;
         }
 

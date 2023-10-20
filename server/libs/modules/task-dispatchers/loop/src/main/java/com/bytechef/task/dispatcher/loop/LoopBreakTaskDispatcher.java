@@ -17,7 +17,6 @@
 
 package com.bytechef.task.dispatcher.loop;
 
-import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP_BREAK;
 
@@ -63,7 +62,7 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
         TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
 
         if (taskExecution.getType()
-            .equals(LOOP + "/v" + VERSION_1)) {
+            .equals(LOOP + "/v1")) {
             return taskExecution;
         } else {
             if (taskExecution.getParentId() == null) {
@@ -76,7 +75,7 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
 
     @Override
     public TaskDispatcher<? extends Task> resolve(Task task) {
-        if (Objects.equals(task.getType(), LOOP_BREAK + "/v" + VERSION_1)) {
+        if (Objects.equals(task.getType(), LOOP_BREAK + "/v1")) {
             return this;
         }
 

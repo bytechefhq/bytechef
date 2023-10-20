@@ -19,7 +19,6 @@
 
 package com.bytechef.task.dispatcher.map;
 
-import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM_INDEX;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM_VAR;
@@ -116,7 +115,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
 
     @Override
     public TaskDispatcher<? extends Task> resolve(Task task) {
-        if (Objects.equals(task.getType(), MAP + "/v" + VERSION_1)) {
+        if (Objects.equals(task.getType(), MAP + "/v1")) {
             return this;
         }
 

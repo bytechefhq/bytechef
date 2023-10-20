@@ -26,12 +26,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
-
 /**
  * @author Ivica Cardic
  */
 public final class TaskDispatcherDSL extends DefinitionDSL {
+
+    private static final int VERSION_1 = 1;
 
     public static ModifiableTaskDispatcherDefinition taskDispatcher(String name) {
         return new ModifiableTaskDispatcherDefinition(name);

@@ -19,7 +19,6 @@
 
 package com.bytechef.task.dispatcher.parallel;
 
-import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants.PARALLEL;
 import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants.TASKS;
 
@@ -112,7 +111,7 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public TaskDispatcher<? extends Task> resolve(Task task) {
-        if (Objects.equals(task.getType(), PARALLEL + "/v" + VERSION_1)) {
+        if (Objects.equals(task.getType(), PARALLEL + "/v1")) {
             return this;
         }
         return null;

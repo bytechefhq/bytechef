@@ -19,7 +19,6 @@
 
 package com.bytechef.task.dispatcher.branch;
 
-import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.CASES;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.DEFAULT;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.EXPRESSION;
@@ -126,7 +125,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
     @Override
     public TaskDispatcher<? extends Task> resolve(Task task) {
-        if (Objects.equals(task.getType(), BRANCH + "/v" + VERSION_1)) {
+        if (Objects.equals(task.getType(), BRANCH + "/v1")) {
             return this;
         }
 

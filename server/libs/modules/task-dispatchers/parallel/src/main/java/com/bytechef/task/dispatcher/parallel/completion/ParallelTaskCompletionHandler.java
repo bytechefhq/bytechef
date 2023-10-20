@@ -19,7 +19,6 @@
 
 package com.bytechef.task.dispatcher.parallel.completion;
 
-import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants.PARALLEL;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
@@ -65,7 +64,7 @@ public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
 
             String type = parentTaskExecution.getType();
 
-            return type.equals(PARALLEL + "/v" + VERSION_1);
+            return type.equals(PARALLEL + "/v1");
         }
     }
 
