@@ -18,7 +18,7 @@ package com.bytechef.task.handler.objecthelpers.v1_0;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.task.commons.json.JSONHelper;
+import com.bytechef.task.commons.json.JsonHelper;
 import com.bytechef.task.handler.objecthelpers.ObjectHelpersTaskConstants;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.stereotype.Component;
@@ -35,9 +35,9 @@ public class ObjectHelpersTaskHandler {
             + ObjectHelpersTaskConstants.JSON_PARSE)
     public static class ObjectHelpersParseTaskHandler implements TaskHandler<Object> {
 
-        private final JSONHelper jsonHelper;
+        private final JsonHelper jsonHelper;
 
-        public ObjectHelpersParseTaskHandler(JSONHelper jsonHelper) {
+        public ObjectHelpersParseTaskHandler(JsonHelper jsonHelper) {
             this.jsonHelper = jsonHelper;
         }
 
@@ -56,9 +56,9 @@ public class ObjectHelpersTaskHandler {
             + ObjectHelpersTaskConstants.JSON_STRINGIFY)
     public static class ObjectHelpersStringifyTaskHandler implements TaskHandler<String> {
 
-        private final JSONHelper jsonHelper;
+        private final JsonHelper jsonHelper;
 
-        public ObjectHelpersStringifyTaskHandler(JSONHelper jsonHelper) {
+        public ObjectHelpersStringifyTaskHandler(JsonHelper jsonHelper) {
             this.jsonHelper = jsonHelper;
         }
 

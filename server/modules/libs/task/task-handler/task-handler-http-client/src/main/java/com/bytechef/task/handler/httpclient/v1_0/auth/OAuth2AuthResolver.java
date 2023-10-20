@@ -16,8 +16,8 @@
 
 package com.bytechef.task.handler.httpclient.v1_0.auth;
 
-import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.ACCESS_TOKEN;
-import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.HEADER_PREFIX;
+import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.ACCESS_TOKEN;
+import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.HEADER_PREFIX;
 
 import com.bytechef.hermes.auth.domain.Authentication;
 import com.github.mizosoft.methanol.Methanol;

@@ -24,7 +24,7 @@ import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.job.domain.Job;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
-import com.bytechef.test.json.JSONArrayUtils;
+import com.bytechef.test.json.JsonArrayUtils;
 import com.bytechef.test.task.BaseTaskIntTest;
 import java.io.File;
 import java.io.IOException;
@@ -63,8 +63,8 @@ public class CSVFileTaskHandlerIntTest extends BaseTaskIntTest {
         Accessor outputs = job.getOutputs();
 
         JSONAssert.assertEquals(
-                JSONArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-                JSONArrayUtils.of((List<?>) outputs.get("readCsvFile")),
+                JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
+                JsonArrayUtils.of((List<?>) outputs.get("readCsvFile")),
                 true);
     }
 
@@ -74,7 +74,7 @@ public class CSVFileTaskHandlerIntTest extends BaseTaskIntTest {
                 "samples/v1_0/csvFile_WRITE.json",
                 Map.of(
                         "rows",
-                        JSONArrayUtils.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))));
+                        JsonArrayUtils.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
@@ -93,8 +93,8 @@ public class CSVFileTaskHandlerIntTest extends BaseTaskIntTest {
         outputs = job.getOutputs();
 
         assertEquals(
-                JSONArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-                JSONArrayUtils.of((List<?>) outputs.get("readCsvFile")),
+                JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
+                JsonArrayUtils.of((List<?>) outputs.get("readCsvFile")),
                 true);
 
         assertThat(fileEntry.getName()).isEqualTo("file.csv");

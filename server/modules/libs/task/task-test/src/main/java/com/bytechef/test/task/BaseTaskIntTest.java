@@ -43,7 +43,7 @@ import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 import com.bytechef.atlas.workflow.service.WorkflowService;
-import com.bytechef.task.commons.json.JSONHelper;
+import com.bytechef.task.commons.json.JsonHelper;
 import com.bytechef.task.execution.service.TaskExecutionService;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +66,7 @@ public abstract class BaseTaskIntTest {
     protected JobService jobService;
 
     @Autowired
-    protected JSONHelper jsonHelper;
+    protected JsonHelper jsonHelper;
 
     @Autowired
     private EventPublisher eventPublisher;

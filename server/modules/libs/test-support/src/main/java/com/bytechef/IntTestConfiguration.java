@@ -29,10 +29,10 @@ import com.bytechef.atlas.job.repository.jdbc.JdbcJobRepository;
 import com.bytechef.atlas.task.execution.repository.TaskExecutionRepository;
 import com.bytechef.atlas.task.execution.repository.jdbc.JdbcTaskExecutionRepository;
 import com.bytechef.atlas.workflow.repository.WorkflowRepository;
-import com.bytechef.atlas.workflow.repository.mapper.JSONWorkflowMapper;
+import com.bytechef.atlas.workflow.repository.mapper.JsonWorkflowMapper;
 import com.bytechef.atlas.workflow.repository.mapper.WorkflowMapper;
 import com.bytechef.atlas.workflow.repository.mapper.WorkflowMapperChain;
-import com.bytechef.atlas.workflow.repository.mapper.YAMLWorkflowMapper;
+import com.bytechef.atlas.workflow.repository.mapper.YamlWorkflowMapper;
 import com.bytechef.atlas.workflow.repository.resource.ResourceBasedWorkflowRepository;
 import com.bytechef.hermes.auth.jdbc.JdbcAuthenticationRepository;
 import com.bytechef.hermes.auth.repository.AuthenticationRepository;
@@ -136,7 +136,7 @@ public class IntTestConfiguration {
 
     @Bean
     WorkflowMapper workflowMapper() {
-        return new WorkflowMapperChain(List.of(new JSONWorkflowMapper(), new YAMLWorkflowMapper()));
+        return new WorkflowMapperChain(List.of(new JsonWorkflowMapper(), new YamlWorkflowMapper()));
     }
 
     @Bean

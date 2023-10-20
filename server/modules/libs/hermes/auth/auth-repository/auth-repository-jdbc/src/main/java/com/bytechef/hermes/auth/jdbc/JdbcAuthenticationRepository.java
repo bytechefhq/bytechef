@@ -16,7 +16,7 @@
 
 package com.bytechef.hermes.auth.jdbc;
 
-import com.bytechef.atlas.util.JSONUtils;
+import com.bytechef.atlas.util.JsonUtils;
 import com.bytechef.hermes.auth.domain.Authentication;
 import com.bytechef.hermes.auth.domain.SimpleAuthentication;
 import com.bytechef.hermes.auth.repository.AuthenticationRepository;
@@ -102,7 +102,7 @@ public class JdbcAuthenticationRepository implements AuthenticationRepository {
         map.put("id", resultSet.getString("id"));
         map.put(
                 "properties",
-                JSONUtils.deserialize(
+                JsonUtils.deserialize(
                         objectMapper, new String(encryption.decrypt(resultSet.getString("properties"))), Map.class));
         map.put("type", resultSet.getString("type"));
         map.put("updateTime", resultSet.getTimestamp("update_time"));
@@ -128,7 +128,7 @@ public class JdbcAuthenticationRepository implements AuthenticationRepository {
         sqlParameterSource.addValue(
                 "properties",
                 new String(
-                        encryption.encrypt(JSONUtils.serialize(objectMapper, simpleAuthentication.getProperties()))));
+                        encryption.encrypt(JsonUtils.serialize(objectMapper, simpleAuthentication.getProperties()))));
         sqlParameterSource.addValue("type", simpleAuthentication.getType());
         sqlParameterSource.addValue("updateTime", simpleAuthentication.getUpdateTime());
 

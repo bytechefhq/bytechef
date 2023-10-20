@@ -21,7 +21,7 @@ import com.bytechef.atlas.context.service.ContextService;
 import com.bytechef.atlas.coordinator.util.TestConfigurator;
 import com.bytechef.atlas.job.domain.Job;
 import com.bytechef.atlas.job.service.JobService;
-import com.bytechef.atlas.workflow.repository.mapper.JSONWorkflowMapper;
+import com.bytechef.atlas.workflow.repository.mapper.JsonWorkflowMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ public class DeleteContextEventListenerIntTest {
 
     @Test
     public void testJobStatusEventHandler() {
-        Job job = testConfigurator.startJob("samples/hello.json", new JSONWorkflowMapper());
+        Job job = testConfigurator.startJob("samples/hello.json", new JsonWorkflowMapper());
 
         Assertions.assertNull(contextRepository.peek(job.getId()));
     }

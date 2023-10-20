@@ -16,7 +16,7 @@
 
 package com.bytechef.task.handler.httpclient.v1_0.auth;
 
-import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.*;
+import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.*;
 
 import com.bytechef.atlas.Accessor;
 import com.bytechef.hermes.auth.domain.Authentication;

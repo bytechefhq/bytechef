@@ -21,7 +21,7 @@ package com.bytechef.atlas.workflow.repository.git;
 import com.bytechef.atlas.workflow.WorkflowFormat;
 import com.bytechef.atlas.workflow.WorkflowResource;
 import com.bytechef.atlas.workflow.domain.Workflow;
-import com.bytechef.atlas.workflow.repository.mapper.YAMLWorkflowMapper;
+import com.bytechef.atlas.workflow.repository.mapper.YamlWorkflowMapper;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -36,7 +36,7 @@ public class GitWorkflowRepositoryTest {
 
     @Test
     public void test1() {
-        GitWorkflowRepository r = new GitWorkflowRepository(new DummyGitOperations(), new YAMLWorkflowMapper());
+        GitWorkflowRepository r = new GitWorkflowRepository(new DummyGitOperations(), new YamlWorkflowMapper());
         List<Workflow> findAll = r.findAll();
         Assertions.assertEquals("samples/hello/123", findAll.iterator().next().getId());
     }

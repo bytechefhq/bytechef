@@ -18,7 +18,7 @@ package com.bytechef.task.handler.httpclient.v1_0.auth;
 
 import com.bytechef.atlas.Accessor;
 import com.bytechef.hermes.auth.domain.Authentication;
-import com.bytechef.task.handler.httpclient.HTTPClientTaskConstants;
+import com.bytechef.task.handler.httpclient.HttpClientTaskConstants;
 import com.github.mizosoft.methanol.Methanol;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
@@ -44,9 +44,9 @@ public class DigestAuthResolver implements AuthResolver {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(
-                        properties.getRequiredString(HTTPClientTaskConstants.USERNAME),
+                        properties.getRequiredString(HttpClientTaskConstants.USERNAME),
                         properties
-                                .getRequiredString(HTTPClientTaskConstants.PASSWORD)
+                                .getRequiredString(HttpClientTaskConstants.PASSWORD)
                                 .toCharArray());
             }
         });

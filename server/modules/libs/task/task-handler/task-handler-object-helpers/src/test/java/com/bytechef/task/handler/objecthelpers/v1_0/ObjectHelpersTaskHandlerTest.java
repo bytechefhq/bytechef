@@ -19,7 +19,7 @@ package com.bytechef.task.handler.objecthelpers.v1_0;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.task.commons.json.JSONHelper;
+import com.bytechef.task.commons.json.JsonHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
  */
 public class ObjectHelpersTaskHandlerTest {
 
-    private static final JSONHelper jsonHelper = new JSONHelper(new ObjectMapper());
+    private static final JsonHelper jsonHelper = new JsonHelper(new ObjectMapper());
     private static final ObjectHelpersTaskHandler.ObjectHelpersParseTaskHandler objectHelpersParseTaskHandler =
             new ObjectHelpersTaskHandler.ObjectHelpersParseTaskHandler(jsonHelper);
     private static final ObjectHelpersTaskHandler.ObjectHelpersStringifyTaskHandler ObjectHelpersStringifyTaskHandler =
