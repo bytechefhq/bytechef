@@ -48,7 +48,7 @@ public class ComponentDefinitionFacadeRSocketClient implements ComponentDefiniti
     }
 
     @Override
-    public List<ComponentDefinitionDTO> getComponentDefinitions(
+    public List<ComponentDefinitionDTO> searchComponentDefinitions(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
         Boolean triggerDefinitions) {
 

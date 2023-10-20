@@ -26,7 +26,7 @@ import java.util.List;
  */
 public interface ComponentDefinitionFacade {
 
-    List<ComponentDefinitionDTO> getComponentDefinitions(
+    List<ComponentDefinitionDTO> searchComponentDefinitions(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
         Boolean triggerDefinitions);
 }

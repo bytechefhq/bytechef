@@ -219,7 +219,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         Boolean triggerDefinitions, ServerWebExchange exchange) {
 
         return Mono.just(
-            componentDefinitionFacade.getComponentDefinitions(
+            componentDefinitionFacade.searchComponentDefinitions(
                 actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions)
                 .stream()
                 .map(componentDefinition -> conversionService.convert(
