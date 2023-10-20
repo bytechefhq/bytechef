@@ -17,7 +17,6 @@
 package com.bytechef.atlas.repository.workflow.mapper;
 
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.workflow.WorkflowResource;
 import java.util.List;
 
 /**

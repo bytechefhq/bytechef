@@ -21,11 +21,6 @@ import com.bytechef.atlas.repository.CounterRepository;
 import com.bytechef.atlas.repository.JobRepository;
 import com.bytechef.atlas.repository.TaskExecutionRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
-import com.bytechef.atlas.repository.WorkflowRepositoryChain;
-import com.bytechef.atlas.repository.workflow.mapper.JsonWorkflowMapper;
-import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
-import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapperChain;
-import com.bytechef.atlas.repository.workflow.mapper.YamlWorkflowMapper;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.JobService;
@@ -36,11 +31,8 @@ import com.bytechef.atlas.service.impl.CounterServiceImpl;
 import com.bytechef.atlas.service.impl.JobServiceImpl;
 import com.bytechef.atlas.service.impl.TaskExecutionServiceImpl;
 import com.bytechef.atlas.service.impl.WorkflowServiceImpl;
-import java.util.List;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 /**
  * @author Ivica Cardic
@@ -71,27 +63,5 @@ public class WorkflowConfiguration {
     @Bean
     public WorkflowService workflowService(WorkflowRepository workflowRepository) {
         return new WorkflowServiceImpl(workflowRepository);
-    }
-
-    @Bean
-    @Primary
-    WorkflowRepository workflowRepository(CacheManager cacheManager, List<WorkflowRepository> workflowRepositories) {
-        return new WorkflowRepositoryChain(cacheManager, workflowRepositories);
-    }
-
-    @Bean
-    @Primary
-    WorkflowMapper workflowMapper() {
-        return new WorkflowMapperChain(List.of(jsonWorkflowMapper(), yamlWorkflowMapper()));
-    }
-
-    @Bean
-    JsonWorkflowMapper jsonWorkflowMapper() {
-        return new JsonWorkflowMapper();
-    }
-
-    @Bean
-    YamlWorkflowMapper yamlWorkflowMapper() {
-        return new YamlWorkflowMapper();
     }
 }

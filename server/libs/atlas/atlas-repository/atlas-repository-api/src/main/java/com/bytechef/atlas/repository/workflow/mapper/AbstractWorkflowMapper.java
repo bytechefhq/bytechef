@@ -19,7 +19,6 @@ package com.bytechef.atlas.repository.workflow.mapper;
 import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.error.ExecutionError;
-import com.bytechef.atlas.workflow.WorkflowResource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
