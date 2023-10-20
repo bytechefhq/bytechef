@@ -1,5 +1,5 @@
 import {Switch} from '@/components/ui/switch';
-import {useWorkflowsEnabledStateStore} from '@/pages/automation/project-instances/ProjectInstanceDialog';
+import {useWorkflowsEnabledStateStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStateStore';
 import {PropertyType} from '@/types/projectTypes';
 import Button from 'components/Button/Button';
 import Input from 'components/Input/Input';
@@ -35,9 +35,13 @@ export const ProjectInstanceDialogWorkflowListItem = ({
     workflowIndex,
 }: ProjectInstanceDialogWorkflowListItemProps) => {
     const [selectedTabIndex, setSelectedTabIndex] = useState(0);
-    const [setEnabled, workflowEnabledMap] = useWorkflowsEnabledStateStore(
-        useShallow((state) => [state.setEnabled, state.workflowEnabledMap])
-    );
+    const [setWorkflowEnabled, workflowEnabledMap] =
+        useWorkflowsEnabledStateStore(
+            useShallow(({setWorkflowEnabled, workflowEnabledMap}) => [
+                setWorkflowEnabled,
+                workflowEnabledMap,
+            ])
+        );
 
     let connections: WorkflowConnectionModel[] = [];
 
@@ -46,6 +50,7 @@ export const ProjectInstanceDialogWorkflowListItem = ({
             connections = connections.concat(task.connections);
         }
     });
+
     workflow.triggers?.forEach((trigger) => {
         if (trigger.connections) {
             connections = connections.concat(trigger.connections);
@@ -128,7 +133,7 @@ export const ProjectInstanceDialogWorkflowListItem = ({
                                 'bg-blue-600'
                         )}
                         onClick={() => {
-                            setEnabled(
+                            setWorkflowEnabled(
                                 workflow.id!,
                                 !workflowEnabledMap.get(workflow.id!)
                             );

@@ -11,8 +11,6 @@ import {ProjectKeys} from 'queries/projects.queries';
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
-import {create} from 'zustand';
-import {devtools} from 'zustand/middleware';
 
 import ProjectInstanceDialogBasicStep from './ProjectInstanceDialogBasicStep';
 import ProjectInstanceDialogWorkflowsStep from './ProjectInstanceDialogWorkflowsStep';
@@ -23,28 +21,6 @@ interface ProjectDialogProps {
     visible?: boolean;
     onClose?: () => void;
 }
-
-export interface WorkflowsEnabledState {
-    workflowEnabledMap: Map<string, boolean>;
-    setEnabled: (workflowId: string, enabled: boolean) => void;
-}
-
-export const useWorkflowsEnabledStateStore = create<WorkflowsEnabledState>()(
-    devtools(
-        (set) => ({
-            setEnabled: (workflowId, enabled) =>
-                set((state) => ({
-                    workflowEnabledMap: new Map<string, boolean>(
-                        state.workflowEnabledMap.set(workflowId, enabled)
-                    ),
-                })),
-            workflowEnabledMap: new Map<string, boolean>(),
-        }),
-        {
-            name: 'project-instances-enabled',
-        }
-    )
-);
 
 const ProjectInstanceDialog = ({
     onClose,
