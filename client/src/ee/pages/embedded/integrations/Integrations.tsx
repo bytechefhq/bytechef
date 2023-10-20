@@ -1,14 +1,14 @@
-import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {
     useGetIntegrationCategoriesQuery,
     useGetIntegrationTagsQuery,
-} from '@/queries/integrations.queries';
+} from '@/ee/queries/integrations.queries';
+import LayoutContainer from '@/layouts/LayoutContainer';
+import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
+import PageHeader from '@/layouts/PageHeader';
 import {TagIcon} from '@heroicons/react/20/solid';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
-import LayoutContainer from '../../../layouts/LayoutContainer';
-import PageHeader from '../../../layouts/PageHeader';
 import IntegrationDialog from './IntegrationDialog';
 import IntegrationList from './IntegrationList';
 

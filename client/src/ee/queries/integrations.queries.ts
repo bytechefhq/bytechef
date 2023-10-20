@@ -1,14 +1,14 @@
 import {useQuery} from '@tanstack/react-query';
 import {
     CategoryModel,
-    EmbeddedIntegrationCategoriesApi,
-    EmbeddedIntegrationTagsApi,
-    EmbeddedIntegrationsApi,
-    EmbeddedWorkflowsApi,
+    EmbeddedIntegrationApi,
+    EmbeddedIntegrationCategoryApi,
+    EmbeddedIntegrationTagApi,
+    EmbeddedWorkflowApi,
     IntegrationModel,
     TagModel,
     WorkflowModel,
-} from 'middleware/dione/configuration';
+} from 'ee/middleware/dione/configuration';
 
 export const IntegrationKeys = {
     integration: (id: number) => ['integration', id],
@@ -29,12 +29,12 @@ export const IntegrationKeys = {
 export const useGetIntegrationCategoriesQuery = () =>
     useQuery<CategoryModel[], Error>(
         IntegrationKeys.integrationCategories,
-        () => new EmbeddedIntegrationCategoriesApi().getIntegrationCategories()
+        () => new EmbeddedIntegrationCategoryApi().getIntegrationCategories()
     );
 
 export const useGetIntegrationTagsQuery = () =>
     useQuery<TagModel[], Error>(IntegrationKeys.integrationTags, () =>
-        new EmbeddedIntegrationTagsApi().getIntegrationTags()
+        new EmbeddedIntegrationTagApi().getIntegrationTags()
     );
 
 export const useGetIntegrationQuery = (
@@ -43,7 +43,7 @@ export const useGetIntegrationQuery = (
 ) =>
     useQuery<IntegrationModel, Error>(
         IntegrationKeys.integration(id),
-        () => new EmbeddedIntegrationsApi().getIntegration({id}),
+        () => new EmbeddedIntegrationApi().getIntegration({id}),
         {
             initialData,
         }
@@ -55,14 +55,14 @@ export const useGetIntegrationsQuery = (filters: {
 }) =>
     useQuery<IntegrationModel[], Error>(
         IntegrationKeys.integrationList(filters),
-        () => new EmbeddedIntegrationsApi().getIntegrations(filters)
+        () => new EmbeddedIntegrationApi().getIntegrations(filters)
     );
 
 export const useGetIntegrationWorkflowsQuery = (id: number) =>
     useQuery<WorkflowModel[], Error>(
         IntegrationKeys.integrationWorkflows(id),
         () =>
-            new EmbeddedWorkflowsApi().getIntegrationWorkflows({
+            new EmbeddedWorkflowApi().getIntegrationWorkflows({
                 id,
             })
     );

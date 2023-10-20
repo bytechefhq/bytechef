@@ -6,7 +6,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import IntegrationPortalContent from '@/pages/embedded/integration/components/IntegrationPortalContent';
+import IntegrationPortalContent from '@/ee/pages/embedded/integration/components/IntegrationPortalContent';
 import * as React from 'react';
 
 const IntegrationPortal = () => {

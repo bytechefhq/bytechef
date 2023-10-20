@@ -2,16 +2,16 @@ import {
     CategoryModel,
     IntegrationModel,
     TagModel,
-} from '@/middleware/dione/configuration';
+} from '@/ee/middleware/dione/configuration';
 import {
     useCreateIntegrationMutation,
     useUpdateIntegrationMutation,
-} from '@/mutations/integrations.mutations';
+} from '@/ee/mutations/integrations.mutations';
 import {
     IntegrationKeys,
     useGetIntegrationCategoriesQuery,
     useGetIntegrationTagsQuery,
-} from '@/queries/integrations.queries';
+} from '@/ee/queries/integrations.queries';
 import {Close} from '@radix-ui/react-dialog';
 import {useQueryClient} from '@tanstack/react-query';
 import Button from 'components/Button/Button';
