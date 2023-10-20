@@ -4,19 +4,31 @@ import React, {Fragment, PropsWithChildren, ReactNode, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 type SidebarContentLayoutProps = {
-    bodyClassName?: string;
     className?: string;
     footer?: ReactNode;
     header: ReactNode;
     leftSidebarBody?: ReactNode;
     leftSidebarHeader?: ReactNode;
     leftSidebarOpen?: boolean;
+    leftSidebarWidth?: string;
+    rightSidebarBody?: ReactNode;
+    rightSidebarHeader?: ReactNode;
+    rightSidebarOpen?: boolean;
+    rightSidebarWidth?: string;
     rightToolbarBody?: ReactNode;
     rightToolbarOpen?: boolean;
 };
 
+const leftSidebarWidths = {
+    '64': ['md:w-64', 'md:pl-64'],
+    '72': ['md:w-72', 'md:pl-72'],
+};
+
+const rightSidebarWidths = {
+    '460': 'w-[460px]',
+};
+
 const LayoutContainer = ({
-    bodyClassName,
     children,
     className,
     footer,
@@ -24,6 +36,11 @@ const LayoutContainer = ({
     leftSidebarBody,
     leftSidebarHeader,
     leftSidebarOpen = true,
+    leftSidebarWidth = '64',
+    rightSidebarBody,
+    rightSidebarHeader,
+    rightSidebarOpen = false,
+    rightSidebarWidth,
     rightToolbarBody,
     rightToolbarOpen = false,
 }: PropsWithChildren<SidebarContentLayoutProps>) => {
@@ -107,7 +124,12 @@ const LayoutContainer = ({
             </Transition.Root>
 
             {leftSidebarOpen && (
-                <aside className="hidden border-r md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col">
+                <aside
+                    className={twMerge(
+                        'hidden md:fixed md:inset-y-0 md:flex md:flex-col',
+                        leftSidebarWidths[leftSidebarWidth][0]
+                    )}
+                >
                     <nav className="flex h-full flex-col">
                         {leftSidebarHeader}
 
@@ -117,34 +139,54 @@ const LayoutContainer = ({
             )}
 
             <div
-                className={twMerge('h-full', leftSidebarOpen ? 'md:pl-72' : '')}
+                className={twMerge(
+                    'flex h-full',
+                    leftSidebarOpen && leftSidebarWidths[leftSidebarWidth][1]
+                )}
             >
-                <div className={twMerge('flex h-full', className)}>
-                    <div
-                        className={twMerge(
-                            'flex h-full w-full flex-col',
-                            bodyClassName
-                        )}
-                    >
-                        {header}
+                <main
+                    className={twMerge(
+                        'flex h-full w-full flex-col border-l',
+                        className
+                    )}
+                >
+                    {header}
 
-                        <main className="flex flex-1 overflow-y-auto">
-                            {children}
-                        </main>
-
-                        {footer}
+                    <div className="flex flex-1 overflow-y-auto">
+                        {children}
                     </div>
 
-                    {rightToolbarOpen && !!rightToolbarBody && (
-                        <aside className="flex">
-                            <nav className="flex h-full flex-col border-l border-gray-100 bg-gray-100">
+                    {footer}
+                </main>
+
+                {rightSidebarOpen && !!rightSidebarBody && (
+                    <aside className="hidden border-l lg:flex lg:shrink-0">
+                        <div
+                            className={twMerge(
+                                'flex',
+                                rightSidebarWidths[rightSidebarWidth]
+                            )}
+                        >
+                            <div className="flex h-full flex-col">
+                                {rightSidebarHeader}
+
                                 <div className="overflow-y-auto">
-                                    {rightToolbarBody}
+                                    {rightSidebarBody}
                                 </div>
-                            </nav>
-                        </aside>
-                    )}
-                </div>
+                            </div>
+                        </div>
+                    </aside>
+                )}
+
+                {rightToolbarOpen && !!rightToolbarBody && (
+                    <aside className="hidden border-l bg-muted lg:flex lg:shrink-0">
+                        <div className="flex w-[60px]">
+                            <div className="flex flex-1 flex-col overflow-y-auto">
+                                {rightToolbarBody}
+                            </div>
+                        </div>
+                    </aside>
+                )}
             </div>
         </>
     );
