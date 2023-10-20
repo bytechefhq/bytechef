@@ -19,6 +19,7 @@ package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
 import com.bytechef.commons.util.MonoUtils;
 import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.definition.registry.rsocket.client.util.ServiceInstanceUtils;
@@ -30,7 +31,9 @@ import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -53,25 +56,87 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
     }
 
     @Override
-    public void applyAuthorization(Connection connection, Authorization.AuthorizationContext authorizationContext) {
-        throw new UnsupportedOperationException();
+    public void executeAuthorizationApply(
+        Connection connection, Authorization.AuthorizationContext authorizationContext) {
+
+        Map<String, Map<String, List<String>>> authorizationContextMap = MonoUtils.get(
+            rSocketRequesterBuilder
+                .websocket(getWebsocketUri(connection))
+                .route("ConnectionDefinitionService.executeAuthorizationApply")
+                .data(connection)
+                .retrieveMono(new ParameterizedTypeReference<>() {}));
+
+        authorizationContext.setHeaders(authorizationContextMap.get("header"));
+        authorizationContext.setQueryParameters(authorizationContextMap.get("queryParameters"));
+    }
+
+    @Override
+    public Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
+        Connection connection, String redirectUri) {
+
+        return MonoUtils.get(
+            rSocketRequesterBuilder
+                .websocket(getWebsocketUri(connection))
+                .route("ConnectionDefinitionService.executeAuthorizationCallback")
+                .data(Map.of("connection", connection, "redirectUri", redirectUri))
+                .retrieveMono(Authorization.AuthorizationCallbackResponse.class));
     }
 
     @Override
     public Optional<String> fetchBaseUri(Connection connection) {
-        throw new UnsupportedOperationException();
+        return Optional.ofNullable(
+            MonoUtils.get(
+                rSocketRequesterBuilder
+                    .websocket(getWebsocketUri(connection))
+                    .route("ConnectionDefinitionService.fetchBaseUri")
+                    .data(connection)
+                    .retrieveMono(String.class)));
     }
 
     @Override
-    public Mono<ConnectionDefinition> getConnectionDefinitionMono(String componentName) {
+    public Authorization getAuthorization(String authorizationName, String componentName, int connectionVersion) {
+        return MonoUtils.get(
+            rSocketRequesterBuilder
+                .websocket(getWebsocketUri(componentName))
+                .route("ConnectionDefinitionService.getAuthorization")
+                .data(
+                    Map.of(
+                        "authorizationName", authorizationName,
+                        "componentName", componentName,
+                        "connectionVersion", connectionVersion))
+                .retrieveMono(ComponentDSL.ModifiableAuthorization.class));
+    }
+
+    @Override
+    public ConnectionDefinition getComponentConnectionDefinition(String componentName, int componentVersion) {
+        return MonoUtils.get(getComponentConnectionDefinitionMono(componentName, componentVersion));
+    }
+
+    @Override
+    public Mono<ConnectionDefinition> getComponentConnectionDefinitionMono(String componentName, int componentVersion) {
         return rSocketRequesterBuilder
             .websocket(ServiceInstanceUtils.toWebSocketUri(
                 ServiceInstanceUtils.filterServiceInstance(
                     discoveryClient.getInstances(WORKER_SERVICE_APP), componentName)))
-            .route("ConnectionDefinitionService.getConnectionDefinition")
-            .data(componentName)
+            .route("ConnectionDefinitionService.getComponentConnectionDefinition")
+            .data(Map.of("componentName", componentName, "componentVersion", componentVersion))
             .retrieveMono(ConnectionDefinition.class)
             .map(connectionDefinition -> connectionDefinition);
+    }
+
+    @Override
+    public Mono<List<ConnectionDefinition>> getComponentConnectionDefinitionsMono(
+        String componentName, int componentVersion) {
+        return Mono.zip(
+            ServiceInstanceUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
+                .stream()
+                .map(serviceInstance -> rSocketRequesterBuilder
+                    .websocket(ServiceInstanceUtils.toWebSocketUri(serviceInstance))
+                    .route("ConnectionDefinitionService.getComponentConnectionDefinitions")
+                    .data(Map.of("componentName", componentName, "componentVersion", componentVersion))
+                    .retrieveMono(new ParameterizedTypeReference<List<ConnectionDefinition>>() {}))
+                .toList(),
+            ServiceInstanceUtils::toConnectionDefinitions);
     }
 
     @Override
@@ -88,21 +153,22 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
     }
 
     @Override
-    public List<ConnectionDefinition> getConnectionDefinitions(String componentName) {
-        return MonoUtils.get(getConnectionDefinitionsMono(componentName));
+    public OAuth2AuthorizationParameters getOAuth2Parameters(Connection connection) {
+        return MonoUtils.get(
+            rSocketRequesterBuilder
+                .websocket(getWebsocketUri(connection))
+                .route("ConnectionDefinitionService.getOAuth2Parameters")
+                .data(connection)
+                .retrieveMono(OAuth2AuthorizationParameters.class));
     }
 
-    @Override
-    public Mono<List<ConnectionDefinition>> getConnectionDefinitionsMono(String componentName) {
-        return Mono.zip(
-            ServiceInstanceUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
-                .stream()
-                .map(serviceInstance -> rSocketRequesterBuilder
-                    .websocket(ServiceInstanceUtils.toWebSocketUri(serviceInstance))
-                    .route("ConnectionDefinitionService.getComponentConnectionDefinitions")
-                    .data(componentName)
-                    .retrieveMono(new ParameterizedTypeReference<List<ConnectionDefinition>>() {}))
-                .toList(),
-            ServiceInstanceUtils::toConnectionDefinitions);
+    private URI getWebsocketUri(Connection connection) {
+        return getWebsocketUri(connection.getComponentName());
+    }
+
+    private URI getWebsocketUri(String componentName) {
+        return ServiceInstanceUtils.toWebSocketUri(
+            ServiceInstanceUtils.filterServiceInstance(
+                discoveryClient.getInstances("worker-service-app"), componentName));
     }
 }

@@ -17,6 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
@@ -28,7 +30,8 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 /**
  * @author Ivica Cardic
@@ -49,24 +52,41 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public void applyAuthorization(Connection connection, Authorization.AuthorizationContext authorizationContext) {
+    public void executeAuthorizationApply(
+        Connection connection, Authorization.AuthorizationContext authorizationContext) {
         if (StringUtils.hasText(connection.getAuthorizationName())) {
-            ConnectionDefinition connectionDefinition = getConnectionDefinition(connection.getComponentName());
+            Authorization authorization = getAuthorization(
+                connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion());
 
-            List<? extends Authorization> authorizations = connectionDefinition.getAuthorizations();
+            BiConsumer<Authorization.AuthorizationContext, Context.Connection> applyConsumer = authorization
+                .getApplyConsumer();
 
-            authorizations.stream()
-                .filter(authorization -> Objects.equals(authorization.getName(), connection.getAuthorizationName()))
-                .findFirst()
-                .map(Authorization::getApplyConsumer)
-                .ifPresent(authorizationConsumer -> authorizationConsumer.accept(authorizationContext,
-                    connection.toContextConnection()));
+            applyConsumer.accept(authorizationContext, connection.toContextConnection());
         }
     }
 
     @Override
+    public Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
+        Connection connection, String redirectUri) {
+
+        Authorization authorization = getAuthorization(
+            connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion());
+
+        Authorization.QuadFunction<Context.Connection, String, String, String, Authorization.AuthorizationCallbackResponse> authorizationCallbackFunction = authorization
+            .getAuthorizationCallbackFunction();
+
+        return authorizationCallbackFunction.apply(
+            connection.toContextConnection(),
+            connection.getParameter(Authorization.CODE),
+            redirectUri,
+            null // TODO pkce verifier
+        );
+    }
+
+    @Override
     public Optional<String> fetchBaseUri(Connection connection) {
-        ConnectionDefinition connectionDefinition = getConnectionDefinition(connection.getComponentName());
+        ConnectionDefinition connectionDefinition = getComponentConnectionDefinition(
+            connection.getComponentName(), connection.getConnectionVersion());
 
         return Optional.ofNullable(
             connectionDefinition.getBaseUriFunction()
@@ -74,8 +94,25 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public Mono<ConnectionDefinition> getConnectionDefinitionMono(String componentName) {
-        return Mono.just(getConnectionDefinition(componentName));
+    public Authorization getAuthorization(String authorizationName, String componentName, int connectionVersion) {
+        ConnectionDefinition connectionDefinition = getComponentConnectionDefinition(componentName, connectionVersion);
+
+        return connectionDefinition.getAuthorization(authorizationName);
+    }
+
+    @Override
+    public ConnectionDefinition getComponentConnectionDefinition(String componentName, int componentVersion) {
+        return componentDefinitions.stream()
+            .filter(componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
+                componentDefinition.getVersion() == componentVersion)
+            .findFirst()
+            .map(ComponentDefinition::getConnection)
+            .orElseThrow(IllegalArgumentException::new);
+    }
+
+    @Override
+    public Mono<ConnectionDefinition> getComponentConnectionDefinitionMono(String componentName, int componentVersion) {
+        return Mono.just(getComponentConnectionDefinition(componentName, componentVersion));
     }
 
     @Override
@@ -84,39 +121,35 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public List<ConnectionDefinition> getConnectionDefinitions(String componentName) {
-        return Stream.concat(
-            componentDefinitions.stream()
-                .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), componentName))
-                .map(ComponentDefinition::getFilterCompatibleConnectionDefinitionsFunction)
-                .filter(Objects::nonNull)
-                .flatMap(filterCompatibleConnectionDefinitionsFunction -> filterCompatibleConnectionDefinitionsFunction
-                    .apply(
-                        componentDefinitions.stream()
-                            .map(ComponentDefinition::getConnection)
-                            .filter(Objects::nonNull)
-                            .toList())
-                    .stream()),
-            Stream.of(
-                connectionDefinitions.stream()
-                    .filter(
-                        connectionDefinition -> Objects.equals(connectionDefinition.getComponentName(), componentName))
-                    .findFirst()
-                    .orElse(null)))
-            .filter(Objects::nonNull)
-            .distinct()
-            .toList();
+    public OAuth2AuthorizationParameters getOAuth2Parameters(Connection connection) {
+        Authorization authorization = getAuthorization(
+            connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion());
+
+        Function<Context.Connection, String> authorizationUrlFunction = authorization.getAuthorizationUrlFunction();
+        Function<Context.Connection, String> clientIdFunction = authorization.getClientIdFunction();
+        Function<Context.Connection, List<String>> scopesFunction = authorization.getScopesFunction();
+
+        return new OAuth2AuthorizationParameters(
+            authorizationUrlFunction.apply(connection.toContextConnection()),
+            clientIdFunction.apply(connection.toContextConnection()),
+            scopesFunction.apply(connection.toContextConnection()));
     }
 
     @Override
-    public Mono<List<ConnectionDefinition>> getConnectionDefinitionsMono(String componentName) {
-        return Mono.just(getConnectionDefinitions(componentName));
-    }
+    public Mono<List<ConnectionDefinition>> getComponentConnectionDefinitionsMono(
+        String componentName, int componentVersion) {
 
-    private ConnectionDefinition getConnectionDefinition(String componentName) {
-        return connectionDefinitions.stream()
-            .filter(connectionDefinition -> componentName.equalsIgnoreCase(connectionDefinition.getComponentName()))
+        ComponentDefinition componentDefinition = componentDefinitions.stream()
+            .filter(
+                curComponentDefinition -> Objects.equals(curComponentDefinition.getName(), componentName) &&
+                    curComponentDefinition.getVersion() == componentVersion)
             .findFirst()
             .orElseThrow(IllegalArgumentException::new);
+
+        return Mono.just(
+            CollectionUtils.concatDistinct(
+                componentDefinition.applyFilterCompatibleConnectionDefinitionsFunction(
+                    componentDefinition, connectionDefinitions),
+                List.of(componentDefinition.getConnection())));
     }
 }
