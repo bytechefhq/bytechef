@@ -55,7 +55,7 @@ const Select: React.FC<SelectProps> = ({
                             <Item
                                 key={selectItem.value}
                                 value={selectItem.value}
-                                className="radix-disabled:opacity-50 relative flex select-none items-center rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none dark:text-gray-300 dark:focus:bg-gray-900"
+                                className="relative flex select-none items-center rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none radix-disabled:opacity-50 dark:text-gray-300 dark:focus:bg-gray-900"
                             >
                                 <ItemText>{selectItem.label}</ItemText>
 
