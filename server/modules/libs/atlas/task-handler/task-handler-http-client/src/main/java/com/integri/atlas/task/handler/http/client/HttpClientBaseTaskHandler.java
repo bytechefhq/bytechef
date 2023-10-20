@@ -19,14 +19,14 @@ package com.integri.atlas.task.handler.http.client;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_PROPERTY_URI;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_TIMEOUT;
 
-import com.integri.atlas.engine.MapObject;
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
+import com.integri.atlas.task.auth.TaskAuth;
 import com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.RequestMethod;
-import com.integri.atlas.task.handler.http.client.authentication.HttpAuthenticationFactory;
 import com.integri.atlas.task.handler.http.client.body.HttpBodyFactory;
 import com.integri.atlas.task.handler.http.client.header.HttpHeader;
-import com.integri.atlas.task.handler.http.client.header.HttpHeadersFactory;
+import com.integri.atlas.task.handler.http.client.header.HttpHeaderFactory;
 import com.integri.atlas.task.handler.http.client.http.HttpClientHelper;
 import com.integri.atlas.task.handler.http.client.params.HttpQueryParamsFactory;
 import com.integri.atlas.task.handler.http.client.response.HttpResponseHandler;
@@ -39,20 +39,17 @@ import java.util.List;
 public abstract class HttpClientBaseTaskHandler implements TaskHandler<Object> {
 
     private final HttpBodyFactory httpBodyFactory;
-    private final HttpAuthenticationFactory httpAuthenticationFactory;
-    private final HttpHeadersFactory httpHeadersFactory;
+    private final HttpHeaderFactory httpHeadersFactory;
     private final HttpQueryParamsFactory queryParamsFactory;
     private final HttpResponseHandler httpResponseHandler;
 
     public HttpClientBaseTaskHandler(
         HttpBodyFactory httpBodyFactory,
-        HttpAuthenticationFactory httpAuthenticationFactory,
-        HttpHeadersFactory httpHeadersFactory,
+        HttpHeaderFactory httpHeadersFactory,
         HttpResponseHandler httpResponseHandler,
         HttpQueryParamsFactory queryParamsFactory
     ) {
         this.httpBodyFactory = httpBodyFactory;
-        this.httpAuthenticationFactory = httpAuthenticationFactory;
         this.httpHeadersFactory = httpHeadersFactory;
         this.httpResponseHandler = httpResponseHandler;
         this.queryParamsFactory = queryParamsFactory;
@@ -60,13 +57,7 @@ public abstract class HttpClientBaseTaskHandler implements TaskHandler<Object> {
 
     @Override
     public Object handle(TaskExecution taskExecution) throws Exception {
-        HttpClientHelper httpClientHelper = new HttpClientHelper(
-            httpAuthenticationFactory.create(
-                taskExecution.getRequiredString("auth"),
-                taskExecution.get("credentials", MapObject.class)
-            ),
-            taskExecution.getLong(PROPERTY_TIMEOUT, 10000)
-        );
+        HttpClientHelper httpClientHelper = new HttpClientHelper(taskExecution.getLong(PROPERTY_TIMEOUT, 10000));
 
         List<HttpHeader> httpHeaders = httpHeadersFactory.getHttpHeaders(taskExecution);
 
@@ -78,7 +69,8 @@ public abstract class HttpClientBaseTaskHandler implements TaskHandler<Object> {
             ),
             httpHeaders,
             httpBodyFactory.getBodyPublisher(taskExecution, httpHeaders),
-            httpBodyFactory.getBodyHandler(taskExecution)
+            httpBodyFactory.getBodyHandler(taskExecution),
+            taskExecution.get(Constants.AUTH, TaskAuth.class)
         );
 
         return httpResponseHandler.handle(taskExecution, httpResponse);

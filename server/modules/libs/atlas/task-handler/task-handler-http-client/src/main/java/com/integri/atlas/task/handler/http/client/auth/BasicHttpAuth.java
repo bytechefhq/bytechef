@@ -14,27 +14,30 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.http.client.authentication;
+package com.integri.atlas.task.handler.http.client.auth;
 
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_PASSWORD;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_USERNAME;
+
+import com.integri.atlas.engine.Accessor;
+import com.integri.atlas.task.auth.TaskAuth;
+import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
  * @author Matija Petanjek
+ * @author Ivica Cardic
  */
-public class BasicAuthentication implements HttpAuthentication {
-
-    private final String password;
-    private final String username;
-
-    public BasicAuthentication(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
+public class BasicHttpAuth implements HttpAuth {
 
     @Override
-    public String getAuthorizationHeader() {
-        String credentials = username + ":" + password;
+    public void apply(HttpRequest.Builder httpRequestBuilder, TaskAuth taskAuth) {
+        httpRequestBuilder.header("Authorization", getHeaderValue(taskAuth.getProperties()));
+    }
+
+    private String getHeaderValue(Accessor properties) {
+        String credentials = properties.getRequiredString(PROPERTY_USERNAME) + ":" + PROPERTY_PASSWORD;
 
         Base64.Encoder encoder = Base64.getEncoder();
 

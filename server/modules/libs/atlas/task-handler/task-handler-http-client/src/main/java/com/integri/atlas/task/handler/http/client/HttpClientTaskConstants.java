@@ -40,13 +40,22 @@ public class HttpClientTaskConstants {
     public static final String PROPERTY_QUERY_PARAMETERS = "queryParameters";
     public static final String PROPERTY_BODY_PARAMETERS = "bodyParameters";
     public static final String PROPERTY_FILE_ENTRY = "fileEntry";
+    public static final String PROPERTY_USERNAME = "username";
+    public static final String PROPERTY_PASSWORD = "password";
     public static final String TASK_HTTP_CLIENT = "httpClient";
+    public static final String PROPERTY_TOKEN = "token";
+    public static final String PROPERTY_ADD_TO = "addTo";
 
-    public enum AuthenticationType {
-        HTTP_API_KEY,
-        HTTP_BASIC_AUTH,
-        HTTP_BEARER_TOKEN,
-        HTTP_DIGEST_AUTH,
+    public enum ApiTokenLocation {
+        HEADER,
+        QUERY_PARAMS,
+    }
+
+    public enum AuthType {
+        API_KEY,
+        BASIC_AUTH,
+        BEARER_TOKEN,
+        DIGEST_AUTH,
         OAUTH2,
     }
 

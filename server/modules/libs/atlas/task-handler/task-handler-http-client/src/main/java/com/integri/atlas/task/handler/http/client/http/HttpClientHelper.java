@@ -16,8 +16,12 @@
 
 package com.integri.atlas.task.handler.http.client.http;
 
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.*;
+
+import com.integri.atlas.task.auth.TaskAuth;
 import com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.RequestMethod;
-import com.integri.atlas.task.handler.http.client.authentication.HttpAuthentication;
+import com.integri.atlas.task.handler.http.client.auth.HttpAuth;
+import com.integri.atlas.task.handler.http.client.auth.HttpAuthRegistry;
 import com.integri.atlas.task.handler.http.client.header.HttpHeader;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -25,6 +29,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Matija Petanjek
@@ -32,11 +37,8 @@ import java.util.List;
 public class HttpClientHelper {
 
     private final HttpClient httpClient;
-    private final HttpAuthentication httpAuthentication;
 
-    public HttpClientHelper(HttpAuthentication httpAuthentication, long timeout) {
-        this.httpAuthentication = httpAuthentication;
-
+    public HttpClientHelper(long timeout) {
         httpClient =
             java.net.http.HttpClient
                 .newBuilder()
@@ -51,13 +53,19 @@ public class HttpClientHelper {
         String uri,
         List<HttpHeader> headers,
         HttpRequest.BodyPublisher bodyPublisher,
-        HttpResponse.BodyHandler<?> bodyHandler
+        HttpResponse.BodyHandler<?> bodyHandler,
+        TaskAuth taskAuth
     ) throws Exception {
         HttpRequest.Builder httpRequestBuilder = HttpRequest
             .newBuilder()
             .method(requestMethod.name(), bodyPublisher)
-            .uri(URI.create(uri))
-            .header("Authorization", httpAuthentication.getAuthorizationHeader());
+            .uri(URI.create(uri));
+
+        if (taskAuth != null) {
+            HttpAuth httpAuth = HttpAuthRegistry.get(AuthType.valueOf(StringUtils.upperCase(taskAuth.getType())));
+
+            httpAuth.apply(httpRequestBuilder, taskAuth);
+        }
 
         for (HttpHeader httpHeader : headers) {
             httpRequestBuilder.header(httpHeader.getName(), httpHeader.getValue());

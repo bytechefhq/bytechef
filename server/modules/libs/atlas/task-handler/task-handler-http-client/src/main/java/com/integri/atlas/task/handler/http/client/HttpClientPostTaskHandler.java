@@ -19,9 +19,8 @@ package com.integri.atlas.task.handler.http.client;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.TASK_HTTP_CLIENT;
 
 import com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.RequestMethod;
-import com.integri.atlas.task.handler.http.client.authentication.HttpAuthenticationFactory;
 import com.integri.atlas.task.handler.http.client.body.HttpBodyFactory;
-import com.integri.atlas.task.handler.http.client.header.HttpHeadersFactory;
+import com.integri.atlas.task.handler.http.client.header.HttpHeaderFactory;
 import com.integri.atlas.task.handler.http.client.params.HttpQueryParamsFactory;
 import com.integri.atlas.task.handler.http.client.response.HttpResponseHandler;
 import org.springframework.stereotype.Component;
@@ -34,12 +33,11 @@ public class HttpClientPostTaskHandler extends HttpClientBaseTaskHandler {
 
     public HttpClientPostTaskHandler(
         HttpBodyFactory httpBodyFactory,
-        HttpAuthenticationFactory httpAuthenticationFactory,
-        HttpHeadersFactory httpHeadersFactory,
+        HttpHeaderFactory httpHeadersFactory,
         HttpResponseHandler httpResponseHandler,
         HttpQueryParamsFactory queryParamsFactory
     ) {
-        super(httpBodyFactory, httpAuthenticationFactory, httpHeadersFactory, httpResponseHandler, queryParamsFactory);
+        super(httpBodyFactory, httpHeadersFactory, httpResponseHandler, queryParamsFactory);
     }
 
     @Override
