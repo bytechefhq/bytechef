@@ -429,6 +429,7 @@ const ConnectionDialog = ({
                                                     return {
                                                         label: capitalizedName,
                                                         value: name,
+                                                        icon: componentDefinition.icon,
                                                         componentDefinition,
                                                     };
                                                 }
