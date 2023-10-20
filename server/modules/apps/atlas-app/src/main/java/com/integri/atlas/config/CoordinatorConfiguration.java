@@ -227,7 +227,7 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    IfTaskDefinitionHandler ifTaskDefinition() {
+    IfTaskDefinitionHandler ifTaskDefinitionHandler() {
         return new IfTaskDefinitionHandler();
     }
 
@@ -269,7 +269,7 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    LoopBreakTaskDefinitionHandler loopBreakTaskDefinition() {
+    LoopBreakTaskDefinitionHandler loopBreakTaskDefinitionHandler() {
         return new LoopBreakTaskDefinitionHandler();
     }
 
@@ -290,7 +290,7 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    LoopTaskDefinitionHandler loopTaskDefinition() {
+    LoopTaskDefinitionHandler loopTaskDefinitionHandler() {
         return new LoopTaskDefinitionHandler();
     }
 
@@ -355,7 +355,7 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    SequenceTaskDefinitionHandler sequenceTaskDefinition() {
+    SequenceTaskDefinitionHandler sequenceTaskDefinitionHandler() {
         return new SequenceTaskDefinitionHandler();
     }
 
