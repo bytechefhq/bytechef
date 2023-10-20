@@ -9,11 +9,24 @@ plugins {
     id "pmd"
 }
 
-sonarqube {
+sonar {
     properties {
         property "sonar.projectKey", "bytechefhq_bytechef"
         property "sonar.organization", "bytechef"
         property "sonar.host.url", "https://sonarcloud.io"
+    }
+}
+
+file("${rootDir}/config/sonar/sonar-project.properties").withReader {
+    Properties sonarProperties = new Properties()
+    sonarProperties.load(it)
+
+    sonarProperties.each { key, value ->
+        sonar {
+            properties {
+                property key, value
+            }
+        }
     }
 }
 

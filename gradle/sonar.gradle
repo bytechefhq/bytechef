@@ -11,16 +11,3 @@ jacocoTestReport {
         xml.enabled = true
     }
 }
-
-file("${rootDir}/config/sonar/sonar-project.properties").withReader {
-    Properties sonarProperties = new Properties()
-    sonarProperties.load(it)
-
-    sonarProperties.each { key, value ->
-        sonarqube {
-            properties {
-                property key, value
-            }
-        }
-    }
-}
