@@ -17,8 +17,6 @@
 
 package com.bytechef.component.xmlfile;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
@@ -30,6 +28,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+
+import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,11 +62,12 @@ public class XmlFileComponentHandlerIntTest {
                         Files.contentOf(sampleFile, StandardCharsets.UTF_8))
                     .toMap()));
 
-        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
+        Assertions.assertThat(job.getStatus())
+            .isEqualTo(Job.Status.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
-        assertThat((List<?>) outputs.get("readXMLFile"))
+        Assertions.assertThat((List<?>) outputs.get("readXMLFile"))
             .isEqualTo(XmlUtils.read(Files.contentOf(getFile("sample.xml"), StandardCharsets.UTF_8), List.class));
     }
 
@@ -78,11 +79,12 @@ public class XmlFileComponentHandlerIntTest {
                 "source",
                 XmlUtils.read(Files.contentOf(getFile("sample.xml"), StandardCharsets.UTF_8), List.class)));
 
-        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
+        Assertions.assertThat(job.getStatus())
+            .isEqualTo(Job.Status.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
-        assertThat(((Map) outputs.get("writeXMLFile")).get(WorkflowConstants.NAME))
+        Assertions.assertThat(((Map) outputs.get("writeXMLFile")).get(WorkflowConstants.NAME))
             .isEqualTo("file.xml");
 
         File sampleFile = getFile("sample.xml");
@@ -98,7 +100,7 @@ public class XmlFileComponentHandlerIntTest {
 
         outputs = job.getOutputs();
 
-        assertThat((List<?>) outputs.get("readXMLFile"))
+        Assertions.assertThat((List<?>) outputs.get("readXMLFile"))
             .isEqualTo(XmlUtils.read(Files.contentOf(sampleFile, StandardCharsets.UTF_8), List.class));
     }
 

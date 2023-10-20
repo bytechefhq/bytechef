@@ -48,11 +48,11 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class FileStorageDownloadAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(DOWNLOAD)
-        .display(display("Download file").description("Download thr file from the URL."))
+        .display(display("Download file").description("Download a file from the URL."))
         .properties(
             string(FileStorageConstants.URL)
                 .label("URL")
-                .description("The URL to download the file from.")
+                .description("The URL to download a file from.")
                 .required(true),
             string(FILENAME)
                 .label("Filename")
@@ -78,7 +78,7 @@ public class FileStorageDownloadAction {
 
                 try (BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream());
                     OutputStream outputStream = new ProgressingOutputStream(
-                        new FileOutputStream(downloadedFile), contentLength, context::publishProgressEvent)) {
+                        new FileOutputStream(downloadedFile), contentLength, context::publishActionProgressEvent)) {
                     copy(inputStream, outputStream);
                 }
 

@@ -17,9 +17,6 @@
 
 package com.bytechef.component.jsonfile;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
-
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
@@ -30,6 +27,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+
+import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,7 +63,8 @@ public class JsonFileComponentHandlerIntTest {
                         Files.contentOf(sampleFile, StandardCharsets.UTF_8))
                     .toMap()));
 
-        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
+        Assertions.assertThat(job.getStatus())
+            .isEqualTo(Job.Status.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
@@ -83,11 +83,12 @@ public class JsonFileComponentHandlerIntTest {
                 "source",
                 new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)).toList()));
 
-        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
+        Assertions.assertThat(job.getStatus())
+            .isEqualTo(Job.Status.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
-        assertThat(((Map) outputs.get("writeJSONFile")).get(WorkflowConstants.NAME))
+        Assertions.assertThat(((Map) outputs.get("writeJSONFile")).get(WorkflowConstants.NAME))
             .isEqualTo("file.json");
 
         File sampleFile = getFile("sample_array.json");
@@ -104,7 +105,7 @@ public class JsonFileComponentHandlerIntTest {
 
         outputs = job.getOutputs();
 
-        assertEquals(
+        JSONAssert.assertEquals(
             new JSONArray(Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
             new JSONArray((List<?>) outputs.get("readJSONFile")),
             true);

@@ -1,5 +1,6 @@
 {
   "actions": [ {
+    "batch": false,
     "display": {
       "description": "Reads data from a XLS/XLSX file.",
       "title": "Read from file"
@@ -88,6 +89,7 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Writes the data to a XLS/XLSX file.",
       "title": "Write to file"

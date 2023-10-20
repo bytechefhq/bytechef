@@ -1,5 +1,6 @@
 {
   "actions": [ {
+    "batch": false,
     "display": {
       "description": "Converts the JSON string to object/array.",
       "title": "Convert from JSON string"
@@ -44,6 +45,7 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Writes the object/array to a JSON string.",
       "title": "Convert to JSON string"

@@ -113,7 +113,8 @@ public class CsvFileReadAction {
         boolean readAsString = inputParameters.getBoolean(READ_AS_STRING, false);
 
         try (
-            InputStream inputStream = context.getFileStream(inputParameters.get(FILE_ENTRY, Context.FileEntry.class))) {
+            InputStream inputStream = context
+                .getFileStream(inputParameters.get(FILE_ENTRY, Context.FileEntry.class))) {
             Integer rangeStartRow = null;
             Integer rangeEndRow = null;
 

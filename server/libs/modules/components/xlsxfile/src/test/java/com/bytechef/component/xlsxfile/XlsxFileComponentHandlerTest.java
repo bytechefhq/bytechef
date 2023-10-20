@@ -97,6 +97,7 @@ public class XlsxFileComponentHandlerTest {
             .isEqualTo("file.xlsx");
     }
 
+    @SuppressWarnings("PMD.SimplifiedTernary")
     private List<JSONObject> getJSONObjectsWithNamedColumns(boolean includeEmptyCells, boolean readAsString)
         throws JSONException {
         return List.of(
@@ -134,6 +135,7 @@ public class XlsxFileComponentHandlerTest {
                 readAsString ? "13.23" : 13.23));
     }
 
+    @SuppressWarnings("PMD.SimplifiedTernary")
     private List<JSONObject> getJSONArrayWithoutNamedColumns(boolean includeEmptyCells, boolean readAsString)
         throws JSONException {
         return List.of(

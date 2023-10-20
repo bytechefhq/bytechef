@@ -1,5 +1,6 @@
 {
   "actions": [ {
+    "batch": false,
     "display": {
       "title": "Set value"
     },

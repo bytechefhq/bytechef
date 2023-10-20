@@ -21,7 +21,7 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
-import com.bytechef.hermes.component.util.HttpClientUtils.Payload;
+import com.bytechef.hermes.component.util.HttpClientUtils.Body;
 import com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import com.bytechef.hermes.definition.Property;
@@ -133,23 +133,23 @@ public class HttpClientActionUtils {
 
         HttpClientUtils.Response response = exchange(
             inputParameters.getRequiredString(URI), requestMethod)
-            .configuration(
-                allowUnauthorizedCerts(inputParameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
-                    .filename(inputParameters.getString(RESPONSE_FILENAME))
-                    .followAllRedirects(inputParameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
-                    .followRedirect(inputParameters.getBoolean(FOLLOW_REDIRECT, false))
-                    .proxy(inputParameters.getString(PROXY))
-                    .responseFormat(getResponseFormat(inputParameters))
-                    .timeout(Duration.ofMillis(inputParameters.getInteger(TIMEOUT, 10000))))
-            .headers(inputParameters.getMap(HEADER_PARAMETERS))
-            .queryParameters(inputParameters.getMap(QUERY_PARAMETERS))
-            .payload(getPayload(inputParameters, getBodyContentType(inputParameters)))
-            .execute();
+                .configuration(
+                    allowUnauthorizedCerts(inputParameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
+                        .filename(inputParameters.getString(RESPONSE_FILENAME))
+                        .followAllRedirects(inputParameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
+                        .followRedirect(inputParameters.getBoolean(FOLLOW_REDIRECT, false))
+                        .proxy(inputParameters.getString(PROXY))
+                        .responseFormat(getResponseFormat(inputParameters))
+                        .timeout(Duration.ofMillis(inputParameters.getInteger(TIMEOUT, 10000))))
+                .headers(inputParameters.getMap(HEADER_PARAMETERS))
+                .queryParameters(inputParameters.getMap(QUERY_PARAMETERS))
+                .body(getPayload(inputParameters, getBodyContentType(inputParameters)))
+                .execute();
 
         if (inputParameters.getBoolean(FULL_RESPONSE, false)) {
             return response;
         } else {
-            return response.body();
+            return response.getBody();
         }
     }
 
@@ -171,32 +171,33 @@ public class HttpClientActionUtils {
             : BodyContentType.valueOf(bodyContentTypeParameter.toUpperCase());
     }
 
-    private static Payload getPayload(InputParameters inputParameters, BodyContentType bodyContentType) {
-        Payload payload = null;
+    private static Body getPayload(InputParameters inputParameters, BodyContentType bodyContentType) {
+        HttpClientUtils.Body body = null;
 
         if (inputParameters.containsKey(BODY_CONTENT)) {
             if (bodyContentType == BodyContentType.BINARY) {
-                payload = Payload.of(
+                body = Body.of(
                     inputParameters.get(BODY_CONTENT, Context.FileEntry.class),
                     inputParameters.getString(BODY_CONTENT_MIME_TYPE));
             } else if (bodyContentType == BodyContentType.FORM_DATA) {
-                payload = Payload.of(
-                    inputParameters.getMap(BODY_CONTENT, List.of(Context.FileEntry.class), Map.of()), bodyContentType);
+                body = HttpClientUtils.Body.of(
+                    inputParameters.getMap(BODY_CONTENT, List.of(Context.FileEntry.class), Map.of()),
+                    bodyContentType);
             } else if (bodyContentType == BodyContentType.FORM_URL_ENCODED) {
-                payload = Payload.of(inputParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
+                body = HttpClientUtils.Body.of(inputParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
             } else if (bodyContentType == BodyContentType.JSON) {
-                payload = Payload.of(
+                body = HttpClientUtils.Body.of(
                     inputParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
             } else if (bodyContentType == BodyContentType.RAW) {
-                payload = Payload.of(
+                body = Body.of(
                     inputParameters.getString(BODY_CONTENT),
                     inputParameters.getString(BODY_CONTENT_MIME_TYPE, "text/plain"));
             } else {
-                payload = Payload.of(inputParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
+                body = HttpClientUtils.Body.of(inputParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
             }
         }
 
-        return payload;
+        return body;
     }
 
     private static ResponseFormat getResponseFormat(InputParameters inputParameters) {

@@ -1,5 +1,6 @@
 {
   "actions": [ {
+    "batch": false,
     "display": {
       "description": "Get the AWS S3 object.",
       "title": "Get Object"
@@ -49,6 +50,7 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Get the url of an AWS S3 object.",
       "title": "Get URL"
@@ -67,6 +69,7 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Get the list AWS S3 objects.",
       "title": "List Objects"
@@ -111,6 +114,7 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Get the url of an pre-signed AWS S3 object.",
       "title": "Get Pre-signed Object"
@@ -129,6 +133,7 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Store an object to AWS S3.",
       "title": "Put Object"

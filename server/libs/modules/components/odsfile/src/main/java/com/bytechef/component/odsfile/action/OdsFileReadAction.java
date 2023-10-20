@@ -107,7 +107,8 @@ public class OdsFileReadAction {
         String sheetName = inputParameters.getString(SHEET_NAME);
 
         try (
-            InputStream inputStream = context.getFileStream(inputParameters.get(FILE_ENTRY, Context.FileEntry.class))) {
+            InputStream inputStream = context
+                .getFileStream(inputParameters.get(FILE_ENTRY, Context.FileEntry.class))) {
             if (inputStream == null) {
                 throw new ComponentExecutionException("Unable to get file content from task " + inputParameters);
             }

@@ -1,5 +1,6 @@
 {
   "actions": [ {
+    "batch": false,
     "display": {
       "description": "The request method to use.",
       "title": "GET"
@@ -122,6 +123,7 @@
       "controlType": "JSON_BUILDER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "The request method to use.",
       "title": "POST"
@@ -501,6 +503,7 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "The request method to use.",
       "title": "PUT"
@@ -968,6 +971,7 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "The request method to use.",
       "title": "PATCH"
@@ -1435,6 +1439,7 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "The request method to use.",
       "title": "DELETE"
@@ -1695,6 +1700,7 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "The request method to use.",
       "title": "HEAD"
@@ -2070,6 +2076,12 @@
         "type": "STRING",
         "controlType": "INPUT_TEXT"
       }, {
+        "label": "Header Prefix",
+        "name": "headerPrefix",
+        "type": "STRING",
+        "defaultValue": "Bearer",
+        "controlType": "INPUT_TEXT"
+      }, {
         "description": "Optional comma-delimited list of scopes",
         "label": "Scopes",
         "name": "scopes",
@@ -2101,6 +2113,12 @@
         "type": "STRING",
         "controlType": "INPUT_TEXT"
       }, {
+        "label": "Header Prefix",
+        "name": "headerPrefix",
+        "type": "STRING",
+        "defaultValue": "Bearer",
+        "controlType": "INPUT_TEXT"
+      }, {
         "description": "Optional comma-delimited list of scopes",
         "label": "Scopes",
         "name": "scopes",
@@ -2130,6 +2148,12 @@
         "required": true,
         "name": "clientSecret",
         "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "label": "Header Prefix",
+        "name": "headerPrefix",
+        "type": "STRING",
+        "defaultValue": "Bearer",
         "controlType": "INPUT_TEXT"
       }, {
         "description": "Optional comma-delimited list of scopes",
