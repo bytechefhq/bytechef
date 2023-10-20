@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import React, {useMemo} from 'react';
 import ReactFlow, {
     ReactFlowProvider,
     Controls,
@@ -15,6 +15,7 @@ import WorkflowNode from './nodes/WorkflowNode';
 
 import './workflowEditor.css';
 import useLayout from './hooks/useLayout';
+import {PlayIcon} from '@heroicons/react/24/outline';
 
 const Workflow = (): JSX.Element => {
     const defaultEdges: Edge[] = [
@@ -29,7 +30,11 @@ const Workflow = (): JSX.Element => {
     const defaultNodes: Node[] = [
         {
             id: '1',
-            data: {label: 'Manual Trigger'},
+            data: {
+                label: 'Manual Trigger',
+                name: 'trigger',
+                icon: <PlayIcon className="h-8 w-8 text-gray-700" />,
+            },
             position: {x: 0, y: 0},
             type: 'workflow',
         },
@@ -61,7 +66,7 @@ const Workflow = (): JSX.Element => {
     useLayout();
 
     return (
-        <div className="flex h-full flex-1 flex-col bg-white">
+        <div className="flex h-full flex-1 flex-col">
             <ReactFlow
                 defaultNodes={defaultNodes}
                 defaultEdges={defaultEdges}
@@ -73,6 +78,7 @@ const Workflow = (): JSX.Element => {
                 nodesDraggable={false}
                 nodesConnectable={false}
                 zoomOnDoubleClick={false}
+                proOptions={{hideAttribution: true}}
             >
                 <MiniMap />
 
