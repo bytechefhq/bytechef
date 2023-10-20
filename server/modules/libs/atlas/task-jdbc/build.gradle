@@ -1,6 +1,6 @@
 dependencies {
     api project(":modules:libs:atlas:engine:engine-worker:engine-worker-api")
-    api project(":modules:libs:atlas:task-definition:task-definition-api")
+    api project(":modules:libs:atlas:task-descriptor:task-descriptor-api")
 
     implementation "org.apache.commons:commons-lang3"
     implementation "org.slf4j:slf4j-api"

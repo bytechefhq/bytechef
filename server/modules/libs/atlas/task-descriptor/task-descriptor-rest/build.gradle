@@ -1,0 +1,14 @@
+dependencies {
+    api project(":modules:libs:atlas:engine:engine-api")
+
+    compileOnly "jakarta.servlet:jakarta.servlet-api"
+
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-web"
+    implementation "org.springframework:spring-webmvc"
+    implementation project(":modules:libs:atlas:task-descriptor:task-descriptor-service")
+
+    testImplementation "org.springframework:spring-jdbc"
+    testImplementation project(":modules:libs:atlas:task-descriptor:task-descriptor-repository:task-descriptor-repository-memory")
+    testImplementation project(":modules:libs:atlas:test-commons")
+}

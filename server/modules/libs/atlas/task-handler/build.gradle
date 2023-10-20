@@ -13,7 +13,7 @@ subprojects {
         compileOnly project(":modules:libs:atlas:file-storage:file-storage-api")
         compileOnly project(":modules:libs:atlas:task-auth:task-auth-api")
         compileOnly project(":modules:libs:atlas:task-commons")
-        compileOnly project(":modules:libs:atlas:task-definition:task-definition-api")
+        compileOnly project(":modules:libs:atlas:task-descriptor:task-descriptor-api")
 
         testImplementation "com.fasterxml.jackson.core:jackson-annotations"
         testImplementation "com.fasterxml.jackson.core:jackson-databind"
@@ -26,7 +26,7 @@ subprojects {
         testImplementation project(":modules:libs:atlas:engine:engine-worker:engine-worker-impl")
         testImplementation project(":modules:libs:atlas:file-storage:file-storage-base64")
         testImplementation project(":modules:libs:atlas:file-storage:file-storage-filesystem")
-        testImplementation project(":modules:libs:atlas:task-definition:task-definition-api")
+        testImplementation project(":modules:libs:atlas:task-descriptor:task-descriptor-api")
         testImplementation project(":modules:libs:atlas:task-commons")
         testImplementation project(":modules:libs:atlas:task-handler:task-handler-io")
         testImplementation project(":modules:libs:atlas:task-handler:task-handler-random")

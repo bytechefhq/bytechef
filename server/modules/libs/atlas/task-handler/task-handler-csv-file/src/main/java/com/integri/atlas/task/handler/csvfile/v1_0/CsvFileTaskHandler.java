@@ -44,7 +44,7 @@ import org.springframework.stereotype.Component;
  */
 class CsvFileTaskHandler {
 
-    @Component(CsvFileTaskConstants.CSV_FILE + "/" + CsvFileTaskConstants.READ + "/" + CsvFileTaskConstants.VERSION)
+    @Component(CsvFileTaskConstants.CSV_FILE + "/" + CsvFileTaskConstants.VERSION + "/" + CsvFileTaskConstants.READ)
     public static class CsvFileReadTaskHandler implements TaskHandler<List<Map<String, ?>>> {
 
         private static final Logger logger = LoggerFactory.getLogger(CsvFileReadTaskHandler.class);
@@ -199,7 +199,7 @@ class CsvFileTaskHandler {
         ) {}
     }
 
-    @Component(CsvFileTaskConstants.CSV_FILE + "/" + CsvFileTaskConstants.WRITE + "/" + CsvFileTaskConstants.VERSION)
+    @Component(CsvFileTaskConstants.CSV_FILE + "/" + CsvFileTaskConstants.VERSION + "/" + CsvFileTaskConstants.WRITE)
     public static class CsvFileWriteTaskHandler implements TaskHandler<FileEntry> {
 
         private static final Logger logger = LoggerFactory.getLogger(CsvFileWriteTaskHandler.class);

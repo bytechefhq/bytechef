@@ -16,19 +16,19 @@
 
 package com.integri.atlas.task.handler.xlsxfile;
 
-import static com.integri.atlas.task.definition.model.DSL.ARRAY_PROPERTY;
-import static com.integri.atlas.task.definition.model.DSL.BOOLEAN_PROPERTY;
-import static com.integri.atlas.task.definition.model.DSL.DATE_TIME_PROPERTY;
-import static com.integri.atlas.task.definition.model.DSL.FILE_ENTRY_PROPERTY;
-import static com.integri.atlas.task.definition.model.DSL.INTEGER_PROPERTY;
-import static com.integri.atlas.task.definition.model.DSL.NUMBER_PROPERTY;
-import static com.integri.atlas.task.definition.model.DSL.OBJECT_PROPERTY;
-import static com.integri.atlas.task.definition.model.DSL.OPERATION;
-import static com.integri.atlas.task.definition.model.DSL.OPTIONS;
-import static com.integri.atlas.task.definition.model.DSL.STRING_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.ARRAY_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.BOOLEAN_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.DATE_TIME_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.FILE_ENTRY_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.INTEGER_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.NUMBER_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.OBJECT_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.OPERATION;
+import static com.integri.atlas.task.descriptor.model.DSL.OPTIONS;
+import static com.integri.atlas.task.descriptor.model.DSL.STRING_PROPERTY;
 
-import com.integri.atlas.task.definition.model.DSL;
-import com.integri.atlas.task.definition.model.TaskDefinition;
+import com.integri.atlas.task.descriptor.model.DSL;
+import com.integri.atlas.task.descriptor.model.TaskDescriptor;
 
 /**
  * @author Ivica Cardic
@@ -49,8 +49,8 @@ public class XlsxFileTaskConstants {
     public static final String WRITE = "write";
     public static final String READ = "read";
 
-    public static final TaskDefinition TASK_DEFINITION = DSL
-        .createTaskDefinition(XLSX_FILE)
+    public static final TaskDescriptor TASK_DESCRIPTOR = DSL
+        .createTaskDescriptor(XLSX_FILE)
         .displayName("XLSX File")
         .description("Reads and writes data from a XLS/XLSX file.")
         .version(VERSION_1_0)

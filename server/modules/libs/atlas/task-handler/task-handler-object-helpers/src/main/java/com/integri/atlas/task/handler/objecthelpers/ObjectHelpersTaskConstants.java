@@ -16,13 +16,13 @@
 
 package com.integri.atlas.task.handler.objecthelpers;
 
-import static com.integri.atlas.task.definition.model.DSL.ARRAY_PROPERTY;
-import static com.integri.atlas.task.definition.model.DSL.OBJECT_PROPERTY;
-import static com.integri.atlas.task.definition.model.DSL.OPERATION;
-import static com.integri.atlas.task.definition.model.DSL.STRING_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.ARRAY_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.OBJECT_PROPERTY;
+import static com.integri.atlas.task.descriptor.model.DSL.OPERATION;
+import static com.integri.atlas.task.descriptor.model.DSL.STRING_PROPERTY;
 
-import com.integri.atlas.task.definition.model.DSL;
-import com.integri.atlas.task.definition.model.TaskDefinition;
+import com.integri.atlas.task.descriptor.model.DSL;
+import com.integri.atlas.task.descriptor.model.TaskDescriptor;
 
 /**
  * @author Ivica Cardic
@@ -35,8 +35,8 @@ public class ObjectHelpersTaskConstants {
     public static final String STRINGIFY = "stringify";
     public static final String PARSE = "parse";
 
-    public static final TaskDefinition TASK_DEFINITION = DSL
-        .createTaskDefinition(OBJECT_HELPERS)
+    public static final TaskDescriptor TASK_DESCRIPTOR = DSL
+        .createTaskDescriptor(OBJECT_HELPERS)
         .displayName("Object Helpers")
         .description("Converts between JSON string and object/array.")
         .version(VERSION_1_0)

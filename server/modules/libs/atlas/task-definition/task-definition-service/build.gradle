@@ -1,9 +1,0 @@
-dependencies {
-    api project(":modules:libs:atlas:task-definition:task-definition-api")
-
-    implementation "org.springframework:spring-context"
-    implementation project(":modules:libs:atlas:task-definition:task-definition-repository:task-definition-repository-api")
-
-    testImplementation project(":modules:libs:atlas:task-definition:task-definition-repository:task-definition-repository-memory")
-    testImplementation project(":modules:libs:atlas:test-commons")
-}
