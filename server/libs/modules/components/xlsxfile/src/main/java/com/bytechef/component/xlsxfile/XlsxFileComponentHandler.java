@@ -14,32 +14,33 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.xlsx.file;
+package com.bytechef.component.xlsxfile;
 
-import static com.bytechef.component.xlsx.file.constants.XlsxFileConstants.INCLUDE_EMPTY_CELLS;
-import static com.bytechef.component.xlsx.file.constants.XlsxFileConstants.PAGE_NUMBER;
-import static com.bytechef.component.xlsx.file.constants.XlsxFileConstants.PAGE_SIZE;
-import static com.bytechef.component.xlsx.file.constants.XlsxFileConstants.PROPERTY_HEADER_ROW;
-import static com.bytechef.component.xlsx.file.constants.XlsxFileConstants.READ_AS_STRING;
-import static com.bytechef.component.xlsx.file.constants.XlsxFileConstants.ROWS;
-import static com.bytechef.component.xlsx.file.constants.XlsxFileConstants.SHEET_NAME;
-import static com.bytechef.component.xlsx.file.constants.XlsxFileConstants.WRITE;
+import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.INCLUDE_EMPTY_CELLS;
+import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.PAGE_NUMBER;
+import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.PAGE_SIZE;
+import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.PROPERTY_HEADER_ROW;
+import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.READ_AS_STRING;
+import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.ROWS;
+import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.SHEET_NAME;
+import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.WRITE;
 import static com.bytechef.hermes.component.ComponentDSL.action;
 import static com.bytechef.hermes.component.ComponentDSL.array;
 import static com.bytechef.hermes.component.ComponentDSL.bool;
 import static com.bytechef.hermes.component.ComponentDSL.createComponent;
+import static com.bytechef.hermes.component.ComponentDSL.dateTime;
 import static com.bytechef.hermes.component.ComponentDSL.display;
 import static com.bytechef.hermes.component.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.ComponentDSL.integer;
-import static com.bytechef.hermes.component.ComponentDSL.options;
+import static com.bytechef.hermes.component.ComponentDSL.number;
+import static com.bytechef.hermes.component.ComponentDSL.object;
 import static com.bytechef.hermes.component.ComponentDSL.string;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
 
 import com.bytechef.commons.collection.MapUtils;
 import com.bytechef.commons.lang.ValueUtils;
-import com.bytechef.component.xlsx.file.constants.XlsxFileConstants;
-import com.bytechef.hermes.component.ComponentDSL;
+import com.bytechef.component.xlsxfile.constants.XlsxFileConstants;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
@@ -78,75 +79,57 @@ public class XlsxFileComponentHandler implements ComponentHandler {
             .actions(
                     action(XlsxFileConstants.READ)
                             .display(display("Read from file").description("Reads data from a XLS/XLSX file."))
-                            .inputs(
+                            .properties(
                                     fileEntry(FILE_ENTRY)
                                             .label("File")
                                             .description(
                                                     "The object property which contains a reference to the XLS/XLSX file to read from.")
                                             .required(true),
-                                    options()
-                                            .label("Options")
-                                            .placeholder("Add Option")
-                                            .options(
-                                                    bool(PROPERTY_HEADER_ROW)
-                                                            .label("Header Row")
-                                                            .description(
-                                                                    "The first row of the file contains the header names.")
-                                                            .defaultValue(true),
-                                                    bool(INCLUDE_EMPTY_CELLS)
-                                                            .label("Include Empty Cells")
-                                                            .description(
-                                                                    "When reading from file the empty cells will be filled with an empty string.")
-                                                            .defaultValue(false),
-                                                    integer(PAGE_SIZE)
-                                                            .label("Page Size")
-                                                            .description(
-                                                                    "The amount of child elements to return in a page."),
-                                                    integer(PAGE_NUMBER)
-                                                            .label("Page Number")
-                                                            .description("The page number to get."),
-                                                    bool(READ_AS_STRING)
-                                                            .label("Read As String")
-                                                            .description(
-                                                                    "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
-                                                            .defaultValue(false),
-                                                    string(SHEET_NAME)
-                                                            .label("Sheet Name")
-                                                            .description(
-                                                                    "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
-                                                            .defaultValue("Sheet")))
-                            .outputSchema(ComponentDSL.array())
+                                    bool(PROPERTY_HEADER_ROW)
+                                            .label("Header Row")
+                                            .description("The first row of the file contains the header names.")
+                                            .defaultValue(true),
+                                    bool(INCLUDE_EMPTY_CELLS)
+                                            .label("Include Empty Cells")
+                                            .description(
+                                                    "When reading from file the empty cells will be filled with an empty string.")
+                                            .defaultValue(false),
+                                    integer(PAGE_SIZE)
+                                            .label("Page Size")
+                                            .description("The amount of child elements to return in a page."),
+                                    integer(PAGE_NUMBER).label("Page Number").description("The page number to get."),
+                                    bool(READ_AS_STRING)
+                                            .label("Read As String")
+                                            .description(
+                                                    "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
+                                            .defaultValue(false),
+                                    string(SHEET_NAME)
+                                            .label("Sheet Name")
+                                            .description(
+                                                    "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
+                                            .defaultValue("Sheet"))
+                            .output(array())
                             .performFunction(this::performRead),
                     action(WRITE)
                             .display(display("Write to file").description("Writes the data to a XLS/XLSX file."))
-                            .inputs(
+                            .properties(
                                     array(ROWS)
                                             .label("Rows")
                                             .description("The array of objects to write to the file.")
                                             .required(true)
-                                            .items(ComponentDSL.object()
-                                                    .additionalProperties(true)
-                                                    .properties(
-                                                            ComponentDSL.bool(),
-                                                            ComponentDSL.dateTime(),
-                                                            ComponentDSL.number(),
-                                                            ComponentDSL.string())),
-                                    options()
-                                            .label("Options")
-                                            .placeholder("Add Option")
-                                            .options(
-                                                    string(FILENAME)
-                                                            .label("Filename")
-                                                            .description(
-                                                                    "Filename to set for binary data. By default, \"file.xlsx\" will be used.")
-                                                            .required(true)
-                                                            .defaultValue("file.xlsx"),
-                                                    string(SHEET_NAME)
-                                                            .label("Sheet Name")
-                                                            .description(
-                                                                    "The name of the sheet to create in the spreadsheet.")
-                                                            .defaultValue("Sheet")))
-                            .outputSchema(ComponentDSL.fileEntry())
+                                            .items(object().additionalProperties(true)
+                                                    .properties(bool(), dateTime(), number(), string())),
+                                    string(FILENAME)
+                                            .label("Filename")
+                                            .description(
+                                                    "Filename to set for binary data. By default, \"file.xlsx\" will be used.")
+                                            .required(true)
+                                            .defaultValue("file.xlsx"),
+                                    string(SHEET_NAME)
+                                            .label("Sheet Name")
+                                            .description("The name of the sheet to create in the spreadsheet.")
+                                            .defaultValue("Sheet"))
+                            .output(fileEntry())
                             .performFunction(this::performWrite));
 
     private enum FileFormat {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.xlsx.file.constants;
+package com.bytechef.component.xlsxfile.constants;
 
 /**
  * @author Ivica Cardic
