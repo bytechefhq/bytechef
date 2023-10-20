@@ -16,27 +16,38 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task.evaluator.spel;
+package com.bytechef.atlas.task.evaluator;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.core.env.Environment;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
 import org.springframework.expression.TypedValue;
+import org.springframework.expression.spel.SpelEvaluationException;
+import org.springframework.expression.spel.SpelMessage;
 
 /**
  * @author Arik Cohen
- * @since Feb, 19 2020
+ * @since Mar, 06 2020
  */
-class Flatten implements MethodExecutor {
+class Config implements MethodExecutor {
+
+    private final transient Environment environment;
+
+    public Config(Environment aEnvironment) {
+        environment = aEnvironment;
+    }
 
     @Override
     public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        @SuppressWarnings("unchecked")
-        List<List<?>> list = (List<List<?>>) aArguments[0];
-        List<?> flat = list.stream().flatMap(List::stream).collect(Collectors.toList());
+        String propertyName = (String) aArguments[0];
+        String value = environment.getProperty(propertyName);
 
-        return new TypedValue(flat);
+        if (value == null) {
+            throw new SpelEvaluationException(
+                    SpelMessage.PROPERTY_OR_FIELD_NOT_READABLE, propertyName, Environment.class);
+        }
+
+        return new TypedValue(value);
     }
 }

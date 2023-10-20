@@ -16,38 +16,22 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task.evaluator.spel;
+package com.bytechef.atlas.task.evaluator;
 
-import org.springframework.core.env.Environment;
+import com.bytechef.commons.utils.UUIDUtils;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
 import org.springframework.expression.TypedValue;
-import org.springframework.expression.spel.SpelEvaluationException;
-import org.springframework.expression.spel.SpelMessage;
 
 /**
  * @author Arik Cohen
- * @since Mar, 06 2020
+ * @since Feb, 19 2020
  */
-class Config implements MethodExecutor {
-
-    private final transient Environment environment;
-
-    public Config(Environment aEnvironment) {
-        environment = aEnvironment;
-    }
+class Uuid implements MethodExecutor {
 
     @Override
     public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        String propertyName = (String) aArguments[0];
-        String value = environment.getProperty(propertyName);
-
-        if (value == null) {
-            throw new SpelEvaluationException(
-                    SpelMessage.PROPERTY_OR_FIELD_NOT_READABLE, propertyName, Environment.class);
-        }
-
-        return new TypedValue(value);
+        return new TypedValue(UUIDUtils.generate());
     }
 }
