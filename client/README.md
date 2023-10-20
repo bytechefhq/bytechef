@@ -6,14 +6,14 @@ This is a [ReactJS](https://reactjs.org) + [Vite](https://vitejs.dev) boilerplat
 
 This project uses many tools like:
 
-- [ReactJS](https://reactjs.org)
-- [Vite](https://vitejs.dev)
-- [TypeScript](https://www.typescriptlang.org)
-- [Vitest](https://vitest.dev/)
-- [Testing Library](https://testing-library.com)
-- [Tailwindcss](https://tailwindcss.com)
-- [Eslint](https://eslint.org)
-- [Prettier](https://prettier.io)
+-   [ReactJS](https://reactjs.org)
+-   [Vite](https://vitejs.dev)
+-   [TypeScript](https://www.typescriptlang.org)
+-   [Vitest](https://vitest.dev/)
+-   [Testing Library](https://testing-library.com)
+-   [Tailwindcss](https://tailwindcss.com)
+-   [Eslint](https://eslint.org)
+-   [Prettier](https://prettier.io)
 
 ## Getting Started
 
