@@ -56,7 +56,7 @@ public class RemoteActionDefinitionFacadeController {
 
         return ResponseEntity.ok(actionDefinitionFacade.executeEditorDescription(
             editorDescriptionRequest.componentName, editorDescriptionRequest.componentVersion,
-            editorDescriptionRequest.actionName, editorDescriptionRequest.inputParameters,
+            editorDescriptionRequest.actionName, editorDescriptionRequest.actionParameters,
             editorDescriptionRequest.connectionId));
     }
 
@@ -71,7 +71,7 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executeOptions(
                 optionsRequest.componentName, optionsRequest.componentVersion, optionsRequest.actionName,
-                optionsRequest.propertyName, optionsRequest.inputParameters, optionsRequest.connectionId,
+                optionsRequest.propertyName, optionsRequest.actionParameters, optionsRequest.connectionId,
                 optionsRequest.searchText));
     }
 
@@ -115,7 +115,7 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executeOutputSchema(
                 outputSchemaRequest.componentName, outputSchemaRequest.componentVersion, outputSchemaRequest.actionName,
-                outputSchemaRequest.inputParameters, outputSchemaRequest.connectionId));
+                outputSchemaRequest.actionParameters, outputSchemaRequest.connectionId));
     }
 
     @RequestMapping(
@@ -134,19 +134,19 @@ public class RemoteActionDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record EditorDescriptionRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        Map<String, Object> inputParameters, Long connectionId) {
+        Map<String, Object> actionParameters, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record OptionsRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName, @NotNull String propertyName,
-        Map<String, Object> inputParameters, Long connectionId, String searchText) {
+        Map<String, Object> actionParameters, Long connectionId, String searchText) {
     }
 
     @SuppressFBWarnings("EI")
     public record OutputSchemaRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        Map<String, Object> inputParameters, Long connectionId) {
+        Map<String, Object> actionParameters, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")

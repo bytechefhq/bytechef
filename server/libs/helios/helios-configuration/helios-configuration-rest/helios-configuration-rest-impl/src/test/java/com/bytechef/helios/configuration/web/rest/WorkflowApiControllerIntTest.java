@@ -32,7 +32,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -188,7 +187,6 @@ public class WorkflowApiControllerIntTest {
 
     private Workflow getWorkflow() throws JsonProcessingException {
         return new Workflow(
-            "1", DEFINITION, Workflow.Format.JSON, objectMapper.readValue(DEFINITION, new TypeReference<>() {}),
-            Map.of());
+            "1", DEFINITION, Workflow.Format.JSON, objectMapper.readValue(DEFINITION, new TypeReference<>() {}));
     }
 }

@@ -38,8 +38,11 @@ public class JobParameters {
     private Map<String, ?> metadata = Collections.emptyMap();
     private Long parentTaskExecutionId;
     private int priority = Prioritizable.DEFAULT_PRIORITY;
-    private final String workflowId;
+    private String workflowId;
     private List<Webhook> webhooks = Collections.emptyList();
+
+    private JobParameters() {
+    }
 
     @SuppressFBWarnings("EI2")
     public JobParameters(String workflowId, Map<String, ?> inputs) {

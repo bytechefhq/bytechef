@@ -55,7 +55,6 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -178,7 +177,7 @@ public class ProjectApiControllerIntTest {
     @Test
     public void testGetProjectWorkflows() {
         try {
-            Workflow workflow = new Workflow("workflow1", "{}", Workflow.Format.JSON, Map.of(), Map.of());
+            Workflow workflow = new Workflow("workflow1", "{}", Workflow.Format.JSON);
 
             when(projectFacade.getProjectWorkflows(1L)).thenReturn(List.of(workflow));
 
@@ -295,13 +294,13 @@ public class ProjectApiControllerIntTest {
 
     @Test
     @SuppressFBWarnings("NP")
-    public void testPostIntegrationWorkflows() throws Exception {
+    public void testPostIntegrationWorkflows() {
         CreateProjectWorkflowRequestModel createProjectWorkflowRequestModel = new CreateProjectWorkflowRequestModel()
             .label("workflowLabel")
             .description("workflowDescription");
         Workflow workflow = new Workflow(
             "id", "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}",
-            Workflow.Format.JSON.getId());
+            Workflow.Format.JSON);
 
         when(projectFacade.addProjectWorkflow(anyLong(), any(), any(), any()))
             .thenReturn(workflow);

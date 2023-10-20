@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-public class WorkflowReservedWordContributorImpl implements WorkflowReservedWordContributor {
+public class TriggerWorkflowReservedWordContributor implements WorkflowReservedWordContributor {
 
     @Override
     public List<String> getReservedWords() {

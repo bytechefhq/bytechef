@@ -82,7 +82,7 @@ public class WebhookExecutorImpl implements WebhookExecutor {
         } else {
             Job job = jobSyncExecutor.execute(createJobParameters(workflowExecutionId, inputs, triggerOutput.value()));
 
-            outputs = job.getOutputs();
+            outputs = job.getOutputs() == null ? null : workflowFileStorageFacade.readJobOutputs(job.getOutputs());
         }
 
         return outputs;

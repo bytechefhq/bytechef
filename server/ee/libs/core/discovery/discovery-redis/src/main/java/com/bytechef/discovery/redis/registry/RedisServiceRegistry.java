@@ -117,7 +117,7 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
 
     @SuppressFBWarnings("RCN")
     private void registerService(RedisRegistration redisRegistration) {
-        String serviceId = redisRegistration.getServiceId();
+        String serviceId = "discovery/" + redisRegistration.getServiceId();
 
         ListOperations<String, RedisRegistration> listOperations = redisTemplate.opsForList();
 

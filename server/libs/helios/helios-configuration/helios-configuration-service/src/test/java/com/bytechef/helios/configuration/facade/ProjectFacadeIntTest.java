@@ -48,6 +48,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -274,13 +275,15 @@ public class ProjectFacadeIntTest {
     public void testGetProjectWorkflows() {
         Workflow workflow = new Workflow("{\"tasks\":[]}", Workflow.Format.JSON);
 
+        workflow.setNew(true);
+
         workflow = workflowRepository.save(workflow);
 
         Project project = new Project();
 
         project.setName("name");
         project.setStatus(Project.Status.UNPUBLISHED);
-        project.setWorkflowIds(List.of(workflow.getId()));
+        project.setWorkflowIds(List.of(Objects.requireNonNull(workflow.getId())));
 
         project = projectRepository.save(project);
 
@@ -288,7 +291,7 @@ public class ProjectFacadeIntTest {
 
         assertThat(
             workflows.stream()
-                .map(curWorkflow -> curWorkflow.getId())
+                .map(Workflow::getId)
                 .toList())
                     .contains(workflow.getId());
     }

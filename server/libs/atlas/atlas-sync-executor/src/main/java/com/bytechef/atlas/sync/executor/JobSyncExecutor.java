@@ -30,6 +30,7 @@ import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.facade.RemoteJobFacade;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
@@ -71,7 +72,7 @@ public class JobSyncExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(JobSyncExecutor.class);
 
-    private final RemoteJobFacade jobFacade;
+    private final JobFacade jobFacade;
     private final RemoteJobService jobService;
 
     public JobSyncExecutor(
@@ -152,8 +153,8 @@ public class JobSyncExecutor {
                 Stream.of(defaultTaskCompletionHandler)));
 
         TaskCoordinator taskCoordinator = new TaskCoordinator(
-            eventPublisher, jobExecutor, jobFacade, jobService, syncMessageBroker, taskCompletionHandlerChain,
-            taskDispatcherChain, taskExecutionService);
+            eventPublisher, jobExecutor, (RemoteJobFacade) jobFacade, jobService, syncMessageBroker,
+            taskCompletionHandlerChain, taskDispatcherChain, taskExecutionService);
 
         syncMessageBroker.receive(
             TaskMessageRoute.TASKS_COMPLETE, o -> taskCoordinator.handleTasksComplete((TaskExecution) o));

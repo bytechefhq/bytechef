@@ -49,7 +49,7 @@ public class RedisDiscoveryClient implements DiscoveryClient {
     public List<ServiceInstance> getInstances(String serviceId) {
         ListOperations<String, RedisRegistration> listOperations = redisTemplate.opsForList();
 
-        List<RedisRegistration> redisRegistrations = listOperations.range(serviceId, 0, -1);
+        List<RedisRegistration> redisRegistrations = listOperations.range("discovery/" + serviceId, 0, -1);
 
         return Objects.requireNonNull(redisRegistrations)
             .parallelStream()
@@ -61,6 +61,9 @@ public class RedisDiscoveryClient implements DiscoveryClient {
     public List<String> getServices() {
         // TODO move "*-app" to configuration
 
-        return List.copyOf(Objects.requireNonNull(redisTemplate.keys("*-app")));
+        return Objects.requireNonNull(redisTemplate.keys("discovery/*"))
+            .stream()
+            .map(key -> key.replace("discovery/", ""))
+            .toList();
     }
 }

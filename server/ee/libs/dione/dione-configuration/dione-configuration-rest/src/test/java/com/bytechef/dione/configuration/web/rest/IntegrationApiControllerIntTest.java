@@ -54,7 +54,6 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -174,7 +173,7 @@ public class IntegrationApiControllerIntTest {
     @Test
     public void testGetIntegrationWorkflows() {
         try {
-            Workflow workflow = new Workflow("{}", Workflow.Format.JSON, "workflow1", Map.of(), Map.of());
+            Workflow workflow = new Workflow("workflow1", "{}", Workflow.Format.JSON);
 
             when(integrationFacade.getIntegrationWorkflows(1L)).thenReturn(
                 List.of(workflow));
@@ -298,8 +297,8 @@ public class IntegrationApiControllerIntTest {
                 .label("workflowLabel")
                 .description("workflowDescription");
         Workflow workflow = new Workflow(
-            "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}", "id",
-            Workflow.Format.JSON.getId());
+            "id", "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}",
+            Workflow.Format.JSON);
 
         when(integrationFacade.addWorkflow(anyLong(), any(), any(), any()))
             .thenReturn(workflow);

@@ -74,7 +74,9 @@ public class JobTestExecutorImpl implements JobTestExecutor {
                     workflowFileStorageFacade.readContextValue(
                         contextService.peek(
                             Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION)),
-                    workflowFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()),
+                    taskExecution.getOutput() == null
+                        ? null
+                        : workflowFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()),
                     taskExecution)));
     }
 

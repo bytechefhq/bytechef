@@ -21,8 +21,9 @@ package com.bytechef.atlas.execution.repository.memory;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
+import org.springframework.util.comparator.Comparators;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -37,13 +38,15 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
 
     private static final Random RANDOM = new Random();
 
-    private final Map<Long, TaskExecution> taskExecutions = new HashMap<>();
+    private final Map<Long, TaskExecution> taskExecutions = new LinkedHashMap<>();
 
     @Override
     public List<TaskExecution> findAllByJobIdOrderByTaskNumber(Long jobId) {
         return taskExecutions.values()
             .stream()
             .filter(taskExecution -> Objects.equals(taskExecution.getJobId(), jobId))
+            .sorted((o1, o2) -> Comparators.comparable()
+                .compare(o1.getTaskNumber(), o2.getTaskNumber()))
             .toList();
     }
 

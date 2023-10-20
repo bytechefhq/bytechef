@@ -74,7 +74,6 @@ public class CounterServiceImpl implements RemoteCounterService {
             Counter counter = new Counter();
 
             counter.setId(id);
-            counter.setNew(true);
             counter.setValue(value);
 
             counterRepository.save(counter);

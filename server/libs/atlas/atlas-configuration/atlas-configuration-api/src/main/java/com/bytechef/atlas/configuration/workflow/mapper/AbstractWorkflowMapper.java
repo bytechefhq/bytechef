@@ -66,6 +66,29 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
         }
     }
 
+    private final Workflow.Format format;
+    private final ObjectMapper objectMapper;
+
+    AbstractWorkflowMapper(Workflow.Format format, ObjectMapper objectMapper) {
+        this.format = format;
+        this.objectMapper = objectMapper;
+    }
+
+    @Override
+    public Workflow readWorkflow(WorkflowResource workflowResource) {
+        return readWorkflow(workflowResource, objectMapper);
+    }
+
+    @Override
+    public Map<String, Object> readWorkflowMap(WorkflowResource workflowResource) {
+        return readWorkflowMap(workflowResource, objectMapper);
+    }
+
+    @Override
+    public WorkflowMapper resolve(WorkflowResource workflowResource) {
+        return workflowResource.getWorkflowFormat() == format ? this : null;
+    }
+
     protected Workflow readWorkflow(WorkflowResource workflowResource, ObjectMapper objectMapper) {
         try {
             String definition = readDefinition(workflowResource);
@@ -73,7 +96,7 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
             Map<String, Object> workflowMap = parse(definition, objectMapper);
 
             return new Workflow(
-                definition, workflowResource.getWorkflowFormat(), workflowResource.getId(),
+                workflowResource.getId(), definition, workflowResource.getWorkflowFormat(),
                 LocalDateTimeUtils.getLocalDateTime(new Date(workflowResource.lastModified())), workflowMap,
                 workflowResource.getMetadata());
         } catch (IOException e) {
