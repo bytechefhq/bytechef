@@ -54,22 +54,22 @@ public class GetOrganizationAction {
                     "type", PropertyType.PATH)))
         .outputSchema(
             object()
-                .properties(object("additional_data").properties(object("followers")
-                    .properties(string("name").label("Name")
-                        .description("The name of the follower")
+                .properties(object("additional_data").properties(object("followers").properties(string("name")
+                    .label("Name")
+                    .description("The name of the follower")
+                    .required(false),
+                    integer("id").label("Id")
+                        .description("The ID of the follower associated with the item")
                         .required(false),
-                        integer("id").label("Id")
-                            .description("The ID of the follower associated with the item")
-                            .required(false),
-                        integer("user_id").label("User_id")
-                            .description("The user ID of the follower")
-                            .required(false),
-                        string("email").label("Email")
-                            .description("The email of the follower")
-                            .required(false),
-                        string("pic_hash").label("Pic_hash")
-                            .description("The follower picture hash")
-                            .required(false))
+                    integer("user_id").label("User_id")
+                        .description("The user ID of the follower")
+                        .required(false),
+                    string("email").label("Email")
+                        .description("The email of the follower")
+                        .required(false),
+                    string("pic_hash").label("Pic_hash")
+                        .description("The follower picture hash")
+                        .required(false))
                     .label("Followers")
                     .description("The follower that is associated with the item")
                     .required(false),
