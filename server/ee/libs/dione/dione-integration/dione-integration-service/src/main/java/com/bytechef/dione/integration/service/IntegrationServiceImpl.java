@@ -17,11 +17,11 @@
 
 package com.bytechef.dione.integration.service;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.dione.integration.domain.Integration;
 import com.bytechef.dione.integration.repository.IntegrationRepository;
 
 import java.util.List;
-import java.util.stream.StreamSupport;
 
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -67,13 +67,12 @@ public class IntegrationServiceImpl implements IntegrationService {
 
     @Override
     public void delete(long id) {
-        integrationRepository.deleteById(id);
+        integrationRepository.delete(getIntegration(id));
     }
 
     @Override
     public Integration getIntegration(long id) {
-        return integrationRepository.findById(id)
-            .orElseThrow(IllegalArgumentException::new);
+        return OptionalUtils.get(integrationRepository.findById(id));
     }
 
     @Override
@@ -83,15 +82,14 @@ public class IntegrationServiceImpl implements IntegrationService {
         if (CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
             integrationIterable = integrationRepository.findAll(Sort.by("name"));
         } else if (!CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
-            integrationIterable = integrationRepository.findByCategoryIdInOrderByName(categoryIds);
+            integrationIterable = integrationRepository.findAllByCategoryIdInOrderByName(categoryIds);
         } else if (CollectionUtils.isEmpty(categoryIds)) {
-            integrationIterable = integrationRepository.findByTagIdInOrderByName(tagIds);
+            integrationIterable = integrationRepository.findAllByTagIdInOrderByName(tagIds);
         } else {
-            integrationIterable = integrationRepository.findByCategoryIdsAndTagIdsOrderByName(categoryIds, tagIds);
+            integrationIterable = integrationRepository.findAllByCategoryIdsAndTagIdsOrderByName(categoryIds, tagIds);
         }
 
-        return StreamSupport.stream(integrationIterable.spliterator(), false)
-            .toList();
+        return com.bytechef.commons.util.CollectionUtils.toList(integrationIterable);
     }
 
     @Override

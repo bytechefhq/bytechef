@@ -88,7 +88,11 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     public void delete(Long id) {
-//        Integration integration = integrationService.getIntegration(id);
+        Integration integration = integrationService.getIntegration(id);
+
+        for (String workflowId : integration.getWorkflowIds()) {
+            workflowService.delete(workflowId);
+        }
 
         integrationService.delete(id);
 
