@@ -203,14 +203,14 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjectDTO> getPublishedProjects(Long categoryId, boolean projectInstances, Long tagId) {
+    public List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Boolean published) {
         List<Long> projectIds = null;
 
         if (projectInstances) {
             projectIds = projectInstanceService.getProjectIds();
         }
 
-        List<Project> projects = projectService.getPublishedProjects(categoryId, projectIds, tagId);
+        List<Project> projects = projectService.getProjects(categoryId, projectIds, tagId, published);
 
         return CollectionUtils.map(
             projects,

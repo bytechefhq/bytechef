@@ -34,27 +34,23 @@ import java.util.Optional;
 public interface ProjectRepository
     extends ListPagingAndSortingRepository<Project, Long>, CrudRepository<Project, Long> {
 
-    List<Project> findAllByPublishedDateNotNullOrderByName();
-
-    List<Project> findAllByCategoryIdAndPublishedDateNotNullOrderByName(Long categoryId);
+    List<Project> findAllByCategoryIdOrderByName(Long categoryId);
 
     @Query("""
             SELECT project.* FROM project
             JOIN project_tag ON project.id = project_tag.project_id
-            WHERE project.published_date is not null
-            AND project.category_id = :categoryId
+            WHERE project.category_id = :categoryId
             AND project_tag.tag_id = :tagId
         """)
-    List<Project> findAllByCategoryIdAndTagIdAndPublishedDateNotNullOrderByName(
+    List<Project> findAllByCategoryIdAndTagIdOrderByName(
         @Param("categoryId") long categoryId, @Param("tagId") long tagId);
 
     @Query("""
             SELECT project.* FROM project
             JOIN project_tag ON project.id = project_tag.project_id
-            WHERE project.published_date is not null
-            AND project_tag.tag_id = :tagId
+            WHERE project_tag.tag_id = :tagId
         """)
-    List<Project> findAllByTagIdAndPublishedDateNotNullOrderByName(@Param("tagId") long tagId);
+    List<Project> findAllByTagIdOrderByName(@Param("tagId") long tagId);
 
     Optional<Project> findByNameIgnoreCase(String name);
 
