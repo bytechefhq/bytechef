@@ -57,8 +57,6 @@ public class Base64StorageServiceTest {
             new ByteArrayInputStream(string.getBytes())
         );
 
-        Assertions
-            .assertThat(fileEntry.getUrl())
-            .isEqualTo("base64:" + Base64.getEncoder().encodeToString(string.getBytes()));
+        Assertions.assertThat(fileEntry.getUrl()).isEqualTo(Base64.getEncoder().encodeToString(string.getBytes()));
     }
 }

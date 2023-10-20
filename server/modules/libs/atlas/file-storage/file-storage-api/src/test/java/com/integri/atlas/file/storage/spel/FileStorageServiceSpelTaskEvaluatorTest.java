@@ -44,7 +44,7 @@ public class FileStorageServiceSpelTaskEvaluatorTest {
 
         MapContext mapContext = new MapContext();
 
-        mapContext.put("fileURL", "base64:" + Base64.getEncoder().encodeToString("data".getBytes()));
+        mapContext.put("fileURL", Base64.getEncoder().encodeToString("data".getBytes()));
 
         TaskExecution taskExecution = evaluator.evaluate(
             SimpleTaskExecution.of("fileContent", "${readFileContent(fileURL)}"),
@@ -68,7 +68,7 @@ public class FileStorageServiceSpelTaskEvaluatorTest {
 
         Assertions
             .assertThat((FileEntry) taskExecution.get("fileEntry"))
-            .hasFieldOrPropertyWithValue("url", "base64:" + Base64.getEncoder().encodeToString("data".getBytes()))
+            .hasFieldOrPropertyWithValue("url", Base64.getEncoder().encodeToString("data".getBytes()))
             .hasFieldOrPropertyWithValue("extension", "txt")
             .hasFieldOrPropertyWithValue("mimeType", "text/plain")
             .hasFieldOrPropertyWithValue("name", "sample.txt");
