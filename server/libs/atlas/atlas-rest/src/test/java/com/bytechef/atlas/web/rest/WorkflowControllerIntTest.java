@@ -23,8 +23,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.web.rest.config.WorkflowRestTestConfiguration;
-import com.bytechef.atlas.web.rest.model.PostWorkflowRequestModel;
-import com.bytechef.atlas.web.rest.model.PutWorkflowRequestModel;
 import com.bytechef.atlas.web.rest.model.WorkflowFormatModel;
 import com.bytechef.atlas.web.rest.model.WorkflowModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -131,9 +129,9 @@ public class WorkflowControllerIntTest {
     public void testPostWorkflow() throws JsonProcessingException {
         Workflow workflow = getWorkflow();
 
-        PostWorkflowRequestModel workflowModel = new PostWorkflowRequestModel()
+        WorkflowModel workflowModel = new WorkflowModel()
             .definition(DEFINITION)
-            .sourceType(PostWorkflowRequestModel.SourceTypeEnum.JDBC)
+            .sourceType(WorkflowModel.SourceTypeEnum.JDBC)
             .format(WorkflowFormatModel.JSON);
 
         when(workflowService.create(DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC))
@@ -174,7 +172,7 @@ public class WorkflowControllerIntTest {
     public void testPutWorkflow() throws JsonProcessingException {
         Workflow workflow = getWorkflow();
 
-        PutWorkflowRequestModel workflowModel = new PutWorkflowRequestModel()
+        WorkflowModel workflowModel = new WorkflowModel()
             .definition(DEFINITION);
 
         when(workflowService.update("1", DEFINITION)).thenReturn(workflow);
