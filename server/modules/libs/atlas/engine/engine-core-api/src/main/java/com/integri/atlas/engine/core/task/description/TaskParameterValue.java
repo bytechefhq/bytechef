@@ -162,7 +162,7 @@ public sealed interface TaskParameterValue
                 SerializerProvider serializerProvider
             ) throws IOException {
                 if (taskPropertyValueDateTime.value == null) {
-                    jsonGenerator.writeString("null");
+                    jsonGenerator.writeString("");
                 } else {
                     jsonGenerator.writeString(taskPropertyValueDateTime.value.toString());
                 }
