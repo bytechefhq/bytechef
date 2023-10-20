@@ -18,7 +18,7 @@
 
 package com.bytechef.atlas.message.broker;
 
-import com.bytechef.commons.uuid.UUIDGenerator;
+import com.bytechef.commons.utils.UUIDUtils;
 
 /**
  * @author Arik Cohen
@@ -31,7 +31,7 @@ public interface Queues {
     String SUBFLOWS = "subflows";
     String EXECUTE = "execute";
     String DLQ = "dlq";
-    String CONTROL = "x.control." + UUIDGenerator.generate();
+    String CONTROL = "x.control." + UUIDUtils.generate();
     String RESTARTS = "restarts";
     String REQUESTS = "requests";
     String TASKS = "tasks";
