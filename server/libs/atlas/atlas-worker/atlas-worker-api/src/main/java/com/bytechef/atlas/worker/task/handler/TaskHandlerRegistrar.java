@@ -16,15 +16,12 @@
 
 package com.bytechef.atlas.worker.task.handler;
 
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
-import com.bytechef.atlas.worker.Worker;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 /**
  * @author Ivica Cardic
  */
-public interface TaskDispatcherAdapterFactory {
+public interface TaskHandlerRegistrar {
 
-    TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver, TaskEvaluator taskEvaluator, Worker.Builder builder);
-
-    String getName();
+    void registerTaskHandlers(ConfigurableListableBeanFactory beanFactory);
 }

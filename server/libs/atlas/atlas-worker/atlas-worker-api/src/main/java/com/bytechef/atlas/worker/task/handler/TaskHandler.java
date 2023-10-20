@@ -18,18 +18,15 @@
 
 package com.bytechef.atlas.worker.task.handler;
 
-import com.bytechef.atlas.task.Task;
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 
 /**
- * a strategy interface used for resolving a {@link TaskHandler} implementation which can handle the
- * given {@link TaskExecution} instance. Implementations are expected to return <code>null</code> if
- * unable to resolve an appropriate {@link TaskHandler} implementation to allow for chaining
- * multiple {@link TaskHandlerResolver} implementations.
+ * A startegy interface used for executing a {@link TaskExecution}.
  *
  * @author Arik Cohen
- * @since Jan 28, 2017
+ * @since Jun 12, 2016
  */
-public interface TaskHandlerResolver {
-    TaskHandler<?> resolve(Task task);
+public interface TaskHandler<O> {
+    O handle(TaskExecution taskExecution) throws TaskExecutionException;
 }
