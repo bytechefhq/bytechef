@@ -22,7 +22,6 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -62,7 +61,7 @@ public class CsvFileComponentHandlerIntTest {
                         Files.contentOf(sampleFile, StandardCharsets.UTF_8))
                     .toMap()));
 
-        assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
+        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
@@ -80,7 +79,7 @@ public class CsvFileComponentHandlerIntTest {
                 "rows",
                 new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)).toList()));
 
-        assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
+        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 

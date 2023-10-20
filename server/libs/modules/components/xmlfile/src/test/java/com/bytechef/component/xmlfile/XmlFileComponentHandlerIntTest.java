@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.component.utils.XmlUtils;
@@ -61,7 +60,7 @@ public class XmlFileComponentHandlerIntTest {
                         Files.contentOf(sampleFile, StandardCharsets.UTF_8))
                     .toMap()));
 
-        assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
+        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
@@ -77,7 +76,7 @@ public class XmlFileComponentHandlerIntTest {
                 "source",
                 XmlUtils.read(Files.contentOf(getFile("sample.xml"), StandardCharsets.UTF_8), List.class)));
 
-        assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
+        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
         Map<String, Object> outputs = job.getOutputs();
 
