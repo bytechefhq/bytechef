@@ -102,6 +102,9 @@ const Property = ({
         mentionInput &&
         !!dataPills?.length;
 
+    const showInputTypeSwitchButton =
+        type !== 'OBJECT' && type !== 'ARRAY' && !!dataPills?.length && !!name;
+
     if (!name) {
         return <></>;
     }
@@ -118,24 +121,21 @@ const Property = ({
             )}
         >
             <div className="relative w-full">
-                {type !== 'OBJECT' &&
-                    type !== 'ARRAY' &&
-                    !!dataPills?.length &&
-                    !!name && (
-                        <Button
-                            className="absolute right-0 top-0 h-auto w-auto p-0.5"
-                            onClick={() => setMentionInput(!mentionInput)}
-                            size="icon"
-                            variant="ghost"
-                            title="Switch input type"
-                        >
-                            {mentionInput ? (
-                                <FormInputIcon className="h-5 w-5 text-gray-800" />
-                            ) : (
-                                <FunctionSquareIcon className="h-5 w-5 text-gray-800" />
-                            )}
-                        </Button>
-                    )}
+                {showInputTypeSwitchButton && (
+                    <Button
+                        className="absolute right-0 top-0 h-auto w-auto p-0.5"
+                        onClick={() => setMentionInput(!mentionInput)}
+                        size="icon"
+                        variant="ghost"
+                        title="Switch input type"
+                    >
+                        {mentionInput ? (
+                            <FormInputIcon className="h-5 w-5 text-gray-800" />
+                        ) : (
+                            <FunctionSquareIcon className="h-5 w-5 text-gray-800" />
+                        )}
+                    </Button>
+                )}
 
                 {showMentionInput && (
                     <MentionsInput
@@ -152,6 +152,7 @@ const Property = ({
                                 event.key !== '{' && event.preventDefault();
                             }
                         }}
+                        singleMention={controlType !== 'TEXT'}
                     />
                 )}
 

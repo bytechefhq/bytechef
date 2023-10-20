@@ -51,6 +51,7 @@ type MentionsInputProps = {
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     onKeyPress?: (event: KeyboardEvent) => void;
     placeholder?: string;
+    singleMention?: boolean;
 };
 
 const MentionsInput = ({
@@ -65,8 +66,10 @@ const MentionsInput = ({
     onChange,
     onKeyPress,
     placeholder = "Mention datapills using '{'",
+    singleMention,
 }: MentionsInputProps) => {
     const [value, setValue] = useState('');
+    const [mentionOccurences, setMentionOccurences] = useState(0);
 
     const editorRef = useRef<ReactQuill>(null);
 
@@ -216,23 +219,28 @@ const MentionsInput = ({
                     // eslint-disable-next-line react-hooks/exhaustive-deps -- put data as dependency and it will render empty editor, but it will update available datapills
                     modules={useMemo(() => modules, [])}
                     onChange={(value) => {
-                        const formattedEvent = {
-                            target: {name, value},
-                        };
-
                         if (onChange) {
-                            onChange(
-                                formattedEvent as ChangeEvent<HTMLInputElement>
-                            );
+                            onChange({
+                                target: {name, value},
+                            } as ChangeEvent<HTMLInputElement>);
                         }
 
                         setValue(value);
+
+                        setMentionOccurences(
+                            value.match(/bytechef-mention/g)?.length || 0
+                        );
                     }}
                     onFocus={() => {
                         if (editorRef.current) {
                             setFocusedInput(editorRef.current);
 
                             setDataPillPanelOpen(true);
+                        }
+                    }}
+                    onKeyDown={(event) => {
+                        if (singleMention && mentionOccurences) {
+                            event.preventDefault();
                         }
                     }}
                     onKeyPress={onKeyPress}
