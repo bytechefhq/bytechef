@@ -78,7 +78,7 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                             className="flex items-center justify-between"
                         >
                             <Link
-                                className="flex justify-start text-sm"
+                                className="flex justify-start text-sm font-semibold"
                                 to={`/automation/projects/${project.id}/workflow/${workflow.id}`}
                             >
                                 {workflow.label}
