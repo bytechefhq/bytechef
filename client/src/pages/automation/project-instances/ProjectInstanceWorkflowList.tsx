@@ -29,7 +29,7 @@ const ProjectInstanceWorkflowList = ({
 }: {
     projectId: number;
     projectInstanceId: number;
-    projectInstanceEnabled?: boolean;
+    projectInstanceEnabled: boolean;
     projectInstanceWorkflows?: Array<ProjectInstanceWorkflowModel>;
 }) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
@@ -105,7 +105,14 @@ const ProjectInstanceWorkflowList = ({
                         projectInstanceWorkflows?.find(
                             (projectInstanceWorkflow) =>
                                 projectInstanceWorkflow.workflowId ===
-                                workflow.id
+                                workflow?.id
+                        );
+
+                    const selectedProjectInstanceWorkflow =
+                        projectInstanceWorkflows?.find(
+                            (projectInstanceWorkflow) =>
+                                projectInstanceWorkflow.workflowId ===
+                                selectedWorkflow?.id
                         );
 
                     return (
@@ -236,15 +243,19 @@ const ProjectInstanceWorkflowList = ({
 
                             {showEditWorkflowDialog &&
                                 projectInstanceWorkflow &&
+                                selectedProjectInstanceWorkflow &&
                                 selectedWorkflow && (
                                     <ProjectInstanceEditWorkflowDialog
                                         onClose={() =>
                                             setShowEditWorkflowDialog(false)
                                         }
-                                        visible
-                                        projectInstanceWorkflow={
-                                            projectInstanceWorkflow
+                                        projectInstanceEnabled={
+                                            projectInstanceEnabled
                                         }
+                                        projectInstanceWorkflow={
+                                            selectedProjectInstanceWorkflow
+                                        }
+                                        visible
                                         workflow={selectedWorkflow}
                                     />
                                 )}

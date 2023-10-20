@@ -70,8 +70,8 @@ const ProjectInstanceList = ({
                                             )
                                                 ? projectInstanceMap.get(
                                                       projectInstance.id!
-                                                  )
-                                                : projectInstance.enabled
+                                                  )!
+                                                : projectInstance.enabled!
                                         }
                                         projectInstanceWorkflows={
                                             projectInstance.projectInstanceWorkflows
