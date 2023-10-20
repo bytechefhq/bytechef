@@ -17,7 +17,7 @@
 
 package com.bytechef.cli.command.component.subcommand;
 
-import com.bytechef.hermes.component.RestComponentHandler;
+import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
@@ -78,9 +78,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RestComponentGenerator {
+public class OpenApiComponentGenerator {
 
-    private static final Logger logger = LoggerFactory.getLogger(RestComponentGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(OpenApiComponentGenerator.class);
 
     private static final ClassName AUTHORIZATION_CLASS_NAME = ClassName.get(
         "com.bytechef.hermes.component.definition", "Authorization");
@@ -92,9 +92,9 @@ public class RestComponentGenerator {
     private static final ClassName COMPONENT_CONSTANTS_CLASS_NAME = ClassName
         .get("com.bytechef.hermes.component.constant", "ComponentConstants");
     private static final ClassName HTTP_CLIENT_UTILS_CLASS = ClassName
-        .get("com.bytechef.hermes.component.utils", "HttpClientUtils");
-    private static final ClassName REST_COMPONENT_HANDLER_CLASS = ClassName
-        .get("com.bytechef.hermes.component", "RestComponentHandler");
+        .get("com.bytechef.hermes.component.util", "HttpClientUtils");
+    private static final ClassName OPEN_API_COMPONENT_HANDLER_CLASS = ClassName
+        .get("com.bytechef.hermes.component", "OpenApiComponentHandler");
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
         {
             enable(SerializationFeature.INDENT_OUTPUT);
@@ -115,7 +115,7 @@ public class RestComponentGenerator {
     private final int version;
     private final Set<String> oAuth2Scopes = new HashSet<>();
 
-    public RestComponentGenerator(
+    public OpenApiComponentGenerator(
         String basePackageName, String componentName, int version, boolean internalComponent, String openApiPath,
         String outputPath) throws IOException {
 
@@ -167,6 +167,41 @@ public class RestComponentGenerator {
         }
 
         writeComponentHandlerServiceFile();
+    }
+
+    private JavaFile.Builder addStaticImport(JavaFile.Builder builder) {
+        return builder.addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ADD_TO")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "AUTHORIZATION_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "BASE_URI")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_ID")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_SECRET")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "HEADER_PREFIX")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "KEY")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "PASSWORD")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "REFRESH_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "SCOPES")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN_URL")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "USERNAME")
+            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "VALUE")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "authorization")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "component")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "connection")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "fileEntry")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
+            .addStaticImport(HTTP_CLIENT_UTILS_CLASS, "BodyContentType", "ResponseFormat")
+            .addStaticImport(OPEN_API_COMPONENT_HANDLER_CLASS, "PropertyType");
     }
 
     @SuppressWarnings("rawtypes")
@@ -537,7 +572,6 @@ public class RestComponentGenerator {
                         .required($L)
                 )
                 .authorizationUrl(connection -> $S)
-                .refreshUrl(connection -> $S)
                 .scopes(connection -> $T.of($L))
                 .tokenUrl(connection -> $S)
                 """,
@@ -549,10 +583,13 @@ public class RestComponentGenerator {
             "Client Secret",
             true,
             oAuthFlow.getAuthorizationUrl(),
-            oAuthFlow.getRefreshUrl(),
             List.class,
             getOAUth2Scopes(oAuthFlow.getScopes()),
             oAuthFlow.getTokenUrl());
+
+        if (oAuthFlow.getRefreshUrl() != null) {
+            builder.add(".refreshUrl(connection -> $S)", oAuthFlow.getRefreshUrl());
+        }
 
         return builder.build();
     }
@@ -577,7 +614,6 @@ public class RestComponentGenerator {
                         .label($S)
                         .required($L)
                 )
-                .refreshUrl(connection -> $S)
                 .scopes(connection -> $T.of($L))
                 .tokenUrl(connection -> $S)
                 """,
@@ -589,9 +625,12 @@ public class RestComponentGenerator {
             "OAuth2 Client Secret",
             true,
             List.class,
-            oAuthFlow.getRefreshUrl(),
             getOAUth2Scopes(oAuthFlow.getScopes()),
             oAuthFlow.getTokenUrl());
+
+        if (oAuthFlow.getRefreshUrl() != null) {
+            builder.add(".refreshUrl(connection -> $S)", oAuthFlow.getRefreshUrl());
+        }
 
         return builder.build();
     }
@@ -617,7 +656,6 @@ public class RestComponentGenerator {
                         .required($L)
                 )
                 .authorizationUrl(connection -> $S)
-                .refreshUrl(connection -> $S)
                 .scopes(connection -> $T.of($L))
                 """,
             AUTHORIZATION_CLASS_NAME,
@@ -628,9 +666,12 @@ public class RestComponentGenerator {
             "Client Secret",
             true,
             oAuthFlow.getAuthorizationUrl(),
-            oAuthFlow.getRefreshUrl(),
             List.class,
             getOAUth2Scopes(oAuthFlow.getScopes()));
+
+        if (oAuthFlow.getRefreshUrl() != null) {
+            builder.add(".refreshUrl(connection -> $S)", oAuthFlow.getRefreshUrl());
+        }
 
         return builder.build();
     }
@@ -655,7 +696,6 @@ public class RestComponentGenerator {
                         .label($S)
                         .required($L)
                 )
-                .refreshUrl(connection -> $S)
                 .scopes(connection -> $T.of($L))
                 .tokenUrl(connection -> $S)
                 """,
@@ -670,6 +710,10 @@ public class RestComponentGenerator {
             oAuthFlow.getRefreshUrl(),
             getOAUth2Scopes(oAuthFlow.getScopes()),
             oAuthFlow.getTokenUrl());
+
+        if (oAuthFlow.getRefreshUrl() != null) {
+            builder.add(".refreshUrl(connection -> $S)", oAuthFlow.getRefreshUrl());
+        }
 
         return builder.build();
     }
@@ -1429,7 +1473,7 @@ public class RestComponentGenerator {
         return openAPI;
     }
 
-    private RestComponentHandler runComponentHandlerClass(Path classPath, String className) throws Exception {
+    private OpenApiComponentHandler runComponentHandlerClass(Path classPath, String className) throws Exception {
         File classFile = classPath.toFile();
 
         URI classURI = classFile.toURI();
@@ -1441,14 +1485,15 @@ public class RestComponentGenerator {
         URLClassLoader classLoader = URLClassLoader.newInstance(classUrls);
 
         @SuppressWarnings("unchecked")
-        Class<RestComponentHandler> clazz = (Class<RestComponentHandler>) Class.forName(className, true, classLoader);
+        Class<OpenApiComponentHandler> clazz = (Class<OpenApiComponentHandler>) Class.forName(className, true,
+            classLoader);
 
         return clazz.getDeclaredConstructor()
             .newInstance();
     }
 
     private Path writeAbstractComponentHandlerSource(Path sourceDirPath) throws IOException {
-        JavaFile javaFile = JavaFile.builder(
+        JavaFile javaFile = addStaticImport(JavaFile.builder(
             getPackageName(),
             TypeSpec.classBuilder("Abstract" + getComponentHandlerClassName(componentName))
                 .addJavadoc("""
@@ -1458,7 +1503,7 @@ public class RestComponentGenerator {
                     """)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addSuperinterface(
-                    ClassName.get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE, "RestComponentHandler"))
+                    ClassName.get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE, "OpenApiComponentHandler"))
                 .addField(FieldSpec.builder(COMPONENT_DEFINITION_CLASS_NAME, "componentDefinition")
                     .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
                     .initializer(getComponentCodeBlock(sourceDirPath))
@@ -1470,42 +1515,8 @@ public class RestComponentGenerator {
                     .addStatement("return componentDefinition")
                     .build())
                 .build())
-            .addStaticImport(AUTHORIZATION_CLASS_NAME, "ApiTokenLocation", "AuthorizationType")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ACCESS_TOKEN")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ADD_TO")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "API_TOKEN")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "AUTHORIZATION_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "BASE_URI")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_ID")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_SECRET")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "HEADER_PREFIX")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "KEY")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "PASSWORD")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "REFRESH_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "SCOPES")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "USERNAME")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "VALUE")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "authorization")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "component")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "connection")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "fileEntry")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
-            .addStaticImport(HTTP_CLIENT_UTILS_CLASS, "BodyContentType", "ResponseFormat")
-            .addStaticImport(REST_COMPONENT_HANDLER_CLASS, "PropertyType")
-            .build();
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "ApiTokenLocation", "AuthorizationType"))
+                .build();
 
         return javaFile.writeToPath(sourceDirPath);
     }
@@ -1539,7 +1550,7 @@ public class RestComponentGenerator {
     private void writeComponentActionSource(
         ClassName className, CodeBlock actionsCodeBlock, Path componentHandlerDirPath) throws IOException {
 
-        JavaFile javaFile = JavaFile.builder(
+        JavaFile javaFile = addStaticImport(JavaFile.builder(
             className.packageName(),
             TypeSpec.classBuilder(className.simpleName())
                 .addJavadoc("""
@@ -1557,38 +1568,8 @@ public class RestComponentGenerator {
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                     .initializer(actionsCodeBlock)
                     .build())
-                .build())
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ACCESS_TOKEN")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ADD_TO")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "API_TOKEN")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "AUTHORIZATION_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "BASE_URI")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_ID")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_SECRET")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "HEADER_PREFIX")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "KEY")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "PASSWORD")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "REFRESH_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "SCOPES")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "USERNAME")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "VALUE")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "fileEntry")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
-            .addStaticImport(HTTP_CLIENT_UTILS_CLASS, "BodyContentType", "ResponseFormat")
-            .addStaticImport(REST_COMPONENT_HANDLER_CLASS, "PropertyType")
-            .build();
+                .build()))
+                    .build();
 
         javaFile.writeTo(componentHandlerDirPath);
     }
@@ -1600,7 +1581,7 @@ public class RestComponentGenerator {
 
         Files.createDirectories(Paths.get(servicesDirPathname));
 
-        String serviceName = COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".RestComponentHandler";
+        String serviceName = COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".OpenApiComponentHandler";
 
         try (PrintWriter printWriter = new PrintWriter(
             servicesDirPathname + File.separator + serviceName, StandardCharsets.UTF_8)) {
@@ -1673,17 +1654,17 @@ public class RestComponentGenerator {
         if (!definitionFile.exists()) {
             Path classPath = compileComponentHandlerSource(componentHandlerSourcePath, simpleClassName);
 
-            RestComponentHandler restComponentHandler = runComponentHandlerClass(
+            OpenApiComponentHandler openApiComponentHandler = runComponentHandlerClass(
                 classPath, packageName + "." + simpleClassName);
 
-            OBJECT_MAPPER.writeValue(definitionFile, restComponentHandler.getDefinition());
+            OBJECT_MAPPER.writeValue(definitionFile, openApiComponentHandler.getDefinition());
         }
     }
 
     private void writeComponentSchemaSource(
         ClassName className, CodeBlock componentSchemaCodeBlock, Path componentHandlerDirPath) throws IOException {
 
-        JavaFile javaFile = JavaFile.builder(
+        JavaFile javaFile = addStaticImport(JavaFile.builder(
             className.packageName(),
             TypeSpec.classBuilder(className.simpleName())
                 .addJavadoc("""
@@ -1700,38 +1681,8 @@ public class RestComponentGenerator {
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                     .initializer("$T.of($L)", List.class, componentSchemaCodeBlock)
                     .build())
-                .build())
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ACCESS_TOKEN")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ADD_TO")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "API_TOKEN")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "AUTHORIZATION_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "BASE_URI")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_ID")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_SECRET")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "HEADER_PREFIX")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "KEY")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "PASSWORD")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "REFRESH_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "SCOPES")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "USERNAME")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "VALUE")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "date")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "dateTime")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "display")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "fileEntry")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "integer")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
-            .addStaticImport(HTTP_CLIENT_UTILS_CLASS, "BodyContentType", "ResponseFormat")
-            .addStaticImport(REST_COMPONENT_HANDLER_CLASS, "PropertyType")
-            .build();
+                .build()))
+                    .build();
 
         javaFile.writeTo(componentHandlerDirPath);
     }
