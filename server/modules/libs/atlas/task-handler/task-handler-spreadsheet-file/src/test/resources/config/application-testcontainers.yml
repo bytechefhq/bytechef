@@ -13,7 +13,7 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
     url: jdbc:tc:postgresql:///integri
-    username: atlas
+    username: postgres
     password:
     hikari:
       poolName: Hikari
