@@ -69,6 +69,26 @@ module.exports = {
                 'accordion-down': 'accordion-down 0.2s ease-out',
                 'accordion-up': 'accordion-up 0.2s ease-out',
             },
+            maxHeight: {
+                'select-content-available-height':
+                    'var(--radix-select-content-available-height)',
+                'select-content-available-height-1/2':
+                    'calc(var(--radix-select-content-available-height) / 2)',
+            },
+            maxWidth: {
+                'select-trigger-width': 'var(--radix-select-trigger-width)',
+            },
+            minWidth: {
+                'select-trigger-width': 'var(--radix-select-trigger-width)',
+            },
+            origin: {
+                'select-content-transform-origin':
+                    '--radix-select-content-transform-origin',
+            },
+            width: {
+                112: '30rem',
+                'select-trigger-width': 'var(--radix-select-trigger-width)',
+            },
         },
     },
     plugins: [
