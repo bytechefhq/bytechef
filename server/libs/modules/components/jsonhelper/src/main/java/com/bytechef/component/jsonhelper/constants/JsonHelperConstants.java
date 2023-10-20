@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.objecthelper.constants;
+package com.bytechef.component.jsonhelper.constants;
 
 /**
  * @author Ivica Cardic
  */
-public class ObjectHelperConstants {
+public class JsonHelperConstants {
 
-    public static final String SOURCE = "source";
-    public static final String OBJECT_HELPER = "objectHelper";
-    public static final String JSON_STRINGIFY = "jsonStringify";
+    public static final String JSON_HELPER = "jsonHelper";
     public static final String JSON_PARSE = "jsonParse";
+    public static final String JSON_STRINGIFY = "jsonStringify";
+    public static final String SOURCE = "source";
 }

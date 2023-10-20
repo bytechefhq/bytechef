@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.objecthelper;
+package com.bytechef.component.jsonhelper;
 
-import static com.bytechef.component.objecthelper.constants.ObjectHelperConstants.JSON_PARSE;
-import static com.bytechef.component.objecthelper.constants.ObjectHelperConstants.JSON_STRINGIFY;
-import static com.bytechef.component.objecthelper.constants.ObjectHelperConstants.OBJECT_HELPER;
-import static com.bytechef.component.objecthelper.constants.ObjectHelperConstants.SOURCE;
+import static com.bytechef.component.jsonhelper.constants.JsonHelperConstants.JSON_HELPER;
+import static com.bytechef.component.jsonhelper.constants.JsonHelperConstants.JSON_PARSE;
+import static com.bytechef.component.jsonhelper.constants.JsonHelperConstants.JSON_STRINGIFY;
+import static com.bytechef.component.jsonhelper.constants.JsonHelperConstants.SOURCE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
@@ -35,11 +35,10 @@ import com.bytechef.hermes.component.utils.JsonUtils;
 /**
  * @author Ivica Cardic
  */
-public class ObjectHelperComponentHandler implements ComponentHandler {
+public class JsonHelperComponentHandler implements ComponentHandler {
 
-    private final ComponentDefinition componentDefinition = component(OBJECT_HELPER)
-            .display(display("Object Helper")
-                    .description("The Object Helper allows you to do various operations on objects."))
+    private final ComponentDefinition componentDefinition = component(JSON_HELPER)
+            .display(display("JSON Helper").description("JSON Helper allows you to do various operations on objects."))
             .actions(
                     action(JSON_PARSE)
                             .display(display("Convert from JSON string")

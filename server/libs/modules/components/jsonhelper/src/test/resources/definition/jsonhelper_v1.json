@@ -102,9 +102,9 @@
     }
   ],
   "display": {
-    "description": "The Object Helper allows you to do various operations on objects.",
-    "label": "Object Helper"
+    "description": "JSON Helper allows you to do various operations on objects.",
+    "label": "JSON Helper"
   },
-  "name": "objectHelper",
+  "name": "jsonHelper",
   "version": 1
 }
