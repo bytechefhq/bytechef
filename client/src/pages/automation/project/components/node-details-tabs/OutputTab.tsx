@@ -18,24 +18,20 @@ const PropertyField = ({data, label}: {data: PropertyType; label: string}) => (
 
 const SchemaProperties = ({properties}: {properties: PropertyType[]}) => (
     <ul className="ml-2 h-full">
-        {properties.map((property: PropertyType, index: number) => {
-            return (
-                <li className="flex flex-col" key={`${property.name}_${index}`}>
-                    <PropertyField data={property} label={property.name!} />
+        {properties.map((property: PropertyType, index: number) => (
+            <li className="flex flex-col" key={`${property.name}_${index}`}>
+                <PropertyField data={property} label={property.name!} />
 
-                    {property.properties && !!property.properties.length && (
-                        <div
-                            key={property.name}
-                            className="ml-4 flex flex-col border-l border-gray-200 pl-1"
-                        >
-                            <SchemaProperties
-                                properties={property.properties}
-                            />
-                        </div>
-                    )}
-                </li>
-            );
-        })}
+                {property.properties && !!property.properties.length && (
+                    <div
+                        key={property.name}
+                        className="ml-3 flex flex-col border-l border-gray-200 pl-1"
+                    >
+                        <SchemaProperties properties={property.properties} />
+                    </div>
+                )}
+            </li>
+        ))}
     </ul>
 );
 
