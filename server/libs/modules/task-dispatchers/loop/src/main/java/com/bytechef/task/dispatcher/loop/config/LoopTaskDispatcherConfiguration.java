@@ -19,7 +19,6 @@ package com.bytechef.task.dispatcher.loop.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
@@ -28,6 +27,7 @@ import com.bytechef.task.dispatcher.loop.LoopTaskDispatcher;
 import com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,10 +38,10 @@ import org.springframework.context.annotation.Configuration;
 public class LoopTaskDispatcherConfiguration {
 
     @Autowired
-    private RemoteContextService contextService;
+    private ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    private MessageBroker messageBroker;
+    private RemoteContextService contextService;
 
     @Autowired
     private RemoteTaskExecutionService taskExecutionService;
@@ -58,12 +58,12 @@ public class LoopTaskDispatcherConfiguration {
 
     @Bean("loopBreakTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory loopBreakTaskDispatcherResolverFactory() {
-        return (taskDispatcher) -> new LoopBreakTaskDispatcher(messageBroker, taskExecutionService);
+        return (taskDispatcher) -> new LoopBreakTaskDispatcher(eventPublisher, taskExecutionService);
     }
 
     @Bean("loopTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory loopTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new LoopTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
+            eventPublisher, contextService, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
     }
 }

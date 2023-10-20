@@ -106,9 +106,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService, Rem
             new ParameterMapImpl(inputParameters),
             connection == null ? null : new ParameterMapImpl(connection.parameters()), searchText, context);
 
-        return options.stream()
-            .map(Option::new)
-            .toList();
+        return CollectionUtils.map(options, Option::new);
     }
 
     @Override
@@ -127,7 +125,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService, Rem
 
     @Override
     public Object executePerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, long taskExecutionId,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
         com.bytechef.hermes.component.definition.ActionDefinition actionDefinition =

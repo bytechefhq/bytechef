@@ -19,7 +19,6 @@ package com.bytechef.task.dispatcher.sequence.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
@@ -27,6 +26,7 @@ import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -37,10 +37,10 @@ import org.springframework.context.annotation.Configuration;
 public class SequenceTaskDispatcherConfiguration {
 
     @Autowired
-    private RemoteContextService contextService;
+    private ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    private MessageBroker messageBroker;
+    private RemoteContextService contextService;
 
     @Autowired
     private RemoteTaskExecutionService taskExecutionService;
@@ -58,6 +58,6 @@ public class SequenceTaskDispatcherConfiguration {
     @Bean("sequenceTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory sequenceTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new SequenceTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
+            eventPublisher, contextService, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
     }
 }

@@ -102,7 +102,7 @@ bytechef:
   file-storage:
     # File storage provider for files (base64 | filesystem) default: filesystem
     provider: filesystem
-    file-storage-dir: ${user.home}/bytechef/files
+    filesystem-dir: ${user.home}/bytechef/files
   message-broker:
     # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
     provider: redis
@@ -111,9 +111,9 @@ bytechef:
     #      mailchimp:
     #        clientId: 123456789
     #        clientSecret: 123456789
-    redirectUri: ${bytechef.publicUrl}/callback
-  publicUrl: http://127.0.0.1:5173
-  webhookUrl: http://127.0.0.1:7888
+    redirect-uri: ${bytechef.public-url}/callback
+  public-url: http://127.0.0.1:5173
+  webhook-url: http://127.0.0.1:7888
   worker:
     task:
       subscriptions:

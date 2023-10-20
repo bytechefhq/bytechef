@@ -17,23 +17,24 @@
 
 package com.bytechef.hermes.worker;
 
-import com.bytechef.event.EventPublisher;
-import com.bytechef.hermes.execution.event.TriggerStartedEvent;
+import com.bytechef.hermes.worker.trigger.event.CancelControlTriggerEvent;
+import com.bytechef.hermes.coordinator.event.TriggerExecutionCompleteEvent;
+import com.bytechef.hermes.coordinator.event.TriggerExecutionErrorEvent;
+import com.bytechef.hermes.worker.trigger.event.TriggerExecutionEvent;
+import com.bytechef.hermes.coordinator.event.TriggerStartedApplicationEvent;
 import com.bytechef.hermes.configuration.trigger.CancelControlTrigger;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerResolver;
-import com.bytechef.message.Controllable;
-import com.bytechef.message.broker.SystemMessageRoute;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.error.ExecutionError;
-import com.bytechef.hermes.execution.message.broker.TriggerMessageRoute;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
+import com.bytechef.message.event.MessageEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -58,36 +59,36 @@ public class TriggerWorker {
 
     private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
-    private final EventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
     private final ExecutorService executorService;
-    private final MessageBroker messageBroker;
     private final Map<WorkflowExecutionId, TriggerExecutionFuture<?>> triggerExecutions = new ConcurrentHashMap<>();
     private final TriggerHandlerResolver triggerHandlerResolver;
 
     public TriggerWorker(
-        EventPublisher eventPublisher, ExecutorService executorService, MessageBroker messageBroker,
+        ApplicationEventPublisher eventPublisher, ExecutorService executorService,
         TriggerHandlerResolver triggerHandlerResolver) {
 
         this.eventPublisher = eventPublisher;
         this.executorService = executorService;
-        this.messageBroker = messageBroker;
         this.triggerHandlerResolver = triggerHandlerResolver;
     }
 
     @SuppressFBWarnings("NP")
-    public void handle(TriggerExecution triggerExecution) {
-        logger.debug("Received trigger: {}", triggerExecution);
+    public void onTriggerExecutionEvent(TriggerExecutionEvent triggerExecutionEvent) {
+        logger.debug("Received trigger execution event: {}", triggerExecutionEvent);
 
+        TriggerExecution triggerExecution = triggerExecutionEvent.getTriggerExecution();
         CountDownLatch latch = new CountDownLatch(1);
 
         Future<?> future = executorService.submit(() -> {
             try {
-                eventPublisher.publishEvent(new TriggerStartedEvent(
+                eventPublisher.publishEvent(new TriggerStartedApplicationEvent(
                     Objects.requireNonNull(triggerExecution.getId())));
 
                 TriggerExecution completedTriggerExecution = doExecuteTrigger(triggerExecution);
 
-                messageBroker.send(TriggerMessageRoute.TRIGGERS_COMPLETE, completedTriggerExecution);
+                eventPublisher.publishEvent(
+                    new TriggerExecutionCompleteEvent(completedTriggerExecution));
             } catch (InterruptedException e) {
                 // ignore
             } catch (Exception e) {
@@ -122,11 +123,13 @@ public class TriggerWorker {
         }
     }
 
-    public void handle(Controllable controllable) {
-        if (controllable instanceof CancelControlTrigger controlTrigger) {
-            logger.debug("Received control trigger: {}", controlTrigger);
+    public void onCancelControlTriggerEvent(MessageEvent<?> event) {
+        if (event instanceof CancelControlTriggerEvent cancelControlTriggerEvent) {
+            CancelControlTrigger cancelControlTrigger = cancelControlTriggerEvent.getControlTrigger();
 
-            long id = controlTrigger.getTriggerExecutionId();
+            logger.debug("Received cancel control trigger: {}", cancelControlTrigger);
+
+            long id = cancelControlTrigger.getTriggerExecutionId();
 
             for (TriggerExecutionFuture<?> triggerExecutionFuture : triggerExecutions.values()) {
                 if (Objects.equals(triggerExecutionFuture.triggerExecution.getId(), id)) {
@@ -177,15 +180,12 @@ public class TriggerWorker {
             new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
         triggerExecution.setStatus(TriggerExecution.Status.FAILED);
 
-        messageBroker.send(SystemMessageRoute.ERRORS, triggerExecution);
+        eventPublisher.publishEvent(new TriggerExecutionErrorEvent(triggerExecution));
     }
 
-    private static class TriggerExecutionFuture<T> implements Future<T> {
+    private record TriggerExecutionFuture<T>(TriggerExecution triggerExecution, Future<T> future) implements Future<T> {
 
-        private final Future<T> future;
-        private final TriggerExecution triggerExecution;
-
-        TriggerExecutionFuture(TriggerExecution triggerExecution, Future<T> future) {
+        private TriggerExecutionFuture(TriggerExecution triggerExecution, Future<T> future) {
             this.triggerExecution = Objects.requireNonNull(triggerExecution);
             this.future = Objects.requireNonNull(future);
         }

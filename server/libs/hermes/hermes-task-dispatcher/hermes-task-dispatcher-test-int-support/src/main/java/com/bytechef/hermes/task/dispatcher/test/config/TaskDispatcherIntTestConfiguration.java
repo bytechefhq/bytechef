@@ -19,8 +19,6 @@ package com.bytechef.hermes.task.dispatcher.test.config;
 
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
-import com.bytechef.event.listener.EventListener;
-import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
@@ -37,7 +35,6 @@ import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
-import com.bytechef.event.listener.EventListenerChain;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,17 +66,6 @@ import java.util.List;
 public class TaskDispatcherIntTestConfiguration {
 
     @TestConfiguration
-    public static class EventConfiguration {
-
-        @Bean
-        EventPublisher eventPublisher(List<EventListener> eventListeners) {
-            EventListener eventListener = new EventListenerChain(eventListeners);
-
-            return eventListener::onApplicationEvent;
-        }
-    }
-
-    @TestConfiguration
     public static class WorkflowExecutionConfiguration {
 
         @Bean
@@ -99,13 +85,12 @@ public class TaskDispatcherIntTestConfiguration {
 
         @Bean
         TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport(
-            RemoteContextService contextService, RemoteCounterService counterService, EventPublisher eventPublisher,
-            RemoteJobService jobService, ObjectMapper objectMapper, RemoteTaskExecutionService taskExecutionService,
-            WorkflowFileStorageFacade workflowFileStorageFacade,
-            RemoteWorkflowService workflowService) {
+            RemoteContextService contextService, RemoteCounterService counterService, RemoteJobService jobService,
+            ObjectMapper objectMapper, RemoteTaskExecutionService taskExecutionService,
+            WorkflowFileStorageFacade workflowFileStorageFacade, RemoteWorkflowService workflowService) {
 
             return new TaskDispatcherWorkflowTestSupport(
-                contextService, counterService, jobService, eventPublisher, objectMapper, taskExecutionService,
+                contextService, counterService, jobService, objectMapper, taskExecutionService,
                 workflowFileStorageFacade, workflowService);
         }
 

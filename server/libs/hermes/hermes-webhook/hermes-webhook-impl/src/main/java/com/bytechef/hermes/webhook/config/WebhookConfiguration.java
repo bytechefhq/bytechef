@@ -18,8 +18,10 @@
 package com.bytechef.hermes.webhook.config;
 
 import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
+
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.execution.facade.RemoteJobFacade;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.RemoteCounterService;
@@ -32,14 +34,13 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
-import com.bytechef.event.EventPublisher;
-import com.bytechef.event.listener.EventListener;
+import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessorRegistry;
 import com.bytechef.hermes.webhook.executor.TriggerSyncExecutor;
 import com.bytechef.hermes.webhook.executor.WebhookExecutor;
 import com.bytechef.hermes.webhook.executor.WebhookExecutorImpl;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
+import com.bytechef.message.event.MessageEvent;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
@@ -58,9 +59,10 @@ import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHa
 import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
-import com.bytechef.task.dispatcher.subflow.event.SubflowJobStatusEventListener;
+import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -74,50 +76,49 @@ public class WebhookConfiguration {
 
     @Bean
     WebhookExecutor webhookExecutor(
-        RemoteContextService contextService, RemoteCounterService counterService,
-        InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry, RemoteJobService jobService,
-        MessageBroker messageBroker, ObjectMapper objectMapper, RemoteTaskExecutionService taskExecutionService,
-        TaskHandlerRegistry taskHandlerRegistry, TriggerSyncExecutor triggerSyncExecutor,
+        ApplicationEventPublisher eventPublisher, RemoteContextService contextService,
+        RemoteCounterService counterService, InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry,
+        RemoteJobFacade jobFacade, RemoteJobService jobService, ObjectMapper objectMapper,
+        RemoteTaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
+        TriggerSyncExecutor triggerSyncExecutor,
         @Qualifier("workflowSyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade,
         RemoteWorkflowService workflowService) {
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
         return new WebhookExecutorImpl(
-            instanceWorkflowAccessorRegistry,
+            eventPublisher, instanceWorkflowAccessorRegistry,
             new JobSyncExecutor(
-                contextService,
-                getEventPublisher(jobService, syncMessageBroker, taskExecutionService, workflowFileStorageFacade),
-                jobService, objectMapper, syncMessageBroker,
+                getApplicationEventListeners(
+                    jobService, syncMessageBroker, taskExecutionService, workflowFileStorageFacade),
+                contextService, jobService, syncMessageBroker,
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, taskExecutionService, workflowFileStorageFacade),
                 getTaskDispatcherAdapterFactories(objectMapper),
                 getTaskDispatcherResolverFactories(
-                    contextService, counterService, syncMessageBroker, taskExecutionService,
+                    contextService, counterService, jobFacade, syncMessageBroker, taskExecutionService,
                     workflowFileStorageFacade),
                 taskExecutionService, taskHandlerRegistry, workflowFileStorageFacade, workflowService),
-            messageBroker, triggerSyncExecutor, workflowFileStorageFacade);
+            triggerSyncExecutor, workflowFileStorageFacade);
     }
 
-    private EventPublisher getEventPublisher(
-        RemoteJobService jobService, MessageBroker messageBroker, RemoteTaskExecutionService taskExecutionService,
-        WorkflowFileStorageFacade workflowFileStorageFacade) {
+    private List<ApplicationEventListener> getApplicationEventListeners(
+        RemoteJobService jobService, SyncMessageBroker syncMessageBroker,
+        RemoteTaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
 
-        List<EventListener> eventListeners = List.of(
-            new SubflowJobStatusEventListener(
-                jobService, messageBroker, taskExecutionService, workflowFileStorageFacade));
+        SubflowJobStatusEventListener subflowJobStatusEventListener = new SubflowJobStatusEventListener(
+            getEventPublisher(syncMessageBroker), jobService, taskExecutionService, workflowFileStorageFacade);
 
-        return workflowEvent -> {
-            for (EventListener eventListener : eventListeners) {
-                eventListener.onApplicationEvent(workflowEvent);
-            }
-        };
+        return List.of(subflowJobStatusEventListener);
+    }
+
+    private static ApplicationEventPublisher getEventPublisher(SyncMessageBroker syncMessageBroker) {
+        return event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event);
     }
 
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
         RemoteContextService contextService, RemoteCounterService counterService,
-        RemoteTaskExecutionService taskExecutionService,
-        WorkflowFileStorageFacade workflowFileStorageFacade) {
+        RemoteTaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new BranchTaskCompletionHandler(
@@ -158,31 +159,38 @@ public class WebhookConfiguration {
     }
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        RemoteContextService contextService, RemoteCounterService counterService, MessageBroker messageBroker,
-        RemoteTaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
+        RemoteContextService contextService, RemoteCounterService counterService, RemoteJobFacade jobFacade,
+        SyncMessageBroker syncMessageBroker, RemoteTaskExecutionService taskExecutionService,
+        WorkflowFileStorageFacade workflowFileStorageFacade) {
+
+        ApplicationEventPublisher eventPublisher = getEventPublisher(syncMessageBroker);
 
         return List.of(
             (taskDispatcher) -> new BranchTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade),
+                eventPublisher, contextService, taskDispatcher, taskExecutionService,
+                workflowFileStorageFacade),
             (taskDispatcher) -> new ConditionTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade),
+                eventPublisher, contextService, taskDispatcher, taskExecutionService,
+                workflowFileStorageFacade),
             (taskDispatcher) -> new EachTaskDispatcher(
-                messageBroker, contextService, counterService, taskDispatcher, taskExecutionService,
+                eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
                 workflowFileStorageFacade),
             (taskDispatcher) -> new ForkJoinTaskDispatcher(
-                contextService, counterService, messageBroker, taskDispatcher, taskExecutionService,
+                eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
                 workflowFileStorageFacade),
-            (taskDispatcher) -> new LoopBreakTaskDispatcher(messageBroker, taskExecutionService),
+            (taskDispatcher) -> new LoopBreakTaskDispatcher(eventPublisher, taskExecutionService),
             (taskDispatcher) -> new LoopTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade),
+                eventPublisher, contextService, taskDispatcher, taskExecutionService,
+                workflowFileStorageFacade),
             (taskDispatcher) -> new MapTaskDispatcher(
-                contextService, counterService, messageBroker, taskDispatcher, taskExecutionService,
+                eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
                 workflowFileStorageFacade),
             (taskDispatcher) -> new ParallelTaskDispatcher(
-                contextService, counterService, messageBroker, taskDispatcher, taskExecutionService,
+                eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
                 workflowFileStorageFacade),
             (taskDispatcher) -> new SequenceTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade),
-            (taskDispatcher) -> new SubflowTaskDispatcher(messageBroker));
+                eventPublisher, contextService, taskDispatcher, taskExecutionService,
+                workflowFileStorageFacade),
+            (taskDispatcher) -> new SubflowTaskDispatcher(jobFacade));
     }
 }

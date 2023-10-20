@@ -19,14 +19,16 @@
 
 package com.bytechef.component.map;
 
+import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
+import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.component.map.concurrency.CurrentThreadExecutorService;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
@@ -37,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.message.event.MessageEvent;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -120,21 +123,23 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
 
     @Test
     public void test3() {
-        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
-        messageBroker.receive(TaskMessageRoute.TASKS_COMPLETE, t -> {
-            TaskExecution taskExecution = (TaskExecution) t;
+        syncMessageBroker.receive(CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS, t -> {
+            TaskExecution taskExecution = ((TaskExecutionCompleteEvent) t).getTaskExecution();
 
             Assertions.assertNull(taskExecution.getOutput());
         });
 
-        messageBroker.receive(SystemMessageRoute.ERRORS, t -> {
-            TaskExecution taskExecution = (TaskExecution) t;
+        syncMessageBroker
+            .receive(CoordinatorMessageRoute.ERROR_EVENTS, t -> {
+                TaskExecution taskExecution = ((TaskExecutionErrorEvent) t).getTaskExecution();
 
-            Assertions.assertNull(taskExecution.getError());
-        });
+                Assertions.assertNull(taskExecution.getError());
+            });
 
-        messageBroker.receive(SystemMessageRoute.EVENTS, t -> {});
+        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
+            t -> {});
 
         MapTaskDispatcherAdapterTaskHandler[] mapAdapterTaskHandlerRefs = new MapTaskDispatcherAdapterTaskHandler[1];
 
@@ -155,8 +160,8 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         };
 
         TaskWorker worker = new TaskWorker(
-            e -> {}, new CurrentThreadExecutorService(), messageBroker, taskHandlerResolver,
-            workflowFileStorageFacade);
+            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            new CurrentThreadExecutorService(), taskHandlerResolver, workflowFileStorageFacade);
 
         mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(objectMapper, taskHandlerResolver);
 
@@ -206,6 +211,6 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         taskExecution.setId(1234L);
         taskExecution.setJobId(4567L);
 
-        worker.handle(taskExecution);
+        worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution));
     }
 }

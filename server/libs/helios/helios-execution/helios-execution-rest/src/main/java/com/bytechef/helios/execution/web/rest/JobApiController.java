@@ -22,7 +22,7 @@ package com.bytechef.helios.execution.web.rest;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
+
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.execution.web.rest.model.CreateJob200ResponseModel;
 import com.bytechef.helios.execution.web.rest.model.JobBasicModel;
@@ -34,6 +34,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * @author Arik Cohen
@@ -41,7 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
-@ConditionalOnEnabled("coordinator")
+@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
 public class JobApiController implements JobApi {
 
     private final ConversionService conversionService;

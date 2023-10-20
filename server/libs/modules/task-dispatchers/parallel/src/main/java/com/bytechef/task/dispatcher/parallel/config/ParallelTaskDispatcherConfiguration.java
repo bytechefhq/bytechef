@@ -19,7 +19,6 @@ package com.bytechef.task.dispatcher.parallel.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.RemoteCounterService;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
@@ -28,6 +27,7 @@ import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,13 +38,13 @@ import org.springframework.context.annotation.Configuration;
 public class ParallelTaskDispatcherConfiguration {
 
     @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    @Autowired
     private RemoteContextService contextService;
 
     @Autowired
     private RemoteCounterService counterService;
-
-    @Autowired
-    private MessageBroker messageBroker;
 
     @Autowired
     private RemoteTaskExecutionService taskExecutionService;
@@ -62,7 +62,7 @@ public class ParallelTaskDispatcherConfiguration {
     @Bean("parallelTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory parallelTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new ParallelTaskDispatcher(
-            contextService, counterService, messageBroker, taskDispatcher, taskExecutionService,
+            eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
             workflowFileStorageFacade);
     }
 }

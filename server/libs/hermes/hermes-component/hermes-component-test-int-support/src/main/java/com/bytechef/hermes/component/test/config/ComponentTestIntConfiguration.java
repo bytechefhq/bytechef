@@ -23,9 +23,6 @@ import com.bytechef.atlas.worker.task.factory.TaskHandlerMapFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.data.storage.service.DataStorageService;
-import com.bytechef.event.listener.EventListener;
-import com.bytechef.event.EventPublisher;
-import com.bytechef.event.listener.EventListenerChain;
 import com.bytechef.hermes.connection.service.RemoteConnectionService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
@@ -108,17 +105,6 @@ public class ComponentTestIntConfiguration {
     }
 
     @TestConfiguration
-    public static class EventConfiguration {
-
-        @Bean
-        EventPublisher eventPublisher(List<EventListener> eventListeners) {
-            EventListener eventListener = new EventListenerChain(eventListeners);
-
-            return eventListener::onApplicationEvent;
-        }
-    }
-
-    @TestConfiguration
     public static class JacksonConfiguration {
 
         @Bean
@@ -154,13 +140,13 @@ public class ComponentTestIntConfiguration {
 
         @Bean
         JobTestExecutor componentWorkflowTestSupport(
-            RemoteContextService contextService, EventPublisher eventPublisher, RemoteJobService jobService,
-            ObjectMapper objectMapper, RemoteTaskExecutionService taskExecutionService,
+            RemoteContextService contextService, RemoteJobService jobService, ObjectMapper objectMapper,
+            RemoteTaskExecutionService taskExecutionService,
             Map<String, TaskHandler<?>> taskHandlerMap, TaskHandlerMapFactory taskHandlerMapFactory,
             RemoteWorkflowService workflowService) {
 
             return new JobTestExecutor(
-                contextService, jobService, eventPublisher, objectMapper, taskExecutionService,
+                contextService, jobService, objectMapper, taskExecutionService,
                 MapUtils.concat(taskHandlerMap, taskHandlerMapFactory.getTaskHandlerMap()), workflowService);
         }
 

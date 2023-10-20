@@ -107,8 +107,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade, Remot
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return actionDefinitionService.executePerform(
-            componentName, componentVersion, actionName, taskExecutionId, inputParameters,
-            componentConnection, contextFactory.createActionContext(componentName, componentConnection));
+            componentName, componentVersion, actionName, inputParameters, componentConnection,
+            contextFactory.createActionContext(componentName, componentConnection, taskExecutionId));
     }
 
     @Override

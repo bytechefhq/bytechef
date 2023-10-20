@@ -11,14 +11,17 @@ openapi:
 bytechef:
   #  discovery-service:
   #    provider: redis
-  #  data-storage:
+  #  data:
+#     storage:
   #    provider: db
   encryption:
     provider: filesystem
-  #  file-storage:
-  #    provider: base64
-  #  message-broker:
-  #    provider: jms
+  #  file:
+#    storage:
+#      provider: base64
+  #  message:
+#       broker:
+  #      provider: jms
 #  workflow:
     #    async:
     #      output-storage:

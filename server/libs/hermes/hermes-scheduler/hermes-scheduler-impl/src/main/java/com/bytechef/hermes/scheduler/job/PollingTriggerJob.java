@@ -17,30 +17,31 @@
 
 package com.bytechef.hermes.scheduler.job;
 
-import com.bytechef.hermes.execution.message.broker.TriggerMessageRoute;
-import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
+import com.bytechef.hermes.coordinator.event.TriggerPollEvent;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Ivica Cardic
  */
 public class PollingTriggerJob implements Job {
 
-    private MessageBroker messageBroker;
+    private ApplicationEventPublisher eventPublisher;
 
     @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+    public void execute(JobExecutionContext context) {
         JobDataMap jobDataMap = context.getMergedJobDataMap();
 
-        messageBroker.send(TriggerMessageRoute.POLLS, jobDataMap.getString("workflowExecutionId"));
+        eventPublisher.publishEvent(
+            new TriggerPollEvent(WorkflowExecutionId.parse(jobDataMap.getString("workflowExecutionId"))));
     }
 
     @Autowired
-    public void setMessageBroker(MessageBroker messageBroker) {
-        this.messageBroker = messageBroker;
+    public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
     }
 }

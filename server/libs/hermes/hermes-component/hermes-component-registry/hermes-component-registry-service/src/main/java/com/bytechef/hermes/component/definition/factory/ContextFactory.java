@@ -18,7 +18,6 @@
 package com.bytechef.hermes.component.definition.factory;
 
 import com.bytechef.data.storage.service.DataStorageService;
-import com.bytechef.event.EventPublisher;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
@@ -29,6 +28,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
 public class ContextFactory {
 
     private final DataStorageService dataStorageService;
-    private final EventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
     private final HttpClientExecutor httpClientExecutor;
     private final ObjectMapper objectMapper;
@@ -48,8 +48,9 @@ public class ContextFactory {
 
     @SuppressFBWarnings("EI")
     public ContextFactory(
-        DataStorageService dataStorageService, EventPublisher eventPublisher, FileStorageService fileStorageService,
-        HttpClientExecutor httpClientExecutor, ObjectMapper objectMapper, XmlMapper xmlMapper) {
+        DataStorageService dataStorageService, ApplicationEventPublisher eventPublisher,
+        FileStorageService fileStorageService, HttpClientExecutor httpClientExecutor, ObjectMapper objectMapper,
+        XmlMapper xmlMapper) {
 
         this.dataStorageService = dataStorageService;
         this.eventPublisher = eventPublisher;
@@ -80,7 +81,7 @@ public class ContextFactory {
 
     private ContextImpl createContextImpl(String componentName, ComponentConnection connection, Long taskExecutionId) {
         return new ContextImpl(
-            componentName, connection, dataStorageService, eventPublisher, objectMapper, fileStorageService,
+            eventPublisher, componentName, connection, dataStorageService, objectMapper, fileStorageService,
             httpClientExecutor, taskExecutionId, xmlMapper);
     }
 }

@@ -81,6 +81,6 @@ public class DateProperty extends ValueProperty<LocalDate> {
             ", controlType=" + controlType +
             ", defaultValue=" + defaultValue +
             ", exampleValue=" + exampleValue +
-            "} " + super.toString();
+            "} ";
     }
 }

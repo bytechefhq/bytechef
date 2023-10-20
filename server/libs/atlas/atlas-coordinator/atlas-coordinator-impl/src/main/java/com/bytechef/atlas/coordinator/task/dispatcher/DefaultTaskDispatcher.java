@@ -20,17 +20,16 @@
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
-import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.atlas.worker.event.TaskExecutionEvent;
+import com.bytechef.atlas.worker.message.route.WorkerMessageRoute;
 import com.bytechef.atlas.configuration.task.Task;
 
 import java.util.List;
-import java.util.Objects;
 
-import com.bytechef.message.broker.MessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Arik Cohen
@@ -40,15 +39,17 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTaskDispatcher.class);
 
-    private final MessageBroker messageBroker;
+    private final ApplicationEventPublisher eventPublisher;
     private final List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors;
 
-    private static final MessageRoute DEFAULT_MESSAGE_ROUTE = TaskMessageRoute.TASKS;
+    private static final WorkerMessageRoute DEFAULT_MESSAGE_ROUTE = WorkerMessageRoute.TASK_EXECUTION_EVENTS;
 
     @SuppressFBWarnings("EI")
     public DefaultTaskDispatcher(
-        MessageBroker messageBroker, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors) {
-        this.messageBroker = Objects.requireNonNull(messageBroker);
+        ApplicationEventPublisher eventPublisher,
+        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors) {
+
+        this.eventPublisher = eventPublisher;
         this.taskDispatcherPreSendProcessors = taskDispatcherPreSendProcessors;
     }
 
@@ -56,7 +57,7 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     public void dispatch(TaskExecution taskExecution) {
         taskExecution = preProcess(taskExecution);
 
-        MessageRoute messageRoute = calculateQueueName(taskExecution);
+        WorkerMessageRoute messageRoute = calculateQueueName(taskExecution);
 
         if (logger.isDebugEnabled()) {
             logger.debug(
@@ -64,7 +65,7 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
                 messageRoute);
         }
 
-        messageBroker.send(messageRoute, taskExecution);
+        eventPublisher.publishEvent(new TaskExecutionEvent(messageRoute, taskExecution));
     }
 
     @Override
@@ -76,11 +77,11 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
         return null;
     }
 
-    private MessageRoute calculateQueueName(Task task) {
+    private WorkerMessageRoute calculateQueueName(Task task) {
         TaskExecution taskExecution = (TaskExecution) task;
 
         return taskExecution.getNode() != null
-            ? TaskMessageRoute.ofWorkerRoute(taskExecution.getNode())
+            ? WorkerMessageRoute.ofTaskMessageRoute(taskExecution.getNode())
             : DEFAULT_MESSAGE_ROUTE;
     }
 

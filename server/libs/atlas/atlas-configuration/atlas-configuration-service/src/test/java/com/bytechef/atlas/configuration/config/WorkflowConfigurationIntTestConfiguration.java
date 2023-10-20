@@ -21,13 +21,10 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
-//import com.bytechef.event.EventPublisher;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -48,9 +45,6 @@ import java.util.List;
 @EnableAutoConfiguration
 @Configuration
 public class WorkflowConfigurationIntTestConfiguration {
-
-    @MockBean
-    private MessageBroker messageBroker;
 
     @Bean
     ObjectMapper objectMapper() {

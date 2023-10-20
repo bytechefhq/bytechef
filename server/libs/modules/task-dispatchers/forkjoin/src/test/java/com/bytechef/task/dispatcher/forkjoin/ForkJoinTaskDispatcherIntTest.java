@@ -69,9 +69,9 @@ public class ForkJoinTaskDispatcherIntTest {
                         taskExecutionService, taskCompletionHandler, counterService, taskDispatcher, contextService,
                         workflowFileStorageFacade)),
             (
-                contextService, counterService, messageBroker, taskExecutionService) -> List.of(
+                messageBroker, contextService, counterService, taskExecutionService) -> List.of(
                     (taskDispatcher) -> new ForkJoinTaskDispatcher(
-                        contextService, counterService, messageBroker, taskDispatcher, taskExecutionService,
+                        messageBroker, contextService, counterService, taskDispatcher, taskExecutionService,
                         workflowFileStorageFacade)),
             () -> Map.of("var", testVarTaskHandler));
 

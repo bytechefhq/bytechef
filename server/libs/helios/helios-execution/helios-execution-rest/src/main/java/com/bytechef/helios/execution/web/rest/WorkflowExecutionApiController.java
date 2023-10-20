@@ -17,7 +17,6 @@
 
 package com.bytechef.helios.execution.web.rest;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.helios.execution.facade.WorkflowExecutionFacade;
 import com.bytechef.helios.execution.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.helios.execution.web.rest.model.WorkflowExecutionModel;
@@ -27,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.time.LocalDateTime;
 
@@ -35,7 +35,7 @@ import java.time.LocalDateTime;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
-@ConditionalOnEnabled("coordinator")
+@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
 public class WorkflowExecutionApiController implements WorkflowExecutionApi {
 
     private final ConversionService conversionService;

@@ -17,9 +17,7 @@
 
 package com.bytechef.hermes.component.jdbc.operation.config;
 
-import com.bytechef.event.EventPublisher;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,7 +27,4 @@ import org.springframework.context.annotation.Configuration;
 @EnableAutoConfiguration
 @Configuration
 public class JdbcOperationIntTestConfiguration {
-
-    @MockBean
-    private EventPublisher eventPublisher;
 }

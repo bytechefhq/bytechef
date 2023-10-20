@@ -17,12 +17,10 @@
 
 package com.bytechef.atlas.configuration.task;
 
-import com.bytechef.message.Controllable;
-
 /**
  * @author Ivica Cardic
  */
-public interface ControlTask extends Task, Controllable {
+public interface ControlTask extends Task {
 
     String getType();
 }

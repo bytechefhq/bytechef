@@ -22,8 +22,6 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.event.EventPublisher;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.RemoteCounterService;
@@ -32,8 +30,10 @@ import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.message.event.MessageEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.List;
 import java.util.Map;
@@ -43,7 +43,6 @@ public class TaskDispatcherWorkflowTestSupport {
     private final RemoteContextService contextService;
     private final RemoteCounterService counterService;
     private final RemoteJobService jobService;
-    private final EventPublisher eventPublisher;
     private final ObjectMapper objectMapper;
     private final RemoteTaskExecutionService taskExecutionService;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
@@ -52,13 +51,12 @@ public class TaskDispatcherWorkflowTestSupport {
     @SuppressFBWarnings("EI")
     public TaskDispatcherWorkflowTestSupport(
         RemoteContextService contextService, RemoteCounterService counterService, RemoteJobService jobService,
-        EventPublisher eventPublisher, ObjectMapper objectMapper, RemoteTaskExecutionService taskExecutionService,
+        ObjectMapper objectMapper, RemoteTaskExecutionService taskExecutionService,
         WorkflowFileStorageFacade workflowFileStorageFacade, RemoteWorkflowService workflowService) {
 
         this.contextService = contextService;
         this.counterService = counterService;
         this.jobService = jobService;
-        this.eventPublisher = eventPublisher;
         this.objectMapper = objectMapper;
         this.taskExecutionService = taskExecutionService;
         this.workflowFileStorageFacade = workflowFileStorageFacade;
@@ -84,10 +82,11 @@ public class TaskDispatcherWorkflowTestSupport {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, eventPublisher, jobService, objectMapper, syncMessageBroker,
+            List.of(), contextService, jobService, syncMessageBroker,
             taskCompletionHandlerFactoriesFunction.apply(counterService, taskExecutionService), List.of(),
-            taskDispatcherResolverFactoriesFunction
-                .apply(contextService, counterService, syncMessageBroker, taskExecutionService),
+            taskDispatcherResolverFactoriesFunction.apply(
+                event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+                contextService, counterService, taskExecutionService),
             taskExecutionService, taskHandlerMapSupplier.get()::get, workflowFileStorageFacade, workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, inputs));
@@ -102,8 +101,8 @@ public class TaskDispatcherWorkflowTestSupport {
     @FunctionalInterface
     public interface TaskDispatcherResolverFactoriesFunction {
         List<TaskDispatcherResolverFactory> apply(
-            RemoteContextService contextService, RemoteCounterService counterService, MessageBroker messageBroker,
-            RemoteTaskExecutionService taskExecutionService);
+            ApplicationEventPublisher eventPublisher, RemoteContextService contextService,
+            RemoteCounterService counterService, RemoteTaskExecutionService taskExecutionService);
     }
 
     @FunctionalInterface

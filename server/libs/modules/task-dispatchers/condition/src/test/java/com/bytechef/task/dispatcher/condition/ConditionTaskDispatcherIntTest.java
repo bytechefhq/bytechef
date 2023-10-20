@@ -21,7 +21,6 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFacto
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.RemoteCounterService;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
@@ -38,6 +37,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Matija Petanjek
@@ -123,7 +123,8 @@ public class ConditionTaskDispatcherIntTest {
         taskDispatcherWorkflowTestSupport.execute(
             EncodingUtils.encodeBase64ToString("condition_v1-conditions-string".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "Hello World", "value2", "Hello"),
-            this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories,
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
             this::getTaskHandlerMap);
 
         Assertions.assertEquals("false branch", testVarTaskHandler.get("equalsResult"));
@@ -148,12 +149,13 @@ public class ConditionTaskDispatcherIntTest {
 
     @SuppressWarnings("PMD")
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        RemoteContextService contextService, RemoteCounterService counterService, MessageBroker messageBroker,
-        RemoteTaskExecutionService taskExecutionService) {
+        ApplicationEventPublisher eventPublisher, RemoteContextService contextService,
+        RemoteCounterService counterService, RemoteTaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskDispatcher) -> new ConditionTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade));
+                eventPublisher, contextService, taskDispatcher, taskExecutionService,
+                workflowFileStorageFacade));
     }
 
     private Map<String, TaskHandler<?>> getTaskHandlerMap() {

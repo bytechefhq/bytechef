@@ -25,13 +25,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "bytechef.file-storage")
 public class FileStorageProperties {
 
-    private String fileStorageDir;
+    private String filesystemDir;
 
-    public String getFileStorageDir() {
-        return fileStorageDir;
+    public String getFilesystemDir() {
+        return filesystemDir;
     }
 
-    public void setFileStorageDir(String fileStorageDir) {
-        this.fileStorageDir = fileStorageDir;
+    public void setFilesystemDir(String fileStorageDir) {
+        this.filesystemDir = fileStorageDir;
     }
 }

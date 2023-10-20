@@ -20,7 +20,6 @@ package com.bytechef.hermes.component.test;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.RemoteJobService;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
@@ -41,7 +40,6 @@ public class JobTestExecutor {
 
     private final RemoteContextService contextService;
     private final RemoteJobService jobService;
-    private final EventPublisher eventPublisher;
     private final ObjectMapper objectMapper;
     private final RemoteTaskExecutionService taskExecutionService;
     private final Map<String, TaskHandler<?>> taskHandlerMap;
@@ -49,14 +47,12 @@ public class JobTestExecutor {
 
     @SuppressFBWarnings("EI")
     public JobTestExecutor(
-        RemoteContextService contextService, RemoteJobService jobService, EventPublisher eventPublisher,
-        ObjectMapper objectMapper,
+        RemoteContextService contextService, RemoteJobService jobService, ObjectMapper objectMapper,
         RemoteTaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
         RemoteWorkflowService workflowService) {
 
         this.contextService = contextService;
         this.jobService = jobService;
-        this.eventPublisher = eventPublisher;
         this.objectMapper = objectMapper;
         this.taskExecutionService = taskExecutionService;
         this.taskHandlerMap = taskHandlerMap;
@@ -69,7 +65,7 @@ public class JobTestExecutor {
 
     public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, eventPublisher, jobService, objectMapper, taskExecutionService,
+            contextService, jobService, objectMapper, taskExecutionService,
             MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get,
             new WorkflowFileStorageFacadeImpl(new Base64FileStorageService(), new ObjectMapper()), workflowService);
 

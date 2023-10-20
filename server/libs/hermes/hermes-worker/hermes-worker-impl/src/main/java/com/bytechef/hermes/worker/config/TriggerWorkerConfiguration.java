@@ -17,16 +17,15 @@
 
 package com.bytechef.hermes.worker.config;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.worker.TriggerWorker;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
 import com.bytechef.hermes.worker.trigger.factory.TriggerHandlerMapFactory;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerRegistry;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerResolver;
-import com.bytechef.message.broker.MessageBroker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -37,7 +36,7 @@ import java.util.concurrent.Executors;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnEnabled("worker")
+@ConditionalOnProperty(prefix = "bytechef", name = "worker.enabled", matchIfMissing = true)
 public class TriggerWorkerConfiguration {
 
     @Bean
@@ -58,10 +57,8 @@ public class TriggerWorkerConfiguration {
 
     @Bean
     TriggerWorker triggerWorker(
-        EventPublisher eventPublisher, MessageBroker messageBroker, TriggerHandlerResolver triggerHandlerResolver) {
+        ApplicationEventPublisher eventPublisher, TriggerHandlerResolver triggerHandlerResolver) {
 
-        return new TriggerWorker(
-            eventPublisher, Executors.newCachedThreadPool(), messageBroker,
-            triggerHandlerResolver);
+        return new TriggerWorker(eventPublisher, Executors.newCachedThreadPool(), triggerHandlerResolver);
     }
 }

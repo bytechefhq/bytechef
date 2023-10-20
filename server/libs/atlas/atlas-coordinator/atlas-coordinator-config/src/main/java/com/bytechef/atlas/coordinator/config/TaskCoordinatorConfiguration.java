@@ -20,11 +20,14 @@
 package com.bytechef.atlas.coordinator.config;
 
 import com.bytechef.atlas.coordinator.TaskCoordinator;
-import com.bytechef.atlas.coordinator.error.TaskExecutionErrorHandler;
-import com.bytechef.atlas.coordinator.event.JobStatusWebhookEventListener;
-import com.bytechef.atlas.coordinator.event.TaskProgressedEventListener;
-import com.bytechef.atlas.coordinator.event.TaskStartedEventListener;
-import com.bytechef.atlas.coordinator.event.TaskStartedWebhookEventListener;
+import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
+import com.bytechef.atlas.coordinator.event.listener.ErrorEventListener;
+import com.bytechef.atlas.coordinator.event.listener.LogTaskApplicationEventListener;
+import com.bytechef.atlas.coordinator.event.listener.TaskExecutionErrorEventListener;
+import com.bytechef.atlas.coordinator.event.listener.TaskProgressedApplicationEventListener;
+import com.bytechef.atlas.coordinator.event.listener.TaskStartedApplicationEventListener;
+import com.bytechef.atlas.coordinator.event.listener.WebhookJobStatusApplicationEventListener;
+import com.bytechef.atlas.coordinator.event.listener.WebhookTaskStartedApplicationEventListener;
 import com.bytechef.atlas.coordinator.job.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
@@ -34,12 +37,9 @@ import com.bytechef.atlas.coordinator.task.dispatcher.ControlTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
-import com.bytechef.atlas.execution.facade.RemoteJobFacade;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.service.RemoteContextService;
-import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
-import com.bytechef.event.EventPublisher;
-import com.bytechef.message.broker.MessageBroker;
+
 import com.bytechef.atlas.execution.service.RemoteJobService;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
@@ -50,9 +50,12 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -62,24 +65,18 @@ import org.springframework.context.annotation.Primary;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnEnabled("coordinator")
+@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
 @EnableConfigurationProperties(TaskCoordinatorProperties.class)
 public class TaskCoordinatorConfiguration {
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @Autowired
     private RemoteContextService contextService;
 
     @Autowired
-    private EventPublisher eventPublisher;
-
-    @Autowired
-    private RemoteJobFacade jobFacade;
-
-    @Autowired
     private RemoteJobService jobService;
-
-    @Autowired
-    private MessageBroker messageBroker;
 
     @Autowired(required = false)
     private List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories = Collections.emptyList();
@@ -102,7 +99,7 @@ public class TaskCoordinatorConfiguration {
 
     @Bean
     ControlTaskDispatcher controlTaskDispatcher() {
-        return new ControlTaskDispatcher(messageBroker);
+        return new ControlTaskDispatcher(eventPublisher);
     }
 
     @Bean
@@ -114,7 +111,7 @@ public class TaskCoordinatorConfiguration {
 
     @Bean
     DefaultTaskDispatcher defaultTaskDispatcher() {
-        return new DefaultTaskDispatcher(messageBroker, taskDispatcherPreSendProcessors);
+        return new DefaultTaskDispatcher(eventPublisher, taskDispatcherPreSendProcessors);
     }
 
     @Bean
@@ -124,13 +121,18 @@ public class TaskCoordinatorConfiguration {
     }
 
     @Bean
-    JobStatusWebhookEventListener jobStatusWebhookEventHandler() {
-        return new JobStatusWebhookEventListener(jobService);
+    LogTaskApplicationEventListener logTaskApplicationEventListener() {
+        return new LogTaskApplicationEventListener();
     }
 
     @Bean
-    TaskExecutionErrorHandler taskExecutionErrorHandler() {
-        return new TaskExecutionErrorHandler(eventPublisher, jobService, taskDispatcher(), taskExecutionService);
+    WebhookJobStatusApplicationEventListener jobStatusWebhookEventHandler() {
+        return new WebhookJobStatusApplicationEventListener(jobService);
+    }
+
+    @Bean
+    TaskExecutionErrorEventListener taskExecutionErrorHandler() {
+        return new TaskExecutionErrorEventListener(eventPublisher, jobService, taskDispatcher(), taskExecutionService);
     }
 
     @Bean
@@ -150,10 +152,12 @@ public class TaskCoordinatorConfiguration {
     }
 
     @Bean
-    TaskCoordinator taskCoordinator() {
+    TaskCoordinator taskCoordinator(
+        List<ApplicationEventListener> applicationEventListeners, List<ErrorEventListener> errorEventListeners) {
+
         return new TaskCoordinator(
-            eventPublisher, jobExecutor(), jobFacade, jobService, messageBroker, taskCompletionHandler(),
-            taskDispatcher(), taskExecutionService);
+            applicationEventListeners, errorEventListeners, eventPublisher, jobExecutor(), jobService,
+            taskCompletionHandler(), taskDispatcher(), taskExecutionService);
     }
 
     @Bean
@@ -173,17 +177,17 @@ public class TaskCoordinatorConfiguration {
     }
 
     @Bean
-    TaskProgressedEventListener taskProgressedEventListener() {
-        return new TaskProgressedEventListener(taskExecutionService);
+    TaskProgressedApplicationEventListener taskProgressedEventListener() {
+        return new TaskProgressedApplicationEventListener(taskExecutionService);
     }
 
     @Bean
-    TaskStartedEventListener taskStartedEventListener() {
-        return new TaskStartedEventListener(taskExecutionService, taskDispatcher(), jobService);
+    TaskStartedApplicationEventListener taskStartedEventListener() {
+        return new TaskStartedApplicationEventListener(taskExecutionService, taskDispatcher(), jobService);
     }
 
     @Bean
-    TaskStartedWebhookEventListener taskStartedWebhookEventListener() {
-        return new TaskStartedWebhookEventListener(jobService);
+    WebhookTaskStartedApplicationEventListener taskStartedWebhookEventListener() {
+        return new WebhookTaskStartedApplicationEventListener(jobService);
     }
 }

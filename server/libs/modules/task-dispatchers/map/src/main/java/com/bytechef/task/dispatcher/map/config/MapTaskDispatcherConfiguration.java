@@ -19,7 +19,6 @@ package com.bytechef.task.dispatcher.map.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.atlas.execution.service.RemoteCounterService;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
@@ -29,6 +28,7 @@ import com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -40,13 +40,13 @@ import org.springframework.context.annotation.Configuration;
 public class MapTaskDispatcherConfiguration {
 
     @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    @Autowired
     private RemoteContextService contextService;
 
     @Autowired
     private RemoteCounterService counterService;
-
-    @Autowired
-    private MessageBroker messageBroker;
 
     @Autowired
     private RemoteTaskExecutionService taskExecutionService;
@@ -64,7 +64,7 @@ public class MapTaskDispatcherConfiguration {
     @Bean("mapTaskDispatcherFactory_v1")
     TaskDispatcherResolverFactory mapTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new MapTaskDispatcher(
-            contextService, counterService, messageBroker, taskDispatcher, taskExecutionService,
+            eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
             workflowFileStorageFacade);
     }
 }

@@ -17,14 +17,13 @@
 
 package com.bytechef.atlas.worker.config;
 
-import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.atlas.worker.TaskWorker;
-import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
-import com.bytechef.message.broker.SystemMessageRoute;
+import com.bytechef.atlas.worker.message.route.WorkerMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 
 import java.util.Map;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,22 +31,23 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnEnabled("worker")
+@ConditionalOnExpression("'${bytechef.worker.enabled:true}' == 'true'")
 public class TaskWorkerMessageBrokerConfigurerConfiguration {
 
     @Bean
     MessageBrokerConfigurer<?> taskWorkerMessageBrokerConfigurer(
         TaskWorker taskWorker, TaskWorkerProperties taskWorkerProperties) {
+
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
             Map<String, Object> subscriptions = taskWorkerProperties.getSubscriptions();
 
             subscriptions.forEach((routeName, concurrency) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, TaskMessageRoute.ofWorkerRoute(routeName),
-                Integer.parseInt((String) concurrency),
-                taskWorker, "handle"));
+                listenerEndpointRegistrar, WorkerMessageRoute.ofTaskMessageRoute(routeName),
+                Integer.parseInt((String) concurrency), taskWorker, "onTaskExecutionEvent"));
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, SystemMessageRoute.CONTROL, 1, taskWorker, "handle");
+                listenerEndpointRegistrar, WorkerMessageRoute.CONTROL_EVENTS, 1, taskWorker,
+                "onCancelControlTaskEvent");
         };
     }
 }

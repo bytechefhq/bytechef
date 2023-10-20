@@ -21,19 +21,21 @@ import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
+import com.bytechef.atlas.coordinator.event.JobResumeEvent;
+import com.bytechef.atlas.coordinator.event.JobStartEvent;
+import com.bytechef.atlas.coordinator.event.JobStopEvent;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.execution.event.JobStatusEvent;
-import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
+
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -42,23 +44,20 @@ public class JobFacadeImpl implements JobFacade, RemoteJobFacade {
 
     private static final Logger logger = LoggerFactory.getLogger(JobFacadeImpl.class);
 
+    private final ApplicationEventPublisher eventPublisher;
     private final ContextService contextService;
-    private final EventPublisher eventPublisher;
     private final JobService jobService;
-    private final MessageBroker messageBroker;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
     private final RemoteWorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public JobFacadeImpl(
-        ContextService contextService, EventPublisher eventPublisher, JobService jobService,
-        MessageBroker messageBroker, WorkflowFileStorageFacade workflowFileStorageFacade,
-        RemoteWorkflowService workflowService) {
+        ApplicationEventPublisher eventPublisher, ContextService contextService, JobService jobService,
+        WorkflowFileStorageFacade workflowFileStorageFacade, RemoteWorkflowService workflowService) {
 
-        this.contextService = contextService;
         this.eventPublisher = eventPublisher;
+        this.contextService = contextService;
         this.jobService = jobService;
-        this.messageBroker = messageBroker;
         this.workflowFileStorageFacade = workflowFileStorageFacade;
         this.workflowService = workflowService;
     }
@@ -72,28 +71,25 @@ public class JobFacadeImpl implements JobFacade, RemoteJobFacade {
     public long createJob(JobParameters jobParameters) {
         Job job = jobService.create(jobParameters, workflowService.getWorkflow(jobParameters.getWorkflowId()));
 
-        Assert.notNull(job.getId(), "'job.id' must not be null");
+        logger.debug("Job id={}, label='{}' created", Objects.requireNonNull(job.getId()), job.getLabel());
 
         contextService.push(
             job.getId(), Context.Classname.JOB,
             workflowFileStorageFacade.storeContextValue(job.getId(), Context.Classname.JOB, job.getInputs()));
 
-        eventPublisher.publishEvent(new JobStatusEvent(job.getId(), job.getStatus()));
-
-        messageBroker.send(TaskMessageRoute.JOBS_START, job.getId());
-
-        logger.debug("Job id={}, label='{}' created", job.getId(), job.getLabel());
+        eventPublisher.publishEvent(new JobStatusApplicationEvent(job.getId(), job.getStatus()));
+        eventPublisher.publishEvent(new JobStartEvent(job.getId()));
 
         return job.getId();
     }
 
     @Override
     public void restartJob(Long id) {
-        messageBroker.send(TaskMessageRoute.JOBS_RESUME, id);
+        eventPublisher.publishEvent(new JobResumeEvent(id));
     }
 
     @Override
     public void stopJob(Long id) {
-        messageBroker.send(TaskMessageRoute.JOBS_STOP, id);
+        eventPublisher.publishEvent(new JobStopEvent(id));
     }
 }

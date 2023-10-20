@@ -12,5 +12,5 @@ dependencies {
 
     runtimeOnly("org.apache.activemq:artemis-jakarta-server")
     runtimeOnly("org.springframework.boot:spring-boot-starter-artemis")
-    runtimeOnly(project(":server:libs:core:message-broker:message-broker-jms"))
+    runtimeOnly(project(":server:libs:core:message:message-broker:message-broker-jms"))
 }

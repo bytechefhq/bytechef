@@ -25,7 +25,6 @@ import com.bytechef.atlas.execution.config.WorkflowExecutionIntTestConfiguration
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
@@ -74,9 +74,9 @@ public class JobFacadeIntTest {
         private WorkflowFileStorageFacade workflowFileStorageFacade;
 
         @Bean
-        JobFacade jobFacade(JobService jobService, MessageBroker messageBroker) {
+        JobFacade jobFacade(ApplicationEventPublisher eventPublisher, JobService jobService) {
             return new JobFacadeImpl(
-                contextService, e -> {}, jobService, messageBroker, workflowFileStorageFacade, workflowService);
+                eventPublisher, contextService, jobService, workflowFileStorageFacade, workflowService);
         }
 
         @Bean

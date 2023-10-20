@@ -19,17 +19,21 @@
 
 package com.bytechef.atlas.coordinator;
 
+import com.bytechef.atlas.coordinator.event.ApplicationEvent;
+import com.bytechef.atlas.coordinator.event.ErrorEvent;
+import com.bytechef.atlas.coordinator.event.JobResumeEvent;
+import com.bytechef.atlas.coordinator.event.JobStartEvent;
+import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
+import com.bytechef.atlas.coordinator.event.JobStopEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
+import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
+import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
+import com.bytechef.atlas.coordinator.event.listener.ErrorEventListener;
 import com.bytechef.atlas.coordinator.job.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.facade.RemoteJobFacade;
-import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.error.ExecutionError;
-import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.execution.event.JobStatusEvent;
 import com.bytechef.atlas.execution.service.RemoteJobService;
 import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.configuration.task.CancelControlTask;
@@ -45,6 +49,7 @@ import com.bytechef.commons.util.ExceptionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * The central class responsible for coordinating and executing jobs.
@@ -57,104 +62,102 @@ public class TaskCoordinator {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskCoordinator.class);
 
-    private final EventPublisher eventPublisher;
+    private final List<ApplicationEventListener> applicationEventListeners;
+    private final List<ErrorEventListener> errorEventListeners;
+    private final ApplicationEventPublisher eventPublisher;
     private final JobExecutor jobExecutor;
-    private final RemoteJobFacade jobFacade;
     private final RemoteJobService jobService;
-    private final MessageBroker messageBroker;
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final RemoteTaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI")
     public TaskCoordinator(
-        EventPublisher eventPublisher, JobExecutor jobExecutor, RemoteJobFacade jobFacade,
-        RemoteJobService jobService, MessageBroker messageBroker, TaskCompletionHandler taskCompletionHandler,
+        List<ApplicationEventListener> applicationEventListeners, List<ErrorEventListener> errorEventListeners,
+        ApplicationEventPublisher eventPublisher,
+        JobExecutor jobExecutor, RemoteJobService jobService, TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher<? super Task> taskDispatcher, RemoteTaskExecutionService taskExecutionService) {
 
+        this.applicationEventListeners = applicationEventListeners;
+        this.errorEventListeners = errorEventListeners;
         this.eventPublisher = eventPublisher;
         this.jobExecutor = jobExecutor;
-        this.jobFacade = jobFacade;
         this.jobService = jobService;
-        this.messageBroker = messageBroker;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
     }
 
     /**
-     * Creates a job instance.
      *
-     * @param jobParameters The job parameters
+     * @param applicationEvent
      */
-    public void handleJobsCreate(JobParameters jobParameters) {
-        this.jobFacade.createJob(jobParameters);
-    }
-
-    /**
-     * Complete a task of a given job.
-     *
-     * @param taskExecution The task to complete.
-     */
-    public void handleTasksComplete(TaskExecution taskExecution) {
-        try {
-            taskCompletionHandler.handle(taskExecution);
-        } catch (Exception e) {
-            taskExecution.setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
-
-            messageBroker.send(SystemMessageRoute.ERRORS, taskExecution);
+    public void onApplicationEvent(ApplicationEvent applicationEvent) {
+        for (ApplicationEventListener applicationEventListener : applicationEventListeners) {
+            applicationEventListener.onApplicationEvent(applicationEvent);
         }
     }
 
-    /**
-     * Start a running job.
-     *
-     * @param jobId The id of the job to start
-     */
-    @SuppressFBWarnings("NP")
-    public void handleJobsStart(Long jobId) {
-        Job job = jobService.setStatusToStarted(jobId);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Starting job id={}", jobId);
+    public void onErrorEvent(ErrorEvent errorEvent) {
+        for (ErrorEventListener errorEventListener : errorEventListeners) {
+            errorEventListener.onErrorEvent(errorEvent);
         }
-
-        jobExecutor.execute(job);
-
-        eventPublisher.publishEvent(new JobStatusEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
     }
 
     /**
      * Resume a stopped or failed job.
      *
-     * @param jobId The id of the job to resume.
+     * @param jobResumeEvent The job resume vent.
      */
-    public void handleJobsResume(Long jobId) {
-        Job job = jobService.resumeToStatusStarted(jobId);
-
+// TODO @Transactional
+    public void onJobResumeEvent(JobResumeEvent jobResumeEvent) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Resuming job id={}", jobId);
+            logger.debug("Resuming job id={}", jobResumeEvent.getJobId());
         }
+
+        Job job = jobService.resumeToStatusStarted(jobResumeEvent.getJobId());
 
         jobExecutor.execute(job);
     }
 
     /**
-     * Stop a running job.
+     * Start a running job.
      *
-     * @param jobId The id of the job to stop
+     * @param jobStartEvent The job start event
      */
     @SuppressFBWarnings("NP")
-    public void handleJobsStop(Long jobId) {
+// TODO @Transactional
+    public void onJobStartEvent(JobStartEvent jobStartEvent) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Stopping job id={}", jobId);
+            logger.debug("Starting job id={}", jobStartEvent.getJobId());
         }
 
-        Job job = jobService.setStatusToStopped(jobId);
+        Job job = jobService.setStatusToStarted(jobStartEvent.getJobId());
 
-        eventPublisher.publishEvent(new JobStatusEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
+        jobExecutor.execute(job);
 
-        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
+        eventPublisher.publishEvent(
+            new JobStatusApplicationEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
+    }
+
+    /**
+     * Stop a running job.
+     *
+     * @param jobStopEvent The job stop event
+     */
+    @SuppressFBWarnings("NP")
+// TODO @Transactional
+    public void onJobStopEvent(JobStopEvent jobStopEvent) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Stopping job id={}", jobStopEvent.getJobId());
+        }
+
+        Job job = jobService.setStatusToStopped(jobStopEvent.getJobId());
+
+        eventPublisher.publishEvent(
+            new JobStatusApplicationEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
+
+        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobStopEvent.getJobId());
 
         if (!taskExecutions.isEmpty()) {
             TaskExecution currentTaskExecution = taskExecutions.get(taskExecutions.size() - 1);
@@ -168,6 +171,24 @@ public class TaskCoordinator {
                 new CancelControlTask(
                     Objects.requireNonNull(currentTaskExecution.getJobId()),
                     Objects.requireNonNull(currentTaskExecution.getId())));
+        }
+    }
+
+    /**
+     * Complete a task of a given job.
+     *
+     * @param taskExecutionCompleteEvent The task to complete.
+     */
+// TODO @Transactional
+    public void onTaskExecutionCompleteEvent(TaskExecutionCompleteEvent taskExecutionCompleteEvent) {
+        TaskExecution taskExecution = taskExecutionCompleteEvent.getTaskExecution();
+
+        try {
+            taskCompletionHandler.handle(taskExecution);
+        } catch (Exception e) {
+            taskExecution.setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
+
+            eventPublisher.publishEvent(new TaskExecutionErrorEvent(taskExecution));
         }
     }
 }

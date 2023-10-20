@@ -27,10 +27,9 @@ import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessorRegistry
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
-import com.bytechef.hermes.execution.message.broker.TriggerMessageRoute;
-import com.bytechef.hermes.execution.message.broker.WebhookParameters;
-import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.hermes.coordinator.event.TriggerWebhookEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,21 +41,22 @@ import java.util.Map;
  */
 public class WebhookExecutorImpl implements WebhookExecutor {
 
+    private final ApplicationEventPublisher eventPublisher;
     private final InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry;
     private final JobSyncExecutor jobSyncExecutor;
-    private final MessageBroker messageBroker;
     private final TriggerSyncExecutor triggerSyncExecutor;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public WebhookExecutorImpl(
+        ApplicationEventPublisher eventPublisher,
         InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry,
-        JobSyncExecutor jobSyncExecutor, MessageBroker messageBroker, TriggerSyncExecutor triggerSyncExecutor,
+        JobSyncExecutor jobSyncExecutor, TriggerSyncExecutor triggerSyncExecutor,
         WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.instanceWorkflowAccessorRegistry = instanceWorkflowAccessorRegistry;
         this.jobSyncExecutor = jobSyncExecutor;
-        this.messageBroker = messageBroker;
+        this.eventPublisher = eventPublisher;
         this.triggerSyncExecutor = triggerSyncExecutor;
         this.workflowFileStorageFacade = workflowFileStorageFacade;
     }
@@ -90,7 +90,8 @@ public class WebhookExecutorImpl implements WebhookExecutor {
 
     @Override
     public void executeAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
-        messageBroker.send(TriggerMessageRoute.WEBHOOKS, new WebhookParameters(workflowExecutionId, webhookRequest));
+        eventPublisher.publishEvent(
+            new TriggerWebhookEvent(new TriggerWebhookEvent.WebhookParameters(workflowExecutionId, webhookRequest)));
     }
 
     @Override

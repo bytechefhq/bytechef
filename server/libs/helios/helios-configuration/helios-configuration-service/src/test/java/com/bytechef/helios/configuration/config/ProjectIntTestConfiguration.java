@@ -18,10 +18,8 @@
 package com.bytechef.helios.configuration.config;
 
 import com.bytechef.atlas.execution.facade.RemoteJobFacade;
-import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.connection.service.RemoteConnectionService;
 import com.bytechef.hermes.execution.facade.RemoteTriggerLifecycleFacade;
-import com.bytechef.message.broker.MessageBroker;
 
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -49,13 +47,7 @@ public class ProjectIntTestConfiguration {
     private RemoteConnectionService connectionService;
 
     @MockBean
-    private EventPublisher eventPublisher;
-
-    @MockBean
     private RemoteJobFacade jobFacade;
-
-    @MockBean
-    private MessageBroker messageBroker;
 
     @MockBean
     private RemoteTriggerLifecycleFacade triggerLifecycleFacade;

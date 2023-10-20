@@ -17,11 +17,8 @@
 
 package com.bytechef.atlas.execution.config;
 
-import com.bytechef.event.EventPublisher;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
@@ -37,12 +34,6 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @EnableAutoConfiguration
 @Configuration
 public class WorkflowExecutionIntTestConfiguration {
-
-    @MockBean
-    private EventPublisher eventPublisher;
-
-    @MockBean
-    private MessageBroker messageBroker;
 
     @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.execution.repository.jdbc")
     public static class WorkflowIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
