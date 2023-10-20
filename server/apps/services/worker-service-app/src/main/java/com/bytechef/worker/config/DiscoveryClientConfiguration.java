@@ -17,44 +17,14 @@
 
 package com.bytechef.worker.config;
 
-import com.bytechef.discovery.metadata.ServiceMetadataRegistry;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
  */
-@DependsOn("workerConfiguration")
 @Configuration
 @EnableDiscoveryClient
-public class DiscoveryClientConfiguration implements InitializingBean {
+public class DiscoveryClientConfiguration {
 
-    private final List<ComponentDefinition> componentDefinitions;
-    private final ServiceMetadataRegistry serviceMetadataRegistry;
-
-    @SuppressFBWarnings("EI2")
-    public DiscoveryClientConfiguration(
-        List<ComponentDefinition> componentDefinitions, ServiceMetadataRegistry serviceMetadataRegistry) {
-
-        this.componentDefinitions = componentDefinitions;
-        this.serviceMetadataRegistry = serviceMetadataRegistry;
-    }
-
-    @Override
-    public void afterPropertiesSet() {
-        serviceMetadataRegistry.registerMetadata(
-            Map.of(
-                "componentNames",
-                componentDefinitions.stream()
-                    .map(ComponentDefinition::getName)
-                    .collect(Collectors.joining(","))));
-    }
 }
