@@ -1,0 +1,11 @@
+dependencies {
+    api project(":modules:libs:atlas:atlas-api")
+
+    implementation "org.apache.commons:commons-lang3"
+    implementation "org.apache.tika:tika-core"
+    implementation "org.jobrunr:jobrunr-spring-boot-starter"
+    implementation "org.springframework:spring-core"
+
+    testImplementation project(":modules:libs:atlas:atlas-api")
+    testImplementation project(":modules:libs:hermes:file-storage:file-storage-base64")
+}

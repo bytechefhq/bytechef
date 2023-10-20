@@ -1,6 +1,0 @@
-dependencies {
-    testImplementation "org.apache.commons:commons-lang3"
-    testImplementation "org.springframework:spring-jdbc"
-    testImplementation "org.springframework.security:spring-security-core"
-    testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
-}

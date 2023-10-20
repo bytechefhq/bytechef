@@ -1,0 +1,86 @@
+/*
+ * Copyright 2021 <your company/name>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.task.handler.xmlhelpers.v1_0;
+
+import static com.bytechef.task.handler.xmlhelpers.v1_0.XMLHelpersTaskHandler.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
+import com.bytechef.task.commons.xml.XMLHelper;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
+/**
+ * @author Ivica Cardic
+ */
+public class XMLHelpersTaskHandlerTest {
+
+    private static final XMLHelper xmlHelper = new XMLHelper();
+    private static final XMLHelpersParseTaskHandler xmlHelpersParseTaskHandler =
+            new XMLHelpersParseTaskHandler(xmlHelper);
+    private static final XMLHelpersStringifyTaskHandler xmlHelpersStringifyTaskHandler =
+            new XMLHelpersStringifyTaskHandler(xmlHelper);
+
+    @Test
+    public void testParse() {
+        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+
+        String source =
+                """
+            <Flower id="45">
+                <name>Poppy</name>
+            </Flower>
+            """;
+
+        taskExecution.put("source", source);
+        taskExecution.put("operation", "XML_TO_JSON");
+
+        assertThat(xmlHelpersParseTaskHandler.handle(taskExecution)).isEqualTo(Map.of("id", "45", "name", "Poppy"));
+
+        source =
+                """
+            <Flowers>
+                <Flower id="45">
+                    <name>Poppy</name>
+                </Flower>
+                <Flower id="50">
+                    <name>Rose</name>
+                </Flower>
+            </Flowers>
+            """;
+
+        taskExecution.put("source", source);
+        taskExecution.put("operation", "XML_TO_JSON");
+
+        assertThat(xmlHelpersParseTaskHandler.handle(taskExecution))
+                .isEqualTo(Map.of(
+                        "Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose"))));
+    }
+
+    @Test
+    public void testStringify() {
+        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+
+        Map<String, ?> source = Map.of("id", 45, "name", "Poppy");
+
+        taskExecution.put("source", source);
+        taskExecution.put("operation", "JSON_TO_XML");
+
+        assertThat(xmlHelpersStringifyTaskHandler.handle(taskExecution)).isEqualTo(xmlHelper.write(source));
+    }
+}

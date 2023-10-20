@@ -1,0 +1,4 @@
+dependencies {
+    api project(":modules:libs:atlas:atlas-api")
+    api project(":modules:libs:hermes:file-storage:file-storage-api")
+}

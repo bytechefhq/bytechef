@@ -1,42 +1,18 @@
 plugins {
-    id "com.integri.java-application-conventions"
+    id "com.bytechef.java-application-conventions"
     id "com.google.cloud.tools.jib"
     id "com.gorylenko.gradle-git-properties"
-    id "org.sonarqube"
     id "org.springframework.boot"
 }
 
 subprojects {
-    apply plugin: "com.integri.java-application-conventions"
+    apply plugin: "com.bytechef.java-application-conventions"
     apply plugin: "com.google.cloud.tools.jib"
     apply plugin: "com.gorylenko.gradle-git-properties"
-    apply plugin: "org.sonarqube"
     apply plugin: "org.springframework.boot"
-
-    apply from: "gradle/docker.gradle"
-    apply from: "${rootDir}/gradle/sonar.gradle"
-
-    if (project.hasProperty("prod")) {
-        apply from: "gradle/profile_prod.gradle"
-    } else {
-        apply from: "gradle/profile_dev.gradle"
-    }
-
-    compileJava.dependsOn processResources
-    processResources.dependsOn bootBuildInfo
-
-    defaultTasks "bootRun"
 
     gitProperties {
         failOnNoGitDirectory = false
         keys = ["git.branch", "git.commit.id.abbrev", "git.commit.id.describe"]
-    }
-
-    configurations {
-        providedRuntime
-    }
-
-    dependencies {
-        testImplementation "org.springframework.boot:spring-boot-starter-test"
     }
 }

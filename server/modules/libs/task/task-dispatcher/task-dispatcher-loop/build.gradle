@@ -1,0 +1,4 @@
+dependencies {
+    testImplementation project(":modules:libs:task:task-dispatcher:task-dispatcher-if")
+    testImplementation project(":modules:libs:task:task-dispatcher:task-dispatcher-sequence")
+}

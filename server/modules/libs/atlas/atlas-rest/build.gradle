@@ -1,0 +1,11 @@
+dependencies {
+    compileOnly "jakarta.servlet:jakarta.servlet-api"
+
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-web"
+    implementation "org.springframework:spring-webmvc"
+    implementation project(":modules:libs:atlas:atlas-coordinator:atlas-coordinator-api")
+    implementation project(":modules:libs:atlas:atlas-service")
+
+    testImplementation project(":modules:libs:test-support")
+}

@@ -1,4 +1,0 @@
-dependencies {
-    testImplementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-if")
-    testImplementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-sequence")
-}

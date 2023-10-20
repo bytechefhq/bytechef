@@ -1,0 +1,37 @@
+subprojects {
+    dependencies {
+        compileOnly "commons-io:commons-io"
+        compileOnly "com.fasterxml.jackson.core:jackson-databind"
+        compileOnly "org.apache.commons:commons-lang3"
+        compileOnly "org.slf4j:slf4j-api"
+        compileOnly "org.springframework:spring-core"
+        compileOnly "org.springframework:spring-context"
+        compileOnly "org.springframework:spring-jdbc"
+        compileOnly "org.springframework.boot:spring-boot"
+        compileOnly project(":modules:libs:atlas:atlas-api")
+        compileOnly project(":modules:libs:atlas:atlas-worker:atlas-worker-api")
+        compileOnly project(":modules:libs:task:task-commons:")
+        compileOnly project(":modules:libs:hermes:descriptor:descriptor-api")
+        compileOnly project(":modules:libs:hermes:auth:auth-service")
+        compileOnly project(":modules:libs:hermes:file-storage:file-storage-api")
+
+        testImplementation "com.fasterxml.jackson.core:jackson-annotations"
+        testImplementation "com.fasterxml.jackson.core:jackson-databind"
+        testImplementation "commons-io:commons-io"
+        testImplementation "org.apache.commons:commons-lang3"
+        testImplementation project(":modules:libs:atlas:atlas-coordinator:atlas-coordinator-impl")
+        testImplementation project(":modules:libs:atlas:atlas-repository:atlas-repository-resource")
+        testImplementation project(":modules:libs:atlas:atlas-service")
+        testImplementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
+        testImplementation project(":modules:libs:atlas:atlas-worker:atlas-worker-impl")
+        testImplementation project(":modules:libs:hermes:descriptor:descriptor-api")
+        testImplementation project(":modules:libs:task:task-commons:")
+        testImplementation project(":modules:libs:hermes:auth:auth-service")
+        testImplementation project(":modules:libs:hermes:file-storage:file-storage-base64")
+        testImplementation project(":modules:libs:hermes:file-storage:file-storage-filesystem")
+        testImplementation project(":modules:libs:task:task-handler:task-handler-io")
+        testImplementation project(":modules:libs:task:task-handler:task-handler-random")
+        testImplementation project(":modules:libs:task:task-handler:task-handler-time")
+        testImplementation project(":modules:libs:test-support")
+    }
+}

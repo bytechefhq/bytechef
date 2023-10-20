@@ -1,3 +1,0 @@
-dependencies {
-    api project(":modules:libs:atlas:task-descriptor:task-descriptor-repository:task-descriptor-repository-api")
-}

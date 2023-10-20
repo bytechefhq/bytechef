@@ -3,7 +3,7 @@ plugins {
 }
 
 subprojects {
-    apply plugin: "com.integri.java-library-conventions"
+    apply plugin: "com.bytechef.java-library-conventions"
     apply plugin: "io.spring.dependency-management"
 
     dependencyManagement {

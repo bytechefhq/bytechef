@@ -1,0 +1,9 @@
+dependencies {
+    api project(":modules:libs:hermes:descriptor:descriptor-api")
+
+    implementation "org.springframework:spring-context"
+    implementation project(":modules:libs:hermes:descriptor:descriptor-repository:descriptor-repository-api")
+
+    testImplementation project(":modules:libs:hermes:descriptor:descriptor-repository:descriptor-repository-memory")
+    testImplementation project(":modules:libs:test-support")
+}

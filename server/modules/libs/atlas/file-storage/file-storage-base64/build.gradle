@@ -1,3 +1,0 @@
-dependencies {
-    api project(":modules:libs:atlas:file-storage:file-storage-api")
-}

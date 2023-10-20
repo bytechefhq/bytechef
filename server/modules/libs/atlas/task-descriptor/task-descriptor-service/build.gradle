@@ -1,9 +1,0 @@
-dependencies {
-    api project(":modules:libs:atlas:task-descriptor:task-descriptor-api")
-
-    implementation "org.springframework:spring-context"
-    implementation project(":modules:libs:atlas:task-descriptor:task-descriptor-repository:task-descriptor-repository-api")
-
-    testImplementation project(":modules:libs:atlas:task-descriptor:task-descriptor-repository:task-descriptor-repository-memory")
-    testImplementation project(":modules:libs:atlas:test-commons")
-}
