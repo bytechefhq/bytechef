@@ -1,14 +1,13 @@
-label: Hello World Workflow
-
+---
+label: "Hello World Workflow"
 inputs:
-  - name: practitionerName
-    label: Practitioner Name
-    type: string
-    required: true
-
+- name: "practitionerName"
+  label: "Practitioner Name"
+  type: "string"
+  required: true
 tasks:
-  - type: logger/v1/info
-    name: printPractitionerName
-    label: Print practitioner name in platform log
-    parameters:
-      text: "Hello ${practitionerName}!"
+- type: "logger/v1/info"
+  name: "printPractitionerName"
+  label: "Print practitioner name in platform log"
+  parameters:
+    text: "Hello ${practitionerName}!"

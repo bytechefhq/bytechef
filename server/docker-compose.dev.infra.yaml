@@ -1,34 +1,28 @@
-version: '3.9'
-
+---
+version: "3.9"
 services:
   postgres:
-    image: postgres:14-alpine
+    image: "postgres:14-alpine"
     ports:
-      - 5432:5432
+    - "5432:5432"
     volumes:
-      - db:/var/lib/postgresql/data
+    - "db:/var/lib/postgresql/data"
     environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=bytechef
-#  rabbitmq:
-#    image: rabbitmq:3.11-management-alpine
-#    ports:
-      # AMQP protocol port
-      - '5672:5672'
-      # HTTP management UI
-      - '15672:15672'
+    - "POSTGRES_PASSWORD=postgres"
+    - "POSTGRES_USER=postgres"
+    - "POSTGRES_DB=bytechef"
+    - "5672:5672"
+    - "15672:15672"
   redis:
-    image: redis:7-alpine
-    restart: always
+    image: "redis:7-alpine"
+    restart: "always"
     ports:
-      - '6379:6379'
-    command: redis-server --save 20 1 --loglevel warning
+    - "6379:6379"
+    command: "redis-server --save 20 1 --loglevel warning"
     volumes:
-      - cache:/data
-
+    - "cache:/data"
 volumes:
   cache:
-    driver: local
+    driver: "local"
   db:
-    driver: local
+    driver: "local"

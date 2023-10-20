@@ -1,142 +1,143 @@
-openapi: 3.0.1
+---
+openapi: "3.0.1"
 info:
-  title:  OpenAPI definition
-  version: v1
+  title: "OpenAPI definition"
+  version: "v1"
 servers:
-  - url: http://localhost:5173/api
+- url: "http://localhost:5173/api"
 paths:
   /categories:
     get:
-      description: Get all categories.
-      summary: Get all categories.
+      description: "Get all categories."
+      summary: "Get all categories."
       tags:
-        - categories
-      operationId: getCategories
+      - "categories"
+      operationId: "getCategories"
       responses:
         "200":
-          description: The list of categories.
+          description: "The list of categories."
           content:
             application/json:
               schema:
-                type: array
+                type: "array"
                 items:
-                  $ref: '#/components/schemas/Category'
+                  $ref: "#/components/schemas/Category"
     post:
-      description: Create a new category.
-      summary: Create a new category.
+      description: "Create a new category."
+      summary: "Create a new category."
       tags:
-        - categories
-      operationId: createCategory
+      - "categories"
+      operationId: "createCategory"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Category'
+              $ref: "#/components/schemas/Category"
         required: true
       responses:
         "200":
-          description: The category object.
+          description: "The category object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Category'
+                $ref: "#/components/schemas/Category"
   /categories/{id}:
     delete:
-      description: Delete a category.
-      summary: Delete a category.
+      description: "Delete a category."
+      summary: "Delete a category."
       tags:
-        - categories
-      operationId: deleteCategory
+      - "categories"
+      operationId: "deleteCategory"
       parameters:
-        - name: id
-          description: The id of a category.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of a category."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       responses:
         "200":
-          description: Successful operation.
+          description: "Successful operation."
     get:
-      description: Get a category by id.
-      summary: Get a category by id.
+      description: "Get a category by id."
+      summary: "Get a category by id."
       tags:
-        - categories
-      operationId: getCategory
+      - "categories"
+      operationId: "getCategory"
       parameters:
-        - name: id
-          description: The id of a category.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of a category."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       responses:
         "200":
-          description: The category object.
+          description: "The category object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Category'
+                $ref: "#/components/schemas/Category"
     put:
-      description: Update an existing category.
-      summary: Update an existing category.
+      description: "Update an existing category."
+      summary: "Update an existing category."
       tags:
-        - categories
-      operationId: updateCategory
+      - "categories"
+      operationId: "updateCategory"
       parameters:
-        - name: id
-          description: The id of a category.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of a category."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Category'
+              $ref: "#/components/schemas/Category"
         required: true
       responses:
         "200":
-          description: The updated category object.
+          description: "The updated category object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Category'
+                $ref: "#/components/schemas/Category"
 components:
   schemas:
     Category:
-      description: A category.
+      description: "A category."
       required:
-        - name
+      - "name"
       properties:
         createdBy:
-          description: The created by.
-          type: string
+          description: "The created by."
+          type: "string"
           readOnly: true
         createdDate:
-          description: The created date.
-          type: string
-          format: date-time
+          description: "The created date."
+          type: "string"
+          format: "date-time"
           readOnly: true
         id:
-          description: The id of the category.
-          type: integer
-          format: int64
+          description: "The id of the category."
+          type: "integer"
+          format: "int64"
         name:
-          description: The name of the category.
-          type: string
+          description: "The name of the category."
+          type: "string"
         lastModifiedBy:
-          description: The last modified by.
-          type: string
+          description: "The last modified by."
+          type: "string"
           readOnly: true
         lastModifiedDate:
-          description: The last modified date.
-          type: string
-          format: date-time
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
           readOnly: true
         __version:
-          type: integer
+          type: "integer"

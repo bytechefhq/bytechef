@@ -1,142 +1,143 @@
-openapi: 3.0.1
+---
+openapi: "3.0.1"
 info:
-  title:  OpenAPI definition
-  version: v1
+  title: "OpenAPI definition"
+  version: "v1"
 servers:
-  - url: http://localhost:5173/api
+- url: "http://localhost:5173/api"
 paths:
   /tags:
     get:
-      description: Get all tags.
-      summary: Get all tags.
+      description: "Get all tags."
+      summary: "Get all tags."
       tags:
-        - tags
-      operationId: getTags
+      - "tags"
+      operationId: "getTags"
       responses:
         "200":
-          description: The list of tags.
+          description: "The list of tags."
           content:
             application/json:
               schema:
-                type: array
+                type: "array"
                 items:
-                  $ref: '#/components/schemas/Tag'
+                  $ref: "#/components/schemas/Tag"
     post:
-      description: Create a new tag.
-      summary: Create a new tag.
+      description: "Create a new tag."
+      summary: "Create a new tag."
       tags:
-        - tags
-      operationId: createTag
+      - "tags"
+      operationId: "createTag"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Tag'
+              $ref: "#/components/schemas/Tag"
         required: true
       responses:
         "200":
-          description: The tag object.
+          description: "The tag object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tag'
+                $ref: "#/components/schemas/Tag"
   /tags/{id}:
     delete:
-      description: Delete a tag.
-      summary: Delete a tag.
+      description: "Delete a tag."
+      summary: "Delete a tag."
       tags:
-        - tags
-      operationId: deleteTag
+      - "tags"
+      operationId: "deleteTag"
       parameters:
-        - name: id
-          description: The id of a tag.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of a tag."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       responses:
         "200":
-          description: Successful operation.
+          description: "Successful operation."
     get:
-      description: Get a tag by id.
-      summary: Get a tag by id.
+      description: "Get a tag by id."
+      summary: "Get a tag by id."
       tags:
-        - tags
-      operationId: getTag
+      - "tags"
+      operationId: "getTag"
       parameters:
-        - name: id
-          description: The id of a tag.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of a tag."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       responses:
         "200":
-          description: The tag object.
+          description: "The tag object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tag'
+                $ref: "#/components/schemas/Tag"
     put:
-      description: Update an existing tag.
-      summary: Update an existing tag.
+      description: "Update an existing tag."
+      summary: "Update an existing tag."
       tags:
-        - tags
-      operationId: updateTag
+      - "tags"
+      operationId: "updateTag"
       parameters:
-        - name: id
-          description: The id of a tag.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of a tag."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Tag'
+              $ref: "#/components/schemas/Tag"
         required: true
       responses:
         "200":
-          description: The updated tag object.
+          description: "The updated tag object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tag'
+                $ref: "#/components/schemas/Tag"
 components:
   schemas:
     Tag:
-      description: A tag.
+      description: "A tag."
       required:
-        - name
+      - "name"
       properties:
         createdBy:
-          description: The created by.
-          type: string
+          description: "The created by."
+          type: "string"
           readOnly: true
         createdDate:
-          description: The created date.
-          type: string
-          format: date-time
+          description: "The created date."
+          type: "string"
+          format: "date-time"
           readOnly: true
         id:
-          description: The id of the tag.
-          type: integer
-          format: int64
+          description: "The id of the tag."
+          type: "integer"
+          format: "int64"
         lastModifiedBy:
-          description: The last modified by.
-          type: string
+          description: "The last modified by."
+          type: "string"
           readOnly: true
         lastModifiedDate:
-          description: The last modified date.
-          type: string
-          format: date-time
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
           readOnly: true
         name:
-          description: The name of the tag.
-          type: string
+          description: "The name of the tag."
+          type: "string"
         __version:
-          type: integer
+          type: "integer"

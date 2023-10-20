@@ -1,88 +1,98 @@
+---
 info:
-  title: Workflow Definition Specification
-  description: Workflow Definition structs.
-  version: v1
+  title: "Workflow Definition Specification"
+  description: "Workflow Definition structs."
+  version: "v1"
 schemas:
   WorkflowDefinition:
-    description: Workflows are the blueprints that describe the execution of a job.
-    type: object
+    description: "Workflows are the blueprints that describe the execution of a job."
+    type: "object"
     properties:
       inputs:
-        description: The workflow's expected inputs
-        type: array
+        description: "The workflow's expected inputs"
+        type: "array"
         items:
-          type: object
+          type: "object"
           additionalProperties:
-            type: object
+            type: "object"
       label:
-        description: A descriptive name for the workflow
-        type: string
+        description: "A descriptive name for the workflow"
+        type: "string"
       outputs:
-        description: The workflow's expected outputs
-        type: array
+        description: "The workflow's expected outputs"
+        type: "array"
         items:
-          type: object
+          type: "object"
           additionalProperties:
-            type: object
+            type: "object"
       tasks:
-        description: The steps that make up the workflow.
-        type: array
+        description: "The steps that make up the workflow."
+        type: "array"
         items:
           oneOf:
-            - $ref: '#/schemas/Task'
-            - $ref: '#/schemas/TaskDispatcher'
+          - $ref: "#/schemas/Task"
+          - $ref: "#/schemas/TaskDispatcher"
       retry:
-        description: The maximum number of times a task may retry.
-        type: integer
-        format: int32
+        description: "The maximum number of times a task may retry."
+        type: "integer"
+        format: "int32"
   Task:
-    description: Represents a step that make up the workflow.
-    type: object
+    description: "Represents a step that make up the workflow."
+    type: "object"
     required:
-      - type
+    - "type"
     properties:
       finalize:
-        description: The (optional) list of tasks that are to be executed after execution of this task -- regardless of whether it had failed or not.
-        type: array
+        description: "The (optional) list of tasks that are to be executed after execution\
+          \ of this task -- regardless of whether it had failed or not."
+        type: "array"
         items:
-          $ref: '#/schemas/Task'
+          $ref: "#/schemas/Task"
       label:
-        description: The human-readable description of the task.
-        type: string
+        description: "The human-readable description of the task."
+        type: "string"
       name:
-        description: The identifier name of the task. Task names are used for assigning the output of one task so it can be later used by subsequent tasks.
-        type: string
+        description: "The identifier name of the task. Task names are used for assigning\
+          \ the output of one task so it can be later used by subsequent tasks."
+        type: "string"
       node:
-        description: Defines the name of the type of the node that the task execution will be routed to. For instance, if the node value is "encoder", then the task will be routed to the "encoder" queue which is presumably subscribed to by worker nodes of "encoder" type.
-        type: string
+        description: "Defines the name of the type of the node that the task execution\
+          \ will be routed to. For instance, if the node value is \"encoder\", then\
+          \ the task will be routed to the \"encoder\" queue which is presumably subscribed\
+          \ to by worker nodes of \"encoder\" type."
+        type: "string"
       post:
-        description: The (optional) list of tasks that are to be executed after the succesful execution of this task.
-        type: array
+        description: "The (optional) list of tasks that are to be executed after the\
+          \ succesful execution of this task."
+        type: "array"
         items:
-          $ref: '#/schemas/Task'
+          $ref: "#/schemas/Task"
       pre:
-        description: The (optional) list of tasks that are to be executed prior to this task.
-        type: array
+        description: "The (optional) list of tasks that are to be executed prior to\
+          \ this task."
+        type: "array"
         items:
-          $ref: '#/schemas/Task'
+          $ref: "#/schemas/Task"
       timeout:
-        description: The timeout expression which describes when this task should be deemed as timed-out.
-        type: string
+        description: "The timeout expression which describes when this task should\
+          \ be deemed as timed-out."
+        type: "string"
       type:
-        description: The type of the task. Type strings are mapped to "TaskHandler" implementations designed to handle that type of task.
-        type: string
+        description: "The type of the task. Type strings are mapped to \"TaskHandler\"\
+          \ implementations designed to handle that type of task."
+        type: "string"
       additionalProperties:
-        description: The additional properties defined by particular task.
-        type: object
+        description: "The additional properties defined by particular task."
+        type: "object"
   TaskDispatcher:
-    description: Represents a strategy for dispatching tasks to be executed.
-    type: object
+    description: "Represents a strategy for dispatching tasks to be executed."
+    type: "object"
     required:
-      - type
+    - "type"
     properties:
       type:
-        description:
-        type: string
+        description: null
+        type: "string"
       additionalProperties:
-        description: The additional properties defined by particular task dispatcher.
-        type: object
+        description: "The additional properties defined by particular task dispatcher."
+        type: "object"

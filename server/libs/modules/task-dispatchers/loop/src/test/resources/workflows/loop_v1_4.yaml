@@ -1,30 +1,30 @@
-label: loop 4
-
+---
+label: "loop 4"
 tasks:
-  - type: loop/v1
-    parameters:
-      list: "${range(1,10)}"
-      itemVar: item1
-      iteratee:
-        type: sequence/v1
-        parameters:
-          tasks:
-            - name: sumVar1
-              type: var
+- type: "loop/v1"
+  parameters:
+    list: "${range(1,10)}"
+    itemVar: "item1"
+    iteratee:
+      type: "sequence/v1"
+      parameters:
+        tasks:
+        - name: "sumVar1"
+          type: "var"
+          parameters:
+            value: "${1 + item1}"
+        - type: "if/v1"
+          parameters:
+            conditions:
+            - number:
+                value1: "${item1}"
+                operation: "GREATER"
+                value2: 5
+            combineOperation: "ANY"
+            caseTrue:
+            - type: "loop-break/v1"
+            caseFalse:
+            - name: "sumVar2"
+              type: "var"
               parameters:
-                value: ${1 + item1}
-            - type: if/v1
-              parameters:
-                conditions:
-                  - number:
-                      value1: ${item1}
-                      operation: GREATER
-                      value2: 5
-                combineOperation: ANY
-                caseTrue:
-                  - type: loop-break/v1
-                caseFalse:
-                  - name: sumVar2
-                    type: var
-                    parameters:
-                      value: ${sumVar1 + 2}
+                value: "${sumVar1 + 2}"

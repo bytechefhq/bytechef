@@ -1,21 +1,22 @@
-label: Hello Parallel
-
+---
+label: "Hello Parallel"
 tasks:
-  - type: parallel
-    parameters:
-      tasks:
-        - type: time/sleep
+- type: "parallel"
+  parameters:
+    tasks:
+    - type: "time/sleep"
+      parameters:
+        millis: 10000
+    - type: "io/print"
+      parameters:
+        text: "hello"
+    - type: "each"
+      parameters:
+        list:
+        - 1000
+        - 2000
+        - 3000
+        iteratee:
+          type: "time/sleep"
           parameters:
-            millis: 10000
-
-        - type: io/print
-          parameters:
-            text: hello
-
-        - type: each
-          parameters:
-            list: [1000,2000,3000]
-            iteratee:
-              type: time/sleep
-              parameters:
-                millis: ${item}
+            millis: "${item}"

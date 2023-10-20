@@ -1,139 +1,133 @@
-label: Liferay Object Maintenance
-
+---
+label: "Liferay Object Maintenance"
 inputs:
-  - name: apiToken
-    label: Token generated with Basic Auth Algorithm
-    type: string
-    required: true
-  - name: objectEndpointUrl
-    label: API Endpoint URL 1
-    type: string
-    required: true
-  - name: batchEngineEndpointUrl
-    label: Batch Engine API Endpoint URL
-    type: string
-    required: true
-  - name: objectDefinitionSourceFileUrl
-    label: Full path of file in local file system that contains data bytes for API endpoint 1 - custom object endpoint
-    type: string
-    required: true
-  - name: objectEntriesSourceFileUrl
-    label: Full path of file in local file system that contains data bytes for API endpoint 2 - batch engine endpoint
-    type: string
-    required: true
-
+- name: "apiToken"
+  label: "Token generated with Basic Auth Algorithm"
+  type: "string"
+  required: true
+- name: "objectEndpointUrl"
+  label: "API Endpoint URL 1"
+  type: "string"
+  required: true
+- name: "batchEngineEndpointUrl"
+  label: "Batch Engine API Endpoint URL"
+  type: "string"
+  required: true
+- name: "objectDefinitionSourceFileUrl"
+  label: "Full path of file in local file system that contains data bytes for API\
+    \ endpoint 1 - custom object endpoint"
+  type: "string"
+  required: true
+- name: "objectEntriesSourceFileUrl"
+  label: "Full path of file in local file system that contains data bytes for API\
+    \ endpoint 2 - batch engine endpoint"
+  type: "string"
+  required: true
 outputs:
-  - name: jobResult
-    value: This would be the exit value
-
+- name: "jobResult"
+  value: "This would be the exit value"
 tasks:
-  - type: logger/v1/info
-    name: loggInputs
-    description: Print received input arguments in log with INFO log level
-    parameters:
-      text: Received ${objectEndpointUrl} to check endpoint presence and post payload in ${objectDefinitionSourceFileUrl} to ${batchEngineEndpointUrl} if endpoint misses, and post payload in ${objectEntriesSourceFileUrl} to ${batchEngineEndpointUrl}
-
-  - type: httpClient/v1/get
-    name: liferayObjectApiGet
-    description: >
-      Get content of Liferay `objectEndpointUrl`.
-    label: Get content from Liferay Object REST endpoint
-    parameters:
-      uri: ${objectEndpointUrl}/openapi.json
-      responseFormat: JSON
-      headerParameters:
-        Authorization:
-          - Basic ${apiToken}
-      fullResponse: true
-
-  - type: logger/v1/info
-    name: loggLiferayObjectApiGet
-    description: Print received input arguments in log with INFO log level
-    parameters:
-      text: Received ${liferayObjectApiGet}
-
-  - type: if/v1
-    parameters:
-      conditions:
-        - string:
-            value1: ${liferayObjectApiGet.statusCode}
-            operation: NOT_EQUALS
-            value2: "200"
-      combineOperation: ANY
-      caseTrue:
-        - type: filesystem/v1/readFile
-          name: jsonFileEntry1
-          description: Read file at `filename` location on local file system and create `jsonFileEntry1` object in memory
-          parameters:
-            filename: ${objectDefinitionSourceFileUrl}
-# ovdje imas primjer ucitavanja u jsonObject iz filesistema
-        - type: jsonFile/v1/read
-          name: jsonObject1
-          description: Create Json object `jsonObject1` by reading bytes of fileEntry `jsonFileEntry1`
-          parameters:
-            fileEntry: ${jsonFileEntry1}
-            isArray: true
-
-        - type: logger/v1/info
-          name: loggJsonObject1
-          description: Print created Json object `jsonObject1` in log with INFO log level
-          parameters:
-            text: Payload in the file ${jsonObject1}
-
-        - type: httpClient/v1/post
-          name: liferayApiPost1
-          description: >
-            Post content of `jsonFileEntry1` to Liferay `batchEngineEndpointUrl`. `sendFile` is
-            set to `true` to tell processor to seek content bytes in fileEntry `jsonFileEntry1`
-            and bodyContentType `JSON` creates request's `ContentType` header value application/json
-          label: Post content to Liferay Batch Engine REST endpoint
-          parameters:
-            uri: ${batchEngineEndpointUrl}/com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition
-            responseFormat: JSON
-            headerParameters:
-              Authorization:
-                - Basic ${apiToken}
-            bodyContentType: BINARY
-            bodyContent: ${jsonFileEntry1}
-
-        - type: logger/v1/info
-          name: loggEndpointResponse1
-          description: Print received response content in log with INFO log level
-          parameters:
-            text: Result ${liferayApiPost1}
-      caseFalse:
-        - type: logger/v1/info
-          name: loggDefinitionExists
-          parameters:
-            text: "Custom Object Definition Exists"
-
-  - type: filesystem/v1/readFile
-    name: jsonFileEntry2
-    description: Read file at `filename` location on local file system and create `jsonFileEntry2` object in memory
-    parameters:
-      filename: ${objectEntriesSourceFileUrl}
-
-  - type: httpClient/v1/post
-    name: liferayApiPost2
-    description: >
-      Post content of `jsonFileEntry2` to Liferay `batchEngineEndpointUrl`. `sendFile` is
-      set to `true` to tell processor to seek content bytes in fileEntry `jsonFileEntry2`
-      and bodyContentType `JSON` creates request's `ContentType` header value application/json
-    label: Post content to Liferay Batch Engine REST endpoint
-    parameters:
-      uri: ${batchEngineEndpointUrl}/com.liferay.object.rest.dto.v1_0.ObjectEntry
-      responseFormat: JSON
-      headerParameters:
-        Authorization:
-          - Basic ${apiToken}
-      queryParameters:
-        taskItemDelegateName:
-          - C_Stock
-      bodyContentType: BINARY
-      bodyContent: ${jsonFileEntry2}
-
-  - type: logger/v1/info
-    name: loggEndpointResponse1
-    description: Print received response content in log with INFO log level
-    parameters:
-      text: Result ${liferayApiPost1}
+- type: "logger/v1/info"
+  name: "loggInputs"
+  description: "Print received input arguments in log with INFO log level"
+  parameters:
+    text: "Received ${objectEndpointUrl} to check endpoint presence and post payload\
+      \ in ${objectDefinitionSourceFileUrl} to ${batchEngineEndpointUrl} if endpoint\
+      \ misses, and post payload in ${objectEntriesSourceFileUrl} to ${batchEngineEndpointUrl}"
+- type: "httpClient/v1/get"
+  name: "liferayObjectApiGet"
+  description: "Get content of Liferay `objectEndpointUrl`.\n"
+  label: "Get content from Liferay Object REST endpoint"
+  parameters:
+    uri: "${objectEndpointUrl}/openapi.json"
+    responseFormat: "JSON"
+    headerParameters:
+      Authorization:
+      - "Basic ${apiToken}"
+    fullResponse: true
+- type: "logger/v1/info"
+  name: "loggLiferayObjectApiGet"
+  description: "Print received input arguments in log with INFO log level"
+  parameters:
+    text: "Received ${liferayObjectApiGet}"
+- type: "if/v1"
+  parameters:
+    conditions:
+    - string:
+        value1: "${liferayObjectApiGet.statusCode}"
+        operation: "NOT_EQUALS"
+        value2: "200"
+    combineOperation: "ANY"
+    caseTrue:
+    - type: "filesystem/v1/readFile"
+      name: "jsonFileEntry1"
+      description: "Read file at `filename` location on local file system and create\
+        \ `jsonFileEntry1` object in memory"
+      parameters:
+        filename: "${objectDefinitionSourceFileUrl}"
+    - type: "jsonFile/v1/read"
+      name: "jsonObject1"
+      description: "Create Json object `jsonObject1` by reading bytes of fileEntry\
+        \ `jsonFileEntry1`"
+      parameters:
+        fileEntry: "${jsonFileEntry1}"
+        isArray: true
+    - type: "logger/v1/info"
+      name: "loggJsonObject1"
+      description: "Print created Json object `jsonObject1` in log with INFO log level"
+      parameters:
+        text: "Payload in the file ${jsonObject1}"
+    - type: "httpClient/v1/post"
+      name: "liferayApiPost1"
+      description: "Post content of `jsonFileEntry1` to Liferay `batchEngineEndpointUrl`.\
+        \ `sendFile` is set to `true` to tell processor to seek content bytes in fileEntry\
+        \ `jsonFileEntry1` and bodyContentType `JSON` creates request's `ContentType`\
+        \ header value application/json\n"
+      label: "Post content to Liferay Batch Engine REST endpoint"
+      parameters:
+        uri: "${batchEngineEndpointUrl}/com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition"
+        responseFormat: "JSON"
+        headerParameters:
+          Authorization:
+          - "Basic ${apiToken}"
+        bodyContentType: "BINARY"
+        bodyContent: "${jsonFileEntry1}"
+    - type: "logger/v1/info"
+      name: "loggEndpointResponse1"
+      description: "Print received response content in log with INFO log level"
+      parameters:
+        text: "Result ${liferayApiPost1}"
+    caseFalse:
+    - type: "logger/v1/info"
+      name: "loggDefinitionExists"
+      parameters:
+        text: "Custom Object Definition Exists"
+- type: "filesystem/v1/readFile"
+  name: "jsonFileEntry2"
+  description: "Read file at `filename` location on local file system and create `jsonFileEntry2`\
+    \ object in memory"
+  parameters:
+    filename: "${objectEntriesSourceFileUrl}"
+- type: "httpClient/v1/post"
+  name: "liferayApiPost2"
+  description: "Post content of `jsonFileEntry2` to Liferay `batchEngineEndpointUrl`.\
+    \ `sendFile` is set to `true` to tell processor to seek content bytes in fileEntry\
+    \ `jsonFileEntry2` and bodyContentType `JSON` creates request's `ContentType`\
+    \ header value application/json\n"
+  label: "Post content to Liferay Batch Engine REST endpoint"
+  parameters:
+    uri: "${batchEngineEndpointUrl}/com.liferay.object.rest.dto.v1_0.ObjectEntry"
+    responseFormat: "JSON"
+    headerParameters:
+      Authorization:
+      - "Basic ${apiToken}"
+    queryParameters:
+      taskItemDelegateName:
+      - "C_Stock"
+    bodyContentType: "BINARY"
+    bodyContent: "${jsonFileEntry2}"
+- type: "logger/v1/info"
+  name: "loggEndpointResponse1"
+  description: "Print received response content in log with INFO log level"
+  parameters:
+    text: "Result ${liferayApiPost1}"

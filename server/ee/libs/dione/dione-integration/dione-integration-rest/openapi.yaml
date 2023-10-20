@@ -1,318 +1,319 @@
-openapi: 3.0.1
+---
+openapi: "3.0.1"
 info:
-  title: OpenAPI definition
-  version: v1
+  title: "OpenAPI definition"
+  version: "v1"
 servers:
-  - url: http://localhost:5173/api
+- url: "http://localhost:5173/api"
 paths:
   /integration-categories:
     get:
-      description: Get categories.
-      summary: Get categories.
+      description: "Get categories."
+      summary: "Get categories."
       tags:
-        - integration-categories
-      operationId: getIntegrationCategories
+      - "integration-categories"
+      operationId: "getIntegrationCategories"
       responses:
         "200":
-          description: The list of categories.
+          description: "The list of categories."
           content:
             application/json:
               schema:
-                description: The response object that contains the array of categories.
-                type: array
+                description: "The response object that contains the array of categories."
+                type: "array"
                 items:
-                  $ref: '../../../../../libs/core/category/category-rest/category-rest-impl/openapi.yaml#/components/schemas/Category'
+                  $ref: "../../../../../libs/core/category/category-rest/category-rest-impl/openapi.yaml#/components/schemas/Category"
   /integration-tags:
     get:
-      description: Get integration tags.
-      summary: Get integration tags.
+      description: "Get integration tags."
+      summary: "Get integration tags."
       tags:
-        - integration-tags
-      operationId: getIntegrationTags
+      - "integration-tags"
+      operationId: "getIntegrationTags"
       responses:
         "200":
-          description: The list of integration tags.
+          description: "The list of integration tags."
           content:
             application/json:
               schema:
-                description: The response object that contains the array of tags.
-                type: array
+                description: "The response object that contains the array of tags."
+                type: "array"
                 items:
-                  $ref: '../../../../../libs/core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
+                  $ref: "../../../../../libs/core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
   /integrations:
     get:
-      description: Get integrations.
-      summary: Get integrations.
+      description: "Get integrations."
+      summary: "Get integrations."
       tags:
-        - integrations
-      operationId: getIntegrations
+      - "integrations"
+      operationId: "getIntegrations"
       parameters:
-        - name: categoryIds
-          description: The list of the category ids used for filtering integrations.
-          in: query
-          required: false
-          schema:
-            type: array
-            items:
-              type: integer
-              format: int64
-        - name: tagIds
-          description: The list of tag ids of used for filtering integrations.
-          in: query
-          required: false
-          schema:
-            type: array
-            items:
-              type: integer
-              format: int64
+      - name: "categoryIds"
+        description: "The list of the category ids used for filtering integrations."
+        in: "query"
+        required: false
+        schema:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+      - name: "tagIds"
+        description: "The list of tag ids of used for filtering integrations."
+        in: "query"
+        required: false
+        schema:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
-          description: The list of integrations.
+          description: "The list of integrations."
           content:
             application/json:
               schema:
-                type: array
+                type: "array"
                 items:
-                  $ref: '#/components/schemas/Integration'
+                  $ref: "#/components/schemas/Integration"
     post:
-      description: Create a new integration.
-      summary: Create a new integration.
+      description: "Create a new integration."
+      summary: "Create a new integration."
       tags:
-        - integrations
-      operationId: createIntegration
+      - "integrations"
+      operationId: "createIntegration"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Integration'
+              $ref: "#/components/schemas/Integration"
         required: true
       responses:
         "200":
-          description: The integration object.
+          description: "The integration object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Integration'
+                $ref: "#/components/schemas/Integration"
   /integrations/{id}:
     delete:
-      description: Delete an integration.
-      summary: Delete an integration.
+      description: "Delete an integration."
+      summary: "Delete an integration."
       tags:
-        - integrations
-      operationId: deleteIntegration
+      - "integrations"
+      operationId: "deleteIntegration"
       parameters:
-        - name: id
-          description: The id of an integration.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of an integration."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       responses:
         "200":
-          description: Successful operation.
+          description: "Successful operation."
     get:
-      description: Get an integration by id.
-      summary: Get an integration by id.
+      description: "Get an integration by id."
+      summary: "Get an integration by id."
       tags:
-        - integrations
-      operationId: getIntegration
+      - "integrations"
+      operationId: "getIntegration"
       parameters:
-        - name: id
-          description: The id of an integration.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of an integration."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       responses:
         "200":
-          description: The integration object.
+          description: "The integration object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Integration'
+                $ref: "#/components/schemas/Integration"
     put:
-      description: Update an existing integration.
-      summary: Update an existing integration.
+      description: "Update an existing integration."
+      summary: "Update an existing integration."
       tags:
-        - integrations
-      operationId: updateIntegration
+      - "integrations"
+      operationId: "updateIntegration"
       parameters:
-        - name: id
-          description: The id of an integration.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of an integration."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Integration'
+              $ref: "#/components/schemas/Integration"
         required: true
       responses:
         "200":
-          description: The updated integration object.
+          description: "The updated integration object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Integration'
+                $ref: "#/components/schemas/Integration"
   /integrations/{id}/workflows:
     get:
-      description: Get workflows for particular integration.
-      summary: Get workflows for particular integration.
+      description: "Get workflows for particular integration."
+      summary: "Get workflows for particular integration."
       tags:
-        - integrations
-      operationId: getIntegrationWorkflows
+      - "integrations"
+      operationId: "getIntegrationWorkflows"
       parameters:
-        - name: id
-          description: The id of an integration.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of an integration."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       responses:
         "200":
-          description: The updated integration object.
+          description: "The updated integration object."
           content:
             application/json:
               schema:
-                type: array
+                type: "array"
                 items:
-                  $ref: '../../../../../libs/atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow'
+                  $ref: "../../../../../libs/atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow"
     post:
-      description: Create new workflow and adds it to an existing integration.
-      summary: Create new workflow and adds it to an existing integration.
+      description: "Create new workflow and adds it to an existing integration."
+      summary: "Create new workflow and adds it to an existing integration."
       tags:
-        - integrations
-      operationId: createIntegrationWorkflow
+      - "integrations"
+      operationId: "createIntegrationWorkflow"
       parameters:
-        - name: id
-          description: The id of an integration.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of an integration."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       requestBody:
         content:
           application/json:
             schema:
-              type: object
+              type: "object"
               required:
-                - name
+              - "name"
               properties:
                 name:
-                  description: The workflow name.
-                  type: string
+                  description: "The workflow name."
+                  type: "string"
                 description:
-                  description: The workflow description.
-                  type: string
+                  description: "The workflow description."
+                  type: "string"
                 definition:
-                  description: The workflow definition.
-                  type: string
+                  description: "The workflow definition."
+                  type: "string"
         required: true
       responses:
         "200":
-          description: The updated integration object.
+          description: "The updated integration object."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Integration'
+                $ref: "#/components/schemas/Integration"
   /integrations/{id}/tags:
     put:
-      description: Updates tags of an existing integration.
-      summary: Updates tags of an existing integration.
+      description: "Updates tags of an existing integration."
+      summary: "Updates tags of an existing integration."
       tags:
-        - integrations
-      operationId: updateIntegrationTags
+      - "integrations"
+      operationId: "updateIntegrationTags"
       parameters:
-        - name: id
-          description: The id of an integration.
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: "id"
+        description: "The id of an integration."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
       requestBody:
         content:
           application/json:
             schema:
-              description: The request object that contains the array of tags.
-              type: object
+              description: "The request object that contains the array of tags."
+              type: "object"
               properties:
                 tags:
-                  type: array
+                  type: "array"
                   items:
-                    $ref: '../../../../../libs/core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
+                    $ref: "../../../../../libs/core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
         required: true
       responses:
         "200":
-          description: Successful operation.
+          description: "Successful operation."
 components:
   schemas:
     Integration:
-      description: A group of workflows that make one logical integration.
-      type: object
+      description: "A group of workflows that make one logical integration."
+      type: "object"
       required:
-        - name
+      - "name"
       properties:
         category:
-          $ref: '../../../../../libs/core/category/category-rest/category-rest-impl/openapi.yaml#/components/schemas/Category'
+          $ref: "../../../../../libs/core/category/category-rest/category-rest-impl/openapi.yaml#/components/schemas/Category"
         createdBy:
-          description: The created by.
-          type: string
+          description: "The created by."
+          type: "string"
           readOnly: true
         createdDate:
-          description: The created date.
-          type: string
-          format: date-time
+          description: "The created date."
+          type: "string"
+          format: "date-time"
           readOnly: true
         id:
-          description: The id of an integration.
-          type: integer
-          format: int64
+          description: "The id of an integration."
+          type: "integer"
+          format: "int64"
           readOnly: true
         name:
-          description: The name of the integration.
-          type: string
+          description: "The name of the integration."
+          type: "string"
         description:
-          description: The description of the integration.
-          type: string
+          description: "The description of the integration."
+          type: "string"
         lastModifiedBy:
-          description: The last modified by.
-          type: string
+          description: "The last modified by."
+          type: "string"
           readOnly: true
         lastModifiedDate:
-          description: The last modified date.
-          type: string
-          format: date-time
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
           readOnly: true
         lastPublishedDate:
-          description: The last published date.
-          type: string
-          format: date-time
+          description: "The last published date."
+          type: "string"
+          format: "date-time"
         integrationVersion:
-          description: The version of an integration.
-          type: integer
+          description: "The version of an integration."
+          type: "integer"
         status:
-          description: A status of an integration.
-          type: string
+          description: "A status of an integration."
+          type: "string"
           enum:
-            - PUBLISHED
-            - UNPUBLISHED
+          - "PUBLISHED"
+          - "UNPUBLISHED"
         tags:
-          type: array
+          type: "array"
           items:
-            $ref: '../../../../../libs/core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag'
+            $ref: "../../../../../libs/core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
         workflowIds:
-          description: The workflow ids belonging to this integration.
-          type: array
+          description: "The workflow ids belonging to this integration."
+          type: "array"
           items:
-            type: string
+            type: "string"
             readOnly: true
         __version:
-          type: integer
+          type: "integer"

@@ -1,19 +1,19 @@
-label: Loop 3
-
+---
+label: "Loop 3"
 tasks:
-  - type: loop/v1
-    parameters:
-      list: "${range(1,10)}"
-      itemVar: item1
-      iteratee:
-        type: sequence/v1
-        parameters:
-          tasks:
-            - name: sumVar1
-              type: var
-              parameters:
-                value: ${1 + item1}
-            - name: sumVar2
-              type: var
-              parameters:
-                value: ${sumVar1 + 2}
+- type: "loop/v1"
+  parameters:
+    list: "${range(1,10)}"
+    itemVar: "item1"
+    iteratee:
+      type: "sequence/v1"
+      parameters:
+        tasks:
+        - name: "sumVar1"
+          type: "var"
+          parameters:
+            value: "${1 + item1}"
+        - name: "sumVar2"
+          type: "var"
+          parameters:
+            value: "${sumVar1 + 2}"

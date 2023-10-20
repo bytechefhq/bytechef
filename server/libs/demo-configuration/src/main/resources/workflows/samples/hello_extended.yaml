@@ -1,71 +1,69 @@
-label: Hello Demo
-
+---
+label: "Hello Demo"
 inputs:
-  - name: yourName
-    label: Your Name
-    type: string
-    required: true
-
+- name: "yourName"
+  label: "Your Name"
+  type: "string"
+  required: true
 outputs:
-  - name: myMagicNumber
-    value: ${randomNumber}
-
+- name: "myMagicNumber"
+  value: "${randomNumber}"
 tasks:
-  - name: randomNumber
-    label: Generate a random number
-    type: randomHelper/v1/randomInt
+- name: "randomNumber"
+  label: "Generate a random number"
+  type: "randomHelper/v1/randomInt"
+  parameters:
+    startInclusive: 0
+    endInclusive: 5000
+- name: "map"
+  type: "var/v1/set"
+  parameters:
+    value: "${T(java.util.Map).of('name', 'My name')}"
+- name: "mapInfo"
+  label: "Print map"
+  type: "logger/v1/info"
+  parameters:
+    text: "Map: ${map}"
+- name: "tempDirOperation"
+  label: "Do something with temp dir"
+  type: "logger/v1/info"
+  parameters:
+    text: "Temp dir: ${workDir}"
+  pre:
+  - name: "workDir"
+    type: "var/v1/set"
+    parameters:
+      value: "${tempDir()}/${uuid()}"
+  - type: "filesystem/v1/mkdir"
+    parameters:
+      path: "${workDir}"
+  post:
+  - name: "workDirLog"
+    type: "var/v1/set"
+    parameters:
+      value: "Deleting temp dir: ${workDir}"
+  finalize:
+  - type: "logger/v1/info"
+    parameters:
+      text: "${workDirLog}"
+  - type: "filesystem/v1/rm"
+    parameters:
+      path: "${workDir}"
+  - name: "randomNumber"
+    label: "Generate a random number"
+    type: "randomHelper/v1/randomInt"
     parameters:
       startInclusive: 0
       endInclusive: 5000
-  - name: map
-    type: var/v1/set
+  - label: "Print a greeting"
+    type: "logger/v1/info"
     parameters:
-      value: "${T(java.util.Map).of('name', 'My name')}"
-  - name: mapInfo
-    label: Print map
-    type: logger/v1/info
+      text: "Hello ${yourName}"
+  - label: "Sleep a little"
+    type: "delay/v1/delay"
     parameters:
-      text: "Map: ${map}"
-  - name: tempDirOperation
-    label: Do something with temp dir
-    type: logger/v1/info
+      millis: "${randomNumber}"
+  - label: "Print a farewell"
+    type: "logger/v1/info"
     parameters:
-      text: "Temp dir: ${workDir}"
-    pre:
-      - name: workDir
-        type: var/v1/set
-        parameters:
-          value: "${tempDir()}/${uuid()}"
-      - type: filesystem/v1/mkdir
-        parameters:
-          path: "${workDir}"
-    post:
-      - name: workDirLog
-        type: var/v1/set
-        parameters:
-          value: "Deleting temp dir: ${workDir}"
-    finalize:
-      - type: logger/v1/info
-        parameters:
-          text: ${workDirLog}
-      - type: filesystem/v1/rm
-        parameters:
-          path: ${workDir}
-      - name: randomNumber
-        label: Generate a random number
-        type: randomHelper/v1/randomInt
-        parameters:
-          startInclusive: 0
-          endInclusive: 5000
-      - label: Print a greeting
-        type: logger/v1/info
-        parameters:
-          text: Hello ${yourName}
-      - label: Sleep a little
-        type: delay/v1/delay
-        parameters:
-          millis: ${randomNumber}
-      - label: Print a farewell
-        type: logger/v1/info
-        parameters:
-          text: Goodbye ${yourName}
+      text: "Goodbye ${yourName}"

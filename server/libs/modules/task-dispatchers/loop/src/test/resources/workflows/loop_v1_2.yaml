@@ -1,21 +1,20 @@
-label: loop 2
-
+---
+label: "loop 2"
 outputs:
-  - name: sumResult
-    value: ${sumResult}
-
+- name: "sumResult"
+  value: "${sumResult}"
 tasks:
-  - type: loop/v1
-    parameters:
-      list: ${range(1,10)}
-      itemVar: item1
-      iteratee:
-        type: loop/v1
-        parameters:
-          list: ${range(1,item1)}
-          itemVar: item2
-          iteratee:
-            name: var1
-            type: var
-            parameters:
-              value: ${item1 + '_' + item2}
+- type: "loop/v1"
+  parameters:
+    list: "${range(1,10)}"
+    itemVar: "item1"
+    iteratee:
+      type: "loop/v1"
+      parameters:
+        list: "${range(1,item1)}"
+        itemVar: "item2"
+        iteratee:
+          name: "var1"
+          type: "var"
+          parameters:
+            value: "${item1 + '_' + item2}"
