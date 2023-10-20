@@ -17,7 +17,11 @@ export const IntegrationKeys = {
         filters,
     ],
     integrationTags: ['integrationTags'] as const,
-    integrationWorkflows: (id: number) => ['integrationWorkflows', id],
+    integrationWorkflows: (id: number) => [
+        ...IntegrationKeys.integrations,
+        id,
+        'integrationWorkflows',
+    ],
     integrations: ['integrations'] as const,
 };
 

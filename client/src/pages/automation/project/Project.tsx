@@ -177,6 +177,7 @@ const Project: React.FC = () => {
 
                             {showWorkflowDialog && (
                                 <WorkflowDialog
+                                    id={project?.id}
                                     visible
                                     createWorkflowRequestMutation={
                                         createProjectWorkflowRequestMutation
