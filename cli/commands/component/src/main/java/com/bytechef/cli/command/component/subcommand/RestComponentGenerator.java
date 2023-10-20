@@ -1199,6 +1199,11 @@ public class RestComponentGenerator {
         JavaFile javaFile = JavaFile.builder(
             getPackageName(),
             TypeSpec.classBuilder("Abstract" + StringUtils.capitalize(componentName) + COMPONENT_HANDLER)
+                .addJavadoc("""
+                    Provides the base implementation for the REST based component.
+
+                    @generated
+                    """)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addSuperinterface(
                     ClassName.get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE, "RestComponentHandler"))
