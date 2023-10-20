@@ -17,17 +17,17 @@
 package com.bytechef.component.var;
 
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.test.workflow.WorkflowExecutor;
+import com.bytechef.atlas.sync.executor.WorkflowExecutor;
+import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@ComponentIntTest
 public class VarComponentHandlerIntTest {
 
     @Autowired

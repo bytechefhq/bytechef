@@ -39,7 +39,7 @@ public class VarComponentHandler implements ComponentHandler {
             .display(display("Var").description("Sets a value which can then be referenced in other tasks."))
             .actions(action(SET)
                     .display(display("Set value"))
-                    .inputs(any(VALUE)
+                    .properties(any(VALUE)
                             .label("Value")
                             .description("Value of any type to set.")
                             .required(true))
