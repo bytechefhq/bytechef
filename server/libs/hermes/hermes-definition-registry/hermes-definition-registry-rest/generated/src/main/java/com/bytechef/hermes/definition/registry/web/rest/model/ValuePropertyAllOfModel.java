@@ -2,12 +2,11 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.PropertyOptionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ControlTypeModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -23,18 +22,36 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ValueProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T18:38:21.432374+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-05T16:27:34.189599+01:00[Europe/Zagreb]")
 public class ValuePropertyAllOfModel {
+
+  @JsonProperty("controlType")
+  private ControlTypeModel controlType;
 
   @JsonProperty("defaultValue")
   private Object defaultValue;
 
-  @JsonProperty("exampleValue")
-  private Object exampleValue;
+  @JsonProperty("sampleValue")
+  private Object sampleValue;
 
-  @JsonProperty("options")
-  @Valid
-  private List<PropertyOptionModel> options = null;
+  public ValuePropertyAllOfModel controlType(ControlTypeModel controlType) {
+    this.controlType = controlType;
+    return this;
+  }
+
+  /**
+   * Get controlType
+   * @return controlType
+  */
+  @Valid 
+  @Schema(name = "controlType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public ControlTypeModel getControlType() {
+    return controlType;
+  }
+
+  public void setControlType(ControlTypeModel controlType) {
+    this.controlType = controlType;
+  }
 
   public ValuePropertyAllOfModel defaultValue(Object defaultValue) {
     this.defaultValue = defaultValue;
@@ -55,50 +72,23 @@ public class ValuePropertyAllOfModel {
     this.defaultValue = defaultValue;
   }
 
-  public ValuePropertyAllOfModel exampleValue(Object exampleValue) {
-    this.exampleValue = exampleValue;
+  public ValuePropertyAllOfModel sampleValue(Object sampleValue) {
+    this.sampleValue = sampleValue;
     return this;
   }
 
   /**
-   * The property example value.
-   * @return exampleValue
+   * The property sample value.
+   * @return sampleValue
   */
   
-  @Schema(name = "exampleValue", description = "The property example value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public Object getExampleValue() {
-    return exampleValue;
+  @Schema(name = "sampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public Object getSampleValue() {
+    return sampleValue;
   }
 
-  public void setExampleValue(Object exampleValue) {
-    this.exampleValue = exampleValue;
-  }
-
-  public ValuePropertyAllOfModel options(List<PropertyOptionModel> options) {
-    this.options = options;
-    return this;
-  }
-
-  public ValuePropertyAllOfModel addOptionsItem(PropertyOptionModel optionsItem) {
-    if (this.options == null) {
-      this.options = new ArrayList<>();
-    }
-    this.options.add(optionsItem);
-    return this;
-  }
-
-  /**
-   * The list of valid property options.
-   * @return options
-  */
-  @Valid 
-  @Schema(name = "options", description = "The list of valid property options.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<PropertyOptionModel> getOptions() {
-    return options;
-  }
-
-  public void setOptions(List<PropertyOptionModel> options) {
-    this.options = options;
+  public void setSampleValue(Object sampleValue) {
+    this.sampleValue = sampleValue;
   }
 
   @Override
@@ -110,23 +100,23 @@ public class ValuePropertyAllOfModel {
       return false;
     }
     ValuePropertyAllOfModel valuePropertyAllOf = (ValuePropertyAllOfModel) o;
-    return Objects.equals(this.defaultValue, valuePropertyAllOf.defaultValue) &&
-        Objects.equals(this.exampleValue, valuePropertyAllOf.exampleValue) &&
-        Objects.equals(this.options, valuePropertyAllOf.options);
+    return Objects.equals(this.controlType, valuePropertyAllOf.controlType) &&
+        Objects.equals(this.defaultValue, valuePropertyAllOf.defaultValue) &&
+        Objects.equals(this.sampleValue, valuePropertyAllOf.sampleValue);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(defaultValue, exampleValue, options);
+    return Objects.hash(controlType, defaultValue, sampleValue);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ValuePropertyAllOfModel {\n");
+    sb.append("    controlType: ").append(toIndentedString(controlType)).append("\n");
     sb.append("    defaultValue: ").append(toIndentedString(defaultValue)).append("\n");
-    sb.append("    exampleValue: ").append(toIndentedString(exampleValue)).append("\n");
-    sb.append("    options: ").append(toIndentedString(options)).append("\n");
+    sb.append("    sampleValue: ").append(toIndentedString(sampleValue)).append("\n");
     sb.append("}");
     return sb.toString();
   }

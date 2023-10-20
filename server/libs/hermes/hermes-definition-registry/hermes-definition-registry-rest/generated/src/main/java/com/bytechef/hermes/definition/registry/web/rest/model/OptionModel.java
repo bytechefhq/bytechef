@@ -2,7 +2,6 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.DisplayOptionModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -20,16 +19,16 @@ import jakarta.annotation.Generated;
  * Defines valid property value.
  */
 
-@Schema(name = "PropertyOption", description = "Defines valid property value.")
-@JsonTypeName("PropertyOption")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T18:38:21.432374+01:00[Europe/Zagreb]")
-public class PropertyOptionModel {
+@Schema(name = "Option", description = "Defines valid property value.")
+@JsonTypeName("Option")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-05T16:27:34.189599+01:00[Europe/Zagreb]")
+public class OptionModel {
 
   @JsonProperty("description")
   private String description;
 
-  @JsonProperty("displayOption")
-  private DisplayOptionModel displayOption;
+  @JsonProperty("displayCondition")
+  private String displayCondition;
 
   @JsonProperty("name")
   private String name;
@@ -37,7 +36,7 @@ public class PropertyOptionModel {
   @JsonProperty("value")
   private Object value;
 
-  public PropertyOptionModel description(String description) {
+  public OptionModel description(String description) {
     this.description = description;
     return this;
   }
@@ -56,26 +55,26 @@ public class PropertyOptionModel {
     this.description = description;
   }
 
-  public PropertyOptionModel displayOption(DisplayOptionModel displayOption) {
-    this.displayOption = displayOption;
+  public OptionModel displayCondition(String displayCondition) {
+    this.displayCondition = displayCondition;
     return this;
   }
 
   /**
-   * Get displayOption
-   * @return displayOption
+   * Defines rules when a property should be shown or hidden.
+   * @return displayCondition
   */
-  @Valid 
-  @Schema(name = "displayOption", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public DisplayOptionModel getDisplayOption() {
-    return displayOption;
+  
+  @Schema(name = "displayCondition", description = "Defines rules when a property should be shown or hidden.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public String getDisplayCondition() {
+    return displayCondition;
   }
 
-  public void setDisplayOption(DisplayOptionModel displayOption) {
-    this.displayOption = displayOption;
+  public void setDisplayCondition(String displayCondition) {
+    this.displayCondition = displayCondition;
   }
 
-  public PropertyOptionModel name(String name) {
+  public OptionModel name(String name) {
     this.name = name;
     return this;
   }
@@ -94,7 +93,7 @@ public class PropertyOptionModel {
     this.name = name;
   }
 
-  public PropertyOptionModel value(Object value) {
+  public OptionModel value(Object value) {
     this.value = value;
     return this;
   }
@@ -121,24 +120,24 @@ public class PropertyOptionModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PropertyOptionModel propertyOption = (PropertyOptionModel) o;
-    return Objects.equals(this.description, propertyOption.description) &&
-        Objects.equals(this.displayOption, propertyOption.displayOption) &&
-        Objects.equals(this.name, propertyOption.name) &&
-        Objects.equals(this.value, propertyOption.value);
+    OptionModel option = (OptionModel) o;
+    return Objects.equals(this.description, option.description) &&
+        Objects.equals(this.displayCondition, option.displayCondition) &&
+        Objects.equals(this.name, option.name) &&
+        Objects.equals(this.value, option.value);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, displayOption, name, value);
+    return Objects.hash(description, displayCondition, name, value);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PropertyOptionModel {\n");
+    sb.append("class OptionModel {\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    displayOption: ").append(toIndentedString(displayOption)).append("\n");
+    sb.append("    displayCondition: ").append(toIndentedString(displayCondition)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    value: ").append(toIndentedString(value)).append("\n");
     sb.append("}");

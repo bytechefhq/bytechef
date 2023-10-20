@@ -3,7 +3,6 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.hermes.definition.registry.web.rest.model.OptionModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -23,19 +22,12 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * ArrayPropertyAllOfModel
+ * DatePropertyAllOfModel
  */
 
-@JsonTypeName("ArrayProperty_allOf")
+@JsonTypeName("DateProperty_allOf")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-05T16:27:34.189599+01:00[Europe/Zagreb]")
-public class ArrayPropertyAllOfModel {
-
-  @JsonProperty("items")
-  @Valid
-  private List<PropertyModel> items = null;
-
-  @JsonProperty("multipleValues")
-  private Boolean multipleValues;
+public class DatePropertyAllOfModel {
 
   @JsonProperty("options")
   @Valid
@@ -44,58 +36,12 @@ public class ArrayPropertyAllOfModel {
   @JsonProperty("optionsDataSource")
   private JsonNullable<Object> optionsDataSource = JsonNullable.undefined();
 
-  public ArrayPropertyAllOfModel items(List<PropertyModel> items) {
-    this.items = items;
-    return this;
-  }
-
-  public ArrayPropertyAllOfModel addItemsItem(PropertyModel itemsItem) {
-    if (this.items == null) {
-      this.items = new ArrayList<>();
-    }
-    this.items.add(itemsItem);
-    return this;
-  }
-
-  /**
-   * Types of the array items.
-   * @return items
-  */
-  @Valid 
-  @Schema(name = "items", description = "Types of the array items.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<PropertyModel> getItems() {
-    return items;
-  }
-
-  public void setItems(List<PropertyModel> items) {
-    this.items = items;
-  }
-
-  public ArrayPropertyAllOfModel multipleValues(Boolean multipleValues) {
-    this.multipleValues = multipleValues;
-    return this;
-  }
-
-  /**
-   * If the array can contain multiple items.
-   * @return multipleValues
-  */
-  
-  @Schema(name = "multipleValues", description = "If the array can contain multiple items.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public Boolean getMultipleValues() {
-    return multipleValues;
-  }
-
-  public void setMultipleValues(Boolean multipleValues) {
-    this.multipleValues = multipleValues;
-  }
-
-  public ArrayPropertyAllOfModel options(List<OptionModel> options) {
+  public DatePropertyAllOfModel options(List<OptionModel> options) {
     this.options = options;
     return this;
   }
 
-  public ArrayPropertyAllOfModel addOptionsItem(OptionModel optionsItem) {
+  public DatePropertyAllOfModel addOptionsItem(OptionModel optionsItem) {
     if (this.options == null) {
       this.options = new ArrayList<>();
     }
@@ -117,7 +63,7 @@ public class ArrayPropertyAllOfModel {
     this.options = options;
   }
 
-  public ArrayPropertyAllOfModel optionsDataSource(Object optionsDataSource) {
+  public DatePropertyAllOfModel optionsDataSource(Object optionsDataSource) {
     this.optionsDataSource = JsonNullable.of(optionsDataSource);
     return this;
   }
@@ -144,11 +90,9 @@ public class ArrayPropertyAllOfModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ArrayPropertyAllOfModel arrayPropertyAllOf = (ArrayPropertyAllOfModel) o;
-    return Objects.equals(this.items, arrayPropertyAllOf.items) &&
-        Objects.equals(this.multipleValues, arrayPropertyAllOf.multipleValues) &&
-        Objects.equals(this.options, arrayPropertyAllOf.options) &&
-        equalsNullable(this.optionsDataSource, arrayPropertyAllOf.optionsDataSource);
+    DatePropertyAllOfModel datePropertyAllOf = (DatePropertyAllOfModel) o;
+    return Objects.equals(this.options, datePropertyAllOf.options) &&
+        equalsNullable(this.optionsDataSource, datePropertyAllOf.optionsDataSource);
   }
 
   private static <T> boolean equalsNullable(JsonNullable<T> a, JsonNullable<T> b) {
@@ -157,7 +101,7 @@ public class ArrayPropertyAllOfModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(items, multipleValues, options, hashCodeNullable(optionsDataSource));
+    return Objects.hash(options, hashCodeNullable(optionsDataSource));
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -170,9 +114,7 @@ public class ArrayPropertyAllOfModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ArrayPropertyAllOfModel {\n");
-    sb.append("    items: ").append(toIndentedString(items)).append("\n");
-    sb.append("    multipleValues: ").append(toIndentedString(multipleValues)).append("\n");
+    sb.append("class DatePropertyAllOfModel {\n");
     sb.append("    options: ").append(toIndentedString(options)).append("\n");
     sb.append("    optionsDataSource: ").append(toIndentedString(optionsDataSource)).append("\n");
     sb.append("}");

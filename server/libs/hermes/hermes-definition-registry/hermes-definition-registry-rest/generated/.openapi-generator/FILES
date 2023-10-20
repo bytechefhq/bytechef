@@ -16,10 +16,12 @@ src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ComponentDe
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ConnectionDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ConnectionDefinitionModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ControlTypeModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DatePropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DatePropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DateTimePropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DisplayModel.java
-src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DisplayOptionModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DynamicPropertiesPropertyAllOfModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DynamicPropertiesPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/IntegerPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/IntegerPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/NumberPropertyAllOfModel.java
@@ -28,11 +30,10 @@ src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ObjectPrope
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ObjectPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OneOfPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OneOfPropertyModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OptionModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/PropertyModel.java
-src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/PropertyOptionModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/PropertyTypeModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ResourcesModel.java
-src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/StringPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/StringPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TaskDispatcherDefinitionModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ValuePropertyAllOfModel.java
