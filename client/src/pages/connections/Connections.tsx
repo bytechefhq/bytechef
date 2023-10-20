@@ -30,9 +30,7 @@ const Connections = () => {
     return (
         <LayoutContainer
             header={<PageHeader position={'main'} title="All Connections" />}
-            leftSidebarHeader={
-                <PageHeader leftSidebar={true} title="Connections" />
-            }
+            leftSidebarHeader={<PageHeader leftSidebar title="Connections" />}
             leftSidebarBody={
                 <LeftSidebarMenu
                     topTitle="Components"

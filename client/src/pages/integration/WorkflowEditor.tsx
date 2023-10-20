@@ -100,8 +100,8 @@ const Workflow = (): JSX.Element => {
                 nodeTypes={nodeTypes}
                 nodesDraggable={false}
                 nodesConnectable={false}
-                panOnDrag={true}
-                panOnScroll={true}
+                panOnDrag
+                panOnScroll
                 proOptions={{hideAttribution: true}}
                 zoomOnDoubleClick={false}
                 zoomOnScroll={false}

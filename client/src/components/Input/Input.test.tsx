@@ -50,7 +50,7 @@ describe('Input', async () => {
                 placeholder="Email"
                 label="Email Address"
                 aria-label="Email Address"
-                error={true}
+                error
             />
         );
         expect(
