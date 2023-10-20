@@ -21,6 +21,7 @@ import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.dto.JobParameters;
+import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.priority.Prioritizable;
 import com.bytechef.atlas.repository.JobRepository;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -47,8 +49,6 @@ import org.springframework.util.Assert;
 public class JobServiceImpl implements JobService {
 
     private static final Logger log = LoggerFactory.getLogger(JobServiceImpl.class);
-
-    private static final String WORKFLOW_ID = "workflowId";
 
     private final JobRepository jobRepository;
     private final List<WorkflowRepository> workflowRepositories;
@@ -70,12 +70,13 @@ public class JobServiceImpl implements JobService {
             .orElseThrow();
 
         Assert.notNull(workflow, String.format("Unknown workflow: %s", workflowId));
+
+        ExecutionError executionError = workflow.getError();
+
         Assert.isNull(
-            workflow.getError(),
-            workflow.getError() != null
-                ? String.format(
-                    "%s: %s", workflowId, workflow.getError()
-                        .getMessage())
+            executionError,
+            executionError != null
+                ? String.format("%s: %s", workflowId, executionError.getMessage())
                 : "");
 
         validate(jobParameters, workflow);
@@ -136,15 +137,14 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job resume(String jobId) {
-        log.debug("Resuming job {}", jobId);
+    public Job resume(String id) {
 
-        Job job = jobRepository.findById(jobId)
+        Job job = jobRepository.findById(id)
             .orElseThrow();
 
-        Assert.notNull(job, String.format("Unknown job %s", jobId));
+        Assert.notNull(job, String.format("Unknown job %s", id));
         Assert.isTrue(job.getParentTaskExecutionId() == null, "Can't resume a subflow");
-        Assert.isTrue(isRestartable(job), "can't restart job " + jobId + " as it is " + job.getStatus());
+        Assert.isTrue(isRestartable(job), "can't restart job " + id + " as it is " + job.getStatus());
 
         job.setStatus(JobStatus.STARTED);
 
@@ -154,8 +154,10 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job start(String jobId) {
-        Job job = jobRepository.findById(jobId)
+    public Job start(String id) {
+        Assert.notNull(id, "id cannot be null.");
+
+        Job job = jobRepository.findById(id)
             .orElseThrow();
 
         job.setCurrentTask(0);
@@ -168,14 +170,14 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job stop(String jobId) {
-        Job job = jobRepository.findById(jobId)
+        Assert.notNull(id, "id cannot be null.");
+        Job job = jobRepository.findById(id)
             .orElseThrow();
 
-        Assert.notNull(job, "Unknown job: " + jobId);
+        Assert.notNull(job, "Unknown job: " + id);
         Assert.isTrue(
             job.getStatus() == JobStatus.STARTED,
-            "Job " + jobId + " can not be stopped as it is " + job.getStatus());
+            "Job " + id + " can not be stopped as it is " + job.getStatus());
 
         Job simpleJob = new Job(job);
 
@@ -191,8 +193,8 @@ public class JobServiceImpl implements JobService {
         return jobRepository.save(job);
     }
 
-    private boolean isRestartable(Job aJob) {
-        return aJob.getStatus() == JobStatus.STOPPED || aJob.getStatus() == JobStatus.FAILED;
+    private boolean isRestartable(Job job) {
+        return job.getStatus() == JobStatus.STOPPED || job.getStatus() == JobStatus.FAILED;
     }
 
     private void validate(JobParameters workflowParameters, Workflow workflow) {
