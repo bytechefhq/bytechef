@@ -24,14 +24,20 @@ import com.bytechef.hermes.component.InputParametersImpl;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableConsumer;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableContext;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableFunction;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRefreshFunction;
+import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerDisableConsumer;
+import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEnableConsumer;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 import java.util.Map;
-
-import static com.bytechef.hermes.component.definition.TriggerDefinition.*;
 
 /**
  * @author Ivica Cardic

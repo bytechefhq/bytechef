@@ -201,14 +201,15 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             : tagService.save(tags);
     }
 
+    private static boolean containsTag(ProjectInstance projectInstance, Tag tag) {
+        List<Long> curTagIds = projectInstance.getTagIds();
+
+        return curTagIds.contains(tag.getId());
+    }
+
     private List<Tag> filterTags(List<Tag> tags, ProjectInstance projectInstance) {
         return tags.stream()
-            .filter(
-                tag -> {
-                    List<Long> curTagIds = projectInstance.getTagIds();
-
-                    return curTagIds.contains(tag.getId());
-                })
+            .filter(tag -> containsTag(projectInstance, tag))
             .toList();
     }
 

@@ -54,7 +54,7 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
     @CreatedDate
     private LocalDateTime createdDate;
 
-    @Column("inputs")
+    @Column
     private MapWrapper inputs = new MapWrapper();
 
     @Column

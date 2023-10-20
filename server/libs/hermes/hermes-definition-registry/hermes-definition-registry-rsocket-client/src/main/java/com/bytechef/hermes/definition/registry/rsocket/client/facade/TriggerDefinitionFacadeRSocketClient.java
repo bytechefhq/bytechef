@@ -18,14 +18,13 @@
 package com.bytechef.hermes.definition.registry.rsocket.client.facade;
 
 import com.bytechef.commons.reactor.util.MonoUtils;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.definition.registry.rsocket.client.AbstractRSocketClient;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.messaging.rsocket.RSocketRequester;
 
 import java.util.Map;
-
-import static com.bytechef.hermes.component.definition.TriggerDefinition.*;
 
 /**
  * @author Ivica Cardic
