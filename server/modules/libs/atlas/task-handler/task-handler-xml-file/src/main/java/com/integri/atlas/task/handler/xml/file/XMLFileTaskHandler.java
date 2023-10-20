@@ -51,52 +51,59 @@ public class XMLFileTaskHandler implements TaskHandler<Object> {
     private final FileStorageService fileStorageService;
 
     @Override
+    @SuppressWarnings("unchecked")
     public Object handle(TaskExecution taskExecution) throws Exception {
         Object result;
 
         Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
 
         if (operation == Operation.READ) {
+            boolean isArray = taskExecution.get("isArray", Boolean.class, true);
             FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);
-            Map<String, Integer> range = taskExecution.get("range");
 
-            Integer rangeStartIndex = null;
+            if (isArray) {
+                Map<String, Integer> range = taskExecution.get("range");
 
-            if (range != null) {
-                rangeStartIndex = range.get("startIndex");
+                Integer rangeStartIndex = null;
+
+                if (range != null) {
+                    rangeStartIndex = range.get("startIndex");
+                }
+
+                Integer rangeEndIndex = null;
+
+                if (range != null) {
+                    rangeEndIndex = range.get("endIndex");
+                }
+
+                List<Map<String, ?>> items = xmlHelper.deserialize(
+                    fileStorageService.readFileContent(fileEntry.getUrl()),
+                    List.class
+                );
+
+                if (
+                    (rangeStartIndex != null && rangeStartIndex > 0) ||
+                    (rangeEndIndex != null && rangeEndIndex < items.size())
+                ) {
+                    items = items.subList(rangeStartIndex == null ? 0 : rangeStartIndex, rangeEndIndex);
+                }
+
+                result = items;
+            } else {
+                result = xmlHelper.deserialize(fileStorageService.readFileContent(fileEntry.getUrl()), Map.class);
             }
-
-            Integer rangeEndIndex = null;
-
-            if (range != null) {
-                rangeEndIndex = range.get("endIndex");
-            }
-
-            List<Map<String, ?>> items = xmlHelper.deserialize(
-                fileStorageService.readFileContent(fileEntry.getUrl()),
-                List.class
-            );
-
-            if (
-                (rangeStartIndex != null && rangeStartIndex > 0) ||
-                (rangeEndIndex != null && rangeEndIndex < items.size())
-            ) {
-                items = items.subList(rangeStartIndex == null ? 0 : rangeStartIndex, rangeEndIndex);
-            }
-
-            result = items;
         } else {
             String fileName = taskExecution.get("fileName", String.class, "file.xml");
-            List<Map<String, ?>> items = taskExecution.get("items");
+            Object object = taskExecution.get("items");
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
             try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
-                printWriter.println(xmlHelper.serialize(items));
+                printWriter.println(xmlHelper.serialize(object));
             }
 
             try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
-                return fileStorageService.storeFileContent(fileName, inputStream);
+                result = fileStorageService.storeFileContent(fileName, inputStream);
             }
         }
 
