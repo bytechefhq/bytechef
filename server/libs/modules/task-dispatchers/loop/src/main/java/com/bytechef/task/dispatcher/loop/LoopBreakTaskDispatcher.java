@@ -57,7 +57,7 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
         messageBroker.send(Queues.COMPLETIONS, loopTaskExecution);
     }
 
-    private TaskExecution findLoopTaskExecution(String taskExecutionId) {
+    private TaskExecution findLoopTaskExecution(Long taskExecutionId) {
         Assert.notNull(taskExecutionId, "'taskExecutionId' must not be null.");
 
         TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);

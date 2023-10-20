@@ -27,6 +27,8 @@ import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.execution.TaskStatus;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.time.LocalDateTime;
 
 /**
@@ -50,19 +52,21 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public boolean canHandle(TaskExecution taskExecution) {
-        String parentId = taskExecution.getParentId();
+        Long parentId = taskExecution.getParentId();
 
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentExecution.getType()
-                .equals(EACH + "/v" + VERSION_1);
+            String type = parentExecution.getType();
+
+            return type.equals(EACH + "/v" + VERSION_1);
         }
 
         return false;
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
         taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.COMPLETED, null, null);
 

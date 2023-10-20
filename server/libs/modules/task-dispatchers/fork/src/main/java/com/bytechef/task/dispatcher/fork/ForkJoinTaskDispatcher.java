@@ -38,12 +38,12 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.MapUtils;
-import com.bytechef.commons.utils.UUIDUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.Assert;
 
@@ -110,6 +110,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
         List<List<Map<String, Object>>> branches = MapUtils.getRequiredList(
             taskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
@@ -133,28 +134,27 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             counterService.set(taskExecution.getId(), branchesWorkflowTasks.size());
 
             for (int i = 0; i < branchesWorkflowTasks.size(); i++) {
-                List<WorkflowTask> branchWorkflowTask = branchesWorkflowTasks.get(i);
+                List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks.get(i);
 
-                Assert.isTrue(branchWorkflowTask.size() > 0, "branch " + i + " does not contain any tasks");
+                Assert.isTrue(branchWorkflowTasks.size() > 0, "branch " + i + " does not contain any tasks");
 
                 TaskExecution branchTaskExecution = new TaskExecution(
-                    WorkflowTask.of(Map.of(BRANCH, i), branchWorkflowTask.get(0)));
+                    WorkflowTask.of(Map.of(BRANCH, i), branchWorkflowTasks.get(0)));
 
-                branchTaskExecution.setId(UUIDUtils.generate());
                 branchTaskExecution.setJobId(taskExecution.getJobId());
                 branchTaskExecution.setParentId(taskExecution.getId());
                 branchTaskExecution.setPriority(taskExecution.getPriority());
                 branchTaskExecution.setStatus(TaskStatus.CREATED);
                 branchTaskExecution.setTaskNumber(1);
 
-                Context context = contextService.peek(taskExecution.getId());
+                branchTaskExecution = taskExecutionService.create(branchTaskExecution);
 
-                contextService.push(taskExecution.getId() + "/" + i, context);
-                contextService.push(branchTaskExecution.getId(), context);
+                Context context = contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION);
+
+                contextService.push(taskExecution.getId(), i, Context.Classname.TASK_EXECUTION, context);
+                contextService.push(branchTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
 
                 branchTaskExecution.evaluate(taskEvaluator, context);
-
-                branchTaskExecution = taskExecutionService.create(branchTaskExecution);
 
                 taskDispatcher.dispatch(branchTaskExecution);
             }

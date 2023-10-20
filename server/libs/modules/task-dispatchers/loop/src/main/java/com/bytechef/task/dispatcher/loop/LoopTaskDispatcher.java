@@ -89,7 +89,9 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1,
                 new WorkflowTask(iteratee));
 
-            Context context = contextService.peek(taskExecution.getId());
+            subTaskExecution = taskExecutionService.create(subTaskExecution);
+
+            Context context = contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
             if (!list.isEmpty()) {
                 context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), list.get(0));
@@ -97,11 +99,9 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
             context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), 0);
 
-            contextService.push(subTaskExecution.getId(), context);
+            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
 
             subTaskExecution.evaluate(taskEvaluator, context);
-
-            subTaskExecution = taskExecutionService.create(subTaskExecution);
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {

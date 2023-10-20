@@ -74,13 +74,14 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public boolean canHandle(TaskExecution taskExecution) {
-        String parentId = taskExecution.getParentId();
+        Long parentId = taskExecution.getParentId();
 
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentExecution.getType()
-                .equals(SWITCH + "/v" + VERSION_1);
+            String type = parentExecution.getType();
+
+            return type.equals(SWITCH + "/v" + VERSION_1);
         }
 
         return false;
@@ -94,11 +95,11 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
         TaskExecution switchTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-            Context newContext = contextService.peek(switchTaskExecution.getId());
+            Context newContext = contextService.peek(switchTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
-            contextService.push(switchTaskExecution.getId(), newContext);
+            contextService.push(switchTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
         }
 
         List<WorkflowTask> subWorkflowTasks = resolveCase(switchTaskExecution);
@@ -107,19 +108,16 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
             WorkflowTask workflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
             TaskExecution subTaskExecution = TaskExecution.of(
-                switchTaskExecution.getJobId(),
-                switchTaskExecution.getId(),
-                switchTaskExecution.getPriority(),
-                taskExecution.getTaskNumber() + 1,
-                workflowTask);
-
-            Context context = contextService.peek(switchTaskExecution.getId());
-
-            contextService.push(subTaskExecution.getId(), context);
-
-            subTaskExecution.evaluate(taskEvaluator, context);
+                switchTaskExecution.getJobId(), switchTaskExecution.getId(), switchTaskExecution.getPriority(),
+                taskExecution.getTaskNumber() + 1, workflowTask);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
+
+            Context context = contextService.peek(switchTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
+
+            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
+
+            subTaskExecution.evaluate(taskEvaluator, context);
 
             taskDispatcher.dispatch(subTaskExecution);
         }

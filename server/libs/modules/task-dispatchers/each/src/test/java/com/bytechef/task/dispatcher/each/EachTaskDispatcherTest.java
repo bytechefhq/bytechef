@@ -20,6 +20,7 @@
 package com.bytechef.task.dispatcher.each;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -31,6 +32,7 @@ import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
@@ -49,18 +51,15 @@ public class EachTaskDispatcherTest {
     private final ContextService contextService = mock(ContextService.class);
     private final CounterService counterService = mock(CounterService.class);
     private final MessageBroker messageBroker = mock(MessageBroker.class);
-    private final TaskDispatcher taskDispatcher = mock(TaskDispatcher.class);
+    @SuppressWarnings("unchecked")
+    private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
 
     @Test
     public void testDispatch1() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-                taskDispatcher,
-                taskExecutionService,
-                messageBroker,
-                contextService,
-                counterService,
+                taskDispatcher, taskExecutionService, messageBroker, contextService, counterService,
                 TaskEvaluator.create());
             dispatcher.dispatch(new TaskExecution());
         });
@@ -68,20 +67,18 @@ public class EachTaskDispatcherTest {
 
     @Test
     public void testDispatch2() {
-        when(contextService.peek(any())).thenReturn(new Context());
-        EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-            taskDispatcher,
-            taskExecutionService,
-            messageBroker,
-            contextService,
-            counterService,
-            TaskEvaluator.create());
-        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
-            "list", Arrays.asList(1, 2, 3),
-            "iteratee", Collections.singletonMap("type", "print"))));
+        when(contextService.peek(anyLong(), any())).thenReturn(new Context());
+        when(taskExecutionService.create(any())).thenReturn(new TaskExecution(1L));
 
-        taskExecution.setId("id");
-        taskExecution.setJobId("jobId");
+        EachTaskDispatcher dispatcher = new EachTaskDispatcher(
+            taskDispatcher, taskExecutionService, messageBroker, contextService, counterService,
+            TaskEvaluator.create());
+        TaskExecution taskExecution = new TaskExecution(
+            new WorkflowTask(
+                Map.of("list", Arrays.asList(1, 2, 3), "iteratee", Collections.singletonMap("type", "print"))));
+
+        taskExecution.setId(1L);
+        taskExecution.setJobId(1L);
 
         dispatcher.dispatch(taskExecution);
 
@@ -92,15 +89,10 @@ public class EachTaskDispatcherTest {
     @Test
     public void testDispatch3() {
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-            taskDispatcher,
-            taskExecutionService,
-            messageBroker,
-            contextService,
-            counterService,
+            taskDispatcher, taskExecutionService, messageBroker, contextService, counterService,
             TaskEvaluator.create());
-        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
-            "list", List.of(),
-            "iteratee", Collections.singletonMap("type", "print"))));
+        TaskExecution taskExecution = new TaskExecution(
+            1L, new WorkflowTask(Map.of("list", List.of(), "iteratee", Collections.singletonMap("type", "print"))));
 
         dispatcher.dispatch(taskExecution);
 
