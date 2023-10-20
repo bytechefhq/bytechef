@@ -19,7 +19,7 @@
 package com.integri.atlas.config;
 
 import com.integri.atlas.engine.coordinator.Coordinator;
-import com.integri.atlas.engine.coordinator.DefaultJobExecutor;
+import com.integri.atlas.engine.coordinator.job.executor.DefaultJobExecutor;
 import com.integri.atlas.engine.coordinator.task.completion.DefaultTaskCompletionHandler;
 import com.integri.atlas.engine.coordinator.task.completion.EachTaskCompletionHandler;
 import com.integri.atlas.engine.coordinator.task.completion.ForkTaskCompletionHandler;
