@@ -33,7 +33,7 @@ export interface UpdateConnectionTagsRequest {
 /**
  * 
  */
-export class ProjectConnectionTagApi extends runtime.BaseAPI {
+export class ConnectionTagApi extends runtime.BaseAPI {
 
     /**
      * Get connection tags.
@@ -45,7 +45,7 @@ export class ProjectConnectionTagApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-connection-tags`,
+            path: `/connections/tags`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -83,7 +83,7 @@ export class ProjectConnectionTagApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/project-connections/{id}/project-connection-tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/connections/{id}/tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,

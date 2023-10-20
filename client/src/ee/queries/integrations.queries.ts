@@ -1,12 +1,12 @@
 import {useQuery} from '@tanstack/react-query';
 import {
+    CategoryApi,
     CategoryModel,
     IntegrationApi,
-    IntegrationCategoryApi,
     IntegrationModel,
     IntegrationTagApi,
-    IntegrationWorkflowApi,
     TagModel,
+    WorkflowApi,
     WorkflowModel,
 } from 'ee/middleware/dione/configuration';
 
@@ -29,7 +29,7 @@ export const IntegrationKeys = {
 export const useGetIntegrationCategoriesQuery = () =>
     useQuery<CategoryModel[], Error>(
         IntegrationKeys.integrationCategories,
-        () => new IntegrationCategoryApi().getIntegrationCategories()
+        () => new CategoryApi().getIntegrationCategories()
     );
 
 export const useGetIntegrationTagsQuery = () =>
@@ -62,7 +62,7 @@ export const useGetIntegrationWorkflowsQuery = (id: number) =>
     useQuery<WorkflowModel[], Error>(
         IntegrationKeys.integrationWorkflows(id),
         () =>
-            new IntegrationWorkflowApi().getIntegrationWorkflows({
+            new WorkflowApi().getIntegrationWorkflows({
                 id,
             })
     );

@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
+export * from './CategoryApi';
 export * from './IntegrationApi';
-export * from './IntegrationCategoryApi';
 export * from './IntegrationTagApi';
-export * from './IntegrationWorkflowApi';
+export * from './WorkflowApi';

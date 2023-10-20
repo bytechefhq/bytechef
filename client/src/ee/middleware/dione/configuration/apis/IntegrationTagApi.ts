@@ -45,7 +45,7 @@ export class IntegrationTagApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/integration-tags`,
+            path: `/integrations/tags`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -83,7 +83,7 @@ export class IntegrationTagApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/integrations/{id}/integration-tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/integrations/{id}/tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,

@@ -42,7 +42,7 @@ export interface GetExecutionsRequest {
 /**
  * 
  */
-export class ProjectWorkflowExecutionApi extends runtime.BaseAPI {
+export class WorkflowExecutionApi extends runtime.BaseAPI {
 
     /**
      * Get workflow execution by id.
@@ -58,7 +58,7 @@ export class ProjectWorkflowExecutionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-workflow-executions/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/workflow-executions/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -114,7 +114,7 @@ export class ProjectWorkflowExecutionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-workflow-executions`,
+            path: `/workflow-executions`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

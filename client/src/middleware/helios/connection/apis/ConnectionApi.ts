@@ -48,7 +48,7 @@ export interface UpdateConnectionRequest {
 /**
  * 
  */
-export class ProjectConnectionApi extends runtime.BaseAPI {
+export class ConnectionApi extends runtime.BaseAPI {
 
     /**
      * Create a new connection.
@@ -66,7 +66,7 @@ export class ProjectConnectionApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/project-connections`,
+            path: `/connections`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -99,7 +99,7 @@ export class ProjectConnectionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-connections/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/connections/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -130,7 +130,7 @@ export class ProjectConnectionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-connections/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/connections/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -170,7 +170,7 @@ export class ProjectConnectionApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-connections`,
+            path: `/connections`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -208,7 +208,7 @@ export class ProjectConnectionApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/project-connections/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/connections/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,

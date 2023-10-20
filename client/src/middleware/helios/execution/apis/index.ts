@@ -1,5 +1,5 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './ProjectJobApi';
-export * from './ProjectWorkflowExecutionApi';
-export * from './ProjectWorkflowTestApi';
+export * from './JobApi';
+export * from './WorkflowExecutionApi';
+export * from './WorkflowTestApi';
