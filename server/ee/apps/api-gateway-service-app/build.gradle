@@ -2,7 +2,7 @@ group = "com.bytechef.api"
 description = ""
 
 springBoot {
-    mainClassName = "com.bytechef.api.gateway.ApiGatewayApplicaton"
+    mainClassName = "com.bytechef.api.gateway.ApiGatewayApplication"
 }
 
 dependencies {
