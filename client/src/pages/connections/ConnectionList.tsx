@@ -49,7 +49,7 @@ const ConnectionList = () => {
                             icon={
                                 <LinkIcon className="h-12 w-12 text-gray-400" />
                             }
-                            message="You do not have any Connection created yet."
+                            message="You do not have any Connections created yet."
                             title="No Connections"
                         />
                     ) : (
