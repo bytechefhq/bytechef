@@ -18,8 +18,8 @@
 
 package com.integri.atlas.engine.core.event;
 
-import com.integri.atlas.engine.core.messagebroker.MessageBroker;
-import com.integri.atlas.engine.core.messagebroker.Queues;
+import com.integri.atlas.engine.core.message.broker.MessageBroker;
+import com.integri.atlas.engine.core.message.broker.Queues;
 import java.util.Objects;
 
 /**

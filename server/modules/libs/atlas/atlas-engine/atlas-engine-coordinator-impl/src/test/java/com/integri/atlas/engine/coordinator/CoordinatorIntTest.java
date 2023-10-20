@@ -29,8 +29,8 @@ import com.integri.atlas.engine.coordinator.workflow.repository.ResourceBasedWor
 import com.integri.atlas.engine.coordinator.workflow.repository.YAMLWorkflowMapper;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
-import com.integri.atlas.engine.core.messagebroker.Queues;
-import com.integri.atlas.engine.core.messagebroker.SyncMessageBroker;
+import com.integri.atlas.engine.core.message.broker.Queues;
+import com.integri.atlas.engine.core.message.broker.SyncMessageBroker;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;

@@ -19,7 +19,7 @@
 package com.integri.atlas.config;
 
 import com.integri.atlas.engine.core.event.DistributedEventPublisher;
-import com.integri.atlas.engine.core.messagebroker.MessageBroker;
+import com.integri.atlas.engine.core.message.broker.MessageBroker;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
