@@ -100,92 +100,94 @@ const ExecutionDetailsDialog = ({selectedItemId}: {selectedItemId: number}) => {
                                     {currentExecution?.taskExecutions?.map(
                                         (taskExecution) => {
                                             return (
-                                                <AccordionItem
-                                                    key={taskExecution.id}
-                                                    value={
-                                                        taskExecution
-                                                            .workflowTask
-                                                            ?.label ||
-                                                        'undefined'
-                                                    }
-                                                    className="mb-8"
-                                                >
-                                                    <AccordionTrigger className="w-full">
-                                                        <span className="flex items-center justify-start md:justify-between">
-                                                            <div className="flex items-center">
-                                                                {currentExecution.taskExecutions &&
-                                                                currentExecution.taskExecutions.every(
-                                                                    (
-                                                                        taskExecution
-                                                                    ) =>
-                                                                        taskExecution.status ===
-                                                                        'COMPLETED'
-                                                                ) ? (
-                                                                    <CheckCircleIcon className="mr-3 h-5 w-5 text-green-500" />
-                                                                ) : (
-                                                                    <CheckCircleIcon className="mr-3 h-5 w-5 text-red-500" />
-                                                                )}
+                                                taskExecution.workflowTask
+                                                    ?.label && (
+                                                    <AccordionItem
+                                                        value={
+                                                            taskExecution
+                                                                .workflowTask
+                                                                ?.label
+                                                        }
+                                                        className="mb-8"
+                                                        key={taskExecution.id}
+                                                    >
+                                                        <AccordionTrigger className="w-full">
+                                                            <div className="flex items-center justify-start md:justify-between">
+                                                                <div className="flex items-center">
+                                                                    {currentExecution.taskExecutions &&
+                                                                    currentExecution.taskExecutions.every(
+                                                                        (
+                                                                            taskExecution
+                                                                        ) =>
+                                                                            taskExecution.status ===
+                                                                            'COMPLETED'
+                                                                    ) ? (
+                                                                        <CheckCircleIcon className="mr-3 h-5 w-5 text-green-500" />
+                                                                    ) : (
+                                                                        <CheckCircleIcon className="mr-3 h-5 w-5 text-red-500" />
+                                                                    )}
 
-                                                                {
-                                                                    taskExecution
-                                                                        .workflowTask
-                                                                        ?.label
-                                                                }
+                                                                    {
+                                                                        taskExecution
+                                                                            .workflowTask
+                                                                            ?.label
+                                                                    }
+                                                                </div>
+
+                                                                <span className="flex justify-start md:justify-between">
+                                                                    {taskExecution.lastModifiedDate?.getDate()}
+                                                                    s
+                                                                </span>
+                                                            </div>
+                                                        </AccordionTrigger>
+
+                                                        <Separator className="my-1 h-px bg-gray-300 dark:bg-gray-700" />
+
+                                                        <AccordionContent>
+                                                            <div className="rounded-lg border bg-white">
+                                                                <span className="flex items-center justify-start bg-gray-200 md:justify-between">
+                                                                    <p className=" font-medium text-gray-900">
+                                                                        Input
+                                                                    </p>
+
+                                                                    <span className="flex justify-start md:justify-between">
+                                                                        {taskExecution.lastModifiedDate?.toLocaleString()}
+                                                                    </span>
+                                                                </span>
+
+                                                                <pre className="m-6 text-sm">
+                                                                    {JSON.stringify(
+                                                                        taskExecution.input ||
+                                                                            dummyData,
+                                                                        null,
+                                                                        2
+                                                                    )}
+                                                                </pre>
                                                             </div>
 
-                                                            <span className="flex justify-start md:justify-between">
-                                                                {taskExecution.lastModifiedDate?.getDate()}
-                                                                s
-                                                            </span>
-                                                        </span>
-                                                    </AccordionTrigger>
+                                                            <div className="mt-4 rounded-lg border bg-white">
+                                                                <span className="flex items-center justify-start bg-gray-200 md:justify-between">
+                                                                    <p className=" font-medium text-gray-900">
+                                                                        Output
+                                                                    </p>
 
-                                                    <Separator className="my-1 h-px bg-gray-300 dark:bg-gray-700" />
-
-                                                    <AccordionContent>
-                                                        <div className="rounded-lg border bg-white">
-                                                            <span className="flex items-center justify-start bg-gray-200 md:justify-between">
-                                                                <p className=" font-medium text-gray-900">
-                                                                    Input
-                                                                </p>
-
-                                                                <span className="flex justify-start md:justify-between">
-                                                                    {taskExecution.lastModifiedDate?.toLocaleString()}
+                                                                    <span className="flex justify-start md:justify-between">
+                                                                        {taskExecution.lastModifiedDate?.toLocaleString()}
+                                                                    </span>
                                                                 </span>
-                                                            </span>
 
-                                                            <pre className="m-6 text-sm">
-                                                                {JSON.stringify(
-                                                                    taskExecution.input ||
-                                                                        dummyData,
-                                                                    null,
-                                                                    2
-                                                                )}
-                                                            </pre>
-                                                        </div>
-
-                                                        <div className="mt-4 rounded-lg border bg-white">
-                                                            <span className="flex items-center justify-start bg-gray-200 md:justify-between">
-                                                                <p className=" font-medium text-gray-900">
-                                                                    Output
-                                                                </p>
-
-                                                                <span className="flex justify-start md:justify-between">
-                                                                    {taskExecution.lastModifiedDate?.toLocaleString()}
-                                                                </span>
-                                                            </span>
-
-                                                            <pre className="m-6 text-sm">
-                                                                {JSON.stringify(
-                                                                    taskExecution.output ||
-                                                                        dummyData,
-                                                                    null,
-                                                                    2
-                                                                )}
-                                                            </pre>
-                                                        </div>
-                                                    </AccordionContent>
-                                                </AccordionItem>
+                                                                <pre className="m-6 text-sm">
+                                                                    {JSON.stringify(
+                                                                        taskExecution.output ||
+                                                                            dummyData,
+                                                                        null,
+                                                                        2
+                                                                    )}
+                                                                </pre>
+                                                            </div>
+                                                        </AccordionContent>
+                                                    </AccordionItem>
+                                                )
                                             );
                                         }
                                     )}

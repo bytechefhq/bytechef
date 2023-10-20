@@ -402,12 +402,11 @@ const Table = ({data}: {data: ProjectExecutionModel[]}): JSX.Element => {
                                     key={header.id}
                                     className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
                                 >
-                                    {header.isPlaceholder
-                                        ? null
-                                        : flexRender(
-                                              header.column.columnDef.header,
-                                              header.getContext()
-                                          )}
+                                    {!header.isPlaceholder &&
+                                        flexRender(
+                                            header.column.columnDef.header,
+                                            header.getContext()
+                                        )}
                                 </th>
                             ))}
                         </tr>
