@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import Input from 'components/Input/Input';
 import Dialog from 'components/Dialog/Dialog';
 import {useForm} from 'react-hook-form';
@@ -13,15 +13,15 @@ interface WorkflowDialogProps {
     id?: number;
     workflowItem?: WorkflowModel | undefined;
     visible?: boolean;
-    version: undefined;
+    onClose?: () => void;
 }
 
-const WorkflowDialog = ({id, visible = false}: WorkflowDialogProps) => {
+const WorkflowDialog = ({
+    id,
+    visible = false,
+    onClose,
+}: WorkflowDialogProps) => {
     const [isOpen, setIsOpen] = useState(visible);
-
-    useEffect(() => {
-        setIsOpen(visible);
-    }, [visible]);
 
     const queryClient = useQueryClient();
 
@@ -49,6 +49,10 @@ const WorkflowDialog = ({id, visible = false}: WorkflowDialogProps) => {
     function closeDialog() {
         reset();
         setIsOpen(false);
+
+        if (onClose) {
+            onClose();
+        }
     }
 
     function createWorkflow() {
@@ -90,9 +94,7 @@ const WorkflowDialog = ({id, visible = false}: WorkflowDialogProps) => {
                     label="Cancel"
                     type="button"
                     onClick={() => {
-                        setIsOpen(false);
-
-                        reset();
+                        closeDialog();
                     }}
                 />
 

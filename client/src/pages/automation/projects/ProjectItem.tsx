@@ -194,7 +194,11 @@ const ProjectItem = ({
             )}
 
             {showWorkflowDialog && (
-                <WorkflowDialog id={project.id} visible version={undefined} />
+                <WorkflowDialog
+                    id={project.id}
+                    visible
+                    onClose={() => setShowWorkflowDialog(false)}
+                />
             )}
         </>
     );

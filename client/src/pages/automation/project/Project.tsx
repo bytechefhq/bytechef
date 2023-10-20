@@ -162,7 +162,10 @@ const Project: React.FC = () => {
                             </div>
 
                             {showWorkflowDialog && (
-                                <WorkflowDialog visible version={undefined} />
+                                <WorkflowDialog
+                                    visible
+                                    onClose={() => setShowWorkflowDialog(false)}
+                                />
                             )}
 
                             <div>
