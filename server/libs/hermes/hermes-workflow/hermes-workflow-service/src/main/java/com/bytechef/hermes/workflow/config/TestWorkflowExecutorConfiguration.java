@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.workflow.config;
 
-import com.bytechef.atlas.job.JobFactory;
-import com.bytechef.atlas.job.JobFactoryImpl;
+import com.bytechef.atlas.factory.JobFactory;
+import com.bytechef.atlas.factory.JobFactoryImpl;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
