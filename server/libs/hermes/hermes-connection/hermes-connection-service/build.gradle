@@ -8,5 +8,5 @@ dependencies {
     implementation project(":server:libs:core:encryption:encryption-api")
 
     testImplementation project(":server:libs:hermes:hermes-connection:hermes-connection-upgrade")
-    testImplementation project(":server:libs:hermes:hermes-test-support")
+    testImplementation project(":server:libs:test-support")
 }

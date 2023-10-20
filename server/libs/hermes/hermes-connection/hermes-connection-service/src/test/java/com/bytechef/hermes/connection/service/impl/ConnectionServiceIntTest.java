@@ -16,19 +16,23 @@
 
 package com.bytechef.hermes.connection.service.impl;
 
+import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.test.extension.PostgresTestContainerExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@ExtendWith(PostgresTestContainerExtension.class)
+@SpringBootTest(classes = ConnectionIntTestConfiguration.class)
 public class ConnectionServiceIntTest {
 
     @Autowired

@@ -16,30 +16,26 @@
 
 package com.bytechef.hermes.connection.repository;
 
+import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.test.extension.PostgresTestContainerExtension;
 import java.util.Map;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@ExtendWith(PostgresTestContainerExtension.class)
+@SpringBootTest(classes = ConnectionIntTestConfiguration.class)
 public class ConnectionRepositoryIntTest {
 
     @Autowired
     private ConnectionRepository connectionRepository;
-
-    @BeforeEach
-    public void beforeEach() {
-        for (Connection connection : connectionRepository.findAll()) {
-            connectionRepository.deleteById(connection.getId());
-        }
-    }
 
     @Test
     public void testCreate() {
