@@ -1,0 +1,37 @@
+{
+  "display": {
+    "description": "Loops sequentially over list of items.",
+    "label": "Loop"
+  },
+  "name": "loop",
+  "inputs": [
+    {
+      "description": "List of items to iterate over.",
+      "label": "List of items",
+      "name": "list",
+      "type": "ARRAY"
+    },
+    {
+      "description": "The name of the item variable.",
+      "label": "Item Var",
+      "name": "itemVar",
+      "type": "STRING",
+      "defaultValue": "item"
+    },
+    {
+      "description": "The name of the index variable.",
+      "label": "Item Index",
+      "name": "itemIndex",
+      "type": "STRING",
+      "defaultValue": "itemIndex"
+    },
+    {
+      "description": "Should loop iterate until condition set by 'Loop Break' statement is met.",
+      "label": "Loop Forever",
+      "name": "loopForever",
+      "type": "BOOLEAN",
+      "defaultValue": false
+    }
+  ],
+  "version": 1
+}
