@@ -19,6 +19,7 @@ package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
+import com.bytechef.hermes.definition.registry.dto.TaskType;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 
 import java.util.List;
@@ -55,5 +56,5 @@ public interface ActionDefinitionService {
 
     List<ActionDefinitionDTO> getActionDefinitions(String componentName, int componentVersion);
 
-    List<ActionDefinitionDTO> getActionDefinitions(List<String> taskTypes);
+    List<ActionDefinitionDTO> getActionDefinitions(List<TaskType> taskTypes);
 }
