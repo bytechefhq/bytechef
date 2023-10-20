@@ -16,6 +16,7 @@
 
 package com.integri.atlas.config;
 
+import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.core.task.evaluator.spel.TempDir;
@@ -33,10 +34,11 @@ import org.springframework.core.env.Environment;
 public class TaskEvaluatorConfiguration {
 
     @Bean
-    TaskEvaluator taskEvaluator(Environment environment, FileStorageService fileStorageService) {
+    TaskEvaluator taskEvaluator(Environment environment, FileStorageService fileStorageService, JSONHelper jsonHelper) {
         return SpelTaskEvaluator
             .builder()
             .environment(environment)
+            .jsonHelper(jsonHelper)
             .methodExecutor("readFile", new ReadFile(fileStorageService))
             .methodExecutor("storeFile", new StoreFile(fileStorageService))
             .methodExecutor("tempDir", new TempDir())
