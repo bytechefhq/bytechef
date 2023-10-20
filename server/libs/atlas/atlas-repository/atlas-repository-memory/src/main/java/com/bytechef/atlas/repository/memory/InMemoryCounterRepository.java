@@ -16,14 +16,16 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.repository.memory.counter;
+package com.bytechef.atlas.repository.memory;
 
-import com.bytechef.atlas.repository.counter.CounterRepository;
+import com.bytechef.atlas.domain.Counter;
+import com.bytechef.atlas.repository.CounterRepository;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Arik Cohen
+ * @author Ivica Cardic
  * @since Feb, 21 2020
  */
 public class InMemoryCounterRepository implements CounterRepository {
@@ -31,21 +33,31 @@ public class InMemoryCounterRepository implements CounterRepository {
     private final Map<String, Long> counters = new HashMap<>();
 
     @Override
-    public void set(String counterName, long value) {
-        counters.put(counterName, value);
+    public void deleteById(String id) {
+        counters.remove(id);
     }
 
     @Override
-    public long decrement(String counterName) {
-        Long value = counters.getOrDefault(counterName, 0L) - 1;
-
-        counters.put(counterName, value);
-
-        return value;
+    public Iterable<Counter> findAll() {
+        return counters.entrySet().stream()
+                .map(entry -> new Counter(entry.getKey(), entry.getValue()))
+                .toList();
     }
 
     @Override
-    public void delete(String counterName) {
-        counters.remove(counterName);
+    public Long findValueByIdForUpdate(String id) {
+        return counters.get(id);
+    }
+
+    @Override
+    public Counter save(Counter counter) {
+        counters.put(counter.getId(), counter.getValue());
+
+        return counter;
+    }
+
+    @Override
+    public void update(String id, long value) {
+        counters.put(id, value);
     }
 }
