@@ -1,5 +1,6 @@
 plugins {
     id "org.sonarqube"
+    id "org.springframework.boot" version "${springBootVersion}" apply false
 }
 
 file("${projectDir}/sonar-project.properties").withReader {
@@ -16,7 +17,24 @@ file("${projectDir}/sonar-project.properties").withReader {
 }
 
 subprojects {
+    apply plugin: "io.spring.dependency-management"
     apply plugin: "org.sonarqube"
 
     apply from: "${rootDir}/gradle/sonar.gradle"
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+
+    dependencies {
+        implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+
+        testImplementation "org.springframework.boot:spring-boot-starter-test"
+
+        testRuntimeOnly "com.zaxxer:HikariCP"
+        testRuntimeOnly "org.postgresql:postgresql"
+        testRuntimeOnly libs.testcontainers.postgresql
+    }
 }
