@@ -1,16 +1,16 @@
-import LayoutContainer from '../../../../layouts/LayoutContainer/LayoutContainer';
+import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
 import IntegrationList from './IntegrationList';
 import IntegrationDialog from './IntegrationDialog';
 import React, {useState} from 'react';
-import PageHeader from '../../../../components/PageHeader/PageHeader';
-import LeftSidebarMenu from '../../../../layouts/LeftSidebarMenu/LeftSidebarMenu';
-import LeftSidebarMenuItem from '../../../../layouts/LeftSidebarMenu/LeftSidebarMenuItem';
+import PageHeader from '../../../components/PageHeader/PageHeader';
+import LeftSidebarMenu from '../../../layouts/LeftSidebarMenu/LeftSidebarMenu';
+import LeftSidebarMenuItem from '../../../layouts/LeftSidebarMenu/LeftSidebarMenuItem';
 import {TagIcon} from '@heroicons/react/20/solid';
 import {useSearchParams} from 'react-router-dom';
 import {
     useGetIntegrationCategoriesQuery,
     useGetIntegrationTagsQuery,
-} from '../../../../queries/integrations.queries';
+} from '../../../queries/integrations.queries';
 
 export enum Type {
     Category,
