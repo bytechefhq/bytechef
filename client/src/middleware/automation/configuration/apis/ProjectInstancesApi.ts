@@ -38,12 +38,6 @@ export interface EnableProjectInstanceRequest {
     enable: boolean;
 }
 
-export interface EnableProjectInstanceWorkflowRequest {
-    id: number;
-    workflowId: string;
-    enable: boolean;
-}
-
 export interface GetProjectInstanceRequest {
     id: number;
 }
@@ -167,45 +161,6 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
      */
     async enableProjectInstance(requestParameters: EnableProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.enableProjectInstanceRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     * Enable/disable a workflow of a project instance.
-     * Enable/disable a workflow of a project instance
-     */
-    async enableProjectInstanceWorkflowRaw(requestParameters: EnableProjectInstanceWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling enableProjectInstanceWorkflow.');
-        }
-
-        if (requestParameters.workflowId === null || requestParameters.workflowId === undefined) {
-            throw new runtime.RequiredError('workflowId','Required parameter requestParameters.workflowId was null or undefined when calling enableProjectInstanceWorkflow.');
-        }
-
-        if (requestParameters.enable === null || requestParameters.enable === undefined) {
-            throw new runtime.RequiredError('enable','Required parameter requestParameters.enable was null or undefined when calling enableProjectInstanceWorkflow.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/project-instances/{id}/workflows/{workflowId}/enable/{enable}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))).replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters.enable))),
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     * Enable/disable a workflow of a project instance.
-     * Enable/disable a workflow of a project instance
-     */
-    async enableProjectInstanceWorkflow(requestParameters: EnableProjectInstanceWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.enableProjectInstanceWorkflowRaw(requestParameters, initOverrides);
     }
 
     /**
