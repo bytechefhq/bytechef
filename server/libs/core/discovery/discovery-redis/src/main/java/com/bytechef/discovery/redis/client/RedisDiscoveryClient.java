@@ -22,23 +22,21 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.data.redis.core.ListOperations;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.util.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 
 /**
  * @author Ivica Cardic
  */
 public class RedisDiscoveryClient implements DiscoveryClient {
 
-    private final StringRedisTemplate redisTemplate;
+    private final RedisTemplate<String, RedisRegistration> redisTemplate;
 
     @SuppressFBWarnings("EI2")
-    public RedisDiscoveryClient(StringRedisTemplate redisTemplate) {
+    public RedisDiscoveryClient(RedisTemplate<String, RedisRegistration> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
@@ -50,25 +48,12 @@ public class RedisDiscoveryClient implements DiscoveryClient {
     @Override
     @SuppressFBWarnings("NP")
     public List<ServiceInstance> getInstances(String serviceId) {
-        ListOperations<String, String> listOperations = redisTemplate.opsForList();
+        ListOperations<String, RedisRegistration> listOperations = redisTemplate.opsForList();
 
-        List<String> range = listOperations.range(serviceId, 0, -1);
+        List<RedisRegistration> redisRegistrations = listOperations.range(serviceId, 0, -1);
 
-        return Objects.requireNonNull(range)
+        return Objects.requireNonNull(redisRegistrations)
             .parallelStream()
-            .map((Function<String, ServiceInstance>) s -> {
-                RedisRegistration redisRegistration = new RedisRegistration();
-
-                redisRegistration.setApplicationName(serviceId);
-
-                String hostName = Objects.requireNonNull(StringUtils.split(s, ":"))[0];
-                String port = Objects.requireNonNull(StringUtils.split(s, ":"))[1];
-
-                redisRegistration.setHost(hostName);
-                redisRegistration.setPort(Integer.parseInt(port));
-
-                return redisRegistration;
-            })
             .collect(Collectors.toList());
     }
 

@@ -17,9 +17,10 @@
 
 package com.bytechef.discovery.redis.client;
 
+import com.bytechef.discovery.redis.registry.RedisRegistration;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.ReactiveDiscoveryClient;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import reactor.core.publisher.Flux;
 
 /**
@@ -29,7 +30,7 @@ public class RedisReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 
     private final RedisDiscoveryClient redisDiscoveryClient;
 
-    public RedisReactiveDiscoveryClient(StringRedisTemplate redisTemplate) {
+    public RedisReactiveDiscoveryClient(RedisTemplate<String, RedisRegistration> redisTemplate) {
         this.redisDiscoveryClient = new RedisDiscoveryClient(redisTemplate);
     }
 
