@@ -36,7 +36,7 @@ export function DesktopSidebar({
               ))}
             </nav>
           </div>
-          <div className="flex shrink-0 justify-center pb-5">
+          <div className="flex shrink-0 justify-center py-4">
             <Link to={'/settings'}>
               <Avatar />
             </Link>
