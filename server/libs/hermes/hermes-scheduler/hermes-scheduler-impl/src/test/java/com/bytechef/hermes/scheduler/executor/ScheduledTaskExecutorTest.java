@@ -1,4 +1,4 @@
-
+package com.bytechef.hermes.scheduler.executor;
 /*
  * Copyright 2021 <your company/name>.
  *
@@ -15,25 +15,30 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.trigger.executor;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class TriggerLifecycleExecutorTest {
+public class ScheduledTaskExecutorTest {
 
     @Disabled
     @Test
-    public void testPerformTriggerDisable() {
+    public void testPollTrigger() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testPerformTriggerEnable() {
+    public void testRefreshDynamicWebhookTrigger() {
         // TODO
     }
+
+    @Disabled
+    @Test
+    public void testTriggerWorkflow() {
+        // TODO
+    }
+
 }

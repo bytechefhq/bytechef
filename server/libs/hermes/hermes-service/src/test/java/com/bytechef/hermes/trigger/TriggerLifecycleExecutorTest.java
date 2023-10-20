@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.trigger.executor;
+package com.bytechef.hermes.trigger;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,17 +23,17 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class ScheduledTriggerExecutorTest {
+public class TriggerLifecycleExecutorTest {
 
     @Disabled
     @Test
-    public void testPerformTriggerDynamicWebhookRefresh() {
+    public void testPerformTriggerDisable() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testPerformTriggerPoll() {
+    public void testPerformTriggerEnable() {
         // TODO
     }
 }
