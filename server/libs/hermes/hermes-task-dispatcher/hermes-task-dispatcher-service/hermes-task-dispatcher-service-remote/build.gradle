@@ -1,0 +1,6 @@
+dependencies {
+    api project(":server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-service:hermes-task-dispatcher-service-api")
+
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework:spring-webflux"
+}
