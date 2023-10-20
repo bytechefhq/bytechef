@@ -20,9 +20,12 @@ package com.bytechef.hermes.connection.config;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.hermes.connection.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.hermes.connection.converter.EncryptedStringToMapWrapperConverter;
+import com.bytechef.hermes.connection.facade.ConnectionFacade;
+import com.bytechef.hermes.connection.facade.ConnectionFacadeImpl;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.connection.service.impl.ConnectionServiceImpl;
+import com.bytechef.tag.service.TagService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -44,6 +47,11 @@ public class ConnectionConfiguration extends AbstractJdbcConfiguration {
     public ConnectionConfiguration(Encryption encryption, ObjectMapper objectMapper) {
         this.encryption = encryption;
         this.objectMapper = objectMapper;
+    }
+
+    @Bean
+    ConnectionFacade connectionFacade(ConnectionService connectionService, TagService tagService) {
+        return new ConnectionFacadeImpl(connectionService, tagService);
     }
 
     @Bean

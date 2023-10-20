@@ -21,13 +21,18 @@ import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.tag.domain.Tag;
+import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.annotation.EmbeddedSql;
+
+import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Ivica Cardic
@@ -42,19 +47,28 @@ public class ConnectionServiceIntTest {
     @Autowired
     private ConnectionRepository connectionRepository;
 
+    @Autowired
+    private TagRepository tagRepository;
+
     @BeforeEach
     public void beforeEach() {
         connectionRepository.deleteAll();
+        tagRepository.deleteAll();
     }
 
     @Test
     public void testCreate() {
         Connection connection = getConnection();
 
+        Tag tag = tagRepository.save(new Tag("tag1"));
+
+        connection.setTags(List.of(tag));
+
         connection = connectionService.create(connection);
 
-        Assertions.assertEquals("name", connection.getName());
-        Assertions.assertEquals(Map.of("key1", "value1"), connection.getParameters());
+        assertThat(connection)
+            .hasFieldOrPropertyWithValue("name", "name")
+            .hasFieldOrPropertyWithValue("tagIds", List.of(tag.getId()));
     }
 
     @Test
@@ -63,15 +77,23 @@ public class ConnectionServiceIntTest {
 
         connectionService.delete(connection.getId());
 
-        Assertions.assertFalse(connectionRepository.findById(connection.getId())
-            .isPresent());
+        assertThat(connectionRepository.findById(connection.getId())).isNotPresent();
     }
 
     @Test
     public void testGetConnection() {
-        Connection connection = connectionRepository.save(getConnection());
+        Connection connection = getConnection();
 
-        Assertions.assertEquals(connection, connectionService.getConnection(connection.getId()));
+        Tag tag = new Tag("tag1");
+
+        tag = tagRepository.save(tag);
+
+        connection.setTags(List.of(tag));
+
+        connection = connectionRepository.save(connection);
+
+        assertThat(connectionService.getConnection(connection.getId())).isEqualTo(connection);
+        assertThat(connectionService.getConnections(null, List.of(tag.getId()))).hasSize(1);
     }
 
     @Test
@@ -82,8 +104,7 @@ public class ConnectionServiceIntTest {
 
         connectionRepository.save(getConnection());
 
-        Assertions.assertEquals(1, connectionService.getConnections()
-            .size());
+        assertThat(connectionService.getConnections(null, null)).hasSize(1);
     }
 
     @Test
@@ -94,16 +115,17 @@ public class ConnectionServiceIntTest {
 
         Connection updatedConnection = connectionService.update(connection);
 
-        Assertions.assertEquals("name2", updatedConnection.getName());
+        assertThat(updatedConnection.getName()).isEqualTo("name2");
     }
 
     private static Connection getConnection() {
         Connection connection = new Connection();
 
         connection.setComponentName("componentName");
-        connection.setComponentVersion(1);
+        connection.setConnectionVersion(1);
         connection.setName("name");
         connection.setParameters(Map.of("key1", "value1"));
+        connection.setVersion(1);
 
         return connection;
     }

@@ -21,6 +21,8 @@ import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
@@ -50,8 +52,10 @@ public class ConnectionServiceRSocketController {
     }
 
     @MessageMapping("getConnections")
-    public Mono<List<Connection>> getConnections() {
-        return Mono.create(sink -> sink.success(connectionService.getConnections()));
+    @SuppressWarnings("unchecked")
+    public Mono<List<Connection>> getConnections(Map<String, Object> map) {
+        return Mono.create(sink -> sink.success(connectionService
+            .getConnections((List<String>) map.get("componentNames"), (List<Long>) map.get("tagIds"))));
     }
 
     @MessageMapping("removeConnection")

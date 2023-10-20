@@ -17,19 +17,17 @@
 
 package com.bytechef.hermes.connection.web.rest.mapper;
 
-import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
-import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
+import com.bytechef.hermes.connection.web.rest.model.TagModel;
+import com.bytechef.tag.domain.Tag;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
 @Mapper(config = ConnectionMapperSpringConfig.class)
-public interface ConnectionModelMapper extends Converter<ConnectionModel, Connection> {
+public interface ConnectionTagModelMapper extends Converter<TagModel, Tag> {
 
-    @Mapping(target = "tagIds", ignore = true)
-    Connection convert(ConnectionModel connectionModel);
+    Tag convert(TagModel tagModel);
 }

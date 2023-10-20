@@ -20,6 +20,7 @@ package com.bytechef.hermes.connection.service.impl;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.stream.StreamSupport;
@@ -27,6 +28,7 @@ import java.util.stream.StreamSupport;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author Ivica Cardic
@@ -62,10 +64,30 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> getConnections() {
-        return StreamSupport.stream(connectionRepository.findAll()
-            .spliterator(), false)
+    public List<Connection> getConnections(List<String> componentNames, List<Long> tagIds) {
+        Iterable<Connection> connectionIterable;
+
+        if (CollectionUtils.isEmpty(componentNames) && CollectionUtils.isEmpty(tagIds)) {
+            connectionIterable = connectionRepository.findAll();
+        } else if (!CollectionUtils.isEmpty(componentNames) && CollectionUtils.isEmpty(tagIds)) {
+            connectionIterable = connectionRepository.findByComponentNameIn(componentNames);
+        } else if (CollectionUtils.isEmpty(componentNames)) {
+            connectionIterable = connectionRepository.findByTagIdIn(tagIds);
+        } else {
+            connectionIterable = connectionRepository.findByComponentNamesAndTagIds(componentNames, tagIds);
+        }
+
+        return StreamSupport.stream(connectionIterable.spliterator(), false)
             .toList();
+    }
+
+    @Override
+    public Connection update(Long id, List<Tag> tags) {
+        Connection connection = getConnection(id);
+
+        connection.setTags(tags);
+
+        return connectionRepository.save(connection);
     }
 
     @Override

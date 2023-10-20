@@ -25921,7 +25921,7 @@
   ],
   "connection": {
     "componentName": "pipedrive",
-    "componentVersion": 1,
+    "version": 1,
     "authorizations": [
       {
         "display": {

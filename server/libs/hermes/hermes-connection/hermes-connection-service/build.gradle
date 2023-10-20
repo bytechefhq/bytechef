@@ -9,5 +9,6 @@ dependencies {
     implementation project(":server:libs:core:encryption:encryption-api")
 
     testImplementation project(":server:libs:db-migration")
+    testImplementation project(":server:libs:core:tag:tag-service")
     testImplementation project(":server:libs:test:test-int-support")
 }
