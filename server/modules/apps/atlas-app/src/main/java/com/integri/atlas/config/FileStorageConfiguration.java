@@ -16,10 +16,9 @@
 
 package com.integri.atlas.config;
 
-import com.integri.atlas.engine.core.binary.BinaryHelper;
-import com.integri.atlas.engine.core.storage.StorageService;
-import com.integri.atlas.engine.core.storage.base64.Base64StorageService;
-import com.integri.atlas.engine.core.storage.file.FileStorageService;
+import com.integri.atlas.engine.core.file.storage.FileStorageService;
+import com.integri.atlas.file.storage.base64.Base64FileStorageService;
+import com.integri.atlas.file.storage.filesystem.FileSystemFileStorageService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,22 +27,17 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-public class StorageConfiguration {
-
-    @Bean
-    BinaryHelper binaryHelper(StorageService storageService) {
-        return new BinaryHelper(storageService);
-    }
+public class FileStorageConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "atlas.storage.provider", havingValue = "base64")
-    StorageService base64StorageService() {
-        return new Base64StorageService();
+    FileStorageService base64FileStorageService() {
+        return new Base64FileStorageService();
     }
 
     @Bean
     @ConditionalOnProperty(name = "atlas.storage.provider", havingValue = "file")
-    StorageService fileStorageService(StorageProperties storageProperties) {
-        return new FileStorageService(storageProperties.getFileStorageDir());
+    FileStorageService fileSystemFileStorageService(StorageProperties storageProperties) {
+        return new FileSystemFileStorageService(storageProperties.getFileStorageDir());
     }
 }
