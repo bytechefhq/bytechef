@@ -46,7 +46,7 @@ type ConnectionTagsMutationProps = {
     onError?: (error: object, variables: UpdateConnectionTagsRequest) => void;
 };
 
-export const useConnectionTagsMutation = (
+export const useUpdateConnectionTagsMutation = (
     mutationProps?: ConnectionTagsMutationProps
 ) =>
     useMutation({
