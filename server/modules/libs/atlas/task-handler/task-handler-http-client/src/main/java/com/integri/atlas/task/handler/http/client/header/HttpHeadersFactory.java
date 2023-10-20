@@ -17,19 +17,25 @@
 package com.integri.atlas.task.handler.http.client.header;
 
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_BODY_CONTENT_TYPE;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_FILE_ENTRY;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_HEADER_PARAMETERS;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_MIME_TYPE;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RAW_PARAMETERS;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RESPONSE_FORMAT;
 
 import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.*;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tika.Tika;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.MultiValueMap;
 
 /**
@@ -46,7 +52,51 @@ public class HttpHeadersFactory {
 
     @SuppressWarnings("unchecked")
     public List<HttpHeader> getHttpHeaders(TaskExecution taskExecution) {
-        List<HttpHeader> httpHeaders = new ArrayList<>();
+        Set<HttpHeader> httpHeaders = new HashSet<>();
+
+        if (taskExecution.containsKey(PROPERTY_RESPONSE_FORMAT)) {
+            httpHeaders.add(new HttpHeader("Accept", MimeTypeUtils.ALL_VALUE));
+        }
+
+        if (taskExecution.containsKey(PROPERTY_BODY_CONTENT_TYPE)) {
+            httpHeaders.add(new HttpHeader("Content-Type", getContentTypeValue(taskExecution)));
+        }
+
+        httpHeaders.addAll(getUserDefinedHttpHeaders(taskExecution));
+
+        return new ArrayList(httpHeaders);
+    }
+
+    private String getContentTypeValue(TaskExecution taskExecution) {
+        BodyContentType bodyContentType = BodyContentType.valueOf(taskExecution.get(PROPERTY_BODY_CONTENT_TYPE));
+
+        if (bodyContentType == BodyContentType.JSON) {
+            return MimeTypeUtils.APPLICATION_JSON_VALUE;
+        }
+
+        if (bodyContentType == BodyContentType.FORM_URLENCODED) {
+            return "application/x-www-form-urlencoded";
+        }
+
+        if (bodyContentType == BodyContentType.FORM_DATA) {
+            return "multipart/form-data;";
+        }
+
+        if (bodyContentType == BodyContentType.RAW) {
+            return taskExecution.getString(PROPERTY_MIME_TYPE);
+        }
+
+        if (bodyContentType == BodyContentType.BINARY) {
+            Tika tika = new Tika();
+
+            return tika.detect(taskExecution.getString(PROPERTY_FILE_ENTRY));
+        }
+
+        throw new IllegalArgumentException("Invalid body content type " + bodyContentType);
+    }
+
+    private Set<HttpHeader> getUserDefinedHttpHeaders(TaskExecution taskExecution) {
+        Set<HttpHeader> httpHeaders = new HashSet<>();
 
         if (taskExecution.containsKey(PROPERTY_HEADER_PARAMETERS)) {
             if (taskExecution.getBoolean(PROPERTY_RAW_PARAMETERS, false)) {
@@ -64,25 +114,6 @@ public class HttpHeadersFactory {
                     )
                 );
             }
-        }
-
-        if (taskExecution.containsKey(PROPERTY_RESPONSE_FORMAT)) {
-            httpHeaders.add(
-                new HttpHeader("Accept", ContentType.valueOf(taskExecution.get(PROPERTY_RESPONSE_FORMAT)).getMimeType())
-            );
-        }
-
-        if (taskExecution.containsKey(PROPERTY_BODY_CONTENT_TYPE)) {
-            httpHeaders.add(
-                new HttpHeader(
-                    "Content-Type",
-                    ContentType.valueOf(taskExecution.get(PROPERTY_BODY_CONTENT_TYPE)).getMimeType()
-                )
-            );
-        }
-
-        if (taskExecution.containsKey(PROPERTY_MIME_TYPE)) {
-            httpHeaders.add(new HttpHeader("Content-Type", taskExecution.get(PROPERTY_MIME_TYPE)));
         }
 
         return httpHeaders;
