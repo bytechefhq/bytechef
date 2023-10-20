@@ -7,13 +7,6 @@ server:
   port: 7777
 
 spring:
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/bytechef_execution
-    username: postgres
-    password: postgres
-    hikari:
-      poolName: Hikari
   devtools:
     livereload:
       port: 35734
@@ -25,3 +18,11 @@ spring:
   jackson:
     serialization:
       indent-output: true
+
+#####
+
+bytechef:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bytechef_execution
+    username: postgres
+    password: postgres

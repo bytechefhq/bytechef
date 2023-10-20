@@ -108,5 +108,7 @@ dependencies {
     implementation project(":server:libs:modules:task-dispatchers:sequence")
     implementation project(":server:libs:modules:task-dispatchers:subflow")
 
+    runtimeOnly "com.h2database:h2"
+
     testImplementation project(":server:libs:test:test-int-support")
 }
