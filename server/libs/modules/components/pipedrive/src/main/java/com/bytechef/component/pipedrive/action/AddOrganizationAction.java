@@ -48,7 +48,7 @@ public class AddOrganizationAction {
                 "path", "/organizations", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object(null).properties(string("name").label("Name")
+        .properties(object().properties(string("name").label("Name")
             .description("The name of the organization")
             .required(false),
             string("add_time").label("Add_time")
@@ -67,7 +67,7 @@ public class AddOrganizationAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object(null).properties(string("address_route").label("Address_route")
+        .outputSchema(object().properties(string("address_route").label("Address_route")
             .description("The route of the organization location")
             .required(false),
             integer("related_closed_deals_count").label("Related_closed_deals_count")

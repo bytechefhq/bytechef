@@ -43,7 +43,7 @@ public class GetInventoryAction {
 
             ))
         .properties()
-        .outputSchema(object(null).additionalProperties(integer())
+        .outputSchema(object().additionalProperties(integer())
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)));

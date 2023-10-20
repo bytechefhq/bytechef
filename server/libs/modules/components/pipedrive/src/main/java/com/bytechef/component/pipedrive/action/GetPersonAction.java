@@ -53,7 +53,7 @@ public class GetPersonAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .outputSchema(object(null).properties(
+        .outputSchema(object().properties(
             object("additional_data").properties(string("dropbox_email").label("Dropbox_email")
                 .description("Dropbox email for the person")
                 .required(false))
@@ -148,7 +148,7 @@ public class GetPersonAction {
             string("first_name").label("First_name")
                 .description("The first name of the person")
                 .required(false),
-            array("email").items(object(null).properties(string("value").label("Value")
+            array("email").items(object().properties(string("value").label("Value")
                 .description("Email")
                 .required(false),
                 bool("primary").label("Primary")
@@ -210,7 +210,7 @@ public class GetPersonAction {
             integer("next_activity_id").label("Next_activity_id")
                 .description("The ID of the next activity associated with the deal")
                 .required(false),
-            array("phone").items(object(null).properties(string("value").label("Value")
+            array("phone").items(object().properties(string("value").label("Value")
                 .description("The phone number")
                 .required(false),
                 bool("primary").label("Primary")

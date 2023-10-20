@@ -52,7 +52,7 @@ public class AddLeadAction {
                 "path", "/leads", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object(null).properties(string("title").label("Title")
+        .properties(object().properties(string("title").label("Title")
             .description("The name of the lead")
             .required(true),
             integer("owner_id").label("Owner_id")
@@ -95,7 +95,7 @@ public class AddLeadAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object(null).properties(bool("success").label("Success")
+        .outputSchema(object().properties(bool("success").label("Success")
             .required(false),
             object("data").properties(string("id").label("Id")
                 .description("The unique ID of the lead in the UUID format")

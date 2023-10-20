@@ -11667,6 +11667,7 @@
     }
   ],
   "connection": {
+    "authorizationRequired": true,
     "authorizations": [
       {
         "display": {
@@ -11726,13 +11727,11 @@
         "type": "OAUTH2_AUTHORIZATION_CODE"
       }
     ],
-    "componentName": "pipedrive",
-    "display": {
+    "componentDisplay": {
       "description": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
       "label": "Pipedrive"
     },
-    "version": 1,
-    "authorizationRequired": true
+    "componentName": "pipedrive"
   },
   "display": {
     "description": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",

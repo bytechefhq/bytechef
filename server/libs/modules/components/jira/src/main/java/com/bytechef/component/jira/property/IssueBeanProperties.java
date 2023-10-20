@@ -62,7 +62,7 @@ public class IssueBeanProperties {
             .label("Schema")
             .description("The schema describing each field present on the issue.")
             .required(false),
-        array("transitions").items(object(null).properties(IssueTransitionProperties.PROPERTIES)
+        array("transitions").items(object().properties(IssueTransitionProperties.PROPERTIES)
             .description("Details of an issue transition."))
             .placeholder("Add")
             .label("Transitions")

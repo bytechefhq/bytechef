@@ -41,7 +41,7 @@ public class LinkGroupProperties {
             .required(false),
         integer("weight").label("Weight")
             .required(false),
-        array("links").items(object(null).properties(SimpleLinkProperties.PROPERTIES)
+        array("links").items(object().properties(SimpleLinkProperties.PROPERTIES)
             .description("Details about the operations available in this version."))
             .placeholder("Add")
             .label("Links")

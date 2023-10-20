@@ -49,7 +49,7 @@ public class CreateUserAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object(null).properties(UserProperties.PROPERTIES)
+        .outputSchema(object().properties(UserProperties.PROPERTIES)
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)));

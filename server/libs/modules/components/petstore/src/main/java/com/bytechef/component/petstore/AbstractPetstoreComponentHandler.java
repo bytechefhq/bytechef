@@ -17,18 +17,8 @@
 
 package com.bytechef.component.petstore;
 
-import static com.bytechef.hermes.component.constant.ComponentConstants.ADD_TO;
-import static com.bytechef.hermes.component.constant.ComponentConstants.CLIENT_ID;
-import static com.bytechef.hermes.component.constant.ComponentConstants.CLIENT_SECRET;
-import static com.bytechef.hermes.component.constant.ComponentConstants.KEY;
-import static com.bytechef.hermes.component.constant.ComponentConstants.VALUE;
-import static com.bytechef.hermes.component.definition.Authorization.ApiTokenLocation;
-import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
-import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.petstore.action.AddPetAction;
 import com.bytechef.component.petstore.action.CreateUserAction;
@@ -49,9 +39,9 @@ import com.bytechef.component.petstore.action.UpdatePetAction;
 import com.bytechef.component.petstore.action.UpdatePetWithFormAction;
 import com.bytechef.component.petstore.action.UpdateUserAction;
 import com.bytechef.component.petstore.action.UploadFileAction;
+import com.bytechef.component.petstore.connection.PetstoreConnection;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import java.util.List;
 
 /**
  * Provides the base implementation for the REST based component.
@@ -73,44 +63,7 @@ public abstract class AbstractPetstoreComponentHandler implements OpenApiCompone
             CreateUserAction.ACTION_DEFINITION, CreateUsersWithListInputAction.ACTION_DEFINITION,
             LoginUserAction.ACTION_DEFINITION, LogoutUserAction.ACTION_DEFINITION, DeleteUserAction.ACTION_DEFINITION,
             GetUserByNameAction.ACTION_DEFINITION, UpdateUserAction.ACTION_DEFINITION))
-        .connection(modifyConnection(
-            connection()
-                .baseUri(connection -> "https://petstore3.swagger.io/api/v3")
-                .authorizations(authorization(
-                    AuthorizationType.OAUTH2_IMPLICIT_CODE.name()
-                        .toLowerCase(),
-                    AuthorizationType.OAUTH2_IMPLICIT_CODE)
-                        .display(
-                            display("OAuth2 Implicit"))
-                        .properties(
-                            string(CLIENT_ID)
-                                .label("Client Id")
-                                .required(true),
-                            string(CLIENT_SECRET)
-                                .label("Client Secret")
-                                .required(true))
-                        .authorizationUrl(connection -> "https://petstore3.swagger.io/oauth/authorize")
-                        .scopes(connection -> List.of("write:pets", "read:pets")),
-                    authorization(
-                        AuthorizationType.API_KEY.name()
-                            .toLowerCase(),
-                        AuthorizationType.API_KEY)
-                            .display(
-                                display("API Key"))
-                            .properties(
-                                string(KEY)
-                                    .label("Key")
-                                    .required(true)
-                                    .defaultValue("api_key")
-                                    .hidden(true),
-                                string(VALUE)
-                                    .label("Value")
-                                    .required(true),
-                                string(ADD_TO)
-                                    .label("Add to")
-                                    .required(true)
-                                    .defaultValue(ApiTokenLocation.HEADER.name())
-                                    .hidden(true)))));
+        .connection(modifyConnection(PetstoreConnection.CONNECTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {

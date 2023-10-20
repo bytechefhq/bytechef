@@ -50,7 +50,7 @@ public class AddPetAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object(null).properties(PetProperties.PROPERTIES)
+        .outputSchema(object().properties(PetProperties.PROPERTIES)
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)));

@@ -8,8 +8,8 @@
       "metadata": {
         "path": "/pet",
         "mimeType": "application/json",
-        "bodyContentType": "JSON",
-        "requestMethod": "POST"
+        "requestMethod": "POST",
+        "bodyContentType": "JSON"
       },
       "name": "addPet",
       "outputSchema": [
@@ -270,8 +270,8 @@
       "metadata": {
         "path": "/pet",
         "mimeType": "application/json",
-        "bodyContentType": "JSON",
-        "requestMethod": "PUT"
+        "requestMethod": "PUT",
+        "bodyContentType": "JSON"
       },
       "name": "updatePet",
       "outputSchema": [
@@ -1092,8 +1092,8 @@
       "metadata": {
         "path": "/pet/{petId}/uploadImage",
         "mimeType": "application/octet-stream",
-        "bodyContentType": "BINARY",
-        "requestMethod": "POST"
+        "requestMethod": "POST",
+        "bodyContentType": "BINARY"
       },
       "name": "uploadFile",
       "outputSchema": [
@@ -1226,8 +1226,8 @@
       "metadata": {
         "path": "/store/order",
         "mimeType": "application/json",
-        "bodyContentType": "JSON",
-        "requestMethod": "POST"
+        "requestMethod": "POST",
+        "bodyContentType": "JSON"
       },
       "name": "placeOrder",
       "outputSchema": [
@@ -1508,8 +1508,8 @@
       "metadata": {
         "path": "/user",
         "mimeType": "application/json",
-        "bodyContentType": "JSON",
-        "requestMethod": "POST"
+        "requestMethod": "POST",
+        "bodyContentType": "JSON"
       },
       "name": "createUser",
       "outputSchema": [
@@ -1677,8 +1677,8 @@
       "metadata": {
         "path": "/user/createWithList",
         "mimeType": "application/json",
-        "bodyContentType": "JSON",
-        "requestMethod": "POST"
+        "requestMethod": "POST",
+        "bodyContentType": "JSON"
       },
       "name": "createUsersWithListInput",
       "outputSchema": [
@@ -2042,8 +2042,8 @@
       "metadata": {
         "path": "/user/{username}",
         "mimeType": "application/json",
-        "bodyContentType": "JSON",
-        "requestMethod": "PUT"
+        "requestMethod": "PUT",
+        "bodyContentType": "JSON"
       },
       "name": "updateUser",
       "outputSchema": [
@@ -2216,6 +2216,7 @@
     }
   ],
   "connection": {
+    "authorizationRequired": true,
     "authorizations": [
       {
         "display": {
@@ -2275,13 +2276,11 @@
         "type": "API_KEY"
       }
     ],
-    "componentName": "petstore",
-    "display": {
+    "componentDisplay": {
       "description": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
       "label": "Petstore"
     },
-    "version": 1,
-    "authorizationRequired": true
+    "componentName": "petstore"
   },
   "display": {
     "description": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",

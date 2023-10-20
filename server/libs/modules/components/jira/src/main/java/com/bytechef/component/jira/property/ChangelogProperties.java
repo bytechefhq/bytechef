@@ -46,7 +46,7 @@ public class ChangelogProperties {
         dateTime("created").label("Created")
             .description("The date on which the change took place.")
             .required(false),
-        array("items").items(object(null).properties(ChangeDetailsProperties.PROPERTIES)
+        array("items").items(object().properties(ChangeDetailsProperties.PROPERTIES)
             .description("A change item."))
             .placeholder("Add")
             .label("Items")

@@ -85,7 +85,7 @@ public class GetPersonsAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .outputSchema(object(null)
+        .outputSchema(object()
             .properties(object("additional_data")
                 .properties(object("pagination").properties(integer("start").label("Start")
                     .description("Pagination start")
@@ -104,7 +104,7 @@ public class GetPersonsAction {
                     .required(false))
                 .label("Additional_data")
                 .required(false),
-                array("data").items(object(null).properties(integer("related_closed_deals_count")
+                array("data").items(object().properties(integer("related_closed_deals_count")
                     .label("Related_closed_deals_count")
                     .description("The count of related closed deals related with the item")
                     .required(false),
@@ -194,7 +194,7 @@ public class GetPersonsAction {
                     string("first_name").label("First_name")
                         .description("The first name of the person")
                         .required(false),
-                    array("email").items(object(null).properties(string("value").label("Value")
+                    array("email").items(object().properties(string("value").label("Value")
                         .description("Email")
                         .required(false),
                         bool("primary").label("Primary")
@@ -256,7 +256,7 @@ public class GetPersonsAction {
                     integer("next_activity_id").label("Next_activity_id")
                         .description("The ID of the next activity associated with the deal")
                         .required(false),
-                    array("phone").items(object(null).properties(string("value").label("Value")
+                    array("phone").items(object().properties(string("value").label("Value")
                         .description("The phone number")
                         .required(false),
                         bool("primary").label("Primary")

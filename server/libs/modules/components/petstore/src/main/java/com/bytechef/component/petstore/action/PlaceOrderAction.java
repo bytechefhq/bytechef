@@ -49,7 +49,7 @@ public class PlaceOrderAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(object(null).properties(OrderProperties.PROPERTIES)
+        .outputSchema(object().properties(OrderProperties.PROPERTIES)
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)));

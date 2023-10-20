@@ -105,10 +105,10 @@ public class GetDealsAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .outputSchema(object(null).properties(bool("success").label("Success")
+        .outputSchema(object().properties(bool("success").label("Success")
             .description("If the response is successful or not")
             .required(false),
-            array("data").items(object(null).properties(integer("email_messages_count").label("Email_messages_count")
+            array("data").items(object().properties(integer("email_messages_count").label("Email_messages_count")
                 .description("The number of emails associated with the deal")
                 .required(false),
                 string("cc_email").label("Cc_email")
@@ -135,7 +135,7 @@ public class GetDealsAction {
                 bool("active_flag").label("Active_flag")
                     .description("Whether the associated person is active or not")
                     .required(false),
-                array("phone").items(object(null).properties(string("label").label("Label")
+                array("phone").items(object().properties(string("label").label("Label")
                     .description("The type of the phone number")
                     .required(false),
                     string("value").label("Value")
@@ -152,7 +152,7 @@ public class GetDealsAction {
                 integer("value").label("Value")
                     .description("The ID of the person associated with the deal")
                     .required(false),
-                array("email").items(object(null).properties(string("label").label("Label")
+                array("email").items(object().properties(string("label").label("Label")
                     .description("The type of the email")
                     .required(false),
                     string("value").label("Value")
@@ -441,7 +441,7 @@ public class GetDealsAction {
                     string("name").label("Name")
                         .description("The name of the person associated with the deal")
                         .required(false),
-                    array("email").items(object(null).properties(string("label").label("Label")
+                    array("email").items(object().properties(string("label").label("Label")
                         .description("The type of the email")
                         .required(false),
                         string("value").label("Value")
@@ -455,7 +455,7 @@ public class GetDealsAction {
                         .label("Email")
                         .description("The emails of the person associated with the deal")
                         .required(false),
-                    array("phone").items(object(null).properties(string("label").label("Label")
+                    array("phone").items(object().properties(string("label").label("Label")
                         .description("The type of the phone number")
                         .required(false),
                         string("value").label("Value")

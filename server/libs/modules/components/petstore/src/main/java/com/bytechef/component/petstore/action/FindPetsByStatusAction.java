@@ -53,7 +53,7 @@ public class FindPetsByStatusAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.QUERY)))
-        .outputSchema(array("array").items(object(null).properties(PetProperties.PROPERTIES))
+        .outputSchema(array("array").items(object().properties(PetProperties.PROPERTIES))
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)));

@@ -51,7 +51,7 @@ public class GetOrderByIdAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .outputSchema(object(null).properties(OrderProperties.PROPERTIES)
+        .outputSchema(object().properties(OrderProperties.PROPERTIES)
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)));

@@ -50,7 +50,7 @@ public class GetPetByIdAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .outputSchema(object(null).properties(PetProperties.PROPERTIES)
+        .outputSchema(object().properties(PetProperties.PROPERTIES)
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)));

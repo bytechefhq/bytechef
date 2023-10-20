@@ -43,7 +43,7 @@ public class SearchResultsProperties {
         integer("total").label("Total")
             .description("The number of results on the page.")
             .required(false),
-        array("issues").items(object(null).properties(IssueBeanProperties.PROPERTIES)
+        array("issues").items(object().properties(IssueBeanProperties.PROPERTIES)
             .description("Details about an issue."))
             .placeholder("Add")
             .label("Issues")

@@ -133,7 +133,7 @@ public class GetIssueAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .outputSchema(object(null).properties(IssueBeanProperties.PROPERTIES)
+        .outputSchema(object().properties(IssueBeanProperties.PROPERTIES)
             .description("Details about an issue.")
             .metadata(
                 Map.of(

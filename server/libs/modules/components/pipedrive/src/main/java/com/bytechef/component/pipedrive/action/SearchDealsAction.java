@@ -113,105 +113,106 @@ public class SearchDealsAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .outputSchema(object(null)
-            .properties(
-                object("data")
-                    .properties(array("items")
-                        .items(object(null).properties(number("result_score").label("Result_score")
-                            .description("Search result relevancy")
-                            .required(false),
-                            object("item").properties(integer("id").label("Id")
-                                .description("The ID of the deal")
+        .outputSchema(
+            object()
+                .properties(
+                    object("data")
+                        .properties(array("items")
+                            .items(object().properties(number("result_score").label("Result_score")
+                                .description("Search result relevancy")
                                 .required(false),
-                                string("type").label("Type")
-                                    .description("The type of the item")
+                                object("item").properties(integer("id").label("Id")
+                                    .description("The ID of the deal")
                                     .required(false),
-                                string("title").label("Title")
-                                    .description("The title of the deal")
-                                    .required(false),
-                                integer("value").label("Value")
-                                    .description("The value of the deal")
-                                    .required(false),
-                                string("currency").label("Currency")
-                                    .description("The currency of the deal")
-                                    .required(false),
-                                string("status").label("Status")
-                                    .description("The status of the deal")
-                                    .required(false),
-                                integer("visible_to").label("Visible_to")
-                                    .description("The visibility of the deal")
-                                    .required(false),
-                                object("owner").properties(integer("id").label("Id")
-                                    .description("The ID of the owner of the deal")
+                                    string("type").label("Type")
+                                        .description("The type of the item")
+                                        .required(false),
+                                    string("title").label("Title")
+                                        .description("The title of the deal")
+                                        .required(false),
+                                    integer("value").label("Value")
+                                        .description("The value of the deal")
+                                        .required(false),
+                                    string("currency").label("Currency")
+                                        .description("The currency of the deal")
+                                        .required(false),
+                                    string("status").label("Status")
+                                        .description("The status of the deal")
+                                        .required(false),
+                                    integer("visible_to").label("Visible_to")
+                                        .description("The visibility of the deal")
+                                        .required(false),
+                                    object("owner").properties(integer("id").label("Id")
+                                        .description("The ID of the owner of the deal")
+                                        .required(false))
+                                        .label("Owner")
+                                        .required(false),
+                                    object("stage").properties(integer("id").label("Id")
+                                        .description("The ID of the stage of the deal")
+                                        .required(false),
+                                        string("name").label("Name")
+                                            .description("The name of the stage of the deal")
+                                            .required(false))
+                                        .label("Stage")
+                                        .required(false),
+                                    object("person").properties(integer("id").label("Id")
+                                        .description("The ID of the person the deal is associated with")
+                                        .required(false),
+                                        string("name").label("Name")
+                                            .description("The name of the person the deal is associated with")
+                                            .required(false))
+                                        .label("Person")
+                                        .required(false),
+                                    object("organization").properties(integer("id").label("Id")
+                                        .description("The ID of the organization the deal is associated with")
+                                        .required(false),
+                                        string("name").label("Name")
+                                            .description("The name of the organization the deal is associated with")
+                                            .required(false))
+                                        .label("Organization")
+                                        .required(false),
+                                    array("custom_fields").items(string(null).description("Custom fields"))
+                                        .placeholder("Add")
+                                        .label("Custom_fields")
+                                        .description("Custom fields")
+                                        .required(false),
+                                    array("notes").items(string(null).description("An array of notes"))
+                                        .placeholder("Add")
+                                        .label("Notes")
+                                        .description("An array of notes")
+                                        .required(false))
+                                    .label("Item")
                                     .required(false))
-                                    .label("Owner")
-                                    .required(false),
-                                object("stage").properties(integer("id").label("Id")
-                                    .description("The ID of the stage of the deal")
-                                    .required(false),
-                                    string("name").label("Name")
-                                        .description("The name of the stage of the deal")
-                                        .required(false))
-                                    .label("Stage")
-                                    .required(false),
-                                object("person").properties(integer("id").label("Id")
-                                    .description("The ID of the person the deal is associated with")
-                                    .required(false),
-                                    string("name").label("Name")
-                                        .description("The name of the person the deal is associated with")
-                                        .required(false))
-                                    .label("Person")
-                                    .required(false),
-                                object("organization").properties(integer("id").label("Id")
-                                    .description("The ID of the organization the deal is associated with")
-                                    .required(false),
-                                    string("name").label("Name")
-                                        .description("The name of the organization the deal is associated with")
-                                        .required(false))
-                                    .label("Organization")
-                                    .required(false),
-                                array("custom_fields").items(string(null).description("Custom fields"))
-                                    .placeholder("Add")
-                                    .label("Custom_fields")
-                                    .description("Custom fields")
-                                    .required(false),
-                                array("notes").items(string(null).description("An array of notes"))
-                                    .placeholder("Add")
-                                    .label("Notes")
-                                    .description("An array of notes")
-                                    .required(false))
-                                .label("Item")
-                                .required(false))
-                            .description("The array of deals"))
-                        .placeholder("Add")
-                        .label("Items")
-                        .description("The array of deals")
-                        .required(false))
-                    .label("Data")
-                    .required(false),
-                bool("success").label("Success")
-                    .description("If the response is successful or not")
-                    .required(false),
-                object("additional_data").properties(object("pagination").properties(integer("start").label("Start")
-                    .description("Pagination start")
-                    .required(false),
-                    integer("limit").label("Limit")
-                        .description("Items shown per page")
+                                .description("The array of deals"))
+                            .placeholder("Add")
+                            .label("Items")
+                            .description("The array of deals")
+                            .required(false))
+                        .label("Data")
                         .required(false),
-                    bool("more_items_in_collection").label("More_items_in_collection")
-                        .description("Whether there are more list items in the collection than displayed")
+                    bool("success").label("Success")
+                        .description("If the response is successful or not")
                         .required(false),
-                    integer("next_start").label("Next_start")
-                        .description("Next pagination start")
+                    object("additional_data").properties(object("pagination").properties(integer("start").label("Start")
+                        .description("Pagination start")
+                        .required(false),
+                        integer("limit").label("Limit")
+                            .description("Items shown per page")
+                            .required(false),
+                        bool("more_items_in_collection").label("More_items_in_collection")
+                            .description("Whether there are more list items in the collection than displayed")
+                            .required(false),
+                        integer("next_start").label("Next_start")
+                            .description("Next pagination start")
+                            .required(false))
+                        .label("Pagination")
+                        .description("Pagination details of the list")
                         .required(false))
-                    .label("Pagination")
-                    .description("Pagination details of the list")
-                    .required(false))
-                    .label("Additional_data")
-                    .required(false))
-            .metadata(
-                Map.of(
-                    "responseFormat", ResponseFormat.JSON)))
+                        .label("Additional_data")
+                        .required(false))
+                .metadata(
+                    Map.of(
+                        "responseFormat", ResponseFormat.JSON)))
         .exampleOutput(
             "{\"success\":true,\"data\":{\"items\":[{\"result_score\":1.22,\"item\":{\"id\":1,\"type\":\"deal\",\"title\":\"Jane Doe deal\",\"value\":100,\"currency\":\"USD\",\"status\":\"open\",\"visible_to\":3,\"owner\":{\"id\":1},\"stage\":{\"id\":1,\"name\":\"Lead In\"},\"person\":{\"id\":1,\"name\":\"Jane Doe\"},\"organization\":null,\"custom_fields\":[],\"notes\":[]}}]},\"additional_data\":{\"description\":\"The additional data of the list\",\"type\":\"object\",\"properties\":{\"start\":{\"type\":\"integer\",\"description\":\"Pagination start\"},\"limit\":{\"type\":\"integer\",\"description\":\"Items shown per page\"},\"more_items_in_collection\":{\"type\":\"boolean\",\"description\":\"If there are more list items in the collection than displayed or not\"}}}}");
 }

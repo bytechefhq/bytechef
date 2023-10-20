@@ -85,7 +85,7 @@ public class GetOrganizationsAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .outputSchema(object(null)
+        .outputSchema(object()
             .properties(
                 object("additional_data").properties(object("pagination").properties(integer("start").label("Start")
                     .description("Pagination start")
@@ -104,7 +104,7 @@ public class GetOrganizationsAction {
                     .required(false))
                     .label("Additional_data")
                     .required(false),
-                array("data").items(object(null).properties(string("address_route").label("Address_route")
+                array("data").items(object().properties(string("address_route").label("Address_route")
                     .description("The route of the organization location")
                     .required(false),
                     integer("related_closed_deals_count").label("Related_closed_deals_count")

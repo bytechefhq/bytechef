@@ -57,7 +57,7 @@ public class GetLeadAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .outputSchema(object(null).properties(bool("success").label("Success")
+        .outputSchema(object().properties(bool("success").label("Success")
             .required(false),
             object("data").properties(string("id").label("Id")
                 .description("The unique ID of the lead in the UUID format")

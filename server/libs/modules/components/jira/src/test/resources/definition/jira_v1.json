@@ -4349,6 +4349,7 @@
     }
   ],
   "connection": {
+    "authorizationRequired": true,
     "authorizations": [
       {
         "display": {
@@ -4397,13 +4398,11 @@
         "type": "OAUTH2_AUTHORIZATION_CODE"
       }
     ],
-    "componentName": "jira",
-    "display": {
+    "componentDisplay": {
       "description": "Jira Cloud platform REST API documentation",
       "label": "Jira"
     },
-    "version": 1,
-    "authorizationRequired": true
+    "componentName": "jira"
   },
   "display": {
     "description": "Jira Cloud platform REST API documentation",
