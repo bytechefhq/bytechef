@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.workflow.test.dto;
+package com.bytechef.hermes.workflow.dto;
 
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.dto.TaskExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
@@ -27,5 +27,5 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record WorkflowResponse(Job job, List<TaskExecution> taskExecutions) {
+public record WorkflowResponse(Job job, List<TaskExecutionDTO> taskExecutions) {
 }

@@ -32,7 +32,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.project.domain.Project;
 import com.bytechef.helios.project.dto.ProjectDTO;
 import com.bytechef.helios.project.dto.ProjectExecutionDTO;
-import com.bytechef.helios.project.dto.TaskExecutionDTO;
+import com.bytechef.atlas.dto.TaskExecutionDTO;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectService;
 import com.bytechef.tag.domain.Tag;

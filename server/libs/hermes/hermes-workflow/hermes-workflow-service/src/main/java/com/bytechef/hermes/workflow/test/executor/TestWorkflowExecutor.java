@@ -17,11 +17,16 @@
 
 package com.bytechef.hermes.workflow.test.executor;
 
+import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.dto.TaskExecutionDTO;
 import com.bytechef.atlas.job.JobParameters;
+import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
-import com.bytechef.hermes.workflow.test.dto.WorkflowResponse;
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.hermes.workflow.dto.WorkflowResponse;
+import com.bytechef.hermes.workflow.executor.WorkflowExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Map;
@@ -31,10 +36,14 @@ import java.util.Map;
  */
 public class TestWorkflowExecutor implements WorkflowExecutor {
 
+    private final ContextService contextService;
     private final JobSyncExecutor jobSyncExecutor;
     private final TaskExecutionService taskExecutionService;
 
-    public TestWorkflowExecutor(JobSyncExecutor jobSyncExecutor, TaskExecutionService taskExecutionService) {
+    public TestWorkflowExecutor(
+        ContextService contextService, JobSyncExecutor jobSyncExecutor, TaskExecutionService taskExecutionService) {
+
+        this.contextService = contextService;
         this.jobSyncExecutor = jobSyncExecutor;
         this.taskExecutionService = taskExecutionService;
     }
@@ -49,6 +58,10 @@ public class TestWorkflowExecutor implements WorkflowExecutor {
     public WorkflowResponse execute(String workflowId, Map<String, Object> inputs) {
         Job job = jobSyncExecutor.execute(new JobParameters(inputs, workflowId));
 
-        return new WorkflowResponse(job, taskExecutionService.getJobTaskExecutions(job.getId()));
+        return new WorkflowResponse(
+            job, CollectionUtils.map(
+                taskExecutionService.getJobTaskExecutions(job.getId()),
+                taskExecution -> new TaskExecutionDTO(
+                    contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION), taskExecution)));
     }
 }

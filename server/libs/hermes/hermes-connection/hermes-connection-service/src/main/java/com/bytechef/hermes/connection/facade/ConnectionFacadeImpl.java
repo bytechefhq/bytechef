@@ -190,10 +190,13 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         for (Workflow workflow : workflows) {
             for (WorkflowTask workflowTask : workflow.getTasks()) {
-                WorkflowConnection workflowConnection = workflowTask.getExtension(WorkflowConnection.class);
+                if (workflowTask
+                    .fetchExtension(WorkflowConnection.class)
+                    .map(workflowConnection -> Objects.equals(
+                        workflowConnection.componentName(), componentName) &&
+                        workflowConnection.connectionVersion() == connectionVersion)
+                    .orElse(false)) {
 
-                if (Objects.equals(workflowConnection.componentName(), componentName) &&
-                    workflowConnection.connectionVersion() == connectionVersion) {
                     return true;
                 }
             }
