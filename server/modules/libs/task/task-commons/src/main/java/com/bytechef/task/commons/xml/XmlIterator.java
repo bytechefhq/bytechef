@@ -16,9 +16,11 @@
 
 package com.bytechef.task.commons.xml;
 
+import com.bytechef.task.commons.exception.TaskException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -31,50 +33,54 @@ class XmlIterator implements Iterator<Map<String, ?>> {
     private final XMLStreamReader xmlStreamReader;
     private final XmlMapper xmlMapper;
     private Map<String, ?> value;
+    private int lastToken = -1;
 
     public XmlIterator(XMLStreamReader xmlStreamReader, XmlMapper xmlMapper) {
         this.xmlStreamReader = xmlStreamReader;
         this.xmlMapper = xmlMapper;
 
         try {
-            int token = xmlStreamReader.next();
+            lastToken = xmlStreamReader.next();
 
-            if (token != XMLStreamConstants.START_ELEMENT) {
+            if (lastToken != XMLStreamConstants.START_ELEMENT) {
                 throw new IllegalArgumentException("Provided stream is not a valid XML");
             }
-        } catch (XMLStreamException e) {
-            throw new RuntimeException(e);
+        } catch (XMLStreamException xmlStreamException) {
+            throw new TaskException("Unable to parse xml", xmlStreamException);
         }
     }
 
     @Override
     public boolean hasNext() {
         try {
-            int token = xmlStreamReader.next();
+            lastToken = xmlStreamReader.next();
 
-            if (token == XMLStreamConstants.END_ELEMENT) {
-                value = null;
-            } else {
-                if (token == XMLStreamConstants.CHARACTERS) {
-                    while ((token = xmlStreamReader.next()) == XMLStreamConstants.CHARACTERS)
-                        ;
-                }
-
-                if (token == XMLStreamConstants.END_ELEMENT) {
-                    value = null;
-                } else {
-                    value = xmlMapper.readValue(xmlStreamReader, Map.class);
-                }
+            if (lastToken == XMLStreamConstants.END_ELEMENT) {
+                return false;
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+
+            while (lastToken == XMLStreamConstants.CHARACTERS) {
+                lastToken = xmlStreamReader.next();
+            }
+
+            if (lastToken == XMLStreamConstants.END_ELEMENT) {
+                return false;
+            }
+
+            value = xmlMapper.readValue(xmlStreamReader, Map.class);
+        } catch (Exception exception) {
+            throw new TaskException("Unable to read value", exception);
         }
 
         return value != null;
     }
 
     @Override
-    public Map<String, ?> next() {
+    public Map<String, ?> next() throws NoSuchElementException {
+        if (lastToken == XMLStreamConstants.END_ELEMENT) {
+            throw new NoSuchElementException();
+        }
+
         return value;
     }
 }

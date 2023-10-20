@@ -16,6 +16,7 @@
 
 package com.bytechef.task.commons.json;
 
+import com.bytechef.task.commons.exception.TaskException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -23,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * @author Ivica Cardic
@@ -32,39 +34,46 @@ class JsonIterator implements Iterator<Map<String, ?>> {
     private final JsonParser jsonParser;
     private final ObjectMapper objectMapper;
     private Map<String, ?> value;
+    private JsonToken lastJsonToken = null;
 
     public JsonIterator(JsonParser jsonParser, ObjectMapper objectMapper) {
         this.jsonParser = jsonParser;
         this.objectMapper = objectMapper;
 
         try {
-            JsonToken jsonToken = jsonParser.nextToken();
+            lastJsonToken = jsonParser.nextToken();
 
-            if (jsonToken != JsonToken.START_ARRAY) {
+            if (lastJsonToken != JsonToken.START_ARRAY) {
                 throw new IllegalArgumentException("Provided stream is not a JSON array");
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException ioException) {
+            throw new TaskException("Unable to read json stream", ioException);
         }
     }
 
     @Override
     public boolean hasNext() {
         try {
-            if (jsonParser.nextToken() == JsonToken.START_OBJECT) {
-                value = objectMapper.readValue(jsonParser, new TypeReference<Map<String, Object>>() {});
-            } else {
-                value = null;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+            lastJsonToken = jsonParser.nextToken();
 
-        return value != null;
+            if (lastJsonToken == JsonToken.START_OBJECT) {
+                value = objectMapper.readValue(jsonParser, new TypeReference<Map<String, Object>>() {});
+
+                return true;
+            }
+
+            return false;
+        } catch (Exception exception) {
+            throw new TaskException("Unable to read json stream", exception);
+        }
     }
 
     @Override
-    public Map<String, ?> next() {
+    public Map<String, ?> next() throws NoSuchElementException {
+        if (lastJsonToken == JsonToken.END_ARRAY) {
+            throw new NoSuchElementException();
+        }
+
         return value;
     }
 }
