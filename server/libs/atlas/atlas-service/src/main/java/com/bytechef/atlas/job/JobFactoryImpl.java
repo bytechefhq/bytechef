@@ -27,13 +27,9 @@ import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 public class JobFactoryImpl implements JobFactory {
-
-    private static final Logger logger = LoggerFactory.getLogger(JobFactoryImpl.class);
 
     private final ContextService contextService;
     private final EventPublisher eventPublisher;
@@ -63,8 +59,6 @@ public class JobFactoryImpl implements JobFactory {
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
 
         messageBroker.send(Queues.JOBS, job.getId());
-
-        logger.debug("Job id={}, label='{}' created", job.getId(), job.getLabel());
 
         return job.getId();
     }

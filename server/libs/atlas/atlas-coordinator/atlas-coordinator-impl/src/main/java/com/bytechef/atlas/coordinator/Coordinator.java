@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Coordinator {
 
-    private static final Logger logger = LoggerFactory.getLogger(Coordinator.class);
+    private static final Logger log = LoggerFactory.getLogger(Coordinator.class);
 
     private final ErrorHandler<? super Errorable> errorHandler;
     private final EventPublisher eventPublisher;
@@ -86,7 +86,13 @@ public class Coordinator {
      * @param jobParametersDTO The Key-Value map representing the workflow parameters
      */
     public void create(JobParametersDTO jobParametersDTO) {
-        jobFactory.create(jobParametersDTO);
+        long jobId = jobFactory.create(jobParametersDTO);
+
+        if (log.isDebugEnabled()) {
+            Job job = jobService.getJob(jobId);
+
+            log.debug("Job id={}, label='{}' created", job.getId(), job.getLabel());
+        }
     }
 
     public void start(Long jobId) {
@@ -96,8 +102,8 @@ public class Coordinator {
 
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Job id={}, label='{}' started", job.getId(), job.getLabel());
+        if (log.isDebugEnabled()) {
+            log.debug("Job id={}, label='{}' started", job.getId(), job.getLabel());
         }
     }
 
@@ -126,8 +132,8 @@ public class Coordinator {
                 new CancelControlTask(currentTaskExecution.getJobId(), currentTaskExecution.getId()));
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Job id={} stopped", job.getId());
+        if (log.isDebugEnabled()) {
+            log.debug("Job id={}, label='{}' stoped", job.getId(), job.getLabel());
         }
 
         return job;
@@ -144,8 +150,8 @@ public class Coordinator {
 
         jobExecutor.execute(job);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Job id={} resumed", job.getId());
+        if (log.isDebugEnabled()) {
+            log.debug("Job id={}, label='{}' resumed", job.getId(), job.getLabel());
         }
 
         return job;
