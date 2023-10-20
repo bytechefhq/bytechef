@@ -67,7 +67,7 @@ const IntegrationList = () => {
                                                         )
                                                 )}
                                                 tags={integration.tags}
-                                                version={integration.version}
+                                                componentVersion={undefined} // missing api
                                                 workflowIds={
                                                     integration.workflowIds
                                                 }

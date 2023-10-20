@@ -16,22 +16,22 @@ import {
 import React from 'react';
 import Button from '../Button/Button';
 
-export interface SelectItem {
-    value: string;
+export interface SelectOption {
     label: string;
+    value: string;
 }
 
 type SelectProps = {
     defaultValue?: string | undefined;
-    selectItems: SelectItem[];
+    options: SelectOption[];
     onValueChange?(value: string): void;
 };
 
-const Select: React.FC<SelectProps> = ({
+const Select = ({
     defaultValue,
-    selectItems,
+    options,
     onValueChange,
-}: SelectProps) => {
+}: SelectProps): JSX.Element => {
     return (
         <Root defaultValue={defaultValue} onValueChange={onValueChange}>
             <Trigger asChild aria-label="Select">
@@ -49,9 +49,9 @@ const Select: React.FC<SelectProps> = ({
                     <ChevronUpIcon />
                 </ScrollUpButton>
 
-                <Viewport className="rounded-lg bg-white p-2 shadow-lg dark:bg-gray-800">
+                <Viewport className="rounded-lg border border-gray-100 bg-white p-2 shadow-lg dark:bg-gray-800">
                     <Group>
-                        {selectItems.map((selectItem) => (
+                        {options.map((selectItem) => (
                             <Item
                                 key={selectItem.value}
                                 value={selectItem.value}

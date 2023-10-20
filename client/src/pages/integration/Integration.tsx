@@ -124,7 +124,7 @@ const Integration: React.FC = () => {
                                             defaultValue={
                                                 integrationWorkflows[0].id
                                             }
-                                            selectItems={integrationWorkflows.map(
+                                            options={integrationWorkflows.map(
                                                 (workflow: WorkflowModel) => ({
                                                     label: workflow.label!,
                                                     value: workflow.id!,

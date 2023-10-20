@@ -1,71 +1,101 @@
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
 import {twMerge} from 'tailwind-merge';
 import React from 'react';
-import ReactSelectCreatable from 'react-select/creatable';
-import {Props} from 'react-select/dist/declarations/src';
+import ReactSelectCreatable, {CreatableProps} from 'react-select/creatable';
 import './CreatableSelect.css';
+import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
+import {GroupBase} from 'react-select';
+import {FieldPath, FieldValues} from 'react-hook-form/dist/types';
 
-type CreatableSelectProps = {
-    name: string;
-    options: {label: string; value: string}[];
-    error?: boolean;
-    label?: string;
+export interface SelectOption {
+    value: string;
+    label: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    onChange?: (value: any) => void;
-    onCreateOption?: (value: string) => void;
-} & Props;
+    [key: string]: any;
+}
 
-const CreatableSelect = ({
+type CreatableSelectProps<
+    Option,
+    IsMulti extends boolean = false,
+    Group extends GroupBase<Option> = GroupBase<Option>,
+    TFieldValues extends FieldValues = FieldValues,
+    TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+> = {
+    defaultValue?: SelectOption;
+    error?: boolean;
+    field?: ControllerRenderProps<TFieldValues, TName>;
+    isMulti?: boolean;
+    label?: string;
+    name: string;
+    options: SelectOption[];
+} & CreatableProps<Option, IsMulti, Group>;
+
+const CreatableSelect = <
+    Option,
+    IsMulti extends boolean = false,
+    Group extends GroupBase<Option> = GroupBase<Option>,
+    TFieldValues extends FieldValues = FieldValues,
+    TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+>({
     error,
+    field,
+    isMulti,
     label,
-    className,
     name,
     ...props
-}: CreatableSelectProps) => (
-    <fieldset className={label ? 'mb-3' : ''}>
-        {label && (
-            <label
-                htmlFor={name}
-                className="text-sm font-medium text-gray-700 dark:text-gray-400"
-            >
-                {label}
-            </label>
-        )}
+}: CreatableSelectProps<
+    Option,
+    IsMulti,
+    Group,
+    TFieldValues,
+    TName
+>): JSX.Element => {
+    return (
+        <fieldset className={label ? 'mb-3' : ''}>
+            {label && (
+                <label
+                    htmlFor={name}
+                    className="text-sm font-medium text-gray-700 dark:text-gray-400"
+                >
+                    {label}
+                </label>
+            )}
 
-        <div
-            className={twMerge([
-                label ? 'mt-1' : '',
-                error ? 'relative rounded-md shadow-sm' : null,
-            ])}
-        >
-            <ReactSelectCreatable
-                classNamePrefix="react-select"
-                className={className}
-                isMulti
-                {...props}
-            />
+            <div
+                className={twMerge([
+                    label ? 'mt-1' : '',
+                    error ? 'relative rounded-md shadow-sm' : null,
+                ])}
+            >
+                <ReactSelectCreatable
+                    {...field}
+                    classNamePrefix="react-select"
+                    isMulti={isMulti}
+                    {...props}
+                />
+
+                {error && (
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                        <ExclamationCircleIcon
+                            className="h-5 w-5 text-red-500"
+                            aria-hidden="true"
+                        />
+                    </div>
+                )}
+            </div>
 
             {error && (
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                    <ExclamationCircleIcon
-                        className="h-5 w-5 text-red-500"
-                        aria-hidden="true"
-                    />
-                </div>
+                <p
+                    role="alert"
+                    className="mt-2 text-sm text-red-600"
+                    id={`${name}-error`}
+                >
+                    This field is required
+                </p>
             )}
-        </div>
-
-        {error && (
-            <p
-                role="alert"
-                className="mt-2 text-sm text-red-600"
-                id={`${name}-error`}
-            >
-                This field is required
-            </p>
-        )}
-    </fieldset>
-);
+        </fieldset>
+    );
+};
 
 CreatableSelect.displayName = 'CreatableSelect';
 

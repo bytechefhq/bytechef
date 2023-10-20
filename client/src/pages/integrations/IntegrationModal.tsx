@@ -22,7 +22,15 @@ import {useIntegrationMutation} from '../../mutations/integrations.mutations';
 const IntegrationModal = () => {
     const [isOpen, setIsOpen] = useState(false);
 
-    const {control, getValues, setValue, handleSubmit, reset} = useForm({
+    const {
+        control,
+        formState: {errors, touchedFields},
+        handleSubmit,
+        getValues,
+        register,
+        reset,
+        setValue,
+    } = useForm({
         defaultValues: {
             name: '',
             description: '',
@@ -43,6 +51,8 @@ const IntegrationModal = () => {
         data: tags,
     } = useGetIntegrationTagsQuery();
 
+    const queryClient = useQueryClient();
+
     const mutation = useIntegrationMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(
@@ -57,28 +67,23 @@ const IntegrationModal = () => {
         },
     });
 
-    const queryClient = useQueryClient();
-
     function createIntegration() {
         const formData = getValues();
 
-        const tagValues = formData.tags?.map((tag: TagModel) => {
-            return {id: tag.id, name: tag.name, version: tag.version};
-        });
-
-        mutation.mutate({...formData, tags: tagValues} as IntegrationModel);
+        mutation.mutate({...formData} as IntegrationModel);
     }
 
     return (
         <Modal
             confirmButtonLabel="Create"
-            description="Use this to create your integration which will contain related workflows"
-            handleConfirmButtonClick={handleSubmit(createIntegration)}
-            triggerLabel="Create Integration"
-            title="Create Integration"
+            description="Create your integration which will contain related workflows"
             form
             isOpen={isOpen}
             setIsOpen={setIsOpen}
+            title="Create Integration"
+            triggerLabel="Create Integration"
+            onCloseClick={reset}
+            onConfirmButtonClick={handleSubmit(createIntegration)}
         >
             {categoriesError &&
                 !categoriesIsLoading &&
@@ -87,30 +92,17 @@ const IntegrationModal = () => {
                 !tagsIsLoading &&
                 `An error has occurred: ${tagsError.message}`}
 
-            <Controller
-                name="name"
-                control={control}
-                rules={{required: true}}
-                render={({field, fieldState: {error, isTouched}}) => (
-                    <Input
-                        error={isTouched && !!error}
-                        label="Name"
-                        placeholder="My CRM Integration"
-                        {...field}
-                    />
-                )}
+            <Input
+                error={touchedFields.name && !!errors.name}
+                label="Name"
+                placeholder="My CRM Integration"
+                {...register('name', {required: true})}
             />
 
-            <Controller
-                control={control}
-                name="description"
-                render={({field}) => (
-                    <TextArea
-                        label="Description"
-                        placeholder="Cute description of your integration"
-                        {...field}
-                    />
-                )}
+            <TextArea
+                label="Description"
+                placeholder="Cute description of your integration"
+                {...register('description')}
             />
 
             {!categoriesIsLoading && (
@@ -119,8 +111,10 @@ const IntegrationModal = () => {
                     name="category"
                     render={({field}) => (
                         <CreatableSelect
+                            field={field}
                             isMulti={false}
                             label="Category"
+                            name="category"
                             options={categories!.map(
                                 (category: CategoryModel) => ({
                                     label: `${category.name
@@ -143,7 +137,6 @@ const IntegrationModal = () => {
                                     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
                                 } as any);
                             }}
-                            {...field}
                         />
                     )}
                 />
@@ -155,8 +148,10 @@ const IntegrationModal = () => {
                     name="tags"
                     render={({field}) => (
                         <CreatableSelect
+                            field={field}
                             isMulti
                             label="Tags"
+                            name="tags"
                             options={tags!.map((tag: TagModel) => ({
                                 label: `${tag.name
                                     .charAt(0)
@@ -176,7 +171,6 @@ const IntegrationModal = () => {
                                     },
                                 ] as never[]);
                             }}
-                            {...field}
                         />
                     )}
                 />
