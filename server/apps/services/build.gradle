@@ -1,21 +1,6 @@
 bootJar.enabled = false
 
 subprojects {
-    apply from: "gradle/docker.gradle"
-
-    if (project.hasProperty("prod")) {
-        apply from: "../../../gradle/profile_prod.gradle"
-    } else {
-        apply from: "../../../gradle/profile_dev.gradle"
-    }
-
-    if (project.hasProperty("native")) {
-        apply from: "../../../gradle/profile_native.gradle"
-    }
-
-    compileJava.dependsOn processResources
-    processResources.dependsOn bootBuildInfo
-
     dependencies {
         //    if (project.hasProperty("consul")) {
         implementation "org.springframework.cloud:spring-cloud-starter-consul-discovery"
