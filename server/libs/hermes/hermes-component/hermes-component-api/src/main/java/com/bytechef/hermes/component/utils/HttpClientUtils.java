@@ -41,11 +41,13 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
@@ -247,7 +249,10 @@ public class HttpClientUtils {
             }
         }
 
-        httpRequestBuilder.uri(createURI(getConnectionBaseUri(context, urlString), queryParameters));
+        httpRequestBuilder.uri(
+			createURI(
+				getConnectionBaseUri(context, urlString),
+				Objects.requireNonNullElse(queryParameters, Collections.emptyMap())));
 
         return httpRequestBuilder.build();
     }
@@ -311,7 +316,7 @@ public class HttpClientUtils {
                 MediaType.parse(fileEntry.getMimeType())));
     }
 
-    private static URI createURI(String uriString, Map<String, List<String>> queryParameters) {
+    private static URI createURI(String uriString, @Nonnull Map<String, List<String>> queryParameters) {
         URI uri;
 
         if (queryParameters.isEmpty()) {
