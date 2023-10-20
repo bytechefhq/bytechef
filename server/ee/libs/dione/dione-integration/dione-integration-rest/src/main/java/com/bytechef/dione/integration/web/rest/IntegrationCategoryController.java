@@ -20,6 +20,7 @@ package com.bytechef.dione.integration.web.rest;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.category.web.rest.model.CategoryModel;
 import com.bytechef.dione.integration.facade.IntegrationFacade;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,6 +40,7 @@ public class IntegrationCategoryController implements IntegrationCategoriesApi {
     private final ConversionService conversionService;
     private final IntegrationFacade integrationFacade;
 
+    @SuppressFBWarnings("EI")
     public IntegrationCategoryController(ConversionService conversionService, IntegrationFacade integrationFacade) {
         this.conversionService = conversionService;
         this.integrationFacade = integrationFacade;

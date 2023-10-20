@@ -80,12 +80,6 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
             integration.setCategory(categoryService.save(category));
         }
 
-        if (CollectionUtils.isEmpty(integration.getWorkflowIds())) {
-            Workflow workflow = workflowService.create(null, Workflow.Format.JSON, Workflow.SourceType.JDBC);
-
-            integration.setWorkflowIds(List.of(workflow.getId()));
-        }
-
         if (!CollectionUtils.isEmpty(integration.getTags())) {
             integration.setTags(tagService.save(integration.getTags()));
         }
@@ -122,7 +116,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     @Override
     @Transactional(readOnly = true)
     public List<Category> getIntegrationCategories() {
-        List<Integration> integrations = integrationService.getIntegrations(null, null);
+        List<Integration> integrations = integrationService.searchIntegrations(null, null);
 
         List<Long> categoryIds = integrations.stream()
             .map(Integration::getCategoryId)
@@ -134,8 +128,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Integration> getIntegrations(List<Long> categoryIds, List<Long> tagIds) {
-        List<Integration> integrations = integrationService.getIntegrations(categoryIds, tagIds);
+    public List<Integration> searchIntegrations(List<Long> categoryIds, List<Long> tagIds) {
+        List<Integration> integrations = integrationService.searchIntegrations(categoryIds, tagIds);
 
         List<Category> categories = categoryService.getCategories(integrations.stream()
             .map(Integration::getCategoryId)
@@ -171,7 +165,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     @Override
     @Transactional(readOnly = true)
     public List<Tag> getIntegrationTags() {
-        List<Integration> integrations = integrationService.getIntegrations(null, null);
+        List<Integration> integrations = integrationService.searchIntegrations(null, null);
 
         List<Long> tagIds = integrations.stream()
             .map(Integration::getTagIds)

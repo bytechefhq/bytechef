@@ -49,7 +49,7 @@ public class IntegrationTagControllerIntTest {
         try {
             this.webTestClient
                 .get()
-                .uri("/integrations/tags")
+                .uri("/integration-tags")
                 .exchange()
                 .expectStatus()
                 .isOk()
