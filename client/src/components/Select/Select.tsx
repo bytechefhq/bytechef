@@ -1,4 +1,9 @@
-import {CheckIcon, ChevronDownIcon, ChevronUpIcon} from '@radix-ui/react-icons';
+import {
+    CheckIcon,
+    ChevronDownIcon,
+    ChevronUpIcon,
+    QuestionMarkCircledIcon,
+} from '@radix-ui/react-icons';
 import {Label} from '@radix-ui/react-label';
 import {
     Content,
@@ -15,6 +20,7 @@ import {
     Value,
     Viewport,
 } from '@radix-ui/react-select';
+import Tooltip from 'components/Tooltip/Tooltip';
 import {twMerge} from 'tailwind-merge';
 
 import Button from '../Button/Button';
@@ -30,6 +36,7 @@ type SelectProps = {
     contentClassName?: string;
     customValueComponent?: React.ReactNode;
     defaultValue?: string | undefined;
+    description?: string;
     label?: string;
     onValueChange?(value: string): void;
     triggerClassName?: string;
@@ -40,6 +47,7 @@ const Select = ({
     contentClassName,
     customValueComponent,
     defaultValue,
+    description,
     label,
     options,
     onValueChange,
@@ -48,8 +56,19 @@ const Select = ({
 }: SelectProps): JSX.Element => (
     <fieldset className="w-full">
         {label && (
-            <Label className="block px-2 text-sm font-medium leading-6 text-gray-900">
-                {label}
+            <Label
+                className={twMerge(
+                    'flex items-center text-sm font-medium leading-6 text-gray-900',
+                    description && 'space-x-1'
+                )}
+            >
+                <span>{label}</span>
+
+                {description && (
+                    <Tooltip text={description}>
+                        <QuestionMarkCircledIcon />
+                    </Tooltip>
+                )}
             </Label>
         )}
 
