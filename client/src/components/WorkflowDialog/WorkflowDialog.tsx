@@ -8,6 +8,8 @@ import TextArea from 'components/TextArea/TextArea';
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 
+import {WorkflowModel} from '../../middleware/workflow';
+
 type WorkflowDialogProps = {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     createWorkflowRequestMutation: UseMutationResult<any, object, any, unknown>;
@@ -32,9 +34,9 @@ const WorkflowDialog = ({
         reset,
     } = useForm({
         defaultValues: {
-            name: '',
+            label: '',
             description: '',
-        },
+        } as WorkflowModel,
     });
 
     const {mutate, isLoading} = createWorkflowRequestMutation;
@@ -81,9 +83,9 @@ const WorkflowDialog = ({
             }
         >
             <Input
-                error={touchedFields.name && !!errors.name}
-                label="Name"
-                {...register('name', {required: true})}
+                error={touchedFields.label && !!errors.label}
+                label="Label"
+                {...register('label', {required: true})}
             />
 
             <TextArea
