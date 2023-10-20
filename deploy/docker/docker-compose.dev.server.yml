@@ -18,14 +18,14 @@ services:
 #      - '5672:5672'
 #      # HTTP management UI
 #      - '15672:15672'
-#  redis:
-#    image: redis:7-alpine
-#    restart: always
-#    ports:
-#      - '6379:6379'
-#    command: redis-server --save 20 1 --loglevel warning
-#    volumes:
-#      - cache:/data
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - cache:/data
   bytechef-server-app:
     build:
       context: ../../
