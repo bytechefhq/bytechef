@@ -83,7 +83,6 @@ public class ConnectionFacadeIntTest {
     public void testCreate() {
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .componentName("componentName")
-            .key("key")
             .name("name1")
             .tags(List.of(new Tag("tag1")))
             .build();
@@ -99,7 +98,6 @@ public class ConnectionFacadeIntTest {
     public void testDelete() {
         ConnectionDTO connectionDTO1 = ConnectionDTO.builder()
             .componentName("componentName")
-            .key("key")
             .name("name1")
             .tags(List.of(new Tag("tag1")))
             .build();
@@ -108,7 +106,6 @@ public class ConnectionFacadeIntTest {
 
         ConnectionDTO connectionDTO2 = ConnectionDTO.builder()
             .componentName("componentName")
-            .key("key")
             .name("name2")
             .tags(List.of(new Tag("tag1")))
             .build();
@@ -133,7 +130,6 @@ public class ConnectionFacadeIntTest {
         Connection connection = new Connection();
 
         connection.setComponentName("componentName");
-        connection.setKey("key");
         connection.setName("name");
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
@@ -154,7 +150,6 @@ public class ConnectionFacadeIntTest {
         Connection connection = new Connection();
 
         connection.setComponentName("componentName");
-        connection.setKey("key");
         connection.setName("name");
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
@@ -184,7 +179,6 @@ public class ConnectionFacadeIntTest {
         Tag tag2 = tagRepository.save(new Tag("tag2"));
 
         connection.setComponentName("componentName");
-        connection.setKey("key");
         connection.setName("name");
         connection.setTags(List.of(tag1, tag2));
 
@@ -198,7 +192,6 @@ public class ConnectionFacadeIntTest {
         connection = new Connection();
 
         connection.setComponentName("componentName");
-        connection.setKey("key");
         connection.setName("name2");
 
         tag1 = OptionalUtils.get(tagRepository.findById(tag1.getId()));
@@ -226,7 +219,6 @@ public class ConnectionFacadeIntTest {
 
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .componentName("componentName")
-            .key("key")
             .name("name")
             .tags(List.of(tag1, tagRepository.save(new Tag("tag2"))))
             .build();
@@ -238,7 +230,6 @@ public class ConnectionFacadeIntTest {
         connectionDTO = ConnectionDTO.builder()
             .componentName("componentName")
             .id(connectionDTO.id())
-            .key("key")
             .name("name")
             .tags(List.of(tag1))
             .version(connectionDTO.version())

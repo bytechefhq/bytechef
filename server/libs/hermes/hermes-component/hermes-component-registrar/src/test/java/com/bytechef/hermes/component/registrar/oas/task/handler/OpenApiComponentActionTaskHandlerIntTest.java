@@ -129,7 +129,6 @@ public class OpenApiComponentActionTaskHandlerIntTest {
 
         connection.setAuthorizationName("api_key");
         connection.setComponentName("petstore");
-        connection.setKey("key");
         connection.setName("PetShop Connection");
 
         connection = connectionRepository.save(connection);

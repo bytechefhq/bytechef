@@ -23,7 +23,6 @@ import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,8 +49,6 @@ public class ConnectionServiceImpl implements ConnectionService {
         Assert.hasText(connection.getComponentName(), "'componentName' must not be empty");
         Assert.hasText(connection.getName(), "'name' must not be empty");
         Assert.isNull(connection.getId(), "'id' must be null");
-
-        connection.setKey(StringUtils.lowerCase(StringUtils.replaceChars(connection.getName(), "[^a-zA-Z0-9]", "")));
 
         return connectionRepository.save(connection);
     }

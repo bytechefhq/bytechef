@@ -132,7 +132,6 @@ public class ConnectionServiceIntTest {
     private static Connection getConnection() {
         return Connection.builder()
             .componentName("componentName")
-            .key("key")
             .name("name")
             .parameters(Map.of("key1", "value1"))
             .version(1)
