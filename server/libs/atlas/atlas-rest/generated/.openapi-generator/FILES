@@ -1,12 +1,11 @@
-README.md
-pom.xml
 src/main/java/com/bytechef/atlas/web/rest/ApiUtil.java
-src/main/java/com/bytechef/atlas/web/rest/CacheControllerApi.java
-src/main/java/com/bytechef/atlas/web/rest/JobControllerApi.java
-src/main/java/com/bytechef/atlas/web/rest/TaskExecutionControllerApi.java
-src/main/java/com/bytechef/atlas/web/rest/WorkflowControllerApi.java
+src/main/java/com/bytechef/atlas/web/rest/CachesApi.java
+src/main/java/com/bytechef/atlas/web/rest/JobsApi.java
+src/main/java/com/bytechef/atlas/web/rest/TaskExecutionsApi.java
+src/main/java/com/bytechef/atlas/web/rest/WorkflowsApi.java
 src/main/java/com/bytechef/atlas/web/rest/model/ExecutionErrorModel.java
 src/main/java/com/bytechef/atlas/web/rest/model/JobModel.java
+src/main/java/com/bytechef/atlas/web/rest/model/JobParametersModel.java
 src/main/java/com/bytechef/atlas/web/rest/model/PageModel.java
 src/main/java/com/bytechef/atlas/web/rest/model/PostJob200ResponseModel.java
 src/main/java/com/bytechef/atlas/web/rest/model/TaskExecutionModel.java

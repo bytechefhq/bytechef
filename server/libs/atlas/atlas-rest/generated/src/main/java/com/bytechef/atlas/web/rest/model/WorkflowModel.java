@@ -2,7 +2,6 @@ package com.bytechef.atlas.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.atlas.web.rest.model.ExecutionErrorModel;
 import com.bytechef.atlas.web.rest.model.WorkflowTaskModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -24,15 +23,16 @@ import java.util.*;
 import javax.annotation.Generated;
 
 /**
- * WorkflowModel
+ * The blueprint that describe the execution of a job.
  */
 
+@Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-10-27T10:08:31.057495+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-11T19:28:49.295573+01:00[Europe/Zagreb]")
 public class WorkflowModel {
 
-  @JsonProperty("content")
-  private String content;
+  @JsonProperty("definition")
+  private String definition;
 
   @JsonProperty("createdBy")
   private String createdBy;
@@ -41,11 +41,8 @@ public class WorkflowModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
-  @JsonProperty("error")
-  private ExecutionErrorModel error;
-
   /**
-   * Gets or Sets format
+   * The format of the workflow definition.
    */
   public enum FormatEnum {
     JSON("JSON"),
@@ -105,30 +102,30 @@ public class WorkflowModel {
   @Valid
   private List<Map<String, Object>> outputs = null;
 
+  @JsonProperty("retry")
+  private Integer retry;
+
   @JsonProperty("tasks")
   @Valid
   private List<WorkflowTaskModel> tasks = null;
 
-  @JsonProperty("retry")
-  private Integer retry;
-
-  public WorkflowModel content(String content) {
-    this.content = content;
+  public WorkflowModel definition(String definition) {
+    this.definition = definition;
     return this;
   }
 
   /**
-   * Get content
-   * @return content
+   * Definition of the workflow that is executed as a job.
+   * @return definition
   */
   
-  @Schema(name = "content", required = false)
-  public String getContent() {
-    return content;
+  @Schema(name = "definition", description = "Definition of the workflow that is executed as a job.", required = false)
+  public String getDefinition() {
+    return definition;
   }
 
-  public void setContent(String content) {
-    this.content = content;
+  public void setDefinition(String definition) {
+    this.definition = definition;
   }
 
   public WorkflowModel createdBy(String createdBy) {
@@ -137,11 +134,11 @@ public class WorkflowModel {
   }
 
   /**
-   * Get createdBy
+   * Created by.
    * @return createdBy
   */
   
-  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "Created by.", required = false)
   public String getCreatedBy() {
     return createdBy;
   }
@@ -156,11 +153,11 @@ public class WorkflowModel {
   }
 
   /**
-   * Get createdDate
+   * Created date.
    * @return createdDate
   */
   @Valid 
-  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "Created date.", required = false)
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -169,36 +166,17 @@ public class WorkflowModel {
     this.createdDate = createdDate;
   }
 
-  public WorkflowModel error(ExecutionErrorModel error) {
-    this.error = error;
-    return this;
-  }
-
-  /**
-   * Get error
-   * @return error
-  */
-  @Valid 
-  @Schema(name = "error", required = false)
-  public ExecutionErrorModel getError() {
-    return error;
-  }
-
-  public void setError(ExecutionErrorModel error) {
-    this.error = error;
-  }
-
   public WorkflowModel format(FormatEnum format) {
     this.format = format;
     return this;
   }
 
   /**
-   * Get format
+   * The format of the workflow definition.
    * @return format
   */
   
-  @Schema(name = "format", required = false)
+  @Schema(name = "format", description = "The format of the workflow definition.", required = false)
   public FormatEnum getFormat() {
     return format;
   }
@@ -213,11 +191,11 @@ public class WorkflowModel {
   }
 
   /**
-   * Get id
+   * Id of the workflow.
    * @return id
   */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "Id of the workflow.", required = false)
   public String getId() {
     return id;
   }
@@ -240,11 +218,11 @@ public class WorkflowModel {
   }
 
   /**
-   * Get inputs
+   * The workflow's expected list of inputs.
    * @return inputs
   */
   @Valid 
-  @Schema(name = "inputs", required = false)
+  @Schema(name = "inputs", description = "The workflow's expected list of inputs.", required = false)
   public List<Map<String, Object>> getInputs() {
     return inputs;
   }
@@ -259,11 +237,11 @@ public class WorkflowModel {
   }
 
   /**
-   * Get label
+   * Descriptive name for the workflow
    * @return label
   */
   
-  @Schema(name = "label", required = false)
+  @Schema(name = "label", description = "Descriptive name for the workflow", required = false)
   public String getLabel() {
     return label;
   }
@@ -278,11 +256,11 @@ public class WorkflowModel {
   }
 
   /**
-   * Get lastModifiedBy
+   * Last modified by.
    * @return lastModifiedBy
   */
   
-  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "Last modified by.", required = false)
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -297,11 +275,11 @@ public class WorkflowModel {
   }
 
   /**
-   * Get lastModifiedDate
+   * Last modified date.
    * @return lastModifiedDate
   */
   @Valid 
-  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "Last modified date.", required = false)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -324,17 +302,36 @@ public class WorkflowModel {
   }
 
   /**
-   * Get outputs
+   * The workflow's list of expected outputs.
    * @return outputs
   */
   @Valid 
-  @Schema(name = "outputs", required = false)
+  @Schema(name = "outputs", description = "The workflow's list of expected outputs.", required = false)
   public List<Map<String, Object>> getOutputs() {
     return outputs;
   }
 
   public void setOutputs(List<Map<String, Object>> outputs) {
     this.outputs = outputs;
+  }
+
+  public WorkflowModel retry(Integer retry) {
+    this.retry = retry;
+    return this;
+  }
+
+  /**
+   * The maximum number of times a task may retry.
+   * @return retry
+  */
+  
+  @Schema(name = "retry", description = "The maximum number of times a task may retry.", required = false)
+  public Integer getRetry() {
+    return retry;
+  }
+
+  public void setRetry(Integer retry) {
+    this.retry = retry;
   }
 
   public WorkflowModel tasks(List<WorkflowTaskModel> tasks) {
@@ -351,36 +348,17 @@ public class WorkflowModel {
   }
 
   /**
-   * Get tasks
+   * The steps that make up the workflow.
    * @return tasks
   */
   @Valid 
-  @Schema(name = "tasks", required = false)
+  @Schema(name = "tasks", description = "The steps that make up the workflow.", required = false)
   public List<WorkflowTaskModel> getTasks() {
     return tasks;
   }
 
   public void setTasks(List<WorkflowTaskModel> tasks) {
     this.tasks = tasks;
-  }
-
-  public WorkflowModel retry(Integer retry) {
-    this.retry = retry;
-    return this;
-  }
-
-  /**
-   * Get retry
-   * @return retry
-  */
-  
-  @Schema(name = "retry", required = false)
-  public Integer getRetry() {
-    return retry;
-  }
-
-  public void setRetry(Integer retry) {
-    this.retry = retry;
   }
 
   @Override
@@ -392,10 +370,9 @@ public class WorkflowModel {
       return false;
     }
     WorkflowModel workflow = (WorkflowModel) o;
-    return Objects.equals(this.content, workflow.content) &&
+    return Objects.equals(this.definition, workflow.definition) &&
         Objects.equals(this.createdBy, workflow.createdBy) &&
         Objects.equals(this.createdDate, workflow.createdDate) &&
-        Objects.equals(this.error, workflow.error) &&
         Objects.equals(this.format, workflow.format) &&
         Objects.equals(this.id, workflow.id) &&
         Objects.equals(this.inputs, workflow.inputs) &&
@@ -403,23 +380,22 @@ public class WorkflowModel {
         Objects.equals(this.lastModifiedBy, workflow.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, workflow.lastModifiedDate) &&
         Objects.equals(this.outputs, workflow.outputs) &&
-        Objects.equals(this.tasks, workflow.tasks) &&
-        Objects.equals(this.retry, workflow.retry);
+        Objects.equals(this.retry, workflow.retry) &&
+        Objects.equals(this.tasks, workflow.tasks);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(content, createdBy, createdDate, error, format, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, tasks, retry);
+    return Objects.hash(definition, createdBy, createdDate, format, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, retry, tasks);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowModel {\n");
-    sb.append("    content: ").append(toIndentedString(content)).append("\n");
+    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
-    sb.append("    error: ").append(toIndentedString(error)).append("\n");
     sb.append("    format: ").append(toIndentedString(format)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
@@ -427,8 +403,8 @@ public class WorkflowModel {
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    outputs: ").append(toIndentedString(outputs)).append("\n");
-    sb.append("    tasks: ").append(toIndentedString(tasks)).append("\n");
     sb.append("    retry: ").append(toIndentedString(retry)).append("\n");
+    sb.append("    tasks: ").append(toIndentedString(tasks)).append("\n");
     sb.append("}");
     return sb.toString();
   }

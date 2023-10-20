@@ -24,11 +24,12 @@ import java.util.*;
 import javax.annotation.Generated;
 
 /**
- * JobModel
+ * Represents an execution of a workflow.
  */
 
+@Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-10-27T10:08:31.057495+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-11T19:28:49.295573+01:00[Europe/Zagreb]")
 public class JobModel {
 
   @JsonProperty("createdBy")
@@ -80,7 +81,7 @@ public class JobModel {
   private LocalDateTime startTime;
 
   /**
-   * Gets or Sets status
+   * The job's status.
    */
   public enum StatusEnum {
     CREATED("CREATED"),
@@ -136,11 +137,11 @@ public class JobModel {
   }
 
   /**
-   * Get createdBy
+   * Created by.
    * @return createdBy
   */
   
-  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "Created by.", required = false)
   public String getCreatedBy() {
     return createdBy;
   }
@@ -155,11 +156,11 @@ public class JobModel {
   }
 
   /**
-   * Get createdDate
+   * Created date.
    * @return createdDate
   */
   @Valid 
-  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "Created date.", required = false)
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -174,11 +175,11 @@ public class JobModel {
   }
 
   /**
-   * Get currentTask
+   * The index of the step on the job's workflow on which the job is working on right now.
    * @return currentTask
   */
   
-  @Schema(name = "currentTask", required = false)
+  @Schema(name = "currentTask", description = "The index of the step on the job's workflow on which the job is working on right now.", required = false)
   public Integer getCurrentTask() {
     return currentTask;
   }
@@ -193,11 +194,11 @@ public class JobModel {
   }
 
   /**
-   * Get endTime
+   * The time execution entered end status COMPLETED, STOPPED, FAILED
    * @return endTime
   */
   @Valid 
-  @Schema(name = "endTime", required = false)
+  @Schema(name = "endTime", description = "The time execution entered end status COMPLETED, STOPPED, FAILED", required = false)
   public LocalDateTime getEndTime() {
     return endTime;
   }
@@ -231,11 +232,11 @@ public class JobModel {
   }
 
   /**
-   * Get id
+   * Id of the job.
    * @return id
   */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "Id of the job.", required = false)
   public String getId() {
     return id;
   }
@@ -258,11 +259,11 @@ public class JobModel {
   }
 
   /**
-   * Get inputs
+   * The key-value map of inputs passed to the job when it was created.
    * @return inputs
   */
   
-  @Schema(name = "inputs", required = false)
+  @Schema(name = "inputs", description = "The key-value map of inputs passed to the job when it was created.", required = false)
   public Map<String, Object> getInputs() {
     return inputs;
   }
@@ -277,11 +278,11 @@ public class JobModel {
   }
 
   /**
-   * Get label
+   * The job's human-readable name.
    * @return label
   */
   
-  @Schema(name = "label", required = false)
+  @Schema(name = "label", description = "The job's human-readable name.", required = false)
   public String getLabel() {
     return label;
   }
@@ -296,11 +297,11 @@ public class JobModel {
   }
 
   /**
-   * Get lastModifiedBy
+   * Last modified by.
    * @return lastModifiedBy
   */
   
-  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "Last modified by.", required = false)
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -315,11 +316,11 @@ public class JobModel {
   }
 
   /**
-   * Get lastModifiedDate
+   * Last modified date.
    * @return lastModifiedDate
   */
   @Valid 
-  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "Last modified date.", required = false)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -342,11 +343,11 @@ public class JobModel {
   }
 
   /**
-   * Get outputs
+   * The key-value map of outputs returned.
    * @return outputs
   */
   
-  @Schema(name = "outputs", required = false)
+  @Schema(name = "outputs", description = "The key-value map of outputs returned.", required = false)
   public Map<String, Object> getOutputs() {
     return outputs;
   }
@@ -361,11 +362,11 @@ public class JobModel {
   }
 
   /**
-   * Get parentTaskExecutionId
+   * The id of the parent task that created this job. Required for sub-flows.
    * @return parentTaskExecutionId
   */
   
-  @Schema(name = "parentTaskExecutionId", required = false)
+  @Schema(name = "parentTaskExecutionId", description = "The id of the parent task that created this job. Required for sub-flows.", required = false)
   public String getParentTaskExecutionId() {
     return parentTaskExecutionId;
   }
@@ -380,11 +381,11 @@ public class JobModel {
   }
 
   /**
-   * Get priority
+   * The priority value.
    * @return priority
   */
   
-  @Schema(name = "priority", required = false)
+  @Schema(name = "priority", description = "The priority value.", required = false)
   public Integer getPriority() {
     return priority;
   }
@@ -399,11 +400,11 @@ public class JobModel {
   }
 
   /**
-   * Get startTime
+   * The time of when the job began.
    * @return startTime
   */
   @Valid 
-  @Schema(name = "startTime", required = false)
+  @Schema(name = "startTime", description = "The time of when the job began.", required = false)
   public LocalDateTime getStartTime() {
     return startTime;
   }
@@ -418,11 +419,11 @@ public class JobModel {
   }
 
   /**
-   * Get status
+   * The job's status.
    * @return status
   */
   
-  @Schema(name = "status", required = false)
+  @Schema(name = "status", description = "The job's status.", required = false)
   public StatusEnum getStatus() {
     return status;
   }
@@ -445,11 +446,11 @@ public class JobModel {
   }
 
   /**
-   * Get webhooks
+   * The list of webhooks configured.
    * @return webhooks
   */
   @Valid 
-  @Schema(name = "webhooks", required = false)
+  @Schema(name = "webhooks", description = "The list of webhooks configured.", required = false)
   public List<Map<String, Object>> getWebhooks() {
     return webhooks;
   }
