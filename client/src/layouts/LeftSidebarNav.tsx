@@ -71,11 +71,11 @@ const LeftSidebarNavItem = ({
     <Link
         to={toLink}
         className={cn(
-            'justify-start',
             buttonVariants({variant: 'ghost'}),
             current
                 ? 'bg-muted hover:bg-muted'
-                : 'hover:bg-transparent hover:underline'
+                : 'hover:bg-transparent hover:underline',
+            'justify-start'
         )}
         aria-current={current ? 'page' : undefined}
         onClick={() => (onItemClick ? onItemClick(id) : null)}
