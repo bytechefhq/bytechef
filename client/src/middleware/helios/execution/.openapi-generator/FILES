@@ -1,6 +1,7 @@
-apis/AutomationExecutionApi.ts
-apis/AutomationJobApi.ts
-apis/AutomationTestApi.ts
+.openapi-generator-ignore
+apis/ProjectJobApi.ts
+apis/ProjectWorkflowExecutionApi.ts
+apis/ProjectWorkflowTestApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts
