@@ -31,7 +31,7 @@ import {
     useGetIntegrationQuery,
     useGetIntegrationWorkflowsQuery,
 } from '../../queries/integrations';
-import WorkflowModal from 'pages/integrations/WorkflowModal';
+import WorkflowDialog from 'pages/integrations/WorkflowDialog';
 
 const headerToggleItems: ToggleItem[] = [
     {
@@ -87,7 +87,8 @@ const Integration: React.FC = () => {
         integration,
     ]);
 
-    const [showWorkflowModal, setShowWorkflowModal] = useState<boolean>(false);
+    const [showWorkflowDialog, setShowWorkflowDialog] =
+        useState<boolean>(false);
 
     return (
         <>
@@ -155,15 +156,15 @@ const Integration: React.FC = () => {
                                             }
                                             size="small"
                                             onClick={() =>
-                                                setShowWorkflowModal(true)
+                                                setShowWorkflowDialog(true)
                                             }
                                         />
                                     </div>
                                 </div>
                             </div>
 
-                            {showWorkflowModal && (
-                                <WorkflowModal visible version={undefined} />
+                            {showWorkflowDialog && (
+                                <WorkflowDialog visible version={undefined} />
                             )}
 
                             <div>

@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 
 import Input from 'components/Input/Input';
-import Modal from 'components/Modal/Modal';
+import Dialog from 'components/Dialog/Dialog';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import TextArea from 'components/TextArea/TextArea';
 import {Controller, useForm} from 'react-hook-form';
@@ -23,19 +23,19 @@ import {
 } from '../../mutations/integrations.mutations';
 import {Close} from '@radix-ui/react-dialog';
 
-interface IntegrationModalProps {
+interface IntegrationDialogProps {
     integration: IntegrationModel | undefined;
     showTrigger?: boolean;
     visible?: boolean;
     onClose?: () => void;
 }
 
-const IntegrationModal = ({
+const IntegrationDialog = ({
     integration,
     showTrigger = true,
     visible = false,
     onClose,
-}: IntegrationModalProps) => {
+}: IntegrationDialogProps) => {
     const [isOpen, setIsOpen] = useState(visible);
 
     const {
@@ -90,7 +90,7 @@ const IntegrationModal = ({
             queryClient.invalidateQueries(IntegrationKeys.integrations);
             queryClient.invalidateQueries(IntegrationKeys.integrationTags);
 
-            closeModal();
+            closeDialog();
         },
     });
 
@@ -104,11 +104,11 @@ const IntegrationModal = ({
 
             queryClient.invalidateQueries(IntegrationKeys.integrationTags);
 
-            closeModal();
+            closeDialog();
         },
     });
 
-    function closeModal() {
+    function closeDialog() {
         reset();
 
         setIsOpen(false);
@@ -149,7 +149,7 @@ const IntegrationModal = ({
     }
 
     return (
-        <Modal
+        <Dialog
             description={`Use this to ${
                 integration?.id ? 'edit' : 'create'
             } your integration which will contain related workflows`}
@@ -158,7 +158,7 @@ const IntegrationModal = ({
                 if (isOpen) {
                     setIsOpen(isOpen);
                 } else {
-                    closeModal();
+                    closeDialog();
                 }
             }}
             title={`${integration?.id ? 'Edit' : 'Create'} Integration`}
@@ -275,8 +275,8 @@ const IntegrationModal = ({
                     onClick={handleSubmit(createIntegration)}
                 />
             </div>
-        </Modal>
+        </Dialog>
     );
 };
 
-export default IntegrationModal;
+export default IntegrationDialog;

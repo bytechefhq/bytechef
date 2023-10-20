@@ -1,6 +1,6 @@
 import LayoutContainer from '../../layouts/LayoutContainer/LayoutContainer';
 import IntegrationList from './IntegrationList';
-import IntegrationModal from './IntegrationModal';
+import IntegrationDialog from './IntegrationDialog';
 import React, {useState} from 'react';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import LeftSidebarMenu from '../../layouts/LeftSidebarMenu/LeftSidebarMenu';
@@ -57,7 +57,7 @@ const Integrations = () => {
             header={
                 <PageHeader
                     position="main"
-                    right={<IntegrationModal integration={undefined} />}
+                    right={<IntegrationDialog integration={undefined} />}
                     title={title}
                 />
             }
