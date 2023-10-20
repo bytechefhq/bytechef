@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.integration.service.impl;
+package com.bytechef.category.servicee.impl;
 
-import com.bytechef.hermes.integration.domain.Category;
-import com.bytechef.hermes.integration.repository.CategoryRepository;
-import com.bytechef.hermes.integration.service.CategoryService;
+import com.bytechef.category.domain.Category;
+import com.bytechef.category.repository.CategoryRepository;
+import com.bytechef.category.servicee.CategoryService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.Collections;
@@ -33,6 +34,7 @@ import java.util.stream.StreamSupport;
  * @author Ivica Cardic
  */
 @Service
+@Transactional
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;

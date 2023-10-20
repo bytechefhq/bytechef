@@ -24,10 +24,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.hermes.integration.domain.Category;
+import com.bytechef.category.domain.Category;
 import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.facade.IntegrationFacade;
-import com.bytechef.hermes.integration.service.CategoryService;
+import com.bytechef.category.servicee.CategoryService;
 import com.bytechef.hermes.integration.web.rest.mapper.IntegrationMapper;
 import com.bytechef.hermes.integration.web.rest.model.CategoryModel;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;

@@ -30,6 +30,7 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-resource")
     implementation project(":server:libs:atlas:atlas-rest:atlas-rest-impl")
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-config")
+    implementation project(":server:libs:core:category:category-service")
     implementation project(":server:libs:core:encryption:encryption-filesystem")
     implementation project(":server:libs:core:rest:rest-impl")
     implementation project(":server:libs:core:tag:tag-service")

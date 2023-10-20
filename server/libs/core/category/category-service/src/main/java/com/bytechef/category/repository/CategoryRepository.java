@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.integration.repository;
+package com.bytechef.category.repository;
 
-import com.bytechef.hermes.integration.domain.Category;
+import com.bytechef.category.domain.Category;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;

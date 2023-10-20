@@ -433,8 +433,7 @@ public class HttpClientUtilsTest {
             new HttpClientUtils.Response("text", Map.of(), 200),
             HttpClientUtils.handleResponse(
                 context, new TestHttpResponse("text"),
-                HttpClientUtils.fullResponse(true)
-                    .responseFormat(HttpClientUtils.ResponseFormat.TEXT)));
+                HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.TEXT)));
     }
 
     private static class TestHttpResponse implements HttpResponse<Object> {
