@@ -62,11 +62,13 @@ openapi:
 
 spring:
   application:
-    name: configuration-service-app
+    name: configurationservice
   cloud:
     redis:
       discovery:
         instanceId: ${spring.application.name}:${random.value}
+#  config:
+#    import: configserver:http://localhost:6111
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: ${bytechef.datasource.url}

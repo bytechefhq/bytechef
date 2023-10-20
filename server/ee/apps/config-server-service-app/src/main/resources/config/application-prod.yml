@@ -1,0 +1,21 @@
+logging:
+  level:
+    ROOT: INFO
+    com.bytechef: INFO
+
+management:
+  prometheus:
+    metrics:
+      export:
+        enabled: false
+
+server:
+  port: 8080
+  shutdown: graceful # see https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-graceful-shutdown
+
+spring:
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false

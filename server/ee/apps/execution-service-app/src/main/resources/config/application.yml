@@ -62,7 +62,7 @@ openapi:
 
 spring:
   application:
-    name: execution-service-app
+    name: executionservice
   cloud:
     redis:
       discovery:

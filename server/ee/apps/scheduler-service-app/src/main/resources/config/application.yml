@@ -47,7 +47,7 @@ management:
 
 spring:
   application:
-    name: scheduler-service-app
+    name: schedulerservice
   cloud:
     redis:
       discovery:
@@ -61,9 +61,6 @@ spring:
       poolName: Hikari
   profiles:
     active: #spring.profiles.active#
-    group:
-      dev:
-        - dev
   jmx:
     enabled: false
   liquibase:

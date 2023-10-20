@@ -47,7 +47,7 @@ management:
 
 spring:
   application:
-    name: api-gateway-app
+    name: apigateway
   cloud:
     gateway:
       discovery:
@@ -82,9 +82,6 @@ spring:
       console-available: true
   profiles:
     active: #spring.profiles.active#
-    group:
-      dev:
-        - dev
   task:
     execution:
       thread-name-prefix: api-gateway-app-task-

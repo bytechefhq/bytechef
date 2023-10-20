@@ -62,7 +62,7 @@ openapi:
 
 spring:
   application:
-    name: server-app
+    name: server
   cache:
     type: ${bytechef.cache.provider}
   datasource:

@@ -47,7 +47,7 @@ management:
 
 spring:
   application:
-    name: coordinator-service-app
+    name: coordinatorservice
   cloud:
     redis:
       discovery:
@@ -61,9 +61,6 @@ spring:
       console-available: true
   profiles:
     active: #spring.profiles.active#
-    group:
-      dev:
-        - dev
   rabbitmq:
     listener:
       direct:

@@ -59,6 +59,8 @@ public class RedisDiscoveryClient implements DiscoveryClient {
     @Override
     @SuppressFBWarnings("NP")
     public List<String> getServices() {
+        // TODO move "*-service-app" to configuration
+
         return List.copyOf(Objects.requireNonNull(redisTemplate.keys("*-service-app")));
     }
 }
