@@ -18,6 +18,7 @@ import type {
   CategoryModel,
   IntegrationModel,
   PostIntegrationWorkflowRequestModel,
+  PutIntegrationTagsRequestModel,
   TagModel,
   WorkflowModel,
 } from '../models';
@@ -28,6 +29,8 @@ import {
     IntegrationModelToJSON,
     PostIntegrationWorkflowRequestModelFromJSON,
     PostIntegrationWorkflowRequestModelToJSON,
+    PutIntegrationTagsRequestModelFromJSON,
+    PutIntegrationTagsRequestModelToJSON,
     TagModelFromJSON,
     TagModelToJSON,
     WorkflowModelFromJSON,
@@ -67,7 +70,7 @@ export interface PutIntegrationRequest {
 
 export interface PutIntegrationTagsRequest {
     id: number;
-    tagModel: Array<TagModel>;
+    putIntegrationTagsRequestModel: PutIntegrationTagsRequestModel;
 }
 
 /**
@@ -298,8 +301,8 @@ export class IntegrationsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Creates new workflow and adds it to an existing integration.
-     * Creates new workflow and adds it to an existing integration.
+     * Create new workflow and adds it to an existing integration.
+     * Create new workflow and adds it to an existing integration.
      */
     async postIntegrationWorkflowRaw(requestParameters: PostIntegrationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -328,8 +331,8 @@ export class IntegrationsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Creates new workflow and adds it to an existing integration.
-     * Creates new workflow and adds it to an existing integration.
+     * Create new workflow and adds it to an existing integration.
+     * Create new workflow and adds it to an existing integration.
      */
     async postIntegrationWorkflow(requestParameters: PostIntegrationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationModel> {
         const response = await this.postIntegrationWorkflowRaw(requestParameters, initOverrides);
@@ -384,8 +387,8 @@ export class IntegrationsApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling putIntegrationTags.');
         }
 
-        if (requestParameters.tagModel === null || requestParameters.tagModel === undefined) {
-            throw new runtime.RequiredError('tagModel','Required parameter requestParameters.tagModel was null or undefined when calling putIntegrationTags.');
+        if (requestParameters.putIntegrationTagsRequestModel === null || requestParameters.putIntegrationTagsRequestModel === undefined) {
+            throw new runtime.RequiredError('putIntegrationTagsRequestModel','Required parameter requestParameters.putIntegrationTagsRequestModel was null or undefined when calling putIntegrationTags.');
         }
 
         const queryParameters: any = {};
@@ -399,7 +402,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: requestParameters.tagModel.map(TagModelToJSON),
+            body: PutIntegrationTagsRequestModelToJSON(requestParameters.putIntegrationTagsRequestModel),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);

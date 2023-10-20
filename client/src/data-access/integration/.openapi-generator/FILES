@@ -4,6 +4,7 @@ index.ts
 models/CategoryModel.ts
 models/IntegrationModel.ts
 models/PostIntegrationWorkflowRequestModel.ts
+models/PutIntegrationTagsRequestModel.ts
 models/TagModel.ts
 models/WorkflowFormatModel.ts
 models/WorkflowModel.ts
