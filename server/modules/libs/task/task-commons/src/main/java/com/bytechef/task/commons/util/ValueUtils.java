@@ -16,6 +16,7 @@
 
 package com.bytechef.task.commons.util;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,7 @@ public class ValueUtils {
     private static final Logger logger = LoggerFactory.getLogger(ValueUtils.class);
 
     public static Boolean booleanOf(String string) {
-        return Boolean.parseBoolean(string);
+        return BooleanUtils.toBooleanObject(string);
     }
 
     public static Double doubleOf(String string) {
