@@ -19,6 +19,8 @@ package com.integri.atlas.task.handler.spreadsheet.file;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.file.storage.FileStorageService;
@@ -31,7 +33,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Map;
 import org.assertj.core.util.Files;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,7 +45,9 @@ import org.springframework.core.io.ClassPathResource;
 public class SpreadsheetFileTaskHandlerTest {
 
     private static final FileStorageService fileStorageService = new Base64FileStorageService();
+    private static final JSONHelper jsonHelper = new JSONHelper(new ObjectMapper());
     private static final SpreadsheetFileTaskHandler spreadsheetFileTaskHandler = new SpreadsheetFileTaskHandler(
+        jsonHelper,
         fileStorageService
     );
 
@@ -309,11 +312,11 @@ public class SpreadsheetFileTaskHandlerTest {
         return taskExecution;
     }
 
-    private SimpleTaskExecution getWriteSimpleTaskExecution(String fileFormat, List<Object> items) {
+    private SimpleTaskExecution getWriteSimpleTaskExecution(String fileFormat, List<Object> input) {
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
         taskExecution.put("fileFormat", fileFormat);
-        taskExecution.put("items", items);
+        taskExecution.put("input", input);
         taskExecution.put("operation", "WRITE");
 
         return taskExecution;

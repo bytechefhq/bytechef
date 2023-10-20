@@ -40,11 +40,6 @@ import org.springframework.stereotype.Component;
 @Component("jsonFile")
 public class JSONFileTaskHandler implements TaskHandler<Object> {
 
-    public JSONFileTaskHandler(FileStorageService fileStorageService, JSONHelper jsonHelper) {
-        this.fileStorageService = fileStorageService;
-        this.jsonHelper = jsonHelper;
-    }
-
     private enum FileType {
         JSON,
         JSONL,
@@ -57,6 +52,11 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
 
     private final FileStorageService fileStorageService;
     private final JSONHelper jsonHelper;
+
+    public JSONFileTaskHandler(FileStorageService fileStorageService, JSONHelper jsonHelper) {
+        this.fileStorageService = fileStorageService;
+        this.jsonHelper = jsonHelper;
+    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -126,17 +126,17 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
                 String.class,
                 "file." + (fileType == FileType.JSON ? "json" : "jsonl")
             );
-            Object object = taskExecution.get("items");
+            Object input = jsonHelper.checkJSON(taskExecution.getRequired("input"));
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
             if (fileType == FileType.JSON) {
                 try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
-                    printWriter.println(jsonHelper.serialize(object));
+                    printWriter.println(jsonHelper.serialize(input));
                 }
             } else {
                 try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
-                    for (Map<String, ?> item : (List<Map<String, ?>>) object) {
+                    for (Map<String, ?> item : (List<Map<String, ?>>) input) {
                         printWriter.println(jsonHelper.serialize(item));
                     }
                 }

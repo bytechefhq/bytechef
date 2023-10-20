@@ -73,7 +73,7 @@ public class XMLFileTaskHandlerIntTest extends BaseTaskIntTest {
         Job job = startJob(
             "samples/xmlFile_WRITE.json",
             Map.of(
-                "items",
+                "input",
                 xmlHelper.deserialize(Files.contentOf(getFile("sample.xml"), Charset.defaultCharset()), List.class)
             )
         );
@@ -107,7 +107,7 @@ public class XMLFileTaskHandlerIntTest extends BaseTaskIntTest {
 
     @Override
     protected Map<String, TaskHandler<?>> getTaskHandlerResolverMap() {
-        return Map.of("xmlFile", new XMLFileTaskHandler(fileStorageService, new XMLHelper()));
+        return Map.of("xmlFile", new XMLFileTaskHandler(jsonHelper, fileStorageService, new XMLHelper()));
     }
 
     private File getFile(String fileName) throws IOException {

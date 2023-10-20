@@ -18,6 +18,8 @@ package com.integri.atlas.task.handler.xml.file;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.xml.XMLHelper;
 import com.integri.atlas.file.storage.FileEntry;
@@ -38,9 +40,14 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class XMLFileTaskHandlerTest {
 
+    private static final JSONHelper jsonHelper = new JSONHelper(new ObjectMapper());
     private static final FileStorageService fileStorageService = new Base64FileStorageService();
     private static final XMLHelper xmlHelper = new XMLHelper();
-    private static final XMLFileTaskHandler xmlFileTaskHandler = new XMLFileTaskHandler(fileStorageService, xmlHelper);
+    private static final XMLFileTaskHandler xmlFileTaskHandler = new XMLFileTaskHandler(
+        jsonHelper,
+        fileStorageService,
+        xmlHelper
+    );
 
     @Test
     @SuppressWarnings("unchecked")
@@ -85,7 +92,7 @@ public class XMLFileTaskHandlerTest {
 
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
-        taskExecution.put("items", xmlHelper.deserialize(Files.contentOf(file, Charset.defaultCharset()), Map.class));
+        taskExecution.put("input", xmlHelper.deserialize(Files.contentOf(file, Charset.defaultCharset()), Map.class));
         taskExecution.put("operation", "WRITE");
 
         FileEntry fileEntry = (FileEntry) xmlFileTaskHandler.handle(taskExecution);
@@ -96,7 +103,7 @@ public class XMLFileTaskHandlerTest {
         assertThat(fileEntry.getName()).isEqualTo("file.xml");
 
         taskExecution.put("fileName", "test.xml");
-        taskExecution.put("items", xmlHelper.deserialize(Files.contentOf(file, Charset.defaultCharset()), Map.class));
+        taskExecution.put("input", xmlHelper.deserialize(Files.contentOf(file, Charset.defaultCharset()), Map.class));
         taskExecution.put("operation", "WRITE");
 
         fileEntry = (FileEntry) xmlFileTaskHandler.handle(taskExecution);
@@ -110,7 +117,7 @@ public class XMLFileTaskHandlerTest {
 
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
-        taskExecution.put("items", xmlHelper.deserialize(Files.contentOf(file, Charset.defaultCharset()), List.class));
+        taskExecution.put("input", xmlHelper.deserialize(Files.contentOf(file, Charset.defaultCharset()), List.class));
         taskExecution.put("operation", "WRITE");
 
         FileEntry fileEntry = (FileEntry) xmlFileTaskHandler.handle(taskExecution);
@@ -121,7 +128,7 @@ public class XMLFileTaskHandlerTest {
         assertThat(fileEntry.getName()).isEqualTo("file.xml");
 
         taskExecution.put("fileName", "test.xml");
-        taskExecution.put("items", xmlHelper.deserialize(Files.contentOf(file, Charset.defaultCharset()), List.class));
+        taskExecution.put("input", xmlHelper.deserialize(Files.contentOf(file, Charset.defaultCharset()), List.class));
         taskExecution.put("operation", "WRITE");
 
         fileEntry = (FileEntry) xmlFileTaskHandler.handle(taskExecution);

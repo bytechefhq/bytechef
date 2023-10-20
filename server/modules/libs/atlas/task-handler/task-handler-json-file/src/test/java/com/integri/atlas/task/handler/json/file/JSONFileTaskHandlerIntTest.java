@@ -74,7 +74,7 @@ public class JSONFileTaskHandlerIntTest extends BaseTaskIntTest {
         Job job = startJob(
             "samples/jsonFile_WRITE.json",
             Map.of(
-                "items",
+                "input",
                 JSONArrayUtil.toList(Files.contentOf(getFile("sample_array.json"), Charset.defaultCharset()))
             )
         );
