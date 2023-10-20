@@ -23,7 +23,7 @@ package com.integri.atlas.engine;
  * @author Arik Cohen
  * @since May 26, 2017
  */
-public class DSL {
+public class Constants {
 
     public static final String ID = "id";
 

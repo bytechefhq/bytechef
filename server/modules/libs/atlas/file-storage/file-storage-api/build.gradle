@@ -5,7 +5,7 @@ dependencies {
     implementation "org.apache.tika:tika-core"
     implementation "org.jobrunr:jobrunr-spring-boot-starter"
     implementation "org.springframework:spring-core"
-    implementation project(":modules:libs:atlas:engine:engine-common")
+    implementation project(":modules:libs:atlas:engine:engine-commons")
 
     testImplementation project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-api")
     testImplementation project(":modules:libs:atlas:file-storage:file-storage-base64")
