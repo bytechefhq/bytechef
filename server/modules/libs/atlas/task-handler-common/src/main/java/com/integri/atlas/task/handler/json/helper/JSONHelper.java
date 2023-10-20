@@ -91,35 +91,33 @@ public class JSONHelper {
 
     @SuppressWarnings({ "raw", "unchecked" })
     public <T> List<T> checkJSONArray(Object object, JavaType itemType) {
-        List<T> result = null;
+        List<T> items = null;
 
         if (object != null) {
             if (object instanceof List list) {
-                result = list;
+                items = list;
             } else if (object instanceof Collection collection) {
-                result = new ArrayList<>(collection);
+                items = new ArrayList(collection);
             } else if (object instanceof String string && string.startsWith("[")) {
-                result = deserialize(string);
+                items = deserialize(string);
             } else {
                 throw new IllegalArgumentException(
                     String.format("%s cannot be converted to JSON compatible format", object)
                 );
             }
 
-            if (!result.isEmpty() && itemType != null) {
-                Object item = result.get(0);
-
-                List<Class<?>> classes = getClasses(item);
-
-                if (!classes.contains(itemType.getRawClass())) {
-                    throw new IllegalArgumentException(
-                        String.format("%s cannot be converted to JSON compatible format", object)
-                    );
-                }
+            if (!allItemsEqual(items, itemType)) {
+                throw new IllegalArgumentException(
+                    String.format("%s cannot be converted to JSON compatible format", object)
+                );
             }
         }
 
-        return result;
+        return items;
+    }
+
+    public Map<String, ?> checkJSONObject(Object object) {
+        return checkJSONObject(object, (JavaType) null);
     }
 
     public <T> Map<String, T> checkJSONObject(Object object, Class<T> itemClass) {
@@ -146,11 +144,7 @@ public class JSONHelper {
             }
 
             if (!result.isEmpty() && valueType != null) {
-                Object value = result.entrySet().iterator().next().getValue();
-
-                List<Class<?>> classes = getClasses(value);
-
-                if (!classes.contains(valueType.getRawClass())) {
+                if (!allItemsEqual(result.values(), valueType)) {
                     throw new IllegalArgumentException(
                         String.format("%s cannot be converted to JSON compatible format", object)
                     );
@@ -212,5 +206,21 @@ public class JSONHelper {
 
         classes.add(result.getClass());
         return classes;
+    }
+
+    private boolean allItemsEqual(Collection<?> items, JavaType itemType) {
+        boolean equals = true;
+
+        for (Object item : items) {
+            List<Class<?>> classes = getClasses(item);
+
+            if (!classes.contains(itemType.getRawClass())) {
+                equals = false;
+
+                break;
+            }
+        }
+
+        return equals;
     }
 }
