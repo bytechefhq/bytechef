@@ -8,6 +8,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     icon?: ReactNode;
     iconPosition?: 'left' | 'right';
     label?: string;
+    link?: boolean;
     onClick?: () => void;
     size?: Size;
 }
@@ -47,6 +48,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             icon,
             iconPosition,
             label,
+            link,
             onClick,
             size,
             ...props
@@ -57,6 +59,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             className={twMerge(
                 'btn',
                 displayTypes[displayType],
+                link && 'bg-transparent text-blue-600 hover:underline',
                 size && sizes[size],
                 className
             )}
