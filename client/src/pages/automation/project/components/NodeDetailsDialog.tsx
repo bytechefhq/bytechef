@@ -51,15 +51,7 @@ const NodeDetailsDialog = () => {
         componentName: currentNode.originNodeName || currentNode.name,
     });
 
-    const componentDefinitionNames = componentDefinitions?.map(
-        (component) => component.name
-    );
-
-    const singleActionComponent =
-        currentComponent?.actions && currentComponent?.actions.length === 1;
-
-    const firstAction =
-        currentComponent?.actions && currentComponent?.actions[0];
+    const firstAction = currentComponent?.actions?.[0];
 
     const getActionName = (): string => {
         const currentComponentActionNames = currentComponent?.actions?.map(
@@ -80,6 +72,10 @@ const NodeDetailsDialog = () => {
         !!currentComponent?.actions
     );
 
+    const componentDefinitionNames = componentDefinitions?.map(
+        (component) => component.name
+    );
+
     useEffect(() => {
         if (activeTab === 'output' && !currentAction) {
             setActiveTab('description');
@@ -92,6 +88,26 @@ const NodeDetailsDialog = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentComponent?.name]);
+
+    const singleActionComponent = currentComponent?.actions?.length === 1;
+
+    const componentTabs = tabs.filter((tab) => {
+        const {name} = tab;
+
+        const componentHasConnection =
+            currentComponent?.name &&
+            componentDefinitionNames?.includes(currentComponent.name);
+
+        if (
+            (name === 'connection' && !componentHasConnection) ||
+            (name === 'output' && !currentAction) ||
+            (name === 'properties' && !currentAction)
+        ) {
+            return;
+        } else {
+            return tab;
+        }
+    });
 
     return (
         <Dialog.Root
@@ -136,21 +152,21 @@ const NodeDetailsDialog = () => {
                             </Dialog.Title>
 
                             <div className="flex h-full flex-col">
-                                {currentComponent?.actions && (
+                                {!!currentComponent?.actions?.length && (
                                     <div className="border-b border-gray-100 p-4">
                                         {singleActionComponent &&
                                         !!firstAction ? (
                                             <>
-                                                <span className="block px-2 text-sm font-medium leading-6">
+                                                <span className="block text-sm font-medium leading-6">
                                                     Action
                                                 </span>
 
-                                                <div className="overflow-hidden rounded-md bg-gray-100 px-4 py-2">
+                                                <div className="flex flex-col overflow-hidden rounded-md bg-gray-100 px-4 py-2">
                                                     <span className="inline-flex text-sm font-medium">
                                                         {firstAction.title}
                                                     </span>
 
-                                                    <p className="mt-1 line-clamp-2 w-full overflow-hidden text-xs text-gray-500">
+                                                    <p className="mt-1 line-clamp-2 w-full overflow-hidden text-xs font-medium text-gray-500">
                                                         {
                                                             firstAction.description
                                                         }
@@ -184,7 +200,7 @@ const NodeDetailsDialog = () => {
                                                             action.description,
                                                     })
                                                 )}
-                                                triggerClassName="w-full bg-gray-100"
+                                                triggerClassName="w-full bg-gray-100 border-none"
                                                 onValueChange={(value) => {
                                                     setCurrentActionName(value);
                                                 }}
@@ -193,53 +209,41 @@ const NodeDetailsDialog = () => {
                                     </div>
                                 )}
 
-                                <div className="mb-4 flex justify-center pt-4">
-                                    {tabs.map((tab) => {
-                                        const componentHasConnection =
-                                            componentDefinitionNames?.includes(
-                                                currentComponent?.name
-                                            );
+                                {componentTabs.length > 1 && (
+                                    <div className="flex justify-center pt-4">
+                                        {componentTabs.map((tab) => (
+                                            <Button
+                                                className={twMerge(
+                                                    'grow justify-center whitespace-nowrap rounded-none border-0 border-b-2 border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
+                                                    activeTab === tab.name &&
+                                                        'border-blue-500 text-blue-500 hover:text-blue-500'
+                                                )}
+                                                onClick={() =>
+                                                    setActiveTab(tab.name)
+                                                }
+                                                key={tab.name}
+                                                label={tab.label}
+                                                name={tab.name}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
 
-                                        if (
-                                            (tab.name === 'connection' &&
-                                                !componentHasConnection) ||
-                                            (tab.name === 'output' &&
-                                                !currentAction)
-                                        ) {
-                                            return;
-                                        } else {
-                                            return (
-                                                <Button
-                                                    className={twMerge(
-                                                        'grow justify-center whitespace-nowrap rounded-none border-0 border-b-2 border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
-                                                        activeTab ===
-                                                            tab.name &&
-                                                            'border-blue-500 text-blue-500 hover:text-blue-500'
-                                                    )}
-                                                    onClick={() =>
-                                                        setActiveTab(tab.name)
-                                                    }
-                                                    key={tab.name}
-                                                    label={tab.label}
-                                                    name={tab.name}
-                                                />
-                                            );
-                                        }
-                                    })}
-                                </div>
-
-                                <div className="h-full flex-[1_1_1px] overflow-auto px-4 py-2">
+                                <div className="h-full flex-[1_1_1px] overflow-auto p-4">
                                     {activeTab === 'description' && (
                                         <DescriptionTab
                                             component={currentComponent}
                                         />
                                     )}
 
-                                    {activeTab === 'properties' && (
-                                        <PropertiesTab
-                                            component={currentComponent}
-                                        />
-                                    )}
+                                    {activeTab === 'properties' &&
+                                        currentAction?.properties && (
+                                            <PropertiesTab
+                                                properties={
+                                                    currentAction.properties
+                                                }
+                                            />
+                                        )}
 
                                     {activeTab === 'connection' &&
                                         currentComponent.connection && (
@@ -249,10 +253,10 @@ const NodeDetailsDialog = () => {
                                         )}
 
                                     {activeTab === 'output' &&
-                                        currentAction && (
+                                        currentAction?.outputSchema && (
                                             <OutputTab
-                                                actionDefinition={
-                                                    currentAction!
+                                                outputSchema={
+                                                    currentAction.outputSchema
                                                 }
                                             />
                                         )}
