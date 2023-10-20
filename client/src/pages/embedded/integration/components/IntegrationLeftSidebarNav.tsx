@@ -25,7 +25,7 @@ const IntegrationLeftSidebarNav = () => {
                         current: location.pathname === item.href,
                         name: item.title,
                     }}
-                    toLink={'/embedded/integrations/1/' + item.href}
+                    toLink={`/embedded/integrations/1/${item.href}`}
                 />
             ))}
         />
