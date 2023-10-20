@@ -1084,7 +1084,7 @@ components:
           description: "The id of a workflow."
           type: "integer"
     ProjectInstanceWorkflowConnection:
-      description: "The connection used in particular task."
+      description: "The connection used in a particular task."
       type: "object"
       properties:
         connectionId:
