@@ -17,6 +17,8 @@
 package com.bytechef.hermes.definition;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -32,7 +34,31 @@ public final class PropertyOption {
 
     private PropertyOption() {}
 
+    public PropertyOption(String name, boolean value, String description) {
+        this.name = name;
+        this.value = value;
+        this.description = description;
+    }
+
     public PropertyOption(String name, int value, String description) {
+        this.name = name;
+        this.value = value;
+        this.description = description;
+    }
+
+    public PropertyOption(String name, LocalDate value, String description) {
+        this.name = name;
+        this.value = value;
+        this.description = description;
+    }
+
+    public PropertyOption(String name, LocalDateTime value, String description) {
+        this.name = name;
+        this.value = value;
+        this.description = description;
+    }
+
+    public PropertyOption(String name, Object value, String description) {
         this.name = name;
         this.value = value;
         this.description = description;
@@ -51,7 +77,7 @@ public final class PropertyOption {
     }
 
     public PropertyOption displayOption(DisplayOption.DisplayOptionCondition... displayOptionEntries) {
-        this.displayOption = DisplayOption.build(List.of(displayOptionEntries));
+        this.displayOption = DisplayOption.of(List.of(displayOptionEntries));
 
         return this;
     }
