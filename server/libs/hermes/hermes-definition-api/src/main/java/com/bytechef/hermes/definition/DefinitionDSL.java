@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class DefinitionDSL {
 
@@ -60,10 +61,6 @@ public class DefinitionDSL {
 
     public static ModifiableProperty.ModifiableDateTimeProperty dateTime(String name) {
         return new ModifiableProperty.ModifiableDateTimeProperty(name);
-    }
-
-    public static ModifiableDisplay display(String label) {
-        return new ModifiableDisplay(label);
     }
 
     public static ModifiableProperty.ModifiableIntegerProperty integer() {
@@ -197,86 +194,9 @@ public class DefinitionDSL {
             .properties(properties);
     }
 
-    public static final class ModifiableDisplay implements Display {
-
-        private String category;
-        private String description;
-        private String icon;
-        private String title;
-        private String subtitle;
-        private String[] tags;
-
-        private ModifiableDisplay() {
-        }
-
-        private ModifiableDisplay(String title) {
-            this.title = title;
-        }
-
-        public ModifiableDisplay category(String category) {
-            this.category = category;
-
-            return this;
-        }
-
-        public ModifiableDisplay description(String description) {
-            this.description = description;
-
-            return this;
-        }
-
-        public ModifiableDisplay icon(String icon) {
-            this.icon = icon;
-
-            return this;
-        }
-
-        public ModifiableDisplay subtitle(String subtitle) {
-            this.subtitle = subtitle;
-
-            return this;
-        }
-
-        public ModifiableDisplay tags(String... tags) {
-            this.tags = tags;
-
-            return this;
-        }
-
-        @Override
-        public String getCategory() {
-            return category;
-        }
-
-        @Override
-        public String getDescription() {
-            return description;
-        }
-
-        @Override
-        public String getIcon() {
-            return icon;
-        }
-
-        @Override
-        public String getSubtitle() {
-            return subtitle;
-        }
-
-        @Override
-        public String[] getTags() {
-            return tags == null ? null : tags.clone();
-        }
-
-        @Override
-        public String getTitle() {
-            return title;
-        }
-    }
-
     protected static class ModifiablePropertiesDataSource implements PropertiesDataSource {
 
-        private List<String> loadPropertiesDependsOn;
+        private final List<String> loadPropertiesDependsOn;
 
         protected ModifiablePropertiesDataSource(List<String> loadPropertiesDependOnPropertyNames) {
             this.loadPropertiesDependsOn = loadPropertiesDependOnPropertyNames;
@@ -384,15 +304,15 @@ public class DefinitionDSL {
         }
 
         @SuppressWarnings("unchecked")
-        public M required(Boolean required) {
+        public M required(boolean required) {
             this.required = required;
 
             return (M) this;
         }
 
         @Override
-        public Boolean getAdvancedOption() {
-            return advancedOption;
+        public Optional<Boolean> getAdvancedOption() {
+            return Optional.ofNullable(advancedOption);
         }
 
         @Override
@@ -406,13 +326,18 @@ public class DefinitionDSL {
         }
 
         @Override
-        public Boolean getExpressionEnabled() {
-            return expressionEnabled;
+        public Optional<Boolean> getExpressionDisabled() {
+            return Optional.ofNullable(expressionEnabled);
         }
 
         @Override
-        public Boolean getHidden() {
-            return hidden;
+        public Optional<Boolean> getHidden() {
+            return Optional.ofNullable(hidden);
+        }
+
+        @Override
+        public Optional<Boolean> getRequired() {
+            return Optional.ofNullable(required);
         }
 
         @Override
@@ -431,13 +356,8 @@ public class DefinitionDSL {
         }
 
         @Override
-        public String getPlaceholder() {
-            return placeholder;
-        }
-
-        @Override
-        public Boolean getRequired() {
-            return required;
+        public Optional<String> getPlaceholder() {
+            return Optional.ofNullable(placeholder);
         }
 
         @Override
@@ -1453,7 +1373,7 @@ public class DefinitionDSL {
 
     protected static class ModifiableOptionsDataSource implements OptionsDataSource {
 
-        private List<String> loadOptionsDependsOn;
+        private final List<String> loadOptionsDependsOn;
 
         protected ModifiableOptionsDataSource(List<String> loadOptionsDependOnPropertyNames) {
             this.loadOptionsDependsOn = loadOptionsDependOnPropertyNames;
@@ -1493,8 +1413,8 @@ public class DefinitionDSL {
         }
 
         @Override
-        public String[] getCategories() {
-            return categories.clone();
+        public Optional<String[]> getCategories() {
+            return Optional.ofNullable(categories == null ? null : categories.clone());
         }
 
         @Override
@@ -1503,8 +1423,8 @@ public class DefinitionDSL {
         }
 
         @Override
-        public Map<String, String> getAdditionalUrls() {
-            return new HashMap<>(additionalUrls);
+        public Optional<Map<String, String>> getAdditionalUrls() {
+            return Optional.ofNullable(additionalUrls == null ? null : new HashMap<>(additionalUrls));
         }
     }
 }

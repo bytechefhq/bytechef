@@ -27,5 +27,9 @@ import java.util.List;
 @JsonDeserialize(as = DefinitionDSL.ModifiablePropertiesDataSource.class)
 public interface PropertiesDataSource {
 
+    /**
+     *
+     * @return
+     */
     List<String> getLoadPropertiesDependsOn();
 }

@@ -27,5 +27,9 @@ import java.util.List;
 @JsonDeserialize(as = DefinitionDSL.ModifiableOptionsDataSource.class)
 public interface OptionsDataSource {
 
+    /**
+     *
+     * @return
+     */
     List<String> getLoadOptionsDependsOn();
 }
