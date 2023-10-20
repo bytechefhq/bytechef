@@ -16,7 +16,7 @@
 
 package com.bytechef.hermes.file.storage.base64.service;
 
-import com.bytechef.hermes.file.storage.dto.FileEntry;
+import com.bytechef.hermes.file.storage.domain.FileEntry;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,8 +36,8 @@ public class Base64StorageServiceTest {
 
     @Test
     public void testOpenInputStream() throws IOException {
-        InputStream inputStream = base64StorageService.getFileContentStream(
-                Base64.getEncoder().encodeToString(string.getBytes(Charset.defaultCharset())));
+        InputStream inputStream = base64StorageService.getFileStream(
+                FileEntry.of(Base64.getEncoder().encodeToString(string.getBytes(Charset.defaultCharset()))));
 
         Assertions.assertThat(new String(inputStream.readAllBytes(), Charset.defaultCharset()))
                 .isEqualTo(string);
@@ -45,8 +45,8 @@ public class Base64StorageServiceTest {
 
     @Test
     public void testRead() {
-        Assertions.assertThat(base64StorageService.readFileContent(
-                        Base64.getEncoder().encodeToString(string.getBytes(Charset.defaultCharset()))))
+        Assertions.assertThat(base64StorageService.readFileToString(
+                        FileEntry.of(Base64.getEncoder().encodeToString(string.getBytes(Charset.defaultCharset())))))
                 .isEqualTo(string);
     }
 
