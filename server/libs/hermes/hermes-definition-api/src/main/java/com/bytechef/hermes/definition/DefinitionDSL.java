@@ -937,7 +937,7 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableNumberProperty options(Option<Double>... options) {
+            public ModifiableNumberProperty options(Option<? extends Number>... options) {
                 this.options = List.of(options);
 
                 return this;

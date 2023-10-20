@@ -98,7 +98,7 @@ public class PipedriveGetDealsAction {
             number("owned_by_you").label("Owned By You")
                 .description(
                     "When supplied, only deals owned by you are returned. However, `filter_id` takes precedence over `owned_by_you` when both are supplied.")
-                .options(option("0", 0L), option("1", 1L))
+                .options(option("0", 0), option("1", 1))
                 .required(false)
                 .metadata(
                     Map.of(
