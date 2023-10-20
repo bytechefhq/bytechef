@@ -13,6 +13,7 @@ import com.bytechef.hermes.definition.registry.web.rest.model.NumberPropertyMode
 import com.bytechef.hermes.definition.registry.web.rest.model.ObjectPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.OneOfPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.OptionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.OptionsDataSourceModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyTypeModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.StringPropertyModel;
@@ -25,12 +26,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.util.NoSuchElementException;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -64,7 +62,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = StringPropertyModel.class, name = "STRING")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-05T16:27:34.189599+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:09:55.588650+01:00[Europe/Zagreb]")
 public class ArrayPropertyModel extends ValuePropertyModel {
 
   @JsonProperty("items")
@@ -79,7 +77,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
   private List<OptionModel> options = null;
 
   @JsonProperty("optionsDataSource")
-  private JsonNullable<Object> optionsDataSource = JsonNullable.undefined();
+  private OptionsDataSourceModel optionsDataSource;
 
   public ArrayPropertyModel items(List<PropertyModel> items) {
     this.items = items;
@@ -154,8 +152,8 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     this.options = options;
   }
 
-  public ArrayPropertyModel optionsDataSource(Object optionsDataSource) {
-    this.optionsDataSource = JsonNullable.of(optionsDataSource);
+  public ArrayPropertyModel optionsDataSource(OptionsDataSourceModel optionsDataSource) {
+    this.optionsDataSource = optionsDataSource;
     return this;
   }
 
@@ -163,13 +161,13 @@ public class ArrayPropertyModel extends ValuePropertyModel {
    * Get optionsDataSource
    * @return optionsDataSource
   */
-  
+  @Valid 
   @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public JsonNullable<Object> getOptionsDataSource() {
+  public OptionsDataSourceModel getOptionsDataSource() {
     return optionsDataSource;
   }
 
-  public void setOptionsDataSource(JsonNullable<Object> optionsDataSource) {
+  public void setOptionsDataSource(OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
   }
 
@@ -260,24 +258,13 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     return Objects.equals(this.items, arrayProperty.items) &&
         Objects.equals(this.multipleValues, arrayProperty.multipleValues) &&
         Objects.equals(this.options, arrayProperty.options) &&
-        equalsNullable(this.optionsDataSource, arrayProperty.optionsDataSource) &&
+        Objects.equals(this.optionsDataSource, arrayProperty.optionsDataSource) &&
         super.equals(o);
-  }
-
-  private static <T> boolean equalsNullable(JsonNullable<T> a, JsonNullable<T> b) {
-    return a == b || (a != null && b != null && a.isPresent() && b.isPresent() && Objects.deepEquals(a.get(), b.get()));
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(items, multipleValues, options, hashCodeNullable(optionsDataSource), super.hashCode());
-  }
-
-  private static <T> int hashCodeNullable(JsonNullable<T> a) {
-    if (a == null) {
-      return 1;
-    }
-    return a.isPresent() ? Arrays.deepHashCode(new Object[]{a.get()}) : 31;
+    return Objects.hash(items, multipleValues, options, optionsDataSource, super.hashCode());
   }
 
   @Override

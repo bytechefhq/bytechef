@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinition", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-05T16:27:34.189599+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:09:55.588650+01:00[Europe/Zagreb]")
 public class TaskDispatcherDefinitionModel {
 
   @JsonProperty("display")
@@ -170,11 +170,11 @@ public class TaskDispatcherDefinitionModel {
   }
 
   /**
-   * Get version
+   * The version of a task dispatcher.
    * @return version
   */
   
-  @Schema(name = "version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "version", description = "The version of a task dispatcher.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getVersion() {
     return version;
   }

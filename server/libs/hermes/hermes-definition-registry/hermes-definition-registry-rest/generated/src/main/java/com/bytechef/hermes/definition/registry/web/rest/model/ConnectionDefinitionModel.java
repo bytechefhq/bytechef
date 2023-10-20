@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinition", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-05T16:27:34.189599+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:09:55.588650+01:00[Europe/Zagreb]")
 public class ConnectionDefinitionModel {
 
   @JsonProperty("authorizationRequired")
@@ -40,8 +40,8 @@ public class ConnectionDefinitionModel {
   @JsonProperty("componentName")
   private String componentName;
 
-  @JsonProperty("display")
-  private DisplayModel display;
+  @JsonProperty("componentDisplay")
+  private DisplayModel componentDisplay;
 
   @JsonProperty("properties")
   @Valid
@@ -49,9 +49,6 @@ public class ConnectionDefinitionModel {
 
   @JsonProperty("resources")
   private ResourcesModel resources;
-
-  @JsonProperty("version")
-  private Integer version;
 
   public ConnectionDefinitionModel authorizationRequired(Boolean authorizationRequired) {
     this.authorizationRequired = authorizationRequired;
@@ -118,23 +115,23 @@ public class ConnectionDefinitionModel {
     this.componentName = componentName;
   }
 
-  public ConnectionDefinitionModel display(DisplayModel display) {
-    this.display = display;
+  public ConnectionDefinitionModel componentDisplay(DisplayModel componentDisplay) {
+    this.componentDisplay = componentDisplay;
     return this;
   }
 
   /**
-   * Get display
-   * @return display
+   * Get componentDisplay
+   * @return componentDisplay
   */
   @Valid 
-  @Schema(name = "display", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public DisplayModel getDisplay() {
-    return display;
+  @Schema(name = "componentDisplay", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public DisplayModel getComponentDisplay() {
+    return componentDisplay;
   }
 
-  public void setDisplay(DisplayModel display) {
-    this.display = display;
+  public void setComponentDisplay(DisplayModel componentDisplay) {
+    this.componentDisplay = componentDisplay;
   }
 
   public ConnectionDefinitionModel properties(List<PropertyModel> properties) {
@@ -183,25 +180,6 @@ public class ConnectionDefinitionModel {
     this.resources = resources;
   }
 
-  public ConnectionDefinitionModel version(Integer version) {
-    this.version = version;
-    return this;
-  }
-
-  /**
-   * The version of a connection.
-   * @return version
-  */
-  
-  @Schema(name = "version", description = "The version of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public Integer getVersion() {
-    return version;
-  }
-
-  public void setVersion(Integer version) {
-    this.version = version;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -214,15 +192,14 @@ public class ConnectionDefinitionModel {
     return Objects.equals(this.authorizationRequired, connectionDefinition.authorizationRequired) &&
         Objects.equals(this.authorizations, connectionDefinition.authorizations) &&
         Objects.equals(this.componentName, connectionDefinition.componentName) &&
-        Objects.equals(this.display, connectionDefinition.display) &&
+        Objects.equals(this.componentDisplay, connectionDefinition.componentDisplay) &&
         Objects.equals(this.properties, connectionDefinition.properties) &&
-        Objects.equals(this.resources, connectionDefinition.resources) &&
-        Objects.equals(this.version, connectionDefinition.version);
+        Objects.equals(this.resources, connectionDefinition.resources);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizationRequired, authorizations, componentName, display, properties, resources, version);
+    return Objects.hash(authorizationRequired, authorizations, componentName, componentDisplay, properties, resources);
   }
 
   @Override
@@ -232,10 +209,9 @@ public class ConnectionDefinitionModel {
     sb.append("    authorizationRequired: ").append(toIndentedString(authorizationRequired)).append("\n");
     sb.append("    authorizations: ").append(toIndentedString(authorizations)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
-    sb.append("    display: ").append(toIndentedString(display)).append("\n");
+    sb.append("    componentDisplay: ").append(toIndentedString(componentDisplay)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
-    sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
   }

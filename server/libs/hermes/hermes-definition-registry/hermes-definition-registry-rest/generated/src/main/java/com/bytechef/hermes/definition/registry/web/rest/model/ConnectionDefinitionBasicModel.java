@@ -22,17 +22,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinitionBasic", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-05T16:27:34.189599+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:09:55.588650+01:00[Europe/Zagreb]")
 public class ConnectionDefinitionBasicModel {
 
   @JsonProperty("componentName")
   private String componentName;
 
-  @JsonProperty("display")
-  private DisplayModel display;
-
-  @JsonProperty("version")
-  private Integer version;
+  @JsonProperty("componentDisplay")
+  private DisplayModel componentDisplay;
 
   public ConnectionDefinitionBasicModel componentName(String componentName) {
     this.componentName = componentName;
@@ -53,42 +50,23 @@ public class ConnectionDefinitionBasicModel {
     this.componentName = componentName;
   }
 
-  public ConnectionDefinitionBasicModel display(DisplayModel display) {
-    this.display = display;
+  public ConnectionDefinitionBasicModel componentDisplay(DisplayModel componentDisplay) {
+    this.componentDisplay = componentDisplay;
     return this;
   }
 
   /**
-   * Get display
-   * @return display
+   * Get componentDisplay
+   * @return componentDisplay
   */
-  @NotNull @Valid 
-  @Schema(name = "display", requiredMode = Schema.RequiredMode.REQUIRED)
-  public DisplayModel getDisplay() {
-    return display;
+  @Valid 
+  @Schema(name = "componentDisplay", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public DisplayModel getComponentDisplay() {
+    return componentDisplay;
   }
 
-  public void setDisplay(DisplayModel display) {
-    this.display = display;
-  }
-
-  public ConnectionDefinitionBasicModel version(Integer version) {
-    this.version = version;
-    return this;
-  }
-
-  /**
-   * The version of a connection.
-   * @return version
-  */
-  @NotNull 
-  @Schema(name = "version", description = "The version of a connection.", requiredMode = Schema.RequiredMode.REQUIRED)
-  public Integer getVersion() {
-    return version;
-  }
-
-  public void setVersion(Integer version) {
-    this.version = version;
+  public void setComponentDisplay(DisplayModel componentDisplay) {
+    this.componentDisplay = componentDisplay;
   }
 
   @Override
@@ -101,13 +79,12 @@ public class ConnectionDefinitionBasicModel {
     }
     ConnectionDefinitionBasicModel connectionDefinitionBasic = (ConnectionDefinitionBasicModel) o;
     return Objects.equals(this.componentName, connectionDefinitionBasic.componentName) &&
-        Objects.equals(this.display, connectionDefinitionBasic.display) &&
-        Objects.equals(this.version, connectionDefinitionBasic.version);
+        Objects.equals(this.componentDisplay, connectionDefinitionBasic.componentDisplay);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, display, version);
+    return Objects.hash(componentName, componentDisplay);
   }
 
   @Override
@@ -115,8 +92,7 @@ public class ConnectionDefinitionBasicModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class ConnectionDefinitionBasicModel {\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
-    sb.append("    display: ").append(toIndentedString(display)).append("\n");
-    sb.append("    version: ").append(toIndentedString(version)).append("\n");
+    sb.append("    componentDisplay: ").append(toIndentedString(componentDisplay)).append("\n");
     sb.append("}");
     return sb.toString();
   }

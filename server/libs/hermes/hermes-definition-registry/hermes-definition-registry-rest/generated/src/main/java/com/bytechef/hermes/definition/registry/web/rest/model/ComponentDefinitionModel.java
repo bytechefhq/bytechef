@@ -2,7 +2,7 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionBasicModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
@@ -22,17 +22,17 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A component contains a set of reusable code(actions) that accomplish specific tasks, triggers(TODO) and connections if there is a need for a connection to an outside service.
+ * A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.
  */
 
-@Schema(name = "ComponentDefinitionWithBasicActions", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers(TODO) and connections if there is a need for a connection to an outside service.")
-@JsonTypeName("ComponentDefinitionWithBasicActions")
+@Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
+@JsonTypeName("ComponentDefinition")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:09:55.588650+01:00[Europe/Zagreb]")
-public class ComponentDefinitionWithBasicActionsModel {
+public class ComponentDefinitionModel {
 
   @JsonProperty("actions")
   @Valid
-  private List<ActionDefinitionBasicModel> actions = new ArrayList<>();
+  private List<ActionDefinitionModel> actions = null;
 
   @JsonProperty("connection")
   private ConnectionDefinitionModel connection;
@@ -49,12 +49,15 @@ public class ComponentDefinitionWithBasicActionsModel {
   @JsonProperty("version")
   private Integer version;
 
-  public ComponentDefinitionWithBasicActionsModel actions(List<ActionDefinitionBasicModel> actions) {
+  public ComponentDefinitionModel actions(List<ActionDefinitionModel> actions) {
     this.actions = actions;
     return this;
   }
 
-  public ComponentDefinitionWithBasicActionsModel addActionsItem(ActionDefinitionBasicModel actionsItem) {
+  public ComponentDefinitionModel addActionsItem(ActionDefinitionModel actionsItem) {
+    if (this.actions == null) {
+      this.actions = new ArrayList<>();
+    }
     this.actions.add(actionsItem);
     return this;
   }
@@ -63,17 +66,17 @@ public class ComponentDefinitionWithBasicActionsModel {
    * The list of all available actions the component can perform.
    * @return actions
   */
-  @NotNull @Valid 
-  @Schema(name = "actions", description = "The list of all available actions the component can perform.", requiredMode = Schema.RequiredMode.REQUIRED)
-  public List<ActionDefinitionBasicModel> getActions() {
+  @Valid 
+  @Schema(name = "actions", description = "The list of all available actions the component can perform.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public List<ActionDefinitionModel> getActions() {
     return actions;
   }
 
-  public void setActions(List<ActionDefinitionBasicModel> actions) {
+  public void setActions(List<ActionDefinitionModel> actions) {
     this.actions = actions;
   }
 
-  public ComponentDefinitionWithBasicActionsModel connection(ConnectionDefinitionModel connection) {
+  public ComponentDefinitionModel connection(ConnectionDefinitionModel connection) {
     this.connection = connection;
     return this;
   }
@@ -92,7 +95,7 @@ public class ComponentDefinitionWithBasicActionsModel {
     this.connection = connection;
   }
 
-  public ComponentDefinitionWithBasicActionsModel display(DisplayModel display) {
+  public ComponentDefinitionModel display(DisplayModel display) {
     this.display = display;
     return this;
   }
@@ -101,8 +104,8 @@ public class ComponentDefinitionWithBasicActionsModel {
    * Get display
    * @return display
   */
-  @NotNull @Valid 
-  @Schema(name = "display", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Valid 
+  @Schema(name = "display", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public DisplayModel getDisplay() {
     return display;
   }
@@ -111,17 +114,17 @@ public class ComponentDefinitionWithBasicActionsModel {
     this.display = display;
   }
 
-  public ComponentDefinitionWithBasicActionsModel name(String name) {
+  public ComponentDefinitionModel name(String name) {
     this.name = name;
     return this;
   }
 
   /**
-   * The component name.
+   * The name.
    * @return name
   */
-  @NotNull 
-  @Schema(name = "name", description = "The component name.", requiredMode = Schema.RequiredMode.REQUIRED)
+  
+  @Schema(name = "name", description = "The name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getName() {
     return name;
   }
@@ -130,7 +133,7 @@ public class ComponentDefinitionWithBasicActionsModel {
     this.name = name;
   }
 
-  public ComponentDefinitionWithBasicActionsModel resources(ResourcesModel resources) {
+  public ComponentDefinitionModel resources(ResourcesModel resources) {
     this.resources = resources;
     return this;
   }
@@ -139,8 +142,8 @@ public class ComponentDefinitionWithBasicActionsModel {
    * Get resources
    * @return resources
   */
-  @NotNull @Valid 
-  @Schema(name = "resources", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Valid 
+  @Schema(name = "resources", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public ResourcesModel getResources() {
     return resources;
   }
@@ -149,7 +152,7 @@ public class ComponentDefinitionWithBasicActionsModel {
     this.resources = resources;
   }
 
-  public ComponentDefinitionWithBasicActionsModel version(Integer version) {
+  public ComponentDefinitionModel version(Integer version) {
     this.version = version;
     return this;
   }
@@ -158,8 +161,8 @@ public class ComponentDefinitionWithBasicActionsModel {
    * The version of a component.
    * @return version
   */
-  @NotNull 
-  @Schema(name = "version", description = "The version of a component.", requiredMode = Schema.RequiredMode.REQUIRED)
+  
+  @Schema(name = "version", description = "The version of a component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getVersion() {
     return version;
   }
@@ -176,13 +179,13 @@ public class ComponentDefinitionWithBasicActionsModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ComponentDefinitionWithBasicActionsModel componentDefinitionWithBasicActions = (ComponentDefinitionWithBasicActionsModel) o;
-    return Objects.equals(this.actions, componentDefinitionWithBasicActions.actions) &&
-        Objects.equals(this.connection, componentDefinitionWithBasicActions.connection) &&
-        Objects.equals(this.display, componentDefinitionWithBasicActions.display) &&
-        Objects.equals(this.name, componentDefinitionWithBasicActions.name) &&
-        Objects.equals(this.resources, componentDefinitionWithBasicActions.resources) &&
-        Objects.equals(this.version, componentDefinitionWithBasicActions.version);
+    ComponentDefinitionModel componentDefinition = (ComponentDefinitionModel) o;
+    return Objects.equals(this.actions, componentDefinition.actions) &&
+        Objects.equals(this.connection, componentDefinition.connection) &&
+        Objects.equals(this.display, componentDefinition.display) &&
+        Objects.equals(this.name, componentDefinition.name) &&
+        Objects.equals(this.resources, componentDefinition.resources) &&
+        Objects.equals(this.version, componentDefinition.version);
   }
 
   @Override
@@ -193,7 +196,7 @@ public class ComponentDefinitionWithBasicActionsModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ComponentDefinitionWithBasicActionsModel {\n");
+    sb.append("class ComponentDefinitionModel {\n");
     sb.append("    actions: ").append(toIndentedString(actions)).append("\n");
     sb.append("    connection: ").append(toIndentedString(connection)).append("\n");
     sb.append("    display: ").append(toIndentedString(display)).append("\n");

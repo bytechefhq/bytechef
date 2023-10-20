@@ -2,12 +2,10 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.hermes.definition.registry.web.rest.model.PropertiesDataSourceModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.Arrays;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.util.NoSuchElementException;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -23,14 +21,14 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("DynamicPropertiesProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-05T16:27:34.189599+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:09:55.588650+01:00[Europe/Zagreb]")
 public class DynamicPropertiesPropertyAllOfModel {
 
   @JsonProperty("propertiesDataSource")
-  private JsonNullable<Object> propertiesDataSource = JsonNullable.undefined();
+  private PropertiesDataSourceModel propertiesDataSource;
 
-  public DynamicPropertiesPropertyAllOfModel propertiesDataSource(Object propertiesDataSource) {
-    this.propertiesDataSource = JsonNullable.of(propertiesDataSource);
+  public DynamicPropertiesPropertyAllOfModel propertiesDataSource(PropertiesDataSourceModel propertiesDataSource) {
+    this.propertiesDataSource = propertiesDataSource;
     return this;
   }
 
@@ -38,13 +36,13 @@ public class DynamicPropertiesPropertyAllOfModel {
    * Get propertiesDataSource
    * @return propertiesDataSource
   */
-  
+  @Valid 
   @Schema(name = "propertiesDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public JsonNullable<Object> getPropertiesDataSource() {
+  public PropertiesDataSourceModel getPropertiesDataSource() {
     return propertiesDataSource;
   }
 
-  public void setPropertiesDataSource(JsonNullable<Object> propertiesDataSource) {
+  public void setPropertiesDataSource(PropertiesDataSourceModel propertiesDataSource) {
     this.propertiesDataSource = propertiesDataSource;
   }
 
@@ -57,23 +55,12 @@ public class DynamicPropertiesPropertyAllOfModel {
       return false;
     }
     DynamicPropertiesPropertyAllOfModel dynamicPropertiesPropertyAllOf = (DynamicPropertiesPropertyAllOfModel) o;
-    return equalsNullable(this.propertiesDataSource, dynamicPropertiesPropertyAllOf.propertiesDataSource);
-  }
-
-  private static <T> boolean equalsNullable(JsonNullable<T> a, JsonNullable<T> b) {
-    return a == b || (a != null && b != null && a.isPresent() && b.isPresent() && Objects.deepEquals(a.get(), b.get()));
+    return Objects.equals(this.propertiesDataSource, dynamicPropertiesPropertyAllOf.propertiesDataSource);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(hashCodeNullable(propertiesDataSource));
-  }
-
-  private static <T> int hashCodeNullable(JsonNullable<T> a) {
-    if (a == null) {
-      return 1;
-    }
-    return a.isPresent() ? Arrays.deepHashCode(new Object[]{a.get()}) : 31;
+    return Objects.hash(propertiesDataSource);
   }
 
   @Override
