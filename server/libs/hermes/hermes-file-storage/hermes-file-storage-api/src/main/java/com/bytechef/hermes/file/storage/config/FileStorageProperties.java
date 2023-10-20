@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.file.storage;
+package com.bytechef.hermes.file.storage.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Ivica Cardic
  */
-public class FileStorageConstants {
+@ConfigurationProperties(prefix = "file.storage")
+public class FileStorageProperties {
 
-    public static final String FILE_ENTRY = "fileEntry";
-    public static final String FILE_NAME = "fileName";
+    private String fileStorageDir;
+
+    public String getFileStorageDir() {
+        return fileStorageDir;
+    }
+
+    public void setFileStorageDir(String fileStorageDir) {
+        this.fileStorageDir = fileStorageDir;
+    }
 }
