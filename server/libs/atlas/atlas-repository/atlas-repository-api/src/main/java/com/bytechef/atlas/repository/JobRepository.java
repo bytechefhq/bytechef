@@ -42,7 +42,7 @@ public interface JobRepository {
 
     Page<Job> findAll(Pageable pageable);
 
-    Optional<Job> findById(String aId);
+    Optional<Job> findById(String id);
 
     Optional<Job> findLatestJob();
 
