@@ -23,8 +23,8 @@ import {
 import WorkflowEditor from './WorkflowEditor';
 import Input from 'components/Input/Input';
 import {IntegrationModel} from '../../data-access/integration';
-import useRightSlideOverStore from './stores/rightSlideOver';
-import useLeftSidebarStore from './stores/leftSidebar';
+import useRightSlideOverStore from './stores/useRightSlideOverStore';
+import useLeftSidebarStore from './stores/useLeftSidebarStore';
 import {useGetComponentDefinitionsQuery} from '../../queries/componentDefinitions';
 import {useGetTaskDispatcherDefinitionsQuery} from '../../queries/taskDispatcherDefinitions';
 import {
