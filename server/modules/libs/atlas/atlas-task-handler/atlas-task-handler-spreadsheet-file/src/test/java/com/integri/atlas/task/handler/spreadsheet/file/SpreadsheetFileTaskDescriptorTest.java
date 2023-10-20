@@ -24,6 +24,9 @@ import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONParser;
 
+/**
+ * @author Ivica Cardic
+ */
 public class SpreadsheetFileTaskDescriptorTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
@@ -42,7 +45,7 @@ public class SpreadsheetFileTaskDescriptorTest {
                 "name":"spreadsheetFile",
                 "properties":[
                     {
-                        "defaultValue":"read",
+                        "defaultValue":"READ",
                         "description":"The operation to perform.",
                         "displayName":"Operation",
                         "name":"operation",
@@ -60,16 +63,29 @@ public class SpreadsheetFileTaskDescriptorTest {
                         ]
                     },
                     {
-                        "defaultValue":"data",
-                        "description":"Name of the binary property from which to read the binary data of the spreadsheet file.",
-                        "displayName":"Binary Property",
+                        "description":"The Binary property which contains the spreadsheet data to read from.",
+                        "displayName":"Binary",
                         "displayOption":{
                             "show":{
                                 "operation":["READ"]
                             }
                         },
-                        "name":"binaryPropertyName",
-                        "type":"STRING"
+                        "name":"binary",
+                        "required":true,
+                        "type":"JSON"
+                    },
+                                        {
+                        "description":"The Binary property which contains JSON data.",
+                        "displayName":"Binary",
+                        "displayOption":{
+                            "show":{
+                                "operation":["WRITE"],
+                                 "readFromBinary":[true]
+                            }
+                        },
+                        "name":"binary",
+                        "required":true,
+                        "type":"JSON"
                     },
                     {
                         "defaultValue":"CSV",
@@ -89,21 +105,6 @@ public class SpreadsheetFileTaskDescriptorTest {
                                 "description":"Comma-separated value"
                             },
                             {
-                                "name":"HTML",
-                                "value":"HTML",
-                                "description":"HTML Table"
-                            },
-                            {
-                                "name":"ODS",
-                                "value":"ODS",
-                                "description":"OpenDocument Spreadsheet"
-                            },
-                            {
-                                "name":"RTF",
-                                "value":"RTF",
-                                "description":"Rich Text Format"
-                            },
-                            {
                                 "name":"XLS",
                                 "value":"XLS",
                                 "description":"Microsoft Excel"
@@ -116,38 +117,51 @@ public class SpreadsheetFileTaskDescriptorTest {
                         ]
                     },
                     {
-                        "defaultValue":"data",
-                        "description":"Name of the binary property in which to save the binary data of the spreadsheet file.",
-                        "displayName":"Binary Property",
+                        "description":"Data to write to the file.",
+                        "displayName":"JSON array of items",
+                        "displayOption":{
+                            "show":{
+                                "operation":["WRITE"],
+                                "readFromBinary":[false]
+                            }
+                        },
+                        "name":"items",
+                        "required":true,
+                        "type":"JSON"
+                    },
+                    {
+                        "defaultValue":true,
+                        "description":"Read data from the Binary property.",
+                        "displayName":"Read from Binary",
                         "displayOption":{
                             "show":{
                                 "operation":["WRITE"]
                             }
                         },
-                        "name":"binaryPropertyName",
-                        "type":"STRING"
+                        "name":"readFromBinary",
+                        "type":"BOOLEAN"
                     },
                     {
                         "displayName":"Options",
                         "name":"options",
                         "type":"COLLECTION",
                         "options":[
-                            {
-                                "defaultValue":false,
-                                "description":"Weather compression will be applied or not.",
-                                "displayName":"Compression",
+                        {
+                                "defaultValue":",",
+                                "description":"Delimiter to use when reading a csv file.",
+                                "displayName":"Delimiter",
                                 "displayOption":{
                                     "show":{
-                                        "operation":["WRITE"],
-                                        "fileFormat":["XLSX","ODS"]
+                                        "operation":["READ"],
+                                        "fileFormat":["CSV"]
                                     }
                                 },
-                                "name":"compression",
-                                "type":"BOOLEAN"
+                                "name":"delimiter",
+                                "type":"STRING"
                             },
                             {
                                 "defaultValue":"",
-                                "description":"File name to set in binary data. By default will \\"spreadsheet.<fileFormat>\\" be used.",
+                                "description":"File name to set for binary data. By default, \\"spreadsheet.<fileFormat>\\" will be used.",
                                 "displayName":"File Name",
                                 "displayOption":{
                                     "show":{
@@ -182,30 +196,6 @@ public class SpreadsheetFileTaskDescriptorTest {
                                 "type":"BOOLEAN"
                             },
                             {
-                                "defaultValue":false,
-                                "description":"If the data should be returned RAW instead of parsed.",
-                                "displayName":"RAW Data",
-                                "displayOption":{
-                                    "show":{
-                                        "operation":["READ"]
-                                    }
-                                },
-                                "name":"rawData",
-                                "type":"BOOLEAN"
-                            },
-                            {
-                                "defaultValue":false,
-                                "description":"In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
-                                "displayName":"Read As String",
-                                "displayOption":{
-                                    "show":{
-                                        "operation":["READ"]
-                                    }
-                                },
-                                "name":"readAsString",
-                                "type":"BOOLEAN"
-                            },
-                            {
                                 "description":"The range to read from the table. If set to a number it will be the starting row.",
                                 "displayName":"Range",
                                 "displayOption":{
@@ -228,12 +218,25 @@ public class SpreadsheetFileTaskDescriptorTest {
                                 ]
                             },
                             {
-                                "defaultValue":"Sheet",
-                                "description":"The name of the sheet to read from in the spreadsheet (if supported). If not set, the first one gets chosen.",
-                                "displayName":"Sheet Name",
+                                "defaultValue":false,
+                                "description":"In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
+                                "displayName":"Read As String",
                                 "displayOption":{
                                     "show":{
                                         "operation":["READ"]
+                                    }
+                                },
+                                "name":"readAsString",
+                                "type":"BOOLEAN"
+                            },
+                            {
+                                "defaultValue":"Sheet",
+                                "description":"The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.",
+                                "displayName":"Sheet Name",
+                                "displayOption":{
+                                    "show":{
+                                        "operation":["READ"],
+                                        "fileFormat":["XLS","XLSX"]
                                     }
                                 },
                                 "name":"sheetName","type":"STRING"
@@ -245,7 +248,7 @@ public class SpreadsheetFileTaskDescriptorTest {
                                 "displayOption":{
                                     "show":{
                                         "operation":["WRITE"],
-                                        "fileFormat":["ODS","XLS","XLSX"]
+                                        "fileFormat":["XLS","XLSX"]
                                     }
                                 },
                                 "name":"sheetName",
