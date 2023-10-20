@@ -115,7 +115,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/integrations/{id}/integration-workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/integrations/{id}/workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
