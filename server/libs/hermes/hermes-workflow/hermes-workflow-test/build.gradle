@@ -1,0 +1,28 @@
+dependencies {
+    api project(":server:libs:atlas:atlas-api")
+
+    implementation "com.fasterxml.jackson.core:jackson-databind"
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api")
+    implementation project(":server:libs:atlas:atlas-event:atlas-event-api")
+    implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
+    implementation project(":server:libs:atlas:atlas-repository:atlas-repository-memory")
+    implementation project(":server:libs:atlas:atlas-service")
+    implementation project(":server:libs:atlas:atlas-sync-executor")
+    implementation project(":server:libs:atlas:atlas-worker:atlas-worker-api")
+    implementation project(":server:libs:atlas:atlas-sync-executor")
+    implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-api")
+
+    implementation project(":server:libs:modules:components:map")
+
+    implementation project(":server:libs:modules:task-dispatchers:each")
+    implementation project(":server:libs:modules:task-dispatchers:forkjoin")
+    implementation project(":server:libs:modules:task-dispatchers:if")
+    implementation project(":server:libs:modules:task-dispatchers:loop")
+    implementation project(":server:libs:modules:task-dispatchers:map")
+    implementation project(":server:libs:modules:task-dispatchers:parallel")
+    implementation project(":server:libs:modules:task-dispatchers:sequence")
+    implementation project(":server:libs:modules:task-dispatchers:subflow")
+    implementation project(":server:libs:modules:task-dispatchers:switch")
+}

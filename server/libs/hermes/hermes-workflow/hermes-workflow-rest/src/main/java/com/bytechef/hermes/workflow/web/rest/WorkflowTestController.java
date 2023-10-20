@@ -19,7 +19,7 @@ package com.bytechef.hermes.workflow.web.rest;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.hermes.workflow.executor.WorkflowTestExecutor;
+import com.bytechef.hermes.workflow.test.executor.WorkflowTestExecutor;
 import com.bytechef.hermwes.workflow.web.rest.WorkflowTestsApi;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
