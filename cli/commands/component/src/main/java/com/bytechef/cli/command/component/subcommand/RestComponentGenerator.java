@@ -1139,10 +1139,30 @@ public class RestComponentGenerator {
                                 propertyName,
                                 schema.getAdditionalProperties());
                         } else {
-                            builder.add(
-                                "object($S).additionalProperties($L())",
-                                propertyName,
-                                getAdditionalPropertiesItemType((Schema) schema.getAdditionalProperties()));
+                            Schema additionalPropertiesSchema = (Schema) schema.getAdditionalProperties();
+
+                            if (additionalPropertiesSchema.get$ref() == null) {
+                                builder.add(
+                                    "object($S).additionalProperties($L())",
+                                    propertyName,
+                                    getAdditionalPropertiesItemType(additionalPropertiesSchema));
+                            } else {
+                                String $ref = additionalPropertiesSchema.get$ref();
+                                Components components = openAPI.getComponents();
+
+                                Map<String, Schema> schemaMap = components.getSchemas();
+
+                                String curSchemaName = $ref.replace("#/components/schemas/", "");
+
+                                schemas.add(curSchemaName);
+
+                                builder.add(
+                                    "object($S).additionalProperties(object().properties($L))",
+                                    propertyName,
+                                    CodeBlock.of(
+                                        "$T.COMPONENT_SCHEMA",
+                                        ClassName.get(getPackageName() + ".schema", curSchemaName + "Schema")));
+                            }
                         }
                     } else {
                         builder.add("object($S)", propertyName);
