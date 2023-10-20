@@ -15,18 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.configuration.config;
+package com.bytechef.atlas.configuration.repository.git.config;
 
+import com.bytechef.atlas.configuration.repository.config.contributor.GitWorkflowRepositoryPropertiesContributor;
 import com.bytechef.atlas.configuration.repository.git.GitWorkflowRepository;
-import com.bytechef.helios.configuration.constant.ProjectConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,7 +35,6 @@ import java.util.Map;
  */
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.git.enabled", havingValue = "true")
-@EnableConfigurationProperties(GitWorkflowRepositoryTypeProperties.class)
 public class GitWorkflowRepositoryConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(GitWorkflowRepositoryConfiguration.class);
@@ -47,10 +47,21 @@ public class GitWorkflowRepositoryConfiguration {
 
     @Bean
     @Order(4)
-    GitWorkflowRepository gitWorkflowRepository(
-        GitWorkflowRepositoryTypeProperties gitWorkflowRepositoryTypeProperties) {
+    GitWorkflowRepository gitWorkflowRepository(List<GitWorkflowRepositoryPropertiesContributor> contributors) {
+        Map<Integer, GitWorkflowRepositoryProperties> gitWorkflowRepositoryPropertiesMap = new HashMap<>();
 
-        return new GitWorkflowRepository(
-            Map.of(ProjectConstants.PROJECT_TYPE, gitWorkflowRepositoryTypeProperties.getProjects()));
+        for (GitWorkflowRepositoryPropertiesContributor contributor : contributors) {
+            GitWorkflowRepositoryPropertiesContributor.GitWorkflowRepositoryProperties gitWorkflowRepositoryProperties =
+                contributor.getGitWorkflowRepositoryProperties();
+
+            gitWorkflowRepositoryPropertiesMap.put(
+                contributor.getType(),
+                new GitWorkflowRepositoryProperties(
+                    gitWorkflowRepositoryProperties.branch(), gitWorkflowRepositoryProperties.password(),
+                    gitWorkflowRepositoryProperties.searchPaths(), gitWorkflowRepositoryProperties.url(),
+                    gitWorkflowRepositoryProperties.username()));
+        }
+
+        return new GitWorkflowRepository(gitWorkflowRepositoryPropertiesMap);
     }
 }

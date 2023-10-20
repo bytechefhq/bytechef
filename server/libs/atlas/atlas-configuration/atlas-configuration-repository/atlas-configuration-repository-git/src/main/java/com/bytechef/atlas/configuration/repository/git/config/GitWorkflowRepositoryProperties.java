@@ -25,61 +25,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-public class GitWorkflowRepositoryProperties {
-
-    private boolean enabled = false;
-    private String url;
-    private String[] searchPaths;
-    private String branch = "master";
-    private String username;
-    private String password;
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String[] getSearchPaths() {
-        return searchPaths == null ? null : searchPaths.clone();
-    }
-
-    @SuppressFBWarnings("EI")
-    public void setSearchPaths(String[] searchPaths) {
-        this.searchPaths = searchPaths;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public String getBranch() {
-        return branch;
-    }
-
-    public void setBranch(String branch) {
-        this.branch = branch;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
+@SuppressFBWarnings("EI")
+public record GitWorkflowRepositoryProperties(
+    String branch, String password, String[] searchPaths, String url, String username) {
 }

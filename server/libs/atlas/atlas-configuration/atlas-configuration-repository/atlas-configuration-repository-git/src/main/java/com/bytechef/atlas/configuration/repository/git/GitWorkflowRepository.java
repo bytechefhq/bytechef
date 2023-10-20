@@ -61,9 +61,9 @@ public class GitWorkflowRepository implements WorkflowRepository {
                 GitWorkflowRepositoryProperties gitWorkflowRepositoryProperties = entry.getValue();
 
                 return new JGitWorkflowOperations(
-                    gitWorkflowRepositoryProperties.getUrl(), gitWorkflowRepositoryProperties.getBranch(),
-                    List.of("yaml", "yml"), Arrays.asList(gitWorkflowRepositoryProperties.getSearchPaths()),
-                    gitWorkflowRepositoryProperties.getUsername(), gitWorkflowRepositoryProperties.getPassword());
+                    gitWorkflowRepositoryProperties.url(), gitWorkflowRepositoryProperties.branch(),
+                    List.of("yaml", "yml"), Arrays.asList(gitWorkflowRepositoryProperties.searchPaths()),
+                    gitWorkflowRepositoryProperties.username(), gitWorkflowRepositoryProperties.password());
             });
     }
 
