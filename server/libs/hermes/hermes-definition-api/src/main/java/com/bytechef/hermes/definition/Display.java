@@ -62,6 +62,6 @@ public sealed class Display permits DefinitionDSL.ModifiableDisplay {
 
     @Schema(name = "tags", description = "Tags for the component.")
     public String[] getTags() {
-        return tags;
+        return tags == null ? null : tags.clone();
     }
 }

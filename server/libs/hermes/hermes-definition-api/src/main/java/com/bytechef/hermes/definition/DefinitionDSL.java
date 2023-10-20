@@ -19,23 +19,12 @@ package com.bytechef.hermes.definition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class DefinitionDSL {
-
-    public static ModifiableProperty.ModifiableAnyProperty any() {
-        return any(null);
-    }
-
-    public static ModifiableProperty.ModifiableAnyProperty any(String name) {
-        return new ModifiableProperty.ModifiableAnyProperty(name);
-    }
 
     public static ModifiableProperty.ModifiableArrayProperty array() {
         return new ModifiableProperty.ModifiableArrayProperty(null);
@@ -73,9 +62,66 @@ public class DefinitionDSL {
         return new ModifiableDisplay(label);
     }
 
-    public static ModifiableDisplayOption.DisplayOptionProperty hideWhen(String propertyName) {
-        return new ModifiableDisplayOption.DisplayOptionProperty(
-                new ModifiableDisplayOption.HideDisplayOptionCondition(propertyName));
+    public static ModifiableDisplayOption.HideDisplayOptionCondition hide(String propertyName, Object value) {
+        return new ModifiableDisplayOption.HideDisplayOptionCondition(Map.of(propertyName, List.of(value)));
+    }
+
+    public static ModifiableDisplayOption.HideDisplayOptionCondition hide(String propertyName, List<Object> values) {
+        return new ModifiableDisplayOption.HideDisplayOptionCondition(Map.of(propertyName, values));
+    }
+
+    public static ModifiableDisplayOption.HideDisplayOptionCondition hide(
+            String propertyName1, List<Object> values1, String propertyName2, List<Object> values2) {
+        return new ModifiableDisplayOption.HideDisplayOptionCondition(
+                Map.of(propertyName1, values1, propertyName2, values2));
+    }
+
+    public static ModifiableDisplayOption.HideDisplayOptionCondition hide(
+            String propertyName1,
+            List<Object> values1,
+            String propertyName2,
+            List<Object> values2,
+            String propertyName3,
+            List<Object> values3) {
+        return new ModifiableDisplayOption.HideDisplayOptionCondition(
+                Map.of(propertyName1, values1, propertyName2, values2, propertyName3, values3));
+    }
+
+    public static ModifiableDisplayOption.HideDisplayOptionCondition hide(
+            String propertyName1,
+            List<Object> values1,
+            String propertyName2,
+            List<Object> values2,
+            String propertyName3,
+            List<Object> values3,
+            String propertyName4,
+            List<Object> values4) {
+        return new ModifiableDisplayOption.HideDisplayOptionCondition(
+                Map.of(propertyName1, values1, propertyName2, values2, propertyName3, values3, propertyName4, values4));
+    }
+
+    public static ModifiableDisplayOption.HideDisplayOptionCondition hide(
+            String propertyName1,
+            List<Object> values1,
+            String propertyName2,
+            List<Object> values2,
+            String propertyName3,
+            List<Object> values3,
+            String propertyName4,
+            List<Object> values4,
+            String propertyName5,
+            List<Object> values5) {
+        return new ModifiableDisplayOption.HideDisplayOptionCondition(Map.of(
+                propertyName1,
+                values1,
+                propertyName2,
+                values2,
+                propertyName3,
+                values3,
+                propertyName4,
+                values4,
+                propertyName5,
+                values5));
     }
 
     public static ModifiableProperty.ModifiableIntegerProperty integer() {
@@ -108,6 +154,14 @@ public class DefinitionDSL {
 
     public static ModifiableProperty.ModifiableObjectProperty object(String name) {
         return new ModifiableProperty.ModifiableObjectProperty(name);
+    }
+
+    public static ModifiableProperty.ModifiableOneOfProperty oneOf() {
+        return oneOf(null);
+    }
+
+    public static ModifiableProperty.ModifiableOneOfProperty oneOf(String name) {
+        return new ModifiableProperty.ModifiableOneOfProperty(name);
     }
 
     public static ModifiablePropertyOption option(String name, boolean value) {
@@ -170,9 +224,66 @@ public class DefinitionDSL {
         return new ModifiableResources();
     }
 
-    public static ModifiableDisplayOption.DisplayOptionProperty showWhen(String propertyName) {
-        return new ModifiableDisplayOption.DisplayOptionProperty(
-                new ModifiableDisplayOption.ShowDisplayOptionCondition(propertyName));
+    public static ModifiableDisplayOption.ShowDisplayOptionCondition show(String propertyName, Object value) {
+        return new ModifiableDisplayOption.ShowDisplayOptionCondition(Map.of(propertyName, List.of(value)));
+    }
+
+    public static ModifiableDisplayOption.ShowDisplayOptionCondition show(String propertyName, List<Object> values) {
+        return new ModifiableDisplayOption.ShowDisplayOptionCondition(Map.of(propertyName, values));
+    }
+
+    public static ModifiableDisplayOption.ShowDisplayOptionCondition show(
+            String propertyName1, List<Object> values1, String propertyName2, List<Object> values2) {
+        return new ModifiableDisplayOption.ShowDisplayOptionCondition(
+                Map.of(propertyName1, values1, propertyName2, values2));
+    }
+
+    public static ModifiableDisplayOption.ShowDisplayOptionCondition show(
+            String propertyName1,
+            List<Object> values1,
+            String propertyName2,
+            List<Object> values2,
+            String propertyName3,
+            List<Object> values3) {
+        return new ModifiableDisplayOption.ShowDisplayOptionCondition(
+                Map.of(propertyName1, values1, propertyName2, values2, propertyName3, values3));
+    }
+
+    public static ModifiableDisplayOption.ShowDisplayOptionCondition show(
+            String propertyName1,
+            List<Object> values1,
+            String propertyName2,
+            List<Object> values2,
+            String propertyName3,
+            List<Object> values3,
+            String propertyName4,
+            List<Object> values4) {
+        return new ModifiableDisplayOption.ShowDisplayOptionCondition(
+                Map.of(propertyName1, values1, propertyName2, values2, propertyName3, values3, propertyName4, values4));
+    }
+
+    public static ModifiableDisplayOption.ShowDisplayOptionCondition show(
+            String propertyName1,
+            List<Object> values1,
+            String propertyName2,
+            List<Object> values2,
+            String propertyName3,
+            List<Object> values3,
+            String propertyName4,
+            List<Object> values4,
+            String propertyName5,
+            List<Object> values5) {
+        return new ModifiableDisplayOption.ShowDisplayOptionCondition(Map.of(
+                propertyName1,
+                values1,
+                propertyName2,
+                values2,
+                propertyName3,
+                values3,
+                propertyName4,
+                values4,
+                propertyName5,
+                values5));
     }
 
     public static ModifiableProperty.ModifiableStringProperty string() {
@@ -181,6 +292,13 @@ public class DefinitionDSL {
 
     public static ModifiableProperty.ModifiableStringProperty string(String name) {
         return new ModifiableProperty.ModifiableStringProperty(name);
+    }
+
+    protected static ModifiableProperty.ModifiableObjectProperty buildObject(
+            String name, String description, String objectType) {
+        return new ModifiableProperty.ModifiableObjectProperty(name)
+                .description(description)
+                .objectType(objectType);
     }
 
     protected static ModifiableProperty.ModifiableObjectProperty buildObject(
@@ -230,141 +348,34 @@ public class DefinitionDSL {
 
     public static final class ModifiableDisplayOption extends DisplayOption {
 
-        private ModifiableDisplayOption() {}
-
-        static ModifiableDisplayOption of(List<DisplayOptionCondition> displayOptionConditions) {
-            ModifiableDisplayOption displayOption = new ModifiableDisplayOption();
-
-            for (DisplayOptionCondition displayOptionCondition : displayOptionConditions) {
-                if (displayOptionCondition instanceof HideDisplayOptionCondition hideDisplayOptionCondition) {
-                    if (displayOption.hideWhen == null) {
-                        displayOption.hideWhen = new HashMap<>();
-                    }
-
-                    displayOption.hideWhen.computeIfAbsent(
-                            hideDisplayOptionCondition.propertyName, key -> displayOptionCondition.values);
-                } else if (displayOptionCondition instanceof ShowDisplayOptionCondition showDisplayOptionCondition) {
-                    if (displayOption.showWhen == null) {
-                        displayOption.showWhen = new HashMap<>();
-                    }
-
-                    displayOption.showWhen.computeIfAbsent(
-                            showDisplayOptionCondition.propertyName, key -> displayOptionCondition.values);
-                }
-            }
-
-            return displayOption;
+        private ModifiableDisplayOption(Map<String, List<Object>> hide, Map<String, List<Object>> show) {
+            super(hide, show);
         }
 
-        public static final class DisplayOptionProperty {
-            private DisplayOptionCondition displayOptionCondition;
+        abstract static class DisplayOptionCondition {
 
-            public DisplayOptionProperty(DisplayOptionCondition displayOptionCondition) {
-                this.displayOptionCondition = displayOptionCondition;
+            protected final Map<String, List<Object>> conditions;
+
+            public DisplayOptionCondition(Map<String, List<Object>> conditions) {
+                this.conditions = conditions;
             }
 
-            public DisplayOptionCondition eq(Boolean value) {
-                displayOptionCondition.values = List.of(value);
-
-                return displayOptionCondition;
-            }
-
-            public DisplayOptionCondition eq(Integer value) {
-                displayOptionCondition.values = List.of(value);
-
-                return displayOptionCondition;
-            }
-
-            public DisplayOptionCondition eq(Long value) {
-                displayOptionCondition.values = List.of(value);
-
-                return displayOptionCondition;
-            }
-
-            public DisplayOptionCondition eq(Float value) {
-                displayOptionCondition.values = List.of(value);
-
-                return displayOptionCondition;
-            }
-
-            public DisplayOptionCondition eq(Double value) {
-                displayOptionCondition.values = List.of(value);
-
-                return displayOptionCondition;
-            }
-
-            public DisplayOptionCondition eq(String value) {
-                displayOptionCondition.values = List.of(value);
-
-                return displayOptionCondition;
-            }
-
-            public DisplayOptionCondition in(Boolean... values) {
-                displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-                return displayOptionCondition;
-            }
-
-            public DisplayOptionCondition in(Integer... values) {
-                displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-                return displayOptionCondition;
-            }
-
-            public DisplayOptionCondition in(Long... values) {
-                displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-                return displayOptionCondition;
-            }
-
-            public DisplayOptionCondition in(Float... values) {
-                displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-                return displayOptionCondition;
-            }
-
-            public DisplayOptionCondition in(Double... values) {
-                displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-                return displayOptionCondition;
-            }
-
-            public DisplayOptionCondition in(String... values) {
-                displayOptionCondition.values = Arrays.stream(values).collect(Collectors.toCollection(ArrayList::new));
-
-                return displayOptionCondition;
-            }
-        }
-
-        public abstract static class DisplayOptionCondition {
-
-            protected final String propertyName;
-            protected List<Object> values = List.of();
-
-            public DisplayOptionCondition(String propertyName) {
-                this.propertyName = propertyName;
-            }
-
-            public String getPropertyName() {
-                return propertyName;
-            }
-
-            public List<Object> getValues() {
-                return new ArrayList<>(values);
+            public Map<String, List<Object>> getConditions() {
+                return conditions;
             }
         }
 
         public static final class HideDisplayOptionCondition extends DisplayOptionCondition {
 
-            public HideDisplayOptionCondition(String propertyName) {
-                super(propertyName);
+            public HideDisplayOptionCondition(Map<String, List<Object>> conditions) {
+                super(conditions);
             }
         }
 
         public static final class ShowDisplayOptionCondition extends DisplayOptionCondition {
 
-            public ShowDisplayOptionCondition(String propertyName) {
-                super(propertyName);
+            public ShowDisplayOptionCondition(Map<String, List<Object>> conditions) {
+                super(conditions);
             }
         }
     }
@@ -389,44 +400,65 @@ public class DefinitionDSL {
     }
 
     public static class ModifiableProperty {
-        public static final class ModifiableAnyProperty extends Property.AnyProperty {
+        public static final class ModifiableOneOfProperty extends Property.OneOfProperty {
 
-            private ModifiableAnyProperty(String name) {
+            private ModifiableOneOfProperty(String name) {
                 super(name);
             }
 
-            public ModifiableAnyProperty description(String description) {
+            public ModifiableOneOfProperty description(String description) {
                 this.description = description;
 
                 return this;
             }
 
-            public ModifiableAnyProperty displayOption(
-                    ModifiableDisplayOption.DisplayOptionCondition... displayOptionConditions) {
-                this.displayOption = ModifiableDisplayOption.of(List.of(displayOptionConditions));
+            public ModifiableOneOfProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
 
                 return this;
             }
 
-            public ModifiableAnyProperty label(String label) {
+            public ModifiableOneOfProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
+
+                return this;
+            }
+
+            public ModifiableOneOfProperty displayOption(
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
+
+                return this;
+            }
+
+            public ModifiableOneOfProperty displayOption(
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
+
+                return this;
+            }
+
+            public ModifiableOneOfProperty label(String label) {
                 this.label = label;
 
                 return this;
             }
 
-            public ModifiableAnyProperty placeholder(String placeholder) {
+            public ModifiableOneOfProperty placeholder(String placeholder) {
                 this.placeholder = placeholder;
 
                 return this;
             }
 
-            public ModifiableAnyProperty required(Boolean required) {
+            public ModifiableOneOfProperty required(Boolean required) {
                 this.required = required;
 
                 return this;
             }
 
-            public ModifiableAnyProperty types(Property<?>... properties) {
+            public ModifiableOneOfProperty types(Property<?>... properties) {
                 this.types = List.of(properties);
 
                 return this;
@@ -439,8 +471,8 @@ public class DefinitionDSL {
                 super(name);
             }
 
-            public ModifiableArrayProperty advancedOption(boolean additional) {
-                this.advancedOption = additional;
+            public ModifiableArrayProperty advancedOption(boolean advancedOption) {
+                this.advancedOption = advancedOption;
 
                 return this;
             }
@@ -451,9 +483,30 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableArrayProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
+
+                return this;
+            }
+
+            public ModifiableArrayProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
+
+                return this;
+            }
+
             public ModifiableArrayProperty displayOption(
-                    ModifiableDisplayOption.DisplayOptionCondition... displayOptionConditions) {
-                this.displayOption = ModifiableDisplayOption.of(List.of(displayOptionConditions));
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
+
+                return this;
+            }
+
+            public ModifiableArrayProperty displayOption(
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
             }
@@ -595,8 +648,10 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableArrayProperty items(Property... items) {
-                this.items = List.of(items);
+            public ModifiableArrayProperty items(Property<?>... items) {
+                if (items != null) {
+                    this.items = List.of(items);
+                }
 
                 return this;
             }
@@ -620,9 +675,30 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableBooleanProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
+
+                return this;
+            }
+
+            public ModifiableBooleanProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
+
+                return this;
+            }
+
             public ModifiableBooleanProperty displayOption(
-                    ModifiableDisplayOption.DisplayOptionCondition... displayOptionConditions) {
-                this.displayOption = ModifiableDisplayOption.of(List.of(displayOptionConditions));
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
+
+                return this;
+            }
+
+            public ModifiableBooleanProperty displayOption(
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
             }
@@ -712,9 +788,30 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableDateProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
+
+                return this;
+            }
+
+            public ModifiableDateProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
+
+                return this;
+            }
+
             public ModifiableDateProperty displayOption(
-                    ModifiableDisplayOption.DisplayOptionCondition... displayOptionConditions) {
-                this.displayOption = ModifiableDisplayOption.of(List.of(displayOptionConditions));
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
+
+                return this;
+            }
+
+            public ModifiableDateProperty displayOption(
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
             }
@@ -803,9 +900,30 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableDateTimeProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
+
+                return this;
+            }
+
+            public ModifiableDateTimeProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
+
+                return this;
+            }
+
             public ModifiableDateTimeProperty displayOption(
-                    ModifiableDisplayOption.DisplayOptionCondition... displayOptionConditions) {
-                this.displayOption = ModifiableDisplayOption.of(List.of(displayOptionConditions));
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
+
+                return this;
+            }
+
+            public ModifiableDateTimeProperty displayOption(
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
             }
@@ -895,9 +1013,30 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableNumberProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
+
+                return this;
+            }
+
+            public ModifiableNumberProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
+
+                return this;
+            }
+
             public ModifiableNumberProperty displayOption(
-                    ModifiableDisplayOption.DisplayOptionCondition... displayOptionConditions) {
-                this.displayOption = ModifiableDisplayOption.of(List.of(displayOptionConditions));
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
+
+                return this;
+            }
+
+            public ModifiableNumberProperty displayOption(
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
             }
@@ -1041,9 +1180,30 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableIntegerProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
+
+                return this;
+            }
+
+            public ModifiableIntegerProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
+
+                return this;
+            }
+
             public ModifiableIntegerProperty displayOption(
-                    ModifiableDisplayOption.DisplayOptionCondition... displayOptionConditions) {
-                this.displayOption = ModifiableDisplayOption.of(List.of(displayOptionConditions));
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
+
+                return this;
+            }
+
+            public ModifiableIntegerProperty displayOption(
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
             }
@@ -1145,9 +1305,30 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableObjectProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
+
+                return this;
+            }
+
+            public ModifiableObjectProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
+
+                return this;
+            }
+
             public ModifiableObjectProperty displayOption(
-                    ModifiableDisplayOption.DisplayOptionCondition... displayOptionConditions) {
-                this.displayOption = ModifiableDisplayOption.of(List.of(displayOptionConditions));
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
+
+                return this;
+            }
+
+            public ModifiableObjectProperty displayOption(
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
             }
@@ -1218,8 +1399,10 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableObjectProperty additionalProperties(boolean additionalProperties) {
-                this.additionalProperties = additionalProperties;
+            public ModifiableObjectProperty additionalProperties(Property<?>... additionalProperties) {
+                if (additionalProperties != null) {
+                    this.additionalProperties = List.of(additionalProperties);
+                }
 
                 return this;
             }
@@ -1231,7 +1414,20 @@ public class DefinitionDSL {
             }
 
             public ModifiableObjectProperty properties(Property<?>... properties) {
-                this.properties = List.of(properties);
+                if (properties != null) {
+                    this.properties = List.of(properties);
+                }
+
+                return this;
+            }
+
+            @SuppressWarnings("unchecked")
+            public ModifiableObjectProperty properties(List<Property> properties) {
+                if (properties != null) {
+                    this.properties = properties.stream()
+                            .map(property -> (Property<?>) property)
+                            .toList();
+                }
 
                 return this;
             }
@@ -1255,9 +1451,30 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableStringProperty displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
+
+                return this;
+            }
+
+            public ModifiableStringProperty displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(null, show.conditions);
+
+                return this;
+            }
+
             public ModifiableStringProperty displayOption(
-                    ModifiableDisplayOption.DisplayOptionCondition... displayOptionConditions) {
-                this.displayOption = ModifiableDisplayOption.of(List.of(displayOptionConditions));
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
+
+                return this;
+            }
+
+            public ModifiableStringProperty displayOption(
+                    ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                    ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+                this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
                 return this;
             }
@@ -1352,39 +1569,30 @@ public class DefinitionDSL {
             return this;
         }
 
+        public ModifiablePropertyOption displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+            this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
+
+            return this;
+        }
+
+        public ModifiablePropertyOption displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+            this.displayOption = new ModifiableDisplayOption(null, show.conditions);
+
+            return this;
+        }
+
         public ModifiablePropertyOption displayOption(
-                ModifiableDisplayOption.DisplayOptionCondition... displayOptionEntries) {
-            this.displayOption = ModifiableDisplayOption.of(List.of(displayOptionEntries));
+                ModifiableDisplayOption.ShowDisplayOptionCondition show,
+                ModifiableDisplayOption.HideDisplayOptionCondition hide) {
+            this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
             return this;
         }
 
-        public ModifiablePropertyOption value(boolean value) {
-            this.value = value;
-
-            return this;
-        }
-
-        public ModifiablePropertyOption value(LocalDate value) {
-            this.value = value;
-
-            return this;
-        }
-
-        public ModifiablePropertyOption value(LocalDateTime value) {
-            this.value = value;
-
-            return this;
-        }
-
-        public ModifiablePropertyOption value(Object value) {
-            this.value = value;
-
-            return this;
-        }
-
-        public ModifiablePropertyOption value(String value) {
-            this.value = value;
+        public ModifiablePropertyOption displayOption(
+                ModifiableDisplayOption.HideDisplayOptionCondition hide,
+                ModifiableDisplayOption.ShowDisplayOptionCondition show) {
+            this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
 
             return this;
         }
