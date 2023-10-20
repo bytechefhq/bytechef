@@ -14,4 +14,7 @@
     <Match>
         <Class name="com.integri.atlas.config.WorkflowRepositoryProperties$GitProperties" />
     </Match>
+    <Match>
+        <Class name="com.bytechef.cli.cmd.component.ComponentCommand" />
+    </Match>
 </FindBugsFilter>
