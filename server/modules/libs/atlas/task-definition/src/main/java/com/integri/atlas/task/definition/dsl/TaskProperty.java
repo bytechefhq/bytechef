@@ -32,6 +32,7 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
         TaskProperty.ColorTaskProperty,
         TaskProperty.DateTimeTaskProperty,
         TaskProperty.CollectionTaskProperty,
+        TaskProperty.FileEntryTaskProperty,
         TaskProperty.GroupTaskProperty,
         TaskProperty.JSONTaskProperty,
         TaskProperty.MultiOptionTaskProperty,
@@ -64,6 +65,10 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
 
     public static CollectionTaskProperty COLLECTION_PROPERTY(String name) {
         return new CollectionTaskProperty(name);
+    }
+
+    public static FileEntryTaskProperty FILE_ENTRY_PROPERTY(String name) {
+        return new FileEntryTaskProperty(name);
     }
 
     public static GroupTaskProperty GROUP_PROPERTY(String name) {
@@ -721,6 +726,14 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
             this.placeholder = placeholder;
 
             return this;
+        }
+    }
+
+    public static final class FileEntryTaskProperty extends TaskProperty<FileEntryTaskProperty> {
+
+        public FileEntryTaskProperty(String name) {
+            this.name = name;
+            this.type = TaskPropertyType.FILE_ENTRY;
         }
     }
 

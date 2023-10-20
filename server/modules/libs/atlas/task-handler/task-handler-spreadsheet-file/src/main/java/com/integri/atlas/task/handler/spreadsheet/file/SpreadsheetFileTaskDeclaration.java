@@ -19,6 +19,7 @@ package com.integri.atlas.task.handler.spreadsheet.file;
 import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValues;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.COLLECTION_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.FILE_ENTRY_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.GROUP_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.JSON_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.NUMBER_PROPERTY;
@@ -51,12 +52,12 @@ public class SpreadsheetFileTaskDeclaration implements TaskDeclaration {
                 )
                 .defaultValue("READ")
                 .required(true),
-            JSON_PROPERTY("fileEntry")
+            FILE_ENTRY_PROPERTY("fileEntry")
                 .displayName("File")
-                .description("The object property which contains the reference to the spreadsheet file to read from.")
+                .description("The object property which contains a reference to the spreadsheet file to read from.")
                 .displayOption(show("operation", "READ"))
                 .required(true),
-            JSON_PROPERTY("fileEntry")
+            FILE_ENTRY_PROPERTY("fileEntry")
                 .displayName("File")
                 .description("The object property which contains reference to the file with JSON data.")
                 .displayOption(show("operation", parameterValues("WRITE"), "inputType", parameterValues("FILE")))
