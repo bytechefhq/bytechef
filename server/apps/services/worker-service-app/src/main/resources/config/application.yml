@@ -15,6 +15,9 @@ health:
       prometheus:
         enabled: true
         step: 60
+  health:
+    rabbit:
+      enabled: false # When using Rabbit, set this to true
     enable:
       http: true
       jvm: true
