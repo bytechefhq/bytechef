@@ -344,23 +344,23 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
 
     @Override
     public String toString() {
-        return "Job{" + "createdBy='"
-            + createdBy + '\'' + ", createdDate="
-            + createdDate + ", currentTask="
-            + currentTask + ", endTime="
-            + endTime + ", error="
-            + error + ", id='"
-            + id + '\'' + ", inputs="
-            + inputs + ", label='"
-            + label + '\'' + ", lastModifiedBy='"
-            + lastModifiedBy + '\'' + ", lastModifiedDate="
-            + lastModifiedDate + ", outputs="
-            + outputs + ", parentTaskExecutionId="
+        return "Job{" + "id="
+            + id + ", workflowId='"
+            + workflowId + '\'' + ", status="
+            + status + ", label='"
+            + label + '\'' + ", startTime="
+            + startTime + ", endTime="
+            + endTime + ", inputs="
+            + inputs + ", outputs="
+            + outputs + ", webhooks="
+            + webhooks + ", error="
+            + error + ", parentTaskExecutionId="
             + getParentTaskExecutionId() + ", priority="
-            + priority + ", startTime="
-            + startTime + ", status="
-            + status + ", webhooks="
-            + webhooks + ", workflowId='"
-            + workflowId + '\'' + '}';
+            + priority + ", currentTask="
+            + currentTask + ", createdBy='"
+            + createdBy + '\'' + ", createdDate="
+            + createdDate + ", lastModifiedBy='"
+            + lastModifiedBy + '\'' + ", lastModifiedDate="
+            + lastModifiedDate + '}';
     }
 }

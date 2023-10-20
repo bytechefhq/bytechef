@@ -263,17 +263,17 @@ public final class Integration implements Persistable<Long> {
     @Override
     public String toString() {
         return "Integration{" +
-            "categoryId=" + getCategoryId() +
-            ", createdBy='" + createdBy + '\'' +
-            ", createdDate=" + createdDate +
+            "id=" + id +
+            ", categoryId=" + getCategoryId() +
             ", description='" + description + '\'' +
-            ", id=" + id +
             ", integrationTags=" + integrationTags +
             ", integrationWorkflows=" + integrationWorkflows +
             ", name='" + name + '\'' +
+            ", version=" + version +
+            ", createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
-            ", version=" + version +
             '}';
     }
 }

@@ -199,17 +199,17 @@ public final class Connection implements Persistable<Long> {
 
     @Override
     public String toString() {
-        return "Connection{" + "authorizationName='"
+        return "Connection{" + ", id="
+            + id + "authorizationName='"
             + authorizationName + '\'' + ", componentName='"
             + componentName + '\'' + ", componentVersion="
-            + componentVersion + ", createdBy='"
-            + createdBy + '\'' + ", createdDate="
-            + createdDate + ", id='"
-            + id + '\'' + ", lastModifiedBy='"
-            + lastModifiedBy + '\'' + ", lastModifiedDate="
-            + lastModifiedDate + ", name='"
+            + componentVersion + ", name='"
             + name + '\'' + ", parameters="
             + parameters + ", version="
-            + version + '}';
+            + version + ", createdBy='"
+            + createdBy + '\'' + ", createdDate="
+            + createdDate + ", lastModifiedBy='"
+            + lastModifiedBy + '\'' + ", lastModifiedDate="
+            + lastModifiedDate + '}';
     }
 }

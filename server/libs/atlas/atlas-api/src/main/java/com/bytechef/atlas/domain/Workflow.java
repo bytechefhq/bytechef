@@ -315,21 +315,21 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     @Override
     public String toString() {
         return "Workflow{" +
-            "definition='" + definition + '\'' +
-            ", createdBy='" + createdBy + '\'' +
-            ", createdDate=" + createdDate +
-            ", error=" + error +
-            ", format=" + format +
-            ", id='" + id + '\'' +
-            ", inputs=" + inputs +
+            ", id=" + id +
             ", label='" + label + '\'' +
-            ", lastModifiedBy='" + lastModifiedBy + '\'' +
-            ", lastModifiedDate=" + lastModifiedDate +
-            ", outputs=" + outputs +
+            ", definition='" + definition + '\'' +
+            ", format=" + format +
             ", sourceType=" + sourceType +
+            ", inputs=" + inputs +
+            ", outputs=" + outputs +
+            ", error=" + error +
             ", retry=" + retry +
             ", tasks=" + tasks +
             ", version=" + version +
+            ", createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
+            ", lastModifiedBy='" + lastModifiedBy + '\'' +
+            ", lastModifiedDate=" + lastModifiedDate +
             '}';
     }
 }
