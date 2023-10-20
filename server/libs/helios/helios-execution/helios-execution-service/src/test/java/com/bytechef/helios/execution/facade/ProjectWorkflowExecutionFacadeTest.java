@@ -15,12 +15,25 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.execution.job;
+package com.bytechef.helios.execution.facade;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public interface ProjectInstanceWorkflowJobFactory {
+public class ProjectWorkflowExecutionFacadeTest {
 
-    long createJob(long projectInstanceId, String workflowId);
+    @Disabled
+    @Test
+    public void testGetProjectWorkflowExecution() {
+        // TODO
+    }
+
+    @Disabled
+    @Test
+    public void searchProjectWorkflowExecutions() {
+        // TODO
+    }
 }

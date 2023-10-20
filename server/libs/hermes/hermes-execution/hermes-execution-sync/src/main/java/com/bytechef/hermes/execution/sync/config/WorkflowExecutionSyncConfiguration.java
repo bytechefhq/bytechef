@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.execution.sync.config;
 
-import com.bytechef.atlas.execution.job.JobFactory;
-import com.bytechef.atlas.execution.job.JobFactoryImpl;
+import com.bytechef.atlas.execution.job.factory.JobFactory;
+import com.bytechef.atlas.execution.job.factory.JobFactoryImpl;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;

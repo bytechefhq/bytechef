@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.execution.job;
+package com.bytechef.helios.execution.job.factory;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.job.JobFactory;
+import com.bytechef.atlas.execution.job.factory.JobFactory;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -27,6 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
+/**
+ * @author Ivica Cardic
+ */
 public class ProjectInstanceWorkflowJobFactoryImpl implements ProjectInstanceWorkflowJobFactory {
 
     private final JobFactory jobFactory;

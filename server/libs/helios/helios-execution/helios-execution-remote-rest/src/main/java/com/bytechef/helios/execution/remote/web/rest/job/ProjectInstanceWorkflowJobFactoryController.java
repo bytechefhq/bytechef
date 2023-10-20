@@ -17,7 +17,7 @@
 
 package com.bytechef.helios.execution.remote.web.rest.job;
 
-import com.bytechef.helios.execution.job.ProjectInstanceWorkflowJobFactory;
+import com.bytechef.helios.execution.job.factory.ProjectInstanceWorkflowJobFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

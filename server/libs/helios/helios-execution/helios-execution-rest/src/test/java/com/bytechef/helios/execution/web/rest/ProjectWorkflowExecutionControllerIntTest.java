@@ -15,18 +15,26 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.coordinator.instance;
+package com.bytechef.helios.execution.web.rest;
 
-import java.util.Map;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 /**
  * @author Ivica Cardic
  */
-public interface InstanceWorkflowManager {
+@Disabled
+@WebMvcTest(value = ProjectWorkflowExecutionController.class)
+public class ProjectWorkflowExecutionControllerIntTest {
 
-    long createJob(long instanceId, String workflowId);
+    @Test
+    public void testGetProjectWorkflowExecution() {
+// TODO
+    }
 
-    Map<String, Object> getInputs(long instanceId, String workflowId);
-
-    String getType();
+    @Test
+    public void testSearchProjectWorkflowExecutions() {
+// TODO
+    }
 }
