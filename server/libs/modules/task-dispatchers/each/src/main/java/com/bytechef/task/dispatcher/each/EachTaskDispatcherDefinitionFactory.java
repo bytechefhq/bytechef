@@ -17,7 +17,14 @@
 
 package com.bytechef.task.dispatcher.each;
 
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
+import static com.bytechef.hermes.definition.DefinitionDSL.any;
+import static com.bytechef.hermes.definition.DefinitionDSL.bool;
+import static com.bytechef.hermes.definition.DefinitionDSL.date;
+import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
+import static com.bytechef.hermes.definition.DefinitionDSL.nullable;
+import static com.bytechef.hermes.definition.DefinitionDSL.number;
+import static com.bytechef.hermes.definition.DefinitionDSL.object;
+import static com.bytechef.hermes.definition.DefinitionDSL.time;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
 
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.integer;
@@ -50,7 +57,8 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
             array(LIST)
                 .label("List of items")
                 .description("List of items to iterate over.")
-                .items(oneOf()),
+                .items(
+                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()),
             string(ITEM_VAR)
                 .label("Item Var")
                 .description("The name of the item variable.")
@@ -59,7 +67,7 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
                 .label("Item Index")
                 .description("The name of the index variable.")
                 .defaultValue(ITEM_INDEX))
-        .outputSchema(oneOf("item"), integer("itemIndex"))
+        .outputSchema(any("item"), integer("itemIndex"))
         .taskProperties(task(ITERATEE));
 
     @Override
