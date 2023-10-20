@@ -17,6 +17,9 @@
 
 package com.bytechef.component.schedule.constant;
 
+import com.bytechef.component.schedule.data.WorkflowScheduleAndData;
+import com.github.kagkarlsson.scheduler.task.TaskWithDataDescriptor;
+
 /**
  * @author Ivica Cardic
  */
@@ -32,4 +35,7 @@ public class ScheduleConstants {
     public static final String SCHEDULE = "schedule";
     public static final String TIME_UNIT = "timeUnit";
     public static final String TIMEZONE = "timezone";
+
+    public static final TaskWithDataDescriptor<WorkflowScheduleAndData> SCHEDULE_RECURRING_TASK =
+        new TaskWithDataDescriptor<>("schedule-recurring-task", WorkflowScheduleAndData.class);
 }

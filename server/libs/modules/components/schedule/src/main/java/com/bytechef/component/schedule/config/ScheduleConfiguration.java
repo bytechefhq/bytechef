@@ -18,21 +18,18 @@
 package com.bytechef.component.schedule.config;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.component.schedule.constant.ScheduleConstants;
+import com.bytechef.component.schedule.data.WorkflowScheduleAndData;
 import com.bytechef.hermes.component.util.ListenerTriggerUtils;
 import com.github.kagkarlsson.scheduler.task.Execution;
 import com.github.kagkarlsson.scheduler.task.ExecutionContext;
 import com.github.kagkarlsson.scheduler.task.Task;
 import com.github.kagkarlsson.scheduler.task.TaskInstance;
-import com.github.kagkarlsson.scheduler.task.TaskWithDataDescriptor;
-import com.github.kagkarlsson.scheduler.task.helper.ScheduleAndData;
 import com.github.kagkarlsson.scheduler.task.helper.Tasks;
-import com.github.kagkarlsson.scheduler.task.schedule.Schedule;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.bytechef.component.schedule.constant.ScheduleConstants.DATETIME;
@@ -40,54 +37,20 @@ import static com.bytechef.component.schedule.constant.ScheduleConstants.DATETIM
 @Configuration
 public class ScheduleConfiguration {
 
-    public static final TaskWithDataDescriptor<WorkflowScheduleAndData> SCHEDULE_RECURRING_TASK =
-        new TaskWithDataDescriptor<>(
-            "schedule-recurring-task", WorkflowScheduleAndData.class);
-
     @Bean
-    public Task<WorkflowScheduleAndData> workflowExecutionTask() {
-        return Tasks.recurringWithPersistentSchedule(SCHEDULE_RECURRING_TASK)
-            .execute(
-                (TaskInstance<WorkflowScheduleAndData> taskInstance, ExecutionContext executionContext) -> {
-                    Execution execution = executionContext.getExecution();
-                    Instant executionTime = execution.getExecutionTime();
+    Task<WorkflowScheduleAndData> workflowExecutionTask() {
+        return Tasks.recurringWithPersistentSchedule(ScheduleConstants.SCHEDULE_RECURRING_TASK)
+            .execute((TaskInstance<WorkflowScheduleAndData> taskInstance, ExecutionContext executionContext) -> {
+                Execution execution = executionContext.getExecution();
+                Instant executionTime = execution.getExecutionTime();
 
-                    WorkflowScheduleAndData workflowScheduleAndData = taskInstance.getData();
+                WorkflowScheduleAndData workflowScheduleAndData = taskInstance.getData();
 
-                    ListenerTriggerUtils.emit(
-                        workflowScheduleAndData.getData(),
-                        CollectionUtils.concat(
-                            Map.of(DATETIME, executionTime.toString()), workflowScheduleAndData.getOutput()));
-                });
-    }
+                WorkflowScheduleAndData.Data data = workflowScheduleAndData.getData();
 
-    public static class WorkflowScheduleAndData implements ScheduleAndData {
-
-        private final Map<String, Object> output;
-        private final Schedule schedule;
-        private final String workflowExecutionId;
-
-        @SuppressFBWarnings("EI")
-        public WorkflowScheduleAndData(
-            Schedule schedule, Map<String, Object> output, String workflowExecutionId) {
-
-            this.output = output;
-            this.schedule = schedule;
-            this.workflowExecutionId = workflowExecutionId;
-        }
-
-        @Override
-        public String getData() {
-            return workflowExecutionId;
-        }
-
-        public Map<String, Object> getOutput() {
-            return new HashMap<>(output);
-        }
-
-        @Override
-        public Schedule getSchedule() {
-            return schedule;
-        }
+                ListenerTriggerUtils.emit(
+                    data.workflowExecutionId(),
+                    CollectionUtils.concat(Map.of(DATETIME, executionTime.toString()), data.output()));
+            });
     }
 }

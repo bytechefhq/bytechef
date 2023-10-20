@@ -17,7 +17,7 @@
 
 package com.bytechef.component.schedule.trigger;
 
-import com.bytechef.component.schedule.config.ScheduleConfiguration.WorkflowScheduleAndData;
+import com.bytechef.component.schedule.data.WorkflowScheduleAndData;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
@@ -30,7 +30,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Map;
 
-import static com.bytechef.component.schedule.config.ScheduleConfiguration.SCHEDULE_RECURRING_TASK;
+import static com.bytechef.component.schedule.constant.ScheduleConstants.SCHEDULE_RECURRING_TASK;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.DATETIME;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.EXPRESSION;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.TIMEZONE;
@@ -81,19 +81,19 @@ public class ScheduleCronTrigger {
     protected void listenerEnable(
         Connection connection, InputParameters inputParameters, String workflowExecutionId) {
 
-        CronSchedule cron = new CronSchedule(
+        CronSchedule cronSchedule = new CronSchedule(
             "0 " + inputParameters.getString(EXPRESSION), ZoneId.of(inputParameters.getString(TIMEZONE)));
 
         schedulerClient.schedule(
             SCHEDULE_RECURRING_TASK.instance(
                 workflowExecutionId,
                 new WorkflowScheduleAndData(
-                    cron,
+                    cronSchedule,
                     Map.of(
                         EXPRESSION, inputParameters.getString(EXPRESSION),
                         TIMEZONE, inputParameters.getString(TIMEZONE)),
                     workflowExecutionId)),
-            cron.getInitialExecutionTime(Instant.now()));
+            cronSchedule.getInitialExecutionTime(Instant.now()));
     }
 
     protected void listenerDisable(
