@@ -35,7 +35,6 @@ export interface ISelectOption {
 type SelectProps = {
     options: ISelectOption[];
     contentClassName?: string;
-    customValueComponent?: React.ReactNode;
     defaultValue?: string | undefined;
     description?: string;
     fieldsetClassName?: string;
@@ -48,7 +47,6 @@ type SelectProps = {
 
 const Select = ({
     contentClassName,
-    customValueComponent,
     defaultValue,
     description,
     fieldsetClassName,
@@ -90,19 +88,13 @@ const Select = ({
                     )}
                     displayType="light"
                 >
-                    {customValueComponent ? (
-                        <Value aria-label={value}>{customValueComponent}</Value>
-                    ) : (
-                        <>
-                            {leadingIcon && (
-                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r border-gray-300 px-2">
-                                    {leadingIcon}
-                                </div>
-                            )}
-
-                            <Value />
-                        </>
+                    {leadingIcon && (
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r border-gray-300 px-2">
+                            {leadingIcon}
+                        </div>
                     )}
+
+                    <Value />
 
                     <Icon className="ml-auto pl-2">
                         <ChevronDownIcon />
