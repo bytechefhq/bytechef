@@ -1,5 +1,6 @@
 import IntegrationConfiguration from '@/pages/embedded/integration/IntegrationConfiguration';
-import IntegrationSettings from '@/pages/embedded/integration/IntegrationSettings';
+import IntegrationConnection from '@/pages/embedded/integration/IntegrationConnection';
+import IntegrationUserMetadata from '@/pages/embedded/integration/IntegrationUserMetadata';
 import IntegrationWorkflowEditor from '@/pages/embedded/integration/IntegrationWorkflowEditor';
 import Account from '@/pages/settings/Account';
 import Appearance from '@/pages/settings/Appearance';
@@ -106,8 +107,12 @@ export const router = createBrowserRouter([
                                 path: 'workflows',
                             },
                             {
-                                element: <IntegrationSettings />,
-                                path: 'settings',
+                                element: <IntegrationConnection />,
+                                path: 'connection',
+                            },
+                            {
+                                element: <IntegrationUserMetadata />,
+                                path: 'user-metadata',
                             },
                         ],
                         path: 'integrations/:integrationId',
