@@ -2,7 +2,8 @@
 openapi: "3.0.1"
 info:
   title: "The Jira Cloud platform REST API"
-  description: "Jira Cloud platform REST API documentation"
+  description: "Jira is a proprietary issue tracking product developed by Atlassian\
+    \ that allows bug tracking and agile project management."
   termsOfService: "http://atlassian.com/terms/"
   contact:
     email: "ecosystem@atlassian.com"
