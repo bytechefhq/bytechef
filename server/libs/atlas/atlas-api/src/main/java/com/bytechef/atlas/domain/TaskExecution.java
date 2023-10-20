@@ -18,7 +18,6 @@
 
 package com.bytechef.atlas.domain;
 
-import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.error.Errorable;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.priority.Prioritizable;
@@ -26,15 +25,13 @@ import com.bytechef.atlas.task.Progressable;
 import com.bytechef.atlas.task.Retryable;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.atlas.task.WorkflowTaskParameters;
+import com.bytechef.atlas.task.WorkflowTaskParameter;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.collection.MapUtils;
 import com.bytechef.commons.uuid.UUIDGenerator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +50,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.util.Assert;
 
 /**
- * WRaps the {@link WorkflowTask} instance to add execution semantics to the task.
+ * Wraps the {@link WorkflowTask} instance to add execution semantics to the task.
  *
  * <p>{@link TaskExecution} instances capture the life cycle of a single execution of a task. By single execution is
  * meant that the task goes through the following states:
@@ -69,13 +66,7 @@ import org.springframework.util.Assert;
  */
 @Table
 public final class TaskExecution
-        implements WorkflowTaskParameters,
-                Errorable,
-                Persistable<String>,
-                Prioritizable,
-                Progressable,
-                Retryable,
-                Task {
+        implements WorkflowTaskParameter, Errorable, Persistable<String>, Prioritizable, Progressable, Retryable, Task {
 
     @CreatedBy
     @Column("created_by")
@@ -150,44 +141,9 @@ public final class TaskExecution
     private int version;
 
     @Column("workflow_task")
-    private WorkflowTask workflowTask;
+    private WorkflowTask workflowTask = WorkflowTask.EMPTY_WORKFLOW_TASK;
 
-    public TaskExecution() {
-        workflowTask = new WorkflowTask();
-    }
-
-    public TaskExecution(Map<String, Object> source) {
-        Assert.notNull(source, "source cannot be null");
-
-        this.endTime = source.containsKey(WorkflowConstants.END_TIME)
-                ? LocalDateTime.from(
-                        MapUtils.getDate(source, WorkflowConstants.END_TIME).toInstant())
-                : null;
-        this.error = MapUtils.get(source, WorkflowConstants.ERROR, ExecutionError.class, null);
-        this.executionTime = MapUtils.getLong(source, WorkflowConstants.EXECUTION_TIME, executionTime);
-        this.job = source.containsKey(WorkflowConstants.JOB_ID)
-                ? new AggregateReference.IdOnlyAggregateReference<>(
-                        MapUtils.getString(source, WorkflowConstants.JOB_ID))
-                : null;
-        this.output = MapUtils.get(source, WorkflowConstants.OUTPUT);
-        this.parent = source.containsKey(WorkflowConstants.PARENT_ID)
-                ? new AggregateReference.IdOnlyAggregateReference<>(
-                        MapUtils.getString(source, WorkflowConstants.PARENT_ID))
-                : null;
-        this.priority = MapUtils.getInteger(source, WorkflowConstants.PRIORITY, DEFAULT_PRIORITY);
-        this.progress = MapUtils.getInteger(source, WorkflowConstants.PROGRESS, progress);
-        this.retry = MapUtils.getInteger(source, WorkflowConstants.RETRY, retry);
-        this.retryAttempts = MapUtils.getInteger(source, WorkflowConstants.RETRY_ATTEMPTS, retryAttempts);
-        this.retryDelay = MapUtils.getString(source, WorkflowConstants.RETRY_DELAY, retryDelay);
-        this.retryDelayFactor = MapUtils.getInteger(source, WorkflowConstants.RETRY_DELAY_FACTOR, retryDelayFactor);
-        this.startTime = source.containsKey(WorkflowConstants.START_TIME)
-                ? LocalDateTime.from(
-                        MapUtils.getDate(source, WorkflowConstants.START_TIME).toInstant())
-                : null;
-        this.status = MapUtils.get(source, WorkflowConstants.STATUS, TaskStatus.class);
-        this.taskNumber = MapUtils.getInteger(source, WorkflowConstants.TASK_NUMBER, taskNumber);
-        this.workflowTask = new WorkflowTask(source);
-    }
+    public TaskExecution() {}
 
     public TaskExecution(TaskExecution taskExecution) {
         Assert.notNull(taskExecution, "taskExecution cannot be null");
@@ -212,24 +168,21 @@ public final class TaskExecution
         this.startTime = taskExecution.startTime;
         this.status = taskExecution.status;
         this.taskNumber = taskExecution.taskNumber;
-        this.workflowTask = new WorkflowTask(taskExecution.workflowTask.asMap());
-    }
-
-    /**
-     * Creates a {@link TaskExecution} instance for the given Key-Value pair.
-     *
-     * @return The new {@link TaskExecution}.
-     */
-    public static TaskExecution of(String key, Object value) {
-        Assert.notNull(key, "key cannot be null");
-
-        return new TaskExecution(Collections.singletonMap(key, value));
+        this.workflowTask = new WorkflowTask(taskExecution.workflowTask);
     }
 
     public static TaskExecution of(TaskExecution taskExecution, WorkflowTask workflowTask) {
         taskExecution = new TaskExecution(taskExecution);
 
         taskExecution.workflowTask = workflowTask;
+
+        return taskExecution;
+    }
+
+    public static TaskExecution of(WorkflowTask workflowTask) {
+        TaskExecution taskExecution = new TaskExecution();
+
+        taskExecution.workflowTask = new WorkflowTask(workflowTask);
 
         return taskExecution;
     }
@@ -243,14 +196,14 @@ public final class TaskExecution
         map.putAll(workflowTask.asMap());
         map.putAll(source);
 
-        return new TaskExecution(map);
+        return of(new WorkflowTask(map));
     }
 
     public static TaskExecution of(WorkflowTask workflowTask, String jobId) {
         Assert.notNull(workflowTask, "workflowTask cannot be null");
         Assert.notNull(jobId, "jobId cannot be null");
 
-        TaskExecution taskExecution = new TaskExecution(workflowTask.asMap());
+        TaskExecution taskExecution = of(workflowTask);
 
         taskExecution.setId(UUIDGenerator.generate());
         taskExecution.setJobId(jobId);
@@ -263,7 +216,7 @@ public final class TaskExecution
         Assert.notNull(workflowTask, "workflowTask cannot be null");
         Assert.notNull(jobId, "jobId cannot be null");
 
-        TaskExecution taskExecution = new TaskExecution(workflowTask.asMap());
+        TaskExecution taskExecution = of(workflowTask);
 
         taskExecution.setId(UUIDGenerator.generate());
         taskExecution.setJobId(jobId);
@@ -278,7 +231,7 @@ public final class TaskExecution
         Assert.notNull(jobId, "jobId cannot be null");
         Assert.notNull(parentId, "parentId cannot be null");
 
-        TaskExecution taskExecution = new TaskExecution(workflowTask.asMap());
+        TaskExecution taskExecution = of(workflowTask);
 
         taskExecution.setId(UUIDGenerator.generate());
         taskExecution.setJobId(jobId);
@@ -291,7 +244,7 @@ public final class TaskExecution
 
     public static TaskExecution of(
             WorkflowTask workflowTask, String jobId, String parentId, int priority, int taskNumber) {
-        TaskExecution taskExecution = new TaskExecution(workflowTask.asMap());
+        TaskExecution taskExecution = of(workflowTask);
 
         Assert.notNull(workflowTask, "workflowTask cannot be null");
         Assert.notNull(jobId, "jobId cannot be null");
@@ -367,7 +320,7 @@ public final class TaskExecution
     /**
      * Get the unique id of the task instance.
      *
-     * @return String the id
+     * @return String the id of the task execution.
      */
     public String getId() {
         return this.id;
@@ -642,7 +595,7 @@ public final class TaskExecution
         return workflowTask.getWorkflowTasks(key);
     }
 
-    // WorkflowTaskParameters
+    // WorkflowTaskParameter
 
     @Override
     public Map<String, Object> asMap() {

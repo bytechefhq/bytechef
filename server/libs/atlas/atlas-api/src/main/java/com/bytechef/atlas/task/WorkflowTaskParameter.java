@@ -27,7 +27,7 @@ import java.util.Map;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-public interface WorkflowTaskParameters {
+public interface WorkflowTaskParameter {
 
     /**
      * Return a map of all key-value pairs.

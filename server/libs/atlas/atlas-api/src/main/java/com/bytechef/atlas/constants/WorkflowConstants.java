@@ -43,10 +43,6 @@ public class WorkflowConstants {
 
     public static final String RETRY_ATTEMPTS = "retryAttempts";
 
-    public static final String RETRY_DELAY = "retryDelay";
-
-    public static final String RETRY_DELAY_FACTOR = "retryDelayFactor";
-
     public static final String EXECUTION_TIME = "executionTime";
 
     public static final String CREATE_TIME = "createTime";
@@ -63,8 +59,6 @@ public class WorkflowConstants {
 
     public static final String STATUS = "status";
 
-    public static final String PROGRESS = "progress";
-
     public static final String OUTPUT = "output";
 
     public static final String ERROR = "error";
@@ -73,8 +67,6 @@ public class WorkflowConstants {
 
     public static final String INPUTS = "inputs";
 
-    public static final String INPUT = "input";
-
     public static final String EXECUTIONS = "executions";
 
     public static final String PRIORITY = "priority";
@@ -82,8 +74,6 @@ public class WorkflowConstants {
     public static final String CURRENT_TASK = "currentTask";
 
     public static final String PARENT_TASK_EXECUTION_ID = "parentTaskExecutionId";
-
-    public static final String WEBHOOKS = "webhooks";
 
     public static final String URL = "url";
 
@@ -99,11 +89,7 @@ public class WorkflowConstants {
 
     public static final String POST = "post";
 
-    public static final String PROPERTIES = "properties";
-
     public static final String FINALIZE = "finalize";
-
-    public static final String UPDATE_TIME = "updateTime";
 
     public static final String[] RESERVED_WORDS = new String[] {
         ID,

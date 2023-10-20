@@ -20,6 +20,8 @@ package com.bytechef.atlas.task;
 
 import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.commons.collection.MapUtils;
+import java.beans.Transient;
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Date;
@@ -33,7 +35,9 @@ import org.springframework.util.Assert;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-public class WorkflowTask implements WorkflowTaskParameters, Task {
+public class WorkflowTask implements WorkflowTaskParameter, Task, Serializable {
+
+    public static final WorkflowTask EMPTY_WORKFLOW_TASK = new WorkflowTask();
 
     private static final List<String> STATIC_FIELDS = List.of(
             WorkflowConstants.FINALIZE,
@@ -50,7 +54,7 @@ public class WorkflowTask implements WorkflowTaskParameters, Task {
     private String label;
     private String name;
     private String node;
-    private Map<String, Object> parameters = Collections.emptyMap();
+    private Map<String, Object> parameters = new HashMap<>();
     private List<WorkflowTask> post = Collections.emptyList();
     private List<WorkflowTask> pre = Collections.emptyList();
     private String timeout;
@@ -84,6 +88,31 @@ public class WorkflowTask implements WorkflowTaskParameters, Task {
                 parameters.put(entry.getKey(), entry.getValue());
             }
         }
+    }
+
+    public WorkflowTask(WorkflowTask workflowTask) {
+        Assert.notNull(workflowTask, "workflowTask cannot be null.");
+
+        this.finalize = workflowTask.getFinalize();
+        this.label = workflowTask.getLabel();
+        this.name = workflowTask.getName();
+        this.node = workflowTask.getNode();
+        this.parameters = new HashMap<>(workflowTask.getParameters());
+        this.post = workflowTask.getPost();
+        this.pre = workflowTask.getPre();
+        this.timeout = workflowTask.getTimeout();
+        this.type = workflowTask.getType();
+    }
+
+    /**
+     * Creates a {@link WorkflowTask} instance for the given Key-Value pair.
+     *
+     * @return The new {@link WorkflowTask}.
+     */
+    public static WorkflowTask of(String key, Object value) {
+        Assert.notNull(key, "key cannot be null");
+
+        return new WorkflowTask(Collections.singletonMap(key, value));
     }
 
     @Override
@@ -195,6 +224,7 @@ public class WorkflowTask implements WorkflowTaskParameters, Task {
         return type;
     }
 
+    @Transient
     public WorkflowTask getWorkflowTask(String key) {
         if (!containsKey(key)) {
             return null;
@@ -209,7 +239,7 @@ public class WorkflowTask implements WorkflowTaskParameters, Task {
                 .toList();
     }
 
-    // WorkflowTaskParameters
+    // WorkflowTaskParameter
 
     @Override
     public Map<String, Object> asMap() {
@@ -376,6 +406,10 @@ public class WorkflowTask implements WorkflowTaskParameters, Task {
     @Override
     public String getString(String key, String defaultValue) {
         return MapUtils.getString(parameters, key, defaultValue);
+    }
+
+    public void put(String key, Object value) {
+        parameters.put(key, value);
     }
 
     @Override
