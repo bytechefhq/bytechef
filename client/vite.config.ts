@@ -29,7 +29,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: '.vitest/setup.ts',
     coverage: {
-      reporter: ['text', 'html'],
+      reporter: ['html', 'lcov', 'text'],
       exclude: ['node_modules/', './vitest/setup.ts', '**/*.test.tsx']
     }
   }
