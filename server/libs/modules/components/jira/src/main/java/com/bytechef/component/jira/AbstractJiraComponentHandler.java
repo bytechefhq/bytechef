@@ -17,10 +17,10 @@
 
 package com.bytechef.component.jira;
 
-import static com.bytechef.hermes.component.constants.ComponentConstants.CLIENT_ID;
-import static com.bytechef.hermes.component.constants.ComponentConstants.CLIENT_SECRET;
-import static com.bytechef.hermes.component.constants.ComponentConstants.PASSWORD;
-import static com.bytechef.hermes.component.constants.ComponentConstants.USERNAME;
+import static com.bytechef.hermes.component.constant.ComponentConstants.CLIENT_ID;
+import static com.bytechef.hermes.component.constant.ComponentConstants.CLIENT_SECRET;
+import static com.bytechef.hermes.component.constant.ComponentConstants.PASSWORD;
+import static com.bytechef.hermes.component.constant.ComponentConstants.USERNAME;
 import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;

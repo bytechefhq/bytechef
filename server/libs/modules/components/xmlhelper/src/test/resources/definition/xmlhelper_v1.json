@@ -5,7 +5,7 @@
         "description": "Converts the XML string to object/array.",
         "label": "Convert from XML string"
       },
-      "name": "xmlParse",
+      "name": "parse",
       "output": [
         {
           "type": "OBJECT"
@@ -26,7 +26,7 @@
         "description": "Writes the object/array to a XML string.",
         "label": "Convert to XML string"
       },
-      "name": "xmlStringify",
+      "name": "stringify",
       "output": [
         {
           "type": "STRING"

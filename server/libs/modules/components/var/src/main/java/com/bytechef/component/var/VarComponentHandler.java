@@ -17,14 +17,12 @@
 
 package com.bytechef.component.var;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 
+import com.bytechef.component.var.action.VarSetAction;
+import com.bytechef.component.var.constant.VarConstants;
 import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 
 /**
@@ -32,26 +30,13 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
  */
 public class VarComponentHandler implements ComponentHandler {
 
-    private static final String VAR = "var";
-    private static final String SET = "set";
-    private static final String VALUE = "value";
-
-    private final ComponentDefinition componentDefinition = component(VAR)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(VarConstants.VAR)
         .display(display("Var").description("Sets a value which can then be referenced in other tasks."))
-        .actions(action(SET)
-            .display(display("Set value"))
-            .properties(oneOf(VALUE)
-                .label("Value")
-                .description("Value of any type to set.")
-                .required(true))
-            .perform(this::performSetValue));
+        .actions(VarSetAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
-        return componentDefinition;
+        return COMPONENT_DEFINITION;
     }
 
-    protected Object performSetValue(Context context, ExecutionParameters executionParameters) {
-        return executionParameters.get(VALUE);
-    }
 }

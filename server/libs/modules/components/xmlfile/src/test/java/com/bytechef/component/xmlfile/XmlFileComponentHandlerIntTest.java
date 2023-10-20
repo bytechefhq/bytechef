@@ -19,7 +19,7 @@ package com.bytechef.component.xmlfile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.atlas.constants.WorkflowConstants;
+import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;

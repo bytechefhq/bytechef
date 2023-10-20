@@ -17,17 +17,20 @@
 
 package com.bytechef.component.xlsxfile;
 
-import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.FILENAME;
-import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.FILE_ENTRY;
-import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.HEADER_ROW;
-import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.INCLUDE_EMPTY_CELLS;
-import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.PAGE_NUMBER;
-import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.PAGE_SIZE;
-import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.READ_AS_STRING;
-import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.ROWS;
-import static com.bytechef.component.xlsxfile.constants.XlsxFileConstants.SHEET_NAME;
+import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.FILENAME;
+import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.FILE_ENTRY;
+import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.HEADER_ROW;
+import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.INCLUDE_EMPTY_CELLS;
+import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.PAGE_NUMBER;
+import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.PAGE_SIZE;
+import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.READ_AS_STRING;
+import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.ROWS;
+import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.SHEET_NAME;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
+import com.bytechef.component.xlsxfile.action.XlsxFileReadAction;
+import com.bytechef.component.xlsxfile.action.XlsxFileWriteAction;
+import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
@@ -37,6 +40,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +82,7 @@ public class XlsxFileComponentHandlerTest {
 
         ExecutionParameters executionParameters = getWriteParameters(new JSONArray(jsonContent).toList());
 
-        xlsxFileComponentHandler.performWrite(context, executionParameters);
+        XlsxFileWriteAction.performWrite(context, executionParameters);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
             .forClass(ByteArrayInputStream.class);
@@ -89,7 +93,7 @@ public class XlsxFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(jsonContent),
-            new JSONArray(xlsxFileComponentHandler.read(inputStreamArgumentCaptor.getValue())),
+            new JSONArray(read(inputStreamArgumentCaptor.getValue())),
             true);
         Assertions.assertThat(filenameArgumentCaptor.getValue())
             .isEqualTo("file.xlsx");
@@ -303,7 +307,7 @@ public class XlsxFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, false)),
-            new JSONArray((List<?>) xlsxFileComponentHandler.performRead(
+            new JSONArray((List<?>) XlsxFileReadAction.performRead(
                 context,
                 getReadParameters(
                     extension, true, false, null, null, false, getFile("sample_header." + extension)))),
@@ -313,7 +317,7 @@ public class XlsxFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(true, false)),
-            new JSONArray((List<?>) xlsxFileComponentHandler.performRead(
+            new JSONArray((List<?>) XlsxFileReadAction.performRead(
                 context,
                 getReadParameters(
                     extension, true, true, null, null, false, getFile("sample_header." + extension)))),
@@ -323,7 +327,7 @@ public class XlsxFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, true)),
-            new JSONArray((List<?>) xlsxFileComponentHandler.performRead(
+            new JSONArray((List<?>) XlsxFileReadAction.performRead(
                 context,
                 getReadParameters(
                     extension, true, false, null, null, true, getFile("sample_header." + extension)))),
@@ -333,7 +337,7 @@ public class XlsxFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(true, true)),
-            new JSONArray((List<?>) xlsxFileComponentHandler.performRead(
+            new JSONArray((List<?>) XlsxFileReadAction.performRead(
                 context,
                 getReadParameters(
                     extension, true, true, null, null, true, getFile("sample_header." + extension)))),
@@ -343,7 +347,7 @@ public class XlsxFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(false, false)),
-            new JSONArray((List<?>) xlsxFileComponentHandler.performRead(
+            new JSONArray((List<?>) XlsxFileReadAction.performRead(
                 context,
                 getReadParameters(
                     extension, false, false, null, null, false, getFile("sample_no_header." + extension)))),
@@ -353,7 +357,7 @@ public class XlsxFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(false, true)),
-            new JSONArray((List<?>) xlsxFileComponentHandler.performRead(
+            new JSONArray((List<?>) XlsxFileReadAction.performRead(
                 context,
                 getReadParameters(
                     extension, false, false, null, null, true, getFile("sample_no_header." + extension)))),
@@ -363,7 +367,7 @@ public class XlsxFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(true, false)),
-            new JSONArray((List<?>) xlsxFileComponentHandler.performRead(
+            new JSONArray((List<?>) XlsxFileReadAction.performRead(
                 context,
                 getReadParameters(
                     extension, false, true, null, null, false, getFile("sample_no_header." + extension)))),
@@ -373,7 +377,7 @@ public class XlsxFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(true, true)),
-            new JSONArray((List<?>) xlsxFileComponentHandler.performRead(
+            new JSONArray((List<?>) XlsxFileReadAction.performRead(
                 context,
                 getReadParameters(
                     extension, false, true, null, null, true, getFile("sample_no_header." + extension)))),
@@ -383,9 +387,15 @@ public class XlsxFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
-            new JSONArray((List<?>) xlsxFileComponentHandler.performRead(
+            new JSONArray((List<?>) XlsxFileReadAction.performRead(
                 context,
                 getReadParameters(extension, true, false, 1, 3, false, getFile("sample_header." + extension)))),
             true);
+    }
+
+    private static List<Map<String, ?>> read(InputStream inputStream) throws IOException {
+        return XlsxFileReadAction.read(
+            XlsxFileConstants.FileFormat.XLSX, inputStream,
+            new XlsxFileReadAction.ReadConfiguration(true, true, 0, Integer.MAX_VALUE, false, "Sheet"));
     }
 }

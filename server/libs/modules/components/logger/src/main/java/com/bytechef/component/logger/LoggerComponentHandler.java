@@ -17,77 +17,29 @@
 
 package com.bytechef.component.logger;
 
-import static com.bytechef.component.logger.constants.LoggerConstants.DEBUG;
-import static com.bytechef.component.logger.constants.LoggerConstants.ERROR;
-import static com.bytechef.component.logger.constants.LoggerConstants.INFO;
-import static com.bytechef.component.logger.constants.LoggerConstants.LOGGER;
-import static com.bytechef.component.logger.constants.LoggerConstants.TEXT;
-import static com.bytechef.component.logger.constants.LoggerConstants.WARN;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.component.logger.constant.LoggerConstants.LOGGER;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
+import com.bytechef.component.logger.action.LoggerDebugAction;
+import com.bytechef.component.logger.action.LoggerErrorAction;
+import com.bytechef.component.logger.action.LoggerInfoAction;
+import com.bytechef.component.logger.action.LoggerWarnAction;
 import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
  */
 public class LoggerComponentHandler implements ComponentHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoggerComponentHandler.class);
-
-    private final ComponentDefinition componentDefinition = ComponentDSL.component(LOGGER)
+    private static final ComponentDefinition COMPONENT_DEFINITION = ComponentDSL.component(LOGGER)
         .display(display("Logger").description("Logs a value to the system log."))
-        .actions(
-            action(DEBUG)
-                .display(display("Debug"))
-                .properties(string(TEXT))
-                .perform(this::performDebug),
-            action(ERROR)
-                .display(display("Error"))
-                .properties(string(TEXT))
-                .perform(this::performError),
-            action(INFO)
-                .display(display("Info"))
-                .properties(string(TEXT))
-                .perform(this::performInfo),
-            action(WARN)
-                .display(display("Warn"))
-                .properties(string(TEXT))
-                .perform(this::performWarn));
+        .actions(LoggerDebugAction.DEBUG_ACTION, LoggerErrorAction.ERROR_ACTION, LoggerInfoAction.INFO_ACTION,
+            LoggerWarnAction.WARN_ACTION);
 
     @Override
     public ComponentDefinition getDefinition() {
-        return componentDefinition;
-    }
-
-    protected Object performDebug(Context context, ExecutionParameters executionParameters) {
-        logger.debug(executionParameters.getString(TEXT));
-
-        return null;
-    }
-
-    protected Object performError(Context context, ExecutionParameters executionParameters) {
-        logger.error(executionParameters.getString(TEXT));
-
-        return null;
-    }
-
-    protected Object performInfo(Context context, ExecutionParameters executionParameters) {
-        logger.info(executionParameters.getString(TEXT));
-
-        return null;
-    }
-
-    protected Object performWarn(Context context, ExecutionParameters executionParameters) {
-        logger.warn(executionParameters.getString(TEXT));
-
-        return null;
+        return COMPONENT_DEFINITION;
     }
 }

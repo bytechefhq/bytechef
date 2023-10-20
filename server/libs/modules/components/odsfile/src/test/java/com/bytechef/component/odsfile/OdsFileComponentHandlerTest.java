@@ -17,17 +17,19 @@
 
 package com.bytechef.component.odsfile;
 
-import static com.bytechef.component.odsfile.constants.OdsFileConstants.FILENAME;
-import static com.bytechef.component.odsfile.constants.OdsFileConstants.FILE_ENTRY;
-import static com.bytechef.component.odsfile.constants.OdsFileConstants.HEADER_ROW;
-import static com.bytechef.component.odsfile.constants.OdsFileConstants.INCLUDE_EMPTY_CELLS;
-import static com.bytechef.component.odsfile.constants.OdsFileConstants.PAGE_NUMBER;
-import static com.bytechef.component.odsfile.constants.OdsFileConstants.PAGE_SIZE;
-import static com.bytechef.component.odsfile.constants.OdsFileConstants.READ_AS_STRING;
-import static com.bytechef.component.odsfile.constants.OdsFileConstants.ROWS;
-import static com.bytechef.component.odsfile.constants.OdsFileConstants.SHEET_NAME;
+import static com.bytechef.component.odsfile.constant.OdsFileConstants.FILENAME;
+import static com.bytechef.component.odsfile.constant.OdsFileConstants.FILE_ENTRY;
+import static com.bytechef.component.odsfile.constant.OdsFileConstants.HEADER_ROW;
+import static com.bytechef.component.odsfile.constant.OdsFileConstants.INCLUDE_EMPTY_CELLS;
+import static com.bytechef.component.odsfile.constant.OdsFileConstants.PAGE_NUMBER;
+import static com.bytechef.component.odsfile.constant.OdsFileConstants.PAGE_SIZE;
+import static com.bytechef.component.odsfile.constant.OdsFileConstants.READ_AS_STRING;
+import static com.bytechef.component.odsfile.constant.OdsFileConstants.ROWS;
+import static com.bytechef.component.odsfile.constant.OdsFileConstants.SHEET_NAME;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
+import com.bytechef.component.odsfile.action.OdsFileReadAction;
+import com.bytechef.component.odsfile.action.OdsFileWriteAction;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
@@ -37,6 +39,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +71,7 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, false)),
-            new JSONArray((List) odsFileComponentHandler.performRead(
+            new JSONArray((List) OdsFileReadAction.performRead(
                 context, getReadParameters(true, false, null, null, false, getFile("sample_header.ods")))),
             true);
 
@@ -76,7 +79,7 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(true, false)),
-            new JSONArray((List) odsFileComponentHandler.performRead(
+            new JSONArray((List) OdsFileReadAction.performRead(
                 context, getReadParameters(true, true, null, null, false, getFile("sample_header.ods")))),
             true);
 
@@ -84,7 +87,7 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, true)),
-            new JSONArray((List) odsFileComponentHandler.performRead(
+            new JSONArray((List) OdsFileReadAction.performRead(
                 context, getReadParameters(true, false, null, null, true, getFile("sample_header.ods")))),
             true);
 
@@ -92,7 +95,7 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(true, true)),
-            new JSONArray((List) odsFileComponentHandler.performRead(
+            new JSONArray((List) OdsFileReadAction.performRead(
                 context, getReadParameters(true, true, null, null, true, getFile("sample_header.ods")))),
             true);
 
@@ -100,7 +103,7 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(false, false)),
-            new JSONArray((List) odsFileComponentHandler.performRead(
+            new JSONArray((List) OdsFileReadAction.performRead(
                 context, getReadParameters(false, false, null, null, false, getFile("sample_no_header.ods")))),
             true);
 
@@ -108,7 +111,7 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(false, true)),
-            new JSONArray((List) odsFileComponentHandler.performRead(
+            new JSONArray((List) OdsFileReadAction.performRead(
                 context, getReadParameters(false, false, null, null, true, getFile("sample_no_header.ods")))),
             true);
 
@@ -116,7 +119,7 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(true, false)),
-            new JSONArray((List) odsFileComponentHandler.performRead(
+            new JSONArray((List) OdsFileReadAction.performRead(
                 context, getReadParameters(false, true, null, null, false, getFile("sample_no_header.ods")))),
             true);
 
@@ -124,7 +127,7 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(true, true)),
-            new JSONArray((List) odsFileComponentHandler.performRead(
+            new JSONArray((List) OdsFileReadAction.performRead(
                 context, getReadParameters(false, true, null, null, true, getFile("sample_no_header.ods")))),
             true);
 
@@ -132,7 +135,7 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
-            new JSONArray((List) odsFileComponentHandler.performRead(
+            new JSONArray((List) OdsFileReadAction.performRead(
                 context, getReadParameters(true, false, 1, 3, false, getFile("sample_header.ods")))),
             true);
     }
@@ -143,7 +146,7 @@ public class OdsFileComponentHandlerTest {
 
         ExecutionParameters executionParameters = getWriteParameters(new JSONArray(jsonContent).toList());
 
-        odsFileComponentHandler.performWrite(context, executionParameters);
+        OdsFileWriteAction.performWrite(context, executionParameters);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
             .forClass(ByteArrayInputStream.class);
@@ -154,7 +157,7 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(jsonContent),
-            new JSONArray(odsFileComponentHandler.read(inputStreamArgumentCaptor.getValue())),
+            new JSONArray(read(inputStreamArgumentCaptor.getValue())),
             true);
         Assertions.assertThat(filenameArgumentCaptor.getValue())
             .isEqualTo("file.ods");
@@ -355,5 +358,11 @@ public class OdsFileComponentHandlerTest {
             .thenReturn("Sheet");
 
         return executionParameters;
+    }
+
+    private static List<Map<String, ?>> read(InputStream inputStream) throws IOException {
+        return OdsFileReadAction.read(
+            inputStream,
+            new OdsFileReadAction.ReadConfiguration(true, true, 0, Integer.MAX_VALUE, false, "Sheet"));
     }
 }

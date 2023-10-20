@@ -17,16 +17,18 @@
 
 package com.bytechef.component.csvfile;
 
-import static com.bytechef.component.csvfile.constants.CsvFileConstants.DELIMITER;
-import static com.bytechef.component.csvfile.constants.CsvFileConstants.FILE_ENTRY;
-import static com.bytechef.component.csvfile.constants.CsvFileConstants.HEADER_ROW;
-import static com.bytechef.component.csvfile.constants.CsvFileConstants.INCLUDE_EMPTY_CELLS;
-import static com.bytechef.component.csvfile.constants.CsvFileConstants.PAGE_NUMBER;
-import static com.bytechef.component.csvfile.constants.CsvFileConstants.PAGE_SIZE;
-import static com.bytechef.component.csvfile.constants.CsvFileConstants.READ_AS_STRING;
-import static com.bytechef.component.csvfile.constants.CsvFileConstants.ROWS;
+import static com.bytechef.component.csvfile.constant.CsvFileConstants.DELIMITER;
+import static com.bytechef.component.csvfile.constant.CsvFileConstants.FILE_ENTRY;
+import static com.bytechef.component.csvfile.constant.CsvFileConstants.HEADER_ROW;
+import static com.bytechef.component.csvfile.constant.CsvFileConstants.INCLUDE_EMPTY_CELLS;
+import static com.bytechef.component.csvfile.constant.CsvFileConstants.PAGE_NUMBER;
+import static com.bytechef.component.csvfile.constant.CsvFileConstants.PAGE_SIZE;
+import static com.bytechef.component.csvfile.constant.CsvFileConstants.READ_AS_STRING;
+import static com.bytechef.component.csvfile.constant.CsvFileConstants.ROWS;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
+import com.bytechef.component.csvfile.action.CsvFileReadAction;
+import com.bytechef.component.csvfile.action.CsvFileWriteAction;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
@@ -36,6 +38,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +70,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, false)),
-            new JSONArray(csvFileComponentHandler.performRead(
+            new JSONArray(CsvFileReadAction.performRead(
                 context, getReadParameters(true, false, null, null, false, getFile("sample_header.csv")))),
             true);
 
@@ -75,7 +78,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(true, false)),
-            new JSONArray(csvFileComponentHandler.performRead(
+            new JSONArray(CsvFileReadAction.performRead(
                 context, getReadParameters(true, true, null, null, false, getFile("sample_header.csv")))),
             true);
 
@@ -83,7 +86,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, true)),
-            new JSONArray(csvFileComponentHandler.performRead(
+            new JSONArray(CsvFileReadAction.performRead(
                 context, getReadParameters(true, false, null, null, true, getFile("sample_header.csv")))),
             true);
 
@@ -91,7 +94,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(true, true)),
-            new JSONArray(csvFileComponentHandler.performRead(
+            new JSONArray(CsvFileReadAction.performRead(
                 context, getReadParameters(true, true, null, null, true, getFile("sample_header.csv")))),
             true);
 
@@ -99,7 +102,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(false, false)),
-            new JSONArray(csvFileComponentHandler.performRead(
+            new JSONArray(CsvFileReadAction.performRead(
                 context, getReadParameters(false, false, null, null, false, getFile("sample_no_header.csv")))),
             true);
 
@@ -107,7 +110,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(false, true)),
-            new JSONArray(csvFileComponentHandler.performRead(
+            new JSONArray(CsvFileReadAction.performRead(
                 context, getReadParameters(false, false, null, null, true, getFile("sample_no_header.csv")))),
             true);
 
@@ -115,7 +118,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(true, false)),
-            new JSONArray(csvFileComponentHandler.performRead(
+            new JSONArray(CsvFileReadAction.performRead(
                 context, getReadParameters(false, true, null, null, false, getFile("sample_no_header.csv")))),
             true);
 
@@ -123,7 +126,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(true, true)),
-            new JSONArray(csvFileComponentHandler.performRead(
+            new JSONArray(CsvFileReadAction.performRead(
                 context, getReadParameters(false, true, null, null, true, getFile("sample_no_header.csv")))),
             true);
 
@@ -131,7 +134,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
-            new JSONArray(csvFileComponentHandler.performRead(
+            new JSONArray(CsvFileReadAction.performRead(
                 context, getReadParameters(true, false, 1, 3, false, getFile("sample_header.csv")))),
             true);
     }
@@ -143,7 +146,7 @@ public class CsvFileComponentHandlerTest {
     public void testPerformWriteCSV() throws IOException {
         String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
 
-        csvFileComponentHandler.performWrite(context, getWriteParameters((List) new JSONArray(jsonContent).toList()));
+        CsvFileWriteAction.performWrite(context, getWriteParameters((List) new JSONArray(jsonContent).toList()));
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
             .forClass(ByteArrayInputStream.class);
@@ -154,7 +157,7 @@ public class CsvFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(jsonContent),
-            new JSONArray(csvFileComponentHandler.read(inputStreamArgumentCaptor.getValue())),
+            new JSONArray(read(inputStreamArgumentCaptor.getValue())),
             true);
         Assertions.assertThat(filenameArgumentCaptor.getValue())
             .isEqualTo("file.csv");
@@ -354,5 +357,11 @@ public class CsvFileComponentHandlerTest {
             .thenReturn(items);
 
         return executionParameters;
+    }
+
+    private List<Map<String, Object>> read(InputStream inputStream) throws IOException {
+        return CsvFileReadAction.read(
+            inputStream,
+            new CsvFileReadAction.ReadConfiguration(",", true, true, 0, Integer.MAX_VALUE, false));
     }
 }

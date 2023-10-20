@@ -17,11 +17,13 @@
 
 package com.bytechef.component.filestorage;
 
-import static com.bytechef.component.filestorage.constants.FileStorageConstants.CONTENT;
-import static com.bytechef.component.filestorage.constants.FileStorageConstants.FILENAME;
-import static com.bytechef.component.filestorage.constants.FileStorageConstants.FILE_ENTRY;
+import static com.bytechef.component.filestorage.constant.FileStorageConstants.CONTENT;
+import static com.bytechef.component.filestorage.constant.FileStorageConstants.FILENAME;
+import static com.bytechef.component.filestorage.constant.FileStorageConstants.FILE_ENTRY;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.component.filestorage.action.FileStorageReadAction;
+import com.bytechef.component.filestorage.action.FileStorageWriteAction;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
@@ -56,7 +58,7 @@ public class FileStorageComponentHandlerTest {
         Mockito.when(executionParameters.get(FILE_ENTRY, FileEntry.class))
             .thenReturn(fileEntry);
 
-        fileStorageComponentHandler.performRead(context, executionParameters);
+        FileStorageReadAction.performRead(context, executionParameters);
 
         ArgumentCaptor<FileEntry> fileEntryArgumentCaptor = ArgumentCaptor.forClass(FileEntry.class);
 
@@ -83,7 +85,7 @@ public class FileStorageComponentHandlerTest {
         Mockito.when(executionParameters.getString(FILENAME, "file.txt"))
             .thenReturn("file.txt");
 
-        fileStorageComponentHandler.performWrite(context, executionParameters);
+        FileStorageWriteAction.performWrite(context, executionParameters);
 
         ArgumentCaptor<String> contentArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -103,7 +105,7 @@ public class FileStorageComponentHandlerTest {
 
         Mockito.reset(context);
 
-        fileStorageComponentHandler.performWrite(context, executionParameters);
+        FileStorageWriteAction.performWrite(context, executionParameters);
 
         filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 

@@ -17,55 +17,26 @@
 
 package com.bytechef.component.delay;
 
-import static com.bytechef.component.delay.constants.DelayConstants.DELAY;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.component.delay.constant.DelayConstants.DELAY;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 
-import com.bytechef.component.delay.constants.DelayConstants;
+import com.bytechef.component.delay.action.DelayDelayAction;
 import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Ivica Cardic
  */
 public class DelayComponentHandler implements ComponentHandler {
 
-    private final ComponentDefinition componentDefinition = ComponentDSL.component(DELAY)
+    private static final ComponentDefinition COMPONENT_DEFINITION = ComponentDSL.component(DELAY)
         .display(display("Delay").description("Sets a value which can then be referenced in other tasks."))
-        .actions(action(DELAY)
-            .display(display("Delay"))
-            .properties(integer(DelayConstants.MILLIS)
-                .label("Millis")
-                .description("Time in milliseconds.")
-                .required(true)
-                .defaultValue(1))
-            .perform(this::performSleep));
+        .actions(DelayDelayAction.DELAY_ACTION);
 
     @Override
     public ComponentDefinition getDefinition() {
-        return componentDefinition;
+        return COMPONENT_DEFINITION;
     }
 
-    protected Object performSleep(Context context, ExecutionParameters executionParameters) {
-        try {
-            if (executionParameters.containsKey("millis")) {
-                Thread.sleep(executionParameters.getLong("millis"));
-            } else if (executionParameters.containsKey("duration")) {
-                Thread.sleep(executionParameters.getDuration("duration")
-                    .toMillis());
-            } else {
-                TimeUnit.SECONDS.sleep(1);
-            }
-        } catch (InterruptedException interruptedException) {
-            throw new ActionExecutionException("Unable to handle task " + executionParameters, interruptedException);
-        }
-
-        return null;
-    }
 }
