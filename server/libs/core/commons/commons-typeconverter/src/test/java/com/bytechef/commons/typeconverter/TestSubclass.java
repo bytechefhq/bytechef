@@ -1,14 +1,10 @@
-package com.toddfast.util.convert;
-
-import com.toddfast.util.convert.TypeConverter.Convertible;
-import com.toddfast.util.convert.TypeConverter.Listener;
-import com.toddfast.util.convert.TypeConverter.Conversion;
+package com.bytechef.commons.typeconverter;
 
 /**
  * @author Todd Fast
  */
 public class TestSubclass extends TestSuperclass
-		implements Listener, Convertible {
+		implements TypeConverter.Listener, TypeConverter.Convertible {
 
 	public void beforeConversion(Object targetTypeKey) {
 		System.out.println("--- beforeConversion("+targetTypeKey+")");
@@ -20,8 +16,8 @@ public class TestSubclass extends TestSuperclass
 		return convertedValue;
 	}
 
-	public Conversion getTypeConversion(final Object targetTypeKey) {
-		return new Conversion() {
+	public TypeConverter.Conversion getTypeConversion(final Object targetTypeKey) {
+		return new TypeConverter.Conversion() {
 
 			@Override
 			public Object[] getTypeKeys() {

@@ -1,6 +1,7 @@
-package com.toddfast.util.convert.conversion;
+package com.bytechef.commons.typeconverter.conversion;
 
-import com.toddfast.util.convert.TypeConverter;
+import com.bytechef.commons.typeconverter.TypeConverter;
+
 import java.math.BigDecimal;
 
 /**
