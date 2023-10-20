@@ -28,8 +28,6 @@ public class ComponentConstants {
     public static final String BASE_URI = "baseUri";
     public static final String CLIENT_ID = "clientId";
     public static final String CLIENT_SECRET = "clientSecret";
-    public static final String FILE_ENTRY = "fileEntry";
-    public static final String FILENAME = "filename";
     public static final String HEADER_PREFIX = "headerPrefix";
     public static final String KEY = "key";
     public static final String PASSWORD = "password";

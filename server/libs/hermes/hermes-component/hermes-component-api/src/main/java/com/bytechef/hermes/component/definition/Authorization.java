@@ -27,7 +27,7 @@ import static com.bytechef.hermes.component.constants.ComponentConstants.USERNAM
 import static com.bytechef.hermes.component.constants.ComponentConstants.VALUE;
 
 import com.bytechef.hermes.component.AuthorizationContext;
-import com.bytechef.hermes.component.ConnectionParameters;
+import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.component.constants.ComponentConstants;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
@@ -35,6 +35,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -47,76 +49,70 @@ import org.apache.commons.lang3.StringUtils;
 public sealed class Authorization permits ComponentDSL.ModifiableAuthorization {
 
     public enum AuthorizationType {
-        API_KEY((AuthorizationContext authorizationContext, ConnectionParameters connectionParameters) -> {
-            if (ApiTokenLocation.valueOf(StringUtils.upperCase(
-                            connectionParameters.getParameter(ADD_TO, ApiTokenLocation.HEADER.name())))
+        API_KEY((AuthorizationContext authorizationContext, Connection connection) -> {
+            if (ApiTokenLocation.valueOf(
+                            StringUtils.upperCase(connection.getParameter(ADD_TO, ApiTokenLocation.HEADER.name())))
                     == ApiTokenLocation.HEADER) {
-                authorizationContext.setHeaders(Map.of(
-                        connectionParameters.getParameter(KEY, API_TOKEN),
-                        List.of(connectionParameters.getParameter(VALUE, ""))));
+                authorizationContext.setHeaders(
+                        Map.of(connection.getParameter(KEY, API_TOKEN), List.of(connection.getParameter(VALUE, ""))));
             } else {
-                authorizationContext.setQueryParameters(Map.of(
-                        connectionParameters.getParameter(KEY, API_TOKEN),
-                        List.of(connectionParameters.getParameter(VALUE, ""))));
+                authorizationContext.setQueryParameters(
+                        Map.of(connection.getParameter(KEY, API_TOKEN), List.of(connection.getParameter(VALUE, ""))));
             }
         }),
-        BASIC_AUTH((AuthorizationContext authorizationContext, ConnectionParameters connectionParameters) -> {
-            authorizationContext.setUsernamePassword(
-                    connectionParameters.getParameter(USERNAME), connectionParameters.getParameter(PASSWORD));
-        }),
-        BEARER_TOKEN((AuthorizationContext authorizationContext, ConnectionParameters connectionParameters) -> {
-            authorizationContext.setHeaders(
-                    Map.of("Authorization", List.of("Bearer " + connectionParameters.getParameter(TOKEN))));
-        }),
-        CUSTOM(null),
-        DIGEST_AUTH((AuthorizationContext authorizationContext, ConnectionParameters connectionParameters) ->
+        BASIC_AUTH((AuthorizationContext authorizationContext, Connection connection) ->
                 authorizationContext.setUsernamePassword(
-                        connectionParameters.getParameter(USERNAME), connectionParameters.getParameter(PASSWORD))),
-        OAUTH2_AUTHORIZATION_CODE(
-                (AuthorizationContext authorizationContext, ConnectionParameters connectionParameters) ->
-                        authorizationContext.setHeaders(Map.of(
-                                "Authorization",
-                                List.of(connectionParameters.getParameter(HEADER_PREFIX, "Bearer") + " "
-                                        + connectionParameters.getParameter(ACCESS_TOKEN))))),
-        OAUTH2_CLIENT_CREDENTIALS(
-                (AuthorizationContext authorizationContext, ConnectionParameters connectionParameters) ->
-                        authorizationContext.setHeaders(Map.of(
-                                "Authorization",
-                                List.of(connectionParameters.getParameter(HEADER_PREFIX, "Bearer") + " "
-                                        + connectionParameters.getParameter(ACCESS_TOKEN)))));
+                        connection.getParameter(USERNAME), connection.getParameter(PASSWORD))),
+        BEARER_TOKEN(
+                (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext.setHeaders(
+                        Map.of("Authorization", List.of("Bearer " + connection.getParameter(TOKEN))))),
+        CUSTOM(null),
+        DIGEST_AUTH((AuthorizationContext authorizationContext, Connection connection) ->
+                authorizationContext.setUsernamePassword(
+                        connection.getParameter(USERNAME), connection.getParameter(PASSWORD))),
+        OAUTH2_AUTHORIZATION_CODE((AuthorizationContext authorizationContext, Connection connection) ->
+                authorizationContext.setHeaders(Map.of(
+                        "Authorization",
+                        List.of(connection.getParameter(HEADER_PREFIX, "Bearer") + " "
+                                + connection.getParameter(ACCESS_TOKEN))))),
+        OAUTH2_CLIENT_CREDENTIALS((AuthorizationContext authorizationContext, Connection connection) ->
+                authorizationContext.setHeaders(Map.of(
+                        "Authorization",
+                        List.of(connection.getParameter(HEADER_PREFIX, "Bearer") + " "
+                                + connection.getParameter(ACCESS_TOKEN)))));
 
-        private final BiConsumer<AuthorizationContext, ConnectionParameters> defaultApplyConsumer;
+        private final BiConsumer<AuthorizationContext, Connection> defaultApplyConsumer;
 
-        AuthorizationType(BiConsumer<AuthorizationContext, ConnectionParameters> defaultApplyConsumer) {
+        AuthorizationType(BiConsumer<AuthorizationContext, Connection> defaultApplyConsumer) {
             this.defaultApplyConsumer = defaultApplyConsumer;
         }
 
-        public BiConsumer<AuthorizationContext, ConnectionParameters> getDefaultApplyConsumer() {
+        public BiConsumer<AuthorizationContext, Connection> getDefaultApplyConsumer() {
             return defaultApplyConsumer;
         }
     }
 
     public enum ApiTokenLocation {
         HEADER,
-        QUERY_PARAMS,
+        QUERY_PARAMETERS,
     }
 
     @JsonIgnore
-    protected BiConsumer<AuthorizationContext, ConnectionParameters> applyConsumer;
+    protected BiConsumer<AuthorizationContext, Connection> applyConsumer;
 
     @JsonIgnore
-    protected BiFunction<ConnectionParameters, String, String> authorizationCallbackFunction;
+    protected BiFunction<Connection, String, String> authorizationCallbackFunction;
 
     @JsonIgnore
-    protected Function<ConnectionParameters, String> authorizationUrlFunction =
+    protected Function<Connection, String> authorizationUrlFunction =
             connectionParameters -> connectionParameters.getParameter(ComponentConstants.AUTHORIZATION_URL);
 
     @JsonIgnore
-    protected Function<ConnectionParameters, String> clientIdFunction =
+    protected Function<Connection, String> clientIdFunction =
             connectionParameters -> connectionParameters.getParameter(ComponentConstants.CLIENT_ID);
 
     @JsonIgnore
-    protected Function<ConnectionParameters, String> clientSecretFunction =
+    protected Function<Connection, String> clientSecretFunction =
             connectionParameters -> connectionParameters.getParameter(ComponentConstants.CLIENT_SECRET);
 
     protected Display display;
@@ -127,46 +123,46 @@ public sealed class Authorization permits ComponentDSL.ModifiableAuthorization {
     protected List<Property<?>> properties;
 
     @JsonIgnore
-    protected Function<ConnectionParameters, String> refreshFunction;
+    protected Function<Connection, String> refreshFunction;
 
     @JsonIgnore
-    protected Function<ConnectionParameters, String> refreshUrlFunction =
+    protected Function<Connection, String> refreshUrlFunction =
             connectionParameters -> connectionParameters.getParameter(ComponentConstants.REFRESH_URL);
 
     @JsonIgnore
-    protected Function<ConnectionParameters, List<String>> scopes =
+    protected Function<Connection, List<String>> scopesFunction =
             connectionParameters -> connectionParameters.getParameter(ComponentConstants.SCOPES);
 
     @JsonIgnore
-    protected Function<ConnectionParameters, String> tokenUrlFunction =
+    protected Function<Connection, String> tokenUrlFunction =
             connectionParameters -> connectionParameters.getParameter(ComponentConstants.TOKEN_URL);
 
     private final String name;
     private final AuthorizationType type;
 
     protected Authorization(String name, AuthorizationType type) {
-        this.name = name;
-        this.type = type;
+        this.name = Objects.requireNonNull(name);
+        this.type = Objects.requireNonNull(type);
         this.applyConsumer = type.getDefaultApplyConsumer();
     }
 
-    public BiConsumer<AuthorizationContext, ConnectionParameters> getApplyConsumer() {
+    public BiConsumer<AuthorizationContext, Connection> getApplyConsumer() {
         return applyConsumer;
     }
 
-    public BiFunction<ConnectionParameters, String, String> getAuthorizationCallbackFunction() {
-        return authorizationCallbackFunction;
+    public Optional<BiFunction<Connection, String, String>> getAuthorizationCallbackFunction() {
+        return Optional.ofNullable(authorizationCallbackFunction);
     }
 
-    public Function<ConnectionParameters, String> getAuthorizationUrlFunction() {
+    public Function<Connection, String> getAuthorizationUrlFunction() {
         return authorizationUrlFunction;
     }
 
-    public Function<ConnectionParameters, String> getClientIdFunction() {
+    public Function<Connection, String> getClientIdFunction() {
         return clientIdFunction;
     }
 
-    public Function<ConnectionParameters, String> getClientSecretFunction() {
+    public Function<Connection, String> getClientSecretFunction() {
         return clientSecretFunction;
     }
 
@@ -188,19 +184,19 @@ public sealed class Authorization permits ComponentDSL.ModifiableAuthorization {
         return properties;
     }
 
-    public Function<ConnectionParameters, String> getRefreshFunction() {
-        return refreshFunction;
+    public Optional<Function<Connection, String>> getRefreshFunction() {
+        return Optional.ofNullable(refreshFunction);
     }
 
-    public Function<ConnectionParameters, String> getRefreshUrlFunction() {
+    public Function<Connection, String> getRefreshUrlFunction() {
         return refreshUrlFunction;
     }
 
-    public Function<ConnectionParameters, List<String>> getScopes() {
-        return scopes;
+    public Function<Connection, List<String>> getScopesFunction() {
+        return scopesFunction;
     }
 
-    public Function<ConnectionParameters, String> getTokenUrlFunction() {
+    public Function<Connection, String> getTokenUrlFunction() {
         return tokenUrlFunction;
     }
 

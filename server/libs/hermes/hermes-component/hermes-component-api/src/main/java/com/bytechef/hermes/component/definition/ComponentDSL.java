@@ -17,13 +17,12 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.AuthorizationContext;
-import com.bytechef.hermes.component.ConnectionParameters;
+import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.definition.DefinitionDSL;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
-import com.bytechef.hermes.definition.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.HashMap;
@@ -64,8 +63,8 @@ public final class ComponentDSL extends DefinitionDSL {
     public static ModifiableProperty.ModifiableObjectProperty fileEntry(String name) {
         return buildObject(
                 name,
-                "FILE_ENTRY",
                 null,
+                "FILE_ENTRY",
                 string("extension").required(true),
                 string("mimeType").required(true),
                 string("name").required(true),
@@ -82,7 +81,7 @@ public final class ComponentDSL extends DefinitionDSL {
             super(name);
         }
 
-        public ModifiableActionDefinition display(Display display) {
+        public ModifiableActionDefinition display(ModifiableDisplay display) {
             this.display = display;
 
             return this;
@@ -94,7 +93,6 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        @SuppressWarnings("unchecked")
         public ModifiableActionDefinition metadata(String key, String value) {
             if (metadata == null) {
                 metadata = new HashMap<>();
@@ -112,8 +110,10 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableActionDefinition output(Property... output) {
-            this.output = List.of(output);
+        public <P extends Property<?>> ModifiableActionDefinition output(P... output) {
+            if (output != null) {
+                this.output = List.of(output);
+            }
 
             return this;
         }
@@ -124,7 +124,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableActionDefinition properties(Property... properties) {
+        public <P extends Property<?>> ModifiableActionDefinition properties(P... properties) {
             this.properties = List.of(properties);
 
             return this;
@@ -137,76 +137,93 @@ public final class ComponentDSL extends DefinitionDSL {
             super(name, type);
         }
 
-        public ModifiableAuthorization apply(BiConsumer<AuthorizationContext, ConnectionParameters> applyConsumer) {
-            this.applyConsumer = applyConsumer;
+        public ModifiableAuthorization apply(BiConsumer<AuthorizationContext, Connection> applyConsumer) {
+            if (applyConsumer != null) {
+                this.applyConsumer = applyConsumer;
+            }
 
             return this;
         }
 
         public ModifiableAuthorization authorizationCallback(
-                BiFunction<ConnectionParameters, String, String> authorizationCallbackFunction) {
+                BiFunction<Connection, String, String> authorizationCallbackFunction) {
             this.authorizationCallbackFunction = authorizationCallbackFunction;
 
             return this;
         }
 
-        public ModifiableAuthorization authorizationUrl(
-                Function<ConnectionParameters, String> authorizationUrlFunction) {
-            this.authorizationUrlFunction = authorizationUrlFunction;
+        public ModifiableAuthorization authorizationUrl(Function<Connection, String> authorizationUrlFunction) {
+            if (authorizationUrlFunction != null) {
+                this.authorizationUrlFunction = authorizationUrlFunction;
+            }
 
             return this;
         }
 
-        public ModifiableAuthorization clientId(Function<ConnectionParameters, String> clientIdFunction) {
-            this.clientIdFunction = clientIdFunction;
+        public ModifiableAuthorization clientId(Function<Connection, String> clientIdFunction) {
+            if (clientIdFunction != null) {
+                this.clientIdFunction = clientIdFunction;
+            }
 
             return this;
         }
 
-        public ModifiableAuthorization clientSecret(Function<ConnectionParameters, String> clientSecretFunction) {
-            this.clientSecretFunction = clientSecretFunction;
+        public ModifiableAuthorization clientSecret(Function<Connection, String> clientSecretFunction) {
+            if (clientSecretFunction != null) {
+                this.clientSecretFunction = clientSecretFunction;
+            }
 
             return this;
         }
 
-        public ModifiableAuthorization display(Display display) {
+        public ModifiableAuthorization display(ModifiableDisplay display) {
             this.display = display;
 
             return this;
         }
 
-        public ModifiableAuthorization onRefresh(List<Object> onRefresh) {
-            this.onRefresh = onRefresh;
+        public ModifiableAuthorization onRefresh(Object... onRefresh) {
+            if (onRefresh != null) {
+                this.onRefresh = List.of(onRefresh);
+            }
 
             return this;
         }
 
-        public ModifiableAuthorization properties(Property... properties) {
-            this.properties = List.of(properties);
+        public <P extends Property<?>> ModifiableAuthorization properties(P... properties) {
+            if (properties != null) {
+                this.properties = List.of(properties);
+            }
 
             return this;
         }
 
-        public ModifiableAuthorization refresh(Function<ConnectionParameters, String> refreshFunction) {
+        public ModifiableAuthorization refresh(Function<Connection, String> refreshFunction) {
             this.refreshFunction = refreshFunction;
 
             return this;
         }
 
-        public ModifiableAuthorization refreshUrl(Function<ConnectionParameters, String> refreshUrlFunction) {
-            this.refreshUrlFunction = refreshUrlFunction;
+        public ModifiableAuthorization refreshUrl(Function<Connection, String> refreshUrlFunction) {
+            if (refreshUrlFunction != null) {
+                this.refreshUrlFunction = refreshUrlFunction;
+            }
 
             return this;
         }
 
-        public ModifiableAuthorization scopes(Function<ConnectionParameters, List<String>> scopes) {
-            this.scopes = scopes;
+        public ModifiableAuthorization scopes(Function<Connection, List<String>> scopesFunction) {
+            if (scopesFunction != null) {
+                this.scopesFunction = scopesFunction;
+            }
 
             return this;
         }
 
-        public ModifiableAuthorization tokenUrl(Function<ConnectionParameters, String> tokenUrlFunction) {
-            this.tokenUrlFunction = tokenUrlFunction;
+        public ModifiableAuthorization tokenUrl(Function<Connection, String> tokenUrlFunction) {
+            if (tokenUrlFunction != null) {
+                this.tokenUrlFunction = tokenUrlFunction;
+            }
 
             return this;
         }
@@ -218,41 +235,39 @@ public final class ComponentDSL extends DefinitionDSL {
             super(name);
         }
 
-        public ModifiableComponentDefinition actions(ActionDefinition... actionDefinitions) {
-            this.actionDefinitions = List.of(actionDefinitions);
+        public ModifiableComponentDefinition actions(ModifiableActionDefinition... actionDefinitions) {
+            if (actionDefinitions != null) {
+                this.actions = List.of(actionDefinitions);
+            }
 
             return this;
         }
 
-        public ModifiableComponentDefinition actions(List<ActionDefinition>... actionsList) {
-            this.actionDefinitions =
-                    Stream.of(actionsList).flatMap(Collection::stream).toList();
+        @SafeVarargs
+        public final ModifiableComponentDefinition actions(List<ModifiableActionDefinition>... actionsList) {
+            if (actionsList != null) {
+                this.actions =
+                        Stream.of(actionsList).flatMap(Collection::stream).toList();
+            }
 
             return this;
         }
 
-        public ModifiableComponentDefinition connection(ConnectionDefinition connectionDefinition) {
-            this.connectionDefinition = new ModifiableConnectionDefinition()
-                    .baseUri(connectionDefinition.getBaseUriFunction())
-                    .authorizations(connectionDefinition.getAuthorizations())
+        public ModifiableComponentDefinition connection(ModifiableConnectionDefinition connectionDefinition) {
+            this.connection = connectionDefinition
                     .componentName(name)
-                    .display(display)
-                    .properties(connectionDefinition.getProperties())
-                    .subtitle(connectionDefinition.getSubtitle())
-                    .resources(connectionDefinition.getResources())
-                    .subtitle(connectionDefinition.getSubtitle())
-                    .testConsumer(connectionDefinition.getTestConsumer());
+                    .componentVersion(version)
+                    .display(display);
 
             return this;
         }
 
-        public ModifiableComponentDefinition display(Display display) {
+        public ModifiableComponentDefinition display(ModifiableDisplay display) {
             this.display = display;
 
             return this;
         }
 
-        @SuppressWarnings("unchecked")
         public ModifiableComponentDefinition metadata(String key, String value) {
             if (metadata == null) {
                 metadata = new HashMap<>();
@@ -270,7 +285,7 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableComponentDefinition resources(Resources resources) {
+        public ModifiableComponentDefinition resources(ModifiableResources resources) {
             this.resources = resources;
 
             return this;
@@ -287,7 +302,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         private ModifiableConnectionDefinition() {}
 
-        public ModifiableConnectionDefinition authorizations(Authorization... authorizations) {
+        public ModifiableConnectionDefinition authorizations(ModifiableAuthorization... authorizations) {
             if (authorizations != null) {
                 this.authorizations = List.of(authorizations);
             }
@@ -295,56 +310,54 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableConnectionDefinition baseUri(Function<ConnectionParameters, String> baseUriFunction) {
-            this.baseUriFunction = baseUriFunction;
+        public ModifiableConnectionDefinition baseUri(Function<Connection, String> baseUriFunction) {
+            if (baseUriFunction != null) {
+                this.baseUriFunction = baseUriFunction;
+            }
 
             return this;
         }
 
-        public ModifiableConnectionDefinition properties(Property<?>... properties) {
-            this.properties = List.of(properties);
+        public <P extends Property<?>> ModifiableConnectionDefinition properties(P... properties) {
+            if (properties != null) {
+                this.properties = List.of(properties);
+            }
 
             return this;
         }
 
-        public ModifiableConnectionDefinition resources(Resources resources) {
+        public ModifiableConnectionDefinition resources(ModifiableResources resources) {
             this.resources = resources;
 
             return this;
         }
 
-        public ModifiableConnectionDefinition subtitle(String subtitle) {
-            this.subtitle = subtitle;
-
-            return this;
-        }
-
-        public ModifiableConnectionDefinition testConsumer(Consumer<ConnectionParameters> testConsumer) {
+        public ModifiableConnectionDefinition testConsumer(Consumer<Connection> testConsumer) {
             this.testConsumer = testConsumer;
 
             return this;
         }
 
-        private ModifiableConnectionDefinition authorizations(List<Authorization> authorizations) {
-            this.authorizations = authorizations;
-
-            return this;
-        }
-
-        private ModifiableConnectionDefinition componentName(String componentName) {
+        protected ModifiableConnectionDefinition componentName(String componentName) {
             this.componentName = componentName;
 
             return this;
         }
 
-        private ModifiableConnectionDefinition display(Display componentName) {
+        protected ModifiableConnectionDefinition componentVersion(int componentVersion) {
+            this.componentVersion = componentVersion;
+
+            return this;
+        }
+
+        protected ModifiableConnectionDefinition display(Display display) {
             this.display = display;
 
             return this;
         }
 
-        private ModifiableConnectionDefinition properties(List<Property<?>> properties) {
-            this.properties = properties;
+        protected ModifiableConnectionDefinition subtitle(String subtitle) {
+            this.subtitle = subtitle;
 
             return this;
         }
@@ -368,13 +381,13 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableJdbcComponentDefinition display(Display display) {
+        public ModifiableJdbcComponentDefinition display(ModifiableDisplay display) {
             this.display = display;
 
             return this;
         }
 
-        public ModifiableJdbcComponentDefinition resources(Resources resources) {
+        public ModifiableJdbcComponentDefinition resources(ModifiableResources resources) {
             this.resources = resources;
 
             return this;

@@ -47,7 +47,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testAnyProperty() throws JSONException, JsonProcessingException {
-        Property<Property.AnyProperty> property = ComponentDSL.any("name")
+        Property<Property.OneOfProperty> property = ComponentDSL.oneOf("name")
                 .description("description")
                 .label("label")
                 .placeholder("placeholder")
@@ -63,7 +63,7 @@ public class ComponentDefinitionTest {
                     "placeholder":"placeholder",
                     "required":true,
                     "types":[{"type":"STRING"}],
-                    "type": "ANY"
+                    "type": "ONE_OF"
                 }
                 """,
                 property);

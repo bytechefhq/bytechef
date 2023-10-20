@@ -19,7 +19,9 @@ package com.bytechef.hermes.component;
 /**
  * @author Ivica Cardic
  */
-public interface ConnectionParameters {
+public interface Connection {
+
+    boolean containsKey(String key);
 
     String getAuthorizationName();
 
@@ -27,5 +29,5 @@ public interface ConnectionParameters {
 
     <T> T getParameter(String name);
 
-    String getParameter(String name, String defaultValue);
+    <T> T getParameter(String name, T defaultValue);
 }

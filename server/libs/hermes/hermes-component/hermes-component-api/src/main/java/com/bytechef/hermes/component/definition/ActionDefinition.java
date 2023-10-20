@@ -25,6 +25,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 /**
@@ -35,8 +37,6 @@ import java.util.function.BiFunction;
         description =
                 "An action is a a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 public sealed class ActionDefinition permits ComponentDSL.ModifiableActionDefinition {
-
-    public static final String ACTION = "action";
 
     protected Display display;
     protected Object exampleOutput;
@@ -49,7 +49,7 @@ public sealed class ActionDefinition permits ComponentDSL.ModifiableActionDefini
     protected BiFunction<Context, ExecutionParameters, Object> performFunction;
 
     protected ActionDefinition(String name) {
-        this.name = name;
+        this.name = Objects.requireNonNull(name);
     }
 
     public Display getDisplay() {
@@ -84,9 +84,9 @@ public sealed class ActionDefinition permits ComponentDSL.ModifiableActionDefini
     /**
      * The code that should be performed when the action is executed as a task whe running inside the workflow engine.
      *
-     * @return a perform function implementation
+     * @return an optional perform function implementation
      */
-    public BiFunction<Context, ExecutionParameters, Object> getPerformFunction() {
-        return performFunction;
+    public Optional<BiFunction<Context, ExecutionParameters, Object>> getPerformFunction() {
+        return Optional.ofNullable(performFunction);
     }
 }

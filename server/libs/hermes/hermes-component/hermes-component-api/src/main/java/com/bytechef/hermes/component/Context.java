@@ -25,11 +25,11 @@ import java.util.Optional;
  */
 public interface Context {
 
-    Optional<ConnectionParameters> fetchConnectionParameters();
+    Optional<Connection> fetchConnectionParameters();
 
     ConnectionDefinition getConnectionDefinition();
 
-    ConnectionParameters getConnectionParameters();
+    Connection getConnectionParameters();
 
     InputStream getFileStream(FileEntry fileEntry);
 

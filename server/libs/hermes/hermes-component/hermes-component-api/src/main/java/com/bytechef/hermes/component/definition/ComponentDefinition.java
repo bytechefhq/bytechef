@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Used for specifying a component.
@@ -35,8 +36,8 @@ import java.util.Map;
                 "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers(TODO) and connections if there is a need for a connection to an outside service.")
 public sealed class ComponentDefinition permits ComponentDSL.ModifiableComponentDefinition {
 
-    protected List<ActionDefinition> actionDefinitions;
-    protected ConnectionDefinition connectionDefinition;
+    protected List<? extends ActionDefinition> actions;
+    protected ConnectionDefinition connection;
     protected Display display;
     protected Map<String, Object> metadata;
     protected String name;
@@ -44,19 +45,19 @@ public sealed class ComponentDefinition permits ComponentDSL.ModifiableComponent
     protected int version = Versions.VERSION_1;
 
     protected ComponentDefinition(String name) {
-        this.name = name;
+        this.name = Objects.requireNonNull(name);
     }
 
     @SuppressWarnings("unchecked")
     @Schema(name = "actions", description = "The list of all available actions the component can perform.")
-    public List<ActionDefinition> getActionDefinitions() {
-        return actionDefinitions;
+    public List<? extends ActionDefinition> getActions() {
+        return actions;
     }
 
     @SuppressWarnings("unchecked")
     @Schema(name = "connection", description = "Definition of connection to an outside service.")
-    public ConnectionDefinition getConnectionDefinition() {
-        return connectionDefinition;
+    public ConnectionDefinition getConnection() {
+        return connection;
     }
 
     public Display getDisplay() {

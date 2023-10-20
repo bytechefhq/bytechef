@@ -17,6 +17,7 @@
 package com.bytechef.hermes.component.utils;
 
 import com.bytechef.hermes.component.exception.ProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.util.Iterator;
 import java.util.Map;
@@ -67,7 +68,7 @@ class XmlIterator implements Iterator<Map<String, ?>> {
                 return false;
             }
 
-            value = xmlMapper.readValue(xmlStreamReader, Map.class);
+            value = xmlMapper.readValue(xmlStreamReader, new TypeReference<>() {});
         } catch (Exception exception) {
             throw new ProcessingException("Unable to read value", exception);
         }

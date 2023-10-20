@@ -59,11 +59,27 @@ public class XmlUtils {
         }
     }
 
+    public static <T> T read(InputStream inputStream, Class<T> clazz) {
+        try {
+            return XML_MAPPER.readValue(inputStream, clazz);
+        } catch (Exception exception) {
+            throw new ProcessingException("Unable to read xml value", exception);
+        }
+    }
+
     public static <T> T read(String xml, Class<T> clazz) {
         try {
             return XML_MAPPER.readValue(xml, clazz);
         } catch (Exception exception) {
             throw new ProcessingException("Unable to read xml value", exception);
+        }
+    }
+
+    public static <T> T read(InputStream inputStream, TypeReference<T> typeReference) {
+        try {
+            return XML_MAPPER.readValue(inputStream, typeReference);
+        } catch (Exception exception) {
+            throw new ProcessingException("Unable to read xml", exception);
         }
     }
 
@@ -88,7 +104,7 @@ public class XmlUtils {
     }
 
     public static <T> T read(String xml, String path, TypeReference<T> typeReference) {
-        return read(parse(path, (documentBuilder -> parse(xml, documentBuilder))), typeReference);
+        return read(parse(path, documentBuilder -> parse(xml, documentBuilder)), typeReference);
     }
 
     public static Stream<Map<String, ?>> stream(InputStream inputStream) {

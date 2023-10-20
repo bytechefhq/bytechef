@@ -18,7 +18,7 @@ package com.bytechef.hermes.component.definition;
 
 import static com.bytechef.hermes.component.constants.ComponentConstants.BASE_URI;
 
-import com.bytechef.hermes.component.ConnectionParameters;
+import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
@@ -26,11 +26,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Used for specifying an connection.
+ * Used for specifying a connection.
  *
  * @author Ivica Cardic
  */
@@ -38,30 +39,39 @@ import java.util.function.Function;
 public sealed class ConnectionDefinition permits ComponentDSL.ModifiableConnectionDefinition {
 
     protected String componentName;
-    protected List<Authorization> authorizations = Collections.emptyList();
-    protected Function<ConnectionParameters, String> baseUriFunction =
-            (connectionParameters) -> connectionParameters.getParameter(BASE_URI);
+    protected int componentVersion;
+    protected List<? extends Authorization> authorizations = Collections.emptyList();
+
+    @JsonIgnore
+    protected Function<Connection, String> baseUriFunction = (connectionParameters) ->
+            connectionParameters.containsKey(BASE_URI) ? connectionParameters.getParameter(BASE_URI) : null;
+
     protected Display display;
-    protected List<Property<?>> properties;
+    protected List<? extends Property<?>> properties;
     protected Resources resources;
     protected String subtitle;
 
     @JsonIgnore
-    protected Consumer<ConnectionParameters> testConsumer;
+    protected Consumer<Connection> testConsumer;
 
     protected ConnectionDefinition() {}
 
-    public List<Authorization> getAuthorizations() {
+    public List<? extends Authorization> getAuthorizations() {
         return authorizations;
     }
 
-    public Function<ConnectionParameters, String> getBaseUriFunction() {
+    public Function<Connection, String> getBaseUriFunction() {
         return baseUriFunction;
     }
 
-    @Schema(name = "componentName", description = "The name of a connection this connection can be used for.")
+    @Schema(name = "componentName", description = "The name of a component this connection can be used for.")
     public String getComponentName() {
         return componentName;
+    }
+
+    @Schema(name = "componentVersion", description = "The version of a component this connection can be used for.")
+    public int getComponentVersion() {
+        return componentVersion;
     }
 
     public Display getDisplay() {
@@ -69,7 +79,7 @@ public sealed class ConnectionDefinition permits ComponentDSL.ModifiableConnecti
     }
 
     @Schema(name = "properties", description = "Properties of the connection.")
-    public List<Property<?>> getProperties() {
+    public List<? extends Property<?>> getProperties() {
         return properties;
     }
 
@@ -82,7 +92,7 @@ public sealed class ConnectionDefinition permits ComponentDSL.ModifiableConnecti
         return subtitle;
     }
 
-    public Consumer<ConnectionParameters> getTestConsumer() {
-        return testConsumer;
+    public Optional<Consumer<Connection>> getTestConsumer() {
+        return Optional.ofNullable(testConsumer);
     }
 }
