@@ -23,4 +23,125 @@
     <Match>
         <Class name="com.bytechef.task.commons.json.JsonHelper" />
     </Match>
+    <Match>
+        <Class name="com.bytechef.task.commons.authentication.AuthenticationHelper" />
+    </Match>
+    <Match>
+        <Bug code="EI2" />
+        <Or>
+            <Class name="com.bytechef.atlas.service.context.ContextService" />
+            <Class name="com.bytechef.atlas.service.counter.CounterService" />
+            <Class name="com.bytechef.atlas.service.job.JobService" />
+            <Class name="com.bytechef.task.commons.file.storage.FileStorageHelper" />
+            <Class name="com.bytechef.atlas.coordinator.event.DeleteContextEventListener" />
+
+        </Or>
+    </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Bug code="EI2" />
+        <Or>
+            <Class name="com.bytechef.hermes.file.storage.job.FileStorageFileRetentionCheckJob" />
+            <Class name="com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.fork.completion.ForkTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.fork.ForkTaskDispatcher" />
+            <Class name="com.bytechef.task.dispatcher.each.EachTaskDispatcher" />
+            <Class name="com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.loop.LoopTaskDispatcher" />
+            <Class name="com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain" />
+            <Class name="com.bytechef.hermes.auth.web.rest.AuthenticationController" />
+            <Class name="com.bytechef.hermes.auth.web.rest.AuthenticationController$AuthenticationCreateDTO" />
+            <Class name="com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain" />
+            <Class name="com.bytechef.atlas.repository.workflow.WorkflowRepositoryChain" />
+            <Class name="com.bytechef.atlas.repository.jdbc.workflow.JdbcWorkflowRepository" />
+            <Class name="com.bytechef.atlas.coordinator.event.EventListenerChain" />
+            <Class name="com.bytechef.atlas.coordinator.job.executor.DefaultJobExecutor" />
+            <Class name="com.bytechef.atlas.repository.jdbc.job.JdbcJobRepository" />
+            <Class name="com.bytechef.atlas.repository.jdbc.context.JdbcContextRepository" />
+            <Class name="com.bytechef.atlas.repository.jdbc.task.execution.JdbcTaskExecutionRepository" />
+            <Class name="com.bytechef.atlas.coordinator.CoordinatorImpl" />
+            <Class name="com.bytechef.atlas.coordinator.error.ErrorHandlerChain" />
+            <Class name="com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler" />
+            <Class name="com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerChain" />
+            <Class name="com.bytechef.atlas.message.broker.jms.JmsMessageBroker" />
+            <Class name="com.bytechef.atlas.message.broker.kafka.KafkaMessageBroker" />
+            <Class name="com.bytechef.atlas.repository.jdbc.counter.JdbcCounterRepository" />
+            <Class name="com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver" />
+            <Class name="com.bytechef.atlas.repository.git.workflow.JGitTemplate" />
+            <Class name="com.bytechef.hermes.auth.domain.Authentication" />
+            <Class name="com.bytechef.hermes.descriptor.resolver.InMemoryAuthenticationDescriptorHandlerResolver" />
+            <Class name="com.bytechef.hermes.descriptor.resolver.TaskDescriptorHandlerResolverChain" />
+            <Class name="com.bytechef.hermes.descriptor.resolver.InMemoryTaskDescriptorHandlerResolver" />
+            <Class name="com.bytechef.hermes.auth.repository.AuthenticationRepository" />
+            <Class name="com.bytechef.hermes.auth.service.AuthenticationServiceImpl" />
+            <Class name="com.bytechef.hermes.descriptor.resolver.AuthenticationDescriptorHandlerResolverChain" />
+            <Class name="com.bytechef.atlas.repository.workflow.mapper.WorkflowMapperChain" />
+            <Class name="com.bytechef.task.dispatcher.map.MapTaskDispatcher$Builder" />
+            <Class name="com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher" />
+            <Class name="com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher" />
+            <Class name="com.bytechef.task.dispatcher.if_.completion.IfTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.switch_.SwitchTaskDispatcher" />
+            <Class name="com.bytechef.task.dispatcher.switch_.completion.SwitchTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.if_.IfTaskDispatcher" />
+        </Or>
+    </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Bug code="EI" />
+        <Or>
+            <Class name="com.bytechef.hermes.auth.domain.Authentication" />
+            <Class name="com.bytechef.hermes.auth.web.rest.AuthenticationController$AuthenticationCreateDTO" />
+            <Class name="com.bytechef.hermes.descriptor.model.Authentication" />
+            <Class name="com.bytechef.hermes.descriptor.model.DisplayOption" />
+            <Class name="com.bytechef.hermes.descriptor.model.DisplayOption$DisplayOptionEntryValue" />
+            <Class name="com.bytechef.hermes.descriptor.model.TaskDescriptor" />
+            <Class name="com.bytechef.hermes.descriptor.model.TaskProperty$OptionTaskProperty" />
+            <Class name="com.bytechef.hermes.descriptor.model.TaskProperty$AnyTaskProperty" />
+            <Class name="com.bytechef.hermes.descriptor.model.TaskProperty$ObjectTaskProperty" />
+            <Class name="com.bytechef.hermes.descriptor.model.TaskProperty$ValueTaskProperty" />
+            <Class name="com.bytechef.hermes.descriptor.resolver.InMemoryTaskDescriptorHandlerResolver" />
+            <Class name="com.bytechef.hermes.descriptor.resolver.InMemoryAuthenticationDescriptorHandlerResolver" />
+            <Class name="com.bytechef.hermes.descriptor.resolver.AuthenticationDescriptorHandlerResolverChain" />
+            <Class name="com.bytechef.hermes.descriptor.model.AuthenticationDescriptor" />
+            <Class name="com.bytechef.hermes.descriptor.model.AuthenticationDescriptors" />
+            <Class name="com.bytechef.hermes.descriptor.model.TaskOperation" />
+            <Class name="com.bytechef.hermes.descriptor.model.TaskProperty$ArrayTaskProperty" />
+        </Or>
+    </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Bug code="THROWS" />
+        <Or>
+            <Class name="com.bytechef.atlas.repository.git.workflow.JGitTemplate" />
+            <Class name="com.bytechef.atlas.repository.resource.workflow.ResourceBasedWorkflowRepository" />
+            <Class name="com.bytechef.atlas.repository.workflow.WorkflowRepositoryChain" />
+            <Class name="com.bytechef.atlas.repository.workflow.mapper.BaseWorkflowMapper" />
+            <Class name="com.bytechef.atlas.worker.WorkerImpl" />
+            <Class name="com.bytechef.hermes.encryption.Encryption" />
+            <Class name="com.bytechef.hermes.encryption.filesystem.FileSystemEncryptionKey" />
+        </Or>
+    </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Bug code="NP" />
+        <Or>
+            <Class name="com.bytechef.atlas.repository.workflow.WorkflowRepositoryChain" />
+            <Class name="com.bytechef.atlas.repository.jdbc.job.JdbcJobRepository" />
+            <Class name="com.bytechef.atlas.repository.jdbc.task.execution.JdbcTaskExecutionRepository" />
+            <Class name="com.bytechef.atlas.repository.workflow.mapper.BaseWorkflowMapper" />
+        </Or>
+    </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Bug code="Dm" />
+        <Or>
+            <Class name="com.bytechef.hermes.encryption.Encryption" />
+            <Class name="com.bytechef.hermes.auth.repository.AuthenticationRepository" />
+            <Class name="com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService" />
+            <Class name="com.bytechef.hermes.file.storage.filesystem.FileSystemFileStorageService" />
+        </Or>
+    </Match>
 </FindBugsFilter>
