@@ -41,7 +41,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import reactor.core.publisher.Mono;
 
@@ -93,18 +92,12 @@ public class DefinitionRegistryConfiguration {
     }
 
     @Bean
-    ConnectionDefinitionService connectionDefinitionService(List<ComponentDefinition> componentDefinitions) {
-        return new ConnectionDefinitionServiceImpl(componentDefinitions);
-    }
-
-    @Bean
-    @Primary
-    ConnectionDefinitionService connectionDefinitionServiceDecorator(
-        ConnectionDefinitionService connectionDefinitionService,
+    ConnectionDefinitionService connectionDefinitionService(
+        List<ComponentDefinition> componentDefinitions,
         ConnectionDefinitionServiceRSocketClient connectionDefinitionServiceRSocketClient) {
 
         return new WorkerConnectionDefinitionService(
-            connectionDefinitionService, connectionDefinitionServiceRSocketClient);
+            new ConnectionDefinitionServiceImpl(componentDefinitions), connectionDefinitionServiceRSocketClient);
     }
 
     @Bean

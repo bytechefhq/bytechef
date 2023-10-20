@@ -30,7 +30,6 @@ import org.springframework.util.MimeTypeUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
-import reactor.netty.tcp.TcpClient;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
@@ -63,13 +62,6 @@ public class RSocketConfiguration {
     }
 
     @Bean
-    public Flux<List<LoadbalanceTarget>> workerLoadBalancedTargets(DiscoveryClient discoveryClient) {
-        return Mono.fromSupplier(() -> discoveryClient.getInstances("worker-service-app"))
-            .repeatWhen(longFlux -> longFlux.delayElements(Duration.ofSeconds(2)))
-            .map(this::toLoadBalanceTarget);
-    }
-
-    @Bean
     RSocketRequester.Builder workerRSocketRequesterBuilder(RSocketStrategies rSocketStrategies) {
         return RSocketRequester.builder()
             .rsocketConnector(
@@ -83,9 +75,9 @@ public class RSocketConfiguration {
             .map(serviceInstance -> LoadbalanceTarget.from(
                 serviceInstance.getHost() + serviceInstance.getPort(),
                 WebsocketClientTransport.create(
-                    HttpClient.from(TcpClient.create()
+                    HttpClient.newConnection()
                         .host(serviceInstance.getHost())
-                        .port(serviceInstance.getPort())),
+                        .port(serviceInstance.getPort()),
                     "/rsocket")))
             .collect(Collectors.toList());
     }
