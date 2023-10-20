@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.message.broker.worker.config;
+package com.bytechef.atlas.worker.config;
 
-import com.bytechef.atlas.config.AtlasProperties;
-import com.bytechef.atlas.config.WorkerProperties;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.atlas.worker.Worker;
+import com.bytechef.autoconfigure.annotation.ConditionalOnWorker;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
@@ -33,18 +32,21 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-public class MessageBrokerWorkerConfiguration implements ApplicationContextAware {
+@ConditionalOnWorker
+public class WorkerMessageBrokerConfiguration implements ApplicationContextAware {
 
-    @Autowired
-    private AtlasProperties atlasProperties;
+    private final WorkerProperties workerProperties;
 
     private ApplicationContext applicationContext;
 
-    @Bean
-    MessageBrokerConfigurer workerMessageBrokerConfigurator() {
-        return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            WorkerProperties workerProperties = atlasProperties.getWorker();
+    @SuppressFBWarnings("EI2")
+    public WorkerMessageBrokerConfiguration(WorkerProperties workerProperties) {
+        this.workerProperties = workerProperties;
+    }
 
+    @Bean
+    MessageBrokerConfigurer<?> workerMessageBrokerConfigurer() {
+        return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
             Worker worker = applicationContext.getBean(Worker.class);
 
             Map<String, Object> subscriptions = workerProperties.getSubscriptions();
