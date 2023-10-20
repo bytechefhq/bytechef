@@ -22,6 +22,7 @@ import static com.integri.atlas.task.definition.dsl.TaskParameter.parameter;
 import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValue;
 import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValues;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.OPTION_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
 import static com.integri.atlas.task.definition.dsl.TaskPropertyOptionValue.optionValue;
 import static com.integri.atlas.task.definition.dsl.TaskPropertyTypeOption.propertyTypeOption;
@@ -1482,7 +1483,296 @@ public class TaskDeclarationTest {
     }
 
     @Test
-    public void testTaskProperty() throws JsonProcessingException, JSONException {
+    public void testBooleanTaskProperty() throws JsonProcessingException, JSONException {
+        TaskProperty<?> taskProperty = TaskProperty
+            .BOOLEAN_PROPERTY("name")
+            .defaultValue(true)
+            .description("description")
+            .displayName("displayName")
+            .displayOption(displayOption())
+            .placeholder("placeholder")
+            .required(true)
+            .typeOption(propertyTypeOption());
+
+        jsonAssertEquals(
+            """
+        {
+            "defaultValue":true,
+            "description":"description",
+            "displayName":"displayName",
+            "displayOption":{},
+            "name":"name",
+            "placeholder":"placeholder",
+            "required":true,
+            "type":"BOOLEAN",
+            "typeOption":{"multipleValues":false}
+        }
+        """,
+            taskProperty
+        );
+    }
+
+    @Test
+    public void testCollectionTaskProperty() throws JsonProcessingException, JSONException {
+        TaskProperty<?> taskProperty = TaskProperty
+            .COLLECTION_PROPERTY("name")
+            .description("description")
+            .displayName("displayName")
+            .displayOption(displayOption())
+            .options(STRING_PROPERTY("stringProperty"))
+            .placeholder("placeholder")
+            .required(true)
+            .typeOption(propertyTypeOption());
+
+        jsonAssertEquals(
+            """
+        {
+            "description":"description",
+            "displayName":"displayName",
+            "displayOption":{},
+            "name":"name",
+            "options": [
+                {
+                    "name":"stringProperty",
+                    "type":"STRING"
+                }
+            ],
+            "placeholder":"placeholder",
+            "required":true,
+            "type":"COLLECTION",
+            "typeOption":{"multipleValues":false}
+        }
+        """,
+            taskProperty
+        );
+    }
+
+    @Test
+    public void testColorTaskProperty() throws JsonProcessingException, JSONException {
+        TaskProperty<?> taskProperty = TaskProperty
+            .COLOR_PROPERTY("name")
+            .defaultValue("#234")
+            .description("description")
+            .displayName("displayName")
+            .displayOption(displayOption())
+            .placeholder("placeholder")
+            .required(true)
+            .typeOption(propertyTypeOption());
+
+        jsonAssertEquals(
+            """
+        {
+            "defaultValue":"#234",
+            "description":"description",
+            "displayName":"displayName",
+            "displayOption":{},
+            "name":"name",
+            "placeholder":"placeholder",
+            "required":true,
+            "type":"COLOR",
+            "typeOption":{"multipleValues":false}
+        }
+        """,
+            taskProperty
+        );
+    }
+
+    @Test
+    public void testDateTimeTaskProperty() throws JsonProcessingException, JSONException {
+        TaskProperty<?> taskProperty = TaskProperty
+            .DATE_TIME_PROPERTY("name")
+            .defaultValue(LocalDateTime.MIN)
+            .description("description")
+            .displayName("displayName")
+            .displayOption(displayOption())
+            .placeholder("placeholder")
+            .required(true)
+            .typeOption(propertyTypeOption());
+
+        jsonAssertEquals(
+            """
+        {
+            "defaultValue":"-999999999-01-01T00:00",
+            "description":"description",
+            "displayName":"displayName",
+            "displayOption":{},
+            "name":"name",
+            "placeholder":"placeholder",
+            "required":true,
+            "type":"DATE_TIME",
+            "typeOption":{"multipleValues":false}
+        }
+        """,
+            taskProperty
+        );
+    }
+
+    @Test
+    public void testFileEntryTaskProperty() throws JsonProcessingException, JSONException {
+        TaskProperty<?> taskProperty = TaskProperty
+            .FILE_ENTRY_PROPERTY("name")
+            .description("description")
+            .displayName("displayName")
+            .displayOption(displayOption())
+            .required(true)
+            .typeOption(propertyTypeOption());
+
+        jsonAssertEquals(
+            """
+        {
+            "description":"description",
+            "displayName":"displayName",
+            "displayOption":{},
+            "name":"name",
+            "required":true,
+            "type":"FILE_ENTRY",
+            "typeOption":{"multipleValues":false}
+        }
+        """,
+            taskProperty
+        );
+    }
+
+    @Test
+    public void testGroupTaskProperty() throws JsonProcessingException, JSONException {
+        TaskProperty<?> taskProperty = TaskProperty
+            .GROUP_PROPERTY("name")
+            .groupProperties(STRING_PROPERTY("stringProperty"))
+            .description("description")
+            .displayName("displayName")
+            .displayOption(displayOption())
+            .required(true)
+            .typeOption(propertyTypeOption());
+
+        jsonAssertEquals(
+            """
+        {
+            "description":"description",
+            "displayName":"displayName",
+            "displayOption":{},
+            "groupProperties": [
+                {
+                    "name":"stringProperty",
+                    "type":"STRING"
+                }
+            ],
+            "name":"name",
+            "required":true,
+            "type":"GROUP",
+            "typeOption":{"multipleValues":false}
+        }
+        """,
+            taskProperty
+        );
+    }
+
+    @Test
+    public void testJSONTaskProperty() throws JsonProcessingException, JSONException {
+        TaskProperty<?> taskProperty = TaskProperty
+            .JSON_PROPERTY("name")
+            .defaultValue(parameter("parameter", parameterValue(2)))
+            .description("description")
+            .displayName("displayName")
+            .displayOption(displayOption())
+            .placeholder("placeholder")
+            .required(true)
+            .typeOption(propertyTypeOption());
+
+        jsonAssertEquals(
+            """
+        {
+            "defaultValue":{"parameter": 2},
+            "description":"description",
+            "displayName":"displayName",
+            "displayOption":{},
+            "name":"name",
+            "placeholder":"placeholder",
+            "required":true,
+            "type":"JSON",
+            "typeOption":{"multipleValues":false}
+        }
+        """,
+            taskProperty
+        );
+    }
+
+    @Test
+    public void testMultiOptionTaskProperty() throws JsonProcessingException, JSONException {
+        TaskProperty<?> taskProperty = TaskProperty
+            .MULTI_OPTION_PROPERTY("name")
+            .defaultValue(2, 3)
+            .description("description")
+            .displayName("displayName")
+            .displayOption(displayOption())
+            .options(option("option1", 1), option("option2", 2), option("option3", 3))
+            .placeholder("placeholder")
+            .required(true)
+            .typeOption(propertyTypeOption());
+
+        jsonAssertEquals(
+            """
+        {
+            "defaultValue":[2,3],
+            "description":"description",
+            "displayName":"displayName",
+            "displayOption":{},
+            "name":"name",
+            "options":[
+                {
+                    "name":"option1",
+                    "value":1
+                },
+                {
+                    "name":"option2",
+                    "value":2
+                },
+                {
+                    "name":"option3",
+                    "value":3
+                }
+            ],
+            "placeholder":"placeholder",
+            "required":true,
+            "type":"MULTI_SELECT",
+            "typeOption":{"multipleValues":false}
+        }
+        """,
+            taskProperty
+        );
+    }
+
+    @Test
+    public void testNumberTaskProperty() throws JsonProcessingException, JSONException {
+        TaskProperty<?> taskProperty = TaskProperty
+            .NUMBER_PROPERTY("name")
+            .defaultValue(2)
+            .description("description")
+            .displayName("displayName")
+            .displayOption(displayOption())
+            .placeholder("placeholder")
+            .required(true)
+            .typeOption(propertyTypeOption());
+
+        jsonAssertEquals(
+            """
+        {
+            "defaultValue":2,
+            "description":"description",
+            "displayName":"displayName",
+            "displayOption":{},
+            "name":"name",
+            "placeholder":"placeholder",
+            "required":true,
+            "type":"NUMBER",
+            "typeOption":{"multipleValues":false}
+        }
+        """,
+            taskProperty
+        );
+    }
+
+    @Test
+    public void testOptionTaskProperty() throws JsonProcessingException, JSONException {
         TaskProperty<?> taskProperty = OPTION_PROPERTY("name")
             .defaultValue(2)
             .description("description")
@@ -1514,6 +1804,36 @@ public class TaskDeclarationTest {
             "placeholder":"placeholder",
             "required":true,
             "type":"SELECT",
+            "typeOption":{"multipleValues":false}
+        }
+        """,
+            taskProperty
+        );
+    }
+
+    @Test
+    public void testStringTaskProperty() throws JsonProcessingException, JSONException {
+        TaskProperty<?> taskProperty = TaskProperty
+            .STRING_PROPERTY("name")
+            .defaultValue("defaultValue")
+            .description("description")
+            .displayName("displayName")
+            .displayOption(displayOption())
+            .placeholder("placeholder")
+            .required(true)
+            .typeOption(propertyTypeOption());
+
+        jsonAssertEquals(
+            """
+        {
+            "defaultValue":"defaultValue",
+            "description":"description",
+            "displayName":"displayName",
+            "displayOption":{},
+            "name":"name",
+            "placeholder":"placeholder",
+            "required":true,
+            "type":"STRING",
             "typeOption":{"multipleValues":false}
         }
         """,
