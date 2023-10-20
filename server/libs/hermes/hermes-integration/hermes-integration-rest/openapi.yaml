@@ -12,6 +12,21 @@ paths:
       tags:
         - integrations
       operationId: getIntegrations
+      parameters:
+        - name: categoryId
+          description: The id of the category used for filtering integrations.
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: tagId
+          description: The list of tag ids of used for filtering integrations.
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
       responses:
         "200":
           description: The list of integrations.
@@ -165,8 +180,8 @@ paths:
                 items:
                   $ref: '../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow'
     post:
-      description: Creates new workflow and adds it to an existing integration.
-      summary: Creates new workflow and adds it to an existing integration.
+      description: Create new workflow and adds it to an existing integration.
+      summary: Create new workflow and adds it to an existing integration.
       tags:
         - integrations
       operationId: postIntegrationWorkflow
