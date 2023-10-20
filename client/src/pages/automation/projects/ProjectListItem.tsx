@@ -18,14 +18,14 @@ import {
     useGetProjectWorkflowsQuery,
 } from '../../../queries/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {twMerge} from 'tailwind-merge';
 import {Link, useNavigate} from 'react-router-dom';
 import ProjectDialog from './ProjectDialog';
-import Name from './components/Name';
 import AlertDialog from '../../../components/AlertDialog/AlertDialog';
 import TagList from '../../../components/TagList/TagList';
 import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
 import getCreatedWorkflow from 'utils/getCreatedWorkflow';
+import Badge from '../../../components/Badge/Badge';
+import HoverCard from '../../../components/HoverCard/HoverCard';
 
 interface ProjectItemProps {
     project: ProjectModel;
@@ -114,97 +114,88 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
             <div className="flex items-center">
                 {initialWorkflowId && (
                     <Link
-                        className="flex-1"
+                        className="flex-1 pr-8"
                         to={`/automation/projects/${project.id}/workflow/${initialWorkflowId}`}
                     >
-                        <div className="flex justify-between">
-                            <div>
-                                <header className="relative mb-2 flex items-center">
-                                    {project.description ? (
-                                        <Name
-                                            description={project.description}
-                                            name={project.name}
-                                        />
-                                    ) : (
+                        <div className="flex items-center justify-between">
+                            <div className="relative flex items-center">
+                                {project.description ? (
+                                    <HoverCard text={project.description}>
                                         <span className="mr-2 text-base font-semibold text-gray-900">
                                             {project.name}
                                         </span>
-                                    )}
+                                    </HoverCard>
+                                ) : (
+                                    <span className="mr-2 text-base font-semibold text-gray-900">
+                                        {project.name}
+                                    </span>
+                                )}
 
-                                    {project.category && (
-                                        <span className="text-xs uppercase text-gray-700">
-                                            {project.category.name}
-                                        </span>
-                                    )}
-                                </header>
-
-                                <footer
-                                    className="flex h-[38px] items-center"
-                                    onClick={(event) => event.preventDefault()}
-                                >
-                                    <div className="mr-4 text-xs font-semibold text-gray-700">
-                                        {project.workflowIds?.length === 1
-                                            ? `${project.workflowIds?.length} workflow`
-                                            : `${project.workflowIds?.length} workflows`}
-                                    </div>
-
-                                    {project.tags && (
-                                        <TagList
-                                            id={project.id!}
-                                            remainingTags={remainingTags}
-                                            tags={project.tags}
-                                            updateTagsMutation={
-                                                updateProjectTagsMutation
-                                            }
-                                            getRequest={(id, tags) => ({
-                                                id: id!,
-                                                updateProjectTagsRequestModel: {
-                                                    tags: tags || [],
-                                                },
-                                            })}
-                                        />
-                                    )}
-                                </footer>
+                                {project.category && (
+                                    <span className="text-xs uppercase text-gray-700">
+                                        {project.category.name}
+                                    </span>
+                                )}
                             </div>
 
-                            <aside className="flex items-center">
-                                <span
-                                    className={twMerge(
-                                        'mr-4 rounded px-2.5 py-0.5 text-sm font-medium',
+                            <div className="ml-2 flex shrink-0">
+                                <Badge
+                                    color={
                                         project.status ===
-                                            ProjectModelStatusEnum.Published
-                                            ? 'bg-green-100 text-green-800 dark:bg-green-200 dark:text-green-900'
-                                            : 'bg-gray-100 text-gray-800 dark:bg-gray-200 dark:text-gray-900'
-                                    )}
-                                >
-                                    {project.status ===
-                                    ProjectModelStatusEnum.Published
-                                        ? `Published V${project.projectVersion}`
-                                        : 'Not Published'}
-                                </span>
+                                        ProjectModelStatusEnum.Published
+                                            ? 'green'
+                                            : 'default'
+                                    }
+                                    text={
+                                        project.status ===
+                                        ProjectModelStatusEnum.Published
+                                            ? `Published V${project.projectVersion}`
+                                            : 'Not Published'
+                                    }
+                                />
+                            </div>
+                        </div>
+                        <div className="mt-2 sm:flex sm:items-center sm:justify-between">
+                            <div
+                                className="flex h-[38px] items-center"
+                                onClick={(event) => event.preventDefault()}
+                            >
+                                <div className="mr-4 text-xs font-semibold text-gray-700">
+                                    {project.workflowIds?.length === 1
+                                        ? `${project.workflowIds?.length} workflow`
+                                        : `${project.workflowIds?.length} workflows`}
+                                </div>
 
-                                <span className="mr-4 w-[76px] text-center text-sm text-gray-500">
-                                    {project.status ===
-                                    ProjectModelStatusEnum.Published
-                                        ? project.lastPublishedDate?.toLocaleDateString()
-                                        : '-'}
-                                </span>
-                            </aside>
+                                {project.tags && (
+                                    <TagList
+                                        id={project.id!}
+                                        remainingTags={remainingTags}
+                                        tags={project.tags}
+                                        updateTagsMutation={
+                                            updateProjectTagsMutation
+                                        }
+                                        getRequest={(id, tags) => ({
+                                            id: id!,
+                                            updateProjectTagsRequestModel: {
+                                                tags: tags || [],
+                                            },
+                                        })}
+                                    />
+                                )}
+                            </div>
+
+                            <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                                {project.status ===
+                                ProjectModelStatusEnum.Published
+                                    ? `${project.publishedDate?.toLocaleDateString()}`
+                                    : '-'}
+                            </div>
                         </div>
                     </Link>
                 )}
 
                 <DropdownMenu id={project.id} menuItems={dropdownItems} />
             </div>
-
-            {showEditDialog && (
-                <ProjectDialog
-                    project={project}
-                    showTrigger={false}
-                    visible
-                    onClose={() => setShowEditDialog(false)}
-                />
-            )}
 
             {showDeleteDialog && (
                 <AlertDialog
@@ -215,11 +206,18 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                     setIsOpen={setShowDeleteDialog}
                     onConfirmClick={() => {
                         if (project.id) {
-                            deleteProjectMutation.mutate({
-                                id: project.id,
-                            });
+                            deleteProjectMutation.mutate(project.id);
                         }
                     }}
+                />
+            )}
+
+            {showEditDialog && (
+                <ProjectDialog
+                    project={project}
+                    showTrigger={false}
+                    visible
+                    onClose={() => setShowEditDialog(false)}
                 />
             )}
 
