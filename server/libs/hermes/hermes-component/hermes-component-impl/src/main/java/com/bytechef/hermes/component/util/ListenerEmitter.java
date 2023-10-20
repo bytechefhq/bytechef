@@ -17,14 +17,23 @@
 
 package com.bytechef.hermes.component.util;
 
-import com.bytechef.atlas.message.broker.TaskMessageRoute;
 import com.bytechef.hermes.domain.TriggerExecution;
+import com.bytechef.hermes.message.broker.TriggerMessageRoute;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
+import com.bytechef.message.broker.MessageBroker;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings({
+    "MS", "UWF"
+})
 public final class ListenerEmitter implements ListenerTriggerUtils.ListenerEmitter {
+
+    private static MessageBroker messageBroker;
 
     @Override
     public void emit(String workflowExecutionId, Object output) {
@@ -33,6 +42,16 @@ public final class ListenerEmitter implements ListenerTriggerUtils.ListenerEmitt
             .workflowExecutionId(WorkflowExecutionId.parse(workflowExecutionId))
             .build();
 
-        ComponentUtilsInstance.messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, triggerExecution);
+        messageBroker.send(TriggerMessageRoute.TRIGGERS_COMPLETIONS, triggerExecution);
+    }
+
+    @Configuration
+    static class ListenerEmitterConfiguration {
+
+        @Autowired
+        @SuppressFBWarnings("ST")
+        void setMessageBroker(MessageBroker messageBroker) {
+            ListenerEmitter.messageBroker = messageBroker;
+        }
     }
 }

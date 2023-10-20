@@ -74,20 +74,20 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
         Configuration configuration, RequestMethod requestMethod) throws Exception {
 
         ComponentContextThreadLocal.ComponentContext componentContext = ComponentContextThreadLocal.get();
+        ComponentDefinition componentDefinition = null;
+        Context context = null;
 
-        HttpClient httpClient = createHttpClient(
-            componentContext == null ? null : componentContext.context(),
-            componentContext == null ? null : componentContext.componentDefinition(), headers, queryParameters,
-            configuration);
+        if (componentContext != null) {
+            componentDefinition = componentContext.componentDefinition();
+            context = componentContext.context();
+        }
 
-        HttpRequest httpRequest = createHTTPRequest(
-            componentContext == null ? null : componentContext.context(), urlString, requestMethod, headers,
-            queryParameters, body);
+        HttpClient httpClient = createHttpClient(context, componentDefinition, headers, queryParameters, configuration);
+        HttpRequest httpRequest = createHTTPRequest(context, urlString, requestMethod, headers, queryParameters, body);
 
         HttpResponse<?> httpResponse = httpClient.send(httpRequest, createBodyHandler(configuration));
 
-        return handleResponse(
-            componentContext == null ? null : componentContext.context(), httpResponse, configuration);
+        return handleResponse(context, httpResponse, configuration);
     }
 
     HttpResponse.BodyHandler<?> createBodyHandler(Configuration configuration) {
@@ -252,11 +252,11 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
         if (componentDefinition == null) {
             OptionalUtils.ifPresent(
                 context.fetchConnection(),
-                (connection -> connection.applyAuthorization(
-                    new AuthorizationContextImpl(headers, queryParameters, new HashMap<>()))));
+                connection -> connection.applyAuthorization(
+                    new AuthorizationContextImpl(headers, queryParameters, new HashMap<>())));
         } else {
-            ConnectionDefinition connectionDefinition = componentDefinition.getConnection()
-                .orElse(null);
+            ConnectionDefinition connectionDefinition = OptionalUtils.orElse(
+                componentDefinition.getConnection(), null);
 
             if (connectionDefinition != null && connectionDefinition.isAuthorizationRequired()) {
                 Context.Connection connection = context.getConnection();
@@ -424,7 +424,7 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
     }
 
     @SuppressFBWarnings("EI")
-    record AuthorizationContextImpl(
+    private record AuthorizationContextImpl(
         Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Map<String, String> body)
         implements Authorization.AuthorizationContext {
 
