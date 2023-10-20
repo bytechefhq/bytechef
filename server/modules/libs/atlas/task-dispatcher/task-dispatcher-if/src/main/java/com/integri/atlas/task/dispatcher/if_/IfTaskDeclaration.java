@@ -41,10 +41,19 @@ public class IfTaskDeclaration implements TaskDeclaration {
         .displayName("IF")
         .description("Directs a stream based on true/false results of comparisons")
         .properties(
+            BOOLEAN_PROPERTY("rawConditions")
+                .displayName("RAW Conditions")
+                .description("If the conditions should be set via the key-value pair in UI or as an raw expression).")
+                .defaultValue(false),
+            STRING_PROPERTY("conditions")
+                .displayName("Conditions")
+                .description("The conditions expressed as an expression.")
+                .displayOption(show("rawConditions", true)),
             COLLECTION_PROPERTY("conditions")
                 .displayName("Conditions")
                 .placeholder("Add Condition")
                 .description("The type of values to compare.")
+                .displayOption(show("rawConditions", false))
                 .typeOption(multipleValues(true))
                 .options(
                     GROUP_PROPERTY("boolean")
@@ -143,17 +152,18 @@ public class IfTaskDeclaration implements TaskDeclaration {
                 ),
             SELECT_PROPERTY("combineOperation")
                 .displayName("Combine")
+                .description(
+                    """
+                    If multiple conditions are set, this setting decides if it is true as soon as ANY condition
+                     matches or only if ALL are met.
+                    """
+                )
+                .displayOption(show("rawConditions", false))
                 .options(
                     option("All", "ALL", "Only if all conditions are met, the workflow goes into \"true\" branch."),
                     option("Any", "ANY", "If any condition is met, the workflow goes into \"true\" branch.")
                 )
-                .description(
-                    """
-                            If multiple conditions are set, this setting decides if it is true as soon as ANY condition
-                             matches or only if ALL are met.
-                            """
-                )
-                .defaultValue("ALL"),
+                .defaultValue("ALL")
         );
 
     @Override
