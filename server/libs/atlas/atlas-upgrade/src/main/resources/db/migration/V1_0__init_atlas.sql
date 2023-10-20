@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS task_execution (
 
 CREATE TABLE IF NOT EXISTS workflow (
     id					     VARCHAR(256) NOT NULL PRIMARY KEY,
-    content    			     TEXT         NOT NULL,
+    definition    			     TEXT         NOT NULL,
     format     			     VARCHAR(256) NOT NULL,
     created_date             TIMESTAMP    NOT NULL,
     created_by               VARCHAR(256) NOT NULL,
