@@ -76,12 +76,6 @@ classes/
 *.code-workspace
 
 ######################
-# Maven
-######################
-/log/
-/target/
-
-######################
 # Gradle
 ######################
 .gradle/
@@ -138,11 +132,6 @@ Desktop.ini
 *application.pid
 
 ######################
-# Maven Wrapper
-######################
-!.mvn/wrapper/maven-wrapper.jar
-
-######################
 # ESLint
 ######################
 .eslintcache
@@ -152,3 +141,8 @@ Desktop.ini
 ######################
 /coverage/
 /.nyc_output/
+
+######################
+# Docusaurus
+######################
+.docusaurus
