@@ -74,7 +74,7 @@ public class GitWorkflowRepository implements WorkflowRepository {
     }
 
     @Override
-    public Workflow.ProviderType getProviderType() {
-        return Workflow.ProviderType.GIT;
+    public Workflow.SourceType getSourceType() {
+        return Workflow.SourceType.GIT;
     }
 }

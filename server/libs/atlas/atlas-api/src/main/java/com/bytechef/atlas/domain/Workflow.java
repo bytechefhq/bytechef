@@ -56,7 +56,6 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
 
     public enum Format {
         JSON,
-        YML,
         YAML;
 
         public static Format parse(String fileName) {
@@ -68,7 +67,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         }
     }
 
-    public enum ProviderType {
+    public enum SourceType {
         CLASSPATH, FILESYSTEM, GIT, JDBC
     }
 
@@ -110,7 +109,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     private final List<Map<String, Object>> outputs;
 
     @Transient
-    private ProviderType providerType;
+    private SourceType sourceType;
 
     @Transient
     private final int retry;
@@ -128,7 +127,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     }
 
     public Workflow(Map<String, Object> source) {
-        Assert.notNull(source, "source cannot be null");
+        Assert.notNull(source, "'source' must not be null.");
 
         id = MapUtils.getString(source, WorkflowConstants.ID);
         inputs = MapUtils.getList(
@@ -213,8 +212,8 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         return Collections.unmodifiableList(outputs);
     }
 
-    public ProviderType getProviderType() {
-        return providerType;
+    public SourceType getSourceType() {
+        return sourceType;
     }
 
     /**
@@ -268,25 +267,28 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    public void setProviderType(ProviderType providerType) {
-        this.providerType = providerType;
+    public void setSourceType(SourceType sourceType) {
+        this.sourceType = sourceType;
     }
 
     @Override
     public String toString() {
-        return "Workflow{" + "content='"
-            + definition + '\'' + ", createdBy='"
-            + createdBy + '\'' + ", createdDate="
-            + createdDate + ", error="
-            + error + ", format="
-            + format + ", id='"
-            + id + '\'' + ", inputs="
-            + inputs + ", label='"
-            + label + '\'' + ", lastModifiedBy='"
-            + lastModifiedBy + '\'' + ", lastModifiedDate="
-            + lastModifiedDate + ", outputs="
-            + outputs + ", tasks="
-            + tasks + ", retry="
-            + retry + '}';
+        return "Workflow{" +
+            "definition='" + definition + '\'' +
+            ", createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
+            ", error=" + error +
+            ", format=" + format +
+            ", id='" + id + '\'' +
+            ", inputs=" + inputs +
+            ", label='" + label + '\'' +
+            ", lastModifiedBy='" + lastModifiedBy + '\'' +
+            ", lastModifiedDate=" + lastModifiedDate +
+            ", outputs=" + outputs +
+            ", sourceType=" + sourceType +
+            ", retry=" + retry +
+            ", tasks=" + tasks +
+            ", version=" + version +
+            '}';
     }
 }

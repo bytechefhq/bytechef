@@ -38,8 +38,8 @@ public interface JdbcWorkflowRepository
     void deleteById(String id);
 
     @Override
-    default Workflow.ProviderType getProviderType() {
-        return Workflow.ProviderType.JDBC;
+    default Workflow.SourceType getSourceType() {
+        return Workflow.SourceType.JDBC;
     }
 
     @Override

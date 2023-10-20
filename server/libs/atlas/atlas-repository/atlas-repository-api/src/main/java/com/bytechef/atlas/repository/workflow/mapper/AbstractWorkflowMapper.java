@@ -40,19 +40,23 @@ import org.springframework.util.Assert;
 public abstract class AbstractWorkflowMapper implements WorkflowMapper {
 
     public Workflow readValue(WorkflowResource workflowResource, ObjectMapper objectMapper) {
+        Workflow workflow = null;
+
         try {
             Map<String, Object> jsonMap = parse(workflowResource, objectMapper);
 
             jsonMap.put(WorkflowConstants.ID, workflowResource.getId());
 
-            return new Workflow(jsonMap);
+            workflow = new Workflow(jsonMap);
         } catch (Exception e) {
-            Workflow workflow = new Workflow(Collections.singletonMap(WorkflowConstants.ID, workflowResource.getId()));
+            workflow = new Workflow(Collections.singletonMap(WorkflowConstants.ID, workflowResource.getId()));
 
             workflow.setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
-
-            return workflow;
         }
+
+        workflow.setFormat(workflowResource.getWorkflowFormat());
+
+        return workflow;
     }
 
     private Map<String, Object> parse(Resource resource, ObjectMapper objectMapper) {
@@ -67,7 +71,6 @@ public abstract class AbstractWorkflowMapper implements WorkflowMapper {
             List<Map<String, Object>> rawTasks = (List<Map<String, Object>>) workflowMap.get(WorkflowConstants.TASKS);
 
             Assert.notNull(rawTasks, "no tasks found");
-            Assert.notEmpty(rawTasks, "no tasks found");
 
             List<Map<String, Object>> tasks = new ArrayList<>();
 
