@@ -6,20 +6,24 @@ spring:
     password: postgres
     hikari:
       poolName: Hikari
-  sql:
-    init:
-      mode: always
+#  sql:
+#    init:
+#      mode: always
   application:
-    name: atlas-app
+    name: test-app
   jackson:
     default-property-inclusion: non_null
     serialization:
       write-dates-as-timestamps: false
       write-null-map-values: false
-    date-format: ${atlas.serialization.date-format}
+    date-format: ${workflow.serialization.date-format}
     time-zone: UTC
 
-atlas:
+workflow:
+  context-repository:
+    provider: jdbc
+  message-broker:
+    provider: jms
   persistence:
     provider: jdbc
   serialization:
@@ -27,8 +31,9 @@ atlas:
   workflow-repository:
     classpath:
       enabled: true
-
-org:
-  jobrunr:
-    background-job-server:
+    jdbc:
       enabled: true
+
+file:
+  storage:
+    provider: base64
