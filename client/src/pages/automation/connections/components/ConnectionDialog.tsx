@@ -616,7 +616,7 @@ const ConnectionDialog = ({
                             <div>
                                 <Alert
                                     text={
-                                        <p>
+                                        <>
                                             Excellent! You can connect and
                                             create the
                                             <span className="font-semibold">
@@ -627,7 +627,7 @@ const ConnectionDialog = ({
                                                 getValues()?.name
                                             }'`}</span>
                                             .
-                                        </p>
+                                        </>
                                     }
                                 />
 
