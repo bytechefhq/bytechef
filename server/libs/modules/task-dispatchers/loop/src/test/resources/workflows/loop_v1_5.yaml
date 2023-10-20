@@ -6,7 +6,7 @@ tasks:
     list: "${range(1,10)}"
     itemVar: "item1"
     iteratee:
-      type: "if/v1"
+      type: "condition/v1"
       parameters:
         conditions:
         - number:

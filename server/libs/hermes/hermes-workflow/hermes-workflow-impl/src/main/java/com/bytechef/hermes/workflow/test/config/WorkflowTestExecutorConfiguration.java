@@ -54,8 +54,8 @@ import com.bytechef.task.dispatcher.each.EachTaskDispatcher;
 import com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler;
 import com.bytechef.task.dispatcher.forkjoin.ForkJoinTaskDispatcher;
 import com.bytechef.task.dispatcher.forkjoin.completion.ForkJoinTaskCompletionHandler;
-import com.bytechef.task.dispatcher.if_.IfTaskDispatcher;
-import com.bytechef.task.dispatcher.if_.completion.IfTaskCompletionHandler;
+import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
+import com.bytechef.task.dispatcher.condition.completion.ConditionTaskCompletionHandler;
 import com.bytechef.task.dispatcher.loop.LoopBreakTaskDispatcher;
 import com.bytechef.task.dispatcher.loop.LoopTaskDispatcher;
 import com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
@@ -145,13 +145,13 @@ public class WorkflowTestExecutorConfiguration {
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new BranchTaskCompletionHandler(
                 contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
+            (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
+                contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
             (taskCompletionHandler, taskDispatcher) -> new EachTaskCompletionHandler(
                 taskExecutionService, taskCompletionHandler, counterService),
             (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
                 taskExecutionService, taskCompletionHandler, counterService, taskDispatcher, contextService,
                 taskEvaluator),
-            (taskCompletionHandler, taskDispatcher) -> new IfTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
             (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
                 contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
             (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(taskExecutionService,
@@ -185,12 +185,12 @@ public class WorkflowTestExecutorConfiguration {
         return List.of(
             (taskDispatcher) -> new BranchTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
+            (taskDispatcher) -> new ConditionTaskDispatcher(
+                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
             (taskDispatcher) -> new EachTaskDispatcher(
                 taskDispatcher, taskExecutionService, messageBroker, contextService, counterService, taskEvaluator),
             (taskDispatcher) -> new ForkJoinTaskDispatcher(
                 contextService, counterService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
-            (taskDispatcher) -> new IfTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
             (taskDispatcher) -> new LoopBreakTaskDispatcher(messageBroker, taskExecutionService),
             (taskDispatcher) -> new LoopTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),

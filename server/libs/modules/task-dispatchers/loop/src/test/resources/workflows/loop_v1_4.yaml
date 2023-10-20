@@ -13,7 +13,7 @@ tasks:
           type: "var"
           parameters:
             value: "${1 + item1}"
-        - type: "if/v1"
+        - type: "condition/v1"
           parameters:
             conditions:
             - number:

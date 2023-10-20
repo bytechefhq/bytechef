@@ -1,0 +1,24 @@
+---
+label: "If Task Boolean Operands"
+inputs:
+- name: "value1"
+  type: "string"
+  required: true
+- name: "value2"
+  type: "string"
+  required: true
+tasks:
+- type: "condition/v1"
+  parameters:
+    rawExpression: true
+    expression: "${value1 == value2 or value1 gt value2}"
+    caseTrue:
+    - name: "equalsResult"
+      type: "var"
+      parameters:
+        value: "true branch"
+    caseFalse:
+    - name: "equalsResult"
+      type: "var"
+      parameters:
+        value: "false branch"

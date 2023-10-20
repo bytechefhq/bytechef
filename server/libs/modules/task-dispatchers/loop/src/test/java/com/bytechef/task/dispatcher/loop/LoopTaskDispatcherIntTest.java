@@ -27,8 +27,8 @@ import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
-import com.bytechef.task.dispatcher.if_.IfTaskDispatcher;
-import com.bytechef.task.dispatcher.if_.completion.IfTaskCompletionHandler;
+import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
+import com.bytechef.task.dispatcher.condition.completion.ConditionTaskCompletionHandler;
 import com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
 import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
@@ -160,7 +160,7 @@ public class LoopTaskDispatcherIntTest {
         CounterService counterService, TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService) {
 
         return List.of(
-            (taskCompletionHandler, taskDispatcher) -> new IfTaskCompletionHandler(
+            (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
                 contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
             (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
                 contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
@@ -174,7 +174,7 @@ public class LoopTaskDispatcherIntTest {
         TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService) {
 
         return List.of(
-            (taskDispatcher) -> new IfTaskDispatcher(
+            (taskDispatcher) -> new ConditionTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
             (taskDispatcher) -> new LoopBreakTaskDispatcher(messageBroker, taskExecutionService),
             (taskDispatcher) -> new LoopTaskDispatcher(
