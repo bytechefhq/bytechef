@@ -83,7 +83,7 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
                 .host(redisProperties.getHost())
                 .password(redisProperties.getPassword())
                 .port(redisProperties.getPort())
-                .ssl(redisProperties.isSsl())
+//                .ssl(redisProperties.isSsl())
                 .timeout(getTimeout(redisProperties.getTimeout())));
     }
 
