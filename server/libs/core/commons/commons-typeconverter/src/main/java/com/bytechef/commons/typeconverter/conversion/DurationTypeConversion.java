@@ -19,30 +19,31 @@ package com.bytechef.commons.typeconverter.conversion;
 
 import com.bytechef.commons.typeconverter.TypeConverter;
 
+import java.time.Duration;
+
 /**
- * Convert to a boolean by parsing the value as a string
+ * Convert to a {@link Duration} by parsing a value as a string of form <code>PT[value]</code>.
  *
- * @author Todd Fast
+ * @author Ivica Cardic
  */
-public class BooleanTypeConversion implements TypeConverter.Conversion<Boolean> {
+public class DurationTypeConversion implements TypeConverter.Conversion<Duration> {
 
     @Override
     public Object[] getTypeKeys() {
         return new Object[] {
-            Boolean.class,
-            Boolean.TYPE,
-            Boolean.class.getName(),
-            TypeConverter.TYPE_BOOLEAN
+            Duration.class,
+            Duration.class.getName(),
+            TypeConverter.TYPE_DURATION
         };
     }
 
     @Override
-    public Boolean convert(Object value) {
+    public Duration convert(Object value) {
         if (value == null) {
             return null;
         }
 
-        if (!(value instanceof Boolean)) {
+        if (!(value instanceof Duration)) {
             String v = value.toString();
 
             v = v.trim();
@@ -50,10 +51,9 @@ public class BooleanTypeConversion implements TypeConverter.Conversion<Boolean> 
             if (v.length() == 0) {
                 value = null;
             } else {
-                value = Boolean.parseBoolean(v);
+                value = Duration.parse("PT" + value);
             }
         }
-
-        return (Boolean) value;
+        return (Duration) value;
     }
 }

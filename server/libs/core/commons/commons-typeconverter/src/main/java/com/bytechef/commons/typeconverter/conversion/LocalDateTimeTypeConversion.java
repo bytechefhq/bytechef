@@ -19,30 +19,33 @@ package com.bytechef.commons.typeconverter.conversion;
 
 import com.bytechef.commons.typeconverter.TypeConverter;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 /**
- * Convert to a boolean by parsing the value as a string
+ * Convert to a {@link LocalDateTime} by parsing a value as a string of form
+ * {@link DateTimeFormatter.ISO_LOCAL_DATE_TIME}.
  *
- * @author Todd Fast
+ * @author Ivica Cardic
  */
-public class BooleanTypeConversion implements TypeConverter.Conversion<Boolean> {
+public class LocalDateTimeTypeConversion implements TypeConverter.Conversion<LocalDateTime> {
 
     @Override
     public Object[] getTypeKeys() {
         return new Object[] {
-            Boolean.class,
-            Boolean.TYPE,
-            Boolean.class.getName(),
-            TypeConverter.TYPE_BOOLEAN
+            LocalDateTime.class,
+            LocalDateTime.class.getName(),
+            TypeConverter.TYPE_LOCAL_DATE_TIME
         };
     }
 
     @Override
-    public Boolean convert(Object value) {
+    public LocalDateTime convert(Object value) {
         if (value == null) {
             return null;
         }
 
-        if (!(value instanceof Boolean)) {
+        if (!(value instanceof LocalDateTime)) {
             String v = value.toString();
 
             v = v.trim();
@@ -50,10 +53,9 @@ public class BooleanTypeConversion implements TypeConverter.Conversion<Boolean> 
             if (v.length() == 0) {
                 value = null;
             } else {
-                value = Boolean.parseBoolean(v);
+                value = LocalDateTime.parse((String) value, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             }
         }
-
-        return (Boolean) value;
+        return (LocalDateTime) value;
     }
 }

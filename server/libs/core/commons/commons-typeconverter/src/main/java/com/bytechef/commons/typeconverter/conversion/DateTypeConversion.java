@@ -19,30 +19,37 @@ package com.bytechef.commons.typeconverter.conversion;
 
 import com.bytechef.commons.typeconverter.TypeConverter;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
- * Convert to a boolean by parsing the value as a string
+ * Convert to a {@link Date} by parsing a value as a string of form <code>yyyy-MM-dd'T'HH:mm:ss.SSSZ</code>.
  *
- * @author Todd Fast
+ * @see SimpleDateFormat#parse(String)
+ *
+ * @author Ivica Cardic
  */
-public class BooleanTypeConversion implements TypeConverter.Conversion<Boolean> {
+public class DateTypeConversion implements TypeConverter.Conversion<Date> {
+
+    private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
     @Override
     public Object[] getTypeKeys() {
         return new Object[] {
-            Boolean.class,
-            Boolean.TYPE,
-            Boolean.class.getName(),
-            TypeConverter.TYPE_BOOLEAN
+            Date.class,
+            Date.class.getName(),
+            TypeConverter.TYPE_DATE
         };
     }
 
     @Override
-    public Boolean convert(Object value) {
+    public Date convert(Object value) {
         if (value == null) {
             return null;
         }
 
-        if (!(value instanceof Boolean)) {
+        if (!(value instanceof Date)) {
             String v = value.toString();
 
             v = v.trim();
@@ -50,10 +57,15 @@ public class BooleanTypeConversion implements TypeConverter.Conversion<Boolean> 
             if (v.length() == 0) {
                 value = null;
             } else {
-                value = Boolean.parseBoolean(v);
+                SimpleDateFormat dateFormat = new SimpleDateFormat(TIMESTAMP_FORMAT);
+
+                try {
+                    value = dateFormat.parse((String) value);
+                } catch (ParseException parseException) {
+                    throw new RuntimeException(parseException);
+                }
             }
         }
-
-        return (Boolean) value;
+        return (Date) value;
     }
 }

@@ -1,3 +1,20 @@
+
+/*
+ * Copyright 2021 <your company/name>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.bytechef.commons.typeconverter;
 
 /**
@@ -5,29 +22,31 @@ package com.bytechef.commons.typeconverter;
  */
 public class StringWrapper {
 
-	public StringWrapper(String value) {
-		super();
-		this.value=value;
-	}
+    public StringWrapper(String value) {
+        super();
+        this.value = value;
+    }
 
-	public String toString() {
-		return getWrappedString(value);
-	}
+    public String toString() {
+        return getWrappedString(value);
+    }
 
-	public static String getWrappedString(String value) {
-		return "Wrapped value \""+value+"\"";
-	}
+    public static String getWrappedString(String value) {
+        return "Wrapped value \"" + value + "\"";
+    }
 
-	public static class TypeConversion implements TypeConverter.Conversion {
+    public static class TypeConversion implements TypeConverter.Conversion {
 
-		public Object[] getTypeKeys() {
-			return new Object[] { StringWrapper.class };
-		}
+        public Object[] getTypeKeys() {
+            return new Object[] {
+                StringWrapper.class
+            };
+        }
 
-		public Object convert(Object value) {
-			return new StringWrapper(value.toString());
-		}
-	}
+        public Object convert(Object value) {
+            return new StringWrapper(value.toString());
+        }
+    }
 
-	private String value;
+    private String value;
 }
