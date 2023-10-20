@@ -31,7 +31,6 @@ import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcherResolver;
 import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
-import com.integri.atlas.task.dispatcher.sequence.util.SequenceTaskUtil;
 import java.util.Date;
 import java.util.List;
 
