@@ -659,11 +659,11 @@ const ConnectionDialog = ({
                                         <>
                                             Excellent! You can connect and
                                             create the
-                                            <span className="font-semibold">
+                                            <span className="font-semibold mx-0.5">
                                                 {componentDefinition?.title}
                                             </span>
                                             connection under name
-                                            <span className="font-semibold">{`'${
+                                            <span className="mx-0.5 font-semibold">{`'${
                                                 getValues()?.name
                                             }'`}</span>
                                             .
