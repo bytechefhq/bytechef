@@ -31,6 +31,14 @@ import java.util.Base64;
 public class Base64FileStorageService implements FileStorageService {
 
     @Override
+    public void deleteFile(String url) throws FileStorageException {}
+
+    @Override
+    public boolean fileExists(String url) throws FileStorageException {
+        return true;
+    }
+
+    @Override
     public FileEntry storeFile(String fileName, String data) throws FileStorageException {
         Base64.Encoder encoder = Base64.getEncoder();
 
