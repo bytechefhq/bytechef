@@ -25,11 +25,11 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @author Ivica Cardic
  */
-public enum WorkflowFormatType {
+public enum WorkflowFormat {
     JSON,
     YAML;
 
-    public static WorkflowFormatType parse(String fileName) {
+    public static WorkflowFormat parse(String fileName) {
         return Objects.equals(StringUtils.lowerCase(FilenameUtils.getExtension(fileName)), "json") ? JSON : YAML;
     }
 }

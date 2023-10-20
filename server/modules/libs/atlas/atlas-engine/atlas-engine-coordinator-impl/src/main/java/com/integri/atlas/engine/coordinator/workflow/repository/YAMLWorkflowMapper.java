@@ -36,6 +36,6 @@ public class YAMLWorkflowMapper extends BaseWorkflowMapper implements WorkflowMa
 
     @Override
     public WorkflowMapper resolve(WorkflowResource workflowResource) {
-        return workflowResource.getFormatType() == WorkflowFormatType.YAML ? this : null;
+        return workflowResource.getWorkflowFormat() == WorkflowFormat.YAML ? this : null;
     }
 }

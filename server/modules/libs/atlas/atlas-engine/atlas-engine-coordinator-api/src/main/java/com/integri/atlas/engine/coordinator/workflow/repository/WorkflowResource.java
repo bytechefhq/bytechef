@@ -33,20 +33,20 @@ public class WorkflowResource implements Resource {
 
     private final String id;
     private final Resource resource;
-    private final WorkflowFormatType formatType;
+    private final WorkflowFormat workflowFormat;
 
-    public WorkflowResource(String id, Resource resource, WorkflowFormatType formatType) {
+    public WorkflowResource(String id, Resource resource, WorkflowFormat workflowFormat) {
         this.id = id;
         this.resource = resource;
-        this.formatType = formatType;
+        this.workflowFormat = workflowFormat;
     }
 
     public String getId() {
         return id;
     }
 
-    public WorkflowFormatType getFormatType() {
-        return formatType;
+    public WorkflowFormat getWorkflowFormat() {
+        return workflowFormat;
     }
 
     @Override

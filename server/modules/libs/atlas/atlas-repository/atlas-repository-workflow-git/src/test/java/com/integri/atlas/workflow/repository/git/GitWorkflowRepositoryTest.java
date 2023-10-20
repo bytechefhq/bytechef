@@ -19,7 +19,7 @@
 package com.integri.atlas.workflow.repository.git;
 
 import com.integri.atlas.engine.coordinator.workflow.Workflow;
-import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowFormatType;
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowFormat;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowResource;
 import com.integri.atlas.engine.coordinator.workflow.repository.YAMLWorkflowMapper;
 import com.integri.atlas.repository.workflow.git.GitOperations;
@@ -53,7 +53,7 @@ public class GitWorkflowRepositoryTest {
                 new WorkflowResource(
                     "samples/hello/123",
                     resolver.getResource("file:workflow/samples/hello.yaml"),
-                    WorkflowFormatType.YAML
+                    WorkflowFormat.YAML
                 )
             );
         }
@@ -63,7 +63,7 @@ public class GitWorkflowRepositoryTest {
             return new WorkflowResource(
                 "samples/hello/123",
                 resolver.getResource("file:workflow/samples/hello.yaml"),
-                WorkflowFormatType.YAML
+                WorkflowFormat.YAML
             );
         }
     }

@@ -43,7 +43,7 @@ public class WorkflowMapperChain implements WorkflowMapper {
         }
 
         throw new IllegalArgumentException(
-            "WorkflowMapper does not exist for format type " + workflowResource.getFormatType()
+            "WorkflowMapper does not exist for format type " + workflowResource.getWorkflowFormat()
         );
     }
 }

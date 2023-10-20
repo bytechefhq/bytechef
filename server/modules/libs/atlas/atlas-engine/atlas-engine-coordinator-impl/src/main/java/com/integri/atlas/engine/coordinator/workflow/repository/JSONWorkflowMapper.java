@@ -35,6 +35,6 @@ public class JSONWorkflowMapper extends BaseWorkflowMapper implements WorkflowMa
 
     @Override
     public WorkflowMapper resolve(WorkflowResource workflowResource) {
-        return workflowResource.getFormatType() == WorkflowFormatType.JSON ? this : null;
+        return workflowResource.getWorkflowFormat() == WorkflowFormat.JSON ? this : null;
     }
 }
