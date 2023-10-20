@@ -3,7 +3,6 @@ import { Dialog, Transition } from '@headlessui/react'
 import { CogIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import ThemeSwitcher from '../../components/ThemeSwitcher/ThemeSwitcher'
 import cx from 'classnames'
-import { Bars3BottomLeftIcon } from '@heroicons/react/24/solid'
 
 const navigation = [
   { name: 'Display', href: '#', icon: CogIcon, current: true }
@@ -30,7 +29,7 @@ export default function Settings() {
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <div className="fixed inset-0 bg-gray-600 bg-opacity-75" />
+              <div className="fixed inset-0 bg-gray-600" />
             </Transition.Child>
 
             <div className="fixed inset-0 z-40 flex">
@@ -88,7 +87,7 @@ export default function Settings() {
                             {/*    item.current*/}
                             {/*      ? 'text-blue-500'*/}
                             {/*      : 'text-gray-400 group-hover:text-gray-500',*/}
-                            {/*    'mr-4 h-6 w-6 flex-shrink-0'*/}
+                            {/*    'mr-4 h-6 w-6 shrink-0'*/}
                             {/*  )}*/}
                             {/*  aria-hidden="true"*/}
                             {/*/>*/}
@@ -100,7 +99,7 @@ export default function Settings() {
                   </div>
                 </Dialog.Panel>
               </Transition.Child>
-              <div className="w-14 flex-shrink-0" aria-hidden="true">
+              <div className="w-14 shrink-0" aria-hidden="true">
                 {/* Dummy element to force sidebar to shrink to fit close icon */}
               </div>
             </div>
@@ -110,13 +109,13 @@ export default function Settings() {
         {/* Static sidebar for desktop */}
         <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
           {/* Sidebar component, swap this element with another sidebar if you like */}
-          <nav className="flex flex-grow flex-col overflow-y-auto border-gray-200 bg-gray-50 pt-4 pb-4 dark:bg-gray-700">
-            <div className="flex flex-shrink-0 items-center px-4">
+          <nav className="flex grow flex-col overflow-y-auto border-gray-200 bg-gray-50 py-4 dark:bg-gray-700">
+            <div className="flex shrink-0 items-center px-4">
               <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-200">
                 Settings
               </h1>
             </div>
-            <div className="mt-5 flex-grow">
+            <div className="mt-5 grow">
               <div className="space-y-1">
                 {navigation.map((item) => (
                   <a
@@ -136,7 +135,7 @@ export default function Settings() {
                     {/*    item.current*/}
                     {/*      ? 'text-black dark:text-gray-300'*/}
                     {/*      : 'text-gray-400 group-hover:text-gray-500',*/}
-                    {/*    'mr-3 h-6 w-6 flex-shrink-0'*/}
+                    {/*    'mr-3 h-6 w-6 shrink-0'*/}
                     {/*  )}*/}
                     {/*  aria-hidden="true"*/}
                     {/*/>*/}
@@ -151,7 +150,7 @@ export default function Settings() {
         {/* Content area */}
         <div className="md:pl-64">
           <div className="mx-auto flex flex-col sm:px-6 md:px-8">
-            {/*<div className="sticky top-0 z-10 flex h-16 flex-shrink-0 border-b border-gray-200 bg-white">*/}
+            {/*<div className="sticky top-0 z-10 flex h-16 shrink-0 border-b border-gray-200 bg-white">*/}
             {/*  <button*/}
             {/*    type="button"*/}
             {/*    className="border-gray-200 px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500 md:hidden"*/}
@@ -181,7 +180,7 @@ export default function Settings() {
                                 Appearance
                               </dt>
                               <dd className="mt-1 flex text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                                <span className="flex-grow">
+                                <span className="grow">
                                   <ThemeSwitcher />
                                 </span>
                               </dd>
