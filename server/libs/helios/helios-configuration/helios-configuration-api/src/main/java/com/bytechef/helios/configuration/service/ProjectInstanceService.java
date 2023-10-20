@@ -34,8 +34,6 @@ public interface ProjectInstanceService {
 
     Optional<ProjectInstance> fetchJobProjectInstance(long jobId);
 
-    ProjectInstance getJobProjectInstance(long jobId);
-
     ProjectInstance getProjectInstance(long id);
 
     List<Long> getProjectIds();

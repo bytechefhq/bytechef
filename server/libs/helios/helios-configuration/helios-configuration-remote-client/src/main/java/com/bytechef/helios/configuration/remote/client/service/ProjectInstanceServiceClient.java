@@ -65,11 +65,6 @@ public class ProjectInstanceServiceClient implements ProjectInstanceService {
     }
 
     @Override
-    public ProjectInstance getJobProjectInstance(long jobId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public ProjectInstance getProjectInstance(long id) {
         throw new UnsupportedOperationException();
     }
