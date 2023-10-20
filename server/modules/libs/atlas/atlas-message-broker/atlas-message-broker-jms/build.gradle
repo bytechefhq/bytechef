@@ -1,6 +1,6 @@
 dependencies {
+    api project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
+
     implementation "javax.jms:javax.jms-api"
     implementation "org.springframework:spring-jms"
-    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-coordinator-api")
-    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
 }

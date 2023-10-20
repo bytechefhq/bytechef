@@ -1,5 +1,5 @@
 dependencies {
+    api project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
+
     implementation "org.springframework.kafka:spring-kafka"
-    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-coordinator-api")
-    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
 }

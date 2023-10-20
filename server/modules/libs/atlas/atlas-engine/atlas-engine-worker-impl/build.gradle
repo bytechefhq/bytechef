@@ -6,11 +6,14 @@ dependencies {
     implementation "org.apache.commons:commons-lang3"
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-context"
-    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-impl")
+    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
+    implementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
+    implementation project(":modules:libs:atlas:atlas-task-dispatcher:atlas-task-dispatcher-map")
 
     testImplementation "mysql:mysql-connector-java"
     testImplementation "org.apache.commons:commons-lang3"
     testImplementation "org.springframework:spring-jdbc"
     testImplementation "org.springframework.security:spring-security-core"
     testImplementation "org.springframework.boot:spring-boot-starter-jdbc"
+    testImplementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-impl")
 }

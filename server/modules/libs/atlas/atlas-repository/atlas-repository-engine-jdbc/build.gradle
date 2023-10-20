@@ -1,9 +1,9 @@
 dependencies {
+    api project(":modules:libs:atlas:atlas-engine:atlas-engine-coordinator-api")
     api project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
 
     implementation "org.springframework:spring-jdbc"
-    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-coordinator-api")
-    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-impl")
+    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
 
     runtimeOnly "org.postgresql:postgresql"
     runtimeOnly "mysql:mysql-connector-java"
@@ -14,4 +14,5 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
     testImplementation "org.testcontainers:mysql"
     testImplementation "org.testcontainers:postgresql"
+    testImplementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-impl")
 }
