@@ -994,6 +994,45 @@ public class RestComponentGenerator {
         return requestBodyPropertiesEntry;
     }
 
+    private CodeBlock getAdditionalPropertiesCodeBlock(String propertyName, Schema<?> schema, boolean outputEntry) {
+        CodeBlock.Builder builder = CodeBlock.builder();
+
+        if (schema.getAdditionalProperties() instanceof Boolean) {
+            builder.add(
+                "object($S).additionalProperties($L)",
+                propertyName,
+                schema.getAdditionalProperties());
+        } else {
+            Schema additionalPropertiesSchema = (Schema) schema.getAdditionalProperties();
+
+            if (additionalPropertiesSchema.get$ref() == null) {
+                builder.add(
+                    "object($S).additionalProperties($L())",
+                    propertyName,
+                    getAdditionalPropertiesItemType(additionalPropertiesSchema));
+            } else {
+                String ref = additionalPropertiesSchema.get$ref();
+
+                String curSchemaName = ref.replace("#/components/schemas/", "");
+
+                schemas.add(curSchemaName);
+
+                builder.add(
+                    "object($S).additionalProperties(object().properties($L))",
+                    propertyName,
+                    CodeBlock.of(
+                        "$T.COMPONENT_SCHEMA",
+                        ClassName.get(getPackageName() + ".schema", curSchemaName + "Schema")));
+            }
+        }
+
+        if (!outputEntry) {
+            builder.add(".placeholder($S)", "Add");
+        }
+
+        return builder.build();
+    }
+
     @SuppressWarnings("rawtypes")
     private String getAdditionalPropertiesItemType(Schema additionalPropertiesSchema) {
         String additionalPropertiesSchemaType = additionalPropertiesSchema.getType() == null ? "object"
@@ -1136,38 +1175,7 @@ public class RestComponentGenerator {
 
                         builder.add("object($S).properties($L)", propertyName, propertiesCodeBlock);
                     } else if (schema.getAdditionalProperties() != null) {
-                        if (schema.getAdditionalProperties() instanceof Boolean) {
-                            builder.add(
-                                "object($S).additionalProperties($L)",
-                                propertyName,
-                                schema.getAdditionalProperties());
-                        } else {
-                            Schema additionalPropertiesSchema = (Schema) schema.getAdditionalProperties();
-
-                            if (additionalPropertiesSchema.get$ref() == null) {
-                                builder.add(
-                                    "object($S).additionalProperties($L())",
-                                    propertyName,
-                                    getAdditionalPropertiesItemType(additionalPropertiesSchema));
-                            } else {
-                                String $ref = additionalPropertiesSchema.get$ref();
-
-                                String curSchemaName = $ref.replace("#/components/schemas/", "");
-
-                                schemas.add(curSchemaName);
-
-                                builder.add(
-                                    "object($S).additionalProperties(object().properties($L))",
-                                    propertyName,
-                                    CodeBlock.of(
-                                        "$T.COMPONENT_SCHEMA",
-                                        ClassName.get(getPackageName() + ".schema", curSchemaName + "Schema")));
-                            }
-                        }
-
-                        if (!outputEntry) {
-                            builder.add(".placeholder($S)", "Add");
-                        }
+                        builder.add(getAdditionalPropertiesCodeBlock(propertyName, schema, outputEntry));
                     } else {
                         builder.add("object($S)", propertyName);
                     }
@@ -1224,12 +1232,12 @@ public class RestComponentGenerator {
                 }
             }
         } else {
-            String $ref = schema.get$ref();
+            String ref = schema.get$ref();
             Components components = openAPI.getComponents();
 
             Map<String, Schema> schemaMap = components.getSchemas();
 
-            String curSchemaName = $ref.replace("#/components/schemas/", "");
+            String curSchemaName = ref.replace("#/components/schemas/", "");
 
             schemas.add(curSchemaName);
 
