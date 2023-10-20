@@ -27,6 +27,7 @@ import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.util.Files;
@@ -35,7 +36,6 @@ import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Base64Utils;
 
 /**
  * @author Ivica Cardic
@@ -54,7 +54,8 @@ public class JsonFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_array.json");
 
         Job job = workflowExecutor.execute(
-            Base64Utils.encodeToString("jsonfile_v1_read".getBytes(StandardCharsets.UTF_8)),
+            Base64.getEncoder()
+                .encodeToString("jsonfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
                 fileStorageService
@@ -76,7 +77,8 @@ public class JsonFileComponentHandlerIntTest {
     @Test
     public void testWrite() throws JSONException {
         Job job = workflowExecutor.execute(
-            Base64Utils.encodeToString("jsonfile_v1_write".getBytes(StandardCharsets.UTF_8)),
+            Base64.getEncoder()
+                .encodeToString("jsonfile_v1_write".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "source",
                 new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)).toList()));
@@ -91,7 +93,8 @@ public class JsonFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_array.json");
 
         job = workflowExecutor.execute(
-            Base64Utils.encodeToString("jsonfile_v1_read".getBytes(StandardCharsets.UTF_8)),
+            Base64.getEncoder()
+                .encodeToString("jsonfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
                 fileStorageService

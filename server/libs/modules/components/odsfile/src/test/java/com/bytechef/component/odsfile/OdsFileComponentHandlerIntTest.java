@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.util.Files;
@@ -37,7 +38,6 @@ import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Base64Utils;
 
 /**
  * @author Ivica Cardic
@@ -56,7 +56,8 @@ public class OdsFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_header.ods");
 
         Job job = workflowExecutor.execute(
-            Base64Utils.encodeToString("odsfile_v1_read".getBytes(StandardCharsets.UTF_8)),
+            Base64.getEncoder()
+                .encodeToString("odsfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
                 fileStorageService
@@ -76,7 +77,8 @@ public class OdsFileComponentHandlerIntTest {
     @Test
     public void testWrite() throws IOException, JSONException {
         Job job = workflowExecutor.execute(
-            Base64Utils.encodeToString("odsfile_v1_write".getBytes(StandardCharsets.UTF_8)),
+            Base64.getEncoder()
+                .encodeToString("odsfile_v1_write".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "rows",
                 new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)).toList()));
@@ -91,7 +93,8 @@ public class OdsFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_header.ods");
 
         job = workflowExecutor.execute(
-            Base64Utils.encodeToString("odsfile_v1_read".getBytes(StandardCharsets.UTF_8)),
+            Base64.getEncoder()
+                .encodeToString("odsfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
                 fileStorageService

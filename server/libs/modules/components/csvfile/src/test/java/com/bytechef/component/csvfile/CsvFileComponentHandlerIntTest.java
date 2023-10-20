@@ -27,6 +27,7 @@ import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.util.Files;
@@ -34,7 +35,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Base64Utils;
 
 /**
  * @author Ivica Cardic
@@ -53,7 +53,8 @@ public class CsvFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_header.csv");
 
         Job job = workflowExecutor.execute(
-            Base64Utils.encodeToString("csvfile_v1_read".getBytes(StandardCharsets.UTF_8)),
+            Base64.getEncoder()
+                .encodeToString("csvfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
                 fileStorageService
@@ -75,7 +76,8 @@ public class CsvFileComponentHandlerIntTest {
     @Test
     public void testWrite() throws JSONException {
         Job job = workflowExecutor.execute(
-            Base64Utils.encodeToString("csvfile_v1_write".getBytes(StandardCharsets.UTF_8)),
+            Base64.getEncoder()
+                .encodeToString("csvfile_v1_write".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "rows",
                 new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)).toList()));
@@ -90,7 +92,8 @@ public class CsvFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_header.csv");
 
         job = workflowExecutor.execute(
-            Base64Utils.encodeToString("csvfile_v1_read".getBytes(StandardCharsets.UTF_8)),
+            Base64.getEncoder()
+                .encodeToString("csvfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
                 fileStorageService
