@@ -65,7 +65,7 @@ public class HttpBodyFactory {
             } else if (taskExecution.getBoolean(PROPERTY_RAW_PARAMETERS, false)) {
                 return HttpRequest.BodyPublishers.ofString(
                     fromBodyParameters(
-                        jsonHelper.checkJSONObject(taskExecution.get(PROPERTY_BODY_PARAMETERS), String.class),
+                        jsonHelper.checkObject(taskExecution.get(PROPERTY_BODY_PARAMETERS), String.class),
                         (String value) -> value
                     )
                 );

@@ -49,7 +49,7 @@ public class XMLConverterTaskHandler implements TaskHandler<Object> {
 
             return xmlHelper.read(input);
         } else {
-            Object input = jsonHelper.checkJSON(taskExecution.getRequired(PROPERTY_INPUT));
+            Object input = jsonHelper.check(taskExecution.getRequired(PROPERTY_INPUT));
 
             return xmlHelper.write(input);
         }

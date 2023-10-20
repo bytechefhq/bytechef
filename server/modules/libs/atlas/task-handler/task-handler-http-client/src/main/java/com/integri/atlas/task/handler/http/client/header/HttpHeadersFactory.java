@@ -103,7 +103,7 @@ public class HttpHeadersFactory {
             if (taskExecution.getBoolean(PROPERTY_RAW_PARAMETERS, false)) {
                 httpHeaders.addAll(
                     fromHeaderParameters(
-                        jsonHelper.checkJSONObject(taskExecution.get(PROPERTY_HEADER_PARAMETERS), String.class),
+                        jsonHelper.checkObject(taskExecution.get(PROPERTY_HEADER_PARAMETERS), String.class),
                         (String value) -> value
                     )
                 );
