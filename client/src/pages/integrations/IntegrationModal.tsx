@@ -19,7 +19,7 @@ import {
 } from '../../data-access/integration';
 import {useIntegrationMutation} from '../../mutations/integrations.mutations';
 
-const IntegrationModal: React.FC = () => {
+const IntegrationModal = () => {
     const [isOpen, setIsOpen] = useState(false);
 
     const {control, getValues, setValue, handleSubmit, reset} = useForm({

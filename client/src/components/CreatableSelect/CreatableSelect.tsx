@@ -15,14 +15,14 @@ type CreatableSelectProps = {
     onCreateOption?: (value: string) => void;
 } & Props;
 
-const CreatableSelect: React.FC<CreatableSelectProps> = ({
+const CreatableSelect = ({
     error,
     label,
     className,
     name,
     ...props
-}) => (
-    <fieldset className="mb-3">
+}: CreatableSelectProps) => (
+    <fieldset className={label ? 'mb-3' : ''}>
         {label && (
             <label
                 htmlFor={name}
@@ -34,7 +34,7 @@ const CreatableSelect: React.FC<CreatableSelectProps> = ({
 
         <div
             className={cx([
-                'mt-1 ',
+                label ? 'mt-1' : '',
                 error ? 'relative rounded-md shadow-sm' : null,
             ])}
         >

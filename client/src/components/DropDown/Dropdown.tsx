@@ -21,11 +21,11 @@ export const Dropdown: React.FC<{
     menuItems: DropDownMenuItem[];
 }> = ({id = 0, menuItems}) => {
     return (
-        <div className="absolute right-0 top-0">
+        <div>
             <Root>
                 <Trigger asChild>
-                    <div className="invisible flex h-8 w-7 items-center justify-center rounded hover:bg-gray-100 group-hover:visible">
-                        <DotsVerticalIcon className="h-3 w-3 hover:cursor-pointer dark:text-white" />
+                    <div className="flex h-8 w-7 items-center justify-center rounded hover:bg-gray-100">
+                        <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer dark:text-white" />
                     </div>
                 </Trigger>
 
@@ -40,7 +40,7 @@ export const Dropdown: React.FC<{
                         {menuItems.map(({label, separator}, i) => (
                             <div key={`menu-item-${i}`}>
                                 {!separator && (
-                                    <Item className="flex cursor-default select-none items-center rounded-md px-4 py-2 text-sm text-gray-400 outline-none hover:cursor-pointer focus:bg-gray-50 dark:text-gray-500 dark:focus:bg-gray-900">
+                                    <Item className="flex cursor-default select-none items-center rounded-md px-4 py-2 text-xs text-gray-400 outline-none hover:cursor-pointer focus:bg-gray-50 dark:text-gray-500 dark:focus:bg-gray-900">
                                         <span className="grow text-gray-700 dark:text-gray-300">
                                             {label}
                                         </span>
