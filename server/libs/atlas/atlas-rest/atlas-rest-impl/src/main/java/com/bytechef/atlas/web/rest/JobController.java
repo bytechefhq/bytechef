@@ -30,6 +30,7 @@ import com.bytechef.atlas.web.rest.model.JobModel;
 import com.bytechef.atlas.web.rest.model.JobParametersModel;
 import com.bytechef.atlas.web.rest.model.TaskExecutionModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
+import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
@@ -57,10 +58,9 @@ public class JobController implements JobsApi {
 
     @SuppressFBWarnings("EI2")
     public JobController(
-        ConversionService conversionService,
-        JobFactory jobFactory, JobService jobService,
-        MessageBroker messageBroker,
-        TaskExecutionService taskExecutionService) {
+        ConversionService conversionService, JobFactory jobFactory, JobService jobService,
+        MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
+
         this.conversionService = conversionService;
         this.jobFactory = jobFactory;
         this.jobService = jobService;
@@ -112,8 +112,7 @@ public class JobController implements JobsApi {
     @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<JobModel>> getLatestJob(ServerWebExchange exchange) {
         return Mono.just(
-            conversionService.convert(jobService.fetchLatestJob()
-                .orElse(null), JobModel.class))
+            conversionService.convert(OptionalUtils.orElse(jobService.fetchLatestJob(), null), JobModel.class))
             .map(ResponseEntity::ok);
     }
 

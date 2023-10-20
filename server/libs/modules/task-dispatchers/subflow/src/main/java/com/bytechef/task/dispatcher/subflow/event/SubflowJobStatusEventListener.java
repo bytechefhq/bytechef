@@ -62,9 +62,7 @@ public class SubflowJobStatusEventListener implements EventListener {
 
     @Override
     public void onApplicationEvent(WorkflowEvent workflowEvent) {
-        String type = workflowEvent.getType();
-
-        if (type.equals(JobStatusWorkflowEvent.JOB_STATUS)) {
+        if (JobStatusWorkflowEvent.JOB_STATUS.equals(workflowEvent.getType())) {
             JobStatusWorkflowEvent jobStatusWorkflowEvent = (JobStatusWorkflowEvent) workflowEvent;
 
             Job.Status status = jobStatusWorkflowEvent.getJobStatus();
@@ -87,8 +85,8 @@ public class SubflowJobStatusEventListener implements EventListener {
                     break;
                 }
                 case FAILED: {
-                    TaskExecution erroredTaskExecution = taskExecutionService
-                        .getTaskExecution(job.getParentTaskExecutionId());
+                    TaskExecution erroredTaskExecution = taskExecutionService.getTaskExecution(
+                        job.getParentTaskExecutionId());
 
                     erroredTaskExecution.setError(new ExecutionError("An error occurred with subflow", List.of()));
 

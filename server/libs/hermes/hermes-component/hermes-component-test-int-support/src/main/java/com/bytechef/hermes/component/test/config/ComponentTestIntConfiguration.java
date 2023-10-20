@@ -130,7 +130,7 @@ public class ComponentTestIntConfiguration {
         }
 
         @Bean
-        JobService jobService(List<WorkflowRepository> workflowRepositories, ObjectMapper objectMapper) {
+        JobService jobService(ObjectMapper objectMapper, List<WorkflowRepository> workflowRepositories) {
             return new JobServiceImpl(
                 new InMemoryJobRepository(taskExecutionRepository(), objectMapper), workflowRepositories);
         }
@@ -147,8 +147,8 @@ public class ComponentTestIntConfiguration {
 
         @Bean
         WorkflowService workflowService(List<WorkflowRepository> workflowRepositories) {
-            return new WorkflowServiceImpl(new ConcurrentMapCacheManager(), Collections.emptyList(),
-                workflowRepositories);
+            return new WorkflowServiceImpl(
+                new ConcurrentMapCacheManager(), Collections.emptyList(), workflowRepositories);
         }
 
         @Bean
