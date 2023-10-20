@@ -17,14 +17,12 @@
 
 package com.bytechef.worker;
 
-import com.bytechef.test.annotation.EmbeddedSql;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
 @SpringBootTest
 public class WorkerApplicationIntTest {
 

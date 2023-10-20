@@ -17,7 +17,6 @@
 
 package com.bytechef.connection;
 
-import com.bytechef.test.annotation.EmbeddedRedis;
 import com.bytechef.test.annotation.EmbeddedSql;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,7 +24,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 /**
  * @author Ivica Cardic
  */
-@EmbeddedRedis
 @EmbeddedSql
 @SpringBootTest
 public class ConnectionApplicationIntTest {
