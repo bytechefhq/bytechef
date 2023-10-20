@@ -17,7 +17,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.oauth2.config;
+package com.bytechef.hermes.connection.config;
 
 import com.bytechef.hermes.component.definition.Authorization;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

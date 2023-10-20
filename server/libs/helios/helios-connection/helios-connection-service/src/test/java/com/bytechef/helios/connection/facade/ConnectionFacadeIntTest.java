@@ -27,7 +27,7 @@ import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowRepos
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowServiceImpl;
 import com.bytechef.hermes.connection.service.ConnectionServiceImpl;
-import com.bytechef.oauth2.config.OAuth2Properties;
+import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;

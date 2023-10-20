@@ -40,6 +40,20 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Connection"
+  /connection-oauth2-properties:
+    get:
+      description: "Get OAuth2 properties."
+      summary: "Get OAuth2 properties"
+      tags:
+      - "connection-oauth2-properties"
+      operationId: "getOAuth2Properties"
+      responses:
+        "200":
+          description: "The OAuth2Properties object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuth2Properties"
   /connection-tags:
     get:
       description: "Get connection tags."
@@ -265,6 +279,18 @@ components:
         __version:
           type: "integer"
           format: "int32"
+    OAuth2Properties:
+      properties:
+        redirectUri:
+          description: "The redirect URI used for OAuth2 callback URL."
+          type: "string"
+          readOnly: true
+        predefinedApps:
+          description: "The list of predefined OAuth2 apps."
+          type: "array"
+          readOnly: true
+          items:
+            type: "string"
     UpdateTagsRequest:
       description: "The request object that contains the array of tags."
       type: "object"

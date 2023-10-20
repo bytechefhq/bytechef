@@ -43,7 +43,6 @@ dependencies {
     implementation project(":server:libs:core:message-broker:message-broker-jms")
     implementation project(":server:libs:core:message-broker:message-broker-kafka")
     implementation project(":server:libs:core:message-broker:message-broker-redis")
-    implementation project(":server:libs:core:oauth2:oauth2-rest")
     implementation project(":server:libs:core:rest:rest-impl")
     implementation project(":server:libs:core:tag:tag-rest:tag-rest-impl")
     implementation project(":server:libs:core:tag:tag-service")
