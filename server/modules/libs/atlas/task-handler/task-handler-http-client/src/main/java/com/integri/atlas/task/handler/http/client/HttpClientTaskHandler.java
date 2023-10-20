@@ -21,11 +21,19 @@ import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.handler.http.client.authentication.HttpAuthenticationFactory;
+import com.integri.atlas.task.handler.http.client.header.ContentType;
 import com.integri.atlas.task.handler.http.client.header.HttpHeadersFactory;
 import com.integri.atlas.task.handler.http.client.params.QueryParamsFactory;
 import com.integri.atlas.task.handler.http.client.response.HttpResponseHandler;
+import java.io.InputStream;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 
 @Component("httpClient")
 public class HttpClientTaskHandler implements TaskHandler<Object> {
@@ -45,23 +53,24 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
     }
 
     @Override
-    public Object handle(TaskExecution aTask) throws Exception {
+    public Object handle(TaskExecution taskExecution) throws Exception {
         IntegriHttpClient integriHttpClient = new IntegriHttpClient(
             httpAuthenticationFactory.create(
-                aTask.getRequiredString("authenticationType"),
-                aTask.get("credentials", MapObject.class)
+                taskExecution.getRequiredString("authenticationType"),
+                taskExecution.get("credentials", MapObject.class)
             ),
-            aTask.getLong("timeout", 10000)
+            taskExecution.getLong("timeout", 10000)
         );
 
         HttpResponse httpResponse = integriHttpClient.send(
-            aTask.getRequiredString("requestMethod"),
-            resolveURI(aTask.getRequiredString("uri"), queryParamsFactory.getQueryParams(aTask)),
-            httpHeadersFactory.getHttpHeaders(aTask),
-            getBody(aTask)
+            taskExecution.getRequiredString("requestMethod"),
+            resolveURI(taskExecution.getRequiredString("uri"), queryParamsFactory.getQueryParams(taskExecution)),
+            httpHeadersFactory.getHttpHeaders(taskExecution),
+            getBodyPublisher(taskExecution),
+            getBodyHandler(taskExecution)
         );
 
-        return httpResponseHandler.handle(aTask, httpResponse);
+        return httpResponseHandler.handle(taskExecution, httpResponse);
     }
 
     private String resolveURI(String uri, String queryParameters) {
@@ -72,12 +81,45 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
         return uri + '?' + queryParameters;
     }
 
-    private String getBody(TaskExecution aTask) {
-        if (aTask.containsKey("bodyParametersRaw")) {
-            return jsonHelper.serialize(aTask.get("bodyParametersRaw"));
-        } else if (aTask.containsKey("bodyParametersKeyValue")) {}
+    private HttpRequest.BodyPublisher getBodyPublisher(TaskExecution taskExecution) {
+        if (taskExecution.containsKey("bodyParametersRaw")) {
+            return HttpRequest.BodyPublishers.ofString(taskExecution.get("bodyParametersRaw"));
+        } else if (taskExecution.containsKey("bodyParametersKeyValue")) {
+            MultiValueMap<String, String> bodyParameters = taskExecution.get(
+                "bodyParametersKeyValue",
+                MultiValueMap.class
+            );
 
-        return "";
+            List<String> bodyParametersList = new ArrayList<>();
+
+            StringBuilder sb = new StringBuilder();
+
+            for (Map.Entry<String, List<String>> entry : bodyParameters.entrySet()) {
+                sb.append(entry.getKey());
+                sb.append("=");
+                sb.append(StringUtils.join(entry.getValue(), ","));
+
+                bodyParametersList.add(sb.toString());
+            }
+
+            return HttpRequest.BodyPublishers.ofString(StringUtils.join(bodyParametersList, "&"));
+        }
+
+        return HttpRequest.BodyPublishers.noBody();
+    }
+
+    private HttpResponse.BodyHandler getBodyHandler(TaskExecution taskExecution) {
+        if (!taskExecution.containsKey("responseFormat")) {
+            return HttpResponse.BodyHandlers.discarding();
+        }
+
+        ContentType contentType = ContentType.valueOf(taskExecution.getString("responseFormat"));
+
+        if (contentType == ContentType.BINARY) {
+            return HttpResponse.BodyHandlers.ofInputStream();
+        }
+
+        return HttpResponse.BodyHandlers.ofString();
     }
 
     private final HttpAuthenticationFactory httpAuthenticationFactory;

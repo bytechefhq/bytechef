@@ -46,10 +46,16 @@ public class IntegriHttpClient {
                 .build();
     }
 
-    public HttpResponse send(String httpMethod, String uri, List<HttpHeader> headers, String body) throws Exception {
+    public HttpResponse send(
+        String httpMethod,
+        String uri,
+        List<HttpHeader> headers,
+        HttpRequest.BodyPublisher bodyPublisher,
+        HttpResponse.BodyHandler bodyHandler
+    ) throws Exception {
         HttpRequest.Builder httpRequestBuilder = HttpRequest
             .newBuilder()
-            .method(httpMethod, HttpRequest.BodyPublishers.ofString(body))
+            .method(httpMethod, bodyPublisher)
             .uri(URI.create(uri))
             .header("Authorization", httpAuthentication.getAuthorizationHeader());
 
@@ -57,7 +63,7 @@ public class IntegriHttpClient {
             httpRequestBuilder.header(httpHeader.getName(), httpHeader.getValue());
         }
 
-        return httpClient.send(httpRequestBuilder.build(), HttpResponse.BodyHandlers.ofString());
+        return httpClient.send(httpRequestBuilder.build(), bodyHandler);
     }
 
     private final HttpClient httpClient;

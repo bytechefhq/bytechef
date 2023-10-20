@@ -20,6 +20,7 @@ import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.task.handler.http.client.header.ContentType;
+import java.io.InputStream;
 import java.net.http.HttpResponse;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -36,7 +37,7 @@ public class HttpResponseHandler {
     }
 
     public Object handle(TaskExecution taskExecution, HttpResponse httpResponse) {
-        boolean fullResponse = taskExecution.getBoolean("fullResponse");
+        boolean fullResponse = taskExecution.getBoolean("fullResponse", false);
 
         String responseFormat = taskExecution.getString("responseFormat");
 
@@ -51,7 +52,7 @@ public class HttpResponseHandler {
         } else if (contentType == ContentType.STRING) {
             return httpResponse.body().toString();
         } else if (contentType == ContentType.BINARY) {
-            //			fileStorageService.storeFile();
+            return fileStorageService.storeFileContent("Moj-File", (InputStream) httpResponse.body());
         }
 
         throw new IllegalArgumentException("Invalid response format " + responseFormat);
