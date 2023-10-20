@@ -21,6 +21,7 @@ import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.commons.utils.ExceptionUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +29,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -42,53 +42,53 @@ import org.springframework.util.FileCopyUtils;
 public abstract class AbstractWorkflowMapper implements WorkflowMapper {
 
     public Workflow readValue(WorkflowResource workflowResource, ObjectMapper objectMapper) {
-        Workflow workflow = null;
+        Workflow workflow;
 
         try {
-            Map<String, Object> jsonMap = parse(workflowResource, objectMapper);
+            String definition = readDefinition(workflowResource);
 
-            jsonMap.put(WorkflowConstants.ID, workflowResource.getId());
+            Map<String, Object> workflowMap = parse(definition, objectMapper);
 
-            workflow = new Workflow(jsonMap);
+            workflow = new Workflow(
+                workflowResource.getId(), workflowResource.getWorkflowFormat(), definition, workflowMap);
         } catch (Exception e) {
-            workflow = new Workflow(Collections.singletonMap(WorkflowConstants.ID, workflowResource.getId()));
-
-            workflow.setError(new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
+            workflow = new Workflow(
+                workflowResource.getId(),
+                new ExecutionError(e.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(e))));
         }
-
-        workflow.setFormat(workflowResource.getWorkflowFormat());
 
         return workflow;
     }
 
-    private Map<String, Object> parse(Resource resource, ObjectMapper objectMapper) {
+    private Map<String, Object> parse(String workflow, ObjectMapper objectMapper) throws JsonProcessingException {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> workflowMap = objectMapper.readValue(workflow, Map.class);
+
+        validate(workflowMap);
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> rawTasks = (List<Map<String, Object>>) workflowMap.get(WorkflowConstants.TASKS);
+
+        Assert.notNull(rawTasks, "no tasks found");
+
+        List<Map<String, Object>> tasks = new ArrayList<>();
+
+        for (int i = 0; i < rawTasks.size(); i++) {
+            Map<String, Object> rawTask = rawTasks.get(i);
+
+            rawTask.put(WorkflowConstants.TASK_NUMBER, i + 1);
+
+            tasks.add(rawTask);
+        }
+
+        workflowMap.put(WorkflowConstants.TASKS, tasks);
+
+        return workflowMap;
+    }
+
+    private String readDefinition(Resource resource) throws IOException {
         try (InputStream in = resource.getInputStream()) {
-            String workflow = FileCopyUtils.copyToString(new InputStreamReader(in, StandardCharsets.UTF_8));
-            @SuppressWarnings("unchecked")
-            Map<String, Object> workflowMap = objectMapper.readValue(workflow, Map.class);
-
-            validate(workflowMap);
-
-            @SuppressWarnings("unchecked")
-            List<Map<String, Object>> rawTasks = (List<Map<String, Object>>) workflowMap.get(WorkflowConstants.TASKS);
-
-            Assert.notNull(rawTasks, "no tasks found");
-
-            List<Map<String, Object>> tasks = new ArrayList<>();
-
-            for (int i = 0; i < rawTasks.size(); i++) {
-                Map<String, Object> rawTask = rawTasks.get(i);
-
-                rawTask.put(WorkflowConstants.TASK_NUMBER, i + 1);
-
-                tasks.add(rawTask);
-            }
-
-            workflowMap.put(WorkflowConstants.TASKS, tasks);
-
-            return workflowMap;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            return FileCopyUtils.copyToString(new InputStreamReader(in, StandardCharsets.UTF_8));
         }
     }
 
