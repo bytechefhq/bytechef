@@ -29,12 +29,12 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
-public class ConnectionOAuth2PropertiesController implements ConnectionOauth2PropertiesApi {
+public class OAuth2PropertiesController implements Oauth2PropertiesApi {
 
     private final OAuth2Properties oAuth2Properties;
 
     @SuppressFBWarnings("EI")
-    public ConnectionOAuth2PropertiesController(OAuth2Properties oAuth2Properties) {
+    public OAuth2PropertiesController(OAuth2Properties oAuth2Properties) {
         this.oAuth2Properties = oAuth2Properties;
     }
 
