@@ -36,9 +36,7 @@ Get response from REST API endpoint and print response content in log.
       uri: ${apiEndpointUrl}
       responseFormat: JSON
       headerParameters:
-      -
-        key: Authorization
-        value: Basic ${apiToken}
+        Authorization: Basic ${apiToken}
 
     - type: logger/v1/info
       name: loggHttpResponse
@@ -67,27 +65,24 @@ Execution flow performs two steps in `tasks` list. The later step is `logger/v1/
     uri: ${apiEndpointUrl}
     responseFormat: JSON
     headerParameters:
-      -
-        key: Authorization
-        value: Basic ${apiToken}
+      Authorization:
+        - Basic ${apiToken}
 ```` 
-Header parameters are passed in yaml array form where each parameter is one array element in form of:
+Header parameters are passed in yaml map form where each parameter is key-value element where key is header name and value is array of header values:
 ````
-  -
-    key: [HEADER_NAME]
-    value: [HEADER_VALUE]
+  [HEADER_NAME]:
+    - [HEADER_VALUE_1]
+    - [HEADER_VALUE_2]
 ````
 This is valid array example:
 ````
-  -
-    key: Authorization
-    value: Basic ${apiToken}
-  -
-    key: ContentType
-    value: application/json
-  -
-    key: Accepts
-    value: application/json
+  Authorization:
+    - Basic ${apiToken}
+  ContentType:
+    - application/json
+  Accepts:
+    - application/json
+    - application/xml
 ````
 Assuming practitioner understands `logger/v1/info` task setup and outcome we consider content of get-content.yaml is ready for execution.
 ## 3.2 Run Workflow
