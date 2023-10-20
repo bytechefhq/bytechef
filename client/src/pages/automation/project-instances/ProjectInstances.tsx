@@ -1,3 +1,7 @@
+import {
+    useGetProjectInstanceTagsQuery,
+    useGetProjectsQuery,
+} from '@/queries/projects.queries';
 import {TagIcon} from '@heroicons/react/20/solid';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
@@ -6,12 +10,11 @@ import PageHeader from '../../../components/PageHeader/PageHeader';
 import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
 import LeftSidebarMenu from '../../../layouts/LeftSidebarMenu/LeftSidebarMenu';
 import LeftSidebarMenuItem from '../../../layouts/LeftSidebarMenu/LeftSidebarMenuItem';
-import {
-    useGetProjectInstanceTagsQuery,
-    useGetProjectsQuery,
-} from '../../../queries/projects.queries';
 import ProjectInstanceDialog from './ProjectInstanceDialog';
 import ProjectInstanceList from './ProjectInstanceList';
+import EmptyList from "@/components/EmptyList/EmptyList";
+import { FolderPlusIcon } from "@heroicons/react/24/outline";
+import { twMerge } from "tailwind-merge";
 
 export enum Type {
     Project,

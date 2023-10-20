@@ -1,3 +1,14 @@
+import {
+    IntegrationModel,
+    IntegrationModelStatusEnum,
+    TagModel,
+} from '@/middleware/embedded/configuration';
+import {
+    useCreateIntegrationWorkflowRequestMutation,
+    useDeleteIntegrationMutation,
+    useUpdateIntegrationTagsMutation,
+} from '@/mutations/integrations.mutations';
+import {IntegrationKeys} from '@/queries/integrations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import {Link} from 'react-router-dom';
@@ -10,17 +21,6 @@ import DropdownMenu, {
 import HoverCard from '../../../components/HoverCard/HoverCard';
 import TagList from '../../../components/TagList/TagList';
 import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
-import {
-    IntegrationModel,
-    IntegrationModelStatusEnum,
-    TagModel,
-} from '../../../middleware/embedded/configuration';
-import {
-    useCreateIntegrationWorkflowRequestMutation,
-    useDeleteIntegrationMutation,
-    useUpdateIntegrationTagsMutation,
-} from '../../../mutations/integrations.mutations';
-import {IntegrationKeys} from '../../../queries/integrations.queries';
 import IntegrationDialog from './IntegrationDialog';
 
 interface IntegrationListItemProps {

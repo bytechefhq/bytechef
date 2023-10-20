@@ -1,14 +1,24 @@
+import {ProjectModel} from '@/middleware/automation/configuration';
+import {WorkflowModel} from '@/middleware/core/workflow/configuration';
+import {useCreateProjectWorkflowRequestMutation} from '@/mutations/projects.mutations';
+import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
+import {
+    ProjectKeys,
+    useGetProjectQuery,
+    useGetProjectWorkflowsQuery,
+} from '@/queries/projects.queries';
+import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
 import {
     ArrowLeftOnRectangleIcon,
     ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/solid';
 import {useQueryClient} from '@tanstack/react-query';
-import Button from 'components/Button/Button';
-import Input from 'components/Input/Input';
 import React, {useEffect, useState} from 'react';
 import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
+import Button from '../../../components/Button/Button';
+import Input from '../../../components/Input/Input';
 import PageLoader from '../../../components/PageLoader/PageLoader';
 import Select from '../../../components/Select/Select';
 import ToggleGroup, {
@@ -16,16 +26,6 @@ import ToggleGroup, {
 } from '../../../components/ToggleGroup/ToggleGroup';
 import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
 import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
-import {ProjectModel} from '../../../middleware/automation/configuration';
-import {WorkflowModel} from '../../../middleware/core/workflow/configuration';
-import {useCreateProjectWorkflowRequestMutation} from '../../../mutations/projects.mutations';
-import {useGetComponentDefinitionsQuery} from '../../../queries/componentDefinitions.queries';
-import {
-    ProjectKeys,
-    useGetProjectQuery,
-    useGetProjectWorkflowsQuery,
-} from '../../../queries/projects.queries';
-import {useGetTaskDispatcherDefinitionsQuery} from '../../../queries/taskDispatcherDefinitions.queries';
 import WorkflowEditor from './WorkflowEditor';
 import LeftSidebar from './components/LeftSidebar';
 import useLeftSidebarStore from './stores/useLeftSidebarStore';

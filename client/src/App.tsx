@@ -1,3 +1,6 @@
+import {DesktopSidebar} from '@/layouts/DesktopSidebar';
+import {MobileSidebar} from '@/layouts/MobileSidebar';
+import {MobileTopNavigation} from '@/layouts/MobileTopNavigation';
 import {
     FolderIcon,
     LinkIcon,
@@ -6,10 +9,6 @@ import {
 } from '@heroicons/react/24/outline';
 import {useEffect, useState} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
-
-import {DesktopSidebar} from './components/Sidebar/DesktopSidebar';
-import {MobileSidebar} from './components/Sidebar/MobileSidebar';
-import {MobileTopNavigation} from './components/Sidebar/MobileTopNavigation';
 
 const user = {
     email: 'emily.selman@example.com',

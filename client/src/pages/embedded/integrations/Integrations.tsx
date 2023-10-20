@@ -1,3 +1,7 @@
+import {
+    useGetIntegrationCategoriesQuery,
+    useGetIntegrationTagsQuery,
+} from '@/queries/integrations.queries';
 import {TagIcon} from '@heroicons/react/20/solid';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
@@ -6,10 +10,6 @@ import PageHeader from '../../../components/PageHeader/PageHeader';
 import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
 import LeftSidebarMenu from '../../../layouts/LeftSidebarMenu/LeftSidebarMenu';
 import LeftSidebarMenuItem from '../../../layouts/LeftSidebarMenu/LeftSidebarMenuItem';
-import {
-    useGetIntegrationCategoriesQuery,
-    useGetIntegrationTagsQuery,
-} from '../../../queries/integrations.queries';
 import IntegrationDialog from './IntegrationDialog';
 import IntegrationList from './IntegrationList';
 
