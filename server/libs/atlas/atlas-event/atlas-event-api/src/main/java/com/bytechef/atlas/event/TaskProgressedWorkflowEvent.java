@@ -22,7 +22,7 @@ import org.springframework.util.Assert;
 /**
  * @author Ivica Cardic
  */
-public class TaskProgressedWorkflowEvent extends WorkflowEvent {
+public class TaskProgressedWorkflowEvent extends AbstractWorkflowEvent {
 
     public static final String TASK_PROGRESSED = "task.progressed";
 

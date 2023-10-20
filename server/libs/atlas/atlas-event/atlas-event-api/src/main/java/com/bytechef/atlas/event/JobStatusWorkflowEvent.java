@@ -23,7 +23,7 @@ import org.springframework.util.Assert;
 /**
  * @author Ivica Cardic
  */
-public class JobStatusWorkflowEvent extends WorkflowEvent {
+public class JobStatusWorkflowEvent extends AbstractWorkflowEvent {
 
     public static final String JOB_STATUS = "job.status";
 

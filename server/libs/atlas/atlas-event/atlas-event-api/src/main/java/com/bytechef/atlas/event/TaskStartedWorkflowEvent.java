@@ -22,7 +22,7 @@ import org.springframework.util.Assert;
 /**
  * @author Ivica Cardic
  */
-public class TaskStartedWorkflowEvent extends WorkflowEvent {
+public class TaskStartedWorkflowEvent extends AbstractWorkflowEvent {
 
     public static final String TASK_STARTED = "task.started";
 
