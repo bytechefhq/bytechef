@@ -40,6 +40,8 @@ interface TagListProps {
     tags: TagModel[];
     /* eslint-disable @typescript-eslint/no-explicit-any */
     updateTagsMutation: UseMutationResult<void, object, any, unknown>;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    getRequest: (id: number, tags: TagModel[]) => any;
 }
 
 const TagList = ({
@@ -47,7 +49,8 @@ const TagList = ({
     tags,
     remainingTags,
     updateTagsMutation,
-}: TagListProps) => {
+    getRequest,
+}: TagListProps): JSX.Element => {
     const [showAllTags, setShowAllTags] = useState(false);
     const [isNewTagWindowVisible, setIsNewTagWindowVisible] = useState(false);
 
@@ -56,23 +59,13 @@ const TagList = ({
 
         newTags.push(newTag);
 
-        updateTagsMutation.mutate({
-            id: id!,
-            updateIntegrationTagsRequestModel: {
-                tags: newTags || [],
-            },
-        });
+        updateTagsMutation.mutate(getRequest(id, newTags));
     };
 
     const handleOnDeleteTag = (deletedTag: TagModel) => {
         const newTags = tags?.filter((tag) => tag.id !== deletedTag.id) || [];
 
-        updateTagsMutation.mutate({
-            id: id || 0,
-            updateIntegrationTagsRequestModel: {
-                tags: newTags || [],
-            },
-        });
+        updateTagsMutation.mutate(getRequest(id, newTags));
     };
 
     return (

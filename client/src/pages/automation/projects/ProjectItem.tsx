@@ -126,6 +126,12 @@ const ProjectItem = ({project, remainingTags}: ProjectItemProps) => {
                                         updateTagsMutation={
                                             updateProjectTagsMutation
                                         }
+                                        getRequest={(id, tags) => ({
+                                            id: id!,
+                                            updateProjectTagsRequestModel: {
+                                                tags: tags || [],
+                                            },
+                                        })}
                                     />
                                 )}
                             </footer>

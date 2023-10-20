@@ -79,6 +79,12 @@ const ConnectionItem = ({connection, remainingTags}: ConnectionItemProps) => {
                             remainingTags={remainingTags}
                             tags={connection.tags}
                             updateTagsMutation={updateConnectionTagsMutation}
+                            getRequest={(id, tags) => ({
+                                id: id!,
+                                updateConnectionTagsRequestModel: {
+                                    tags: tags || [],
+                                },
+                            })}
                         />
                     )}
                 </div>
