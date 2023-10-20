@@ -1,14 +1,14 @@
 import {useCallback} from 'react';
 import {NodeProps, useReactFlow} from 'reactflow';
-import useStore from '../store/store';
+import useRightSlideOverStore from '../stores/rightSlideOver.store';
 
 // this hook implements the logic for clicking a workflow node
 // on workflow node click: create a new child node of the clicked node
-export default function useNodeClick(
+export default function useNodeClickHook(
     data: NodeProps['data'],
     id: NodeProps['id']
 ) {
-    const {setCurrentNode, setRightSlideOverOpen} = useStore();
+    const {setCurrentNode, setRightSlideOverOpen} = useRightSlideOverStore();
 
     const {getNode} = useReactFlow();
 

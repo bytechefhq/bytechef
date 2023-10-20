@@ -41,7 +41,7 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
 // this is the store selector that is used for triggering the layout, this returns the number of nodes once they change
 const nodeCountSelector = (state: ReactFlowState) => state.nodeInternals.size;
 
-export default function useLayout() {
+export default function useLayoutHook() {
     const nodeCount = useStore(nodeCountSelector);
 
     const {getNodes, setNodes, getEdges} = useReactFlow();
