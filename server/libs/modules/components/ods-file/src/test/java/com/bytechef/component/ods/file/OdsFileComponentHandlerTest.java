@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.odsfile.v1_0;
+package com.bytechef.component.ods.file;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.task.commons.file.storage.FileStorageHelper;
-import com.bytechef.test.json.JsonArrayUtils;
-import com.bytechef.test.json.JsonObjectUtils;
+import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.FileEntry;
+import com.bytechef.hermes.component.test.MockContext;
+import com.bytechef.hermes.component.test.MockExecutionParameters;
+import com.bytechef.hermes.component.test.json.JsonArrayUtils;
+import com.bytechef.hermes.component.test.json.JsonObjectUtils;
+import com.bytechef.hermes.test.definition.DefinitionAssert;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -40,108 +41,110 @@ import org.springframework.core.io.ClassPathResource;
 /**
  * @author Ivica Cardic
  */
-public class OdsFileTaskHandlerTest {
+public class OdsFileComponentHandlerTest {
 
-    private static final FileStorageHelper fileStorageHelper = new FileStorageHelper(new Base64FileStorageService());
-    private static final OdsFileTaskHandler.OdsFileReadTaskHandler odsFileReadTaskHandler =
-            new OdsFileTaskHandler.OdsFileReadTaskHandler(fileStorageHelper);
-    private static final OdsFileTaskHandler.OdsFileWriteTaskHandler odsFileWriteTaskHandler =
-            new OdsFileTaskHandler.OdsFileWriteTaskHandler(fileStorageHelper);
+    private static final MockContext context = new MockContext();
+    private static final OdsFileComponentHandler odsFileComponentHandler = new OdsFileComponentHandler();
 
     @Test
-    public void testReadODS() throws Exception {
+    public void testGetComponentDefinition() throws IOException {
+        DefinitionAssert.assertEquals("definition/ods-file_v1.json", new OdsFileComponentHandler().getDefinition());
+    }
+
+    @Test
+    public void testPerformReadODS() throws IOException, JSONException {
         // headerRow: true, includeEmptyCells: false, readAsString: false
 
         assertEquals(
                 JsonArrayUtils.of(getJSONObjectsWithNamedColumns(false, false)),
-                JsonArrayUtils.of(odsFileReadTaskHandler.handle(
-                        getReadSimpleTaskExecution(true, false, null, null, false, getFile("sample_header.ods")))),
+                JsonArrayUtils.of((List) odsFileComponentHandler.performRead(
+                        context, getReadParameters(true, false, null, null, false, getFile("sample_header.ods")))),
                 true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: false
 
         assertEquals(
                 JsonArrayUtils.of(getJSONObjectsWithNamedColumns(true, false)),
-                JsonArrayUtils.of(odsFileReadTaskHandler.handle(
-                        getReadSimpleTaskExecution(true, true, null, null, false, getFile("sample_header.ods")))),
+                JsonArrayUtils.of((List) odsFileComponentHandler.performRead(
+                        context, getReadParameters(true, true, null, null, false, getFile("sample_header.ods")))),
                 true);
 
         // headerRow: true, includeEmptyCells: false, readAsString: true
 
         assertEquals(
                 JsonArrayUtils.of(getJSONObjectsWithNamedColumns(false, true)),
-                JsonArrayUtils.of(odsFileReadTaskHandler.handle(
-                        getReadSimpleTaskExecution(true, false, null, null, true, getFile("sample_header.ods")))),
+                JsonArrayUtils.of((List) odsFileComponentHandler.performRead(
+                        context, getReadParameters(true, false, null, null, true, getFile("sample_header.ods")))),
                 true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: true
 
         assertEquals(
                 JsonArrayUtils.of(getJSONObjectsWithNamedColumns(true, true)),
-                JsonArrayUtils.of(odsFileReadTaskHandler.handle(
-                        getReadSimpleTaskExecution(true, true, null, null, true, getFile("sample_header.ods")))),
+                JsonArrayUtils.of((List) odsFileComponentHandler.performRead(
+                        context, getReadParameters(true, true, null, null, true, getFile("sample_header.ods")))),
                 true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: false
 
         assertEquals(
                 JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(false, false)),
-                JsonArrayUtils.of(odsFileReadTaskHandler.handle(
-                        getReadSimpleTaskExecution(false, false, null, null, false, getFile("sample_no_header.ods")))),
+                JsonArrayUtils.of((List) odsFileComponentHandler.performRead(
+                        context, getReadParameters(false, false, null, null, false, getFile("sample_no_header.ods")))),
                 true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: true
 
         assertEquals(
                 JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(false, true)),
-                JsonArrayUtils.of(odsFileReadTaskHandler.handle(
-                        getReadSimpleTaskExecution(false, false, null, null, true, getFile("sample_no_header.ods")))),
+                JsonArrayUtils.of((List) odsFileComponentHandler.performRead(
+                        context, getReadParameters(false, false, null, null, true, getFile("sample_no_header.ods")))),
                 true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: false
 
         assertEquals(
                 JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(true, false)),
-                JsonArrayUtils.of(odsFileReadTaskHandler.handle(
-                        getReadSimpleTaskExecution(false, true, null, null, false, getFile("sample_no_header.ods")))),
+                JsonArrayUtils.of((List) odsFileComponentHandler.performRead(
+                        context, getReadParameters(false, true, null, null, false, getFile("sample_no_header.ods")))),
                 true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: true
 
         assertEquals(
                 JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(true, true)),
-                JsonArrayUtils.of(odsFileReadTaskHandler.handle(
-                        getReadSimpleTaskExecution(false, true, null, null, true, getFile("sample_no_header.ods")))),
+                JsonArrayUtils.of((List) odsFileComponentHandler.performRead(
+                        context, getReadParameters(false, true, null, null, true, getFile("sample_no_header.ods")))),
                 true);
 
         // paging
 
         assertEquals(
                 JsonArrayUtils.of(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
-                JsonArrayUtils.of(odsFileReadTaskHandler.handle(
-                        getReadSimpleTaskExecution(true, false, 1, 3, false, getFile("sample_header.ods")))),
+                JsonArrayUtils.of((List) odsFileComponentHandler.performRead(
+                        context, getReadParameters(true, false, 1, 3, false, getFile("sample_header.ods")))),
                 true);
     }
 
     @Test
-    public void testWriteODS() throws Exception {
+    public void testPerformWriteODS() throws IOException, JSONException {
         String jsonContent = Files.contentOf(getFile("sample.json"), Charset.defaultCharset());
 
         assertThat(jsonContent).isNotNull();
 
-        SimpleTaskExecution simpleTaskExecution = getWriteSimpleTaskExecution(JsonArrayUtils.toList(jsonContent));
+        ExecutionParameters executionParameters = getWriteParameters(JsonArrayUtils.toList(jsonContent));
 
-        assertThat(simpleTaskExecution).isNotNull();
+        assertThat(executionParameters).isNotNull();
 
-        FileEntry fileEntry = odsFileWriteTaskHandler.handle(simpleTaskExecution);
+        FileEntry fileEntry = (FileEntry) odsFileComponentHandler.performWrite(context, executionParameters);
 
         assertThat(fileEntry).isNotNull();
         assertThat(fileEntry.getName()).isNotNull();
 
         assertEquals(
                 JsonArrayUtils.of(jsonContent),
-                JsonArrayUtils.of(odsFileReadTaskHandler.handle(
-                        getReadSimpleTaskExecution(true, true, null, null, false, fileEntry))),
+                JsonArrayUtils.of((List) odsFileComponentHandler.performRead(
+                        context, getReadParameters(true, true, null, null, false, fileEntry))),
                 true);
 
         assertThat(fileEntry.getName()).isEqualTo("file.ods");
@@ -304,7 +307,7 @@ public class OdsFileTaskHandlerTest {
         return classPathResource.getFile();
     }
 
-    private SimpleTaskExecution getReadSimpleTaskExecution(
+    private ExecutionParameters getReadParameters(
             boolean headerRow,
             boolean includeEmptyCells,
             Integer pageNumber,
@@ -312,41 +315,39 @@ public class OdsFileTaskHandlerTest {
             boolean readAsString,
             File file)
             throws FileNotFoundException {
-        return getReadSimpleTaskExecution(
+        return getReadParameters(
                 headerRow,
                 includeEmptyCells,
                 pageNumber,
                 pageSize,
                 readAsString,
-                file == null ? null : fileStorageHelper.storeFileContent(file.getName(), new FileInputStream(file)));
+                file == null ? null : context.storeFileContent(file.getName(), new FileInputStream(file)));
     }
 
-    private SimpleTaskExecution getReadSimpleTaskExecution(
+    private ExecutionParameters getReadParameters(
             boolean headerRow,
             boolean includeEmptyCells,
             Integer pageNumber,
             Integer pageSize,
             boolean readAsString,
             FileEntry fileEntry) {
-        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+        MockExecutionParameters parameters = new MockExecutionParameters();
 
-        taskExecution.put("fileEntry", fileEntry);
-        taskExecution.put("headerRow", headerRow);
-        taskExecution.put("includeEmptyCells", includeEmptyCells);
-        taskExecution.put("operation", "READ");
-        taskExecution.put("pageNumber", pageNumber);
-        taskExecution.put("pageSize", pageSize);
-        taskExecution.put("readAsString", readAsString);
+        parameters.set("fileEntry", fileEntry.toMap());
+        parameters.set("headerRow", headerRow);
+        parameters.set("includeEmptyCells", includeEmptyCells);
+        parameters.set("pageNumber", pageNumber);
+        parameters.set("pageSize", pageSize);
+        parameters.set("readAsString", readAsString);
 
-        return taskExecution;
+        return parameters;
     }
 
-    private SimpleTaskExecution getWriteSimpleTaskExecution(List<Object> items) {
-        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+    private ExecutionParameters getWriteParameters(List<Object> items) {
+        MockExecutionParameters parameters = new MockExecutionParameters();
 
-        taskExecution.put("rows", items);
-        taskExecution.put("operation", "WRITE");
+        parameters.set("rows", items);
 
-        return taskExecution;
+        return parameters;
     }
 }
