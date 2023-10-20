@@ -1,3 +1,4 @@
+import {Checkbox} from '@/components/ui/checkbox';
 import {
     Tooltip,
     TooltipContent,
@@ -9,7 +10,6 @@ import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import Alert from 'components/Alert/Alert';
 import Button from 'components/Button/Button';
-import Checkbox from 'components/Checkbox/Checkbox';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import Dialog from 'components/Dialog/Dialog';
 import FilterableSelect, {
