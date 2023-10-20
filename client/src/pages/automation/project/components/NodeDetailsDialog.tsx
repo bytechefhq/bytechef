@@ -71,8 +71,6 @@ const NodeDetailsDialog = () => {
         !!currentComponent
     );
 
-    console.log('currentAction: ', currentAction);
-
     return (
         <Dialog.Root
             open={nodeDetailsOpen}
@@ -128,15 +126,15 @@ const NodeDetailsDialog = () => {
                                                     Action
                                                 </span>
 
-                                                <div className="overflow-hidden rounded-md bg-gray-100 py-2">
-                                                    <span className="inline-flex px-4 text-sm font-medium">
+                                                <div className="overflow-hidden rounded-md bg-gray-100 px-4 py-2">
+                                                    <span className="inline-flex text-sm font-medium">
                                                         {
                                                             firstAction.display
                                                                 .title
                                                         }
                                                     </span>
 
-                                                    <p className="mt-1 line-clamp-2 w-full overflow-hidden px-4 text-xs text-gray-500">
+                                                    <p className="mt-1 line-clamp-2 w-full overflow-hidden text-xs text-gray-500">
                                                         {
                                                             firstAction.display
                                                                 .description
@@ -147,6 +145,25 @@ const NodeDetailsDialog = () => {
                                         ) : (
                                             <Select
                                                 contentClassName="max-w-select-trigger-width max-h-select-content-available-height-1/2"
+                                                customValueComponent={
+                                                    <div className="flex flex-col">
+                                                        <span className="inline-flex text-sm font-medium">
+                                                            {
+                                                                currentAction
+                                                                    ?.display
+                                                                    .title
+                                                            }
+                                                        </span>
+
+                                                        <p className="mt-1 line-clamp-2 w-full text-left text-xs text-gray-500">
+                                                            {
+                                                                currentAction
+                                                                    ?.display
+                                                                    .description
+                                                            }
+                                                        </p>
+                                                    </div>
+                                                }
                                                 label="Actions"
                                                 options={currentComponent.actions.map(
                                                     (action) => ({

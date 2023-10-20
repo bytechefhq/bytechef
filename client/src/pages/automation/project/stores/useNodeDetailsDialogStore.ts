@@ -18,6 +18,7 @@ interface NodeDetailsState {
     currentNode: Node;
     setCurrentNode: (currentNode: Node) => void;
 }
+
 interface ConnectionNoteState {
     showConnectionNote: boolean;
     setShowConnectionNote: (showConnectionNote: boolean) => void;

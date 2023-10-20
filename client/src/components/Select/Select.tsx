@@ -28,6 +28,7 @@ export interface ISelectOption {
 type SelectProps = {
     options: ISelectOption[];
     contentClassName?: string;
+    customValueComponent?: React.ReactNode;
     defaultValue?: string | undefined;
     label?: string;
     onValueChange?(value: string): void;
@@ -37,6 +38,7 @@ type SelectProps = {
 
 const Select = ({
     contentClassName,
+    customValueComponent,
     defaultValue,
     label,
     options,
@@ -58,7 +60,11 @@ const Select = ({
         >
             <Trigger asChild aria-label="Select">
                 <Button className={triggerClassName} displayType="light">
-                    <Value />
+                    {customValueComponent ? (
+                        <Value aria-label={value}>{customValueComponent}</Value>
+                    ) : (
+                        <Value />
+                    )}
 
                     <Icon className="ml-auto pl-2">
                         <ChevronDownIcon />
@@ -85,7 +91,7 @@ const Select = ({
                                 <Item
                                     key={selectItem.value}
                                     value={selectItem.value}
-                                    className="relative flex cursor-pointer select-none items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none radix-disabled:opacity-50 dark:text-gray-300 dark:focus:bg-gray-900"
+                                    className="radix-disabled:opacity-50 relative flex cursor-pointer select-none items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none dark:text-gray-300 dark:focus:bg-gray-900"
                                 >
                                     <ItemIndicator className="absolute left-2 inline-flex items-center">
                                         <CheckIcon />
