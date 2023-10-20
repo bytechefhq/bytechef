@@ -44,7 +44,7 @@ public class GitWorkflowRepositoryProperties {
     }
 
     public String[] getSearchPaths() {
-        return searchPaths;
+        return searchPaths == null ? null : searchPaths.clone();
     }
 
     @SuppressFBWarnings("EI")
