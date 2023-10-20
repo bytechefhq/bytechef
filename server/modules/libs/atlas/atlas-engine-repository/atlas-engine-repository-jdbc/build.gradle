@@ -15,4 +15,5 @@ dependencies {
     testImplementation "org.testcontainers:mysql"
     testImplementation "org.testcontainers:postgresql"
     testImplementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-impl")
+    testImplementation project(":modules:libs:atlas:atlas-test-support")
 }

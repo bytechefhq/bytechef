@@ -1,6 +1,5 @@
 dependencies {
     api project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
-    api project(":modules:libs:atlas:atlas-json-item")
 
     implementation "org.springframework.boot:spring-boot-autoconfigure"
 }
