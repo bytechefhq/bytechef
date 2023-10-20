@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.auth.service;
+package com.bytechef.hermes.connection.service;
 
-import com.bytechef.hermes.auth.domain.Authentication;
+import com.bytechef.hermes.connection.domain.Connection;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public interface AuthenticationService {
-    Authentication add(String name, String type, Map<String, Object> properties);
+public interface ConnectionService {
+    Connection add(Connection connection);
 
-    Authentication fetchAuthentication(String id);
+    void delete(String id);
 
-    List<Authentication> getAuthentications();
+    Optional<Connection> fetchConnection(String id);
 
-    void remove(String id);
+    Connection getConnection(String id);
 
-    Authentication update(String id, String name);
+    List<Connection> getConnections();
+
+    Connection update(String id, String name);
 }

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.auth;
+package com.bytechef.hermes.connection;
 
 /**
  * @author Ivica Cardic
  */
-public class AuthenticationConstants {
+public class ConnectionConstants {
 
-    public static final String AUTHENTICATION_ID = "authenticationId";
+    public static final String CONNECTION_ID = "connectionId";
 }
