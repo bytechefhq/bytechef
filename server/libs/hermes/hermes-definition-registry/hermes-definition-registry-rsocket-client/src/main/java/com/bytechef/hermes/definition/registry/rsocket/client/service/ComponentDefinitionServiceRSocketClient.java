@@ -50,7 +50,7 @@ public class ComponentDefinitionServiceRSocketClient extends AbstractRSocketClie
         return MonoUtils.get(
             getRSocketRequester(name)
                 .route("ComponentDefinitionService.getComponentDefinition")
-                .data(Map.of("name", name, "version", version))
+                .data(version == null ? Map.of("name", name) : Map.of("name", name, "version", version))
                 .retrieveMono(ComponentDefinitionDTO.class));
     }
 
