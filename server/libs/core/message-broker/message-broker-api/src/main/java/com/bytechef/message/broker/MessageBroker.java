@@ -29,8 +29,8 @@ package com.bytechef.message.broker;
 public interface MessageBroker {
 
     /**
-     * @param queueName A string representation used for routing the message to the appropriate destination.
-     * @param message   The message to send.
+     * @param route   A representation used for routing the message to the appropriate destination.
+     * @param message The message to send.
      */
-    void send(String queueName, Object message);
+    void send(MessageRoute route, Object message);
 }

@@ -19,10 +19,10 @@
 
 package com.bytechef.message.broker.amqp;
 
-import com.bytechef.message.broker.ExchangeType;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.Prioritizable;
 import com.bytechef.message.Retryable;
+import com.bytechef.message.broker.MessageRoute;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.util.Assert;
@@ -36,10 +36,11 @@ public class AmqpMessageBroker implements MessageBroker {
     private AmqpTemplate amqpTemplate;
 
     @Override
-    public void send(String queueName, Object message) {
-        Assert.notNull(queueName, "'queueName' must not be null");
+    public void send(MessageRoute messageRoute, Object message) {
+        Assert.notNull(messageRoute, "'queueName' must not be null");
 
-        amqpTemplate.convertAndSend(determineExchange(queueName), determineRoutingKey(queueName), message,
+        amqpTemplate.convertAndSend(
+            determineExchange(messageRoute.toString()), determineRoutingKey(messageRoute.toString()), message,
             amqpMessage -> {
                 if (message instanceof Retryable) {
                     Retryable retryable = (Retryable) message;
@@ -66,7 +67,7 @@ public class AmqpMessageBroker implements MessageBroker {
 
         Assert.isTrue(routingKeyItems.length <= 2, "Invalid routing key: " + queueName);
 
-        return routingKeyItems.length == 2 ? routingKeyItems[0] : ExchangeType.NORMAL.toString();
+        return routingKeyItems.length == 2 ? routingKeyItems[0] : MessageRoute.Exchange.MESSAGE.toString();
     }
 
     private String determineRoutingKey(String queueName) {

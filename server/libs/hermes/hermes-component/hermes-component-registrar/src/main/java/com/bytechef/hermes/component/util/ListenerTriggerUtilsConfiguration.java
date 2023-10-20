@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.util;
 
-import com.bytechef.atlas.message.broker.TaskQueues;
+import com.bytechef.atlas.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.hermes.trigger.TriggerExecution;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
@@ -45,7 +45,7 @@ public class ListenerTriggerUtilsConfiguration implements InitializingBean {
             TriggerExecution triggerExecution = new TriggerExecution(
                 output, WorkflowExecutionId.parse(workflowExecutionId));
 
-            messageBroker.send(TaskQueues.TASKS_COMPLETIONS, triggerExecution);
+            messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, triggerExecution);
         };
     }
 }

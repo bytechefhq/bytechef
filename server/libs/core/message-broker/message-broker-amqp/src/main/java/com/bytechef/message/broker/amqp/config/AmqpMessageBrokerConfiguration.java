@@ -19,8 +19,8 @@
 
 package com.bytechef.message.broker.amqp.config;
 
-import com.bytechef.message.broker.ExchangeType;
-import com.bytechef.message.broker.Queues;
+import com.bytechef.message.broker.SystemMessageRoute;
+import com.bytechef.message.broker.MessageRoute;
 import com.bytechef.message.broker.amqp.AmqpMessageBroker;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -75,8 +75,12 @@ public class AmqpMessageBrokerConfiguration
     @Autowired
     private RabbitProperties rabbitProperties;
 
+    @Bean
+    RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
+        return new RabbitAdmin(connectionFactory);
+    }
+
     @Override
-    @SuppressWarnings("unchecked")
     public void configureRabbitListeners(RabbitListenerEndpointRegistrar listenerEndpointRegistrar) {
         for (MessageBrokerConfigurer<RabbitListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
 
@@ -86,36 +90,31 @@ public class AmqpMessageBrokerConfiguration
 
     @Override
     public void registerListenerEndpoint(
-        RabbitListenerEndpointRegistrar listenerEndpointRegistrar, String queueName, int concurrency, Object delegate,
-        String methodName) {
+        RabbitListenerEndpointRegistrar listenerEndpointRegistrar, MessageRoute messageRoute, int concurrency,
+        Object delegate, String methodName) {
 
         Class<?> delegateClass = delegate.getClass();
 
-        logger.info("Registering AMQP Listener: {} -> {}:{}", queueName, delegateClass.getName(), methodName);
+        logger.info("Registering AMQP Listener: {} -> {}:{}", messageRoute, delegateClass.getName(), methodName);
 
         Exchange exchange;
         Queue queue;
 
-        if (Objects.equals(queueName, Queues.TASKS_CONTROL)) {
+        if (messageRoute.isControlExchange()) {
             exchange = controlExchange();
             queue = controlQueue();
         } else {
-            exchange = tasksExchange();
+            exchange = messageExchange();
 
             Map<String, Object> args = new HashMap<String, Object>();
 
             args.put("x-dead-letter-exchange", "");
-            args.put("x-dead-letter-routing-key", Queues.DLQ);
+            args.put("x-dead-letter-routing-key", SystemMessageRoute.DLQ.toString());
 
-            queue = new Queue(queueName, true, false, false, args);
+            queue = new Queue(messageRoute.toString(), true, false, false, args);
         }
 
         registerListenerEndpoint(listenerEndpointRegistrar, queue, exchange, concurrency, delegate, methodName);
-    }
-
-    @Bean
-    RabbitAdmin admin(ConnectionFactory connectionFactory) {
-        return new RabbitAdmin(connectionFactory);
     }
 
     @Bean
@@ -133,27 +132,27 @@ public class AmqpMessageBrokerConfiguration
     }
 
     @Bean
-    Queue dlqQueue() {
-        return new Queue(Queues.DLQ);
-    }
-
-    @Bean
     Queue controlQueue() {
-        return new Queue(ExchangeType.CONTROL + "/" + ExchangeType.CONTROL, true, true, true);
-    }
-
-    @Bean
-    Exchange tasksExchange() {
-        return ExchangeBuilder.directExchange(ExchangeType.NORMAL.toString())
-            .durable(true)
-            .build();
+        return new Queue(SystemMessageRoute.CONTROL.toString(), true, true, true);
     }
 
     @Bean
     Exchange controlExchange() {
         // TODO It should probably be topic exchange: https://www.baeldung.com/java-rabbitmq-exchanges-queues-bindings
 
-        return ExchangeBuilder.fanoutExchange(ExchangeType.CONTROL.toString())
+        return ExchangeBuilder.fanoutExchange(MessageRoute.Exchange.CONTROL.toString())
+            .durable(true)
+            .build();
+    }
+
+    @Bean
+    Queue dlqQueue() {
+        return new Queue(SystemMessageRoute.DLQ.toString());
+    }
+
+    @Bean
+    Exchange messageExchange() {
+        return ExchangeBuilder.directExchange(MessageRoute.Exchange.MESSAGE.toString())
             .durable(true)
             .build();
     }
@@ -177,8 +176,8 @@ public class AmqpMessageBrokerConfiguration
         RabbitListenerEndpointRegistrar listenerEndpointRegistrar, Queue queue, Exchange exchange, int concurrency,
         Object delegate, String methodName) {
 
-        admin(connectionFactory).declareQueue(queue);
-        admin(connectionFactory)
+        rabbitAdmin(connectionFactory).declareQueue(queue);
+        rabbitAdmin(connectionFactory)
             .declareBinding(BindingBuilder.bind(queue)
                 .to(exchange)
                 .with(queue.getName())

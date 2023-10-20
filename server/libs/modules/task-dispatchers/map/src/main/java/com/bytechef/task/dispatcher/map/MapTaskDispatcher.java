@@ -29,7 +29,7 @@ import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstan
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.message.broker.TaskQueues;
+import com.bytechef.atlas.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.CounterService;
@@ -86,7 +86,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
-            messageBroker.send(TaskQueues.TASKS_COMPLETIONS, taskExecution);
+            messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, taskExecution);
         } else {
             counterService.set(taskExecution.getId(), list.size());
 

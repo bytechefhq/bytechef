@@ -20,13 +20,13 @@
 package com.bytechef.atlas.worker;
 
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.message.broker.TaskQueues;
+import com.bytechef.atlas.message.broker.TaskMessageRoute;
 import com.bytechef.atlas.task.ControlTask;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.event.TaskStartedWorkflowEvent;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.message.broker.Queues;
+import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.atlas.task.CancelControlTask;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
@@ -106,7 +106,7 @@ public class TaskWorker {
 
                 TaskExecution completedTaskExecution = doExecuteTask(taskExecution);
 
-                messageBroker.send(TaskQueues.TASKS_COMPLETIONS, completedTaskExecution);
+                messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, completedTaskExecution);
             } catch (InterruptedException e) {
                 // ignore
             } catch (Exception e) {
@@ -239,7 +239,7 @@ public class TaskWorker {
             new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
         taskExecution.setStatus(TaskExecution.Status.FAILED);
 
-        messageBroker.send(Queues.ERRORS, taskExecution);
+        messageBroker.send(SystemMessageRoute.ERRORS, taskExecution);
     }
 
     private long calculateTimeout(TaskExecution taskExecution) {

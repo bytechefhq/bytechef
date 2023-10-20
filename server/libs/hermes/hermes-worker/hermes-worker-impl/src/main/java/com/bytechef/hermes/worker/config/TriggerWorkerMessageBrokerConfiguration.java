@@ -20,7 +20,7 @@ package com.bytechef.hermes.worker.config;
 import com.bytechef.hermes.worker.TriggerWorker;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.autoconfigure.annotation.ConditionalOnWorker;
-import com.bytechef.hermes.message.broker.TriggerQueues;
+import com.bytechef.hermes.message.broker.TriggerMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -46,7 +46,7 @@ public class TriggerWorkerMessageBrokerConfiguration {
             TriggerWorker worker = applicationContext.getBean(TriggerWorker.class);
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, TriggerQueues.TRIGGERS, 1, worker, "handle");
+                listenerEndpointRegistrar, TriggerMessageRoute.TRIGGERS, 1, worker, "handle");
         };
     }
 }

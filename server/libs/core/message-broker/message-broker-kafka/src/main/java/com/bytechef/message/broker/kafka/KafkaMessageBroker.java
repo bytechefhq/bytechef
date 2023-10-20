@@ -23,6 +23,7 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.Retryable;
 import java.util.concurrent.TimeUnit;
 
+import com.bytechef.message.broker.MessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -37,19 +38,17 @@ public class KafkaMessageBroker implements MessageBroker {
     private KafkaTemplate<Integer, Object> kafkaTemplate;
 
     @Override
-    public void send(String queueName, Object message) {
-        Assert.notNull(queueName, "'queueName' key must not be null");
+    public void send(MessageRoute messageRoute, Object message) {
+        Assert.notNull(messageRoute, "'queueName' key must not be null");
 
-        if (message instanceof Retryable) {
-            Retryable retryable = (Retryable) message;
-
+        if (message instanceof Retryable retryable) {
             delay(retryable.getRetryDelayMillis());
         }
 
         Class<?> messageClass = message.getClass();
 
         kafkaTemplate.send(MessageBuilder.withPayload(message)
-            .setHeader(KafkaHeaders.TOPIC, queueName)
+            .setHeader(KafkaHeaders.TOPIC, messageRoute.toString())
             .setHeader("_type", messageClass.getName())
             .build());
     }

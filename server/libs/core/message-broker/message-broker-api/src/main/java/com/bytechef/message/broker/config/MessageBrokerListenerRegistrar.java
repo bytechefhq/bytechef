@@ -17,11 +17,13 @@
 
 package com.bytechef.message.broker.config;
 
+import com.bytechef.message.broker.MessageRoute;
+
 /**
  * @author Ivica Cardic
  */
 public interface MessageBrokerListenerRegistrar<T> {
 
     void registerListenerEndpoint(
-        T listenerEndpointRegistrar, String queueName, int concurrency, Object delegate, String methodName);
+        T listenerEndpointRegistrar, MessageRoute messageRoute, int concurrency, Object delegate, String methodName);
 }

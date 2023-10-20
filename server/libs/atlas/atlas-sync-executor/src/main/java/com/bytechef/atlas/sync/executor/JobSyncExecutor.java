@@ -28,13 +28,13 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.job.JobParameters;
-import com.bytechef.atlas.message.broker.TaskQueues;
+import com.bytechef.atlas.message.broker.TaskMessageRoute;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.job.JobFactoryImpl;
-import com.bytechef.message.broker.Queues;
+import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
@@ -75,7 +75,7 @@ public class JobSyncExecutor {
             syncMessageBroker = new SyncMessageBroker();
         }
 
-        syncMessageBroker.receive(Queues.ERRORS, message -> {
+        syncMessageBroker.receive(SystemMessageRoute.ERRORS, message -> {
             TaskExecution erroredTaskExecution = (TaskExecution) message;
 
             ExecutionError error = erroredTaskExecution.getError();
@@ -98,7 +98,7 @@ public class JobSyncExecutor {
             .taskEvaluator(builder.taskEvaluator)
             .build();
 
-        syncMessageBroker.receive(TaskQueues.TASKS, o -> worker.handle((TaskExecution) o));
+        syncMessageBroker.receive(TaskMessageRoute.TASKS, o -> worker.handle((TaskExecution) o));
 
         TaskDispatcherChain taskDispatcherChain = new TaskDispatcherChain();
 
@@ -141,8 +141,8 @@ public class JobSyncExecutor {
             .taskExecutionService(builder.taskExecutionService)
             .build();
 
-        syncMessageBroker.receive(TaskQueues.TASKS_COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
-        syncMessageBroker.receive(TaskQueues.TASKS_JOBS, jobId -> coordinator.start((Long) jobId));
+        syncMessageBroker.receive(TaskMessageRoute.TASKS_COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
+        syncMessageBroker.receive(TaskMessageRoute.TASKS_JOBS, jobId -> coordinator.start((Long) jobId));
     }
 
     public static Builder builder() {

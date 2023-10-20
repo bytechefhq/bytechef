@@ -19,8 +19,8 @@
 
 package com.bytechef.message.broker.kafka.config;
 
-import com.bytechef.message.broker.ExchangeType;
-import com.bytechef.message.broker.Queues;
+import com.bytechef.message.broker.MessageRoute;
+import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
 import com.bytechef.message.broker.kafka.KafkaMessageBroker;
@@ -31,7 +31,6 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Stream;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -88,16 +87,17 @@ public class KafkaMessageBrokerConfiguration
 
     @Override
     public void registerListenerEndpoint(
-        KafkaListenerEndpointRegistrar listenerEndpointRegistrar, String queueName, int concurrency, Object delegate,
+        KafkaListenerEndpointRegistrar listenerEndpointRegistrar, MessageRoute messageRoute, int concurrency,
+        Object delegate,
         String methodName) {
 
-        if (Objects.equals(queueName, Queues.TASKS_CONTROL)) {
-            queueName = ExchangeType.CONTROL + "/" + ExchangeType.CONTROL;
+        if (messageRoute.isControlExchange()) {
+            messageRoute = SystemMessageRoute.CONTROL;
         }
 
         Class<?> delegateClass = delegate.getClass();
 
-        logger.info("Registering Kafka Listener: {} -> {}:{}", queueName, delegateClass.getName(), methodName);
+        logger.info("Registering Kafka Listener: {} -> {}:{}", messageRoute, delegateClass.getName(), methodName);
 
         Method listenerMethod = Stream.of(delegateClass.getMethods())
             .filter(it -> methodName.equals(it.getName()))
@@ -106,7 +106,7 @@ public class KafkaMessageBrokerConfiguration
                 () -> new IllegalArgumentException("No method found: " + methodName + " on " + delegate.getClass()));
 
         MethodKafkaListenerEndpoint<String, String> endpoint = createListenerEndpoint(
-            queueName, delegate, listenerMethod);
+            messageRoute.toString(), delegate, listenerMethod);
 
         listenerEndpointRegistrar.registerEndpoint(endpoint);
     }

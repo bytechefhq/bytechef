@@ -18,7 +18,7 @@
 package com.bytechef.event.listener.config;
 
 import com.bytechef.event.listener.EventListener;
-import com.bytechef.message.broker.Queues;
+import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.ApplicationContext;
@@ -52,7 +52,7 @@ public class EventListenerMessageBrokerConfiguration {
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                Queues.EVENTS,
+                SystemMessageRoute.EVENTS,
                 subscriptions.getEvents(),
                 eventListener,
                 "onApplicationEvent");

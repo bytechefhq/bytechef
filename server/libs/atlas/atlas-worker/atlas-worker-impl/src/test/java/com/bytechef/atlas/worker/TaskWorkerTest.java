@@ -19,8 +19,8 @@ package com.bytechef.atlas.worker;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.message.broker.TaskQueues;
-import com.bytechef.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskMessageRoute;
+import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.task.CancelControlTask;
 import com.bytechef.atlas.task.WorkflowTask;
@@ -45,9 +45,9 @@ public class TaskWorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         messageBroker.receive(
-            TaskQueues.TASKS_COMPLETIONS,
+            TaskMessageRoute.TASKS_COMPLETIONS,
             t -> Assertions.assertEquals("done", ((TaskExecution) t).getOutput()));
-        messageBroker.receive(Queues.EVENTS, t -> {});
+        messageBroker.receive(SystemMessageRoute.EVENTS, t -> {});
 
         TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(jt -> t -> "done")
@@ -69,10 +69,10 @@ public class TaskWorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         messageBroker.receive(
-            Queues.ERRORS,
+            SystemMessageRoute.ERRORS,
             t -> Assertions.assertEquals("bad input", ((TaskExecution) t).getError()
                 .getMessage()));
-        messageBroker.receive(Queues.EVENTS, t -> {});
+        messageBroker.receive(SystemMessageRoute.EVENTS, t -> {});
 
         TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(jt -> t -> {
@@ -95,13 +95,13 @@ public class TaskWorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         messageBroker.receive(
-            TaskQueues.TASKS_COMPLETIONS, t -> Assertions.assertEquals("done", ((TaskExecution) t).getOutput()));
-        messageBroker.receive(Queues.ERRORS, t -> {
+            TaskMessageRoute.TASKS_COMPLETIONS, t -> Assertions.assertEquals("done", ((TaskExecution) t).getOutput()));
+        messageBroker.receive(SystemMessageRoute.ERRORS, t -> {
             TaskExecution taskExecution = (TaskExecution) t;
 
             Assertions.assertNull(taskExecution.getError());
         });
-        messageBroker.receive(Queues.EVENTS, t -> {});
+        messageBroker.receive(SystemMessageRoute.EVENTS, t -> {});
 
         TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(t1 -> {
@@ -137,10 +137,9 @@ public class TaskWorkerTest {
             .getAbsolutePath();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
-        messageBroker.receive(TaskQueues.TASKS_COMPLETIONS, t -> {
-            Assertions.assertFalse(new File(tempDir).exists());
-        });
-        messageBroker.receive(Queues.EVENTS, t -> {});
+        messageBroker.receive(
+            TaskMessageRoute.TASKS_COMPLETIONS, t -> Assertions.assertFalse(new File(tempDir).exists()));
+        messageBroker.receive(SystemMessageRoute.EVENTS, t -> {});
 
         TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(t1 -> {
@@ -183,10 +182,10 @@ public class TaskWorkerTest {
             .getAbsolutePath();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
-        messageBroker.receive(Queues.ERRORS, t -> {
+        messageBroker.receive(SystemMessageRoute.ERRORS, t -> {
             Assertions.assertFalse(new File(tempDir).exists());
         });
-        messageBroker.receive(Queues.EVENTS, t -> {});
+        messageBroker.receive(SystemMessageRoute.EVENTS, t -> {});
         TaskWorker worker = TaskWorker.builder()
             .taskHandlerResolver(t1 -> {
                 String type = t1.getType();

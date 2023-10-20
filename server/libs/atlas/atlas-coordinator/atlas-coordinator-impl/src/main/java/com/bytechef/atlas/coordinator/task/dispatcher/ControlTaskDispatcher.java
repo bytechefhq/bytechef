@@ -20,7 +20,7 @@
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
 import com.bytechef.atlas.task.ControlTask;
-import com.bytechef.message.broker.ExchangeType;
+import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.task.Task;
 
@@ -40,7 +40,7 @@ public class ControlTaskDispatcher implements TaskDispatcher<ControlTask>, TaskD
 
     @Override
     public void dispatch(ControlTask controlTask) {
-        messageBroker.send(ExchangeType.CONTROL + "/" + ExchangeType.CONTROL, controlTask);
+        messageBroker.send(SystemMessageRoute.CONTROL, controlTask);
     }
 
     @Override
