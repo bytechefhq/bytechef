@@ -133,7 +133,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     public Workflow() {
     }
 
-    public Workflow(String id, Format format, String definition, Map<String, Object> source) {
+    public Workflow(String id, String definition, Format format, Map<String, Object> source) {
         Assert.notNull(id, "'id' must not be null.");
         Assert.notNull(format, "'format' must not be null.");
         Assert.notNull(source, "'source' must not be null.");
