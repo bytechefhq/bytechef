@@ -1,7 +1,7 @@
 import {PlusIcon, XMarkIcon} from '@heroicons/react/24/outline';
 import Button from 'components/Button/Button';
 import Select from 'components/Select/Select';
-import {ComponentDefinitionWithBasicActionsModel} from 'middleware/definition-registry';
+import {ComponentDefinitionModel} from 'middleware/definition-registry';
 import {useGetConnectionsQuery} from 'queries/connections.queries';
 
 import {useConnectionNoteStore} from '../../stores/useNodeDetailsDialogStore';
@@ -9,10 +9,10 @@ import {useConnectionNoteStore} from '../../stores/useNodeDetailsDialogStore';
 const ConnectionTab = ({
     currentComponent,
 }: {
-    currentComponent: ComponentDefinitionWithBasicActionsModel;
+    currentComponent: ComponentDefinitionModel;
 }) => {
     const {data: connections} = useGetConnectionsQuery({
-        componentNames: [currentComponent.connection!.componentName!],
+        componentNames: [currentComponent.name!],
     });
 
     const {showConnectionNote, setShowConnectionNote} =

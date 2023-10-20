@@ -1,11 +1,11 @@
-import {ComponentDefinitionWithBasicActionsModel} from 'middleware/definition-registry';
+import {ComponentDefinitionModel} from 'middleware/definition-registry';
 
 const PropertiesTab = ({
     currentComponent,
 }: {
-    currentComponent: ComponentDefinitionWithBasicActionsModel;
+    currentComponent: ComponentDefinitionModel;
 }) => {
-    return <div>Properties for {currentComponent.display.label}</div>;
+    return <div>Properties for {currentComponent.display.title}</div>;
 };
 
 export default PropertiesTab;

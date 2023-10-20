@@ -40,12 +40,13 @@ const NodeDetailsDialog = () => {
 
     const {data: currentComponent} = useGetComponentDefinitionQuery({
         componentName: currentNode.name,
-        componentVersion: currentNode.version,
     });
 
-    const singleActionComponent = currentComponent?.actions.length === 1;
+    const singleActionComponent =
+        currentComponent?.actions && currentComponent?.actions.length === 1;
 
-    const firstAction = currentComponent?.actions[0];
+    const firstAction =
+        currentComponent?.actions && currentComponent?.actions[0];
 
     return (
         <Dialog.Root
@@ -114,21 +115,25 @@ const NodeDetailsDialog = () => {
                                             </div>
                                         </>
                                     ) : (
-                                        <Select
-                                            contentClassName="max-w-select-trigger-width max-h-select-content-available-height-1/2"
-                                            label="Actions"
-                                            options={currentComponent?.actions.map(
-                                                (action) => ({
-                                                    label: action.display
-                                                        .title!,
-                                                    value: action.name,
-                                                    description:
-                                                        action.display
-                                                            .description,
-                                                })
+                                        <>
+                                            {currentComponent?.actions && (
+                                                <Select
+                                                    contentClassName="max-w-select-trigger-width max-h-select-content-available-height-1/2"
+                                                    label="Actions"
+                                                    options={currentComponent?.actions.map(
+                                                        (action) => ({
+                                                            label: action
+                                                                .display.title!,
+                                                            value: action.name,
+                                                            description:
+                                                                action.display
+                                                                    .description,
+                                                        })
+                                                    )}
+                                                    triggerClassName="w-full bg-gray-100"
+                                                />
                                             )}
-                                            triggerClassName="w-full bg-gray-100"
-                                        />
+                                        </>
                                     )}
                                 </div>
 
@@ -191,7 +196,7 @@ const NodeDetailsDialog = () => {
 
                             <div className="mt-auto flex p-4">
                                 <Select
-                                    defaultValue={currentComponent?.version.toString()}
+                                    defaultValue={currentComponent.version.toString()}
                                     options={[
                                         {label: 'v1', value: '1'},
                                         {label: 'v2', value: '2'},

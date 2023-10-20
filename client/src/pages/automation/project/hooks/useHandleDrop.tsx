@@ -1,7 +1,7 @@
 import {PlayIcon} from '@heroicons/react/24/outline';
 import {
-    ComponentDefinitionModel,
-    TaskDispatcherDefinitionModel,
+    ComponentDefinitionBasicModel,
+    TaskDispatcherDefinitionBasicModel,
 } from 'middleware/definition-registry';
 import {Edge, Node, useReactFlow} from 'reactflow';
 
@@ -11,11 +11,15 @@ import getRandomId from '../utils/getRandomId';
 export default function useHandleDrop(): [
     (
         targetNode: Node,
-        droppedNode: ComponentDefinitionModel | TaskDispatcherDefinitionModel
+        droppedNode:
+            | ComponentDefinitionBasicModel
+            | TaskDispatcherDefinitionBasicModel
     ) => void,
     (
         targetEdge: Edge,
-        droppedNode: ComponentDefinitionModel | TaskDispatcherDefinitionModel
+        droppedNode:
+            | ComponentDefinitionBasicModel
+            | TaskDispatcherDefinitionBasicModel
     ) => void
 ] {
     const {getEdges, setEdges, getNodes, setNodes} = useReactFlow();
@@ -28,7 +32,9 @@ export default function useHandleDrop(): [
 
     function handleDropOnPlaceholderNode(
         targetNode: Node,
-        droppedNode: ComponentDefinitionModel | TaskDispatcherDefinitionModel
+        droppedNode:
+            | ComponentDefinitionBasicModel
+            | TaskDispatcherDefinitionBasicModel
     ) {
         const newWorkflowNode = {
             ...targetNode,
@@ -94,7 +100,9 @@ export default function useHandleDrop(): [
 
     function handleDropOnWorkflowEdge(
         targetEdge: Edge,
-        droppedNode: ComponentDefinitionModel | TaskDispatcherDefinitionModel
+        droppedNode:
+            | ComponentDefinitionBasicModel
+            | TaskDispatcherDefinitionBasicModel
     ) {
         const previousNode = nodes.find(
             (node) => node.id === targetEdge.source

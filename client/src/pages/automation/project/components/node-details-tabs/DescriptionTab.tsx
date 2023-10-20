@@ -1,18 +1,18 @@
 import Input from 'components/Input/Input';
 import TextArea from 'components/TextArea/TextArea';
-import {ComponentDefinitionWithBasicActionsModel} from 'middleware/definition-registry';
+import {ComponentDefinitionModel} from 'middleware/definition-registry';
 
 const DescriptionTab = ({
     currentComponent,
 }: {
-    currentComponent: ComponentDefinitionWithBasicActionsModel;
+    currentComponent: ComponentDefinitionModel;
 }) => (
     <>
         <Input
             label="Name"
             labelClassName="px-2"
             name="componentDescriptionName"
-            defaultValue={currentComponent.display.label}
+            defaultValue={currentComponent.display.title}
         />
 
         <TextArea

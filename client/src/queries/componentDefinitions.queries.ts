@@ -2,7 +2,7 @@ import {useQuery} from '@tanstack/react-query';
 
 import {
     ComponentDefinitionBasicModel,
-    ComponentDefinitionWithBasicActionsModel,
+    ComponentDefinitionModel,
     ComponentDefinitionsApi,
     GetComponentDefinitionRequest,
     GetComponentDefinitionsRequest,
@@ -22,7 +22,7 @@ export const ComponentDefinitionKeys = {
 export const useGetComponentDefinitionQuery = (
     request: GetComponentDefinitionRequest
 ) =>
-    useQuery<ComponentDefinitionWithBasicActionsModel, Error>(
+    useQuery<ComponentDefinitionModel, Error>(
         ComponentDefinitionKeys.componentDefinition(request),
         () => new ComponentDefinitionsApi().getComponentDefinition(request)
     );

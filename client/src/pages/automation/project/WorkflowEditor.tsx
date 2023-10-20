@@ -1,7 +1,7 @@
 import {PlayIcon} from '@heroicons/react/24/outline';
 import {
-    ComponentDefinitionModel,
-    TaskDispatcherDefinitionModel,
+    ComponentDefinitionBasicModel,
+    TaskDispatcherDefinitionBasicModel,
 } from 'middleware/definition-registry';
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';
 import ReactFlow, {
@@ -27,8 +27,8 @@ import 'reactflow/dist/base.css';
 import './WorkflowEditor.css';
 
 type WorkflowProps = {
-    components: ComponentDefinitionModel[];
-    flowControls: TaskDispatcherDefinitionModel[];
+    components: ComponentDefinitionBasicModel[];
+    flowControls: TaskDispatcherDefinitionBasicModel[];
 };
 
 const Workflow = ({components, flowControls}: WorkflowProps): JSX.Element => {

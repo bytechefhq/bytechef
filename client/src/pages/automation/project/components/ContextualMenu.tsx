@@ -54,7 +54,6 @@ const ContextualMenu = ({
                     label: clickedItem.display?.title,
                     name: getFormattedName(clickedItem.name!, nodes),
                     icon: <Component1Icon className="h-8 w-8 text-gray-700" />,
-                    version: clickedItem.version,
                 },
                 position: {
                     x: 0,
@@ -137,7 +136,6 @@ const ContextualMenu = ({
                                     clickedItem.name!,
                                     nodes
                                 ),
-                                version: clickedItem.version,
                             },
                             type: 'workflow',
                         };
