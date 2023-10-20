@@ -16,6 +16,7 @@
 
 package com.integri.atlas.engine.coordinator.event;
 
+import com.integri.atlas.engine.coordinator.context.ContextService;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
@@ -28,14 +29,14 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Ivica Cardic
  */
-public class ContextJobStatusEventListener implements EventListener {
+public class DeleteContextEventListener implements EventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(ContextJobStatusEventListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeleteContextEventListener.class);
 
     private final ContextService contextService;
     private final JobRepository jobRepository;
 
-    public ContextJobStatusEventListener(ContextService contextService, JobRepository jobRepository) {
+    public DeleteContextEventListener(ContextService contextService, JobRepository jobRepository) {
         this.contextService = contextService;
         this.jobRepository = jobRepository;
     }

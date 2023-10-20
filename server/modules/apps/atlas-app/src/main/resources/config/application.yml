@@ -79,6 +79,9 @@ spring:
         size: 2
 
 atlas:
+  context:
+    delete-listener:
+      enabled: false
   coordinator:
     enabled: true
   message-broker:

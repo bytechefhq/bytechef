@@ -17,7 +17,7 @@
 package com.integri.atlas;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.coordinator.event.ContextService;
+import com.integri.atlas.engine.coordinator.context.ContextService;
 import com.integri.atlas.engine.coordinator.event.EventListener;
 import com.integri.atlas.engine.coordinator.event.EventListenerChain;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;

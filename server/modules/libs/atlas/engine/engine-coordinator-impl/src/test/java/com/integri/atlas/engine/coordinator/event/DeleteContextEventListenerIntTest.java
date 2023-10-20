@@ -16,6 +16,7 @@
 
 package com.integri.atlas.engine.coordinator.event;
 
+import com.integri.atlas.engine.coordinator.context.ContextService;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
@@ -37,7 +38,7 @@ import org.springframework.context.annotation.Bean;
  * @author Ivica Cardic
  */
 @SpringBootTest
-public class ContextJobStatusEventListenerIntTest extends BaseTaskIntTest {
+public class DeleteContextEventListenerIntTest extends BaseTaskIntTest {
 
     @Autowired
     private ContextRepository contextRepository;
@@ -63,11 +64,11 @@ public class ContextJobStatusEventListenerIntTest extends BaseTaskIntTest {
     public static class CoordinatorTestConfiguration {
 
         @Bean
-        ContextJobStatusEventListener contextJobStatusEventHandler(
+        DeleteContextEventListener deleteContextEventListener(
             ContextService contextService,
             JobRepository jobRepository
         ) {
-            return new ContextJobStatusEventListener(contextService, jobRepository);
+            return new DeleteContextEventListener(contextService, jobRepository);
         }
     }
 }
