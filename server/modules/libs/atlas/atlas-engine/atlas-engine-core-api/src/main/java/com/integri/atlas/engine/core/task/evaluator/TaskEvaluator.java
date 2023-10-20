@@ -38,4 +38,6 @@ public interface TaskEvaluator {
      * @return the evaluate {@link TaskExecution}.
      */
     TaskExecution evaluate(TaskExecution aJobTask, Context aContext);
+
+    <T> T evaluate(String expression, Class<T> returnType);
 }
