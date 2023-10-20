@@ -16,28 +16,25 @@
 
 package com.integri.atlas.task.handler.http.client.header;
 
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.BodyContentType;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_BODY_CONTENT_TYPE;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_FILE_ENTRY;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_HEADER_PARAMETERS;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_KEY;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_MIME_TYPE;
-import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RAW_PARAMETERS;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RESPONSE_FORMAT;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_VALUE;
 import static com.integri.atlas.task.handler.http.client.header.HttpHeader.BOUNDARY_TMPL;
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
-import com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.*;
-import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MimeTypeUtils;
-import org.springframework.util.MultiValueMap;
 
 /**
  * @author Matija Petanjek
@@ -45,15 +42,13 @@ import org.springframework.util.MultiValueMap;
 @Component
 public class HttpHeadersFactory {
 
-    private final JsonHelper jsonHelper;
-
-    public HttpHeadersFactory(JsonHelper jsonHelper) {
-        this.jsonHelper = jsonHelper;
-    }
-
     @SuppressWarnings("unchecked")
     public List<HttpHeader> getHttpHeaders(TaskExecution taskExecution) {
         Set<HttpHeader> httpHeaders = new HashSet<>();
+
+        if (taskExecution.containsKey(PROPERTY_HEADER_PARAMETERS)) {
+            httpHeaders.addAll(fromHeaderParameters(taskExecution.get(PROPERTY_HEADER_PARAMETERS, List.class)));
+        }
 
         if (taskExecution.containsKey(PROPERTY_RESPONSE_FORMAT)) {
             httpHeaders.add(new HttpHeader("Accept", MimeTypeUtils.ALL_VALUE));
@@ -65,7 +60,7 @@ public class HttpHeadersFactory {
 
         httpHeaders.addAll(getUserDefinedHttpHeaders(taskExecution));
 
-        return new ArrayList(httpHeaders);
+        return new ArrayList<>(httpHeaders);
     }
 
     private String getContentTypeValue(TaskExecution taskExecution) {
@@ -100,34 +95,17 @@ public class HttpHeadersFactory {
         Set<HttpHeader> httpHeaders = new HashSet<>();
 
         if (taskExecution.containsKey(PROPERTY_HEADER_PARAMETERS)) {
-            if (taskExecution.getBoolean(PROPERTY_RAW_PARAMETERS, false)) {
-                httpHeaders.addAll(
-                    fromHeaderParameters(
-                        jsonHelper.checkObject(taskExecution.get(PROPERTY_HEADER_PARAMETERS), String.class),
-                        (String value) -> value
-                    )
-                );
-            } else {
-                httpHeaders.addAll(
-                    fromHeaderParameters(
-                        taskExecution.get(PROPERTY_HEADER_PARAMETERS, MultiValueMap.class),
-                        (List<String> values) -> StringUtils.join(values, ',')
-                    )
-                );
-            }
+            httpHeaders.addAll(fromHeaderParameters(taskExecution.get(PROPERTY_HEADER_PARAMETERS)));
         }
 
         return httpHeaders;
     }
 
-    private <T> List<HttpHeader> fromHeaderParameters(
-        Map<String, T> headerParameters,
-        Function<T, String> entryValueFunction
-    ) {
+    private List<HttpHeader> fromHeaderParameters(List<Map<String, String>> headerParameters) {
         List<HttpHeader> httpHeaders = new ArrayList<>();
 
-        for (Map.Entry<String, T> entry : headerParameters.entrySet()) {
-            httpHeaders.add(new HttpHeader(entry.getKey(), entryValueFunction.apply(entry.getValue())));
+        for (Map<String, String> parameter : headerParameters) {
+            httpHeaders.add(new HttpHeader(parameter.get(PROPERTY_KEY), parameter.get(PROPERTY_VALUE)));
         }
 
         return httpHeaders;
