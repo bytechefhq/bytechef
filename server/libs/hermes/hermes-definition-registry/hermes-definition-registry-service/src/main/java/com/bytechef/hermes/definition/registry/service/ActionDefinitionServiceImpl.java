@@ -30,8 +30,10 @@ import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.definition.DynamicOptionsProperty;
+import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.OptionsDataSource;
 import com.bytechef.hermes.definition.PropertiesDataSource;
+import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
@@ -100,11 +102,12 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         ComponentPropertiesFunction propertiesFunction = (ComponentPropertiesFunction) propertiesDataSource
             .getProperties();
 
-        return propertiesFunction.apply(
+        List<? extends Property.ValueProperty<?>> valueProperties = propertiesFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            actionParameters)
-            .stream()
+            actionParameters);
+
+        return valueProperties.stream()
             .map(valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty))
             .toList();
     }
@@ -122,11 +125,12 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         ComponentOptionsFunction optionsFunction = (ComponentOptionsFunction) optionsDataSource.getOptions();
 
-        return optionsFunction.apply(
+        List<Option<?>> options = optionsFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            actionParameters, searchText)
-            .stream()
+            actionParameters, searchText);
+
+        return options.stream()
             .map(OptionDTO::new)
             .toList();
     }
