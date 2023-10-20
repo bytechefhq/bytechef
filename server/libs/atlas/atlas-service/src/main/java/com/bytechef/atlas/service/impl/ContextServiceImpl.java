@@ -38,49 +38,44 @@ public class ContextServiceImpl implements ContextService {
     }
 
     @Override
-    public void push(long stackId, Context.Classname classname, @NonNull Context context) {
-        Assert.notNull(context, "'context' must not be null.");
+    public void push(long stackId, Context.Classname classname, Map<String, Object> value) {
+        Assert.notNull(classname, "'classname' must not be null.");
+        Assert.notNull(value, "'value' must not be null.");
 
-        context.setClassnameId(classname.getId());
-        context.setId(null);
+        Context context = new Context(stackId, classname, value);
+
         context.setNew(true);
-        context.setStackId(stackId);
 
         contextRepository.save(context);
     }
 
     @Override
     public void push(
-        @NonNull long stackId, @NonNull int subStackId, Context.Classname classname, @NonNull Context context) {
-        Assert.notNull(context, "'context' must not be null.");
+        long stackId, int subStackId, Context.Classname classname, @NonNull Map<String, Object> value) {
+        Assert.notNull(classname, "'classname' must not be null.");
+        Assert.notNull(value, "'value' must not be null.");
 
-        context.setClassnameId(classname.getId());
-        context.setId(null);
+        Context context = new Context(stackId, subStackId, classname, value);
+
         context.setNew(true);
-        context.setSubStackId(subStackId);
-        context.setStackId(stackId);
 
         contextRepository.save(context);
     }
 
     @Override
-    public Context push(long stackId, Context.Classname classname, Map<String, Object> value) {
-        Context context = new Context(stackId, classname, value);
-
-        context.setNew(true);
-
-        return contextRepository.save(context);
-    }
-
-    @Override
     @Transactional(readOnly = true)
-    public Context peek(long stackId, Context.Classname classname) {
-        return contextRepository.findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(stackId, classname.getId());
+    public Map<String, Object> peek(long stackId, Context.Classname classname) {
+        Context context = contextRepository.findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(
+            stackId, classname.getId());
+
+        return context.getValue();
     }
 
     @Override
-    public Context peek(long stackId, int subStackId, Context.Classname classname) {
-        return contextRepository.findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(stackId, subStackId,
-            classname.getId());
+    public Map<String, Object> peek(long stackId, int subStackId, Context.Classname classname) {
+        Context context = contextRepository.findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
+            stackId, subStackId, classname.getId());
+
+        return context.getValue();
     }
 }

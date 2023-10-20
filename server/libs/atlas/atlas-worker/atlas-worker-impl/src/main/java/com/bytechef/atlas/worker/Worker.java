@@ -19,7 +19,6 @@
 
 package com.bytechef.atlas.worker;
 
-import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
@@ -39,6 +38,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -163,7 +163,7 @@ public class Worker {
     }
 
     private TaskExecution doExecuteTask(TaskExecution taskExecution) throws Exception {
-        Context context = new Context();
+        Map<String, Object> context = new HashMap<>();
 
         try {
             long startTime = System.currentTimeMillis();
@@ -198,8 +198,10 @@ public class Worker {
         }
     }
 
-    private void executeSubTasks(TaskExecution taskExecution, List<WorkflowTask> subWorkflowTasks, Context context)
+    private void executeSubTasks(
+        TaskExecution taskExecution, List<WorkflowTask> subWorkflowTasks, Map<String, Object> context)
         throws Exception {
+
         for (WorkflowTask subWorkflowTask : subWorkflowTasks) {
             TaskExecution subTaskExecution = TaskExecution.of(taskExecution.getJobId(), subWorkflowTask);
 

@@ -19,6 +19,7 @@ package com.bytechef.atlas.rsocket.client.service;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.service.ContextService;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
 
@@ -37,21 +38,18 @@ public class ContextServiceRSocketClient implements ContextService {
     }
 
     @Override
-    public void push(long stackId, Context.Classname classname, Context context) {
-        context.setClassnameId(classname.getId());
-        context.setStackId(stackId);
+    public void push(long stackId, Context.Classname classname, Map<String, Object> value) {
+        Context context = new Context(stackId, classname, value);
 
-        rSocketRequester.route("pushStack")
+        rSocketRequester.route("pushStackWithValue")
             .data(context)
             .send()
             .block();
     }
 
     @Override
-    public void push(long stackId, int subStackId, Context.Classname classname, Context context) {
-        context.setClassnameId(classname.getId());
-        context.setSubStackId(subStackId);
-        context.setStackId(stackId);
+    public void push(long stackId, int subStackId, Context.Classname classname, Map<String, Object> value) {
+        Context context = new Context(stackId, subStackId, classname, value);
 
         rSocketRequester.route("pushStackWithSubStackId")
             .data(context)
@@ -60,41 +58,20 @@ public class ContextServiceRSocketClient implements ContextService {
     }
 
     @Override
-    public Context push(long stackId, Context.Classname classname, Map<String, Object> value) {
-        Context context = new Context(stackId, classname, value);
-
-        return rSocketRequester.route("pushStackWithValue")
-            .data(context)
-            .retrieveMono(Context.class)
-            .block();
-    }
-
-    @Override
-    public Context peek(long stackId, Context.Classname classname) {
-        Context context = new Context();
-
-        context.setClassnameId(classname.getId());
-        context.setStackId(stackId);
-
+    public Map<String, Object> peek(long stackId, Context.Classname classname) {
         return rSocketRequester
             .route("peekStack")
-            .data(context)
-            .retrieveMono(Context.class)
+            .data(new Context(stackId, classname))
+            .retrieveMono(new ParameterizedTypeReference<Map<String, Object>>() {})
             .block();
     }
 
     @Override
-    public Context peek(long stackId, int subStackId, Context.Classname classname) {
-        Context context = new Context();
-
-        context.setClassnameId(classname.getId());
-        context.setStackId(stackId);
-        context.setSubStackId(subStackId);
-
+    public Map<String, Object> peek(long stackId, int subStackId, Context.Classname classname) {
         return rSocketRequester
             .route("peekStackWithSubStack")
-            .data(context)
-            .retrieveMono(Context.class)
+            .data(new Context(stackId, subStackId, classname))
+            .retrieveMono(new ParameterizedTypeReference<Map<String, Object>>() {})
             .block();
     }
 }

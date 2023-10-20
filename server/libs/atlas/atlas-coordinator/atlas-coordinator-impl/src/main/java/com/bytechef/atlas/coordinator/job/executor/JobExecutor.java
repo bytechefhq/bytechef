@@ -33,6 +33,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Arik Cohen
@@ -76,7 +77,7 @@ public class JobExecutor {
 
     @SuppressFBWarnings("NP")
     private void executeNextTask(Job job, Workflow workflow) {
-        Context context = contextService.peek(job.getId(), Context.Classname.JOB);
+        Map<String, Object> context = contextService.peek(job.getId(), Context.Classname.JOB);
         TaskExecution nextTaskExecution = nextTaskExecution(job, workflow);
 
         nextTaskExecution = taskExecutionService.create(nextTaskExecution);

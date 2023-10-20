@@ -24,6 +24,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 /**
  * @author Ivica Cardic
  */
@@ -39,7 +41,8 @@ public class ContextServiceRSocketController {
 
     @MessageMapping("pushStack")
     public Mono<Void> pushStack(Context context) {
-        contextService.push(context.getStackId(), Context.Classname.valueOf(context.getClassnameId()), context);
+        contextService.push(
+            context.getStackId(), Context.Classname.valueOf(context.getClassnameId()), context.getValue());
 
         return Mono.empty();
     }
@@ -47,7 +50,7 @@ public class ContextServiceRSocketController {
     @MessageMapping("pushStackWithSubStackId")
     public Mono<Void> pushStackWithSubStackId(Context context) {
         contextService.push(context.getStackId(), context.getSubStackId(),
-            Context.Classname.valueOf(context.getClassnameId()), context);
+            Context.Classname.valueOf(context.getClassnameId()), context.getValue());
 
         return Mono.empty();
     }
@@ -61,13 +64,13 @@ public class ContextServiceRSocketController {
     }
 
     @MessageMapping("peekStack")
-    public Mono<Context> peekStack(Context context) {
+    public Mono<Map<String, Object>> peekStack(Context context) {
         return Mono.create(sink -> sink
             .success(contextService.peek(context.getStackId(), Context.Classname.valueOf(context.getClassnameId()))));
     }
 
     @MessageMapping("peekStackWithSubStackId")
-    public Mono<Context> peekStackWithSubStackId(Context context) {
+    public Mono<Map<String, Object>> peekStackWithSubStackId(Context context) {
         return Mono.create(sink -> sink
             .success(contextService.peek(context.getStackId(), context.getSubStackId(),
                 Context.Classname.valueOf(context.getClassnameId()))));
