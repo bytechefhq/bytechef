@@ -4,8 +4,8 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.hermes.definition.registry.web.rest.model.AuthorizationModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ValuePropertyModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinition", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-24T18:32:48.786669+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-27T08:02:46.343401+01:00[Europe/Zagreb]")
 public class ConnectionDefinitionModel {
 
   @JsonProperty("authorizationRequired")
@@ -40,12 +40,15 @@ public class ConnectionDefinitionModel {
   @JsonProperty("componentName")
   private String componentName;
 
+  @JsonProperty("connectionVersion")
+  private String connectionVersion;
+
   @JsonProperty("display")
   private DisplayModel display;
 
   @JsonProperty("properties")
   @Valid
-  private List<ValuePropertyModel> properties = null;
+  private List<PropertyModel> properties = null;
 
   @JsonProperty("resources")
   private ResourcesModel resources;
@@ -118,6 +121,25 @@ public class ConnectionDefinitionModel {
     this.componentName = componentName;
   }
 
+  public ConnectionDefinitionModel connectionVersion(String connectionVersion) {
+    this.connectionVersion = connectionVersion;
+    return this;
+  }
+
+  /**
+   * The connection version.
+   * @return connectionVersion
+  */
+  
+  @Schema(name = "connectionVersion", description = "The connection version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public String getConnectionVersion() {
+    return connectionVersion;
+  }
+
+  public void setConnectionVersion(String connectionVersion) {
+    this.connectionVersion = connectionVersion;
+  }
+
   public ConnectionDefinitionModel display(DisplayModel display) {
     this.display = display;
     return this;
@@ -137,12 +159,12 @@ public class ConnectionDefinitionModel {
     this.display = display;
   }
 
-  public ConnectionDefinitionModel properties(List<ValuePropertyModel> properties) {
+  public ConnectionDefinitionModel properties(List<PropertyModel> properties) {
     this.properties = properties;
     return this;
   }
 
-  public ConnectionDefinitionModel addPropertiesItem(ValuePropertyModel propertiesItem) {
+  public ConnectionDefinitionModel addPropertiesItem(PropertyModel propertiesItem) {
     if (this.properties == null) {
       this.properties = new ArrayList<>();
     }
@@ -156,11 +178,11 @@ public class ConnectionDefinitionModel {
   */
   @Valid 
   @Schema(name = "properties", description = "The properties of the connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<ValuePropertyModel> getProperties() {
+  public List<PropertyModel> getProperties() {
     return properties;
   }
 
-  public void setProperties(List<ValuePropertyModel> properties) {
+  public void setProperties(List<PropertyModel> properties) {
     this.properties = properties;
   }
 
@@ -189,11 +211,11 @@ public class ConnectionDefinitionModel {
   }
 
   /**
-   * The connection version.
+   * Get version
    * @return version
   */
   
-  @Schema(name = "version", description = "The connection version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Double getVersion() {
     return version;
   }
@@ -214,6 +236,7 @@ public class ConnectionDefinitionModel {
     return Objects.equals(this.authorizationRequired, connectionDefinition.authorizationRequired) &&
         Objects.equals(this.authorizations, connectionDefinition.authorizations) &&
         Objects.equals(this.componentName, connectionDefinition.componentName) &&
+        Objects.equals(this.connectionVersion, connectionDefinition.connectionVersion) &&
         Objects.equals(this.display, connectionDefinition.display) &&
         Objects.equals(this.properties, connectionDefinition.properties) &&
         Objects.equals(this.resources, connectionDefinition.resources) &&
@@ -222,7 +245,7 @@ public class ConnectionDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizationRequired, authorizations, componentName, display, properties, resources, version);
+    return Objects.hash(authorizationRequired, authorizations, componentName, connectionVersion, display, properties, resources, version);
   }
 
   @Override
@@ -232,6 +255,7 @@ public class ConnectionDefinitionModel {
     sb.append("    authorizationRequired: ").append(toIndentedString(authorizationRequired)).append("\n");
     sb.append("    authorizations: ").append(toIndentedString(authorizations)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
+    sb.append("    connectionVersion: ").append(toIndentedString(connectionVersion)).append("\n");
     sb.append("    display: ").append(toIndentedString(display)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");

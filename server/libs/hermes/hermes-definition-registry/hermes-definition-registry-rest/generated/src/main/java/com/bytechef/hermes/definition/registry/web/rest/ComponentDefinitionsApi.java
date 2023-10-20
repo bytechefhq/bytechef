@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-24T18:32:48.786669+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-27T08:02:46.343401+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "action-definitions", description = "the action-definitions API")
 public interface ComponentDefinitionsApi {
@@ -49,7 +49,7 @@ public interface ComponentDefinitionsApi {
      * @param componentName The name of the component. (required)
      * @param componentVersion The version of the component to get. (required)
      * @param actionName The name of the action to get. (required)
-     * @return OK (status code 200)
+     * @return Successful operation. (status code 200)
      */
     @Operation(
         operationId = "getActionDefinition",
@@ -57,7 +57,7 @@ public interface ComponentDefinitionsApi {
         description = "Get an action of a component definition.",
         tags = { "action-definitions" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "OK", content = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ActionDefinitionModel.class))
             })
         }
@@ -93,7 +93,7 @@ public interface ComponentDefinitionsApi {
      *
      * @param name The name of the component to get. (required)
      * @param version The version of the component to get. (required)
-     * @return OK (status code 200)
+     * @return Successful operation. (status code 200)
      */
     @Operation(
         operationId = "getComponentDefinition",
@@ -101,7 +101,7 @@ public interface ComponentDefinitionsApi {
         description = "Get a component definition.",
         tags = { "component-definitions" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "OK", content = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ComponentDefinitionWithBasicActionsModel.class))
             })
         }
@@ -120,7 +120,7 @@ public interface ComponentDefinitionsApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"connection\" : { \"authorizationRequired\" : true, \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"authorizations\" : [ { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"properties\" : [ null, null ] }, { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"properties\" : [ null, null ] } ], \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"componentName\" : \"componentName\", \"version\" : 0.8008281904610115, \"properties\" : [ null, null ] }, \"actions\" : [ { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\" }, { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\" } ], \"version\" : 6 }";
+                String exampleString = "{ \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"connection\" : { \"authorizationRequired\" : true, \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"authorizations\" : [ { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"properties\" : [ { \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"displayOption\" : { \"hide\" : { \"key\" : [ \"{}\", \"{}\" ] }, \"show\" : { \"key\" : [ \"{}\", \"{}\" ] } }, \"required\" : true }, { \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"displayOption\" : { \"hide\" : { \"key\" : [ \"{}\", \"{}\" ] }, \"show\" : { \"key\" : [ \"{}\", \"{}\" ] } }, \"required\" : true } ] }, { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"properties\" : [ { \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"displayOption\" : { \"hide\" : { \"key\" : [ \"{}\", \"{}\" ] }, \"show\" : { \"key\" : [ \"{}\", \"{}\" ] } }, \"required\" : true }, { \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"displayOption\" : { \"hide\" : { \"key\" : [ \"{}\", \"{}\" ] }, \"show\" : { \"key\" : [ \"{}\", \"{}\" ] } }, \"required\" : true } ] } ], \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"componentName\" : \"componentName\", \"version\" : 0.8008281904610115, \"connectionVersion\" : \"connectionVersion\", \"properties\" : [ { \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"displayOption\" : { \"hide\" : { \"key\" : [ \"{}\", \"{}\" ] }, \"show\" : { \"key\" : [ \"{}\", \"{}\" ] } }, \"required\" : true }, { \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"displayOption\" : { \"hide\" : { \"key\" : [ \"{}\", \"{}\" ] }, \"show\" : { \"key\" : [ \"{}\", \"{}\" ] } }, \"required\" : true } ] }, \"actions\" : [ { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\" }, { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\" } ], \"version\" : 6 }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -135,7 +135,7 @@ public interface ComponentDefinitionsApi {
      * Get all component definition versions of a component definition.
      *
      * @param name The name of the component to get. (required)
-     * @return OK (status code 200)
+     * @return Successful operation. (status code 200)
      */
     @Operation(
         operationId = "getComponentDefinitionVersions",
@@ -143,7 +143,7 @@ public interface ComponentDefinitionsApi {
         description = "Get all component definition versions of a component definition.",
         tags = { "component-definitions" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "OK", content = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ComponentDefinitionBasicModel.class)))
             })
         }
@@ -177,7 +177,7 @@ public interface ComponentDefinitionsApi {
      *
      * @param connectionDefinitions Use for filtering components which define connection definitions. (optional)
      * @param connectionInstances Use for filtering components which have connection instances created. (optional)
-     * @return OK (status code 200)
+     * @return Successful operation. (status code 200)
      */
     @Operation(
         operationId = "getComponentDefinitions",
@@ -185,7 +185,7 @@ public interface ComponentDefinitionsApi {
         description = "Get all component definitions.",
         tags = { "component-definitions" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "OK", content = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ComponentDefinitionBasicModel.class)))
             })
         }

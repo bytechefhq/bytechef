@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-24T18:32:48.786669+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-27T08:02:46.343401+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "task-dispatcher-definitions", description = "the task-dispatcher-definitions API")
 public interface TaskDispatcherDefinitionsApi {
@@ -44,7 +44,7 @@ public interface TaskDispatcherDefinitionsApi {
      * GET /task-dispatcher-definitions : Get all task dispatcher definitions.
      * Get all task dispatcher definitions.
      *
-     * @return OK (status code 200)
+     * @return Successful operation. (status code 200)
      */
     @Operation(
         operationId = "getTaskDispatcherDefinitions",
@@ -52,7 +52,7 @@ public interface TaskDispatcherDefinitionsApi {
         description = "Get all task dispatcher definitions.",
         tags = { "task-dispatcher-definitions" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "OK", content = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = TaskDispatcherDefinitionModel.class)))
             })
         }
