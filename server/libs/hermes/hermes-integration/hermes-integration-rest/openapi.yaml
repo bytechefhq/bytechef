@@ -126,6 +126,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Integration'
+  /integrations/{id}/workflows:
+    post:
+      description: Creates new workflow and adds it to an existing integration.
+      summary: Creates new workflow and adds it to an existing integration.
+      tags:
+        - integrations
+      operationId: postIntegrationWorkflow
+      parameters:
+        - name: id
+          description: The id of the integration.
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - workflowName
+              properties:
+                workflowName:
+                  type: string
+        required: true
+      responses:
+        "200":
+          description: The updated integration object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Integration'
   /integrations/{id}/tags:
     put:
       description: Updates tags of an existing integration.
