@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.workflow.repository;
 
-import com.integri.atlas.engine.coordinator.cache.Clearable;
+import com.integri.atlas.engine.cache.Clearable;
 import com.integri.atlas.engine.workflow.Workflow;
 import java.util.List;
 import java.util.stream.Collectors;
