@@ -1,7 +1,7 @@
 import {CogIcon} from '@heroicons/react/24/outline';
 import ThemeSwitcher from '../../components/ThemeSwitcher/ThemeSwitcher';
 import cx from 'classnames';
-import SidebarContentLayout from '../../components/Layouts/SidebarContentLayout';
+import LayoutContainer from '../../layouts/LayoutContainer/LayoutContainer';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import React from 'react';
 
@@ -9,7 +9,7 @@ const navigation = [{name: 'Display', href: '#', icon: CogIcon, current: true}];
 
 export default function Settings() {
     return (
-        <SidebarContentLayout
+        <LayoutContainer
             header={<PageHeader title="Display" />}
             leftSidebarHeader={
                 <h1
@@ -56,6 +56,6 @@ export default function Settings() {
                     </dl>
                 </div>
             </div>
-        </SidebarContentLayout>
+        </LayoutContainer>
     );
 }

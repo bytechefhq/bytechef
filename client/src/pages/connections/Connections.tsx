@@ -1,4 +1,4 @@
-import SidebarContentLayout from '../../components/Layouts/SidebarContentLayout';
+import LayoutContainer from '../../layouts/LayoutContainer/LayoutContainer';
 import PageHeader from '../../components/PageHeader/PageHeader';
 import React, {useState} from 'react';
 import LeftSidebarMenu from '../../layouts/LeftSidebarMenu/LeftSidebarMenu';
@@ -28,7 +28,7 @@ const Connections = () => {
     const {isLoading: tagsIsLoading, data: tags} = useGetConnectionTagsQuery();
 
     return (
-        <SidebarContentLayout
+        <LayoutContainer
             header={<PageHeader position={'main'} title="All Connections" />}
             leftSidebarHeader={
                 <PageHeader leftSidebar={true} title="Connections" />
