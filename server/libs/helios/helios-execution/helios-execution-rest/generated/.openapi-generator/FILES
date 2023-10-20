@@ -2,7 +2,9 @@ README.md
 pom.xml
 src/main/java/com/bytechef/helios/configuration/web/rest/ApiUtil.java
 src/main/java/com/bytechef/helios/configuration/web/rest/ProjectWorkflowExecutionsApi.java
+src/main/java/com/bytechef/helios/configuration/web/rest/model/CategoryModel.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/JobAllOfModel.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/ProjectWorkflowExecutionBasicModel.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/ProjectWorkflowExecutionModel.java
+src/main/java/com/bytechef/helios/configuration/web/rest/model/TagModel.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/WorkflowModel.java

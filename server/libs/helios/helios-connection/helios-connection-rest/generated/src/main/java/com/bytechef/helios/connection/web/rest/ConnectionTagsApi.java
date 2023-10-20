@@ -5,7 +5,7 @@
  */
 package com.bytechef.helios.connection.web.rest;
 
-import com.bytechef.tag.web.rest.model.TagModel;
+import com.bytechef.helios.connection.web.rest.model.TagModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-16T09:53:37.311699+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-28T21:55:47.675278+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "connection-tags", description = "The Automation Connection Tags API")
 public interface ConnectionTagsApi {
