@@ -62,7 +62,7 @@ public class JobParametersDTO {
 
     @Default
     public JobParametersDTO(Map<String, Object> inputs, String label, Map<String, Object> outputs,
-                            Long parentTaskExecutionId, Integer priority, String workflowId, List<Map<String, Object>> webhooks) {
+        Long parentTaskExecutionId, Integer priority, String workflowId, List<Map<String, Object>> webhooks) {
 
         if (inputs != null) {
             this.inputs = new HashMap<>(inputs);

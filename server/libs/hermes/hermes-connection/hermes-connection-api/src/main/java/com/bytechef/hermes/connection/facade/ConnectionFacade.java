@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.connection.facade;
 
-import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.connection.dto.ConnectionDTO;
 import com.bytechef.tag.domain.Tag;
 
 import java.util.List;
@@ -27,17 +27,17 @@ import java.util.List;
  */
 public interface ConnectionFacade {
 
-    Connection create(Connection connection);
+    ConnectionDTO create(ConnectionDTO connectionDTO);
 
     void delete(Long id);
 
-    Connection getConnection(Long id);
+    ConnectionDTO getConnection(Long id);
 
-    List<Connection> getConnections(List<String> componentNames, List<Long> tagIds);
+    List<ConnectionDTO> getConnections(List<String> componentNames, List<Long> tagIds);
 
     List<Tag> getConnectionTags();
 
-    Connection update(Long id, List<Tag> tags);
+    ConnectionDTO update(Long id, List<Tag> tags);
 
-    Connection update(Connection connection);
+    ConnectionDTO update(ConnectionDTO connectionDTO);
 }

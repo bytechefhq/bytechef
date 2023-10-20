@@ -17,11 +17,12 @@
 
 package com.bytechef.hermes.connection.repository;
 
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Map;
-import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,43 +48,32 @@ public class ConnectionRepositoryIntTest {
     public void testCreate() {
         Connection connection = connectionRepository.save(getConnection());
 
-        Assertions.assertEquals(
-            connection, connectionRepository.findById(connection.getId())
-                .get());
+        Assertions.assertEquals(connection, OptionalUtils.get(connectionRepository.findById(connection.getId())));
     }
 
     @Test
     public void testDelete() {
         Connection connection = connectionRepository.save(getConnection());
 
-        Assertions.assertEquals(
-            connection, connectionRepository.findById(connection.getId())
-                .orElseThrow());
+        Assertions.assertEquals(connection, OptionalUtils.get(connectionRepository.findById(connection.getId())));
 
         connectionRepository.deleteById(connection.getId());
 
-        Assertions.assertFalse(connectionRepository.findById(connection.getId())
-            .isPresent());
+        Assertions.assertFalse(OptionalUtils.isPresent(connectionRepository.findById(connection.getId())));
     }
 
     @Test
     public void testFindAll() {
         connectionRepository.save(getConnection());
 
-        Assertions.assertEquals(
-            1,
-            StreamSupport.stream(connectionRepository.findAll()
-                .spliterator(), false)
-                .count());
+        Assertions.assertEquals(1, CollectionUtils.count(connectionRepository.findAll()));
     }
 
     @Test
     public void testFindById() {
         Connection connection = connectionRepository.save(getConnection());
 
-        Assertions.assertEquals(
-            connection, connectionRepository.findById(connection.getId())
-                .get());
+        Assertions.assertEquals(connection, OptionalUtils.get(connectionRepository.findById(connection.getId())));
     }
 
     @Test
@@ -95,22 +85,19 @@ public class ConnectionRepositoryIntTest {
 
         connectionRepository.save(connection);
 
-        Connection updatedConnection = connectionRepository.findById(connection.getId())
-            .get();
+        Connection updatedConnection = OptionalUtils.get(connectionRepository.findById(connection.getId()));
 
         Assertions.assertEquals("name2", updatedConnection.getName());
         Assertions.assertEquals(Map.of("key2", "value2"), updatedConnection.getParameters());
     }
 
     private static Connection getConnection() {
-        Connection connection = new Connection();
-
-        connection.setComponentName("componentName");
-        connection.setKey("key");
-        connection.setName("name");
-        connection.setParameters(Map.of("key1", "value1"));
-        connection.setVersion(1);
-
-        return connection;
+        return Connection.Builder.builder()
+            .componentName("componentName")
+            .key("key")
+            .name("name")
+            .parameters(Map.of("key1", "value1"))
+            .version(1)
+            .build();
     }
 }

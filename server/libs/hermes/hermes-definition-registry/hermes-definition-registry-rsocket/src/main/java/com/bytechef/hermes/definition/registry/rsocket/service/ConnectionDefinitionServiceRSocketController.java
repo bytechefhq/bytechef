@@ -23,7 +23,6 @@ import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
-import com.bytechef.tag.domain.Tag;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
@@ -122,7 +121,7 @@ public class ConnectionDefinitionServiceRSocketController {
         connection.setKey(MapValueUtils.getString(map, "key"));
         connection.setName(MapValueUtils.getString(map, "name"));
         connection.setParameters(MapValueUtils.getMap(map, "parameters"));
-        connection.setTags(MapValueUtils.getList(map, "tags", Tag.class));
+        connection.setTagIds(MapValueUtils.getList(map, "tagIds", Long.class));
         connection.setVersion(MapValueUtils.getInteger(map, "version"));
 
         return connection;

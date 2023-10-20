@@ -17,10 +17,13 @@
 
 package com.bytechef.hermes.project.web.rest.mapper;
 
+import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
 import com.bytechef.hermes.project.domain.ProjectInstance;
 import com.bytechef.hermes.project.web.rest.mapper.config.ProjectMapperSpringConfig;
 import com.bytechef.hermes.project.web.rest.model.ProjectInstanceModel;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -30,4 +33,8 @@ import org.springframework.core.convert.converter.Converter;
 public interface ProjectInstanceMapper extends Converter<ProjectInstance, ProjectInstanceModel> {
 
     ProjectInstanceModel convert(ProjectInstance projectInstance);
+
+    @Mapping(target = "active", ignore = true)
+    @Mapping(target = "tags", ignore = true)
+    ConnectionModel convert(Connection connection);
 }

@@ -18,7 +18,6 @@
 package com.bytechef.hermes.connection.domain;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -29,13 +28,13 @@ import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.tag.domain.Tag;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
@@ -89,9 +88,6 @@ public final class Connection implements Persistable<Long> {
     @Column("parameters")
     private EncryptedMapWrapper parameters;
 
-    @Transient
-    private List<Tag> tags = new ArrayList<>();
-
     @Version
     private int version;
 
@@ -99,12 +95,12 @@ public final class Connection implements Persistable<Long> {
         this.parameters = new EncryptedMapWrapper(Collections.emptyMap());
     }
 
-    public void addTag(Tag tag) {
-        if (tag.getId() != null) {
-            connectionTags.add(new ConnectionTag(tag));
-        }
+    public Connection(long id, String name, List<Long> tagIds, int version) {
+        this.id = id;
+        this.name = name;
+        this.version = version;
 
-        tags.add(tag);
+        setTagIds(tagIds);
     }
 
     public boolean containsParameter(String name) {
@@ -215,10 +211,6 @@ public final class Connection implements Persistable<Long> {
             .toList();
     }
 
-    public List<Tag> getTags() {
-        return List.copyOf(tags);
-    }
-
     public int getVersion() {
         return version;
     }
@@ -257,17 +249,24 @@ public final class Connection implements Persistable<Long> {
     }
 
     public void setParameters(Map<String, Object> parameters) {
-        this.parameters = new EncryptedMapWrapper(parameters);
+        if (!CollectionUtils.isEmpty(parameters)) {
+            this.parameters = new EncryptedMapWrapper(parameters);
+        }
+    }
+
+    public void setTagIds(List<Long> tagIds) {
+        this.connectionTags = new HashSet<>();
+
+        if (!CollectionUtils.isEmpty(tagIds)) {
+            for (Long tagId : tagIds) {
+                connectionTags.add(new ConnectionTag(tagId));
+            }
+        }
     }
 
     public void setTags(List<Tag> tags) {
-        this.connectionTags = new HashSet<>();
-        this.tags = new ArrayList<>();
-
         if (!CollectionUtils.isEmpty(tags)) {
-            for (Tag tag : tags) {
-                addTag(tag);
-            }
+            setTagIds(com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId));
         }
     }
 
@@ -297,12 +296,85 @@ public final class Connection implements Persistable<Long> {
             + lastModifiedDate + '}';
     }
 
-    public Connection update(Connection connection) {
-        this.setName(connection.getName());
-        this.setTags(connection.getTags());
-        this.setVersion(connection.getVersion());
+    @SuppressFBWarnings("EI")
+    public static final class Builder {
+        private String authorizationName;
+        private String componentName;
+        private int connectionVersion;
+        private Long id;
+        private String key;
+        private String name;
+        private Map<String, Object> parameters;
+        private List<Long> tagIds;
+        private int version;
 
-        return this;
+        private Builder() {
+        }
+
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        public Builder authorizationName(String authorizationName) {
+            this.authorizationName = authorizationName;
+            return this;
+        }
+
+        public Builder componentName(String componentName) {
+            this.componentName = componentName;
+            return this;
+        }
+
+        public Builder connectionVersion(int connectionVersion) {
+            this.connectionVersion = connectionVersion;
+            return this;
+        }
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder key(String key) {
+            this.key = key;
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder parameters(Map<String, Object> parameters) {
+            this.parameters = parameters;
+            return this;
+        }
+
+        public Builder tagIds(List<Long> tagIds) {
+            this.tagIds = tagIds;
+            return this;
+        }
+
+        public Builder version(int version) {
+            this.version = version;
+            return this;
+        }
+
+        public Connection build() {
+            Connection connection = new Connection();
+
+            connection.setAuthorizationName(authorizationName);
+            connection.setComponentName(componentName);
+            connection.setConnectionVersion(connectionVersion);
+            connection.setId(id);
+            connection.setKey(key);
+            connection.setName(name);
+            connection.setParameters(parameters);
+            connection.setVersion(version);
+            connection.setTagIds(tagIds);
+
+            return connection;
+        }
     }
 
     private static class ConnectionImpl implements Context.Connection {

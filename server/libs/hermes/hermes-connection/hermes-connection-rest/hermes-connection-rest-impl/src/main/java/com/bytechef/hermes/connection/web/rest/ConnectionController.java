@@ -19,7 +19,7 @@ package com.bytechef.hermes.connection.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.hermes.connection.config.OAuth2Properties;
-import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.facade.ConnectionFacade;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
 import com.bytechef.hermes.connection.web.rest.model.OAuth2AuthorizationParametersModel;
@@ -68,7 +68,7 @@ public class ConnectionController implements ConnectionsApi {
         return connectionModelMono.map(connectionModel -> ResponseEntity.ok(
             conversionService.convert(
                 connectionFacade.create(
-                    conversionService.convert(connectionModel, Connection.class)),
+                    conversionService.convert(connectionModel, ConnectionDTO.class)),
                 ConnectionModel.class)));
     }
 
@@ -103,12 +103,14 @@ public class ConnectionController implements ConnectionsApi {
     public Mono<ResponseEntity<OAuth2AuthorizationParametersModel>> getConnectionOAuth2AuthorizationParameters(
         Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
 
-        return connectionModelMono.map(connectionModel -> ResponseEntity.ok(
-            conversionService.convert(
-                connectionDefinitionService.getOAuth2Parameters(
-                    oAuth2Properties.checkPredefinedApp(
-                        conversionService.convert(connectionModel, Connection.class))),
-                OAuth2AuthorizationParametersModel.class)));
+        return connectionModelMono
+            .map(connectionModel -> conversionService.convert(connectionModel, ConnectionDTO.class))
+            .map(ConnectionDTO::toConnection)
+            .map(connection -> connectionDefinitionService.getOAuth2Parameters(
+                oAuth2Properties.checkPredefinedApp(connection)))
+            .map(oAuth2AuthorizationParametersDTO -> conversionService.convert(
+                oAuth2AuthorizationParametersDTO, OAuth2AuthorizationParametersModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override
@@ -118,7 +120,7 @@ public class ConnectionController implements ConnectionsApi {
         return connectionModelMono.map(connectionModel -> ResponseEntity.ok(
             conversionService.convert(
                 connectionFacade.update(
-                    conversionService.convert(connectionModel.id(id), Connection.class)),
+                    conversionService.convert(connectionModel.id(id), ConnectionDTO.class)),
                 ConnectionModel.class)));
     }
 

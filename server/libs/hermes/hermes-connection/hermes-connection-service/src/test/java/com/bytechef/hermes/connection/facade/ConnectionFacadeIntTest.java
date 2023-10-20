@@ -17,9 +17,12 @@
 
 package com.bytechef.hermes.connection.facade;
 
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.connection.service.ConnectionServiceImpl;
@@ -78,48 +81,48 @@ public class ConnectionFacadeIntTest {
 
     @Test
     public void testCreate() {
-        Connection connection = new Connection();
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .componentName("componentName")
+            .key("key")
+            .name("name1")
+            .tags(List.of(new Tag("tag1")))
+            .build();
 
-        connection.setComponentName("componentName");
-        connection.setKey("key");
-        connection.setName("name1");
-        connection.setTags(List.of(new Tag("tag1")));
+        connectionDTO = connectionFacade.create(connectionDTO);
 
-        connection = connectionFacade.create(connection);
-
-        assertThat(connection.getName()).isEqualTo("name1");
-        assertThat(connection.getId()).isNotNull();
-        assertThat(connection.getTagIds()).hasSize(1);
+        assertThat(connectionDTO.name()).isEqualTo("name1");
+        assertThat(connectionDTO.id()).isNotNull();
+        assertThat(connectionDTO.tags()).hasSize(1);
     }
 
     @Test
     public void testDelete() {
-        Connection connection1 = new Connection();
+        ConnectionDTO connectionDTO1 = ConnectionDTO.builder()
+            .componentName("componentName")
+            .key("key")
+            .name("name1")
+            .tags(List.of(new Tag("tag1")))
+            .build();
 
-        connection1.setComponentName("componentName");
-        connection1.setKey("key");
-        connection1.setName("name1");
-        connection1.setTags(List.of(new Tag("tag1")));
+        connectionDTO1 = connectionFacade.create(connectionDTO1);
 
-        connection1 = connectionFacade.create(connection1);
+        ConnectionDTO connectionDTO2 = ConnectionDTO.builder()
+            .componentName("componentName")
+            .key("key")
+            .name("name2")
+            .tags(List.of(new Tag("tag1")))
+            .build();
 
-        Connection connection2 = new Connection();
-
-        connection2.setComponentName("componentName");
-        connection2.setKey("key");
-        connection2.setName("name2");
-        connection2.setTags(List.of(new Tag("tag1")));
-
-        connection2 = connectionFacade.create(connection2);
+        connectionDTO2 = connectionFacade.create(connectionDTO2);
 
         assertThat(connectionRepository.count()).isEqualTo(2);
         assertThat(tagRepository.count()).isEqualTo(1);
 
-        connectionFacade.delete(connection1.getId());
+        connectionFacade.delete(connectionDTO1.id());
 
         assertThat(connectionRepository.count()).isEqualTo(1);
 
-        connectionFacade.delete(connection2.getId());
+        connectionFacade.delete(connectionDTO2.id());
 
         assertThat(connectionRepository.count()).isEqualTo(0);
         assertThat(tagRepository.count()).isEqualTo(1);
@@ -141,7 +144,7 @@ public class ConnectionFacadeIntTest {
         connection = connectionRepository.save(connection);
 
         assertThat(connectionFacade.getConnection(connection.getId()))
-            .isEqualTo(connection)
+            .isEqualTo(new ConnectionDTO(connection, List.of(tag1, tag2)))
             .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
     }
 
@@ -160,14 +163,14 @@ public class ConnectionFacadeIntTest {
 
         connection = connectionRepository.save(connection);
 
-        List<Connection> connections = connectionFacade.getConnections(null, null);
+        List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(null, null);
 
-        assertThat(connections).isEqualTo(List.of(connection));
+        assertThat(CollectionUtils.map(connectionDTOs, ConnectionDTO::toConnection)).isEqualTo(List.of(connection));
 
-        connection = connections.get(0);
+        ConnectionDTO connectionDTO = connectionDTOs.get(0);
 
         assertThat(connectionFacade.getConnection(connection.getId()))
-            .isEqualTo(connection)
+            .isEqualTo(connectionDTO)
             .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
     }
 
@@ -177,11 +180,12 @@ public class ConnectionFacadeIntTest {
         Connection connection = new Connection();
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
+        Tag tag2 = tagRepository.save(new Tag("tag2"));
 
         connection.setComponentName("componentName");
         connection.setKey("key");
         connection.setName("name");
-        connection.setTags(List.of(tag1, tagRepository.save(new Tag("tag2"))));
+        connection.setTags(List.of(tag1, tag2));
 
         connectionRepository.save(connection);
 
@@ -196,8 +200,7 @@ public class ConnectionFacadeIntTest {
         connection.setKey("key");
         connection.setName("name2");
 
-        tag1 = tagRepository.findById(tag1.getId())
-            .orElseThrow();
+        tag1 = OptionalUtils.get(tagRepository.findById(tag1.getId()));
 
         connection.setTags(List.of(tag1, tagRepository.save(new Tag("tag3"))));
 
@@ -218,27 +221,31 @@ public class ConnectionFacadeIntTest {
 
     @Test
     public void testUpdate() {
-        Connection connection = new Connection();
-
-        connection.setComponentName("componentName");
-        connection.setKey("key");
-        connection.setName("name");
-
         Tag tag1 = new Tag("tag1");
 
-        connection.setTags(List.of(tag1, tagRepository.save(new Tag("tag2"))));
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .componentName("componentName")
+            .key("key")
+            .name("name")
+            .tags(List.of(tag1, tagRepository.save(new Tag("tag2"))))
+            .build();
 
-        connection = connectionFacade.create(connection);
+        connectionDTO = connectionFacade.create(connectionDTO);
 
-        assertThat(connection.getTagIds()).hasSize(2);
+        assertThat(connectionDTO.tags()).hasSize(2);
 
-        connection.setTags(List.of(tag1));
+        connectionDTO = ConnectionDTO.builder()
+            .componentName("componentName")
+            .id(connectionDTO.id())
+            .key("key")
+            .name("name")
+            .tags(List.of(tag1))
+            .version(connectionDTO.version())
+            .build();
 
-        connectionRepository.save(connection);
+        connectionDTO = connectionFacade.update(connectionDTO);
 
-        connection = connectionFacade.update(connection);
-
-        assertThat(connection.getTagIds()).hasSize(1);
+        assertThat(connectionDTO.tags()).hasSize(1);
     }
 
     @TestConfiguration
