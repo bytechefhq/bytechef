@@ -20,6 +20,7 @@
 package com.bytechef.component.schedule;
 
 import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -30,7 +31,36 @@ public class ScheduleComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/schedule_v1.json", new ScheduleComponentHandler(null).getDefinition());
+        JsonFileAssert.assertEquals("definition/schedule_v1.json", new ScheduleComponentHandler(null).getDefinition());
+    }
+
+    @Test
+    @Disabled
+    public void testCronTrigger() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testEveryDayTrigger() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testEveryMonthTrigger() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testEveryWeekTrigger() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testIntervalTrigger() {
+        // TODO
     }
 }

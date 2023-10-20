@@ -20,6 +20,7 @@
 package com.bytechef.component.datamapper;
 
 import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,5 +33,47 @@ public class DataMapperComponentHandlerTest {
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
             "definition/data_mapper_v1.json", new DataMapperComponentHandler().getDefinition());
+    }
+
+    @Test
+    @Disabled
+    public void testMapKeysAction() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testMapListToObjectAction() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testMapMultipleValuesBetweenObjectsAction() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testMapObjectsAction() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testMapObjectsToListAction() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testMapOneValueAction() {
+        // TODO
+    }
+
+    @Test
+    @Disabled
+    public void testMapValuesAction() {
+        // TODO
     }
 }
