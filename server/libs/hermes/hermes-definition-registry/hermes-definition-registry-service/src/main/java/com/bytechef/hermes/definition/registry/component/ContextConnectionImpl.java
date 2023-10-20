@@ -57,8 +57,7 @@ public class ContextConnectionImpl implements Context.Connection {
 
     @Override
     public Optional<String> fetchBaseUri() {
-        return connectionDefinitionService.fetchBaseUri(
-            componentName, connectionVersion, parameters);
+        return connectionDefinitionService.fetchBaseUri(componentName, connectionVersion, parameters);
     }
 
     @Override
@@ -76,7 +75,6 @@ public class ContextConnectionImpl implements Context.Connection {
         return "ContextConnection{" +
             "authorizationName='" + authorizationName + '\'' +
             ", componentName='" + componentName + '\'' +
-            ", connectionDefinitionService=" + connectionDefinitionService +
             ", connectionVersion=" + connectionVersion +
             ", parameters=" + parameters +
             '}';
