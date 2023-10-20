@@ -45,7 +45,7 @@ const DropdownMenu = ({
         <Portal>
             <Content
                 align="end"
-                className="radix-side-bottom:animate-slide-down radix-side-top:animate-slide-up z-50 rounded-lg border border-gray-50 bg-white p-1.5 shadow-md"
+                className="data-[side=bottom]:animate-slide-down data-[side=top]:animate-slide-up z-50 rounded-lg border border-gray-50 bg-white p-1.5 shadow-md"
                 id={id.toString()}
             >
                 {menuItems.map((menuItem, i) => {
