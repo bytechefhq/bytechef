@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
@@ -108,8 +107,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             outputSchema = OptionalUtils.orElse(actionDefinition.getOutputSchema(), Collections.emptyList());
         } else {
             // TODO
-            //  Parse outputSchemaProperty and build new output schema definition.
-            //  Use SampleDataType to parse sample. Default is JSON.
+            // Parse outputSchemaProperty and build new output schema definition.
+            // Use SampleDataType to parse sample. Default is JSON.
         }
 
         return new ActionDefinitionDTO(

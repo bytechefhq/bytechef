@@ -269,7 +269,9 @@ public sealed interface Property<P extends Property<P>>
     sealed interface StringProperty
         extends ValueProperty<String, StringProperty> permits ModifiableStringProperty {
 
-        enum SampleDataType {CSV, JSON, XML}
+        enum SampleDataType {
+            CSV, JSON, XML
+        }
 
         Optional<List<Option<?>>> getOptions();
 

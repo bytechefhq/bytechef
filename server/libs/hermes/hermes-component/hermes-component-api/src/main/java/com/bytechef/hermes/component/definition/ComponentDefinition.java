@@ -32,36 +32,100 @@ import java.util.Optional;
 @JsonDeserialize(as = ComponentDSL.ModifiableComponentDefinition.class)
 public sealed interface ComponentDefinition permits ComponentDSL.ModifiableComponentDefinition {
 
+    /**
+     *
+     * @return
+     */
     Optional<FilterCompatibleConnectionDefinitionsFunction> getFilterCompatibleConnectionDefinitions();
 
+    /**
+     *
+     * @return
+     */
     Optional<List<? extends ActionDefinition>> getActions();
 
+    /**
+     *
+     * @return
+     */
     Optional<String> getCategory();
 
+    /**
+     *
+     * @return
+     */
     Optional<ConnectionDefinition> getConnection();
 
+    /**
+     *
+     * @return
+     */
     Optional<Boolean> getCustomAction();
 
+    /**
+     *
+     * @return
+     */
     Optional<Help> getCustomActionHelp();
 
+    /**
+     *
+     * @return
+     */
     Optional<String> getDescription();
 
+    /**
+     *
+     * @return
+     */
     String getIcon();
 
+    /**
+     *
+     * @return
+     */
     Map<String, Object> getMetadata();
 
+    /**
+     *
+     * @return
+     */
     String getName();
 
+    /**
+     *
+     * @return
+     */
     NodeDescriptionFunction getNodeDescription();
 
+    /**
+     *
+     * @return
+     */
     Optional<Resources> getResources();
 
+    /**
+     *
+     * @return
+     */
     Optional<String[]> getTags();
 
+    /**
+     *
+     * @return
+     */
     String getTitle();
 
+    /**
+     *
+     * @return
+     */
     Optional<List<? extends TriggerDefinition>> getTriggers();
 
+    /**
+     *
+     * @return
+     */
     int getVersion();
 
     /**
