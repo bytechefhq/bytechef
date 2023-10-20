@@ -20,7 +20,6 @@ package com.bytechef.dione.integration.facade;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.category.domain.Category;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.dione.integration.domain.Integration;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.dione.integration.dto.IntegrationDTO;
@@ -99,7 +98,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(long id) {
         Integration integration = integrationService.getIntegration(id);
 
         for (String workflowId : integration.getWorkflowIds()) {
@@ -115,14 +114,14 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public IntegrationDTO getIntegration(Long id) {
+    public IntegrationDTO getIntegration(long id) {
         Integration integration = integrationService.getIntegration(id);
 
         return new IntegrationDTO(
             integration,
             integration.getCategoryId() == null
                 ? null
-                : OptionalUtils.get(categoryService.fetchCategory(integration.getCategoryId())),
+                : categoryService.getCategory(integration.getCategoryId()),
             tagService.getTags(integration.getTagIds()));
     }
 
@@ -144,32 +143,23 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     public List<IntegrationDTO> searchIntegrations(List<Long> categoryIds, List<Long> tagIds) {
         List<Integration> integrations = integrationService.searchIntegrations(categoryIds, tagIds);
 
-        List<Category> categories = categoryService.getCategories(integrations.stream()
-            .map(Integration::getCategoryId)
-            .filter(Objects::nonNull)
-            .toList());
-
-        List<Tag> tags = tagService.getTags(
-            integrations.stream()
-                .flatMap(integration -> com.bytechef.commons.util.CollectionUtils.stream(integration.getTagIds()))
-                .filter(Objects::nonNull)
-                .toList());
-
         return com.bytechef.commons.util.CollectionUtils.map(
             integrations,
             integration -> new IntegrationDTO(
                 integration,
                 com.bytechef.commons.util.CollectionUtils.findFirstOrElse(
-                    categories,
+                    categoryService.getCategories(
+                        com.bytechef.commons.util.CollectionUtils.map(
+                            integrations, Integration::getCategoryId, Objects::nonNull)),
                     category -> Objects.equals(integration.getCategoryId(), category.getId()),
                     null),
                 com.bytechef.commons.util.CollectionUtils.filter(
-                    tags,
-                    tag -> {
-                        List<Long> curTagIds = integration.getTagIds();
-
-                        return curTagIds.contains(tag.getId());
-                    })));
+                    tagService.getTags(
+                        com.bytechef.commons.util.CollectionUtils.flatMap(
+                            integrations, curIntegration -> com.bytechef.commons.util.CollectionUtils.stream(
+                                curIntegration.getTagIds()),
+                            Objects::nonNull)),
+                    tag -> com.bytechef.commons.util.CollectionUtils.contains(integration.getTagIds(), tag.getId()))));
     }
 
     @Override
@@ -186,14 +176,15 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public List<Workflow> getIntegrationWorkflows(Long id) {
+    @Transactional(readOnly = true)
+    public List<Workflow> getIntegrationWorkflows(long id) {
         Integration integration = integrationService.getIntegration(id);
 
         return workflowService.getWorkflows(integration.getWorkflowIds());
     }
 
     @Override
-    public IntegrationDTO update(Long id, List<Tag> tags) {
+    public IntegrationDTO update(long id, List<Tag> tags) {
         tags = CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
 
         Integration integration = integrationService.update(
@@ -201,9 +192,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
         return new IntegrationDTO(
             integration,
-            integration.getCategoryId() == null
-                ? null
-                : OptionalUtils.get(categoryService.fetchCategory(integration.getCategoryId())),
+            integration.getCategoryId() == null ? null : categoryService.getCategory(integration.getCategoryId()),
             tags);
     }
 

@@ -157,6 +157,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Workflow> getWorkflows(List<String> workflowIds) {
         List<Workflow> workflows = new ArrayList<>();
 

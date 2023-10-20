@@ -63,11 +63,13 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Tag getTag(long id) {
         return OptionalUtils.get(tagRepository.findById(id));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Tag> getTags() {
         return StreamSupport.stream(
             tagRepository.findAll(Sort.by("name"))
@@ -77,6 +79,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Tag> getTags(@NonNull List<Long> ids) {
         Assert.notNull(ids, "'ids' must not be null");
 

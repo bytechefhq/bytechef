@@ -24,6 +24,7 @@ import com.bytechef.helios.project.repository.ProjectInstanceRepository;
 import com.bytechef.helios.project.domain.ProjectInstance;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -35,6 +36,7 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @Service
+@Transactional
 public class ProjectInstanceServiceImpl implements ProjectInstanceService {
 
     private final ProjectInstanceJobRepository projectInstanceJobRepository;
@@ -79,21 +81,25 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProjectInstance getProjectInstance(long id) {
         return OptionalUtils.get(projectInstanceRepository.findById(id));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Long> getProjectIds() {
         return projectInstanceRepository.findAllProjectId();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProjectInstance> getProjectInstances() {
         return searchProjectInstances(List.of(), List.of());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProjectInstance> searchProjectInstances(List<Long> projectIds, List<Long> tagIds) {
         Iterable<ProjectInstance> projectInstanceIterable;
 

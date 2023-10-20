@@ -34,20 +34,20 @@ public interface IntegrationFacade {
 
     IntegrationDTO create(IntegrationDTO integrationDTO);
 
-    void delete(Long id);
+    void delete(long id);
 
-    IntegrationDTO getIntegration(Long id);
+    IntegrationDTO getIntegration(long id);
 
     @Transactional(readOnly = true)
     List<Category> getIntegrationCategories();
 
     List<Tag> getIntegrationTags();
 
-    List<Workflow> getIntegrationWorkflows(Long id);
+    List<Workflow> getIntegrationWorkflows(long id);
 
     List<IntegrationDTO> searchIntegrations(List<Long> categoryIds, List<Long> tagIds);
 
-    IntegrationDTO update(Long id, List<Tag> tags);
+    IntegrationDTO update(long id, List<Tag> tags);
 
     IntegrationDTO update(IntegrationDTO integration);
 }

@@ -70,16 +70,14 @@ public class JobController implements JobsApi {
 
     @Override
     public Mono<ResponseEntity<CreateJob200ResponseModel>> createJob(
-        Mono<JobParametersModel> workflowParametersModelMono, ServerWebExchange exchange) {
+        Mono<JobParametersModel> jobParametersModelMono, ServerWebExchange exchange) {
 
-        return workflowParametersModelMono.map(workflowParametersModel -> {
-            JobParametersDTO jobParametersDTO = conversionService.convert(
-                workflowParametersModel, JobParametersDTO.class);
-
-            long jobId = jobFactory.create(jobParametersDTO);
-
-            return ResponseEntity.ok(new CreateJob200ResponseModel().jobId(jobId));
-        });
+        return jobParametersModelMono
+            .map(jobParametersModel -> new CreateJob200ResponseModel()
+                .jobId(
+                    jobFactory.create(
+                        conversionService.convert(jobParametersModel, JobParametersDTO.class))))
+            .map(ResponseEntity::ok);
     }
 
     @Override

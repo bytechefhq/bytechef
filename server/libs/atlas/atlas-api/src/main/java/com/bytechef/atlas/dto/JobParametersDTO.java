@@ -116,14 +116,14 @@ public class JobParametersDTO {
             return false;
         }
 
-        JobParametersDTO workflowParameters = (JobParametersDTO) o;
+        JobParametersDTO jobParametersDTO = (JobParametersDTO) o;
 
-        return Objects.equals(this.inputs, workflowParameters.inputs)
-            && Objects.equals(this.label, workflowParameters.label)
-            && Objects.equals(this.parentTaskExecutionId, workflowParameters.parentTaskExecutionId)
-            && Objects.equals(this.priority, workflowParameters.priority)
-            && Objects.equals(this.workflowId, workflowParameters.workflowId)
-            && Objects.equals(this.webhooks, workflowParameters.webhooks);
+        return Objects.equals(this.inputs, jobParametersDTO.inputs)
+            && Objects.equals(this.label, jobParametersDTO.label)
+            && Objects.equals(this.parentTaskExecutionId, jobParametersDTO.parentTaskExecutionId)
+            && Objects.equals(this.priority, jobParametersDTO.priority)
+            && Objects.equals(this.workflowId, jobParametersDTO.workflowId)
+            && Objects.equals(this.webhooks, jobParametersDTO.webhooks);
     }
 
     @Override

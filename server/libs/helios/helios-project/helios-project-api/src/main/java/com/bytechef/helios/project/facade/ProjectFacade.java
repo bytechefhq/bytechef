@@ -41,15 +41,15 @@ public interface ProjectFacade {
 
     long createProjectInstanceJob(long id, String workflowId);
 
-    void deleteProject(Long id);
+    void deleteProject(long id);
 
-    void deleteProjectInstance(Long projectInstanceId);
+    void deleteProjectInstance(long projectInstanceId);
 
     ProjectDTO duplicateProject(long id);
 
-    ProjectDTO getProject(Long id);
+    ProjectDTO getProject(long id);
 
-    ProjectInstanceDTO getProjectInstance(Long projectInstanceId);
+    ProjectInstanceDTO getProjectInstance(long projectInstanceId);
 
     List<Category> getProjectCategories();
 
@@ -57,7 +57,7 @@ public interface ProjectFacade {
 
     List<Tag> getProjectTags();
 
-    List<Workflow> getProjectWorkflows(Long id);
+    List<Workflow> getProjectWorkflows(long id);
 
     ProjectExecutionDTO getProjectExecution(long id);
 
@@ -75,6 +75,6 @@ public interface ProjectFacade {
 
     ProjectInstanceDTO updateProjectInstanceTags(Long projectInstanceId, List<Tag> tags);
 
-    ProjectDTO updateProjectTags(Long id, List<Tag> tags);
+    ProjectDTO updateProjectTags(long id, List<Tag> tags);
 
 }

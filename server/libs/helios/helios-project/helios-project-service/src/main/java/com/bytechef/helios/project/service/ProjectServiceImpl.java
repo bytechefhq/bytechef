@@ -27,6 +27,7 @@ import java.util.Optional;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -34,6 +35,7 @@ import org.springframework.util.CollectionUtils;
  * @author Ivica Cardic
  */
 @Service
+@Transactional
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
@@ -78,26 +80,31 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Project> fetchProject(String name) {
         return projectRepository.findByName(name);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Project getProject(long id) {
         return OptionalUtils.get(projectRepository.findById(id));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Project> getProjects() {
         return com.bytechef.commons.util.CollectionUtils.toList(projectRepository.findAll(Sort.by("name")));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Project> getProjects(List<Long> ids) {
         return com.bytechef.commons.util.CollectionUtils.toList(projectRepository.findAllById(ids));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Project> searchProjects(List<Long> categoryIds, List<Long> ids, List<Long> tagIds) {
         Iterable<Project> projectIterable;
 

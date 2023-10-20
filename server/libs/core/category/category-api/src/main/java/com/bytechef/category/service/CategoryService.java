@@ -20,7 +20,6 @@ package com.bytechef.category.service;
 import com.bytechef.category.domain.Category;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CategoryService {
 
@@ -33,8 +32,6 @@ public interface CategoryService {
     Category getCategory(long id);
 
     List<Category> getCategories(List<Long> ids);
-
-    Optional<Category> fetchCategory(Long id);
 
     Category save(Category category);
 
