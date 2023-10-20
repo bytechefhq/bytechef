@@ -18,6 +18,9 @@
 
 package com.bytechef.config;
 
+import com.bytechef.atlas.config.AtlasProperties;
+import com.bytechef.atlas.config.CoordinatorProperties;
+import com.bytechef.atlas.config.WorkerProperties;
 import com.bytechef.atlas.coordinator.Coordinator;
 import com.bytechef.atlas.coordinator.event.EventListener;
 import com.bytechef.atlas.message.broker.Exchanges;

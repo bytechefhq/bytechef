@@ -19,13 +19,11 @@ package com.bytechef.atlas.workflow.service;
 import com.bytechef.atlas.workflow.domain.Workflow;
 import com.bytechef.atlas.workflow.repository.WorkflowRepository;
 import java.util.List;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Ivica Cardic
  */
-@Service
 @Transactional
 public class WorkflowService {
 

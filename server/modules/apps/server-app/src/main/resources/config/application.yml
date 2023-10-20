@@ -53,7 +53,7 @@ management:
 
 spring:
   application:
-    name: atlas-app
+    name: server-app
   jackson:
     default-property-inclusion: non_null
     serialization:
@@ -76,13 +76,13 @@ spring:
           prefetch: 1
   task:
     execution:
-      thread-name-prefix: atlas-application-task-
+      thread-name-prefix: server-application-task-
       pool:
         core-size: 2
         max-size: 50
         queue-capacity: 10000
     scheduling:
-      thread-name-prefix: atlas-application-scheduling-
+      thread-name-prefix: server-application-scheduling-
       pool:
         size: 2
 

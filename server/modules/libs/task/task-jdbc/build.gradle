@@ -1,9 +1,9 @@
 dependencies {
     api project(":modules:libs:atlas:atlas-worker:atlas-worker-api")
-    api project(":modules:libs:hermes:descriptor:descriptor-api")
 
     implementation "org.apache.commons:commons-lang3"
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-jdbc"
+    implementation project(":modules:libs:hermes:descriptor:descriptor-api")
 }

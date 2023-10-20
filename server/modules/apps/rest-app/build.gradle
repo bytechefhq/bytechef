@@ -1,0 +1,28 @@
+plugins {
+    id "org.springframework.boot"
+}
+
+group = "com.bytechef.api"
+description = ""
+
+apply from: "gradle/docker.gradle"
+
+if (project.hasProperty("prod")) {
+    apply from: "gradle/profile_prod.gradle"
+} else {
+    apply from: "gradle/profile_dev.gradle"
+}
+
+compileJava.dependsOn processResources
+processResources.dependsOn bootBuildInfo
+
+defaultTasks "bootRun"
+
+springBoot {
+    mainClassName = "com.bytechef.RestApp"
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+}

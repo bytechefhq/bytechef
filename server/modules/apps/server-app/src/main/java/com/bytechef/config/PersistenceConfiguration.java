@@ -18,6 +18,8 @@
 
 package com.bytechef.config;
 
+import com.bytechef.atlas.config.AtlasProperties;
+import com.bytechef.atlas.config.WorkflowRepositoryProperties;
 import com.bytechef.atlas.context.repository.ContextRepository;
 import com.bytechef.atlas.context.repository.jdbc.JdbcContextRepository;
 import com.bytechef.atlas.counter.repository.CounterRepository;

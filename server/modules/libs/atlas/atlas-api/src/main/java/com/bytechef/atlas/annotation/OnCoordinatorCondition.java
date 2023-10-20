@@ -33,9 +33,11 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 public class OnCoordinatorCondition extends SpringBootCondition {
 
     @Override
-    public ConditionOutcome getMatchOutcome(ConditionContext aContext, AnnotatedTypeMetadata aMetadata) {
-        String property = aContext.getEnvironment().getProperty("atlas.coordinator.enabled");
-        boolean result = Boolean.valueOf(property);
+    public ConditionOutcome getMatchOutcome(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {
+        String property = conditionContext.getEnvironment().getProperty("atlas.coordinator.enabled");
+
+        boolean result = Boolean.valueOf(property == null ? "true" : property);
+
         return new ConditionOutcome(
                 result,
                 ConditionMessage.forCondition(

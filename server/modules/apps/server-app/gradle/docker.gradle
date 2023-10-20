@@ -3,7 +3,7 @@ jib {
         image = "eclipse-temurin:17-jre-focal"
     }
     to {
-        image = "bytechef-app:latest"
+        image = "server-app:latest"
     }
     container {
         entrypoint = ["bash", "-c", "/entrypoint.sh"]
