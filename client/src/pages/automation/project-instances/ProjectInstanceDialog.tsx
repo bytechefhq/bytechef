@@ -11,6 +11,8 @@ import {ProjectKeys} from 'queries/projects.queries';
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
+import {create} from 'zustand';
+import {devtools} from 'zustand/middleware';
 
 import ProjectInstanceDialogBasicStep from './ProjectInstanceDialogBasicStep';
 import ProjectInstanceDialogWorkflowsStep from './ProjectInstanceDialogWorkflowsStep';
@@ -21,6 +23,28 @@ interface ProjectDialogProps {
     visible?: boolean;
     onClose?: () => void;
 }
+
+export interface WorkflowsEnabledState {
+    workflowEnabledMap: Map<string, boolean>;
+    setEnabled: (workflowId: string, enabled: boolean) => void;
+}
+
+export const useWorkflowsEnabledStateStore = create<WorkflowsEnabledState>()(
+    devtools(
+        (set) => ({
+            setEnabled: (workflowId, enabled) =>
+                set((state) => ({
+                    workflowEnabledMap: new Map<string, boolean>(
+                        state.workflowEnabledMap.set(workflowId, enabled)
+                    ),
+                })),
+            workflowEnabledMap: new Map<string, boolean>(),
+        }),
+        {
+            name: 'project-instances-enabled',
+        }
+    )
+);
 
 const ProjectInstanceDialog = ({
     onClose,
@@ -33,7 +57,7 @@ const ProjectInstanceDialog = ({
 
     const {
         control,
-        formState: {errors, isValid, touchedFields},
+        formState,
         getValues,
         handleSubmit,
         register,
@@ -42,16 +66,18 @@ const ProjectInstanceDialog = ({
     } = useForm<ProjectInstanceModel>({
         defaultValues: {
             description: projectInstance?.description || '',
+            enabled: projectInstance?.enabled || false,
             name: projectInstance?.name || '',
             project: projectInstance?.project || null,
             projectId: projectInstance?.id || 0,
+            projectInstanceWorkflows: [],
             tags:
                 projectInstance?.tags?.map((tag) => ({
                     ...tag,
                     label: tag.name,
                 })) || [],
         } as ProjectInstanceModel,
-        mode: 'onChange',
+        mode: 'onBlur',
     });
 
     const queryClient = useQueryClient();
@@ -63,6 +89,7 @@ const ProjectInstanceDialog = ({
             queryClient.invalidateQueries(ProjectKeys.projectList({}));
 
             closeDialog();
+            setActiveStepIndex(0);
         },
     });
 
@@ -73,12 +100,14 @@ const ProjectInstanceDialog = ({
             queryClient.invalidateQueries(ProjectKeys.projectList({}));
 
             closeDialog();
+            setActiveStepIndex(0);
         },
     });
 
     function closeDialog() {
         reset();
 
+        setActiveStepIndex(0);
         setIsOpen(false);
 
         if (onClose) {
@@ -92,11 +121,11 @@ const ProjectInstanceDialog = ({
                 <ProjectInstanceDialogBasicStep
                     projectInstance={projectInstance}
                     control={control}
-                    touchedFields={touchedFields}
+                    touchedFields={formState.touchedFields}
                     register={register}
                     setValue={setValue}
                     getValues={getValues}
-                    errors={errors}
+                    errors={formState.errors}
                 />
             ),
             name: 'Basic',
@@ -104,6 +133,7 @@ const ProjectInstanceDialog = ({
         {
             content: (
                 <ProjectInstanceDialogWorkflowsStep
+                    formState={formState}
                     getValues={getValues}
                     register={register}
                 />
@@ -114,8 +144,6 @@ const ProjectInstanceDialog = ({
 
     function saveProjectInstance() {
         const formData = getValues();
-
-        console.log('formData', formData);
 
         if (!formData) {
             return;
@@ -130,13 +158,10 @@ const ProjectInstanceDialog = ({
         } else {
             createProjectInstanceMutation.mutate(formData);
         }
-
-        setActiveStepIndex(0);
     }
 
     return (
         <Dialog
-            className={twMerge(activeStepIndex === 1 && 'h-[800px]')}
             isOpen={isOpen}
             onOpenChange={(isOpen) => {
                 if (isOpen) {
@@ -151,7 +176,12 @@ const ProjectInstanceDialog = ({
                     : undefined
             }
         >
-            <div className="flex h-full w-full rounded-l-lg">
+            <div
+                className={twMerge(
+                    'flex h-full w-full rounded-l-lg',
+                    activeStepIndex === 1 && 'h-[500px] max-h-[800px]'
+                )}
+            >
                 <div className="flex w-full flex-col">
                     <header className="flex items-center py-2">
                         <h2 className="font-semibold">
@@ -202,29 +232,36 @@ const ProjectInstanceDialog = ({
                                     />
                                 </Close>
 
-                                <Button
-                                    disabled={!isValid}
-                                    label="Next"
-                                    onClick={() => {
-                                        handleSubmit(saveProjectInstance);
-
-                                        setActiveStepIndex(activeStepIndex + 1);
-                                    }}
-                                />
+                                {!projectInstance?.id && (
+                                    <Button
+                                        disabled={!formState.isValid}
+                                        label="Next"
+                                        onClick={() => {
+                                            setActiveStepIndex(
+                                                activeStepIndex + 1
+                                            );
+                                        }}
+                                    />
+                                )}
                             </>
                         )}
 
-                        {activeStepIndex === 1 && (
+                        {(activeStepIndex === 1 || projectInstance?.id) && (
                             <>
-                                <Button
-                                    displayType="lightBorder"
-                                    label="Previous"
-                                    onClick={() =>
-                                        setActiveStepIndex(activeStepIndex - 1)
-                                    }
-                                />
+                                {!projectInstance?.id && (
+                                    <Button
+                                        displayType="lightBorder"
+                                        label="Previous"
+                                        onClick={() =>
+                                            setActiveStepIndex(
+                                                activeStepIndex - 1
+                                            )
+                                        }
+                                    />
+                                )}
 
                                 <Button
+                                    disabled={projectInstance?.enabled}
                                     label="Save"
                                     onClick={handleSubmit(saveProjectInstance)}
                                 />

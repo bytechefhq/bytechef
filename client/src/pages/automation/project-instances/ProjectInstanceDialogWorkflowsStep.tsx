@@ -1,4 +1,6 @@
 import {Switch} from '@/components/ui/switch';
+import {useWorkflowsEnabledStateStore} from '@/pages/automation/project-instances/ProjectInstanceDialog';
+import {PropertyType} from '@/types/projectTypes';
 import Button from 'components/Button/Button';
 import Input from 'components/Input/Input';
 import Properties from 'components/Properties/Properties';
@@ -10,103 +12,71 @@ import {
 import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
 import {useState} from 'react';
 import {UseFormGetValues, UseFormRegister} from 'react-hook-form';
+import {FormState} from 'react-hook-form/dist/types/form';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 interface ProjectInstanceDialogWorkflowListItemProps {
-    workflow: WorkflowModel;
+    formState: FormState<ProjectInstanceModel>;
     label: string;
-    register?: UseFormRegister<ProjectInstanceModel>;
-    workflowIndex?: number;
-    getValues?: UseFormGetValues<ProjectInstanceModel>;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    register: UseFormRegister<any>;
+    switchHidden?: boolean;
+    workflow: WorkflowModel;
+    workflowIndex: number;
 }
 
 export const ProjectInstanceDialogWorkflowListItem = ({
-    getValues,
+    formState,
     label,
     register,
+    switchHidden = false,
     workflow,
     workflowIndex,
 }: ProjectInstanceDialogWorkflowListItemProps) => {
     const [selectedTabIndex, setSelectedTabIndex] = useState(0);
-    const [isEnabled, setIsEnabled] = useState(false);
-
-    const connections: WorkflowConnectionModel[] = [];
-
-    workflow.tasks?.forEach(
-        (task) => task.connections && connections.concat(task.connections)
+    const [setEnabled, workflowEnabledMap] = useWorkflowsEnabledStateStore(
+        useShallow((state) => [state.setEnabled, state.workflowEnabledMap])
     );
-    workflow.triggers?.forEach(
-        (trigger) =>
-            trigger.connections && connections.concat(trigger.connections)
-    );
+
+    let connections: WorkflowConnectionModel[] = [];
+
+    workflow.tasks?.forEach((task) => {
+        if (task.connections) {
+            connections = connections.concat(task.connections);
+        }
+    });
+    workflow.triggers?.forEach((trigger) => {
+        if (trigger.connections) {
+            connections = connections.concat(trigger.connections);
+        }
+    });
 
     const tabs = [
         {
             content: workflow.inputs && (
                 <Properties
-                    properties={workflow.inputs.map((input, inputIndex) => {
-                        console.log('input', input, inputIndex);
-
+                    path={`projectInstanceWorkflows.${workflowIndex!}.inputs`}
+                    register={register}
+                    formState={formState}
+                    properties={workflow.inputs.map((input) => {
                         if (input.type === 'string') {
                             return {
-                                ...input,
                                 controlType: 'TEXT',
                                 type: 'STRING',
-                                ...register(
-                                    `projectInstanceWorkflows.${workflowIndex!}.inputs.${
-                                        input.name
-                                    }`,
-                                    {
-                                        value:
-                                            getValues &&
-                                            getValues(
-                                                `projectInstanceWorkflows.${workflowIndex!}.inputs.${
-                                                    input.name
-                                                }`
-                                            ),
-                                    }
-                                    // input.name
-                                ),
-                            };
+                                ...input,
+                            } as PropertyType;
                         } else if (input.type === 'number') {
                             return {
-                                ...input,
                                 type: 'NUMBER',
-                                ...register(
-                                    `projectInstanceWorkflows.${workflowIndex!}.inputs.${
-                                        input.name
-                                    }`,
-                                    {
-                                        value:
-                                            getValues &&
-                                            getValues(
-                                                `projectInstanceWorkflows.${workflowIndex!}.inputs.${
-                                                    input.name
-                                                }`
-                                            ),
-                                    }
-                                ),
-                            };
+                                ...input,
+                            } as PropertyType;
                         } else {
                             return {
-                                ...input,
                                 controlType: 'SELECT',
                                 type: 'BOOLEAN',
-                                ...register(
-                                    `projectInstanceWorkflows.${workflowIndex!}.inputs.${
-                                        input.name
-                                    }`,
-                                    {
-                                        value:
-                                            getValues &&
-                                            getValues(
-                                                `projectInstanceWorkflows.${workflowIndex!}.inputs.${
-                                                    input.name
-                                                }`
-                                            ),
-                                    }
-                                ),
-                            };
+                                ...input,
+                            } as PropertyType;
                         }
                     })}
                 />
@@ -116,17 +86,18 @@ export const ProjectInstanceDialogWorkflowListItem = ({
         {
             content: (
                 <>
-                    {connections?.map((connection, connectionIndex) => (
-                        <Input
-                            key={connection.componentName}
-                            label={connection.componentName}
-                            labelClassName="px-2"
-                            // name={connection.componentName}
-                            {...register(
-                                `projectInstanceWorkflows.${workflowIndex!}.connections.${connectionIndex}`
-                            )}
-                        />
-                    ))}
+                    {register &&
+                        connections?.map((connection, connectionIndex) => (
+                            <Input
+                                key={connection.componentName}
+                                label={connection.componentName}
+                                labelClassName="px-2"
+                                // name={connection.componentName}
+                                {...register(
+                                    `projectInstanceWorkflows.${workflowIndex!}.connections.${connectionIndex}`
+                                )}
+                            />
+                        ))}
                 </>
             ),
             name: 'Connections',
@@ -135,30 +106,58 @@ export const ProjectInstanceDialogWorkflowListItem = ({
 
     return (
         <div>
-            <div
-                className="flex cursor-pointer justify-between py-2"
-                onClick={() => setIsEnabled(!isEnabled)}
-            >
-                <span className="font-semibold">{label}</span>
-
-                <Switch
-                    checked={isEnabled}
-                    className={twMerge(
-                        'cursor-pointer rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2',
-                        isEnabled && 'bg-blue-600'
+            {register && (
+                <input
+                    type="hidden"
+                    {...register(
+                        `projectInstanceWorkflows.${workflowIndex!}.workflowId`,
+                        {value: workflow.id}
                     )}
-                >
-                    <span
-                        aria-hidden="true"
-                        className={twMerge(
-                            'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-                            isEnabled ? 'translate-x-5' : 'translate-x-0'
-                        )}
-                    />
-                </Switch>
-            </div>
+                />
+            )}
 
-            {isEnabled && (
+            {!switchHidden && (
+                <div className="flex cursor-pointer justify-between py-2">
+                    <span className="font-semibold">{label}</span>
+
+                    <Switch
+                        checked={workflowEnabledMap.get(workflow.id!)}
+                        className={twMerge(
+                            'cursor-pointer rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2',
+                            workflowEnabledMap.get(workflow.id!) &&
+                                'bg-blue-600'
+                        )}
+                        onClick={() => {
+                            setEnabled(
+                                workflow.id!,
+                                !workflowEnabledMap.get(workflow.id!)
+                            );
+                        }}
+                    >
+                        <span
+                            aria-hidden="true"
+                            className={twMerge(
+                                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                                workflowEnabledMap.get(workflow.id!)
+                                    ? 'translate-x-5'
+                                    : 'translate-x-0'
+                            )}
+                        />
+                    </Switch>
+                </div>
+            )}
+
+            {workflowEnabledMap.get(workflow.id!) && register && (
+                <input
+                    type="hidden"
+                    {...register(
+                        `projectInstanceWorkflows.${workflowIndex!}.enabled`,
+                        {value: workflowEnabledMap.get(workflow.id!)}
+                    )}
+                />
+            )}
+
+            {(workflowEnabledMap.get(workflow.id!) || switchHidden) && (
                 <div className="mt-2">
                     {connections?.length ? (
                         <>
@@ -190,24 +189,29 @@ export const ProjectInstanceDialogWorkflowListItem = ({
     );
 };
 
-const ProjectInstanceDialogWorkflowsStep = (props: {
+const ProjectInstanceDialogWorkflowsStep = ({
+    formState,
+    getValues,
+    register,
+}: {
+    formState: FormState<ProjectInstanceModel>;
     getValues: UseFormGetValues<ProjectInstanceModel>;
     register: UseFormRegister<ProjectInstanceModel>;
 }) => {
     const {data: workflows} = useGetProjectWorkflowsQuery(
-        props.getValues().projectId!
+        getValues().projectId!
     );
 
     return (
         <ul className="space-y-4">
             {workflows?.map((workflow, workflowIndex) => (
                 <ProjectInstanceDialogWorkflowListItem
+                    formState={formState}
                     key={workflow.id!}
                     workflow={workflow}
                     label={workflow.label!}
-                    register={props.register}
+                    register={register}
                     workflowIndex={workflowIndex}
-                    getValues={props.getValues}
                 />
             ))}
         </ul>

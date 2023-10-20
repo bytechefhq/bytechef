@@ -2,17 +2,20 @@ import DropdownMenu from '@/components/DropdownMenu/DropdownMenu';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
-    ProjectInstanceModel,
     ProjectInstanceWorkflowModel,
     WorkflowModel,
 } from '@/middleware/helios/configuration';
 import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import {useEnableProjectInstanceWorkflowMutation} from '@/mutations/projects.mutations';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
+import {CalendarIcon} from '@heroicons/react/24/outline';
+import {useQueryClient} from '@tanstack/react-query';
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
-import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
+import {
+    ProjectKeys,
+    useGetProjectWorkflowsQuery,
+} from 'queries/projects.queries';
 import {useState} from 'react';
-import {UseFormRegister} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';
 
@@ -21,13 +24,13 @@ import ProjectInstanceEditWorkflowDialog from './ProjectInstanceEditWorkflowDial
 const ProjectInstanceWorkflowList = ({
     projectId,
     projectInstanceEnabled,
+    projectInstanceId,
     projectInstanceWorkflows,
-    register,
 }: {
     projectId: number;
+    projectInstanceId: number;
     projectInstanceEnabled?: boolean;
     projectInstanceWorkflows?: Array<ProjectInstanceWorkflowModel>;
-    register: UseFormRegister<ProjectInstanceModel>;
 }) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
 
@@ -50,12 +53,18 @@ const ProjectInstanceWorkflowList = ({
         [key: string]: ComponentDefinitionBasicModel | undefined;
     } = {};
 
-    const enableProjectInstanceWorkflow =
-        useEnableProjectInstanceWorkflowMutation({});
+    const queryClient = useQueryClient();
+
+    const enableProjectInstanceWorkflowMutation =
+        useEnableProjectInstanceWorkflowMutation({
+            onSuccess: () => {
+                queryClient.invalidateQueries(ProjectKeys.projectInstances);
+            },
+        });
 
     return (
-        <div className="border-b border-b-gray-100 py-2">
-            <h3 className="flex justify-start pl-2 text-sm font-semibold uppercase text-gray-500">
+        <div className="border-b border-b-gray-100 py-3 pl-4">
+            <h3 className="flex justify-start pl-2 text-sm font-semibold uppercase text-gray-400">
                 Workflows
             </h3>
 
@@ -92,12 +101,19 @@ const ProjectInstanceWorkflowList = ({
                             definitionNames?.indexOf(item) === index
                     );
 
+                    const projectInstanceWorkflow =
+                        projectInstanceWorkflows?.find(
+                            (projectInstanceWorkflow) =>
+                                projectInstanceWorkflow.workflowId ===
+                                workflow.id
+                        );
+
                     return (
                         <li
                             key={workflow.id}
                             className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
                         >
-                            <div className="w-9/12">
+                            <div className="w-10/12">
                                 <Link
                                     className="flex items-center"
                                     to={`/automation/projects/${projectId}/workflow/${workflow.id}`}
@@ -150,35 +166,61 @@ const ProjectInstanceWorkflowList = ({
                                     </div>
 
                                     <div className="flex flex-1 justify-end text-sm">
-                                        {workflow.lastModifiedDate?.toLocaleDateString()}
+                                        {projectInstanceWorkflow?.lastExecutionDate ? (
+                                            <Tooltip>
+                                                <TooltipTrigger>
+                                                    <div className="flex text-sm text-gray-500">
+                                                        <CalendarIcon
+                                                            className="mr-1 h-5 w-5 shrink-0 text-gray-400"
+                                                            aria-hidden="true"
+                                                        />
+
+                                                        <span>
+                                                            {`${projectInstanceWorkflow.lastExecutionDate?.toLocaleDateString()} ${projectInstanceWorkflow.lastExecutionDate?.toLocaleTimeString()}`}
+                                                        </span>
+                                                    </div>
+                                                </TooltipTrigger>
+
+                                                <TooltipContent>
+                                                    Last Execution Date
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        ) : (
+                                            '-'
+                                        )}
                                     </div>
                                 </Link>
                             </div>
 
-                            <div className="flex w-2/12 items-center justify-center">
-                                <Switch
-                                    disabled={projectInstanceEnabled}
-                                    checked={
-                                        projectInstanceWorkflows?.find(
-                                            (workflowInstance) =>
-                                                workflowInstance.id === workflow
-                                        )?.enabled
-                                    }
-                                    onCheckedChange={(value) =>
-                                        enableProjectInstanceWorkflow.mutateAsync(
-                                            {
-                                                enable: value,
-                                                id: projectId,
-                                                workflowId: workflow.id!,
-                                            }
-                                        )
-                                    }
-                                />
+                            <div className="flex w-1/12 items-center justify-end">
+                                {projectInstanceWorkflow && (
+                                    <Switch
+                                        disabled={projectInstanceEnabled}
+                                        checked={
+                                            projectInstanceWorkflow.enabled
+                                        }
+                                        onCheckedChange={(value) => {
+                                            enableProjectInstanceWorkflowMutation.mutate(
+                                                {
+                                                    enable: value,
+                                                    id: projectInstanceId,
+                                                    workflowId: workflow.id!,
+                                                },
+                                                {
+                                                    onSuccess: () => {
+                                                        projectInstanceWorkflow.enabled =
+                                                            !projectInstanceWorkflow?.enabled;
+                                                    },
+                                                }
+                                            );
+                                        }}
+                                    />
+                                )}
                             </div>
 
                             <div className="flex w-1/12 justify-end">
                                 <DropdownMenu
-                                    id={projectId}
+                                    id={projectInstanceId}
                                     menuItems={[
                                         {
                                             label: 'Edit',
@@ -192,16 +234,20 @@ const ProjectInstanceWorkflowList = ({
                                 />
                             </div>
 
-                            {showEditWorkflowDialog && (
-                                <ProjectInstanceEditWorkflowDialog
-                                    onClose={() =>
-                                        setShowEditWorkflowDialog(false)
-                                    }
-                                    register={register}
-                                    visible
-                                    workflow={selectedWorkflow!}
-                                />
-                            )}
+                            {showEditWorkflowDialog &&
+                                projectInstanceWorkflow &&
+                                selectedWorkflow && (
+                                    <ProjectInstanceEditWorkflowDialog
+                                        onClose={() =>
+                                            setShowEditWorkflowDialog(false)
+                                        }
+                                        visible
+                                        projectInstanceWorkflow={
+                                            projectInstanceWorkflow
+                                        }
+                                        workflow={selectedWorkflow}
+                                    />
+                                )}
                         </li>
                     );
                 })}
