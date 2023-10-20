@@ -15,21 +15,14 @@ type NativeSelectProps = {
     label?: string;
     options: SelectOption[];
     placeholder?: string;
-    onValueChange?(value: string | undefined): void;
-};
+} & React.DetailedHTMLProps<
+    React.SelectHTMLAttributes<HTMLSelectElement>,
+    HTMLSelectElement
+>;
 
 const NativeSelect = React.forwardRef<HTMLSelectElement, NativeSelectProps>(
     (
-        {
-            className,
-            fieldsetClassName,
-            label,
-            name,
-            error,
-            options,
-            onValueChange,
-            ...props
-        },
+        {className, fieldsetClassName, label, name, error, options, ...props},
         ref
     ): JSX.Element => (
         <fieldset className={twMerge(label ? 'mb-3' : '', fieldsetClassName)}>
@@ -56,15 +49,6 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, NativeSelectProps>(
                     id={name}
                     name={name}
                     ref={ref}
-                    onChange={(event) => {
-                        if (onValueChange) {
-                            onValueChange(
-                                event.target.value
-                                    ? event.target.value
-                                    : undefined
-                            );
-                        }
-                    }}
                     {...props}
                 >
                     {options?.map((option) => (
