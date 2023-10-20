@@ -23,6 +23,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
     - name: Set up Node 16
       uses: actions/setup-node@v3
       with:
@@ -41,8 +43,20 @@ jobs:
         java-version: '17'
         components: 'js,python,r,ruby'
         github-token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+    - name: Cache SonarCloud packages
+      uses: actions/cache@v1
       with:
-        arguments: build
-        build-root-directory: .
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar
+    - name: Cache Gradle packages
+      uses: actions/cache@v1
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+        restore-keys: ${{ runner.os }}-gradle
+    - name: Build and analyze
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: ./gradlew build jacocoTestReport sonarqube --info
