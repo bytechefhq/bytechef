@@ -33,11 +33,9 @@ const WorkflowNodesListItem = ({
             onDragStart={(event) => onDragStart(event, node.name!)}
             onClick={handleClick}
         >
-            {node.icon && (
+            {node.icon ? (
                 <InlineSVG className="mr-2 h-7 w-7 flex-none" src={node.icon} />
-            )}
-
-            {!node.icon && (
+            ) : (
                 <Component1Icon className="mr-2 h-7 w-7 flex-none" />
             )}
 

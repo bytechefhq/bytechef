@@ -56,14 +56,12 @@ const ContextualMenu = ({
                     name: getFormattedName(clickedItem.name!, nodes),
                     icon: (
                         <>
-                            {clickedItem.icon && (
+                            {clickedItem.icon ? (
                                 <InlineSVG
                                     className="h-9 w-9 text-gray-700"
                                     src={clickedItem.icon}
                                 />
-                            )}
-
-                            {!clickedItem.icon && (
+                            ) : (
                                 <Component1Icon className="h-9 w-9 text-gray-700" />
                             )}
                         </>
@@ -145,14 +143,12 @@ const ContextualMenu = ({
                             data: {
                                 icon: (
                                     <>
-                                        {clickedItem.icon && (
+                                        {clickedItem.icon ? (
                                             <InlineSVG
                                                 className="h-9 w-9 text-gray-700"
                                                 src={clickedItem.icon}
                                             />
-                                        )}
-
-                                        {!clickedItem.icon && (
+                                        ) : (
                                             <Component1Icon className="h-9 w-9 text-gray-700" />
                                         )}
                                     </>
