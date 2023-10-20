@@ -227,7 +227,7 @@ const ContextualMenu = ({
     }, [components, filter, flowControls, edge]);
 
     return (
-        <div className="nowheel rounded-md bg-white shadow-md">
+        <div className="nowheel">
             {typeof components === 'undefined' ||
                 (typeof flowControls === 'undefined' && (
                     <div className="px-3 py-2 text-xs text-gray-500">
@@ -235,7 +235,7 @@ const ContextualMenu = ({
                     </div>
                 ))}
 
-            <header className="border-b border-gray-200 px-3 pt-2 text-center text-gray-600">
+            <header className="border-b border-gray-200 px-3 pt-3 text-center text-gray-600">
                 <Input
                     name="contextualMenuFilter"
                     placeholder="Filter workflow nodes"
