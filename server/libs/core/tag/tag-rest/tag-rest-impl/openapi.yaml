@@ -1,0 +1,143 @@
+openapi: 3.0.1
+info:
+  title:  OpenAPI definition
+  version: v1
+servers:
+  - url: http://localhost:5173/api
+paths:
+  /tags:
+    get:
+      description: Get all tags.
+      summary: Get all tags.
+      tags:
+        - tags
+      operationId: getTags
+      responses:
+        "200":
+          description: The list of tags.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+    post:
+      description: Create a new tag.
+      summary: Create a new tag.
+      tags:
+        - tags
+      operationId: postTag
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tag'
+        required: true
+      responses:
+        "200":
+          description: The tag object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+  /tags/{id}:
+    delete:
+      description: Delete a tag.
+      summary: Delete a tag.
+      tags:
+        - tags
+      operationId: deleteTag
+      parameters:
+        - name: id
+          description: The id of a tag.
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Successful operation.
+    get:
+      description: Get a tag by id.
+      summary: Get a tag by id.
+      tags:
+        - tags
+      operationId: getTag
+      parameters:
+        - name: id
+          description: The id of a tag.
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: The tag object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+    put:
+      description: Update an existing tag.
+      summary: Update an existing tag.
+      tags:
+        - tags
+      operationId: putTag
+      parameters:
+        - name: id
+          description: The id of a tag.
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tag'
+        required: true
+      responses:
+        "200":
+          description: The updated tag object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+components:
+  schemas:
+    Tag:
+      description: A tag.
+      required:
+        - name
+      properties:
+        createdBy:
+          description: The created by.
+          type: string
+          readOnly: true
+        createdDate:
+          description: The created date.
+          type: string
+          format: date-time
+          readOnly: true
+        id:
+          description: The id of the tag.
+          type: integer
+          format: int64
+        lastModifiedBy:
+          description: The last modified by.
+          type: string
+          readOnly: true
+        lastModifiedDate:
+          description: The last modified date.
+          type: string
+          format: date-time
+          readOnly: true
+        name:
+          description: The name of the tag.
+          type: string
+        version:
+          type: integer
+          format: int32

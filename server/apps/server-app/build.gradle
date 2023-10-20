@@ -33,6 +33,7 @@ dependencies {
     implementation project(":server:libs:core:category:category-service")
     implementation project(":server:libs:core:encryption:encryption-filesystem")
     implementation project(":server:libs:core:rest:rest-impl")
+    implementation project(":server:libs:core:tag:tag-rest:tag-rest-impl")
     implementation project(":server:libs:core:tag:tag-service")
     implementation project(":server:libs:db-migration")
     implementation project(":server:libs:dione:dione-integration:dione-integration-rest")

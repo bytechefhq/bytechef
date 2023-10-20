@@ -26,9 +26,17 @@ import java.util.List;
  */
 public interface TagService {
 
-    List<Tag> save(List<Tag> tags);
+    Tag create(Tag tag);
 
-    void delete(Long id);
+    void delete(long id);
+
+    Tag getTag(long id);
+
+    List<Tag> getTags();
 
     List<Tag> getTags(List<Long> ids);
+
+    List<Tag> save(List<Tag> tags);
+
+    Tag update(Tag tag);
 }

@@ -247,7 +247,7 @@ paths:
                 tags:
                   type: array
                   items:
-                    $ref: '#/components/schemas/Tag'
+                    $ref: '../../../core/tag/tag-rest/openapi.yaml#/components/schemas/Tag'
         required: true
       responses:
         "200":

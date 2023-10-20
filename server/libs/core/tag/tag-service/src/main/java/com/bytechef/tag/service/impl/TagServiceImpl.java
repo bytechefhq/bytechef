@@ -46,23 +46,48 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void delete(Long id) {
+    public Tag create(Tag tag) {
+        Assert.notNull(tag, "'tag' must not be null");
+        Assert.isNull(tag.getId(), "'tag.id' must be null");
+
+        return tagRepository.save(tag);
+    }
+
+    @Override
+    public void delete(long id) {
         tagRepository.deleteById(id);
     }
 
     @Override
+    public Tag getTag(long id) {
+        return tagRepository.findById(id)
+            .orElseThrow();
+    }
+
+    @Override
+    public List<Tag> getTags() {
+        return StreamSupport.stream(
+            tagRepository.findAll()
+                .spliterator(),
+            false)
+            .toList();
+    }
+
+    @Override
     public List<Tag> getTags(@NonNull List<Long> ids) {
-        return StreamSupport.stream(tagRepository.findAllById(ids)
-            .spliterator(), false)
+        return StreamSupport.stream(
+            tagRepository.findAllById(ids)
+                .spliterator(),
+            false)
             .toList();
     }
 
     @Override
     @SuppressFBWarnings("NP")
     public List<Tag> save(@NonNull List<Tag> tags) {
-        List<Tag> resultTags = new ArrayList<>();
-
         Assert.notNull(tags, "'tags' must not be null");
+
+        List<Tag> resultTags = new ArrayList<>();
 
         for (Tag tag : tags) {
             if (tag.isNew()) {
@@ -80,5 +105,13 @@ public class TagServiceImpl implements TagService {
         }
 
         return resultTags;
+    }
+
+    @Override
+    public Tag update(Tag tag) {
+        Assert.notNull(tag, "'tag' must not be null");
+        Assert.notNull(tag.getId(), "'tag.id' must not be null");
+
+        return tagRepository.save(tag);
     }
 }
