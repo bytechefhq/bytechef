@@ -50,7 +50,7 @@ const Integrations = () => {
               tags &&
               tags.length > 0
             ? tags && tags.filter((tag) => tag.id === current.id)[0].name!
-            : 'All Integrations';
+            : 'All Categories';
 
     return (
         <LayoutContainer
@@ -64,7 +64,7 @@ const Integrations = () => {
             leftSidebarHeader={<PageHeader leftSidebar title="Integrations" />}
             leftSidebarBody={
                 <LeftSidebarMenu
-                    topTitle="Components"
+                    topTitle="Categories"
                     topBody={
                         <>
                             <LeftSidebarMenuItem
