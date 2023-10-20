@@ -1,0 +1,16 @@
+label: Sum Sequence
+tasks:
+  - name: sumSequence
+    type: sequence
+    tasks:
+      - name: value1
+        type: core/var
+        value: 1
+
+      - name: value2
+        type: core/var
+        value: ${value1 + 1}
+
+      - name: value3
+        type: core/var
+        value: ${value2 + 1}
