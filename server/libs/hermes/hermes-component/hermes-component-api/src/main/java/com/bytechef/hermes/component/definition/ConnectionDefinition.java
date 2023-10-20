@@ -33,7 +33,6 @@ import java.util.Optional;
 public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConnectionDefinition {
 
     String BASE_URI = "baseUri";
-    String CONNECTION_ID = "connectionId";
 
     boolean containsAuthorizations();
 
