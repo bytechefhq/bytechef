@@ -29,10 +29,10 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
  */
 public class YamlWorkflowMapper extends AbstractWorkflowMapper implements WorkflowMapperResolver {
 
-    private static final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(new YAMLFactory());
 
     public Workflow readValue(WorkflowResource workflowResource) {
-        return readValue(workflowResource, mapper);
+        return readValue(workflowResource, OBJECT_MAPPER);
     }
 
     @Override

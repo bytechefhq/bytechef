@@ -19,7 +19,6 @@
 package com.bytechef.atlas.repository;
 
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.commons.cache.Clearable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,7 +34,7 @@ import org.springframework.util.Assert;
  * @author Arik Cohen
  * @since Jun 2, 2017
  */
-public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
+public class WorkflowRepositoryChain implements WorkflowRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkflowRepositoryChain.class);
 
@@ -52,15 +51,6 @@ public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
 
         this.cacheManager = cacheManager;
         this.workflowRepositories = workflowRepositories;
-    }
-
-    @Override
-    public void clear() {
-        cacheManager.getCacheNames().forEach(cacheName -> {
-            Cache cache = Objects.requireNonNull(cacheManager.getCache(cacheName));
-
-            cache.clear();
-        });
     }
 
     @Override
