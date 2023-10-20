@@ -37,7 +37,7 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery();
 
     const workflowComponentDefinitions: {
-        [key: string]: ComponentDefinitionBasicModel;
+        [key: string]: ComponentDefinitionBasicModel | undefined;
     } = {};
 
     workflows?.map((workflow) => {
