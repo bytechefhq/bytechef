@@ -40,15 +40,15 @@ public class WorkflowRepositoryChain implements WorkflowRepository, Clearable {
     private static final String CACHE_ALL = WorkflowRepositoryChain.class.getName() + ".all";
     private static final String CACHE_ONE = WorkflowRepositoryChain.class.getName() + ".one";
 
-    private final List<WorkflowRepository> repositories;
+    private final CacheManager cacheManager;
+    private final List<WorkflowRepository> workflowRepositories;
 
-    // TODO make it distributed
-    private CacheManager cacheManager = new ConcurrentMapCacheManager();
+    public WorkflowRepositoryChain(CacheManager cacheManager, List<WorkflowRepository> workflowRepositories) {
+        Assert.notNull(cacheManager, "'cacheManager' can not be null");
+        Assert.notNull(workflowRepositories, "'workflowRepositories' can not be null");
 
-    public WorkflowRepositoryChain(List<WorkflowRepository> workflowRepositories) {
-        Assert.notNull(workflowRepositories, "'aRepositories' can not be null");
-
-        repositories = workflowRepositories;
+        this.cacheManager = cacheManager;
+        this.workflowRepositories = workflowRepositories;
     }
 
     @Override
