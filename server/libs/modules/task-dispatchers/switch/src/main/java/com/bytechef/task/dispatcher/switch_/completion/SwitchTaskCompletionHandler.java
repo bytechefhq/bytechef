@@ -18,21 +18,20 @@
 
 package com.bytechef.task.dispatcher.switch_.completion;
 
-import com.bytechef.atlas.Constants;
-import com.bytechef.atlas.MapObject;
-import com.bytechef.atlas.context.domain.Context;
-import com.bytechef.atlas.context.domain.MapContext;
+import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.SWITCH;
+
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
-import com.bytechef.atlas.service.context.ContextService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
+import com.bytechef.atlas.domain.Context;
+import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
-import com.bytechef.atlas.uuid.UUIDGenerator;
-import java.util.Collections;
-import java.util.Date;
+import com.bytechef.commons.date.LocalDateTimeUtils;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.util.Assert;
 
@@ -69,7 +68,7 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentExecution.getType().equals(Constants.SWITCH);
+            return parentExecution.getType().equals(SWITCH + "/v" + VERSION_1);
         }
 
         return false;
@@ -77,74 +76,71 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public void handle(TaskExecution taskExecution) {
-        SimpleTaskExecution completedSubTaskExecution = SimpleTaskExecution.of(taskExecution);
+        TaskExecution completedSubTaskExecution = new TaskExecution(taskExecution);
 
         completedSubTaskExecution.setStatus(TaskStatus.COMPLETED);
 
-        taskExecutionService.merge(completedSubTaskExecution);
+        taskExecutionService.update(completedSubTaskExecution);
 
-        SimpleTaskExecution switchTaskExecution =
-                SimpleTaskExecution.of(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+        TaskExecution switchTaskExecution =
+                new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             Context context = contextService.peek(switchTaskExecution.getId());
-            MapContext newContext = new MapContext(context.asMap());
+            Context newContext = new Context(context);
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
             contextService.push(switchTaskExecution.getId(), newContext);
         }
 
-        List<MapObject> tasks = resolveCase(switchTaskExecution);
+        List<WorkflowTask> subWorkflowTasks = resolveCase(switchTaskExecution);
 
-        if (taskExecution.getTaskNumber() < tasks.size()) {
-            MapObject task = tasks.get(taskExecution.getTaskNumber());
+        if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
+            WorkflowTask workflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
 
-            SimpleTaskExecution subTaskExecution = SimpleTaskExecution.of(task);
+            TaskExecution subTaskExecution = TaskExecution.of(
+                    workflowTask,
+                    switchTaskExecution.getJobId(),
+                    switchTaskExecution.getId(),
+                    switchTaskExecution.getPriority(),
+                    taskExecution.getTaskNumber() + 1);
 
-            subTaskExecution.setId(UUIDGenerator.generate());
-            subTaskExecution.setStatus(TaskStatus.CREATED);
-            subTaskExecution.setCreateTime(new Date());
-            subTaskExecution.setTaskNumber(taskExecution.getTaskNumber() + 1);
-            subTaskExecution.setJobId(switchTaskExecution.getJobId());
-            subTaskExecution.setParentId(switchTaskExecution.getId());
-            subTaskExecution.setPriority(switchTaskExecution.getPriority());
-
-            MapContext context = new MapContext(contextService.peek(switchTaskExecution.getId()));
+            Context context = new Context(contextService.peek(switchTaskExecution.getId()));
 
             contextService.push(subTaskExecution.getId(), context);
 
             TaskExecution evaluatedSubTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-            taskExecutionService.create(evaluatedSubTaskExecution);
+            evaluatedSubTaskExecution = taskExecutionService.add(evaluatedSubTaskExecution);
+
             taskDispatcher.dispatch(evaluatedSubTaskExecution);
         }
         // no more tasks to execute -- complete the switch
         else {
-            switchTaskExecution.setEndTime(new Date());
-            switchTaskExecution.setExecutionTime(
-                    switchTaskExecution.getEndTime().getTime()
-                            - switchTaskExecution.getStartTime().getTime());
+            switchTaskExecution.setEndTime(LocalDateTime.now());
+            switchTaskExecution.setExecutionTime(LocalDateTimeUtils.getTime(switchTaskExecution.getEndTime())
+                    - LocalDateTimeUtils.getTime(switchTaskExecution.getStartTime()));
 
             taskCompletionHandler.handle(switchTaskExecution);
         }
     }
 
-    private List<MapObject> resolveCase(TaskExecution taskExecution) {
+    private List<WorkflowTask> resolveCase(TaskExecution taskExecution) {
         Object expression = taskExecution.getRequired("expression");
-        List<MapObject> cases = taskExecution.getList("cases", MapObject.class);
+        List<WorkflowTask> caseWorkflowTasks = taskExecution.getWorkflowTasks("cases");
 
-        Assert.notNull(cases, "you must specify 'cases' in a switch statement");
+        Assert.notNull(caseWorkflowTasks, "you must specify 'cases' in a switch statement");
 
-        for (MapObject oneCase : cases) {
-            Object key = oneCase.getRequired("key");
-            List<MapObject> tasks = oneCase.getList("tasks", MapObject.class);
+        for (WorkflowTask caseWorkflowTask : caseWorkflowTasks) {
+            Object key = caseWorkflowTask.getRequired("key");
+            List<WorkflowTask> subWorkflowTasks = caseWorkflowTask.getWorkflowTasks("tasks");
 
             if (key.equals(expression)) {
-                return tasks;
+                return subWorkflowTasks;
             }
         }
 
-        return taskExecution.getList("default", MapObject.class, Collections.emptyList());
+        return taskExecution.getWorkflowTasks("default");
     }
 }

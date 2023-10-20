@@ -1,0 +1,15 @@
+{
+  "display": {
+    "label": "Branch"
+  },
+  "name": "switch",
+  "inputs": [
+    {
+      "description": "Defines expression upon which evaluation the proper branch continues execution.",
+      "label": "Expression",
+      "name": "expression",
+      "type": "STRING"
+    }
+  ],
+  "version": 1
+}

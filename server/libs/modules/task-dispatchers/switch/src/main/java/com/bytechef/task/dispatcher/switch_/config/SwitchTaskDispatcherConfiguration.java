@@ -18,10 +18,10 @@ package com.bytechef.task.dispatcher.switch_.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.service.context.ContextService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
+import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.task.dispatcher.switch_.SwitchTaskDispatcher;
 import com.bytechef.task.dispatcher.switch_.completion.SwitchTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
