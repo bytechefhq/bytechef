@@ -10,7 +10,7 @@
         "label": "Delay"
       },
       "name": "delay",
-      "inputs": [
+      "properties": [
         {
           "description": "Time in milliseconds.",
           "label": "Millis",

@@ -16,14 +16,14 @@
 
 package com.bytechef.component.delay;
 
+import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@ComponentIntTest
 public class DelayComponentHandlerIntTest {
 
     @Disabled

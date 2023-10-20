@@ -20,9 +20,9 @@ package com.bytechef.component.delay;
 
 import static com.bytechef.hermes.component.definition.Action.ACTION;
 
-import com.bytechef.hermes.component.test.MockContext;
-import com.bytechef.hermes.component.test.MockExecutionParameters;
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.hermes.component.test.mock.MockContext;
+import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ public class DelayComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        DefinitionAssert.assertEquals("definition/delay_v1.json", new DelayComponentHandler().getDefinition());
+        AssertUtils.assertEquals("definition/delay_v1.json", new DelayComponentHandler().getDefinition());
     }
 
     @Test
