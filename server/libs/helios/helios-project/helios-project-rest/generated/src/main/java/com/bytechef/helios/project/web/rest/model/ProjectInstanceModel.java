@@ -2,8 +2,8 @@ package com.bytechef.helios.project.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.helios.project.web.rest.model.ProjectBasicModel;
 import com.bytechef.helios.project.web.rest.model.ProjectInstanceWorkflowModel;
-import com.bytechef.helios.project.web.rest.model.ProjectModel;
 import com.bytechef.tag.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstance", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-26T12:53:46.029630+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-30T20:58:23.415641+02:00[Europe/Zagreb]")
 public class ProjectInstanceModel {
 
   private String description;
@@ -51,7 +51,7 @@ public class ProjectInstanceModel {
 
   private String name;
 
-  private ProjectModel project;
+  private ProjectBasicModel project;
 
   private Long projectId;
 
@@ -276,7 +276,7 @@ public class ProjectInstanceModel {
     this.name = name;
   }
 
-  public ProjectInstanceModel project(ProjectModel project) {
+  public ProjectInstanceModel project(ProjectBasicModel project) {
     this.project = project;
     return this;
   }
@@ -288,11 +288,11 @@ public class ProjectInstanceModel {
   @Valid 
   @Schema(name = "project", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("project")
-  public ProjectModel getProject() {
+  public ProjectBasicModel getProject() {
     return project;
   }
 
-  public void setProject(ProjectModel project) {
+  public void setProject(ProjectBasicModel project) {
     this.project = project;
   }
 
