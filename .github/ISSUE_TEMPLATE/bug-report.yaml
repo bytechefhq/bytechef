@@ -1,0 +1,67 @@
+name: 🐞 Bug report
+description: Create a bug report to help us improve ByteChef
+title: "[Bug]: "
+labels: [bug]
+assignees:
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Please fill the form in English
+  - type: textarea
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what you're experiencing and what you expect.
+      placeholder: |
+        When I do <X>, <Y> happens and I see the error message attached below:
+        ```...```
+        What I expect is <Z>
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps To Reproduce
+      description: Add steps to reproduce this behaviour, include console / network logs & videos
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: "The version of your ByteChef instance"
+      placeholder: "2.3.1"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: OS
+      description: "The OS version your ByteChef instance is running on"
+      placeholder: "e.g. macOS 11, Windows 7/10, Ubuntu 18.04, GCP n2., AWS EC2"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Browser
+      description: "The browser information if the problem is UI related"
+      placeholder: "browser, desktop or mobile, os, e.g. firefox 78, desktop, macOS 11"
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the problem here.
+    validations:
+      required: false

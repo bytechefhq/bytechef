@@ -1,0 +1,34 @@
+name: New component request
+description: Suggest a new component to improve ByteChef
+title: "[Feature]: "
+labels: [enhancement]
+assignees:
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to request a new component for ByteChef!
+  - type: textarea
+    attributes:
+      label: Tell us about the new component you’d like to have
+      description: What is the name of the product for which do you want the component? Do you need a specific version of the underlying product e.g. you specifically need support for an older version of the API or DB?
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Link to the product page
+      description: Add a link to the product page for which you want component (if relevant).
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Describe the context around this new component
+      description: Why do you need this integration? How does your team intend to use the data? This helps us understand the use case. If this is an API component, which entities/endpoints do you need supported?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Describe the alternative you are considering or using
+      description: What are you considering doing if you don’t have this integration through ByteChef?
+    validations:
+      required: true
