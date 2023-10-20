@@ -148,29 +148,25 @@ const DataPillPanel = () => {
 
                         <main className="flex h-full w-full flex-col">
                             <Input
-                                name="dataPillFilter"
-                                placeholder="Filter Data Pills..."
                                 fieldsetClassName="p-2 border-b border-gray-100 mb-0"
+                                name="dataPillFilter"
                                 onChange={(event) =>
                                     setDataPillFilterQuery(event.target.value)
                                 }
+                                placeholder="Filter Data Pills..."
                                 value={dataPillFilterQuery}
                             />
 
                             {actionData?.length && (
                                 <DataPillPanelBody
                                     actionData={actionData}
-                                    containerHeight={panelContainerHeight}
-                                    dataPillFilterQuery={dataPillFilterQuery}
-                                    previousComponents={previousComponents!}
-                                    previousComponentNames={
-                                        previousComponentNames
-                                    }
                                     componentActionData={
                                         componentActionData.filter(
                                             (data) => data.component
                                         ) as Array<ComponentActionData>
                                     }
+                                    containerHeight={panelContainerHeight}
+                                    dataPillFilterQuery={dataPillFilterQuery}
                                 />
                             )}
                         </main>
