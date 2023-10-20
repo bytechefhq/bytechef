@@ -34,7 +34,7 @@ const SchemaProperties = ({properties}: {properties: any}) => {
                                 }
                             </span>
 
-                            <span className="pl-2">{property.label}</span>
+                            <span className="pl-2">{property.name}</span>
                         </div>
 
                         {property.properties &&
