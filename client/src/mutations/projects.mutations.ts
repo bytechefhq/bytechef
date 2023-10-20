@@ -2,8 +2,10 @@ import {useMutation} from '@tanstack/react-query';
 import {
     CreateProjectWorkflowRequest,
     ProjectInstanceModel,
+    ProjectInstanceTagsApi,
     ProjectInstancesApi,
     ProjectModel,
+    ProjectTagsApi,
     ProjectsApi,
     UpdateProjectInstanceTagsRequest,
     UpdateProjectTagsRequest,
@@ -170,7 +172,7 @@ export const useUpdateProjectTagsMutation = (
 ) =>
     useMutation({
         mutationFn: (request: UpdateProjectTagsRequest) => {
-            return new ProjectsApi().updateProjectTags(request);
+            return new ProjectTagsApi().updateProjectTags(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
@@ -192,7 +194,9 @@ export const useUpdateProjectInstanceTagsMutation = (
 ) =>
     useMutation({
         mutationFn: (request: UpdateProjectTagsRequest) => {
-            return new ProjectInstancesApi().updateProjectInstanceTags(request);
+            return new ProjectInstanceTagsApi().updateProjectInstanceTags(
+                request
+            );
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
