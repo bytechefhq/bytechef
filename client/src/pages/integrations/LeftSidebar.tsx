@@ -7,6 +7,12 @@ import LeftSidebarItem, {Type} from './LeftSidebarItem';
 import {useSearchParams} from 'react-router-dom';
 import {TagIcon} from '@heroicons/react/20/solid';
 
+const SidebarSubtitle: React.FC<{title: string}> = ({title}) => (
+    <h4 className="py-1 px-2 pr-4 text-sm font-medium tracking-tight text-gray-900 dark:text-gray-200">
+        {title}
+    </h4>
+);
+
 const LeftSidebar: React.FC = () => {
     const [searchParams] = useSearchParams();
     const [current, setCurrent] = useState<{id?: number; type: Type}>({
@@ -55,11 +61,12 @@ const LeftSidebar: React.FC = () => {
                         />
                     ))}
             </div>
+
             <div className="mb-4 space-y-1" aria-label="Categories">
                 <SidebarSubtitle title="Tags" />
 
                 {!tagsIsLoading &&
-                    (tags?.length === 0 ? (
+                    (!tags?.length ? (
                         <p className="px-3 text-xs">No tags.</p>
                     ) : (
                         tags?.map((item) => (
@@ -79,16 +86,6 @@ const LeftSidebar: React.FC = () => {
                         ))
                     ))}
             </div>
-        </div>
-    );
-};
-
-const SidebarSubtitle: React.FC<{title: string}> = ({title}) => {
-    return (
-        <div>
-            <h4 className="py-1 px-2 pr-4 text-sm font-medium tracking-tight text-gray-900 dark:text-gray-200">
-                {title}
-            </h4>
         </div>
     );
 };
