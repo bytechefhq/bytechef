@@ -38,7 +38,7 @@ const navigation: {
     {
         href: '/automation/workflow-executions',
         icon: QueueListIcon,
-        name: 'Workflow Execution History',
+        name: 'Workflow Executions',
     },
 ];
 
