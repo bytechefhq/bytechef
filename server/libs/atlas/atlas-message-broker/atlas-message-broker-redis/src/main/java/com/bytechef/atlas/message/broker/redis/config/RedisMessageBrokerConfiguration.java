@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Ivica Cardic
@@ -76,6 +77,8 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
         redisListenerEndpointRegistrar.stop();
 
         executorService.shutdownNow();
+
+        executorService.awaitTermination(1, TimeUnit.SECONDS);
     }
 
     @Bean

@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Ivica Cardic
@@ -64,6 +65,12 @@ class RedisListenerEndpointRegistrar {
             } catch (Exception e) {
                 if (!stopped) {
                     logger.error(e.getMessage(), e);
+
+                    try {
+                        TimeUnit.SECONDS.sleep(1);
+                    } catch (InterruptedException ex) {
+                        // ignore
+                    }
                 }
             }
         }
