@@ -44,14 +44,12 @@ public class WorkerTest {
         messageBroker.receive(
             Queues.COMPLETIONS,
             t -> Assertions.assertEquals("done", ((TaskExecution) t).getOutput()));
-        messageBroker.receive(Queues.EVENTS, t -> {
-        });
+        messageBroker.receive(Queues.EVENTS, t -> {});
 
         Worker worker = Worker.builder()
             .withTaskHandlerResolver(jt -> t -> "done")
             .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {
-            })
+            .withEventPublisher(e -> {})
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
 
@@ -68,15 +66,13 @@ public class WorkerTest {
             Queues.ERRORS,
             t -> Assertions.assertEquals("bad input", ((TaskExecution) t).getError()
                 .getMessage()));
-        messageBroker.receive(Queues.EVENTS, t -> {
-        });
+        messageBroker.receive(Queues.EVENTS, t -> {});
         Worker worker = Worker.builder()
             .withTaskHandlerResolver(jt -> t -> {
                 throw new IllegalArgumentException("bad input");
             })
             .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {
-            })
+            .withEventPublisher(e -> {})
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
         TaskExecution task = new TaskExecution();
@@ -96,8 +92,7 @@ public class WorkerTest {
 
             Assertions.assertNull(taskExecution.getError());
         });
-        messageBroker.receive(Queues.EVENTS, t -> {
-        });
+        messageBroker.receive(Queues.EVENTS, t -> {});
 
         Worker worker = Worker.builder()
             .withTaskHandlerResolver(t1 -> {
@@ -110,8 +105,7 @@ public class WorkerTest {
             })
             .withMessageBroker(messageBroker)
             .withTaskEvaluator(TaskEvaluator.create())
-            .withEventPublisher(e -> {
-            })
+            .withEventPublisher(e -> {})
             .build();
 
         TaskExecution task = new TaskExecution(new WorkflowTask(Map.of(
@@ -136,8 +130,7 @@ public class WorkerTest {
         messageBroker.receive(Queues.COMPLETIONS, t -> {
             Assertions.assertFalse(new File(tempDir).exists());
         });
-        messageBroker.receive(Queues.EVENTS, t -> {
-        });
+        messageBroker.receive(Queues.EVENTS, t -> {});
 
         Worker worker = Worker.builder()
             .withTaskHandlerResolver(t1 -> {
@@ -157,8 +150,7 @@ public class WorkerTest {
                 }
             })
             .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {
-            })
+            .withEventPublisher(e -> {})
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
 
@@ -184,8 +176,7 @@ public class WorkerTest {
         messageBroker.receive(Queues.ERRORS, t -> {
             Assertions.assertFalse(new File(tempDir).exists());
         });
-        messageBroker.receive(Queues.EVENTS, t -> {
-        });
+        messageBroker.receive(Queues.EVENTS, t -> {});
 
         Worker worker = Worker.builder()
             .withTaskHandlerResolver(t1 -> {
@@ -207,8 +198,7 @@ public class WorkerTest {
                 }
             })
             .withMessageBroker(messageBroker)
-            .withEventPublisher(e -> {
-            })
+            .withEventPublisher(e -> {})
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
 
@@ -239,8 +229,7 @@ public class WorkerTest {
                 return null;
             })
             .withMessageBroker(messageBroker)
-            .withEventPublisher(event -> {
-            })
+            .withEventPublisher(event -> {})
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
 
@@ -277,8 +266,7 @@ public class WorkerTest {
                 return null;
             })
             .withMessageBroker(messageBroker)
-            .withEventPublisher(event -> {
-            })
+            .withEventPublisher(event -> {})
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
 
@@ -328,8 +316,7 @@ public class WorkerTest {
                 return null;
             })
             .withMessageBroker(messageBroker)
-            .withEventPublisher(event -> {
-            })
+            .withEventPublisher(event -> {})
             .withTaskEvaluator(TaskEvaluator.create())
             .build();
 

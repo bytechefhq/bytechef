@@ -176,8 +176,7 @@ public class WorkflowExecutor {
             contextService, taskDispatcherChain, taskExecutionService, taskEvaluator, workflowService);
 
         DefaultTaskCompletionHandler defaultTaskCompletionHandler = new DefaultTaskCompletionHandler(
-            contextService, e -> {
-            }, jobExecutor, jobService, taskEvaluator, taskExecutionService, workflowService);
+            contextService, e -> {}, jobExecutor, jobService, taskEvaluator, taskExecutionService, workflowService);
 
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
 
