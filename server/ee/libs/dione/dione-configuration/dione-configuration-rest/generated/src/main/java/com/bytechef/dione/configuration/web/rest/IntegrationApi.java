@@ -5,9 +5,9 @@
  */
 package com.bytechef.dione.configuration.web.rest;
 
-import com.bytechef.dione.configuration.web.rest.model.CreateIntegrationWorkflowRequestModel;
 import com.bytechef.dione.configuration.web.rest.model.IntegrationModel;
 import com.bytechef.dione.configuration.web.rest.model.WorkflowModel;
+import com.bytechef.dione.configuration.web.rest.model.WorkflowRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-06T20:36:51.350361+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-09T13:39:53.714562+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "integration", description = "The Embedded Integration API")
 public interface IntegrationApi {
@@ -89,7 +89,7 @@ public interface IntegrationApi {
      * Create new workflow and adds it to an existing integration.
      *
      * @param id The id of an integration. (required)
-     * @param createIntegrationWorkflowRequestModel  (required)
+     * @param workflowRequestModel  (required)
      * @return The updated integration object. (status code 200)
      */
     @Operation(
@@ -111,7 +111,7 @@ public interface IntegrationApi {
     )
     default ResponseEntity<WorkflowModel> createIntegrationWorkflow(
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "CreateIntegrationWorkflowRequestModel", description = "", required = true) @Valid @RequestBody CreateIntegrationWorkflowRequestModel createIntegrationWorkflowRequestModel
+        @Parameter(name = "WorkflowRequestModel", description = "", required = true) @Valid @RequestBody WorkflowRequestModel workflowRequestModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

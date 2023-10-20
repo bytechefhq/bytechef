@@ -16,67 +16,44 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * OutputModel
+ * WorkflowRequestModel
  */
 
-@JsonTypeName("Output")
+@JsonTypeName("WorkflowRequest")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-09T13:39:53.714562+02:00[Europe/Zagreb]")
-public class OutputModel {
+public class WorkflowRequestModel {
 
-  private String name;
+  private String definition;
 
-  private Object value;
-
-  public OutputModel() {
+  public WorkflowRequestModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public OutputModel(String name, Object value) {
-    this.name = name;
-    this.value = value;
+  public WorkflowRequestModel(String definition) {
+    this.definition = definition;
   }
 
-  public OutputModel name(String name) {
-    this.name = name;
+  public WorkflowRequestModel definition(String definition) {
+    this.definition = definition;
     return this;
   }
 
   /**
-   * The name of an output
-   * @return name
+   * The definition of a workflow.
+   * @return definition
   */
   @NotNull 
-  @Schema(name = "name", description = "The name of an output", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("name")
-  public String getName() {
-    return name;
+  @Schema(name = "definition", description = "The definition of a workflow.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("definition")
+  public String getDefinition() {
+    return definition;
   }
 
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public OutputModel value(Object value) {
-    this.value = value;
-    return this;
-  }
-
-  /**
-   * The value of an output
-   * @return value
-  */
-  @NotNull 
-  @Schema(name = "value", description = "The value of an output", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("value")
-  public Object getValue() {
-    return value;
-  }
-
-  public void setValue(Object value) {
-    this.value = value;
+  public void setDefinition(String definition) {
+    this.definition = definition;
   }
 
   @Override
@@ -87,22 +64,20 @@ public class OutputModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    OutputModel output = (OutputModel) o;
-    return Objects.equals(this.name, output.name) &&
-        Objects.equals(this.value, output.value);
+    WorkflowRequestModel workflowRequest = (WorkflowRequestModel) o;
+    return Objects.equals(this.definition, workflowRequest.definition);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, value);
+    return Objects.hash(definition);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class OutputModel {\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    value: ").append(toIndentedString(value)).append("\n");
+    sb.append("class WorkflowRequestModel {\n");
+    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("}");
     return sb.toString();
   }
