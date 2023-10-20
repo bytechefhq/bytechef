@@ -16,13 +16,10 @@
 import * as runtime from '../runtime';
 import type {
   WorkflowModel,
-  WorkflowParametersModel,
 } from '../models';
 import {
     WorkflowModelFromJSON,
     WorkflowModelToJSON,
-    WorkflowParametersModelFromJSON,
-    WorkflowParametersModelToJSON,
 } from '../models';
 
 export interface CreateWorkflowRequest {
@@ -35,11 +32,6 @@ export interface DeleteWorkflowRequest {
 
 export interface GetWorkflowRequest {
     id: string;
-}
-
-export interface TestWorkflowRequest {
-    id: string;
-    workflowParametersModel: WorkflowParametersModel;
 }
 
 export interface UpdateWorkflowRequest {
@@ -175,45 +167,6 @@ export class WorkflowsApi extends runtime.BaseAPI {
      */
     async getWorkflows(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowModel>> {
         const response = await this.getWorkflowsRaw(initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Create a request for testing a workflow.
-     * Create a request for testing a workflow.
-     */
-    async testWorkflowRaw(requestParameters: TestWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling testWorkflow.');
-        }
-
-        if (requestParameters.workflowParametersModel === null || requestParameters.workflowParametersModel === undefined) {
-            throw new runtime.RequiredError('workflowParametersModel','Required parameter requestParameters.workflowParametersModel was null or undefined when calling testWorkflow.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/workflows/{id}/test`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: WorkflowParametersModelToJSON(requestParameters.workflowParametersModel),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse<any>(response);
-    }
-
-    /**
-     * Create a request for testing a workflow.
-     * Create a request for testing a workflow.
-     */
-    async testWorkflow(requestParameters: TestWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.testWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

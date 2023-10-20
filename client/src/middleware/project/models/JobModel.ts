@@ -57,7 +57,7 @@ export interface JobModel {
      */
     error?: ExecutionErrorModel;
     /**
-     * Id of the job.
+     * The id of a job.
      * @type {string}
      * @memberof JobModel
      */

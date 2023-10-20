@@ -15,10 +15,16 @@
 
 import * as runtime from '../runtime';
 import type {
+  CreateProjectInstanceJob200ResponseModel,
+  JobParametersModel,
   ProjectInstanceModel,
   UpdateTagsRequestModel,
 } from '../models';
 import {
+    CreateProjectInstanceJob200ResponseModelFromJSON,
+    CreateProjectInstanceJob200ResponseModelToJSON,
+    JobParametersModelFromJSON,
+    JobParametersModelToJSON,
     ProjectInstanceModelFromJSON,
     ProjectInstanceModelToJSON,
     UpdateTagsRequestModelFromJSON,
@@ -27,6 +33,11 @@ import {
 
 export interface CreateProjectInstanceRequest {
     projectInstanceModel: ProjectInstanceModel;
+}
+
+export interface CreateProjectInstanceJobRequest {
+    id: number;
+    jobParametersModel: JobParametersModel;
 }
 
 export interface DeleteProjectInstanceRequest {
@@ -89,6 +100,45 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
      */
     async createProjectInstance(requestParameters: CreateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstanceModel> {
         const response = await this.createProjectInstanceRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Create a request for running a new job.
+     * Create a request for running a new job.
+     */
+    async createProjectInstanceJobRaw(requestParameters: CreateProjectInstanceJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateProjectInstanceJob200ResponseModel>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling createProjectInstanceJob.');
+        }
+
+        if (requestParameters.jobParametersModel === null || requestParameters.jobParametersModel === undefined) {
+            throw new runtime.RequiredError('jobParametersModel','Required parameter requestParameters.jobParametersModel was null or undefined when calling createProjectInstanceJob.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/project-instances/{id}/jobs`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: JobParametersModelToJSON(requestParameters.jobParametersModel),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreateProjectInstanceJob200ResponseModelFromJSON(jsonValue));
+    }
+
+    /**
+     * Create a request for running a new job.
+     * Create a request for running a new job.
+     */
+    async createProjectInstanceJob(requestParameters: CreateProjectInstanceJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateProjectInstanceJob200ResponseModel> {
+        const response = await this.createProjectInstanceJobRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

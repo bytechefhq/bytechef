@@ -8,5 +8,4 @@ export * from './PageModel';
 export * from './TaskExecutionModel';
 export * from './WorkflowFormatModel';
 export * from './WorkflowModel';
-export * from './WorkflowParametersModel';
 export * from './WorkflowTaskModel';

@@ -20,7 +20,7 @@ import { exists, mapValues } from '../runtime';
  */
 export interface WorkflowTaskModel {
     /**
-     * The (optional) list of tasks that are to be executed after execution of this task -- regardless of whether it had failed or not.
+     * The (optional) list of tasks that are to be executed after execution of a task -- regardless of whether it had failed or not.
      * @type {Array<WorkflowTaskModel>}
      * @memberof WorkflowTaskModel
      */
@@ -50,19 +50,19 @@ export interface WorkflowTaskModel {
      */
     parameters?: { [key: string]: object; };
     /**
-     * The (optional) list of tasks that are to be executed after the succesful execution of this task.
+     * The (optional) list of tasks that are to be executed after the successful execution of a task.
      * @type {Array<WorkflowTaskModel>}
      * @memberof WorkflowTaskModel
      */
     post?: Array<WorkflowTaskModel>;
     /**
-     * The (optional) list of tasks that are to be executed prior to this task.
+     * The (optional) list of tasks that are to be executed prior to a task.
      * @type {Array<WorkflowTaskModel>}
      * @memberof WorkflowTaskModel
      */
     pre?: Array<WorkflowTaskModel>;
     /**
-     * The timeout expression which describes when this task should be deemed as timed-out.
+     * The timeout expression which describes when a task should be deemed as timed-out.
      * @type {string}
      * @memberof WorkflowTaskModel
      */

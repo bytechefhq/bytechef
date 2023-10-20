@@ -8,10 +8,12 @@ apis/index.ts
 index.ts
 models/CategoryModel.ts
 models/ConnectionModel.ts
+models/CreateProjectInstanceJob200ResponseModel.ts
 models/CreateProjectWorkflowRequestModel.ts
 models/ExecutionErrorModel.ts
 models/JobBasicModel.ts
 models/JobModel.ts
+models/JobParametersModel.ts
 models/PageModel.ts
 models/ProjectBasicModel.ts
 models/ProjectExecutionBasicModel.ts

@@ -16,31 +16,31 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface CreateJob200ResponseModel
+ * @interface CreateProjectInstanceJob200ResponseModel
  */
-export interface CreateJob200ResponseModel {
+export interface CreateProjectInstanceJob200ResponseModel {
     /**
      * The id of an executed job.
      * @type {number}
-     * @memberof CreateJob200ResponseModel
+     * @memberof CreateProjectInstanceJob200ResponseModel
      */
     jobId?: number;
 }
 
 /**
- * Check if a given object implements the CreateJob200ResponseModel interface.
+ * Check if a given object implements the CreateProjectInstanceJob200ResponseModel interface.
  */
-export function instanceOfCreateJob200ResponseModel(value: object): boolean {
+export function instanceOfCreateProjectInstanceJob200ResponseModel(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function CreateJob200ResponseModelFromJSON(json: any): CreateJob200ResponseModel {
-    return CreateJob200ResponseModelFromJSONTyped(json, false);
+export function CreateProjectInstanceJob200ResponseModelFromJSON(json: any): CreateProjectInstanceJob200ResponseModel {
+    return CreateProjectInstanceJob200ResponseModelFromJSONTyped(json, false);
 }
 
-export function CreateJob200ResponseModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): CreateJob200ResponseModel {
+export function CreateProjectInstanceJob200ResponseModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): CreateProjectInstanceJob200ResponseModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -50,7 +50,7 @@ export function CreateJob200ResponseModelFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function CreateJob200ResponseModelToJSON(value?: CreateJob200ResponseModel | null): any {
+export function CreateProjectInstanceJob200ResponseModelToJSON(value?: CreateProjectInstanceJob200ResponseModel | null): any {
     if (value === undefined) {
         return undefined;
     }
