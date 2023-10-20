@@ -41,7 +41,7 @@ public class UpdateUserAction {
                 .description("This can only be done by the logged in user."))
         .metadata(
             Map.of(
-                "requestMethod", "PUT",
+                "method", "PUT",
                 "path", "/user/{username}", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))

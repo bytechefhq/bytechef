@@ -38,7 +38,7 @@ public class LoginUserAction {
                 .description(""))
         .metadata(
             Map.of(
-                "requestMethod", "GET",
+                "method", "GET",
                 "path", "/user/login"
 
             ))
@@ -54,7 +54,7 @@ public class LoginUserAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .outputSchema(string(null).metadata(
+        .outputSchema(string().metadata(
             Map.of(
                 "responseFormat", ResponseFormat.TEXT)));
 }

@@ -40,7 +40,7 @@ public class GetPetByIdAction {
                 .description("Returns a single pet"))
         .metadata(
             Map.of(
-                "requestMethod", "GET",
+                "method", "GET",
                 "path", "/pet/{petId}"
 
             ))

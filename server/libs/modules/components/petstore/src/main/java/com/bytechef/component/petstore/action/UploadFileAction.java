@@ -43,7 +43,7 @@ public class UploadFileAction {
                 .description(""))
         .metadata(
             Map.of(
-                "requestMethod", "POST",
+                "method", "POST",
                 "path", "/pet/{petId}/uploadImage", "bodyContentType", BodyContentType.BINARY, "mimeType",
                 "application/octet-stream"
 

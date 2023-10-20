@@ -46,7 +46,7 @@ public class GetDealsAction {
                     "Returns all deals. For more information, see the tutorial for <a href=\"https://pipedrive.readme.io/docs/getting-all-deals\" target=\"_blank\" rel=\"noopener noreferrer\">getting all deals</a>."))
         .metadata(
             Map.of(
-                "requestMethod", "GET",
+                "method", "GET",
                 "path", "/deals"
 
             ))

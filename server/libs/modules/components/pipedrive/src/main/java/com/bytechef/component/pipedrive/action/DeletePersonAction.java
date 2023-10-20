@@ -40,7 +40,7 @@ public class DeletePersonAction {
                 .description("Marks a person as deleted. After 30 days, the person will be permanently deleted."))
         .metadata(
             Map.of(
-                "requestMethod", "DELETE",
+                "method", "DELETE",
                 "path", "/persons/{id}"
 
             ))

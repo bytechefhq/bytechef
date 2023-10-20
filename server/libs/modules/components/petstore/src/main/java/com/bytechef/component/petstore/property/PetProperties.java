@@ -41,7 +41,7 @@ public class PetProperties {
         object("category").properties(CategoryProperties.PROPERTIES)
             .label("Category")
             .required(false),
-        array("photoUrls").items(string(null))
+        array("photoUrls").items(string())
             .placeholder("Add")
             .label("PhotoUrls")
             .required(true),

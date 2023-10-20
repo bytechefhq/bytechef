@@ -42,7 +42,7 @@ public class GetPersonsAction {
                 .description("Returns all persons."))
         .metadata(
             Map.of(
-                "requestMethod", "GET",
+                "method", "GET",
                 "path", "/persons"
 
             ))
@@ -86,8 +86,8 @@ public class GetPersonsAction {
                     Map.of(
                         "type", PropertyType.QUERY)))
         .outputSchema(object()
-            .properties(object("additional_data").properties(
-                object("pagination").properties(integer("start").label("Start")
+            .properties(object("additional_data")
+                .properties(object("pagination").properties(integer("start").label("Start")
                     .description("Pagination start")
                     .required(false),
                     integer("limit").label("Limit")

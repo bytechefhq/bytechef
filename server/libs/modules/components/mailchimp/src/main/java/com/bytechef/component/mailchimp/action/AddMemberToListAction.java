@@ -45,7 +45,7 @@ public class AddMemberToListAction {
                 .description("Add member to list"))
         .metadata(
             Map.of(
-                "requestMethod", "POST",
+                "method", "POST",
                 "path", "/lists/{listId}/members", "bodyContentType", BodyContentType.JSON, "mimeType",
                 "application/json"
 
@@ -124,7 +124,7 @@ public class AddMemberToListAction {
                 string("timestamp_opt").label("Timestamp_opt")
                     .description("The date and time the subscriber confirmed their opt-in status in ISO 8601 format.")
                     .required(false),
-                array("tags").items(string(null).description("The tags that are associated with a member."))
+                array("tags").items(string().description("The tags that are associated with a member."))
                     .placeholder("Add")
                     .label("Tags")
                     .description("The tags that are associated with a member.")

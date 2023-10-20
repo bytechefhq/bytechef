@@ -1,5 +1,6 @@
 {
   "actions": [ {
+    "batch": false,
     "display": {
       "description": "Add a new pet to the store",
       "title": "Add a new pet to the store"
@@ -7,7 +8,7 @@
     "metadata": {
       "path": "/pet",
       "mimeType": "application/json",
-      "requestMethod": "POST",
+      "method": "POST",
       "bodyContentType": "JSON"
     },
     "name": "addPet",
@@ -215,6 +216,7 @@
       "controlType": "JSON_BUILDER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Update an existing pet by Id",
       "title": "Update an existing pet"
@@ -222,7 +224,7 @@
     "metadata": {
       "path": "/pet",
       "mimeType": "application/json",
-      "requestMethod": "PUT",
+      "method": "PUT",
       "bodyContentType": "JSON"
     },
     "name": "updatePet",
@@ -430,20 +432,20 @@
       "controlType": "JSON_BUILDER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Multiple status values can be provided with comma separated strings",
       "title": "Finds Pets by status"
     },
     "metadata": {
-      "path": "/pet/findByStatus",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/pet/findByStatus"
     },
     "name": "findPetsByStatus",
     "outputSchema": [ {
       "metadata": {
         "responseFormat": "JSON"
       },
-      "name": "array",
       "type": "ARRAY",
       "items": [ {
         "type": "OBJECT",
@@ -567,20 +569,20 @@
       } ]
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
       "title": "Finds Pets by tags"
     },
     "metadata": {
-      "path": "/pet/findByTags",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/pet/findByTags"
     },
     "name": "findPetsByTags",
     "outputSchema": [ {
       "metadata": {
         "responseFormat": "JSON"
       },
-      "name": "array",
       "type": "ARRAY",
       "items": [ {
         "type": "OBJECT",
@@ -700,13 +702,14 @@
       "controlType": "JSON_BUILDER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "delete a pet",
       "title": "Deletes a pet"
     },
     "metadata": {
-      "path": "/pet/{petId}",
-      "requestMethod": "DELETE"
+      "method": "DELETE",
+      "path": "/pet/{petId}"
     },
     "name": "deletePet",
     "properties": [ {
@@ -731,13 +734,14 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Returns a single pet",
       "title": "Find pet by ID"
     },
     "metadata": {
-      "path": "/pet/{petId}",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/pet/{petId}"
     },
     "name": "getPetById",
     "outputSchema": [ {
@@ -852,13 +856,14 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "",
       "title": "Updates a pet in the store with form data"
     },
     "metadata": {
-      "path": "/pet/{petId}",
-      "requestMethod": "POST"
+      "method": "POST",
+      "path": "/pet/{petId}"
     },
     "name": "updatePetWithForm",
     "properties": [ {
@@ -893,6 +898,7 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "",
       "title": "uploads an image"
@@ -900,7 +906,7 @@
     "metadata": {
       "path": "/pet/{petId}/uploadImage",
       "mimeType": "application/octet-stream",
-      "requestMethod": "POST",
+      "method": "POST",
       "bodyContentType": "BINARY"
     },
     "name": "uploadFile",
@@ -983,13 +989,14 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Returns a map of status codes to quantities",
       "title": "Returns pet inventories by status"
     },
     "metadata": {
-      "path": "/store/inventory",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/store/inventory"
     },
     "name": "getInventory",
     "outputSchema": [ {
@@ -1006,6 +1013,7 @@
     } ],
     "properties": [ ]
   }, {
+    "batch": false,
     "display": {
       "description": "Place a new order in the store",
       "title": "Place an order for a pet"
@@ -1013,7 +1021,7 @@
     "metadata": {
       "path": "/store/order",
       "mimeType": "application/json",
-      "requestMethod": "POST",
+      "method": "POST",
       "bodyContentType": "JSON"
     },
     "name": "placeOrder",
@@ -1140,13 +1148,14 @@
       "controlType": "JSON_BUILDER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors",
       "title": "Delete purchase order by ID"
     },
     "metadata": {
-      "path": "/store/order/{orderId}",
-      "requestMethod": "DELETE"
+      "method": "DELETE",
+      "path": "/store/order/{orderId}"
     },
     "name": "deleteOrder",
     "properties": [ {
@@ -1161,13 +1170,14 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
       "title": "Find purchase order by ID"
     },
     "metadata": {
-      "path": "/store/order/{orderId}",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/store/order/{orderId}"
     },
     "name": "getOrderById",
     "outputSchema": [ {
@@ -1242,6 +1252,7 @@
       "controlType": "INPUT_INTEGER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "This can only be done by the logged in user.",
       "title": "Create user"
@@ -1249,7 +1260,7 @@
     "metadata": {
       "path": "/user",
       "mimeType": "application/json",
-      "requestMethod": "POST",
+      "method": "POST",
       "bodyContentType": "JSON"
     },
     "name": "createUser",
@@ -1388,6 +1399,7 @@
       "controlType": "JSON_BUILDER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "Creates list of users with given input array",
       "title": "Creates list of users with given input array"
@@ -1395,7 +1407,7 @@
     "metadata": {
       "path": "/user/createWithList",
       "mimeType": "application/json",
-      "requestMethod": "POST",
+      "method": "POST",
       "bodyContentType": "JSON"
     },
     "name": "createUsersWithListInput",
@@ -1403,7 +1415,6 @@
       "metadata": {
         "responseFormat": "JSON"
       },
-      "name": "array",
       "type": "ARRAY",
       "items": [ {
         "type": "OBJECT",
@@ -1545,13 +1556,14 @@
       "controlType": "JSON_BUILDER"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "",
       "title": "Logs user into the system"
     },
     "metadata": {
-      "path": "/user/login",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/user/login"
     },
     "name": "loginUser",
     "outputSchema": [ {
@@ -1583,24 +1595,26 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "",
       "title": "Logs out current logged in user session"
     },
     "metadata": {
-      "path": "/user/logout",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/user/logout"
     },
     "name": "logoutUser",
     "properties": [ ]
   }, {
+    "batch": false,
     "display": {
       "description": "This can only be done by the logged in user.",
       "title": "Delete user"
     },
     "metadata": {
-      "path": "/user/{username}",
-      "requestMethod": "DELETE"
+      "method": "DELETE",
+      "path": "/user/{username}"
     },
     "name": "deleteUser",
     "properties": [ {
@@ -1615,13 +1629,14 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "",
       "title": "Get user by user name"
     },
     "metadata": {
-      "path": "/user/{username}",
-      "requestMethod": "GET"
+      "method": "GET",
+      "path": "/user/{username}"
     },
     "name": "getUserByName",
     "outputSchema": [ {
@@ -1702,6 +1717,7 @@
       "controlType": "INPUT_TEXT"
     } ]
   }, {
+    "batch": false,
     "display": {
       "description": "This can only be done by the logged in user.",
       "title": "Update user"
@@ -1709,7 +1725,7 @@
     "metadata": {
       "path": "/user/{username}",
       "mimeType": "application/json",
-      "requestMethod": "PUT",
+      "method": "PUT",
       "bodyContentType": "JSON"
     },
     "name": "updateUser",
@@ -1859,7 +1875,7 @@
     } ]
   } ],
   "connection": {
-    "authorizationRequired": true,
+    "authorizationRequired": false,
     "authorizations": [ {
       "display": {
         "title": "OAuth2 Implicit"
@@ -1913,5 +1929,6 @@
     "title": "Petstore"
   },
   "name": "petstore",
-  "version": 1
+  "version": 1,
+  "triggers": [ ]
 }

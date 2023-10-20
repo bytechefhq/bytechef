@@ -45,7 +45,7 @@ public class SearchDealsAction {
                     "Searches all deals by title, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope. Found deals can be filtered by the person ID and the organization ID."))
         .metadata(
             Map.of(
-                "requestMethod", "GET",
+                "method", "GET",
                 "path", "/deals/search"
 
             ))
@@ -171,12 +171,12 @@ public class SearchDealsAction {
                                             .required(false))
                                         .label("Organization")
                                         .required(false),
-                                    array("custom_fields").items(string(null).description("Custom fields"))
+                                    array("custom_fields").items(string().description("Custom fields"))
                                         .placeholder("Add")
                                         .label("Custom_fields")
                                         .description("Custom fields")
                                         .required(false),
-                                    array("notes").items(string(null).description("An array of notes"))
+                                    array("notes").items(string().description("An array of notes"))
                                         .placeholder("Add")
                                         .label("Notes")
                                         .description("An array of notes")

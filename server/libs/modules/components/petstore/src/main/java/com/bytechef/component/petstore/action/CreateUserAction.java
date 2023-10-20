@@ -40,7 +40,7 @@ public class CreateUserAction {
                 .description("This can only be done by the logged in user."))
         .metadata(
             Map.of(
-                "requestMethod", "POST",
+                "method", "POST",
                 "path", "/user", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))

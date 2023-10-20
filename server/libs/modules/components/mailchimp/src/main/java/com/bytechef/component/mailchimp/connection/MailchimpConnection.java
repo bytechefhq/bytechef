@@ -17,6 +17,7 @@
 
 package com.bytechef.component.mailchimp.connection;
 
+import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import static com.bytechef.hermes.component.definition.Authorization.CLIENT_ID;
 import static com.bytechef.hermes.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
@@ -24,7 +25,6 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 
 /**
@@ -34,21 +34,17 @@ import com.bytechef.hermes.component.definition.ComponentDSL;
  */
 public class MailchimpConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri(connection -> null)
         .authorizations(authorization(
-            Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE.name()
-                .toLowerCase(),
-            Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-            .display(
-                display("OAuth2 Authorization Code"))
-            .properties(
-                string(CLIENT_ID)
-                    .label("Client Id")
-                    .required(true),
-                string(CLIENT_SECRET)
-                    .label("Client Secret")
-                    .required(true))
-            .authorizationUrl(connection -> "https://login.mailchimp.com/oauth2/authorize")
-
-            .tokenUrl(connection -> "https://login.mailchimp.com/oauth2/token"));
+            AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                .display(
+                    display("OAuth2 Authorization Code"))
+                .properties(
+                    string(CLIENT_ID)
+                        .label("Client Id")
+                        .required(true),
+                    string(CLIENT_SECRET)
+                        .label("Client Secret")
+                        .required(true))
+                .authorizationUrl(connection -> "https://login.mailchimp.com/oauth2/authorize")
+                .tokenUrl(connection -> "https://login.mailchimp.com/oauth2/token"));
 }

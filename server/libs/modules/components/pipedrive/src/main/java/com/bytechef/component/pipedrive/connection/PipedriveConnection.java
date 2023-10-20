@@ -18,6 +18,8 @@
 package com.bytechef.component.pipedrive.connection;
 
 import static com.bytechef.hermes.component.definition.Authorization.ADD_TO;
+import static com.bytechef.hermes.component.definition.Authorization.ApiTokenLocation;
+import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import static com.bytechef.hermes.component.definition.Authorization.CLIENT_ID;
 import static com.bytechef.hermes.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.hermes.component.definition.Authorization.VALUE;
@@ -26,7 +28,6 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
 
@@ -39,38 +40,35 @@ public class PipedriveConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri(connection -> "https://api.pipedrive.com/v1")
         .authorizations(authorization(
-            Authorization.AuthorizationType.API_KEY.name()
-                .toLowerCase(),
-            Authorization.AuthorizationType.API_KEY)
-            .display(
-                display("API Key"))
-            .properties(
-
-                string(VALUE)
-                    .label("Value")
-                    .required(true),
-                string(ADD_TO)
-                    .label("Add to")
-                    .required(true)
-                    .defaultValue(Authorization.ApiTokenLocation.QUERY_PARAMETERS.name())
-                    .hidden(true)
-
-            ), authorization(
-                Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE.name()
-                    .toLowerCase(),
-                Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+            AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
                 .display(
-                    display("OAuth2 Authorization Code"))
+                    display("API Key"))
                 .properties(
-                    string(CLIENT_ID)
-                        .label("Client Id")
+
+                    string(VALUE)
+                        .label("Value")
                         .required(true),
-                    string(CLIENT_SECRET)
-                        .label("Client Secret")
-                        .required(true))
-                .authorizationUrl(connection -> "https://oauth.pipedrive.com/oauth/authorize")
-                .scopes(connection -> List.of("deals:full", "contacts:full", "search:read", "leads:read", "leads:full",
-                    "contacts:read", "deals:read"))
-                .tokenUrl(connection -> "https://oauth.pipedrive.com/oauth/token")
-                .refreshUrl(connection -> "https://oauth.pipedrive.com/oauth/token"));
+                    string(ADD_TO)
+                        .label("Add to")
+                        .required(true)
+                        .defaultValue(ApiTokenLocation.QUERY_PARAMETERS.name())
+                        .hidden(true)
+
+                ), authorization(
+                    AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(),
+                    AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                        .display(
+                            display("OAuth2 Authorization Code"))
+                        .properties(
+                            string(CLIENT_ID)
+                                .label("Client Id")
+                                .required(true),
+                            string(CLIENT_SECRET)
+                                .label("Client Secret")
+                                .required(true))
+                        .authorizationUrl(connection -> "https://oauth.pipedrive.com/oauth/authorize")
+                        .scopes(connection -> List.of("deals:full", "contacts:full", "search:read", "leads:read",
+                            "leads:full", "contacts:read", "deals:read"))
+                        .tokenUrl(connection -> "https://oauth.pipedrive.com/oauth/token")
+                        .refreshUrl(connection -> "https://oauth.pipedrive.com/oauth/token"));
 }

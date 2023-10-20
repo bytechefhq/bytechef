@@ -51,7 +51,7 @@ public class GetIssueAction {
                     + " *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue."))
         .metadata(
             Map.of(
-                "requestMethod", "GET",
+                "method", "GET",
                 "path", "/rest/api/3/issue/{issueIdOrKey}"
 
             ))
@@ -61,7 +61,7 @@ public class GetIssueAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            array("fields").items(string(null))
+            array("fields").items(string())
                 .placeholder("Add")
                 .label("Fields")
                 .description(
@@ -106,7 +106,7 @@ public class GetIssueAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            array("properties").items(string(null))
+            array("properties").items(string())
                 .placeholder("Add")
                 .label("Properties")
                 .description(

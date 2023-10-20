@@ -28,8 +28,8 @@ import java.util.List;
  * @generated
  */
 public class IssueUpdateMetadataProperties {
-    public static final List<Property> PROPERTIES = List
-        .of(object("fields").additionalProperties(object().properties(FieldMetadataProperties.PROPERTIES))
+    public static final List<Property> PROPERTIES =
+        List.of(object("fields").additionalProperties(object().properties(FieldMetadataProperties.PROPERTIES))
             .placeholder("Add")
             .label("Fields")
             .required(false));

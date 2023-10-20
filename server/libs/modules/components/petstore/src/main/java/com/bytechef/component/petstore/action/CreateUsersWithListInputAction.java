@@ -41,7 +41,7 @@ public class CreateUsersWithListInputAction {
                 .description("Creates list of users with given input array"))
         .metadata(
             Map.of(
-                "requestMethod", "POST",
+                "method", "POST",
                 "path", "/user/createWithList", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
@@ -50,7 +50,7 @@ public class CreateUsersWithListInputAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .outputSchema(array("array").items(object().properties(UserProperties.PROPERTIES))
+        .outputSchema(array().items(object().properties(UserProperties.PROPERTIES))
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)));

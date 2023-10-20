@@ -31,7 +31,7 @@ import java.util.List;
  * @generated
  */
 public class ErrorCollectionProperties {
-    public static final List<Property> PROPERTIES = List.of(array("errorMessages").items(string(null).description(
+    public static final List<Property> PROPERTIES = List.of(array("errorMessages").items(string().description(
         "The list of error messages produced by this operation. For example, \"input parameter 'key' must be provided\""))
         .placeholder("Add")
         .label("ErrorMessages")

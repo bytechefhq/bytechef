@@ -54,7 +54,7 @@ public class CreateIssueAction {
                         + "**[Permissions](#permissions) required:** *Browse projects* and *Create issues* [project permissions](https://confluence.atlassian.com/x/yodKLg) for the project in which the issue or subtask is created."))
         .metadata(
             Map.of(
-                "requestMethod", "POST",
+                "method", "POST",
                 "path", "/rest/api/3/issue", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
