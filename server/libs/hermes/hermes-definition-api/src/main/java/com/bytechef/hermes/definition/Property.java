@@ -60,7 +60,7 @@ import java.util.Map;
     @JsonSubTypes.Type(value = Property.StringProperty.class, name = "STRING")
 })
 // CHECKSTYLE:OFF
-public sealed interface Property<P extends Property<P>> permits ModifiableProperty,Property.DynamicPropertiesProperty,Property.OneOfProperty,Property.ValueProperty {
+public sealed interface Property<P extends Property<P>> permits ModifiableProperty, Property.DynamicPropertiesProperty, Property.OneOfProperty, Property.ValueProperty {
 
     enum ControlType {
         CHECKBOX,
@@ -93,6 +93,8 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
         STRING
     }
 
+    Object accept(PropertyVisitor propertyVisitor);
+
     Boolean getAdvancedOption();
 
     String getDescription();
@@ -115,23 +117,45 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
 
     Type getType();
 
+    interface PropertyVisitor {
+        Object visit(ArrayProperty arrayProperty);
+
+        Object visit(BooleanProperty booleanProperty);
+
+        Object visit(DateProperty dateProperty);
+
+        Object visit(DateTimeProperty dateTimeProperty);
+
+        Object visit(DynamicPropertiesProperty dateProperty);
+
+        Object visit(IntegerProperty integerProperty);
+
+        Object visit(NumberProperty numberProperty);
+
+        Object visit(OneOfProperty oneOfProperty);
+
+        Object visit(ObjectProperty objectProperty);
+
+        Object visit(StringProperty stringProperty);
+    }
+
     @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableDynamicPropertiesProperty.class)
     sealed interface DynamicPropertiesProperty
-        extends Property<DynamicPropertiesProperty>permits ModifiableDynamicPropertiesProperty {
+        extends Property<DynamicPropertiesProperty> permits ModifiableDynamicPropertiesProperty {
 
         PropertiesDataSource getPropertiesDataSource();
     }
 
     @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableOneOfProperty.class)
     sealed interface OneOfProperty
-        extends Property<OneOfProperty>permits ModifiableOneOfProperty {
+        extends Property<OneOfProperty> permits ModifiableOneOfProperty {
 
         List<? extends Property<?>> getTypes();
     }
 
     @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableValueProperty.class)
     sealed interface ValueProperty<V, P extends ValueProperty<V, P>> extends
-        Property<P>permits ArrayProperty,BooleanProperty,DateProperty,DateTimeProperty,IntegerProperty,NumberProperty,ObjectProperty,StringProperty,ModifiableValueProperty {
+        Property<P> permits ArrayProperty, BooleanProperty, DateProperty, DateTimeProperty, IntegerProperty, NumberProperty, ObjectProperty, StringProperty, ModifiableValueProperty {
 
         ControlType getControlType();
 
@@ -142,7 +166,7 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
 
     @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableArrayProperty.class)
     sealed interface ArrayProperty
-        extends ValueProperty<Object[], ArrayProperty>permits ModifiableArrayProperty {
+        extends ValueProperty<Object[], ArrayProperty> permits ModifiableArrayProperty {
 
         List<Property<?>> getItems();
 
@@ -155,12 +179,12 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
 
     @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableBooleanProperty.class)
     sealed interface BooleanProperty extends
-        ValueProperty<Boolean, BooleanProperty>permits ModifiableBooleanProperty {
+        ValueProperty<Boolean, BooleanProperty> permits ModifiableBooleanProperty {
     }
 
     @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableDateProperty.class)
     sealed interface DateProperty
-        extends ValueProperty<LocalDate, DateProperty>permits ModifiableDateProperty {
+        extends ValueProperty<LocalDate, DateProperty> permits ModifiableDateProperty {
 
         List<Option<?>> getOptions();
 
@@ -169,7 +193,7 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
 
     @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableDateTimeProperty.class)
     sealed interface DateTimeProperty extends
-        ValueProperty<LocalDateTime, DateTimeProperty>permits ModifiableDateTimeProperty {
+        ValueProperty<LocalDateTime, DateTimeProperty> permits ModifiableDateTimeProperty {
 
         List<Option<?>> getOptions();
 
@@ -178,7 +202,7 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
 
     @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableIntegerProperty.class)
     sealed interface IntegerProperty extends
-        ValueProperty<Integer, IntegerProperty>permits ModifiableIntegerProperty {
+        ValueProperty<Integer, IntegerProperty> permits ModifiableIntegerProperty {
 
         Integer getMaxValue();
 
@@ -191,7 +215,7 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
 
     @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableNumberProperty.class)
     sealed interface NumberProperty
-        extends ValueProperty<Double, NumberProperty>permits ModifiableNumberProperty {
+        extends ValueProperty<Double, NumberProperty> permits ModifiableNumberProperty {
 
         Integer getMaxValue();
 
@@ -206,7 +230,7 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
 
     @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableObjectProperty.class)
     sealed interface ObjectProperty
-        extends ValueProperty<Object, ObjectProperty>permits ModifiableObjectProperty {
+        extends ValueProperty<Object, ObjectProperty> permits ModifiableObjectProperty {
 
         List<? extends Property<?>> getAdditionalProperties();
 
@@ -223,7 +247,7 @@ public sealed interface Property<P extends Property<P>> permits ModifiableProper
 
     @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableStringProperty.class)
     sealed interface StringProperty
-        extends ValueProperty<String, StringProperty>permits ModifiableStringProperty {
+        extends ValueProperty<String, StringProperty> permits ModifiableStringProperty {
 
         List<Option<?>> getOptions();
 
