@@ -1,4 +1,4 @@
-import {WorkflowModel, WorkflowRequestModel} from '@/middleware/helios/configuration';
+import {WorkflowModel} from '@/middleware/helios/configuration';
 import {PlusIcon} from '@heroicons/react/24/outline';
 import {Close} from '@radix-ui/react-dialog';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -76,27 +76,23 @@ const WorkflowDialog = ({
             mutate({
                 id: workflow.id,
                 workflowRequestModel: {
-                    definition: JSON.stringify(
-                        {
-                            ...JSON.parse(workflow.definition!),
-                            description: formData.description,
-                            label: formData.label,
-                        }
-                    )
-                }
+                    definition: JSON.stringify({
+                        ...JSON.parse(workflow.definition!),
+                        description: formData.description,
+                        label: formData.label,
+                    }),
+                },
             });
         } else {
             mutate({
                 id: parentId,
                 workflowRequestModel: {
-                    definition: JSON.stringify(
-                        {
-                            description: formData.description,
-                            label: formData.label,
-                            tasks: []
-                        }
-                    )
-                }
+                    definition: JSON.stringify({
+                        description: formData.description,
+                        label: formData.label,
+                        tasks: [],
+                    }),
+                },
             });
         }
 

@@ -11,7 +11,8 @@ import {
     ProjectModel,
     ProjectTagApi,
     UpdateProjectInstanceTagsRequest,
-    UpdateProjectTagsRequest, UpdateWorkflowRequest,
+    UpdateProjectTagsRequest,
+    UpdateWorkflowRequest,
     WorkflowApi,
     WorkflowModel,
 } from 'middleware/helios/configuration';
