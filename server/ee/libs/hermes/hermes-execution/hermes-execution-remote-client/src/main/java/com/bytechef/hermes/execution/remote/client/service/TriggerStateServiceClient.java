@@ -18,7 +18,7 @@
 package com.bytechef.hermes.execution.remote.client.service;
 
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.execution.service.TriggerStorageService;
+import com.bytechef.hermes.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -30,12 +30,12 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @Component("triggerStorageService")
-public class TriggerStorageServiceClient implements TriggerStorageService {
+public class TriggerStateServiceClient implements TriggerStateService {
 
     private final WebClient.Builder loadBalancedWebClientBuilder;
 
     @SuppressFBWarnings("EI")
-    public TriggerStorageServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
+    public TriggerStateServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
         this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
     }
 

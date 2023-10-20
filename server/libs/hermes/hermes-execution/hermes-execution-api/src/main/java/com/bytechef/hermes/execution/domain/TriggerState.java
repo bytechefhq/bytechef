@@ -34,8 +34,8 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-@Table("trigger_storage")
-public class TriggerStorage implements Persistable<Long> {
+@Table("trigger_state")
+public class TriggerState implements Persistable<Long> {
 
     @CreatedBy
     @Column("created_by")
@@ -57,7 +57,7 @@ public class TriggerStorage implements Persistable<Long> {
     private LocalDateTime lastModifiedDate;
 
     @Column
-    private TriggerStorageValue value;
+    private TriggerStateValue value;
 
     @Version
     private int version;
@@ -65,11 +65,11 @@ public class TriggerStorage implements Persistable<Long> {
     @Column("workflow_execution_id")
     private WorkflowExecutionId workflowExecutionId;
 
-    public TriggerStorage() {
+    public TriggerState() {
     }
 
-    public TriggerStorage(WorkflowExecutionId workflowExecutionId, Object value) {
-        this.value = new TriggerStorageValue(value, value.getClass());
+    public TriggerState(WorkflowExecutionId workflowExecutionId, Object value) {
+        this.value = new TriggerStateValue(value, value.getClass());
         this.workflowExecutionId = workflowExecutionId;
     }
 
@@ -120,9 +120,9 @@ public class TriggerStorage implements Persistable<Long> {
             return false;
         }
 
-        TriggerStorage triggerStorage = (TriggerStorage) o;
+        TriggerState triggerState = (TriggerState) o;
 
-        return Objects.equals(id, triggerStorage.id);
+        return Objects.equals(id, triggerState.id);
     }
 
     @Override
@@ -140,7 +140,7 @@ public class TriggerStorage implements Persistable<Long> {
     }
 
     public void setValue(Object value) {
-        this.value = new TriggerStorageValue(value, value.getClass());
+        this.value = new TriggerStateValue(value, value.getClass());
     }
 
     public void setVersion(int version) {
@@ -165,8 +165,8 @@ public class TriggerStorage implements Persistable<Long> {
             '}';
     }
 
-    public record TriggerStorageValue(Object value, String classname) {
-        public TriggerStorageValue(Object value, Class<?> classValue) {
+    public record TriggerStateValue(Object value, String classname) {
+        public TriggerStateValue(Object value, Class<?> classValue) {
             this(value, classValue.getName());
         }
     }

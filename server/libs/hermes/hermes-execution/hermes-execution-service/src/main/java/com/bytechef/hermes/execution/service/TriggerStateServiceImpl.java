@@ -18,8 +18,8 @@
 package com.bytechef.hermes.execution.service;
 
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.execution.domain.TriggerStorage;
-import com.bytechef.hermes.execution.repository.TriggerStorageRepository;
+import com.bytechef.hermes.execution.domain.TriggerState;
+import com.bytechef.hermes.execution.repository.TriggerStateRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,33 +31,33 @@ import java.util.Optional;
  */
 @Service("triggerStorageService")
 @Transactional
-public class TriggerStorageServiceImpl implements TriggerStorageService {
+public class TriggerStateServiceImpl implements TriggerStateService {
 
-    private final TriggerStorageRepository triggerStorageRepository;
+    private final TriggerStateRepository triggerStateRepository;
 
     @SuppressFBWarnings("EI")
-    public TriggerStorageServiceImpl(TriggerStorageRepository triggerStorageRepository) {
-        this.triggerStorageRepository = triggerStorageRepository;
+    public TriggerStateServiceImpl(TriggerStateRepository triggerStateRepository) {
+        this.triggerStateRepository = triggerStateRepository;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public <T> Optional<T> fetchValue(WorkflowExecutionId workflowExecutionId) {
-        return triggerStorageRepository.findByWorkflowExecutionId(workflowExecutionId.getWorkflowId())
+        return triggerStateRepository.findByWorkflowExecutionId(workflowExecutionId.getWorkflowId())
             .map(triggerLifecycle -> (T) triggerLifecycle.getValue());
     }
 
     @Override
     public void save(WorkflowExecutionId workflowExecutionId, Object value) {
-        triggerStorageRepository
+        triggerStateRepository
             .findByWorkflowExecutionId(workflowExecutionId.toString())
             .ifPresentOrElse(
                 triggerLifecycle -> {
                     triggerLifecycle.setValue(value);
 
-                    triggerStorageRepository.save(triggerLifecycle);
+                    triggerStateRepository.save(triggerLifecycle);
                 },
-                () -> triggerStorageRepository.save(new TriggerStorage(workflowExecutionId, value)));
+                () -> triggerStateRepository.save(new TriggerState(workflowExecutionId, value)));
     }
 }

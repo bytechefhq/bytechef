@@ -19,7 +19,7 @@ package com.bytechef.platform.config;
 
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
-import com.bytechef.hermes.execution.service.TriggerStorageService;
+import com.bytechef.hermes.execution.service.TriggerStateService;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacadeImpl;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,9 +35,9 @@ public class TriggerConfiguration {
     @Bean
     TriggerLifecycleFacade triggerLifecycleManager(
         TriggerScheduler triggerScheduler, TriggerDefinitionService triggerDefinitionService,
-        TriggerStorageService triggerStorageService, @Value("bytechef.webhookUrl") String webhookUrl) {
+        TriggerStateService triggerStateService, @Value("bytechef.webhookUrl") String webhookUrl) {
 
         return new TriggerLifecycleFacadeImpl(
-            triggerScheduler, triggerDefinitionService, triggerStorageService, webhookUrl);
+            triggerScheduler, triggerDefinitionService, triggerStateService, webhookUrl);
     }
 }
