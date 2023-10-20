@@ -28,6 +28,4 @@ const EmptyList = ({
     );
 };
 
-EmptyList.displayName = 'EmptyList';
-
 export default EmptyList;

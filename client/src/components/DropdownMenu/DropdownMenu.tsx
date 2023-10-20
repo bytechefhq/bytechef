@@ -10,7 +10,7 @@ import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-export interface DropdownMenuItem {
+export interface DropdownMenuItemProps {
     icon?: ReactNode;
     integrationId?: number;
     label?: string;
@@ -21,7 +21,7 @@ export interface DropdownMenuItem {
 }
 
 interface DropdownMenuProps {
-    menuItems: DropdownMenuItem[];
+    menuItems: DropdownMenuItemProps[];
     id?: number;
 }
 
@@ -82,7 +82,5 @@ const DropdownMenu = ({id = 0, menuItems}: DropdownMenuProps): JSX.Element => {
         </div>
     );
 };
-
-DropdownMenu.displayName = 'DropdownMenu';
 
 export default DropdownMenu;

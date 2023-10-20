@@ -1,7 +1,15 @@
-import {Transition} from '@headlessui/react';
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
 import React, {Dispatch, Fragment, SetStateAction} from 'react';
 import Button from '../Button/Button';
+import {
+    Content,
+    Description,
+    Overlay,
+    Portal,
+    Root,
+    Title,
+} from '@radix-ui/react-alert-dialog';
+import {Transition} from '@headlessui/react';
 
 interface AlertDialogProps {
     danger: boolean;
@@ -21,8 +29,8 @@ const AlertDialog = ({
     onConfirmClick,
 }: AlertDialogProps) => {
     return (
-        <AlertDialogPrimitive.Root open={isOpen} onOpenChange={setIsOpen}>
-            <AlertDialogPrimitive.Portal forceMount>
+        <Root open={isOpen} onOpenChange={setIsOpen}>
+            <Portal forceMount>
                 <Transition.Root show={isOpen}>
                     <Transition.Child
                         as={Fragment}
@@ -33,11 +41,12 @@ const AlertDialog = ({
                         leaveFrom="opacity-100"
                         leaveTo="opacity-0"
                     >
-                        <AlertDialogPrimitive.Overlay
+                        <Overlay
                             forceMount
                             className="fixed inset-0 z-20 bg-black/50"
                         />
                     </Transition.Child>
+
                     <Transition.Child
                         as={Fragment}
                         enter="ease-out duration-300"
@@ -47,16 +56,18 @@ const AlertDialog = ({
                         leaveFrom="opacity-100 scale-100"
                         leaveTo="opacity-0 scale-95"
                     >
-                        <AlertDialogPrimitive.Content
+                        <Content
                             forceMount
-                            className="fixed top-[50%] left-[50%] z-50 w-[95vw] max-w-md -translate-x-[50%] -translate-y-[50%] rounded-lg bg-white p-4 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75 dark:bg-gray-800 md:w-full"
+                            className="fixed top-[50%] left-[50%] z-50 w-[95vw] max-w-md translate-x-[-50%] translate-y-[-50%] rounded-lg bg-white p-4 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75 dark:bg-gray-800 md:w-full"
                         >
-                            <AlertDialogPrimitive.Title className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                            <Title className="text-sm font-medium text-gray-900 dark:text-gray-100">
                                 {title}
-                            </AlertDialogPrimitive.Title>
-                            <AlertDialogPrimitive.Description className="mt-2 text-sm font-normal text-gray-700 dark:text-gray-400">
+                            </Title>
+
+                            <Description className="mt-2 text-sm font-normal text-gray-700 dark:text-gray-400">
                                 {message}
-                            </AlertDialogPrimitive.Description>
+                            </Description>
+
                             <div className="mt-4 flex justify-end space-x-2">
                                 <AlertDialogPrimitive.Cancel asChild={true}>
                                     <Button
@@ -65,6 +76,7 @@ const AlertDialog = ({
                                         type="button"
                                     />
                                 </AlertDialogPrimitive.Cancel>
+
                                 <AlertDialogPrimitive.Action asChild={true}>
                                     <Button
                                         displayType={
@@ -76,14 +88,12 @@ const AlertDialog = ({
                                     />
                                 </AlertDialogPrimitive.Action>
                             </div>
-                        </AlertDialogPrimitive.Content>
+                        </Content>
                     </Transition.Child>
                 </Transition.Root>
-            </AlertDialogPrimitive.Portal>
-        </AlertDialogPrimitive.Root>
+            </Portal>
+        </Root>
     );
 };
-
-AlertDialog.displayName = 'AlertDialog';
 
 export default AlertDialog;
