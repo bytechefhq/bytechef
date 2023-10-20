@@ -17,10 +17,10 @@
 
 package com.bytechef.hermes.coordinator.trigger.completion;
 
-import com.bytechef.hermes.coordinator.job.InstanceJobFactoryAccessor;
+import com.bytechef.hermes.coordinator.job.InstanceFacadeRegistry;
 import com.bytechef.hermes.domain.TriggerExecution.Status;
 import com.bytechef.hermes.domain.TriggerExecution;
-import com.bytechef.hermes.coordinator.job.InstanceJobFactory;
+import com.bytechef.hermes.coordinator.job.InstanceFacade;
 import com.bytechef.hermes.service.TriggerExecutionService;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import org.springframework.stereotype.Component;
@@ -31,23 +31,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class TriggerCompletionHandler {
 
-    private final InstanceJobFactoryAccessor instanceJobFactoryAccessor;
+    private final InstanceFacadeRegistry instanceFacadeRegistry;
     private final TriggerExecutionService triggerExecutionService;
 
     public TriggerCompletionHandler(
-        InstanceJobFactoryAccessor instanceJobFactoryAccessor, TriggerExecutionService triggerExecutionService) {
+        InstanceFacadeRegistry instanceFacadeRegistry, TriggerExecutionService triggerExecutionService) {
 
-        this.instanceJobFactoryAccessor = instanceJobFactoryAccessor;
+        this.instanceFacadeRegistry = instanceFacadeRegistry;
         this.triggerExecutionService = triggerExecutionService;
     }
 
     public void handle(TriggerExecution triggerExecution) {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
-        InstanceJobFactory instanceJobFactory = instanceJobFactoryAccessor.getInstanceJobFactory(
+        InstanceFacade instanceFacade = instanceFacadeRegistry.getInstanceFacade(
             workflowExecutionId.getInstanceType());
 
-        instanceJobFactory.createJob(workflowExecutionId.getWorkflowId(), workflowExecutionId.getInstanceId());
+        instanceFacade.createJob(workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
 
         triggerExecution.setStatus(Status.COMPLETED);
 

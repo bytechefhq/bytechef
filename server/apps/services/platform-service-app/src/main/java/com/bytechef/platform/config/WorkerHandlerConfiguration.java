@@ -18,11 +18,11 @@
 package com.bytechef.platform.config;
 
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.atlas.worker.task.handler.TaskHandlerAccessor;
+import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.hermes.worker.handler.remote.web.rest.client.TaskHandlerClient;
 import com.bytechef.hermes.worker.handler.remote.web.rest.client.TriggerHandlerClient;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
-import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerAccessor;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -41,12 +41,12 @@ public class WorkerHandlerConfiguration {
     }
 
     @Bean
-    TaskHandlerAccessor taskHandlerAccessor() {
+    TaskHandlerRegistry taskHandlerAccessor() {
         return type -> (TaskHandler<?>) taskExecution -> taskHandlerClient.handle(type, taskExecution);
     }
 
     @Bean
-    TriggerHandlerAccessor triggerHandlerAccessor() {
+    TriggerHandlerRegistry triggerHandlerAccessor() {
         return type -> (TriggerHandler<?>) triggerExecution -> triggerHandlerClient.handle(type, triggerExecution);
     }
 }

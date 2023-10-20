@@ -19,6 +19,7 @@ package com.bytechef.platform.config;
 
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient;
+import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -27,7 +28,9 @@ import org.springframework.web.reactive.function.client.WebClient;
  * @author Ivica Cardic
  */
 @Configuration
-@LoadBalancerClient("coordinator-service-app")
+@LoadBalancerClients({
+    @LoadBalancerClient("coordinator-service-app"), @LoadBalancerClient("scheduler-service-app")
+})
 public class WebClientConfiguration {
 
     @LoadBalanced

@@ -17,6 +17,7 @@
 
 package com.bytechef.server.config;
 
+import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
@@ -27,13 +28,12 @@ import com.bytechef.helios.project.facade.ProjectFacadeImpl;
 import com.bytechef.helios.project.facade.ProjectInstanceFacadeImpl;
 import com.bytechef.helios.project.facade.WorkflowExecutionFacade;
 import com.bytechef.helios.project.facade.WorkflowExecutionFacadeImpl;
-import com.bytechef.helios.project.job.ProjectInstanceJobFactory;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.project.service.ProjectService;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.trigger.executor.TriggerLifecycleExecutor;
+import com.bytechef.hermes.trigger.TriggerLifecycleExecutor;
 import com.bytechef.tag.service.TagService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,13 +46,13 @@ public class ProjectConfiguration {
 
     @Bean
     com.bytechef.helios.project.facade.ProjectInstanceFacade projectInstanceFacade(
-        ConnectionService connectionService, ProjectInstanceJobFactory projectInstanceJobFactory,
-        ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        ProjectService projectService, TagService tagService, TriggerLifecycleExecutor triggerLifecycleExecutor,
+        ConnectionService connectionService, JobFactory jobFactory, ProjectInstanceService projectInstanceService,
+        ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
+        TagService tagService, TriggerLifecycleExecutor triggerLifecycleExecutor,
         WorkflowService workflowService) {
 
         return new ProjectInstanceFacadeImpl(
-            connectionService, projectInstanceJobFactory, projectInstanceService, projectInstanceWorkflowService,
+            connectionService, jobFactory, projectInstanceService, projectInstanceWorkflowService,
             projectService, tagService, triggerLifecycleExecutor, workflowService);
     }
 
@@ -68,7 +68,8 @@ public class ProjectConfiguration {
     @Bean
     WorkflowExecutionFacade workflowExecutionFacade(
         ComponentDefinitionService componentDefinitionService, ContextService contextService, JobService jobService,
-        ProjectInstanceService projectInstanceService, ProjectService projectService,
+        com.bytechef.helios.project.service.ProjectInstanceService projectInstanceService,
+        ProjectService projectService,
         TaskExecutionService taskExecutionService, WorkflowService workflowService) {
 
         return new WorkflowExecutionFacadeImpl(
