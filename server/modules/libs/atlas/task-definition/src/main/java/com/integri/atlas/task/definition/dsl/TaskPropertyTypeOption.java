@@ -25,9 +25,9 @@ public class TaskPropertyTypeOption {
 
     private List<String> loadOptionsDependsOn;
     private String loadOptionsMethod;
-    private Double maxValue;
-    private Double minValue;
-    private boolean multipleValues;
+    private Integer maxValue;
+    private Integer minValue;
+    private Boolean multipleValues;
     private String multipleValueButtonText;
     private Integer numberPrecision;
 
@@ -49,19 +49,19 @@ public class TaskPropertyTypeOption {
         return this;
     }
 
-    public TaskPropertyTypeOption maxValue(double maxValue) {
+    public TaskPropertyTypeOption maxValue(int maxValue) {
         this.maxValue = maxValue;
 
         return this;
     }
 
-    public TaskPropertyTypeOption minValue(double minValue) {
+    public TaskPropertyTypeOption minValue(int minValue) {
         this.minValue = minValue;
 
         return this;
     }
 
-    public TaskPropertyTypeOption multipleValues(boolean multipleValues) {
+    public TaskPropertyTypeOption multipleValues(Boolean multipleValues) {
         this.multipleValues = multipleValues;
 
         return this;
@@ -87,11 +87,11 @@ public class TaskPropertyTypeOption {
         return loadOptionsMethod;
     }
 
-    public Double getMaxValue() {
+    public Integer getMaxValue() {
         return maxValue;
     }
 
-    public Double getMinValue() {
+    public Integer getMinValue() {
         return minValue;
     }
 

@@ -19,10 +19,13 @@ package com.integri.atlas.task.definition.dsl;
 import static com.integri.atlas.task.definition.dsl.DisplayOption.displayOption;
 import static com.integri.atlas.task.definition.dsl.TaskCredential.credential;
 import static com.integri.atlas.task.definition.dsl.TaskParameter.parameter;
+import static com.integri.atlas.task.definition.dsl.TaskParameter.parameters;
 import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValue;
 import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValues;
-import static com.integri.atlas.task.definition.dsl.TaskProperty.OPTION_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.SELECT_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.hide;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.show;
 import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
 import static com.integri.atlas.task.definition.dsl.TaskPropertyOptionValue.optionValue;
 import static com.integri.atlas.task.definition.dsl.TaskPropertyTypeOption.propertyTypeOption;
@@ -52,7 +55,7 @@ public class TaskDeclarationTest {
 
     @Test
     public void testDisplayOption() throws JsonProcessingException, JSONException {
-        DisplayOption displayOption = displayOption().hide("name");
+        DisplayOption displayOption = hide("name");
 
         jsonAssertEquals("""
             {
@@ -60,7 +63,7 @@ public class TaskDeclarationTest {
             }
             """, displayOption);
 
-        displayOption = displayOption().hide("name", true, false);
+        displayOption = hide("name", true, false);
 
         jsonAssertEquals("""
         {
@@ -68,7 +71,7 @@ public class TaskDeclarationTest {
         }
         """, displayOption);
 
-        displayOption = displayOption().hide("name", 1, 2);
+        displayOption = hide("name", 1, 2);
 
         jsonAssertEquals(
             """
@@ -79,7 +82,7 @@ public class TaskDeclarationTest {
             displayOption
         );
 
-        displayOption = displayOption().hide("name", 1L, 2L);
+        displayOption = hide("name", 1L, 2L);
 
         jsonAssertEquals(
             """
@@ -90,7 +93,7 @@ public class TaskDeclarationTest {
             displayOption
         );
 
-        displayOption = displayOption().hide("name", 1F, 2F);
+        displayOption = hide("name", 1F, 2F);
 
         jsonAssertEquals("""
         {
@@ -98,7 +101,7 @@ public class TaskDeclarationTest {
         }
         """, displayOption);
 
-        displayOption = displayOption().hide("name", 1D, 2D);
+        displayOption = hide("name", 1D, 2D);
 
         jsonAssertEquals("""
         {
@@ -106,7 +109,7 @@ public class TaskDeclarationTest {
         }
         """, displayOption);
 
-        displayOption = displayOption().hide("name", "value1", "value2");
+        displayOption = hide("name", "value1", "value2");
 
         jsonAssertEquals(
             """
@@ -117,7 +120,7 @@ public class TaskDeclarationTest {
             displayOption
         );
 
-        displayOption = displayOption().hide("name1", parameterValues(1));
+        displayOption = hide("name1", parameterValues(1));
 
         jsonAssertEquals("""
         {
@@ -125,7 +128,7 @@ public class TaskDeclarationTest {
         }
         """, displayOption);
 
-        displayOption = displayOption().hide("name1", parameterValues(1), "name2", parameterValues(2));
+        displayOption = hide("name1", parameterValues(1), "name2", parameterValues(2));
 
         jsonAssertEquals("""
         {
@@ -133,8 +136,7 @@ public class TaskDeclarationTest {
         }
         """, displayOption);
 
-        displayOption =
-            displayOption().hide("name1", parameterValues(1), "name2", parameterValues(2), "name3", parameterValues(3));
+        displayOption = hide("name1", parameterValues(1), "name2", parameterValues(2), "name3", parameterValues(3));
 
         jsonAssertEquals(
             """
@@ -347,7 +349,7 @@ public class TaskDeclarationTest {
             displayOption
         );
 
-        displayOption = displayOption().show("name");
+        displayOption = show("name");
 
         jsonAssertEquals("""
             {
@@ -355,7 +357,7 @@ public class TaskDeclarationTest {
             }
             """, displayOption);
 
-        displayOption = displayOption().show("name", true, false);
+        displayOption = show("name", true, false);
 
         jsonAssertEquals("""
         {
@@ -363,7 +365,7 @@ public class TaskDeclarationTest {
         }
         """, displayOption);
 
-        displayOption = displayOption().show("name", 1, 2);
+        displayOption = show("name", 1, 2);
 
         jsonAssertEquals(
             """
@@ -374,7 +376,7 @@ public class TaskDeclarationTest {
             displayOption
         );
 
-        displayOption = displayOption().show("name", 1L, 2L);
+        displayOption = show("name", 1L, 2L);
 
         jsonAssertEquals(
             """
@@ -385,7 +387,7 @@ public class TaskDeclarationTest {
             displayOption
         );
 
-        displayOption = displayOption().show("name", 1F, 2F);
+        displayOption = show("name", 1F, 2F);
 
         jsonAssertEquals("""
         {
@@ -393,7 +395,7 @@ public class TaskDeclarationTest {
         }
         """, displayOption);
 
-        displayOption = displayOption().show("name", 1D, 2D);
+        displayOption = show("name", 1D, 2D);
 
         jsonAssertEquals("""
         {
@@ -401,7 +403,7 @@ public class TaskDeclarationTest {
         }
         """, displayOption);
 
-        displayOption = displayOption().show("name", "value1", "value2");
+        displayOption = show("name", "value1", "value2");
 
         jsonAssertEquals(
             """
@@ -412,7 +414,7 @@ public class TaskDeclarationTest {
             displayOption
         );
 
-        displayOption = displayOption().show("name1", parameterValues(1));
+        displayOption = show("name1", parameterValues(1));
 
         jsonAssertEquals("""
         {
@@ -420,7 +422,7 @@ public class TaskDeclarationTest {
         }
         """, displayOption);
 
-        displayOption = displayOption().show("name1", parameterValues(1), "name2", parameterValues(2));
+        displayOption = show("name1", parameterValues(1), "name2", parameterValues(2));
 
         jsonAssertEquals("""
         {
@@ -428,8 +430,7 @@ public class TaskDeclarationTest {
         }
         """, displayOption);
 
-        displayOption =
-            displayOption().show("name1", parameterValues(1), "name2", parameterValues(2), "name3", parameterValues(3));
+        displayOption = show("name1", parameterValues(1), "name2", parameterValues(2), "name3", parameterValues(3));
 
         jsonAssertEquals(
             """
@@ -441,17 +442,16 @@ public class TaskDeclarationTest {
         );
 
         displayOption =
-            displayOption()
-                .show(
-                    "name1",
-                    parameterValues(1),
-                    "name2",
-                    parameterValues(2),
-                    "name3",
-                    parameterValues(3),
-                    "name4",
-                    parameterValues(4)
-                );
+            show(
+                "name1",
+                parameterValues(1),
+                "name2",
+                parameterValues(2),
+                "name3",
+                parameterValues(3),
+                "name4",
+                parameterValues(4)
+            );
 
         jsonAssertEquals(
             """
@@ -463,19 +463,18 @@ public class TaskDeclarationTest {
         );
 
         displayOption =
-            displayOption()
-                .show(
-                    "name1",
-                    parameterValues(1),
-                    "name2",
-                    parameterValues(2),
-                    "name3",
-                    parameterValues(3),
-                    "name4",
-                    parameterValues(4),
-                    "name5",
-                    parameterValues(5)
-                );
+            show(
+                "name1",
+                parameterValues(1),
+                "name2",
+                parameterValues(2),
+                "name3",
+                parameterValues(3),
+                "name4",
+                parameterValues(4),
+                "name5",
+                parameterValues(5)
+            );
 
         jsonAssertEquals(
             """
@@ -487,21 +486,20 @@ public class TaskDeclarationTest {
         );
 
         displayOption =
-            displayOption()
-                .show(
-                    "name1",
-                    parameterValues(1),
-                    "name2",
-                    parameterValues(2),
-                    "name3",
-                    parameterValues(3),
-                    "name4",
-                    parameterValues(4),
-                    "name5",
-                    parameterValues(5),
-                    "name6",
-                    parameterValues(6)
-                );
+            show(
+                "name1",
+                parameterValues(1),
+                "name2",
+                parameterValues(2),
+                "name3",
+                parameterValues(3),
+                "name4",
+                parameterValues(4),
+                "name5",
+                parameterValues(5),
+                "name6",
+                parameterValues(6)
+            );
 
         jsonAssertEquals(
             """
@@ -513,23 +511,22 @@ public class TaskDeclarationTest {
         );
 
         displayOption =
-            displayOption()
-                .show(
-                    "name1",
-                    parameterValues(1),
-                    "name2",
-                    parameterValues(2),
-                    "name3",
-                    parameterValues(3),
-                    "name4",
-                    parameterValues(4),
-                    "name5",
-                    parameterValues(5),
-                    "name6",
-                    parameterValues(6),
-                    "name7",
-                    parameterValues(7)
-                );
+            show(
+                "name1",
+                parameterValues(1),
+                "name2",
+                parameterValues(2),
+                "name3",
+                parameterValues(3),
+                "name4",
+                parameterValues(4),
+                "name5",
+                parameterValues(5),
+                "name6",
+                parameterValues(6),
+                "name7",
+                parameterValues(7)
+            );
 
         jsonAssertEquals(
             """
@@ -541,25 +538,24 @@ public class TaskDeclarationTest {
         );
 
         displayOption =
-            displayOption()
-                .show(
-                    "name1",
-                    parameterValues(1),
-                    "name2",
-                    parameterValues(2),
-                    "name3",
-                    parameterValues(3),
-                    "name4",
-                    parameterValues(4),
-                    "name5",
-                    parameterValues(5),
-                    "name6",
-                    parameterValues(6),
-                    "name7",
-                    parameterValues(7),
-                    "name8",
-                    parameterValues(8)
-                );
+            show(
+                "name1",
+                parameterValues(1),
+                "name2",
+                parameterValues(2),
+                "name3",
+                parameterValues(3),
+                "name4",
+                parameterValues(4),
+                "name5",
+                parameterValues(5),
+                "name6",
+                parameterValues(6),
+                "name7",
+                parameterValues(7),
+                "name8",
+                parameterValues(8)
+            );
 
         jsonAssertEquals(
             """
@@ -571,27 +567,26 @@ public class TaskDeclarationTest {
         );
 
         displayOption =
-            displayOption()
-                .show(
-                    "name1",
-                    parameterValues(1),
-                    "name2",
-                    parameterValues(2),
-                    "name3",
-                    parameterValues(3),
-                    "name4",
-                    parameterValues(4),
-                    "name5",
-                    parameterValues(5),
-                    "name6",
-                    parameterValues(6),
-                    "name7",
-                    parameterValues(7),
-                    "name8",
-                    parameterValues(8),
-                    "name9",
-                    parameterValues(9)
-                );
+            show(
+                "name1",
+                parameterValues(1),
+                "name2",
+                parameterValues(2),
+                "name3",
+                parameterValues(3),
+                "name4",
+                parameterValues(4),
+                "name5",
+                parameterValues(5),
+                "name6",
+                parameterValues(6),
+                "name7",
+                parameterValues(7),
+                "name8",
+                parameterValues(8),
+                "name9",
+                parameterValues(9)
+            );
 
         jsonAssertEquals(
             """
@@ -606,29 +601,28 @@ public class TaskDeclarationTest {
         );
 
         displayOption =
-            displayOption()
-                .show(
-                    "name1",
-                    parameterValues(1),
-                    "name2",
-                    parameterValues(2),
-                    "name3",
-                    parameterValues(3),
-                    "name4",
-                    parameterValues(4),
-                    "name5",
-                    parameterValues(5),
-                    "name6",
-                    parameterValues(6),
-                    "name7",
-                    parameterValues(7),
-                    "name8",
-                    parameterValues(8),
-                    "name9",
-                    parameterValues(9),
-                    "name10",
-                    parameterValues(10)
-                );
+            show(
+                "name1",
+                parameterValues(1),
+                "name2",
+                parameterValues(2),
+                "name3",
+                parameterValues(3),
+                "name4",
+                parameterValues(4),
+                "name5",
+                parameterValues(5),
+                "name6",
+                parameterValues(6),
+                "name7",
+                parameterValues(7),
+                "name8",
+                parameterValues(8),
+                "name9",
+                parameterValues(9),
+                "name10",
+                parameterValues(10)
+            );
 
         jsonAssertEquals(
             """
@@ -692,7 +686,7 @@ public class TaskDeclarationTest {
 
         assertEquals("true", taskParameter);
 
-        taskParameter = parameter(true, false);
+        taskParameter = parameters(true, false);
 
         assertEquals("[true,false]", taskParameter);
 
@@ -700,7 +694,7 @@ public class TaskDeclarationTest {
 
         assertEquals("1", taskParameter);
 
-        taskParameter = parameter(1, 2);
+        taskParameter = parameters(1, 2);
 
         assertEquals("[1,2]", taskParameter);
 
@@ -708,7 +702,7 @@ public class TaskDeclarationTest {
 
         assertEquals("1", taskParameter);
 
-        taskParameter = parameter(1L, 2L);
+        taskParameter = parameters(1L, 2L);
 
         assertEquals("[1,2]", taskParameter);
 
@@ -716,7 +710,7 @@ public class TaskDeclarationTest {
 
         assertEquals("1.0", taskParameter);
 
-        taskParameter = parameter(1F, 2F);
+        taskParameter = parameters(1F, 2F);
 
         assertEquals("[1.0,2.0]", taskParameter);
 
@@ -724,7 +718,7 @@ public class TaskDeclarationTest {
 
         assertEquals("1.0", taskParameter);
 
-        taskParameter = parameter(1D, 2D);
+        taskParameter = parameters(1D, 2D);
 
         assertEquals("[1.0,2.0]", taskParameter);
 
@@ -736,7 +730,7 @@ public class TaskDeclarationTest {
         }
         """, taskParameter);
 
-        taskParameter = parameter("parameter", true, false);
+        taskParameter = TaskParameter.parameter("parameter", true, false);
 
         jsonAssertEquals("""
         {
@@ -752,7 +746,7 @@ public class TaskDeclarationTest {
         }
         """, taskParameter);
 
-        taskParameter = parameter("parameter", 1, 2);
+        taskParameter = TaskParameter.parameter("parameter", 1, 2);
 
         jsonAssertEquals("""
         {
@@ -768,7 +762,7 @@ public class TaskDeclarationTest {
         }
         """, taskParameter);
 
-        taskParameter = parameter("parameter", 1L, 2L);
+        taskParameter = TaskParameter.parameter("parameter", 1L, 2L);
 
         jsonAssertEquals("""
         {
@@ -784,7 +778,7 @@ public class TaskDeclarationTest {
         }
         """, taskParameter);
 
-        taskParameter = parameter("parameter", 1F, 2F);
+        taskParameter = TaskParameter.parameter("parameter", 1F, 2F);
 
         jsonAssertEquals("""
         {
@@ -800,7 +794,7 @@ public class TaskDeclarationTest {
         }
         """, taskParameter);
 
-        taskParameter = parameter("parameter", 1D, 2D);
+        taskParameter = TaskParameter.parameter("parameter", 1D, 2D);
 
         jsonAssertEquals("""
         {
@@ -845,7 +839,7 @@ public class TaskDeclarationTest {
             taskParameter
         );
 
-        taskParameter = parameter("parameter1", parameterValue(1));
+        taskParameter = TaskParameter.parameter("parameter1", parameterValue(1));
 
         jsonAssertEquals("""
         {
@@ -873,7 +867,8 @@ public class TaskDeclarationTest {
             taskParameter
         );
 
-        taskParameter = parameter("parameter1", parameter("parameter11", 1, 11), "parameter2", parameterValue(2));
+        taskParameter =
+            parameter("parameter1", TaskParameter.parameter("parameter11", 1, 11), "parameter2", parameterValue(2));
 
         jsonAssertEquals(
             """
@@ -1419,7 +1414,7 @@ public class TaskDeclarationTest {
         }
         """, taskParameter);
 
-        taskParameter = parameter(new String[] { "parameter1", "parameter1", "parameter1" });
+        taskParameter = parameters(new String[] { "parameter1", "parameter1", "parameter1" });
 
         assertEquals("""
             ["parameter1","parameter1","parameter1"]""", taskParameter);
@@ -1505,7 +1500,7 @@ public class TaskDeclarationTest {
             "placeholder":"placeholder",
             "required":true,
             "type":"BOOLEAN",
-            "typeOption":{"multipleValues":false}
+            "typeOption":{}
         }
         """,
             taskProperty
@@ -1540,7 +1535,7 @@ public class TaskDeclarationTest {
             "placeholder":"placeholder",
             "required":true,
             "type":"COLLECTION",
-            "typeOption":{"multipleValues":false}
+            "typeOption":{}
         }
         """,
             taskProperty
@@ -1570,7 +1565,7 @@ public class TaskDeclarationTest {
             "placeholder":"placeholder",
             "required":true,
             "type":"COLOR",
-            "typeOption":{"multipleValues":false}
+            "typeOption":{}
         }
         """,
             taskProperty
@@ -1600,33 +1595,7 @@ public class TaskDeclarationTest {
             "placeholder":"placeholder",
             "required":true,
             "type":"DATE_TIME",
-            "typeOption":{"multipleValues":false}
-        }
-        """,
-            taskProperty
-        );
-    }
-
-    @Test
-    public void testFileEntryTaskProperty() throws JsonProcessingException, JSONException {
-        TaskProperty<?> taskProperty = TaskProperty
-            .FILE_ENTRY_PROPERTY("name")
-            .description("description")
-            .displayName("displayName")
-            .displayOption(displayOption())
-            .required(true)
-            .typeOption(propertyTypeOption());
-
-        jsonAssertEquals(
-            """
-        {
-            "description":"description",
-            "displayName":"displayName",
-            "displayOption":{},
-            "name":"name",
-            "required":true,
-            "type":"FILE_ENTRY",
-            "typeOption":{"multipleValues":false}
+            "typeOption":{}
         }
         """,
             taskProperty
@@ -1659,7 +1628,7 @@ public class TaskDeclarationTest {
             "name":"name",
             "required":true,
             "type":"GROUP",
-            "typeOption":{"multipleValues":false}
+            "typeOption":{}
         }
         """,
             taskProperty
@@ -1667,10 +1636,10 @@ public class TaskDeclarationTest {
     }
 
     @Test
-    public void testJSONTaskProperty() throws JsonProcessingException, JSONException {
+    public void testIntegerTaskProperty() throws JsonProcessingException, JSONException {
         TaskProperty<?> taskProperty = TaskProperty
-            .JSON_PROPERTY("name")
-            .defaultValue(parameter("parameter", parameterValue(2)))
+            .INTEGER_PROPERTY("name")
+            .defaultValue(2)
             .description("description")
             .displayName("displayName")
             .displayOption(displayOption())
@@ -1681,7 +1650,37 @@ public class TaskDeclarationTest {
         jsonAssertEquals(
             """
         {
-            "defaultValue":{"parameter": 2},
+            "defaultValue":2,
+            "description":"description",
+            "displayName":"displayName",
+            "displayOption":{},
+            "name":"name",
+            "placeholder":"placeholder",
+            "required":true,
+            "type":"INTEGER",
+            "typeOption":{}
+        }
+        """,
+            taskProperty
+        );
+    }
+
+    @Test
+    public void testJSONTaskProperty() throws JsonProcessingException, JSONException {
+        TaskProperty<?> taskProperty = TaskProperty
+            .JSON_PROPERTY("name")
+            .defaultValue(parameters(parameter("key", parameter("key1", "value1"))))
+            .description("description")
+            .displayName("displayName")
+            .displayOption(displayOption())
+            .placeholder("placeholder")
+            .required(true)
+            .typeOption(propertyTypeOption());
+
+        jsonAssertEquals(
+            """
+        {
+            "defaultValue":[{"key":{"key1":"value1"}}],
             "description":"description",
             "displayName":"displayName",
             "displayOption":{},
@@ -1689,7 +1688,7 @@ public class TaskDeclarationTest {
             "placeholder":"placeholder",
             "required":true,
             "type":"JSON",
-            "typeOption":{"multipleValues":false}
+            "typeOption":{}
         }
         """,
             taskProperty
@@ -1699,7 +1698,7 @@ public class TaskDeclarationTest {
     @Test
     public void testMultiOptionTaskProperty() throws JsonProcessingException, JSONException {
         TaskProperty<?> taskProperty = TaskProperty
-            .MULTI_OPTION_PROPERTY("name")
+            .MULTI_SELECT_PROPERTY("name")
             .defaultValue(2, 3)
             .description("description")
             .displayName("displayName")
@@ -1734,7 +1733,7 @@ public class TaskDeclarationTest {
             "placeholder":"placeholder",
             "required":true,
             "type":"MULTI_SELECT",
-            "typeOption":{"multipleValues":false}
+            "typeOption":{}
         }
         """,
             taskProperty
@@ -1764,7 +1763,7 @@ public class TaskDeclarationTest {
             "placeholder":"placeholder",
             "required":true,
             "type":"NUMBER",
-            "typeOption":{"multipleValues":false}
+            "typeOption":{}
         }
         """,
             taskProperty
@@ -1773,7 +1772,7 @@ public class TaskDeclarationTest {
 
     @Test
     public void testOptionTaskProperty() throws JsonProcessingException, JSONException {
-        TaskProperty<?> taskProperty = OPTION_PROPERTY("name")
+        TaskProperty<?> taskProperty = SELECT_PROPERTY("name")
             .defaultValue(2)
             .description("description")
             .displayName("displayName")
@@ -1804,7 +1803,7 @@ public class TaskDeclarationTest {
             "placeholder":"placeholder",
             "required":true,
             "type":"SELECT",
-            "typeOption":{"multipleValues":false}
+            "typeOption":{}
         }
         """,
             taskProperty
@@ -1813,8 +1812,7 @@ public class TaskDeclarationTest {
 
     @Test
     public void testStringTaskProperty() throws JsonProcessingException, JSONException {
-        TaskProperty<?> taskProperty = TaskProperty
-            .STRING_PROPERTY("name")
+        TaskProperty<?> taskProperty = STRING_PROPERTY("name")
             .defaultValue("defaultValue")
             .description("description")
             .displayName("displayName")
@@ -1834,7 +1832,7 @@ public class TaskDeclarationTest {
             "placeholder":"placeholder",
             "required":true,
             "type":"STRING",
-            "typeOption":{"multipleValues":false}
+            "typeOption":{}
         }
         """,
             taskProperty
@@ -1921,8 +1919,8 @@ public class TaskDeclarationTest {
         {
             "loadOptionsDependsOn":["property1","property2"],
             "loadOptionsMethod":"method",
-            "maxValue":2.0,
-            "minValue":1.0,
+            "maxValue":2,
+            "minValue":1,
             "multipleValues":true,
             "multipleValueButtonText":"Add",
             "numberPrecision":2

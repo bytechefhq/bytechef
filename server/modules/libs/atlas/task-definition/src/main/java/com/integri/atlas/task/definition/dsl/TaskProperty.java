@@ -17,6 +17,7 @@
 package com.integri.atlas.task.definition.dsl;
 
 import static com.integri.atlas.task.definition.dsl.TaskParameter.parameter;
+import static com.integri.atlas.task.definition.dsl.TaskParameter.parameters;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,12 +33,12 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
         TaskProperty.ColorTaskProperty,
         TaskProperty.DateTimeTaskProperty,
         TaskProperty.CollectionTaskProperty,
-        TaskProperty.FileEntryTaskProperty,
         TaskProperty.GroupTaskProperty,
+        TaskProperty.IntegerTaskProperty,
         TaskProperty.JSONTaskProperty,
-        TaskProperty.MultiOptionTaskProperty,
+        TaskProperty.MultiSelectTaskProperty,
         TaskProperty.NumberTaskProperty,
-        TaskProperty.OptionTaskProperty,
+        TaskProperty.SelectTaskProperty,
         TaskProperty.StringTaskProperty {
 
     protected TaskParameter defaultValue;
@@ -68,28 +69,28 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
         return new CollectionTaskProperty(name);
     }
 
-    public static FileEntryTaskProperty FILE_ENTRY_PROPERTY(String name) {
-        return new FileEntryTaskProperty(name);
-    }
-
     public static GroupTaskProperty GROUP_PROPERTY(String name) {
         return new GroupTaskProperty(name);
+    }
+
+    public static IntegerTaskProperty INTEGER_PROPERTY(String name) {
+        return new IntegerTaskProperty(name);
     }
 
     public static JSONTaskProperty JSON_PROPERTY(String name) {
         return new JSONTaskProperty(name);
     }
 
-    public static MultiOptionTaskProperty MULTI_OPTION_PROPERTY(String name) {
-        return new MultiOptionTaskProperty(name);
+    public static MultiSelectTaskProperty MULTI_SELECT_PROPERTY(String name) {
+        return new MultiSelectTaskProperty(name);
     }
 
     public static NumberTaskProperty NUMBER_PROPERTY(String name) {
         return new NumberTaskProperty(name);
     }
 
-    public static OptionTaskProperty OPTION_PROPERTY(String name) {
-        return new OptionTaskProperty(name);
+    public static SelectTaskProperty SELECT_PROPERTY(String name) {
+        return new SelectTaskProperty(name);
     }
 
     public static StringTaskProperty STRING_PROPERTY(String name) {
@@ -287,31 +288,31 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
     public static DisplayOption show(String k1, Boolean... values) {
         return DisplayOption
             .displayOption()
-            .hide(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
+            .show(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
     }
 
     public static DisplayOption show(String k1, Integer... values) {
         return DisplayOption
             .displayOption()
-            .hide(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
+            .show(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
     }
 
     public static DisplayOption show(String k1, Long... values) {
         return DisplayOption
             .displayOption()
-            .hide(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
+            .show(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
     }
 
     public static DisplayOption show(String k1, Float... values) {
         return DisplayOption
             .displayOption()
-            .hide(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
+            .show(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
     }
 
     public static DisplayOption show(String k1, Double... values) {
         return DisplayOption
             .displayOption()
-            .hide(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
+            .show(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
     }
 
     public static DisplayOption show(String k1, String... values) {
@@ -488,11 +489,11 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
         return TaskPropertyTypeOption.propertyTypeOption().loadOptionsMethod(loadOptionsMethod);
     }
 
-    public static TaskPropertyTypeOption maxValue(Double maxValue) {
+    public static TaskPropertyTypeOption maxValue(Integer maxValue) {
         return TaskPropertyTypeOption.propertyTypeOption().maxValue(maxValue);
     }
 
-    public static TaskPropertyTypeOption minValue(double minValue) {
+    public static TaskPropertyTypeOption minValue(Integer minValue) {
         return TaskPropertyTypeOption.propertyTypeOption().minValue(minValue);
     }
 
@@ -672,37 +673,37 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
         }
 
         public CollectionTaskProperty defaultValue(Boolean... values) {
-            defaultValue = parameter(values);
+            defaultValue = parameters(values);
 
             return this;
         }
 
         public CollectionTaskProperty defaultValue(Integer... values) {
-            defaultValue = parameter(values);
+            defaultValue = parameters(values);
 
             return this;
         }
 
         public CollectionTaskProperty defaultValue(Long... values) {
-            defaultValue = parameter(values);
+            defaultValue = parameters(values);
 
             return this;
         }
 
         public CollectionTaskProperty defaultValue(Float... values) {
-            defaultValue = parameter(values);
+            defaultValue = parameters(values);
 
             return this;
         }
 
         public CollectionTaskProperty defaultValue(Double... values) {
-            defaultValue = parameter(values);
+            defaultValue = parameters(values);
 
             return this;
         }
 
         public CollectionTaskProperty defaultValue(String... values) {
-            defaultValue = parameter(values);
+            defaultValue = parameters(values);
 
             return this;
         }
@@ -740,14 +741,6 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
         }
     }
 
-    public static final class FileEntryTaskProperty extends TaskProperty<FileEntryTaskProperty> {
-
-        public FileEntryTaskProperty(String name) {
-            this.name = name;
-            this.type = TaskPropertyType.FILE_ENTRY;
-        }
-    }
-
     public static final class GroupTaskProperty extends TaskProperty<GroupTaskProperty> {
 
         private List<TaskProperty<?>> groupProperties;
@@ -768,6 +761,24 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
         }
     }
 
+    public static final class IntegerTaskProperty extends TaskProperty<IntegerTaskProperty> {
+
+        public IntegerTaskProperty(String name) {
+            this.name = name;
+            this.type = TaskPropertyType.INTEGER;
+        }
+
+        public IntegerTaskProperty defaultValue(int value) {
+            this.defaultValue = parameter(value);
+
+            return this;
+        }
+
+        public String getPlaceholder() {
+            return placeholder;
+        }
+    }
+
     public static final class JSONTaskProperty extends TaskProperty<JSONTaskProperty> {
 
         public JSONTaskProperty(String name) {
@@ -782,29 +793,28 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
         }
     }
 
-    public static final class MultiOptionTaskProperty extends TaskProperty<MultiOptionTaskProperty> {
+    public static final class MultiSelectTaskProperty extends TaskProperty<MultiSelectTaskProperty> {
 
         private List<TaskPropertyOption> options;
-        private String placeholder;
 
-        public MultiOptionTaskProperty(String name) {
+        public MultiSelectTaskProperty(String name) {
             this.name = name;
             this.type = TaskPropertyType.MULTI_SELECT;
         }
 
-        public MultiOptionTaskProperty defaultValue(Integer... value) {
-            this.defaultValue = parameter(value);
+        public MultiSelectTaskProperty defaultValue(Integer... value) {
+            this.defaultValue = parameters(value);
 
             return this;
         }
 
-        public MultiOptionTaskProperty defaultValue(String... value) {
-            this.defaultValue = parameter(value);
+        public MultiSelectTaskProperty defaultValue(String... value) {
+            this.defaultValue = parameters(value);
 
             return this;
         }
 
-        public MultiOptionTaskProperty options(TaskPropertyOption... options) {
+        public MultiSelectTaskProperty options(TaskPropertyOption... options) {
             this.options = List.of(options);
 
             return this;
@@ -816,8 +826,6 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
     }
 
     public static final class NumberTaskProperty extends TaskProperty<NumberTaskProperty> {
-
-        private String placeholder;
 
         public NumberTaskProperty(String name) {
             this.name = name;
@@ -847,58 +855,37 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
 
             return this;
         }
-
-        public NumberTaskProperty placeholder(String placeholder) {
-            this.placeholder = placeholder;
-
-            return this;
-        }
-
-        public String getPlaceholder() {
-            return placeholder;
-        }
     }
 
-    public static final class OptionTaskProperty extends TaskProperty<OptionTaskProperty> {
+    public static final class SelectTaskProperty extends TaskProperty<SelectTaskProperty> {
 
         private List<TaskPropertyOption> options;
-        private String placeholder;
 
-        public OptionTaskProperty(String name) {
+        public SelectTaskProperty(String name) {
             this.name = name;
             this.type = TaskPropertyType.SELECT;
         }
 
-        public OptionTaskProperty defaultValue(int defaultValue) {
+        public SelectTaskProperty defaultValue(int defaultValue) {
             this.defaultValue = parameter(defaultValue);
 
             return this;
         }
 
-        public OptionTaskProperty defaultValue(String defaultValue) {
+        public SelectTaskProperty defaultValue(String defaultValue) {
             this.defaultValue = parameter(defaultValue);
 
             return this;
         }
 
-        public OptionTaskProperty options(TaskPropertyOption... options) {
+        public SelectTaskProperty options(TaskPropertyOption... options) {
             this.options = List.of(options);
-
-            return this;
-        }
-
-        public OptionTaskProperty placeholder(String placeholder) {
-            this.placeholder = placeholder;
 
             return this;
         }
 
         public List<TaskPropertyOption> getOptions() {
             return options;
-        }
-
-        public String getPlaceholder() {
-            return placeholder;
         }
     }
 

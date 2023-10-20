@@ -36,11 +36,11 @@ public class JSONFileTaskDeclarationTest {
     };
 
     @Test
-    public void testSpreadsheetFileTaskSpecification() throws JsonProcessingException {
+    public void testJSONFileTaskSpecification() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
             {
-                "description":"Reads and writes data from a JSON file",
+                "description":"Reads and writes data from a JSON file.",
                 "displayName":"JSON File",
                 "name":"jsonFile",
                 "properties":[
@@ -92,23 +92,23 @@ public class JSONFileTaskDeclarationTest {
                         },
                         "name":"fileEntry",
                         "required":true,
-                        "type":"FILE_ENTRY"
+                        "type":"JSON"
                     },
                     {
-                        "description":"Data to write to the file.",
-                        "displayName":"JSON object or array of items",
+                        "description":"Object or array of objects to write to the file.",
+                        "displayName":"Input",
                         "displayOption":{
                             "show":{
                                 "operation":["WRITE"]
                             }
                         },
-                        "name":"items",
+                        "name":"input",
                         "required":true,
                         "type":"JSON"
                     },
                     {
                         "defaultValue":true,
-                        "description":"The input JSON is array?",
+                        "description":"The object input is array?",
                         "displayName":"Is Array",
                         "displayOption":{
                             "show":{
@@ -124,7 +124,7 @@ public class JSONFileTaskDeclarationTest {
                         "type":"COLLECTION",
                         "options":[
                             {
-                                "defaultValue":"",
+                                "defaultValue":"file.json",
                                 "description":"File name to set for binary data. By default, \\"file.json\\" will be used.",
                                 "displayName":"File Name",
                                 "displayOption":{
@@ -135,7 +135,7 @@ public class JSONFileTaskDeclarationTest {
                                 "name":"fileName",
                                 "type":"STRING"
                             },
-                                                        {
+                            {
                                 "description":"The amount of child elements to return in a page.",
                                 "displayName":"Page Size",
                                 "displayOption":{
@@ -145,7 +145,7 @@ public class JSONFileTaskDeclarationTest {
                                     }
                                 },
                                 "name":"pageSize",
-                                "type":"NUMBER"
+                                "type":"INTEGER"
                             },
                             {
                                 "description":"The page number to get.",
@@ -157,7 +157,7 @@ public class JSONFileTaskDeclarationTest {
                                     }
                                 },
                                 "name":"pageNumber",
-                                "type":"NUMBER"
+                                "type":"INTEGER"
                             },
                         ],
                         "placeholder":"Add Option"
