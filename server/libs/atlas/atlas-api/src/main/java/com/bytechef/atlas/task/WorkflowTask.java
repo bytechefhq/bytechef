@@ -27,9 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
 
@@ -46,6 +47,10 @@ public class WorkflowTask implements Task {
 
     private List<WorkflowTask> finalize = Collections.emptyList();
     private String label;
+
+    @JsonAnySetter
+    private final Map<String, Object> extensions = new HashMap<>();
+
     private String name;
     private String node;
     private Map<String, Object> parameters = Collections.emptyMap();
@@ -57,9 +62,7 @@ public class WorkflowTask implements Task {
     private WorkflowTask() {
     }
 
-    public WorkflowTask(Map<String, Object> source) {
-        Assert.notNull(source, "'source' must not be null");
-
+    private WorkflowTask(Map<String, Object> source) {
         if (source.containsKey(WorkflowConstants.FINALIZE)) {
             this.finalize = CollectionUtils.map(
                 MapValueUtils.getList(
@@ -104,6 +107,12 @@ public class WorkflowTask implements Task {
         this.type = MapValueUtils.getRequiredString(source, WorkflowConstants.TYPE);
     }
 
+    public static WorkflowTask of(Map<String, Object> source) {
+        Assert.notNull(source, "'source' must not be null");
+
+        return new WorkflowTask(source);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -127,10 +136,12 @@ public class WorkflowTask implements Task {
             && Objects.equals(type, that.type);
     }
 
-    public <T> Optional<T> fetchExtension(Class<T> extensionClass) {
-        // TODO
+    public <T> T getExtension(String name, Class<T> extensionClass) {
+        return MapValueUtils.get(extensions, name, extensionClass);
+    }
 
-        return Optional.empty();
+    public <T> T getExtension(String name, ParameterizedTypeReference<T> elementType) {
+        return MapValueUtils.get(extensions, name, elementType);
     }
 
     @Override

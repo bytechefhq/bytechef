@@ -183,7 +183,7 @@ public final class TaskExecution
 
         Map<String, Object> map = Evaluator.evaluate(workflowTask.toMap(), context);
 
-        setWorkflowTask(new WorkflowTask(map));
+        setWorkflowTask(WorkflowTask.of(map));
 
         return this;
     }
@@ -285,6 +285,10 @@ public final class TaskExecution
     @Override
     public int getMaxRetries() {
         return maxRetries;
+    }
+
+    public Map<String, Object> getMetadata() {
+        return new HashMap<>(metadata);
     }
 
     public Object getMetadata(String key) {

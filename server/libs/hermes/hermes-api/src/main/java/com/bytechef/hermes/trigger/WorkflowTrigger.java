@@ -18,17 +18,20 @@
 package com.bytechef.hermes.trigger;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
+import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.commons.util.MapValueUtils;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -42,6 +45,10 @@ public class WorkflowTrigger implements Serializable, Trigger {
 
     private String componentName;
     private int componentVersion;
+
+    @JsonAnySetter
+    private Map<String, Object> extensions = new HashMap<>();
+
     private String name;
     private String label;
     private Map<String, Object> parameters;
@@ -52,9 +59,7 @@ public class WorkflowTrigger implements Serializable, Trigger {
     private WorkflowTrigger() {
     }
 
-    public WorkflowTrigger(Map<String, Object> source) {
-        Assert.notNull(source, "'source' must not be null");
-
+    private WorkflowTrigger(Map<String, Object> source) {
         if (source.containsKey(WorkflowConstants.LABEL)) {
             this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
         }
@@ -80,6 +85,19 @@ public class WorkflowTrigger implements Serializable, Trigger {
         this.triggerName = typeItems[2];
     }
 
+    public static WorkflowTrigger of(Map<String, Object> source) {
+        Assert.notNull(source, "'source' must not be null");
+
+        return new WorkflowTrigger(source);
+    }
+
+    public static List<WorkflowTrigger> of(Workflow workflow) {
+        return workflow.getExtension("triggers", new ParameterizedTypeReference<List<Map<String, Object>>>() {})
+            .stream()
+            .map(WorkflowTrigger::new)
+            .toList();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -99,10 +117,12 @@ public class WorkflowTrigger implements Serializable, Trigger {
             && Objects.equals(type, that.type);
     }
 
-    public <T> Optional<T> fetchExtension(Class<T> extensionClass) {
-        // TODO
+    public <T> T getExtension(String name, Class<T> extensionClass) {
+        return MapValueUtils.get(extensions, name, extensionClass);
+    }
 
-        return Optional.empty();
+    public <T> T getExtension(String name, ParameterizedTypeReference<T> elementType) {
+        return MapValueUtils.get(extensions, name, elementType);
     }
 
     @Override

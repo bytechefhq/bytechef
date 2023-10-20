@@ -99,7 +99,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                     .parentId(taskExecution.getId())
                     .priority(taskExecution.getPriority())
                     .taskNumber(i + 1)
-                    .workflowTask(new WorkflowTask(iteratee))
+                    .workflowTask(WorkflowTask.of(iteratee))
                     .build();
 
                 Map<String, Object> newContext = new HashMap<>(

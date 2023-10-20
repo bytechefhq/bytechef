@@ -97,7 +97,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
                 .parentId(loopTaskExecution.getId())
                 .priority(loopTaskExecution.getPriority())
                 .taskNumber(taskExecution.getTaskNumber() + 1)
-                .workflowTask(new WorkflowTask(iteratee))
+                .workflowTask(WorkflowTask.of(iteratee))
                 .build();
 
             Map<String, Object> newContext = new HashMap<>(

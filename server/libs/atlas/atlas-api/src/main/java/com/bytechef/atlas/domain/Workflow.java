@@ -31,12 +31,15 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -116,6 +119,10 @@ public final class Workflow implements Errorable, Persistable<String> {
     @Transient
     private ExecutionError error;
 
+    @JsonAnySetter
+    @Transient
+    private Map<String, Object> extensions = new HashMap<>();
+
     @Column
     private int format;
 
@@ -173,7 +180,9 @@ public final class Workflow implements Errorable, Persistable<String> {
         this.description = MapValueUtils.getString(source, WorkflowConstants.DESCRIPTION);
         this.id = id;
         this.inputs = CollectionUtils.map(
-            MapValueUtils.getList(source, WorkflowConstants.INPUTS, Map.class, Collections.emptyList()),
+            MapValueUtils.getList(
+                source, WorkflowConstants.INPUTS, new ParameterizedTypeReference<Map<String, Object>>() {},
+                Collections.emptyList()),
             map -> new Input(
                 MapValueUtils.getRequiredString(map, WorkflowConstants.NAME),
                 MapValueUtils.getString(map, WorkflowConstants.LABEL),
@@ -182,14 +191,15 @@ public final class Workflow implements Errorable, Persistable<String> {
         this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
         this.outputs = CollectionUtils.map(
             MapValueUtils.getList(
-                source, WorkflowConstants.OUTPUTS, Map.class, Collections.emptyList()),
+                source, WorkflowConstants.OUTPUTS, new ParameterizedTypeReference<Map<String, Object>>() {},
+                Collections.emptyList()),
             map -> new Output(
                 MapValueUtils.getRequiredString(map, WorkflowConstants.NAME),
                 MapValueUtils.getRequiredString(map, WorkflowConstants.VALUE)));
         this.maxRetries = MapValueUtils.getInteger(source, WorkflowConstants.MAX_RETRIES, 0);
         this.tasks = CollectionUtils.map(
             MapValueUtils.getList(source, WorkflowConstants.TASKS, Map.class, Collections.emptyList()),
-            WorkflowTask::new);
+            WorkflowTask::of);
     }
 
     public Workflow(String definition, Format format) {
@@ -228,10 +238,12 @@ public final class Workflow implements Errorable, Persistable<String> {
         return Objects.equals(id, workflow.id);
     }
 
-    public <T> Optional<T> fetchExtension(Class<T> extensionClass) {
-        // TODO
+    public <T> T getExtension(String name, Class<T> extensionClass) {
+        return MapValueUtils.get(extensions, name, extensionClass);
+    }
 
-        return Optional.empty();
+    public <T> T getExtension(String name, ParameterizedTypeReference<T> elementType) {
+        return MapValueUtils.get(extensions, name, elementType);
     }
 
     @Override

@@ -87,6 +87,13 @@ public final class MapValueUtils {
         return conversionService.convert(value, returnType);
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> T get(Map<String, Object> map, String key, ParameterizedTypeReference<T> elementType) {
+        ResolvableType resolvableType = ResolvableType.forType(elementType);
+
+        return get(map, key, (Class<T>) resolvableType.getRawClass());
+    }
+
     public static <T> T get(Map<String, Object> map, String key, Class<T> returnType, T defaultValue) {
         T value = get(map, key, returnType);
 
@@ -214,17 +221,18 @@ public final class MapValueUtils {
 
     @SuppressWarnings("unchecked")
     public static <T> List<T> getList(Map<String, Object> map, String key, ParameterizedTypeReference<T> elementType) {
+        ResolvableType resolvableType = ResolvableType.forType(elementType);
 
-        return getList(map, key, (Class<T>) ResolvableType.forType(elementType)
-            .getRawClass());
+        return getList(map, key, (Class<T>) resolvableType.getRawClass());
     }
 
     @SuppressWarnings("unchecked")
     public static <T> List<T> getList(
         Map<String, Object> map, String key, ParameterizedTypeReference<T> elementType, List<T> defaultValue) {
 
-        List<T> list = getList(map, key, (Class<T>) ResolvableType.forType(elementType)
-            .getRawClass(), defaultValue);
+        ResolvableType resolvableType = ResolvableType.forType(elementType);
+
+        List<T> list = getList(map, key, (Class<T>) resolvableType.getRawClass(), defaultValue);
 
         return list != null ? list : defaultValue;
     }

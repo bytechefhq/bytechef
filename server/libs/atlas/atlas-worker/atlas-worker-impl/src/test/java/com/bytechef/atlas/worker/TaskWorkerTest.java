@@ -57,7 +57,7 @@ public class TaskWorkerTest {
             .build();
 
         TaskExecution taskExecution = TaskExecution.builder()
-            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
             .build();
 
         taskExecution.setId(1234L);
@@ -84,7 +84,7 @@ public class TaskWorkerTest {
             .eventPublisher(e -> {})
             .build();
         TaskExecution taskExecution = TaskExecution.builder()
-            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
             .build();
 
         taskExecution.setId(1234L);
@@ -120,7 +120,7 @@ public class TaskWorkerTest {
             .build();
 
         TaskExecution task = TaskExecution.builder()
-            .workflowTask(new WorkflowTask(Map.of(
+            .workflowTask(WorkflowTask.of(Map.of(
                 "pre",
                 List.of(Map.of("name", "myVar", "type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "done"))),
                 "type", "var",
@@ -167,7 +167,7 @@ public class TaskWorkerTest {
             .build();
 
         TaskExecution taskExecution = TaskExecution.builder()
-            .workflowTask(new WorkflowTask(Map.of(
+            .workflowTask(WorkflowTask.of(Map.of(
                 "post", List.of(Map.of("type", "rm", WorkflowConstants.PARAMETERS, Map.of("path", tempDir))),
                 "pre", List.of(Map.of("type", "mkdir", WorkflowConstants.PARAMETERS, Map.of("path", tempDir))),
                 "type", "pass")))
@@ -215,7 +215,7 @@ public class TaskWorkerTest {
             .build();
 
         TaskExecution taskExecution = TaskExecution.builder()
-            .workflowTask(new WorkflowTask(Map.of(
+            .workflowTask(WorkflowTask.of(Map.of(
                 "finalize", List.of(Map.of("type", "rm", "path", tempDir)),
                 "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
                 "type", "rogue")))
@@ -247,7 +247,7 @@ public class TaskWorkerTest {
             .build();
 
         TaskExecution taskExecution = TaskExecution.builder()
-            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
             .build();
 
         taskExecution.setId(1234L);
@@ -291,7 +291,7 @@ public class TaskWorkerTest {
             .build();
 
         TaskExecution taskExecution1 = TaskExecution.builder()
-            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
             .build();
 
         taskExecution1.setId(1111L);
@@ -301,7 +301,7 @@ public class TaskWorkerTest {
         executorService.submit(() -> worker.handle(taskExecution1));
 
         TaskExecution taskExecution2 = TaskExecution.builder()
-            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
             .build();
 
         taskExecution2.setId(3333L);
@@ -345,7 +345,7 @@ public class TaskWorkerTest {
             .build();
 
         TaskExecution taskExecution1 = TaskExecution.builder()
-            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
             .build();
         taskExecution1.setId(1111L);
         taskExecution1.setJobId(2222L);
@@ -353,7 +353,7 @@ public class TaskWorkerTest {
         executorService.submit(() -> worker.handle(taskExecution1));
 
         TaskExecution taskExecution2 = TaskExecution.builder()
-            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
+            .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
             .build();
         taskExecution2.setId(3333L);
         taskExecution2.setJobId(2222L);
