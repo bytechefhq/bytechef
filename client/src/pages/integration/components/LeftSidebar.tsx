@@ -5,7 +5,7 @@ import {
     ComponentDefinitionBasicModel,
     DisplayModel,
     TaskDispatcherDefinitionModel,
-} from '../../../data-access/definition-registry';
+} from '../../../middleware/definition-registry';
 
 interface DragEvent<T = Element> extends React.MouseEvent<T, DragEventInit> {
     dataTransfer: DataTransfer;

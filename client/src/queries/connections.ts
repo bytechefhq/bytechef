@@ -1,6 +1,6 @@
 import {useQuery} from '@tanstack/react-query';
 
-import {ConnectionsApi, TagModel} from '../data-access/connection';
+import {ConnectionsApi, TagModel} from '../middleware/connection';
 
 export const ConnectionKeys = {
     connection: (id: number) => ['connections', id],

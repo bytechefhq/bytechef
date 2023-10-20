@@ -4,8 +4,8 @@ import {
     IntegrationModel,
     IntegrationsApi,
     TagModel,
-} from 'data-access/integration';
-import {WorkflowModel} from '../data-access/workflow';
+} from 'middleware/integration';
+import {WorkflowModel} from '../middleware/workflow';
 
 export const IntegrationKeys = {
     integration: (id: number) => ['integration', id],

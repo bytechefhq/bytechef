@@ -33,7 +33,7 @@ export default defineConfig({
             exclude: [
                 '.vitest/',
                 'node_modules/',
-                'src/data-access',
+                'src/middleware',
                 '**/*.test.tsx',
             ],
         },

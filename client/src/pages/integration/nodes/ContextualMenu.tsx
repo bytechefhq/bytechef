@@ -5,7 +5,7 @@ import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
-} from '../../../data-access/definition-registry';
+} from '../../../middleware/definition-registry';
 
 const uuid = (): string =>
     new Date().getTime().toString(36) + Math.random().toString(36).slice(2);

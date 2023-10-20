@@ -2,7 +2,7 @@ import {useQuery} from '@tanstack/react-query';
 import {
     TaskDispatcherDefinitionModel,
     TaskDispatcherDefinitionsApi,
-} from '../data-access/definition-registry';
+} from '../middleware/definition-registry';
 
 export const TaskDispatcherKeys = {
     taskDispatcherDefinitions: ['taskDispatcherDefinitions'] as const,

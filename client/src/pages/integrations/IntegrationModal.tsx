@@ -16,7 +16,7 @@ import {
     CategoryModel,
     IntegrationModel,
     TagModel,
-} from '../../data-access/integration';
+} from '../../middleware/integration';
 import {useIntegrationMutation} from '../../mutations/integrations.mutations';
 
 const IntegrationModal = () => {

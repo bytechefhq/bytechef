@@ -2,7 +2,7 @@ import {useQuery} from '@tanstack/react-query';
 import {
     ComponentDefinitionBasicModel,
     ComponentDefinitionsApi,
-} from '../data-access/definition-registry';
+} from '../middleware/definition-registry';
 
 export const ComponentDefinitionKeys = {
     componentDefinitions: ['componentDefinitions'] as const,

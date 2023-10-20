@@ -3,7 +3,7 @@ import {
     IntegrationModel,
     IntegrationsApi,
     PutIntegrationTagsRequest,
-} from 'data-access/integration';
+} from 'middleware/integration';
 
 type IntegrationMutationProps = {
     onSuccess?: (result: IntegrationModel, variables: IntegrationModel) => void;
