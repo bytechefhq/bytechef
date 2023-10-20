@@ -32,7 +32,6 @@ dependencies {
         implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.2"
         implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.2"
         implementation "com.github.miachm.sods:SODS:1.4.0"
-        implementation "com.google.guava:guava:31.0-jre"
         implementation "commons-io:commons-io:2.11.0"
         implementation "javax.jms:javax.jms-api:2.0.1"
         implementation "org.apache.commons:commons-exec:1.3"

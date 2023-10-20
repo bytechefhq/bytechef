@@ -18,13 +18,13 @@
 
 package com.integri.atlas.engine.worker.task.map;
 
-import com.google.common.util.concurrent.MoreExecutors;
 import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.error.Error;
 import com.integri.atlas.engine.core.message.broker.Queues;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 import com.integri.atlas.engine.worker.Worker;
+import com.integri.atlas.engine.worker.task.concurrency.CurrentThreadExecutorService;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolver;
 import com.integri.atlas.message.broker.sync.SyncMessageBroker;
@@ -79,7 +79,7 @@ public class MapTaskHandlerAdapter implements TaskHandler<List<?>> {
             .withTaskHandlerResolver(taskHandlerResolver)
             .withMessageBroker(messageBroker)
             .withEventPublisher(e -> {})
-            .withExecutors(MoreExecutors.newDirectExecutorService())
+            .withExecutors(new CurrentThreadExecutorService())
             .withTaskEvaluator(taskEvaluator)
             .build();
 
