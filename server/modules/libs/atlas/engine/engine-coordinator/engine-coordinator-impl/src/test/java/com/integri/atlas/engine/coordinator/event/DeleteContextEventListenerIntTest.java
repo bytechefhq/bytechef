@@ -46,7 +46,7 @@ public class DeleteContextEventListenerIntTest extends BaseTaskIntTest {
     }
 
     @TestConfiguration
-    public static class CoordinatorTestConfiguration {
+    public static class DeleteContextEventListenerIntTestConfiguration {
 
         @Bean
         DeleteContextEventListener deleteContextEventListener(ContextService contextService, JobService jobService) {
