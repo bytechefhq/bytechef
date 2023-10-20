@@ -51,7 +51,7 @@ public class MessageBrokerWorkerConfiguration implements ApplicationContextAware
                 Map<String, Object> subscriptions = workerProperties.getSubscriptions();
 
                 subscriptions.forEach((k, v) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
-                        listenerEndpointRegistrar, k, Integer.valueOf((String) v), worker, "handle"));
+                        listenerEndpointRegistrar, k, Integer.parseInt((String) v), worker, "handle"));
 
                 messageBrokerListenerRegistrar.registerListenerEndpoint(
                         listenerEndpointRegistrar, Queues.CONTROL, 1, worker, "handle");
