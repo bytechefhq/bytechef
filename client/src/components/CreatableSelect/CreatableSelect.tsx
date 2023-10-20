@@ -1,5 +1,4 @@
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
-import React from 'react';
 import ReactSelectCreatable, {CreatableProps} from 'react-select/creatable';
 import {twMerge} from 'tailwind-merge';
 
@@ -47,54 +46,46 @@ const CreatableSelect = <
     label,
     name,
     ...props
-}: CreatableSelectProps<
-    Option,
-    IsMulti,
-    Group,
-    TFieldValues,
-    TName
->): JSX.Element => {
-    return (
-        <fieldset className={twMerge(label && 'mb-3', fieldsetClassName)}>
-            {label && (
-                <label
-                    htmlFor={name || field?.name}
-                    className="text-sm font-medium text-gray-700"
-                >
-                    {label}
-                </label>
-            )}
+}: CreatableSelectProps<Option, IsMulti, Group, TFieldValues, TName>) => (
+    <fieldset className={twMerge(label && 'mb-3', fieldsetClassName)}>
+        {label && (
+            <label
+                htmlFor={name || field?.name}
+                className="text-sm font-medium text-gray-700"
+            >
+                {label}
+            </label>
+        )}
 
-            <div className={twMerge([label && 'mt-1'])}>
-                <ReactSelectCreatable
-                    {...field}
-                    classNamePrefix="react-select"
-                    isMulti={isMulti}
-                    {...props}
-                />
-
-                {error && (
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <ExclamationCircleIcon
-                            className="h-5 w-5 text-red-500"
-                            aria-hidden="true"
-                        />
-                    </div>
-                )}
-            </div>
+        <div className={twMerge([label && 'mt-1'])}>
+            <ReactSelectCreatable
+                {...field}
+                classNamePrefix="react-select"
+                isMulti={isMulti}
+                {...props}
+            />
 
             {error && (
-                <p
-                    role="alert"
-                    className="mt-2 text-sm text-red-600"
-                    id={`${name}-error`}
-                >
-                    This field is required
-                </p>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                    <ExclamationCircleIcon
+                        className="h-5 w-5 text-red-500"
+                        aria-hidden="true"
+                    />
+                </div>
             )}
-        </fieldset>
-    );
-};
+        </div>
+
+        {error && (
+            <p
+                role="alert"
+                className="mt-2 text-sm text-red-600"
+                id={`${name}-error`}
+            >
+                This field is required
+            </p>
+        )}
+    </fieldset>
+);
 
 CreatableSelect.displayName = 'CreatableSelect';
 

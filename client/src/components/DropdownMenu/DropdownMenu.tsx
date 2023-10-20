@@ -30,7 +30,7 @@ const DropdownMenu = ({
     customTriggerComponent,
     id = 0,
     menuItems,
-}: DropdownMenuProps): JSX.Element => (
+}: DropdownMenuProps) => (
     <Root>
         <Trigger asChild>
             {customTriggerComponent ? (

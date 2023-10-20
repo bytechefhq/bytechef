@@ -19,7 +19,7 @@ import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import Dialog from 'components/Dialog/Dialog';
 import Input from 'components/Input/Input';
 import TextArea from 'components/TextArea/TextArea';
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 
 interface IntegrationDialogProps {
