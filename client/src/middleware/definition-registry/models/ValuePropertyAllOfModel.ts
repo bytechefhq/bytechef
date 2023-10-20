@@ -43,7 +43,7 @@ export interface ValuePropertyAllOfModel {
      * @type {object}
      * @memberof ValuePropertyAllOfModel
      */
-    sampleValue?: object;
+    exampleValue?: object;
 }
 
 /**
@@ -67,7 +67,7 @@ export function ValuePropertyAllOfModelFromJSONTyped(json: any, ignoreDiscrimina
         
         'controlType': !exists(json, 'controlType') ? undefined : ControlTypeModelFromJSON(json['controlType']),
         'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
-        'sampleValue': !exists(json, 'sampleValue') ? undefined : json['sampleValue'],
+        'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
     };
 }
 
@@ -82,7 +82,7 @@ export function ValuePropertyAllOfModelToJSON(value?: ValuePropertyAllOfModel | 
         
         'controlType': ControlTypeModelToJSON(value.controlType),
         'defaultValue': value.defaultValue,
-        'sampleValue': value.sampleValue,
+        'exampleValue': value.exampleValue,
     };
 }
 

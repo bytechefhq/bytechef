@@ -26,12 +26,12 @@ import {
 } from '../models';
 
 export interface GetComponentDefinitionRequest {
-    name: string;
-    version: number;
+    componentName: string;
+    componentVersion: number;
 }
 
 export interface GetComponentDefinitionVersionsRequest {
-    name: string;
+    componentName: string;
 }
 
 export interface GetComponentDefinitionsRequest {
@@ -49,12 +49,12 @@ export class ComponentDefinitionsApi extends runtime.BaseAPI {
      * Get a component definition.
      */
     async getComponentDefinitionRaw(requestParameters: GetComponentDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ComponentDefinitionWithBasicActionsModel>> {
-        if (requestParameters.name === null || requestParameters.name === undefined) {
-            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling getComponentDefinition.');
+        if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
+            throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentDefinition.');
         }
 
-        if (requestParameters.version === null || requestParameters.version === undefined) {
-            throw new runtime.RequiredError('version','Required parameter requestParameters.version was null or undefined when calling getComponentDefinition.');
+        if (requestParameters.componentVersion === null || requestParameters.componentVersion === undefined) {
+            throw new runtime.RequiredError('componentVersion','Required parameter requestParameters.componentVersion was null or undefined when calling getComponentDefinition.');
         }
 
         const queryParameters: any = {};
@@ -62,7 +62,7 @@ export class ComponentDefinitionsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{name}/{version}`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))).replace(`{${"version"}}`, encodeURIComponent(String(requestParameters.version))),
+            path: `/component-definitions/{componentName}/{componentVersion}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters.componentName))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters.componentVersion))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -85,8 +85,8 @@ export class ComponentDefinitionsApi extends runtime.BaseAPI {
      * Get all component definition versions of a component definition.
      */
     async getComponentDefinitionVersionsRaw(requestParameters: GetComponentDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasicModel>>> {
-        if (requestParameters.name === null || requestParameters.name === undefined) {
-            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling getComponentDefinitionVersions.');
+        if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
+            throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentDefinitionVersions.');
         }
 
         const queryParameters: any = {};
@@ -94,7 +94,7 @@ export class ComponentDefinitionsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{name}`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
+            path: `/component-definitions/{componentName}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters.componentName))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

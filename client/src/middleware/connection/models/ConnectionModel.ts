@@ -27,6 +27,12 @@ import {
  */
 export interface ConnectionModel {
     /**
+     * If a connection is used in any of active workflows.
+     * @type {boolean}
+     * @memberof ConnectionModel
+     */
+    active?: boolean;
+    /**
      * The name of an authorization used by this connection. Used for HTTP based services.
      * @type {string}
      * @memberof ConnectionModel
@@ -38,6 +44,12 @@ export interface ConnectionModel {
      * @memberof ConnectionModel
      */
     componentName: string;
+    /**
+     * The version of a component that uses this connection.
+     * @type {number}
+     * @memberof ConnectionModel
+     */
+    connectionVersion?: number;
     /**
      * The created by.
      * @type {string}
@@ -116,8 +128,10 @@ export function ConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boo
     }
     return {
         
+        'active': !exists(json, 'active') ? undefined : json['active'],
         'authorizationName': !exists(json, 'authorizationName') ? undefined : json['authorizationName'],
         'componentName': json['componentName'],
+        'connectionVersion': !exists(json, 'connectionVersion') ? undefined : json['connectionVersion'],
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'name': json['name'],
@@ -139,8 +153,10 @@ export function ConnectionModelToJSON(value?: ConnectionModel | null): any {
     }
     return {
         
+        'active': value.active,
         'authorizationName': value.authorizationName,
         'componentName': value.componentName,
+        'connectionVersion': value.connectionVersion,
         'name': value.name,
         'parameters': value.parameters,
         'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),

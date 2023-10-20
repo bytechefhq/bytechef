@@ -16,12 +16,15 @@
 import * as runtime from '../runtime';
 import type {
   ConnectionModel,
+  OAuth2AuthorizationParametersModel,
   TagModel,
   UpdateConnectionTagsRequestModel,
 } from '../models';
 import {
     ConnectionModelFromJSON,
     ConnectionModelToJSON,
+    OAuth2AuthorizationParametersModelFromJSON,
+    OAuth2AuthorizationParametersModelToJSON,
     TagModelFromJSON,
     TagModelToJSON,
     UpdateConnectionTagsRequestModelFromJSON,
@@ -38,6 +41,10 @@ export interface DeleteConnectionRequest {
 
 export interface GetConnectionRequest {
     id: number;
+}
+
+export interface GetConnectionOAuth2AuthorizationParametersRequest {
+    connectionModel: ConnectionModel;
 }
 
 export interface GetConnectionsRequest {
@@ -155,6 +162,41 @@ export class ConnectionsApi extends runtime.BaseAPI {
      */
     async getConnection(requestParameters: GetConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectionModel> {
         const response = await this.getConnectionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Populates a new connection with oauth parameters.
+     * Populates a new connection with oauth parameters.
+     */
+    async getConnectionOAuth2AuthorizationParametersRaw(requestParameters: GetConnectionOAuth2AuthorizationParametersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OAuth2AuthorizationParametersModel>> {
+        if (requestParameters.connectionModel === null || requestParameters.connectionModel === undefined) {
+            throw new runtime.RequiredError('connectionModel','Required parameter requestParameters.connectionModel was null or undefined when calling getConnectionOAuth2AuthorizationParameters.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/connections/oauth2`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ConnectionModelToJSON(requestParameters.connectionModel),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => OAuth2AuthorizationParametersModelFromJSON(jsonValue));
+    }
+
+    /**
+     * Populates a new connection with oauth parameters.
+     * Populates a new connection with oauth parameters.
+     */
+    async getConnectionOAuth2AuthorizationParameters(requestParameters: GetConnectionOAuth2AuthorizationParametersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OAuth2AuthorizationParametersModel> {
+        const response = await this.getConnectionOAuth2AuthorizationParametersRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
