@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.file.storage;
+package com.integri.atlas.file.storage;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import com.integri.atlas.engine.core.context.MapContext;
+import com.integri.atlas.engine.core.task.SimpleTaskExecution;
+import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
+import java.util.Collections;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -42,5 +49,18 @@ public class FileEntryTest {
             .hasFieldOrPropertyWithValue("mimeType", "text/plain")
             .hasFieldOrPropertyWithValue("name", "name.txt")
             .hasFieldOrPropertyWithValue("url", "/tmp/fileName.txt");
+    }
+
+    @Test
+    public void testSpelEvaluation() {
+        SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
+        TaskExecution taskExecution = SimpleTaskExecution.of("result", "${fileEntry.name} ${fileEntry.url}");
+
+        TaskExecution evaluated = evaluator.evaluate(
+            taskExecution,
+            new MapContext(Collections.singletonMap("fileEntry", FileEntry.of("sample.txt", "/tmp/fileName.txt")))
+        );
+
+        assertEquals("sample.txt /tmp/fileName.txt", evaluated.getString("result"));
     }
 }

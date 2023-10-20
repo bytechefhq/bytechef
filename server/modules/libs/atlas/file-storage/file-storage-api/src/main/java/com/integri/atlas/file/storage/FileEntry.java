@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.file.storage;
+package com.integri.atlas.file.storage;
 
 import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
