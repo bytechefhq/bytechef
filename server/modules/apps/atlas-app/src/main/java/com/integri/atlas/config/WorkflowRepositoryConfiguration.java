@@ -70,6 +70,7 @@ public class WorkflowRepositoryConfiguration {
     }
 
     @Bean
+    @Primary
     WorkflowMapper workflowMapper() {
         return new WorkflowMapperChain(List.of(jsonWorkflowMapper(), yamlWorkflowMapper()));
     }
