@@ -18,6 +18,7 @@
 package com.bytechef.hermes.component.registry.remote.web.rest.service;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
@@ -123,6 +124,22 @@ public class TriggerDefinitionServiceController {
         @PathVariable("componentVersion") Integer componentVersion) {
 
         return ResponseEntity.ok(triggerDefinitionService.getTriggerDefinitions(componentName, componentVersion));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/trigger-definition-service/get-webhook-trigger-flags/{componentName}/{componentVersion}" +
+            "/{triggerName}",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<WebhookTriggerFlags> getWebhookTriggerFlags(
+        @PathVariable("componentName") String componentName,
+        @PathVariable("componentVersion") Integer componentVersion,
+        @PathVariable("triggerName") String triggerName) {
+
+        return ResponseEntity.ok(
+            triggerDefinitionService.getWebhookTriggerFlags(componentName, componentVersion, triggerName));
     }
 
     @SuppressFBWarnings("EI")

@@ -31,6 +31,7 @@ import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +69,8 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
 
         Assert.notNull(error, "'error' must not be null");
 
-        logger.error("Task {}: {}\n{}", taskExecution.getId(), error.getMessage(), error.getStackTrace());
+        logger.error("Task id={}: message={}\nstackTrace={}", taskExecution.getId(), error.getMessage(),
+            error.getStackTrace());
 
         // set task status to FAILED and persist
 
@@ -98,7 +100,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
                 taskExecution = taskExecutionService.update(taskExecution);
             }
 
-            Job job = jobService.getTaskExecutionJob(taskExecution.getId());
+            Job job = jobService.getTaskExecutionJob(Objects.requireNonNull(taskExecution.getId()));
 
             Assert.notNull(job, String.format("No job found for task %s ", taskExecution.getId()));
 
@@ -107,12 +109,12 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
 
             jobService.update(job);
 
-            eventPublisher.publishEvent(new JobStatusEvent(job.getId(), job.getStatus()));
+            eventPublisher.publishEvent(new JobStatusEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
         }
     }
 
     @Override
     public Class<?> getType() {
-        return TaskExecutionErrorHandler.class;
+        return TaskExecution.class;
     }
 }

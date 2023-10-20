@@ -27,48 +27,27 @@ import java.io.Serializable;
  */
 public class WorkflowExecutionId implements Serializable {
 
-    private final String componentName;
-    private final int componentVersion;
-    private final String componentTriggerName;
-    private final long instanceId;
-    private final String instanceType;
-    private final String workflowId;
-    private final String workflowTriggerName;
-    private final boolean webhookRawBody;
-    private final boolean workflowSyncExecution;
-    private final boolean workflowSyncValidation;
+    private long instanceId;
+    private String instanceType;
+    private String workflowId;
+    private String triggerName;
 
-    private WorkflowExecutionId(
-        String workflowId, long instanceId, String instanceType, String workflowTriggerName,
-        String componentName, int componentVersion, String componentTriggerName, boolean webhookRawBody,
-        boolean workflowSyncExecution, boolean workflowSyncValidation) {
-
-        this.componentName = componentName;
-        this.componentVersion = componentVersion;
-        this.instanceId = instanceId;
-        this.instanceType = instanceType;
-        this.componentTriggerName = componentTriggerName;
-        this.workflowId = workflowId;
-        this.workflowTriggerName = workflowTriggerName;
-        this.webhookRawBody = webhookRawBody;
-        this.workflowSyncExecution = workflowSyncExecution;
-        this.workflowSyncValidation = workflowSyncValidation;
+    private WorkflowExecutionId() {
     }
 
-    public static WorkflowExecutionId of(
-        String workflowId, long instanceId, String instanceType, String workflowTriggerName,
-        String componentName, int componentVersion, String componentTriggerName, boolean rawBody,
-        boolean workflowSyncExecution, boolean workflowSyncValidation) {
+    private WorkflowExecutionId(String instanceType, long instanceId, String workflowId, String triggerName) {
+        this.instanceId = instanceId;
+        this.instanceType = instanceType;
+        this.triggerName = triggerName;
+        this.workflowId = workflowId;
+    }
 
-        Assert.hasText(workflowId, "'workflowId' must not be null");
+    public static WorkflowExecutionId of(String instanceType, long instanceId, String workflowId, String triggerName) {
         Assert.notNull(instanceType, "'instanceType' must not be null");
-        Assert.hasText(workflowTriggerName, "'workflowTriggerName' must not be null");
-        Assert.hasText(componentName, "'componentName' must not be null");
-        Assert.hasText(componentTriggerName, "'componentTriggerName' must not be null");
+        Assert.hasText(workflowId, "'workflowId' must not be null");
+        Assert.hasText(triggerName, "'workflowTriggerName' must not be null");
 
-        return new WorkflowExecutionId(
-            workflowId, instanceId, instanceType, workflowTriggerName, componentName, componentVersion,
-            componentTriggerName, rawBody, workflowSyncExecution, workflowSyncValidation);
+        return new WorkflowExecutionId(instanceType, instanceId, workflowId, triggerName);
     }
 
     public static WorkflowExecutionId parse(String id) {
@@ -76,29 +55,7 @@ public class WorkflowExecutionId implements Serializable {
 
         String[] items = id.split(":");
 
-        return WorkflowExecutionId.of(
-            items[0], Long.parseLong(items[1]), items[2], items[3], items[4], Integer.parseInt(items[5]), items[6],
-            Boolean.parseBoolean(items[7]), Boolean.parseBoolean(items[8]), Boolean.parseBoolean(items[9]));
-    }
-
-    public boolean isWebhookRawBody() {
-        return webhookRawBody;
-    }
-
-    public boolean isWorkflowSyncExecution() {
-        return workflowSyncExecution;
-    }
-
-    public boolean isWorkflowSyncValidation() {
-        return workflowSyncValidation;
-    }
-
-    public String getComponentName() {
-        return componentName;
-    }
-
-    public int getComponentVersion() {
-        return componentVersion;
+        return WorkflowExecutionId.of(items[0], Long.parseLong(items[1]), items[2], items[3]);
     }
 
     public long getInstanceId() {
@@ -109,39 +66,23 @@ public class WorkflowExecutionId implements Serializable {
         return instanceType;
     }
 
-    public String getComponentTriggerName() {
-        return componentTriggerName;
-    }
-
     public String getWorkflowId() {
         return workflowId;
     }
 
-    public String getWorkflowTriggerName() {
-        return workflowTriggerName;
+    public String getTriggerName() {
+        return triggerName;
     }
 
     @Override
     public String toString() {
         return Base64Utils.encodeToString(
-            workflowId +
+            instanceType +
                 ':' +
                 instanceId +
                 ':' +
-                instanceType +
+                workflowId +
                 ':' +
-                workflowTriggerName +
-                ':' +
-                componentName +
-                ':' +
-                componentVersion +
-                ':' +
-                componentTriggerName +
-                ':' +
-                workflowSyncExecution +
-                ':' +
-                workflowSyncValidation +
-                ':' +
-                webhookRawBody);
+                triggerName);
     }
 }

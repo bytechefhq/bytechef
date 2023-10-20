@@ -268,8 +268,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return outputSchemaDataSource.getOutputSchema();
     }
 
-    private SampleOutputFunction
-        getSampleOutputFunction(String componentName, int componentVersion, String actionName) {
+    private SampleOutputFunction getSampleOutputFunction(
+        String componentName, int componentVersion, String actionName) {
+
         com.bytechef.hermes.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(
                 componentName, componentVersion, actionName);

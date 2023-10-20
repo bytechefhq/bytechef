@@ -21,7 +21,7 @@ import com.bytechef.message.broker.MessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
 import com.bytechef.message.broker.redis.listener.RedisListenerEndpointRegistrar;
-import com.bytechef.message.broker.redis.serializer.RedisMessageSerializer;
+import com.bytechef.message.broker.redis.serializer.RedisMessageDeserializer;
 import com.oblac.jrsmq.RedisSMQ;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.DisposableBean;
@@ -56,7 +56,7 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
     private final RedisConnectionFactory redisConnectionFactory;
     private RedisListenerEndpointRegistrar redisListenerEndpointRegistrar;
     private RedisMessageListenerContainer redisMessageListenerContainer;
-    private final RedisMessageSerializer redisMessageSerializer;
+    private final RedisMessageDeserializer redisMessageDeserializer;
     private final RedisSMQ redisSMQ;
 
     @SuppressFBWarnings("EI2")
@@ -64,14 +64,14 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
         @Qualifier("controlChannelTopic") ChannelTopic controlChannelTopic,
         @Autowired(
             required = false) List<MessageBrokerConfigurer<RedisListenerEndpointRegistrar>> messageBrokerConfigurers,
-        RedisConnectionFactory redisConnectionFactory, RedisMessageSerializer redisMessageSerializer,
+        RedisConnectionFactory redisConnectionFactory, RedisMessageDeserializer redisMessageDeserializer,
         RedisSMQ redisSMQ) {
 
         this.messageBrokerConfigurers = messageBrokerConfigurers == null
             ? Collections.emptyList()
             : messageBrokerConfigurers;
         this.redisConnectionFactory = redisConnectionFactory;
-        this.redisMessageSerializer = redisMessageSerializer;
+        this.redisMessageDeserializer = redisMessageDeserializer;
         this.redisSMQ = redisSMQ;
         this.controlChannelTopic = controlChannelTopic;
     }
@@ -79,7 +79,7 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
     @Override
     public void afterSingletonsInstantiated() {
         redisListenerEndpointRegistrar = new RedisListenerEndpointRegistrar(
-            executorService, redisMessageSerializer, redisSMQ);
+            executorService, redisMessageDeserializer, redisSMQ);
 
         for (MessageBrokerConfigurer<RedisListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
 

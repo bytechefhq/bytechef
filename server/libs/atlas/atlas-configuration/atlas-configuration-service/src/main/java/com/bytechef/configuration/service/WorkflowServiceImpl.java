@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -180,9 +179,11 @@ public class WorkflowServiceImpl implements WorkflowService {
         if (cacheAll.get(CACHE_ALL) == null) {
             workflows = workflowRepositories.stream()
                 .flatMap(workflowRepository -> {
-                    Iterable<Workflow> iterable = workflowRepository.findAll();
+                    List<Workflow> curWorkflows = workflowRepository.findAll();
 
-                    return StreamSupport.stream(iterable.spliterator(), false)
+                    return curWorkflows
+                        .stream()
+                        .filter(Objects::nonNull)
                         .peek(workflow -> workflow.setSourceType(workflowRepository.getSourceType()));
                 })
                 .sorted((a, b) -> {

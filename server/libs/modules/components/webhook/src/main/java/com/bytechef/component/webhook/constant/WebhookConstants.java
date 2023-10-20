@@ -28,5 +28,4 @@ public class WebhookConstants {
     public static final String METHOD = "method";
     public static final String PARAMETERS = "query";
     public static final String WEBHOOK = "webhook";
-    public static final String X_CRSF_TOKEN = "X-Crsf-Token";
 }
