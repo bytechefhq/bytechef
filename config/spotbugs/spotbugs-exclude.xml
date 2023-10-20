@@ -31,7 +31,7 @@
             <Class name="com.bytechef.atlas.repository.jdbc.JdbcContextRepository" />
             <Class name="com.bytechef.atlas.repository.jdbc.JdbcTaskExecutionRepository" />
             <Class name="com.bytechef.atlas.coordinator.Coordinator" />
-            <Class name="com.bytechef.atlas.coordinator.impl.CoordinatorManagerImpl(" />
+            <Class name="com.bytechef.atlas.coordinator.CoordinatorManagerImpl(" />
             <Class name="com.bytechef.atlas.coordinator.error.ErrorHandlerChain" />
             <Class name="com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler" />
             <Class name="com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerChain" />
@@ -82,7 +82,7 @@
             <Class name="com.bytechef.hermes.component.definition.ComponentDSL$ComponentDisplay" />
             <Class name="com.bytechef.hermes.component.definition.ComponentDSL$ComponentDefinition" />
             <Class name="com.bytechef.hermes.component.definition.ComponentDSL$ConnectionDefinition" />
-            <Class name="com.bytechef.hermes.component.impl.ContextImpl" />
+            <Class name="com.bytechef.hermes.component.ContextImpl" />
             <Class name="com.bytechef.hermes.component.ComponentAdapterTaskHandler" />
             <Class name="com.bytechef.hermes.component.jdbc.DataSourceFactory" />
             <Class name="com.bytechef.atlas.worker.config.WorkerProperties" />
@@ -93,7 +93,7 @@
             <Class name="com.bytechef.atlas.domain.Workflow" />
             <Class name="com.bytechef.atlas.domain.TaskExecution"/>
             <Class name="com.bytechef.atlas.domain.Job"/>
-            <Class name="com.bytechef.atlas.coordinator.impl.CoordinatorManagerImpl"/>
+            <Class name="com.bytechef.atlas.coordinator.CoordinatorManagerImpl"/>
             <Class name="com.bytechef.atlas.repository.git.config.GitWorkflowRepositoryProperties"/>
             <Class name="com.bytechef.atlas.domain.JobSummary"/>
             <Class name="com.bytechef.atlas.service.ContextService"/>
@@ -104,7 +104,7 @@
         <!-- TODO Review this issues -->
         <Bug code="EI" />
         <Or>
-            <Class name="com.bytechef.hermes.component.Connection" />
+            <Class name="com.bytechef.hermes.component.Context.Connection" />
             <Class name="com.bytechef.hermes.connection.web.rest.ConnectionController$ConnectionCreateDTO" />
             <Class name="com.bytechef.hermes.component.definition.ConnectionDefinition" />
             <Class name="com.bytechef.hermes.definition.DisplayOption" />
@@ -185,7 +185,7 @@
             <Class name="com.bytechef.component.csvfile.CsvFileComponentHandlerTest" />
             <Class name="com.bytechef.component.xlsxfile.XlsxFileComponentHandlerTest" />
             <Class name="com.bytechef.component.xmlfile.XmlFileComponentHandlerTest" />
-            <Class name="com.bytechef.hermes.connection.service.impl.ConnectionServiceIntTest"/>
+            <Class name="com.bytechef.hermes.connection.service.ConnectionServiceIntTest"/>
             <Class name="com.bytechef.hermes.connection.repository.ConnectionRepositoryIntTest"/>
         </Or>
     </Match>
