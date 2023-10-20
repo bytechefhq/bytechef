@@ -88,7 +88,7 @@ const WorkflowNode = ({id, data}: NodeProps) => {
                         <Button
                             className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
                             displayType="icon"
-                            icon={<PencilIcon className="h-5 w-5" />}
+                            icon={<PencilIcon className="h-4 w-4" />}
                             onClick={handleEditNodeClick}
                             title="Edit a node"
                         />
@@ -96,7 +96,7 @@ const WorkflowNode = ({id, data}: NodeProps) => {
                         <Button
                             className="bg-white p-2 shadow-md hover:text-red-500 hover:shadow-sm"
                             displayType="icon"
-                            icon={<TrashIcon className="h-5 w-5" />}
+                            icon={<TrashIcon className="h-4 w-4" />}
                             onClick={handleDeleteNodeClick}
                             title="Delete a node"
                         />
