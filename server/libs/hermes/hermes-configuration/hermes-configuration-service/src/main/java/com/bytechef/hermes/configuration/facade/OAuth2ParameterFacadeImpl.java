@@ -15,27 +15,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.web.rest.oauth2;
+package com.bytechef.hermes.configuration.facade;
 
 import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-@Component
-public class OAuth2ParameterAccessor {
+@Service
+public class OAuth2ParameterFacadeImpl implements OAuth2ParameterFacade {
 
     private final ConnectionDefinitionService connectionDefinitionService;
     private final OAuth2Properties oAuth2Properties;
 
     @SuppressFBWarnings("EI")
-    public OAuth2ParameterAccessor(
+    public OAuth2ParameterFacadeImpl(
         ConnectionDefinitionService connectionDefinitionService, OAuth2Properties oAuth2Properties) {
 
         this.connectionDefinitionService = connectionDefinitionService;

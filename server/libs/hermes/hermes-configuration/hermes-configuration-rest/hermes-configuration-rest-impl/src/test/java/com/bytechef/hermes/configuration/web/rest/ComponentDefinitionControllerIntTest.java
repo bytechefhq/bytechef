@@ -15,18 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.web.rest;
+package com.bytechef.hermes.configuration.web.rest;
 
-import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
+import com.bytechef.hermes.configuration.web.rest.config.WorkflowConfigurationRestTestConfiguration;
+import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
-import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
-import com.bytechef.hermes.definition.registry.web.rest.config.RegistryDefinitionRestTestConfiguration;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
+import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
+
 import java.util.List;
 
 import com.bytechef.hermes.connection.config.OAuth2Properties;
@@ -48,9 +49,9 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  * @author Ivica Cardic
  */
 @Disabled
-@ContextConfiguration(classes = RegistryDefinitionRestTestConfiguration.class)
-@WebMvcTest(TaskDispatcherDefinitionController.class)
-public class TaskDispatcherDefinitionControllerIntTest {
+@ContextConfiguration(classes = WorkflowConfigurationRestTestConfiguration.class)
+@WebMvcTest(ComponentDefinitionController.class)
+public class ComponentDefinitionControllerIntTest {
 
     @MockBean
     private ActionDefinitionFacade actionDefinitionFacade;
@@ -92,17 +93,14 @@ public class TaskDispatcherDefinitionControllerIntTest {
     }
 
     @Test
-    public void testGetTaskDispatcherDefinitions() {
-        Mockito.when(taskDispatcherDefinitionService.getTaskDispatcherDefinitions())
-            .thenReturn(
-                List.of(
-                    new TaskDispatcherDefinitionDTO("task-dispatcher1"),
-                    new TaskDispatcherDefinitionDTO("task-dispatcher2")));
+    public void testGetComponentDefinitions() {
+        Mockito.when(componentDefinitionFacade.getComponentDefinitions(null, null, null, null, null))
+            .thenReturn(List.of(new ComponentDefinitionDTO("component1"), new ComponentDefinitionDTO("component2")));
 
         try {
             webTestClient
                 .get()
-                .uri("/core/task-dispatcher-definitions")
+                .uri("/core/component-definitions")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -112,10 +110,10 @@ public class TaskDispatcherDefinitionControllerIntTest {
                     """
                         [
                             {
-                                "name":"task-dispatcher1"
+                                "name":"component1"
                             },
                             {
-                                "name":"task-dispatcher2"
+                                "name":"component2"
                             }
                         ]
                         """);

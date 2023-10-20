@@ -2,36 +2,6 @@ plugins {
     alias(libs.plugins.org.openapi.generator)
 }
 
-task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
-    apiPackage = "com.bytechef.hermes.definition.registry.web.rest"
-    configOptions = [
-        "dateLibrary": "java8-localdatetime",
-        "interfaceOnly": "true",
-        "useSpringBoot3": "true"
-    ]
-    generatorName = "spring"
-    inputSpec = "$projectDir/openapi.yaml".toString()
-    modelNameSuffix = "Model"
-    modelPackage = "com.bytechef.hermes.definition.registry.web.rest.model"
-    outputDir = "$projectDir/generated".toString()
-}
-
-sourceSets.main.java.srcDir "${projectDir}/generated/src/main/java"
-
-task generateOpenAPITypeScriptFetch(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
-    generatorName = "typescript-fetch"
-    inputSpec = "$projectDir/openapi.yaml".toString()
-    modelNameSuffix = "Model"
-    outputDir = "$rootDir/client/src/middleware/core/definition-registry".toString()
-    typeMappings = [
-        DateTime: "Date"
-    ]
-}
-
-tasks.register("generateOpenAPI") {
-    dependsOn tasks.generateOpenAPISpring, tasks.generateOpenAPITypeScriptFetch
-}
-
 dependencies {
     annotationProcessor libs.org.mapstruct.mapstruct.processor
     annotationProcessor libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions

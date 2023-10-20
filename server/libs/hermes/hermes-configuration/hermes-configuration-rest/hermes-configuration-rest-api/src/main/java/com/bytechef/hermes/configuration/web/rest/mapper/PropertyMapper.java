@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.web.rest.mapper;
+package com.bytechef.hermes.configuration.web.rest.mapper;
 
+import com.bytechef.hermes.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.dto.AnyPropertyDTO;
 import com.bytechef.hermes.definition.registry.dto.ArrayPropertyDTO;
 import com.bytechef.hermes.definition.registry.dto.BooleanPropertyDTO;
@@ -32,21 +33,20 @@ import com.bytechef.hermes.definition.registry.dto.OptionsDataSourceDTO;
 import com.bytechef.hermes.definition.registry.dto.PropertyDTO;
 import com.bytechef.hermes.definition.registry.dto.StringPropertyDTO;
 import com.bytechef.hermes.definition.registry.dto.TimePropertyDTO;
-import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.web.rest.model.AnyPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ArrayPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.BooleanPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.DatePropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.DateTimePropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.DynamicPropertiesPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.IntegerPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.NullPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.NumberPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ObjectPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.OptionsDataSourceModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.StringPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.TimePropertyModel;
+import com.bytechef.hermes.configuration.web.rest.model.AnyPropertyModel;
+import com.bytechef.hermes.configuration.web.rest.model.ArrayPropertyModel;
+import com.bytechef.hermes.configuration.web.rest.model.BooleanPropertyModel;
+import com.bytechef.hermes.configuration.web.rest.model.DatePropertyModel;
+import com.bytechef.hermes.configuration.web.rest.model.DateTimePropertyModel;
+import com.bytechef.hermes.configuration.web.rest.model.DynamicPropertiesPropertyModel;
+import com.bytechef.hermes.configuration.web.rest.model.IntegerPropertyModel;
+import com.bytechef.hermes.configuration.web.rest.model.NullPropertyModel;
+import com.bytechef.hermes.configuration.web.rest.model.NumberPropertyModel;
+import com.bytechef.hermes.configuration.web.rest.model.ObjectPropertyModel;
+import com.bytechef.hermes.configuration.web.rest.model.OptionsDataSourceModel;
+import com.bytechef.hermes.configuration.web.rest.model.PropertyModel;
+import com.bytechef.hermes.configuration.web.rest.model.StringPropertyModel;
+import com.bytechef.hermes.configuration.web.rest.model.TimePropertyModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -63,7 +63,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = DefinitionMapperSpringConfig.class)
+@Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
 public interface PropertyMapper extends Converter<PropertyDTO, PropertyModel>, PropertyDTO.PropertyVisitor {
 
     @Override

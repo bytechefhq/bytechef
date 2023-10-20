@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.web.rest;
+package com.bytechef.hermes.configuration.web.rest;
 
-import com.bytechef.hermes.definition.registry.web.rest.model.GetOAuth2AuthorizationParametersRequestModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.OAuth2AuthorizationParametersModel;
-import com.bytechef.hermes.definition.registry.web.rest.oauth2.OAuth2ParameterAccessor;
+import com.bytechef.hermes.configuration.facade.OAuth2ParameterFacade;
+import com.bytechef.hermes.configuration.web.rest.model.GetOAuth2AuthorizationParametersRequestModel;
+import com.bytechef.hermes.configuration.web.rest.model.OAuth2AuthorizationParametersModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -30,14 +30,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
 public class ConnectionDefinitionController implements ConnectionDefinitionsApi {
 
-    private final OAuth2ParameterAccessor oAuth2ParameterAccessor;
+    private final OAuth2ParameterFacade oAuth2ParameterFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
     public ConnectionDefinitionController(
-        OAuth2ParameterAccessor oAuth2ParameterAccessor, ConversionService conversionService) {
+        OAuth2ParameterFacade oAuth2ParameterFacade, ConversionService conversionService) {
 
-        this.oAuth2ParameterAccessor = oAuth2ParameterAccessor;
+        this.oAuth2ParameterFacade = oAuth2ParameterFacade;
         this.conversionService = conversionService;
     }
 
@@ -48,7 +48,7 @@ public class ConnectionDefinitionController implements ConnectionDefinitionsApi 
 
         return ResponseEntity.ok(
             conversionService.convert(
-                oAuth2ParameterAccessor.getOAuth2Parameters(
+                oAuth2ParameterFacade.getOAuth2Parameters(
                     parametersRequestModel.getComponentName(), parametersRequestModel.getConnectionVersion(),
                     parametersRequestModel.getParameters(), parametersRequestModel.getAuthorizationName()),
                 OAuth2AuthorizationParametersModel.class));

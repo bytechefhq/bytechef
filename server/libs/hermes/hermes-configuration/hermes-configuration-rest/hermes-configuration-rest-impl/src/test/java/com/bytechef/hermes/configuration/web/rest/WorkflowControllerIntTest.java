@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.hermes.configuration.web.rest.config.WorkflowRestTestConfiguration;
+import com.bytechef.hermes.configuration.web.rest.config.WorkflowConfigurationRestTestConfiguration;
 import com.bytechef.hermes.configuration.dto.WorkflowDTO;
 import com.bytechef.hermes.configuration.facade.WorkflowFacade;
 import com.bytechef.hermes.configuration.web.rest.model.WorkflowFormatModel;
@@ -51,7 +51,7 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 /**
  * @author Ivica Cardic
  */
-@ContextConfiguration(classes = WorkflowRestTestConfiguration.class)
+@ContextConfiguration(classes = WorkflowConfigurationRestTestConfiguration.class)
 @WebMvcTest(WorkflowController.class)
 public class WorkflowControllerIntTest {
 

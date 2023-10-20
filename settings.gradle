@@ -94,7 +94,6 @@ include("server:libs:hermes:hermes-component:hermes-component-context:hermes-com
 include("server:libs:hermes:hermes-component:hermes-component-impl")
 include("server:libs:hermes:hermes-component:hermes-component-test-int-support")
 include("server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
-include("server:libs:hermes:hermes-definition-registry:hermes-definition-registry-rest")
 include("server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
 include("server:libs:hermes:hermes-configuration:hermes-configuration-api")
 include("server:libs:hermes:hermes-configuration:hermes-configuration-rest:hermes-configuration-rest-api")

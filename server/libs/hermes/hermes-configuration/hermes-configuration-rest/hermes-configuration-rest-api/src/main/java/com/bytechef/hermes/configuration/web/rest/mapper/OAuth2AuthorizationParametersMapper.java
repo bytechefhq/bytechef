@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.web.rest.mapper;
+package com.bytechef.hermes.configuration.web.rest.mapper;
 
+import com.bytechef.hermes.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
-import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.web.rest.model.OAuth2AuthorizationParametersModel;
+import com.bytechef.hermes.configuration.web.rest.model.OAuth2AuthorizationParametersModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = DefinitionMapperSpringConfig.class)
+@Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
 public interface OAuth2AuthorizationParametersMapper
     extends Converter<OAuth2AuthorizationParametersDTO, OAuth2AuthorizationParametersModel> {
 

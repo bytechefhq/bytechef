@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.web.rest.mapper;
+package com.bytechef.hermes.configuration.web.rest.mapper;
 
+import com.bytechef.hermes.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.dto.ResourcesDTO;
 import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
-import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionBasicModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionModel;
+import com.bytechef.hermes.configuration.web.rest.model.ResourcesModel;
+import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherDefinitionBasicModel;
+import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherDefinitionModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -31,10 +31,10 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = DefinitionMapperSpringConfig.class)
+@Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
 public class TaskDispatcherDefinitionMapper {
 
-    @Mapper(config = DefinitionMapperSpringConfig.class)
+    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
     public interface TaskDispatcherDefinitionToTaskDispatcherDefinitionModelMapper
         extends Converter<TaskDispatcherDefinitionDTO, TaskDispatcherDefinitionModel> {
 
@@ -53,7 +53,7 @@ public class TaskDispatcherDefinitionMapper {
         }
     }
 
-    @Mapper(config = DefinitionMapperSpringConfig.class)
+    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
     public interface ModifiableTaskDispatcherDefinitionToTaskDispatcherDefinitionModelMapper
         extends Converter<TaskDispatcherDefinitionDTO, TaskDispatcherDefinitionBasicModel> {
 
