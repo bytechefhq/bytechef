@@ -155,7 +155,7 @@ const Property = ({
                 />
             )}
 
-            {controlType === 'JSON_BUILDER' && <span>JSON builder</span>}
+            {controlType === 'OBJECT_BUILDER' && <span>JSON builder</span>}
 
             {controlType === 'CODE_EDITOR' && (
                 <div className="h-full w-full border-2">
