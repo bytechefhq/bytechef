@@ -131,24 +131,21 @@ public class HttpClientComponentHandler implements ComponentHandler {
         // Header properties
         //
 
-        array(HEADER_PARAMETERS)
+        object(HEADER_PARAMETERS)
             .label("Header Parameters")
             .description("Header parameters to send.")
-            .defaultValue("")
             .placeholder("Add Parameter")
-            .items(object().label("Parameter")
-                .additionalProperties(string())),
+            .additionalProperties(string()),
+
         //
         // Query parameters properties
         //
 
-        array(QUERY_PARAMETERS)
+        object(QUERY_PARAMETERS)
             .label("Query Parameters")
             .description("Query parameters to send.")
-            .defaultValue("")
             .placeholder("Add Parameter")
-            .items(object().label("Parameter")
-                .additionalProperties(string()))
+            .additionalProperties(string())
     };
 
     private static final Property<?>[] BODY_CONTENT_PROPERTIES = new Property[] {
