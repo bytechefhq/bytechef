@@ -22,10 +22,11 @@ const PopoverMenu = ({children, id}: PopoverMenuProps) => {
                 <Trigger asChild>{children}</Trigger>
 
                 <Content
-                    align="center"
+                    align="start"
                     sideOffset={4}
+                    side="right"
                     // eslint-disable-next-line tailwindcss/no-custom-classname
-                    className="nowheel z-50 w-48 rounded-lg bg-white shadow-md radix-side-bottom:animate-slide-down radix-side-top:animate-slide-up dark:bg-gray-800 md:w-56"
+                    className="nowheel relative w-96 animate-slide-down rounded-lg bg-white shadow-md will-change-auto dark:bg-gray-800"
                 >
                     <Arrow className="fill-current text-white dark:text-gray-800" />
 

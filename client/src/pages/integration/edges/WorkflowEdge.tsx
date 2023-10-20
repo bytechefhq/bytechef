@@ -34,7 +34,7 @@ export default function WorkflowEdge({
             <path
                 id={id}
                 style={style}
-                className={styles.edgePath}
+                className="fill-none stroke-gray-400 stroke-1"
                 d={edgePath}
                 markerEnd={markerEnd}
             />

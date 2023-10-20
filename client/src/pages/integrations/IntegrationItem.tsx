@@ -182,6 +182,7 @@ const IntegrationItem = ({
 
     const handleOnDeleteTag = (deletedTag: TagModel) => {
         const newTags = tags?.filter((tag) => tag.id !== deletedTag.id) || [];
+
         mutation.mutate({
             id: id || 0,
             putIntegrationTagsRequestModel: {
@@ -260,7 +261,7 @@ const Status = ({published, version}: StatusProps) => {
                 published ? 'dark:text-green-900' : 'dark:text-gray-900'
             )}
         >
-            {label} {published && 'V' + version}
+            {label} {published && `V${version}`}
         </span>
     );
 };

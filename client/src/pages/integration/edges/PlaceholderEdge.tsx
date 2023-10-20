@@ -3,7 +3,6 @@ import {getBezierPath, EdgeProps} from 'reactflow';
 
 import styles from './EdgeTypes.module.css';
 
-// the placeholder edges do not have a special functionality, only used as a visual
 export default function PlaceholderEdge({
     id,
     sourceX,

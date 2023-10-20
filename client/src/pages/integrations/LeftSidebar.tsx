@@ -17,9 +17,9 @@ const LeftSidebar: React.FC = () => {
     const [searchParams] = useSearchParams();
     const [current, setCurrent] = useState<{id?: number; type: Type}>({
         id: searchParams.get('categoryId')
-            ? +searchParams.get('categoryId')!
+            ? parseInt(searchParams.get('categoryId')!)
             : searchParams.get('tagId')
-            ? +searchParams.get('tagId')!
+            ? parseInt(searchParams.get('tagId')!)
             : undefined,
         type: searchParams.get('tagId') ? Type.Tag : Type.Category,
     });
