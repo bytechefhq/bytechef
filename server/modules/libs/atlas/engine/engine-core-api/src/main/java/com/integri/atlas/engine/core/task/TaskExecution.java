@@ -19,9 +19,7 @@
 package com.integri.atlas.engine.core.task;
 
 import com.integri.atlas.engine.core.error.Errorable;
-import com.integri.atlas.engine.core.error.Prioritizable;
-import com.integri.atlas.engine.core.error.Progressable;
-import com.integri.atlas.engine.core.error.Retryable;
+import com.integri.atlas.engine.core.priority.Prioritizable;
 import java.util.Date;
 
 /**

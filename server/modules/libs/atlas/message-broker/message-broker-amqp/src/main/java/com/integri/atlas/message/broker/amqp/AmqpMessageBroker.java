@@ -19,9 +19,9 @@
 package com.integri.atlas.message.broker.amqp;
 
 import com.integri.atlas.engine.coordinator.message.broker.Exchanges;
-import com.integri.atlas.engine.core.error.Prioritizable;
-import com.integri.atlas.engine.core.error.Retryable;
 import com.integri.atlas.engine.core.message.broker.MessageBroker;
+import com.integri.atlas.engine.core.priority.Prioritizable;
+import com.integri.atlas.engine.core.task.Retryable;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.util.Assert;
 
