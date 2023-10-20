@@ -1,3 +1,0 @@
-dependencies {
-    api project(":modules:libs:hermes:file-storage:file-storage-api")
-}

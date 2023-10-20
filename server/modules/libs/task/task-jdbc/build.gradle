@@ -5,5 +5,5 @@ dependencies {
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-jdbc"
-    implementation project(":modules:libs:hermes:descriptor:descriptor-api")
+    implementation project(":modules:libs:hermes:hermes-descriptor:hermes-descriptor-api")
 }
