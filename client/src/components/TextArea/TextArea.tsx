@@ -30,7 +30,7 @@ const TextArea = ({label, name, error, ...props}: TextAreaProps) => (
                     'block w-full rounded-md border focus:outline-none focus:ring-1 dark:bg-gray-800',
                     error
                         ? 'border-red-300 pr-10 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500 dark:text-red-500 sm:text-sm'
-                        : 'border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:ring-sky-500 dark:border-gray-700 dark:text-white dark:focus:border-sky-500 sm:text-sm',
+                        : 'border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:text-white dark:focus:border-sky-500 dark:focus:ring-sky-500 sm:text-sm',
                 ])}
                 id={name}
                 name={name}
