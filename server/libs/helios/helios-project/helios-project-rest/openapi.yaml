@@ -197,6 +197,41 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProjectInstance"
+  /project-instances/{id}/jobs:
+    post:
+      description: "Create a request for running a new job."
+      summary: "Create a request for running a new job."
+      tags:
+      - "project-instances"
+      operationId: "createProjectInstanceJob"
+      parameters:
+      - name: "id"
+        description: "The id of a project instance."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        description: "Parameters required to run a job, for example '{\"workflowId\"\
+          :\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobParameters"
+        required: true
+      responses:
+        "200":
+          description: "The id of a created job."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  jobId:
+                    description: "The id of an executed job."
+                    type: "integer"
+                    format: "int64"
   /project-instances/{id}/tags:
     put:
       description: "Updates tags of an existing project instance."
@@ -582,6 +617,15 @@ components:
           - "FAILED"
           - "COMPLETED"
           readOnly: true
+    JobParameters:
+      description: "Defines parameters used to execute a job."
+      type: "object"
+      required:
+      - "workflowId"
+      properties:
+        workflowId:
+          description: "Id of the workflow to execute."
+          type: "string"
     Page:
       description: "A sublist of a list of objects. It allows gain information about\
         \ the position of it in the containing entire list."
