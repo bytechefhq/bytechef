@@ -7,7 +7,7 @@ import useWorkflowExecutionDetailsDialogStore from '../../project/stores/useWork
 import ReadOnlyWorkflow from './dialog-content/ReadOnlyWorkflow';
 import WorkflowTaskListAccordion from './dialog-content/WorkflowTaskListAccordion';
 
-const ExecutionDetailsDialog = () => {
+const WorkflowExecutionDetailsDialog = () => {
     const {
         setWorkflowExecutionDetailsDialogOpen,
         workflowExecutionDetailsDialogOpen,
@@ -111,4 +111,4 @@ const ExecutionDetailsDialog = () => {
     );
 };
 
-export default ExecutionDetailsDialog;
+export default WorkflowExecutionDetailsDialog;

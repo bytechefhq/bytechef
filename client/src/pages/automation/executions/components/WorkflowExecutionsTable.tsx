@@ -72,7 +72,7 @@ const columns = [
     }),
 ];
 
-const ExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
+const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
     const reactTable = useReactTable<WorkflowExecutionModel>({
         columns,
         data,
@@ -139,4 +139,4 @@ const ExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
     );
 };
 
-export default ExecutionsTable;
+export default WorkflowExecutionsTable;
