@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.execution.config;
+package com.bytechef.athena.swagger.config;
 
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
@@ -17,20 +17,9 @@ import org.springframework.context.annotation.Profile;
  *
  * @author Ivica Cardic
  */
-@Configuration
+@Configuration("embeddedSwaggerConfiguration")
 @Profile("api-docs")
 public class SwaggerConfiguration {
-
-    @Bean
-    public GroupedOpenApi automationOpenApi() {
-        return GroupedOpenApi.builder()
-            .group("automation")
-            .displayName("Automation API")
-            .pathsToMatch(new String[] {
-                "/api/automation/**"
-            })
-            .build();
-    }
 
     @Bean
     public GroupedOpenApi embeddedOpenApi() {
