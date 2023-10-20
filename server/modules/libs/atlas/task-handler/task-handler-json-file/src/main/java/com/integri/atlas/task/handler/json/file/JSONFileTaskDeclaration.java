@@ -16,7 +16,9 @@
 
 package com.integri.atlas.task.handler.json.file;
 
+import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValue;
 import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValues;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.COLLECTION_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.FILE_ENTRY_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.GROUP_PROPERTY;
@@ -63,10 +65,15 @@ public class JSONFileTaskDeclaration implements TaskDeclaration {
                 .displayOption(show("operation", "READ"))
                 .required(true),
             JSON_PROPERTY("items")
-                .displayName("JSON array of items")
+                .displayName("JSON object or array of items")
                 .description("Data to write to the file.")
                 .displayOption(show("operation", parameterValues("WRITE")))
                 .required(true),
+            BOOLEAN_PROPERTY("isArray")
+                .displayName("Is Array")
+                .description("The input JSON is array?")
+                .displayOption(show("operation", "READ"))
+                .defaultValue(true),
             COLLECTION_PROPERTY("options")
                 .displayName("Options")
                 .placeholder("Add Option")
@@ -79,7 +86,7 @@ public class JSONFileTaskDeclaration implements TaskDeclaration {
                     GROUP_PROPERTY("range")
                         .displayName("Range")
                         .description("The range to read from the JSON array.")
-                        .displayOption(show("operation", "READ"))
+                        .displayOption(show("operation", parameterValues("READ"), "isArray", parameterValues(true)))
                         .groupProperties(
                             NUMBER_PROPERTY("startIndex").displayName("The start index of the JSON array"),
                             NUMBER_PROPERTY("endIndex").displayName("The end index of the JSON array")

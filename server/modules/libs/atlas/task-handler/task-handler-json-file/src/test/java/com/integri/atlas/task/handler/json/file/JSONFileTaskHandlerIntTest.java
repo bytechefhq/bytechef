@@ -45,7 +45,7 @@ public class JSONFileTaskHandlerIntTest extends BaseTaskIntTest {
 
     @Test
     public void testRead() throws IOException {
-        File sampleFile = getFile("sample.json");
+        File sampleFile = getFile("sample_array.json");
 
         Job job = startJob(
             "samples/jsonFile_READ.json",
@@ -63,7 +63,7 @@ public class JSONFileTaskHandlerIntTest extends BaseTaskIntTest {
         Accessor outputs = job.getOutputs();
 
         JSONAssert.assertEquals(
-            JSONArrayUtil.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
+            JSONArrayUtil.of(Files.contentOf(getFile("sample_array.json"), Charset.defaultCharset())),
             JSONArrayUtil.of((List<?>) outputs.get("readJSONFile")),
             true
         );
@@ -73,7 +73,10 @@ public class JSONFileTaskHandlerIntTest extends BaseTaskIntTest {
     public void testWrite() throws IOException {
         Job job = startJob(
             "samples/jsonFile_WRITE.json",
-            Map.of("items", JSONArrayUtil.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())))
+            Map.of(
+                "items",
+                JSONArrayUtil.toList(Files.contentOf(getFile("sample_array.json"), Charset.defaultCharset()))
+            )
         );
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
@@ -81,7 +84,7 @@ public class JSONFileTaskHandlerIntTest extends BaseTaskIntTest {
         Accessor outputs = job.getOutputs();
 
         FileEntry fileEntry = outputs.get("writeJSONFile", FileEntry.class);
-        File sampleFile = getFile("sample.json");
+        File sampleFile = getFile("sample_array.json");
 
         job =
             startJob(

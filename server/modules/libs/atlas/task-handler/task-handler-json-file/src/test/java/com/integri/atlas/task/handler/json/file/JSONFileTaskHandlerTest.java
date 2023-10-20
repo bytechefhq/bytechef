@@ -26,6 +26,7 @@ import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.file.storage.base64.Base64FileStorageService;
 import com.integri.atlas.json.JSONArrayUtil;
+import com.integri.atlas.json.JSONObjectUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -50,8 +51,26 @@ public class JSONFileTaskHandlerTest {
     );
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testReadJSON() throws Exception {
         File file = getFile("sample.json");
+
+        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+
+        taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
+        taskExecution.put("isArray", false);
+        taskExecution.put("operation", "READ");
+
+        assertEquals(
+            JSONObjectUtil.of(Files.contentOf(file, Charset.defaultCharset())),
+            JSONObjectUtil.of((Map<String, ?>) jsonFileTaskHandler.handle(taskExecution)),
+            true
+        );
+    }
+
+    @Test
+    public void testReadJSONArray() throws Exception {
+        File file = getFile("sample_array.json");
 
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
@@ -86,7 +105,7 @@ public class JSONFileTaskHandlerTest {
         taskExecution.put("operation", "READ");
 
         assertEquals(
-            JSONArrayUtil.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
+            JSONArrayUtil.of(Files.contentOf(getFile("sample_array.json"), Charset.defaultCharset())),
             JSONArrayUtil.of((List<?>) jsonFileTaskHandler.handle(taskExecution)),
             true
         );
@@ -104,6 +123,27 @@ public class JSONFileTaskHandlerTest {
     @Test
     public void testWriteJSON() throws Exception {
         File file = getFile("sample.json");
+
+        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+
+        taskExecution.put("items", JSONObjectUtil.toMap(Files.contentOf(file, Charset.defaultCharset())));
+        taskExecution.put("fileType", "JSON");
+        taskExecution.put("operation", "WRITE");
+
+        FileEntry fileEntry = (FileEntry) jsonFileTaskHandler.handle(taskExecution);
+
+        assertEquals(
+            JSONObjectUtil.of(Files.contentOf(file, Charset.defaultCharset())),
+            JSONObjectUtil.of(fileStorageService.readFileContent(fileEntry.getUrl())),
+            true
+        );
+
+        assertThat(fileEntry.getName()).isEqualTo("file.json");
+    }
+
+    @Test
+    public void testWriteJSONArray() throws Exception {
+        File file = getFile("sample_array.json");
 
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
@@ -139,7 +179,7 @@ public class JSONFileTaskHandlerTest {
 
         taskExecution.put(
             "items",
-            JSONArrayUtil.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))
+            JSONArrayUtil.toList(Files.contentOf(getFile("sample_array.json"), Charset.defaultCharset()))
         );
         taskExecution.put("fileType", "JSONL");
         taskExecution.put("operation", "WRITE");
@@ -158,7 +198,7 @@ public class JSONFileTaskHandlerTest {
         taskExecution.put("fileType", "JSONL");
         taskExecution.put(
             "items",
-            JSONArrayUtil.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))
+            JSONArrayUtil.toList(Files.contentOf(getFile("sample_array.json"), Charset.defaultCharset()))
         );
         taskExecution.put("operation", "WRITE");
 
