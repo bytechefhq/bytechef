@@ -21,9 +21,8 @@ import com.bytechef.commons.util.MonoUtils;
 import com.bytechef.commons.util.DiscoveryUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -101,6 +100,7 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
     @Override
     public Authorization.AuthorizationType getAuthorizationType(
         String authorizationName, String componentName, int connectionVersion) {
+
         return MonoUtils.get(
             rSocketRequesterBuilder
                 .websocket(getWebsocketUri(componentName))
@@ -110,26 +110,26 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
                         "authorizationName", authorizationName,
                         "componentName", componentName,
                         "connectionVersion", connectionVersion))
-    @Override
-    public ConnectionDefinition getComponentConnectionDefinition(String componentName, int componentVersion) {
-        return MonoUtils.get(getComponentConnectionDefinitionMono(componentName, componentVersion));
+                .retrieveMono(Authorization.AuthorizationType.class));
     }
 
     @Override
-    public Mono<ConnectionDefinition> getComponentConnectionDefinitionMono(String componentName, int componentVersion) {
+    public Mono<ConnectionDefinitionDTO> getComponentConnectionDefinitionMono(
+        String componentName, int componentVersion) {
         return rSocketRequesterBuilder
             .websocket(DiscoveryUtils.toWebSocketUri(
                 DiscoveryUtils.filterServiceInstance(
                     discoveryClient.getInstances(WORKER_SERVICE_APP), componentName)))
             .route("ConnectionDefinitionService.getComponentConnectionDefinition")
             .data(Map.of("componentName", componentName, "componentVersion", componentVersion))
-            .retrieveMono(ConnectionDefinition.class)
+            .retrieveMono(ConnectionDefinitionDTO.class)
             .map(connectionDefinition -> connectionDefinition);
     }
 
     @Override
-    public Mono<List<ConnectionDefinition>> getComponentConnectionDefinitionsMono(
+    public Mono<List<ConnectionDefinitionDTO>> getComponentConnectionDefinitionsMono(
         String componentName, int componentVersion) {
+
         return Mono.zip(
             DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
                 .stream()
@@ -137,20 +137,22 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
                     .websocket(DiscoveryUtils.toWebSocketUri(serviceInstance))
                     .route("ConnectionDefinitionService.getComponentConnectionDefinitions")
                     .data(Map.of("componentName", componentName, "componentVersion", componentVersion))
-                    .retrieveMono(new ParameterizedTypeReference<List<ConnectionDefinition>>() {}))
+                    .retrieveMono(
+                        new ParameterizedTypeReference<List<ConnectionDefinitionDTO>>() {}))
                 .toList(),
             this::toConnectionDefinitions);
     }
 
     @Override
-    public Mono<List<ConnectionDefinition>> getConnectionDefinitionsMono() {
+    public Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono() {
         return Mono.zip(
             DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
                 .stream()
                 .map(serviceInstance -> rSocketRequesterBuilder
                     .websocket(DiscoveryUtils.toWebSocketUri(serviceInstance))
                     .route("ConnectionDefinitionService.getConnectionDefinitions")
-                    .retrieveMono(new ParameterizedTypeReference<List<ConnectionDefinition>>() {}))
+                    .retrieveMono(
+                        new ParameterizedTypeReference<List<ConnectionDefinitionDTO>>() {}))
                 .toList(),
             this::toConnectionDefinitions);
     }
@@ -181,9 +183,9 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
     }
 
     @SuppressWarnings("unchecked")
-    private List<ConnectionDefinition> toConnectionDefinitions(Object[] objectArray) {
+    private List<ConnectionDefinitionDTO> toConnectionDefinitions(Object[] objectArray) {
         return Arrays.stream(objectArray)
-            .map(object -> (List<ConnectionDefinition>) object)
+            .map(object -> (List<ConnectionDefinitionDTO>) object)
             .flatMap(Collection::stream)
             .toList();
     }

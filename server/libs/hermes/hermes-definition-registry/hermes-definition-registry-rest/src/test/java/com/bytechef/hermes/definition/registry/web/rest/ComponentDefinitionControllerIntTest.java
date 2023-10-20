@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.web.rest;
 
-import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
@@ -66,7 +66,8 @@ public class ComponentDefinitionControllerIntTest {
     @Test
     public void testGetComponentDefinitions() {
         Mockito.when(componentDefinitionFacade.getComponentDefinitions(null, null))
-            .thenReturn(Mono.just(List.of(ComponentDSL.component("component1"), ComponentDSL.component("component2"))));
+            .thenReturn(
+                Mono.just(List.of(new ComponentDefinitionDTO("component1"), new ComponentDefinitionDTO("component2"))));
 
         try {
             webTestClient

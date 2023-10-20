@@ -17,44 +17,26 @@
 
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionBasicModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionWithBasicActionsModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 public class ComponentDefinitionMapper {
 
     @Mapper(config = DefinitionMapperSpringConfig.class)
+    public interface ComponentDefinitionToComponentDefinitionModelMapper
+        extends Converter<ComponentDefinitionDTO, ComponentDefinitionModel> {
+
+        ComponentDefinitionModel convert(ComponentDefinitionDTO componentDefinition);
+    }
+
+    @Mapper(config = DefinitionMapperSpringConfig.class)
     public interface ComponentDefinitionToComponentDefinitionBasicModelMapper
-        extends Converter<ComponentDefinition, ComponentDefinitionBasicModel> {
+        extends Converter<ComponentDefinitionDTO, ComponentDefinitionBasicModel> {
 
-        ComponentDefinitionBasicModel convert(ComponentDefinition componentDefinition);
-    }
-
-    @Mapper(config = DefinitionMapperSpringConfig.class)
-    public interface ModifiableComponentDefinitionToComponentDefinitionBasicModelMapper
-        extends Converter<ModifiableComponentDefinition, ComponentDefinitionBasicModel> {
-
-        @Override
-        ComponentDefinitionBasicModel convert(ModifiableComponentDefinition componentDefinition);
-    }
-
-    @Mapper(config = DefinitionMapperSpringConfig.class)
-    public interface ComponentDefinitionToComponentDefinitionWithBasicActionsModelMapper
-        extends Converter<ComponentDefinition, ComponentDefinitionWithBasicActionsModel> {
-
-        @Override
-        ComponentDefinitionWithBasicActionsModel convert(ComponentDefinition componentDefinition);
-    }
-
-    @Mapper(config = DefinitionMapperSpringConfig.class)
-    public interface ModifiableComponentDefinitionToComponentDefinitionWithBasicActionsModelMapper
-        extends Converter<ModifiableComponentDefinition, ComponentDefinitionWithBasicActionsModel> {
-
-        @Override
-        ComponentDefinitionWithBasicActionsModel convert(ModifiableComponentDefinition componentDefinition);
+        ComponentDefinitionBasicModel convert(ComponentDefinitionDTO componentDefinition);
     }
 }

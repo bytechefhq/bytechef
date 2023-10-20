@@ -17,8 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
-import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableAuthorization;
+import com.bytechef.hermes.definition.registry.dto.AuthorizationDTO;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.web.rest.model.AuthorizationModel;
 import org.mapstruct.Mapper;
@@ -30,17 +29,9 @@ import org.springframework.core.convert.converter.Converter;
 public class AuthorizationMapper {
 
     @Mapper(config = DefinitionMapperSpringConfig.class)
-    public interface AuthorizationToAuthorizationModelMapper extends Converter<Authorization, AuthorizationModel> {
+    public interface AuthorizationToAuthorizationModelMapper extends Converter<AuthorizationDTO, AuthorizationModel> {
 
         @Override
-        AuthorizationModel convert(Authorization authorization);
-    }
-
-    @Mapper(config = DefinitionMapperSpringConfig.class)
-    public interface ModifiableAuthorizationToAuthorizationModelMapper
-        extends Converter<ModifiableAuthorization, AuthorizationModel> {
-
-        @Override
-        AuthorizationModel convert(ModifiableAuthorization authorization);
+        AuthorizationModel convert(AuthorizationDTO authorization);
     }
 }

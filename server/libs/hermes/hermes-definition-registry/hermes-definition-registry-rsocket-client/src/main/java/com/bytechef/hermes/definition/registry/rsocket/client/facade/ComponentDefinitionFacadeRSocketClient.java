@@ -18,7 +18,7 @@
 package com.bytechef.hermes.definition.registry.rsocket.client.facade;
 
 import com.bytechef.commons.util.DiscoveryUtils;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
@@ -46,7 +46,7 @@ public class ComponentDefinitionFacadeRSocketClient implements ComponentDefiniti
     }
 
     @Override
-    public Mono<List<ComponentDefinition>> getComponentDefinitions(
+    public Mono<List<ComponentDefinitionDTO>> getComponentDefinitions(
         Boolean connectionDefinitions, Boolean connectionInstances) {
 
         return Mono.zip(
@@ -61,15 +61,15 @@ public class ComponentDefinitionFacadeRSocketClient implements ComponentDefiniti
                             put("connectionInstances", connectionInstances);
                         }
                     })
-                    .retrieveMono(new ParameterizedTypeReference<List<ComponentDefinition>>() {}))
+                    .retrieveMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
                 .toList(),
             this::toComponentDefinitions);
     }
 
     @SuppressWarnings("unchecked")
-    private List<ComponentDefinition> toComponentDefinitions(Object[] objectArray) {
+    private List<ComponentDefinitionDTO> toComponentDefinitions(Object[] objectArray) {
         return Arrays.stream(objectArray)
-            .map(object -> (List<ComponentDefinition>) object)
+            .map(object -> (List<ComponentDefinitionDTO>) object)
             .flatMap(Collection::stream)
             .toList();
     }

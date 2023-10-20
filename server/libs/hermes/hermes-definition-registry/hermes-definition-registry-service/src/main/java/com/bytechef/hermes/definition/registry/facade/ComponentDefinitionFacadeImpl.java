@@ -17,9 +17,9 @@
 
 package com.bytechef.hermes.definition.registry.facade;
 
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import reactor.core.publisher.Mono;
@@ -44,7 +44,7 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
     }
 
     @Override
-    public Mono<List<ComponentDefinition>> getComponentDefinitions(
+    public Mono<List<ComponentDefinitionDTO>> getComponentDefinitions(
         Boolean connectionDefinitions, Boolean connectionInstances) {
 
         List<Connection> connections = connectionService.getConnections();
@@ -58,19 +58,19 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
                     if (connectionDefinitions != null && connectionDefinitions &&
                         connectionInstances != null && connectionInstances) {
 
-                        if (componentDefinition.getConnection() == null) {
+                        if (componentDefinition.connection() == null) {
                             return false;
                         } else {
                             return connections.stream()
                                 .anyMatch(connection -> Objects.equals(connection.getComponentName(),
-                                    componentDefinition.getName()));
+                                    componentDefinition.name()));
                         }
                     } else if (connectionDefinitions != null && connectionDefinitions) {
-                        return componentDefinition.getConnection() != null;
+                        return componentDefinition.connection() != null;
                     } else if (connectionInstances != null && connectionInstances) {
                         return connections.stream()
                             .anyMatch(connection -> Objects.equals(connection.getComponentName(),
-                                componentDefinition.getName()));
+                                componentDefinition.name()));
                     } else {
                         return false;
                     }

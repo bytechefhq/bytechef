@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.controller.service;
 
+import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
-import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
@@ -43,18 +43,18 @@ public class TaskDispatcherDefinitionServiceRSocketController {
     }
 
     @MessageMapping("TaskDispatcherDefinitionService.getTaskDispatcherDefinition")
-    public Mono<TaskDispatcherDefinition> getTaskDispatcherDefinitions(Map<String, Object> map) {
+    public Mono<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitions(Map<String, Object> map) {
         return taskDispatcherDefinitionService.getTaskDispatcherDefinitionMono(
             (String) map.get("name"), (Integer) map.get("version"));
     }
 
     @MessageMapping("TaskDispatcherDefinitionService.getTaskDispatcherDefinitions")
-    public Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitions() {
+    public Mono<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitions() {
         return taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono();
     }
 
     @MessageMapping("TaskDispatcherDefinitionService.getComponentDefinitionsForName")
-    public Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitions(String name) {
+    public Mono<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitions(String name) {
         return taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono(name);
     }
 }

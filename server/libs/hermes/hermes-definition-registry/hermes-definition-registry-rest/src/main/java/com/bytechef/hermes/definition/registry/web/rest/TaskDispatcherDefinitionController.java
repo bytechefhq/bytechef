@@ -19,6 +19,7 @@ package com.bytechef.hermes.definition.registry.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
+import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionModel;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.core.convert.ConversionService;
@@ -61,6 +62,7 @@ public class TaskDispatcherDefinitionController implements TaskDispatcherDefinit
     @Override
     public Mono<ResponseEntity<Flux<TaskDispatcherDefinitionModel>>> getTaskDispatcherDefinitions(
         @Parameter(hidden = true) ServerWebExchange exchange) {
+
         return Mono.just(
             taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono()
                 .mapNotNull(taskDispatcherDefinitions -> taskDispatcherDefinitions.stream()
@@ -72,14 +74,14 @@ public class TaskDispatcherDefinitionController implements TaskDispatcherDefinit
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<TaskDispatcherDefinitionModel>>> getTaskDispatcherDefinitionVersions(
+    public Mono<ResponseEntity<Flux<TaskDispatcherDefinitionBasicModel>>> getTaskDispatcherDefinitionVersions(
         String taskDispatcherName, ServerWebExchange exchange) {
 
         return Mono.just(
             taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono(taskDispatcherName)
                 .mapNotNull(taskDispatcherDefinitions -> taskDispatcherDefinitions.stream()
                     .map(taskDispatcherDefinition -> conversionService.convert(
-                        taskDispatcherDefinition, TaskDispatcherDefinitionModel.class))
+                        taskDispatcherDefinition, TaskDispatcherDefinitionBasicModel.class))
                     .toList())
                 .flatMapMany(Flux::fromIterable))
             .map(ResponseEntity::ok);

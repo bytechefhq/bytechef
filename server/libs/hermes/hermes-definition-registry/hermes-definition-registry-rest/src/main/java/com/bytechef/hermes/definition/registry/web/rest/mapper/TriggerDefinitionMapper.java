@@ -17,33 +17,22 @@
 
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
-import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
+import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionBasicModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.TriggerDefinitionModel;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-public class ConnectionDefinitionMapper {
+public class TriggerDefinitionMapper {
 
     @Mapper(config = DefinitionMapperSpringConfig.class)
-    public interface ConnectionDefinitionToConnectionDefinitionModelMapper
-        extends Converter<ConnectionDefinitionDTO, ConnectionDefinitionModel> {
+    public interface TriggerDefinitionToTriggerDefinitionModelMapper
+        extends Converter<TriggerDefinitionDTO, TriggerDefinitionModel> {
 
         @Override
-        @Mapping(target = "baseUri", ignore = true)
-        ConnectionDefinitionModel convert(ConnectionDefinitionDTO connectionDefinition);
-    }
-
-    @Mapper(config = DefinitionMapperSpringConfig.class)
-    public interface ConnectionDefinitionToConnectionDefinitionBasicModelMapper
-        extends Converter<ConnectionDefinitionDTO, ConnectionDefinitionBasicModel> {
-
-        @Override
-        ConnectionDefinitionBasicModel convert(ConnectionDefinitionDTO connectionDefinition);
+        TriggerDefinitionModel convert(TriggerDefinitionDTO triggerDefinition);
     }
 }

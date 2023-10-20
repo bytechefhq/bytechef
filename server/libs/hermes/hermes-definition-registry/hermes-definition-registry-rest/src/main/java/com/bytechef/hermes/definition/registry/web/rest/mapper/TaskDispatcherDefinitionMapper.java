@@ -17,10 +17,10 @@
 
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
+import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
+import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionModel;
-import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.ModifiableTaskDispatcherDefinition;
-import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -32,17 +32,17 @@ public class TaskDispatcherDefinitionMapper {
 
     @Mapper(config = DefinitionMapperSpringConfig.class)
     public interface TaskDispatcherDefinitionToTaskDispatcherDefinitionModelMapper
-        extends Converter<TaskDispatcherDefinition, TaskDispatcherDefinitionModel> {
+        extends Converter<TaskDispatcherDefinitionDTO, TaskDispatcherDefinitionModel> {
 
         @Override
-        TaskDispatcherDefinitionModel convert(TaskDispatcherDefinition taskDispatcherDefinition);
+        TaskDispatcherDefinitionModel convert(TaskDispatcherDefinitionDTO taskDispatcherDefinition);
     }
 
     @Mapper(config = DefinitionMapperSpringConfig.class)
     public interface ModifiableTaskDispatcherDefinitionToTaskDispatcherDefinitionModelMapper
-        extends Converter<ModifiableTaskDispatcherDefinition, TaskDispatcherDefinitionModel> {
+        extends Converter<TaskDispatcherDefinitionDTO, TaskDispatcherDefinitionBasicModel> {
 
         @Override
-        TaskDispatcherDefinitionModel convert(ModifiableTaskDispatcherDefinition taskDispatcherDefinition);
+        TaskDispatcherDefinitionBasicModel convert(TaskDispatcherDefinitionDTO taskDispatcherDefinition);
     }
 }

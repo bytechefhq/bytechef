@@ -22,12 +22,15 @@ import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionBasicModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionWithBasicActionsModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.TriggerDefinitionBasicModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.TriggerDefinitionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import org.springframework.core.convert.ConversionService;
@@ -51,27 +54,29 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
     private final ConversionService conversionService;
     private final ComponentDefinitionFacade componentDefinitionFacade;
     private final ComponentDefinitionService componentDefinitionService;
+    private final TriggerDefinitionService triggerDefinitionService;
 
     @SuppressFBWarnings("EI")
     public ComponentDefinitionController(
         ActionDefinitionService actionDefinitionService, ConnectionDefinitionService connectionDefinitionService,
         ConversionService conversionService, ComponentDefinitionFacade componentDefinitionFacade,
-        ComponentDefinitionService componentDefinitionService) {
+        ComponentDefinitionService componentDefinitionService, TriggerDefinitionService triggerDefinitionService) {
 
         this.actionDefinitionService = actionDefinitionService;
         this.connectionDefinitionService = connectionDefinitionService;
         this.componentDefinitionFacade = componentDefinitionFacade;
         this.conversionService = conversionService;
         this.componentDefinitionService = componentDefinitionService;
+        this.triggerDefinitionService = triggerDefinitionService;
     }
 
     @Override
-    public Mono<ResponseEntity<ComponentDefinitionWithBasicActionsModel>> getComponentDefinition(
+    public Mono<ResponseEntity<ComponentDefinitionModel>> getComponentDefinition(
         String componentName, Integer componentVersion, ServerWebExchange exchange) {
 
         return componentDefinitionService.getComponentDefinitionMono(componentName, componentVersion)
             .mapNotNull(componentDefinition -> conversionService.convert(
-                componentDefinition, ComponentDefinitionWithBasicActionsModel.class))
+                componentDefinition, ComponentDefinitionModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -89,12 +94,12 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         String componentName, Integer componentVersion, ServerWebExchange exchange) {
 
         return Mono.just(
-                connectionDefinitionService.getComponentConnectionDefinitionsMono(componentName, componentVersion)
-                    .mapNotNull(connectionDefinitions -> connectionDefinitions.stream()
-                        .map(connectionDefinition -> conversionService.convert(
-                            connectionDefinition, ActionDefinitionBasicModel.class))
-                        .toList())
-                    .flatMapMany(Flux::fromIterable))
+            actionDefinitionService.getComponentDefinitionActionsMono(componentName, componentVersion)
+                .mapNotNull(connectionDefinitions -> connectionDefinitions.stream()
+                    .map(actionDefinition -> conversionService.convert(
+                        actionDefinition, ActionDefinitionBasicModel.class))
+                    .toList())
+                .flatMapMany(Flux::fromIterable))
             .map(ResponseEntity::ok);
     }
 
@@ -145,6 +150,29 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
                 .mapNotNull(componentDefinitions -> componentDefinitions.stream()
                     .map(componentDefinition -> conversionService.convert(
                         componentDefinition, ComponentDefinitionBasicModel.class))
+                    .toList())
+                .flatMapMany(Flux::fromIterable))
+            .map(ResponseEntity::ok);
+    }
+
+    @Override
+    public Mono<ResponseEntity<TriggerDefinitionModel>> getComponentTriggerDefinition(
+        String componentName, Integer componentVersion, String triggerName, ServerWebExchange exchange) {
+
+        return triggerDefinitionService.getComponentDefinitionTriggerMono(componentName, componentVersion, triggerName)
+            .mapNotNull(triggerDefinition -> conversionService.convert(triggerDefinition, TriggerDefinitionModel.class))
+            .map(ResponseEntity::ok);
+    }
+
+    @Override
+    public Mono<ResponseEntity<Flux<TriggerDefinitionBasicModel>>> getComponentTriggerDefinitions(
+        String componentName, Integer componentVersion, ServerWebExchange exchange) {
+
+        return Mono.just(
+            triggerDefinitionService.getComponentDefinitionTriggersMono(componentName, componentVersion)
+                .mapNotNull(connectionDefinitions -> connectionDefinitions.stream()
+                    .map(triggerDefinition -> conversionService.convert(
+                        triggerDefinition, TriggerDefinitionBasicModel.class))
                     .toList())
                 .flatMapMany(Flux::fromIterable))
             .map(ResponseEntity::ok);

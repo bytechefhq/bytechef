@@ -17,6 +17,9 @@
 
 package com.bytechef.hermes.definition.registry.dto;
 
+import com.bytechef.hermes.definition.Display;
+import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
@@ -25,5 +28,11 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record OAuth2AuthorizationParametersDTO(String authorizationUrl, String clientId, List<String> scopes) {
+public record TaskDispatcherDefinitionDTO(
+    Display display, String name, List<Property<? extends Property<?>>> outputSchema, List<Property<?>> properties,
+    Resources resources, List<Property<?>> taskProperties, int version) {
+
+    public TaskDispatcherDefinitionDTO(String name) {
+        this(null, name, null, null, null, null, 0);
+    }
 }

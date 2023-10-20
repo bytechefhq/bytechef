@@ -18,8 +18,8 @@
 package com.bytechef.hermes.definition.registry.rsocket.controller.service;
 
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -89,19 +89,19 @@ public class ConnectionDefinitionServiceRSocketController {
     }
 
     @MessageMapping("ConnectionDefinitionService.getComponentConnectionDefinition")
-    public Mono<ConnectionDefinition> getComponentConnectionDefinition(Map<String, Object> map) {
+    public Mono<ConnectionDefinitionDTO> getComponentConnectionDefinition(Map<String, Object> map) {
         return connectionDefinitionService.getComponentConnectionDefinitionMono(
             (String) map.get("componentName"), (Integer) map.get("componentVersion"));
     }
 
     @MessageMapping("ConnectionDefinitionService.getComponentConnectionDefinitions")
-    public Mono<List<ConnectionDefinition>> getComponentConnectionDefinitions(Map<String, Object> map) {
+    public Mono<List<ConnectionDefinitionDTO>> getComponentConnectionDefinitions(Map<String, Object> map) {
         return connectionDefinitionService.getComponentConnectionDefinitionsMono(
             (String) map.get("componentName"), (Integer) map.get("componentVersion"));
     }
 
     @MessageMapping("ConnectionDefinitionService.getConnectionDefinitions")
-    public Mono<List<ConnectionDefinition>> getConnectionDefinitions() {
+    public Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitions() {
         return connectionDefinitionService.getConnectionDefinitionsMono();
     }
 

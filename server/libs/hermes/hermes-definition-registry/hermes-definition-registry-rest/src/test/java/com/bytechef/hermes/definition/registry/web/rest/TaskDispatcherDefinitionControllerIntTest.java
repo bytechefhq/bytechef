@@ -17,12 +17,12 @@
 
 package com.bytechef.hermes.definition.registry.web.rest;
 
+import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.web.rest.config.RegistryDefinitionRestTestConfiguration;
-import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -67,8 +67,8 @@ public class TaskDispatcherDefinitionControllerIntTest {
             .thenReturn(
                 Mono.just(
                     List.of(
-                        TaskDispatcherDSL.taskDispatcher("task-dispatcher1"),
-                        TaskDispatcherDSL.taskDispatcher("task-dispatcher2"))));
+                        new TaskDispatcherDefinitionDTO("task-dispatcher1"),
+                        new TaskDispatcherDefinitionDTO("task-dispatcher2"))));
 
         try {
             webTestClient
