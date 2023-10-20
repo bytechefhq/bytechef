@@ -1,13 +1,14 @@
 import {Component1Icon, Cross1Icon} from '@radix-ui/react-icons';
 import Input from 'components/Input/Input';
+import {ComponentDefinitionModel} from 'data-access/component-definition';
+import {TaskDispatcherDefinitionModel} from 'data-access/task-dispatcher-definition';
 import React, {memo, useEffect, useState} from 'react';
 import {Node, NodeProps} from 'reactflow';
-import {ComponentType, FlowControlType} from './LeftSidebar';
 
 const ContextualMenu = ({data}: NodeProps): JSX.Element => {
     const [filter, setFilter] = useState('');
     const [filteredNodes, setFilteredNodes] = useState<
-        Array<ComponentType | FlowControlType>
+        Array<ComponentDefinitionModel | TaskDispatcherDefinitionModel>
     >([]);
 
     const {components, flowControls, label, setNodes} = data;
@@ -48,7 +49,11 @@ const ContextualMenu = ({data}: NodeProps): JSX.Element => {
                 <ul>
                     {filteredNodes.length ? (
                         filteredNodes.map(
-                            (filteredItem: ComponentType | FlowControlType) => (
+                            (
+                                filteredItem:
+                                    | ComponentDefinitionModel
+                                    | TaskDispatcherDefinitionModel
+                            ) => (
                                 <li
                                     className="border-t border-t-slate-300 py-2 px-4"
                                     key={filteredItem.name}
@@ -56,7 +61,7 @@ const ContextualMenu = ({data}: NodeProps): JSX.Element => {
                                     <span className="flex items-center  text-sm">
                                         <Component1Icon className="mr-1" />
 
-                                        {filteredItem.display.label}
+                                        {filteredItem.display?.label}
                                     </span>
                                 </li>
                             )

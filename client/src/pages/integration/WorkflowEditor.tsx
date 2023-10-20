@@ -17,7 +17,8 @@ import 'reactflow/dist/base.css';
 import CustomNode from './CustomNode';
 import ButtonEdge from './ButtonEdge';
 import ContextualMenu from './ContextualMenu';
-import {ComponentType, FlowControlType} from './LeftSidebar';
+import {ComponentDefinitionModel} from 'data-access/component-definition';
+import {TaskDispatcherDefinitionModel} from 'data-access/task-dispatcher-definition';
 
 import './workflowEditor.css';
 
@@ -27,8 +28,8 @@ const getId = () => `dndnode_${id++}`;
 
 interface WorkflowEditorProps {
     data: {
-        components: Array<ComponentType>;
-        flowControls: Array<FlowControlType>;
+        components: Array<ComponentDefinitionModel>;
+        flowControls: Array<TaskDispatcherDefinitionModel>;
     };
 }
 
