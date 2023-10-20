@@ -104,6 +104,9 @@ components:
       description: TODO
       type: object
       properties:
+        authorizationName:
+          description: TODO
+          type: string
         componentName:
           description: TODO
           type: string
@@ -126,14 +129,6 @@ components:
           description: TODO
           type: string
           readOnly: true
-        label:
-          description: TODO
-          type: string
-        parameters:
-          description: TODO
-          type: object
-          additionalProperties:
-            type: object
         lastModifiedBy:
           description: TODO
           type: string
@@ -143,6 +138,11 @@ components:
           type: string
           format: date-time
           readOnly: true
+        parameters:
+          description: TODO
+          type: object
+          additionalProperties:
+            type: object
     ConnectionUpdate:
       type: object
       properties:

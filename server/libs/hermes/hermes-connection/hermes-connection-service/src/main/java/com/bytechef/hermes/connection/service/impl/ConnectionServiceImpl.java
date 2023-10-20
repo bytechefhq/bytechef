@@ -76,7 +76,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         return connectionRepository
                 .findById(id)
                 .map(connection -> {
-                    connection.setLabel(name);
+                    connection.setName(name);
 
                     return connectionRepository.save(connection);
                 })
