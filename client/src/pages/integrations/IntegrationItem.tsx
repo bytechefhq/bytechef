@@ -10,17 +10,18 @@ import {
 import {
     useDeleteIntegrationMutation,
     useCreateIntegrationMutation,
+    useUpdateIntegrationTagsMutation,
 } from '../../mutations/integrations.mutations';
 import {IntegrationKeys} from '../../queries/integrations';
 import {useQueryClient} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
 import {Link} from 'react-router-dom';
 import IntegrationModal from './IntegrationModal';
-import TagList from './components/TagList';
 import duplicate from './utils/duplicate';
 import Name from './components/Name';
 import AlertDialog from '../../components/AlertDialog/AlertDialog';
 import WorkflowModal from './WorkflowModal';
+import TagList from '../../components/TagList/TagList';
 
 interface IntegrationItemProps {
     integration: IntegrationModel;
@@ -92,6 +93,13 @@ const IntegrationItem = ({
         },
     });
 
+    const updateIntegrationTagsMutation = useUpdateIntegrationTagsMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries(IntegrationKeys.integrations);
+            queryClient.invalidateQueries(IntegrationKeys.integrationTags);
+        },
+    });
+
     return (
         <>
             <div className="flex items-center">
@@ -132,9 +140,12 @@ const IntegrationItem = ({
 
                                 {integration.tags && (
                                     <TagList
-                                        integrationId={integration.id!}
+                                        id={integration.id!}
                                         remainingTags={remainingTags}
                                         tags={integration.tags}
+                                        updateTagsMutation={
+                                            updateIntegrationTagsMutation
+                                        }
                                     />
                                 )}
                             </footer>

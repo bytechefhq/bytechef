@@ -6,9 +6,12 @@ import {ConnectionModel, TagModel} from '../../middleware/connection';
 import {useQueryClient} from '@tanstack/react-query';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {ConnectionKeys} from '../../queries/connections';
-import {useDeleteConnectionMutation} from '../../mutations/connections.mutations';
+import {
+    useDeleteConnectionMutation,
+    useUpdateConnectionTagsMutation,
+} from '../../mutations/connections.mutations';
 import {ComponentDefinitionKeys} from '../../queries/componentDefinitions';
-import TagList from './components/TagList';
+import TagList from '../../components/TagList/TagList';
 
 interface ConnectionItemProps {
     connection: ConnectionModel;
@@ -18,13 +21,20 @@ interface ConnectionItemProps {
 const ConnectionItem = ({connection, remainingTags}: ConnectionItemProps) => {
     const queryClient = useQueryClient();
 
-    const connectionDeleteMutation = useDeleteConnectionMutation({
+    const deleteConnectionMutation = useDeleteConnectionMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(
                 ComponentDefinitionKeys.componentDefinitions({
                     connectionInstances: true,
                 })
             );
+            queryClient.invalidateQueries(ConnectionKeys.connections);
+            queryClient.invalidateQueries(ConnectionKeys.connectionTags);
+        },
+    });
+
+    const updateConnectionTagsMutation = useUpdateConnectionTagsMutation({
+        onSuccess: () => {
             queryClient.invalidateQueries(ConnectionKeys.connections);
             queryClient.invalidateQueries(ConnectionKeys.connectionTags);
         },
@@ -42,7 +52,7 @@ const ConnectionItem = ({connection, remainingTags}: ConnectionItemProps) => {
             label: 'Delete',
             onClick: (id?: number) => {
                 if (id) {
-                    connectionDeleteMutation.mutate(id);
+                    deleteConnectionMutation.mutate(id);
                 }
             },
         },
@@ -65,9 +75,10 @@ const ConnectionItem = ({connection, remainingTags}: ConnectionItemProps) => {
                 >
                     {connection.tags && (
                         <TagList
-                            connectionId={connection.id!}
+                            id={connection.id!}
                             remainingTags={remainingTags}
                             tags={connection.tags}
+                            updateTagsMutation={updateConnectionTagsMutation}
                         />
                     )}
                 </div>
