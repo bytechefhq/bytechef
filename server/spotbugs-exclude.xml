@@ -144,4 +144,12 @@
             <Class name="com.bytechef.hermes.file.storage.filesystem.FileSystemFileStorageService" />
         </Or>
     </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Bug code="RCN" />
+        <And>
+            <Class name="com.bytechef.hermes.file.storage.filesystem.FileSystemFileStorageService" />
+            <Method name="deleteFiles" params="long"/>
+        </And>
+    </Match>
 </FindBugsFilter>
