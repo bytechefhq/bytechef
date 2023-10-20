@@ -30,12 +30,13 @@ import com.bytechef.dione.configuration.facade.IntegrationFacade;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.dione.configuration.web.rest.config.IntegrationRestTestConfiguration;
 import com.bytechef.dione.configuration.web.rest.mapper.IntegrationMapper;
+import com.bytechef.dione.configuration.web.rest.model.CategoryModel;
 import com.bytechef.dione.configuration.web.rest.model.CreateIntegrationWorkflowRequestModel;
 import com.bytechef.dione.configuration.web.rest.model.IntegrationModel;
+import com.bytechef.dione.configuration.web.rest.model.TagModel;
 import com.bytechef.dione.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.hermes.configuration.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
-import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import org.junit.jupiter.api.Assertions;
@@ -123,6 +124,50 @@ public class IntegrationControllerIntTest {
                 .isOk()
                 .expectBody(IntegrationModel.class)
                 .isEqualTo(integrationMapper.convert(integrationDTO));
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+    }
+
+    @Test
+    public void testGetIntegrationCategories() {
+        try {
+            when(integrationFacade.getIntegrationCategories()).thenReturn(List.of(new Category(1, "name")));
+
+            this.webTestClient
+                .get()
+                .uri("/embedded/integrations/categories")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(CategoryModel.class)
+                .hasSize(1);
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+    }
+
+    @Test
+    public void testGetIntegrationTags() {
+        when(integrationFacade.getIntegrationTags()).thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
+
+        try {
+            this.webTestClient
+                .get()
+                .uri("/embedded/integration-tags")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.[0].id")
+                .isEqualTo(1)
+                .jsonPath("$.[1].id")
+                .isEqualTo(2)
+                .jsonPath("$.[0].name")
+                .isEqualTo("tag1")
+                .jsonPath("$.[1].name")
+                .isEqualTo("tag2");
         } catch (Exception exception) {
             Assertions.fail(exception);
         }

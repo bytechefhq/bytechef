@@ -17,6 +17,7 @@
 
 package com.bytechef.helios.configuration.web.rest;
 
+import com.bytechef.helios.configuration.web.rest.model.TagModel;
 import com.bytechef.hermes.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.helios.configuration.web.rest.model.CreateProjectWorkflowRequestModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
@@ -24,7 +25,6 @@ import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.helios.configuration.dto.ProjectDTO;
 import com.bytechef.helios.configuration.facade.ProjectFacade;
 import com.bytechef.tag.domain.Tag;
-import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
