@@ -1,6 +1,9 @@
 dependencies {
-    implementation "org.springframework:spring-test"
-    implementation "org.springframework.boot:spring-boot-test"
+    api "org.springframework:spring-test"
+    api "org.springframework.boot:spring-boot-test"
+    api "org.springframework.data:spring-data-commons"
+    api "org.springframework.data:spring-data-jdbc"
+
     implementation libs.testcontainers
     implementation libs.testcontainers.postgresql
 
