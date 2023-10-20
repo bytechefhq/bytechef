@@ -21,7 +21,6 @@ import {
 } from './PropertyTypeModel';
 
 import {
-     AnyPropertyModelFromJSONTyped,
      ArrayPropertyModelFromJSONTyped,
      BooleanPropertyModelFromJSONTyped,
      DatePropertyModelFromJSONTyped,
@@ -121,9 +120,6 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         return json;
     }
     if (!ignoreDiscriminator) {
-        if (json['type'] === 'ANY') {
-            return AnyPropertyModelFromJSONTyped(json, true);
-        }
         if (json['type'] === 'ARRAY') {
             return ArrayPropertyModelFromJSONTyped(json, true);
         }

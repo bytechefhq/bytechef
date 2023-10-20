@@ -8,7 +8,6 @@ apis/index.ts
 index.ts
 models/ActionDefinitionBasicModel.ts
 models/ActionDefinitionModel.ts
-models/AnyPropertyModel.ts
 models/ArrayPropertyModel.ts
 models/AuthorizationModel.ts
 models/AuthorizationTypeModel.ts
@@ -39,6 +38,7 @@ models/ResourcesModel.ts
 models/StringPropertyModel.ts
 models/TaskDispatcherDefinitionBasicModel.ts
 models/TaskDispatcherDefinitionModel.ts
+models/TaskDispatcherOperationRequestModel.ts
 models/TimePropertyModel.ts
 models/TriggerDefinitionBasicModel.ts
 models/TriggerDefinitionModel.ts
