@@ -21,6 +21,7 @@ import static com.integri.atlas.engine.core.task.description.TaskParameterValue.
 import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.GROUP_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.JSON_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.NUMBER_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
@@ -31,6 +32,9 @@ import com.integri.atlas.engine.core.task.TaskDescriptor;
 import com.integri.atlas.engine.core.task.description.TaskDescription;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Ivica Cardic
+ */
 @Component
 public class SpreadsheetFileTaskDescriptor implements TaskDescriptor {
 
@@ -42,52 +46,51 @@ public class SpreadsheetFileTaskDescriptor implements TaskDescriptor {
                 .displayName("Operation")
                 .description("The operation to perform.")
                 .options(option("Read to file", "READ"), option("Write from file", "WRITE"))
-                .defaultValue("read")
+                .defaultValue("READ")
                 .required(true),
-            //
-            // read from file
-            //
-            STRING_PROPERTY("binaryPropertyName")
-                .displayName("Binary Property")
+            JSON_PROPERTY("binary")
+                .displayName("Binary")
+                .description("The Binary property which contains the spreadsheet data to read from.")
                 .displayOption(show("operation", "READ"))
-                .description("Name of the binary property from which to read the binary data of the spreadsheet file.")
-                .defaultValue("data"),
-            //
-            // write to file
-            //
+                .required(true),
+            JSON_PROPERTY("binary")
+                .displayName("Binary")
+                .description("The Binary property which contains JSON data.")
+                .displayOption(show("operation", parameterValues("WRITE"), "readFromBinary", parameterValues(true)))
+                .required(true),
             SELECT_PROPERTY("fileFormat")
                 .displayName("FileFormat")
                 .description("The format of the file to save the data.")
                 .displayOption(show("operation", "WRITE"))
                 .options(
                     option("CSV", "CSV", "Comma-separated value"),
-                    option("HTML", "HTML", "HTML Table"),
-                    option("ODS", "ODS", "OpenDocument Spreadsheet"),
-                    option("RTF", "RTF", "Rich Text Format"),
                     option("XLS", "XLS", "Microsoft Excel"),
                     option("XLSX", "XLSX", "Microsoft Excel")
                 )
                 .defaultValue("CSV"),
-            STRING_PROPERTY("binaryPropertyName")
-                .displayName("Binary Property")
+            JSON_PROPERTY("items")
+                .displayName("JSON array of items")
+                .description("Data to write to the file.")
+                .displayOption(show("operation", parameterValues("WRITE"), "readFromBinary", parameterValues(false)))
+                .required(true),
+            BOOLEAN_PROPERTY("readFromBinary")
+                .displayName("Read from Binary")
+                .description("Read data from the Binary property.")
                 .displayOption(show("operation", "WRITE"))
-                .description("Name of the binary property in which to save the binary data of the spreadsheet file.")
-                .defaultValue("data"),
+                .defaultValue(true),
             COLLECTION_PROPERTY("options")
                 .displayName("Options")
                 .placeholder("Add Option")
                 .options(
-                    BOOLEAN_PROPERTY("compression")
-                        .displayName("Compression")
-                        .description("Weather compression will be applied or not.")
-                        .displayOption(
-                            show("operation", parameterValues("WRITE"), "fileFormat", parameterValues("XLSX", "ODS"))
-                        )
-                        .defaultValue(false),
+                    STRING_PROPERTY("delimiter")
+                        .displayName("Delimiter")
+                        .description("Delimiter to use when reading a csv file.")
+                        .displayOption(show("operation", parameterValues("READ"), "fileFormat", parameterValues("CSV")))
+                        .defaultValue(","),
                     STRING_PROPERTY("fileName")
                         .displayName("File Name")
                         .description(
-                            "File name to set in binary data. By default will \"spreadsheet.<fileFormat>\" be used."
+                            "File name to set for binary data. By default, \"spreadsheet.<fileFormat>\" will be used."
                         )
                         .displayOption(show("operation", "WRITE"))
                         .defaultValue(""),
@@ -111,42 +114,27 @@ public class SpreadsheetFileTaskDescriptor implements TaskDescriptor {
                             NUMBER_PROPERTY("startRow").displayName("Start Row index"),
                             NUMBER_PROPERTY("endRow").displayName("End Row index")
                         ),
-                    BOOLEAN_PROPERTY("rawData")
-                        .displayName("RAW Data")
-                        .displayOption(show("operation", "READ"))
-                        .description("If the data should be returned RAW instead of parsed.")
-                        .defaultValue(false),
                     BOOLEAN_PROPERTY("readAsString")
                         .displayName("Read As String")
                         .description(
                             "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way."
                         )
-                        .displayOption(
-                            show(
-                                "operation",
-                                parameterValues("READ"),
-                                "fileFormat",
-                                parameterValues("ODS", "XLS", "XLSX")
-                            )
-                        )
+                        .displayOption(show("operation", "READ"))
                         .defaultValue(false),
                     STRING_PROPERTY("sheetName")
                         .displayName("Sheet Name")
                         .description(
-                            "The name of the sheet to read from in the spreadsheet (if supported). If not set, the first one gets chosen."
+                            "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen."
                         )
-                        .displayOption(show("operation", "READ"))
+                        .displayOption(
+                            show("operation", parameterValues("READ"), "fileFormat", parameterValues("XLS", "XLSX"))
+                        )
                         .defaultValue("Sheet"),
                     STRING_PROPERTY("sheetName")
                         .displayName("Sheet Name")
                         .description("The name of the sheet to create in the spreadsheet.")
                         .displayOption(
-                            show(
-                                "operation",
-                                parameterValues("WRITE"),
-                                "fileFormat",
-                                parameterValues("ODS", "XLS", "XLSX")
-                            )
+                            show("operation", parameterValues("WRITE"), "fileFormat", parameterValues("XLS", "XLSX"))
                         )
                         .defaultValue("Sheet")
                 )
