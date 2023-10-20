@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.http.request;
+package com.integri.atlas.task.handler.http.client;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class HttpRequestTaskDescriptorTest {
+public class HttpClientTaskDescriptorTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -36,9 +36,7 @@ public class HttpRequestTaskDescriptorTest {
     };
 
     @Test
-    public void testHttpRequestTaskDescription() throws JsonProcessingException {
-        System.out.println(objectMapper.writeValueAsString(HttpRequestTaskDescriptor.TASK_DESCRIPTION));
-
+    public void testHttpClientTaskDescription() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
             {
@@ -114,8 +112,8 @@ public class HttpRequestTaskDescriptorTest {
                     ]
                 },
                 "description":"Makes an HTTP request and returns the response data",
-                "displayName":"HTTP Request",
-                "name":"httpRequest"
+                "displayName":"HTTP Client",
+                "name":"httpClient"
                 ,"properties":[
                     {
                         "defaultValue":"GET",
@@ -452,7 +450,7 @@ public class HttpRequestTaskDescriptorTest {
                                 "requestMethod":["PATCH","POST","PUT"]
                             }
                         },
-                        "name":"bodyBinary ",
+                        "name":"bodyBinary",
                         "type":"JSON"
                     }
                 ],
@@ -460,7 +458,7 @@ public class HttpRequestTaskDescriptorTest {
             }
                 """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(HttpRequestTaskDescriptor.TASK_DESCRIPTION)
+                objectMapper.writeValueAsString(HttpClientTaskDescriptor.TASK_DESCRIPTION)
             ),
             true
         );

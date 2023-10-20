@@ -37,7 +37,7 @@ dependencies {
     implementation project(":modules:libs:atlas:atlas-task-dispatcher:atlas-task-dispatcher-switch")
     implementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-bento4")
     implementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-core")
-    implementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-http-request")
+    implementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-http-client")
     implementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-local-file")
     implementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-spreadsheet-file")
     implementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-io")

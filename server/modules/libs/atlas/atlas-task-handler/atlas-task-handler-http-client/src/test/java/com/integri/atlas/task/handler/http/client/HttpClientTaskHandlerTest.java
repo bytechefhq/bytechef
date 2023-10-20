@@ -14,19 +14,6 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.http.request;
+package com.integri.atlas.task.handler.http.client;
 
-import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import java.util.List;
-import java.util.Map;
-import org.springframework.stereotype.Component;
-
-@Component("httpRequest")
-public class HttpRequestTaskHandler implements TaskHandler<List<Map<String, Object>>> {
-
-    @Override
-    public List<Map<String, Object>> handle(TaskExecution aTask) throws Exception {
-        return null;
-    }
-}
+public class HttpClientTaskHandlerTest {}

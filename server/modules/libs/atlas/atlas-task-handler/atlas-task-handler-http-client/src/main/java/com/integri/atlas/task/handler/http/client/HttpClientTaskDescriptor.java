@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.http.request;
+package com.integri.atlas.task.handler.http.client;
 
 import static com.integri.atlas.engine.core.task.description.TaskAuthentication.authentication;
 import static com.integri.atlas.engine.core.task.description.TaskAuthentication.credential;
@@ -37,10 +37,10 @@ import com.integri.atlas.engine.core.task.description.TaskDescription;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HttpRequestTaskDescriptor implements TaskDescriptor {
+public class HttpClientTaskDescriptor implements TaskDescriptor {
 
-    public static final TaskDescription TASK_DESCRIPTION = task("httpRequest")
-        .displayName("HTTP Request")
+    public static final TaskDescription TASK_DESCRIPTION = task("httpClient")
+        .displayName("HTTP Client")
         .description("Makes an HTTP request and returns the response data")
         .authentication(
             authentication()
