@@ -214,7 +214,7 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
     public String toString() {
         return "ProjectTag{" + ", id='"
             + id + '\'' + ", workflowId='"
-            + workflowId + '\'' + ", inputParameters="
+            + workflowId + '\'' + ", inputs="
             + inputs + ", projectInstanceWorkflowConnections="
             + projectInstanceWorkflowConnections + ", lastExecutionDate="
             + lastExecutionDate + ", enabled="
