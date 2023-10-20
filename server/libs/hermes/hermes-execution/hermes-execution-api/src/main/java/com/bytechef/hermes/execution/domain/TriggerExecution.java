@@ -29,6 +29,7 @@ import com.bytechef.message.Prioritizable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -38,7 +39,6 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -304,7 +304,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     @Override
     @JsonIgnore
     public String getType() {
-        Assert.notNull(workflowTrigger.getType(), "Type must not be null");
+        Validate.notNull(workflowTrigger.getType(), "Type must not be null");
 
         return workflowTrigger.getType();
     }
@@ -488,7 +488,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         }
 
         public Builder workflowExecutionId(WorkflowExecutionId workflowExecutionId) {
-            Assert.notNull(workflowExecutionId, "'workflowExecutionId' must not be null");
+            Validate.notNull(workflowExecutionId, "'workflowExecutionId' must not be null");
 
             this.workflowExecutionId = workflowExecutionId;
 
@@ -496,7 +496,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         }
 
         public Builder workflowTrigger(WorkflowTrigger workflowTrigger) {
-            Assert.notNull(workflowTrigger, "'workflowTrigger' must not be null");
+            Validate.notNull(workflowTrigger, "'workflowTrigger' must not be null");
 
             this.workflowTrigger = workflowTrigger;
 

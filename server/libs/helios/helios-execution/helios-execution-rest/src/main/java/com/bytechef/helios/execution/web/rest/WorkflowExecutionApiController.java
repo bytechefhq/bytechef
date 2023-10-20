@@ -50,7 +50,6 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<WorkflowExecutionModel> getExecution(Long id) {
         return ResponseEntity.ok(
             conversionService.convert(workflowExecutionFacade.getWorkflowExecution(id),

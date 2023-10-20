@@ -24,11 +24,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Objects;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.apache.commons.lang3.Validate;
 import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 
@@ -59,7 +59,7 @@ public class JsonFileAssert {
     private static URI getUri(String path) throws URISyntaxException {
         ClassLoader classLoader = JsonFileAssert.class.getClassLoader();
 
-        URL url = Objects.requireNonNull(classLoader.getResource(path));
+        URL url = Validate.notNull(classLoader.getResource(path), "url");
 
         return url.toURI();
     }

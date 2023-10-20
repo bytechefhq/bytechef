@@ -54,7 +54,6 @@ public class ComponentDefinitionController implements ComponentDefinitionApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<ComponentDefinitionModel> getComponentDefinition(
         String componentName, Integer componentVersion) {
 

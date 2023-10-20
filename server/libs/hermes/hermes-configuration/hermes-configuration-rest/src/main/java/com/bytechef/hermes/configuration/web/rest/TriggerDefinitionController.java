@@ -26,7 +26,6 @@ import com.bytechef.hermes.configuration.web.rest.model.OptionModel;
 import com.bytechef.hermes.configuration.web.rest.model.PropertyModel;
 import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionModel;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,7 +56,6 @@ public class TriggerDefinitionController implements TriggerDefinitionApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<TriggerDefinitionModel> getComponentTriggerDefinition(
         String componentName, Integer componentVersion, String triggerName) {
 

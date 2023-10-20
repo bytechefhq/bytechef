@@ -26,9 +26,9 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 /**
  * @author Arik Cohen
@@ -66,13 +66,12 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
         taskExecution.setStatus(TaskExecution.Status.COMPLETED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        long subTasksLeft = counterService.decrement(Objects.requireNonNull(taskExecution.getParentId()));
+        long subTasksLeft = counterService.decrement(Validate.notNull(taskExecution.getParentId(), "parentId"));
 
         if (subTasksLeft == 0) {
             TaskExecution eachTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());

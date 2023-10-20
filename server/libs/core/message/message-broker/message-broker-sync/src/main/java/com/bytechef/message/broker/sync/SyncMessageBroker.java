@@ -24,7 +24,7 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.route.MessageRoute;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.util.Assert;
+import org.apache.commons.lang3.Validate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,13 +49,13 @@ public class SyncMessageBroker implements MessageBroker {
 
     @Override
     public void send(MessageRoute messageRoute, Object message) {
-        Assert.notNull(messageRoute, "'messageRoute' must not be null");
+        Validate.notNull(messageRoute, "'messageRoute' must not be null");
 
         List<Receiver> receivers = receiverMap.get(messageRoute);
 
-        Assert.isTrue(receivers != null && !receivers.isEmpty(), "no listeners subscribed for: " + messageRoute);
+        Validate.isTrue(receivers != null && !receivers.isEmpty(), "no listeners subscribed for: " + messageRoute);
 
-        for (Receiver receiver : receivers) {
+        for (Receiver receiver : Validate.notNull(receivers, "receivers")) {
             receiver.receive(
                 objectMapper.convertValue(
                     JsonUtils.read(JsonUtils.write(message, objectMapper), objectMapper), message.getClass()));

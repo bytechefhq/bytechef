@@ -23,13 +23,12 @@ import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnectio
 import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowConnectionRepository;
 import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -80,7 +79,7 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
 
     @Override
     public ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId) {
-        Assert.notNull(workflowId, "'workflowId' must not be null");
+        Validate.notNull(workflowId, "'workflowId' must not be null");
 
         return OptionalUtils.get(
             projectInstanceWorkflowRepository.findByProjectInstanceIdAndWorkflowId(projectInstanceId, workflowId));
@@ -93,7 +92,7 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
 
     @Override
     public List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(List<Long> projectInstanceIds) {
-        Assert.notNull(projectInstanceIds, "'projectInstanceIds' must not be null");
+        Validate.notNull(projectInstanceIds, "'projectInstanceIds' must not be null");
 
         return projectInstanceWorkflowRepository.findAllByProjectInstanceIdIn(projectInstanceIds);
     }
@@ -101,7 +100,7 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     @Override
     public ProjectInstanceWorkflow update(ProjectInstanceWorkflow projectInstanceWorkflow) {
         ProjectInstanceWorkflow curProjectInstanceWorkflow = OptionalUtils.get(
-            projectInstanceWorkflowRepository.findById(Objects.requireNonNull(projectInstanceWorkflow.getId())));
+            projectInstanceWorkflowRepository.findById(Validate.notNull(projectInstanceWorkflow.getId(), "id")));
 
         curProjectInstanceWorkflow.setConnections(projectInstanceWorkflow.getConnections());
         curProjectInstanceWorkflow.setEnabled(projectInstanceWorkflow.isEnabled());
@@ -112,9 +111,8 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public List<ProjectInstanceWorkflow> update(List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
-        Assert.notNull(projectInstanceWorkflows, "'projectInstanceWorkflows' must not be null");
+        Validate.notNull(projectInstanceWorkflows, "'projectInstanceWorkflows' must not be null");
 
         List<ProjectInstanceWorkflow> updatedProjectInstanceWorkflows = new ArrayList<>();
 

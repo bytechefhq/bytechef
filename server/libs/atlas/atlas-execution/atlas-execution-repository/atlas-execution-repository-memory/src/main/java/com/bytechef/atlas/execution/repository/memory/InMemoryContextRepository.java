@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Random;
 
 import com.bytechef.file.storage.domain.FileEntry;
-import org.springframework.util.Assert;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Arik Cohen
@@ -53,7 +53,7 @@ public class InMemoryContextRepository implements ContextRepository {
     public Context findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(long stackId, int classnameId) {
         Deque<FileEntry> linkedList = contexts.get(getKey(stackId, null, classnameId));
 
-        Assert.notNull(linkedList, "unknown stack: " + stackId);
+        Validate.notNull(linkedList, "unknown stack: %s", stackId);
 
         return new Context(linkedList.peek());
     }
@@ -63,7 +63,7 @@ public class InMemoryContextRepository implements ContextRepository {
         long stackId, int subStackId, int classnameId) {
         Deque<FileEntry> linkedList = contexts.get(getKey(stackId, subStackId, classnameId));
 
-        Assert.notNull(linkedList, "unknown stack: " + stackId);
+        Validate.notNull(linkedList, "unknown stack: " + stackId);
 
         return new Context(linkedList.peek());
     }

@@ -22,7 +22,7 @@ import com.bytechef.hermes.worker.trigger.message.route.WorkerMessageRoute;
 import com.bytechef.message.Prioritizable;
 import com.bytechef.message.event.MessageEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.util.Assert;
+import org.apache.commons.lang3.Validate;
 
 import java.time.LocalDateTime;
 
@@ -41,7 +41,7 @@ public class TriggerExecutionEvent implements Prioritizable, MessageEvent<Worker
     public TriggerExecutionEvent(TriggerExecution triggerExecution) {
         super();
 
-        Assert.notNull(triggerExecution, "'triggerExecution' must not be null");
+        Validate.notNull(triggerExecution, "'triggerExecution' must not be null");
 
         this.createdDate = LocalDateTime.now();
         this.triggerExecution = triggerExecution;

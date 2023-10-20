@@ -23,6 +23,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDef
 
 import com.bytechef.hermes.component.definition.ParameterMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
@@ -31,7 +32,6 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
@@ -86,7 +86,7 @@ public class AwsS3ListObjectsAction {
         public String getSuffix() {
             Path path = Paths.get(getKey());
 
-            Path fileName = Objects.requireNonNull(path.getFileName());
+            Path fileName = Validate.notNull(path.getFileName(), "fileName");
 
             return fileName.toString();
         }

@@ -15,15 +15,24 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.test.executor;
+package com.bytechef.commons.util;
 
-import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.hermes.execution.dto.JobDTO;
+import org.springframework.lang.Nullable;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * @author Ivica Cardic
  */
-public interface JobTestExecutor {
+public class StreamUtils {
 
-    JobDTO execute(JobParameters jobParameters);
+    public static byte[] copyToByteArray(@Nullable InputStream in) throws IOException {
+        return org.springframework.util.StreamUtils.copyToByteArray(in);
+    }
+
+    public static String copyToString(@Nullable InputStream in, Charset charset) throws IOException {
+        return org.springframework.util.StreamUtils.copyToString(in, charset);
+    }
 }

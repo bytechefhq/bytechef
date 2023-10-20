@@ -21,7 +21,7 @@ import com.bytechef.hermes.coordinator.message.route.CoordinatorMessageRoute;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.message.Prioritizable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.util.Assert;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic
@@ -37,7 +37,7 @@ public class TriggerExecutionCompleteEvent extends AbstractEvent implements Prio
     public TriggerExecutionCompleteEvent(TriggerExecution triggerExecution) {
         super(CoordinatorMessageRoute.TRIGGER_EXECUTION_COMPLETE_EVENTS);
 
-        Assert.notNull(triggerExecution, "'triggerExecution' must not be null");
+        Validate.notNull(triggerExecution, "'triggerExecution' must not be null");
 
         this.triggerExecution = triggerExecution;
     }

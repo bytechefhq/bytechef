@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.connection.service;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
@@ -24,11 +25,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ivica Cardic
@@ -46,10 +47,10 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public Connection create(Connection connection) {
-        Assert.notNull(connection, "'connection' must not be null");
-        Assert.hasText(connection.getComponentName(), "'componentName' must not be empty");
-        Assert.hasText(connection.getName(), "'name' must not be empty");
-        Assert.isNull(connection.getId(), "'id' must be null");
+        Validate.notNull(connection, "'connection' must not be null");
+        Validate.notBlank(connection.getComponentName(), "'componentName' must not be empty");
+        Validate.notBlank(connection.getName(), "'name' must not be empty");
+        Validate.isTrue(connection.getId() == null, "'id' must be null");
 
         return connectionRepository.save(connection);
     }
@@ -91,16 +92,16 @@ public class ConnectionServiceImpl implements ConnectionService {
     public List<Connection> getConnections(String componentName, Integer connectionVersion, Long tagId) {
         Iterable<Connection> connectionIterable;
 
-        if (!StringUtils.hasText(componentName) && tagId == null) {
+        if (StringUtils.isBlank(componentName) && tagId == null) {
             connectionIterable = connectionRepository.findAll(Sort.by("name"));
-        } else if (StringUtils.hasText(componentName) && tagId == null) {
+        } else if (StringUtils.isNotBlank(componentName) && tagId == null) {
             if (connectionVersion == null) {
                 connectionIterable = connectionRepository.findAllByComponentNameOrderByName(componentName);
             } else {
                 connectionIterable = connectionRepository.findAllByComponentNameAndConnectionVersionOrderByName(
                     componentName, connectionVersion);
             }
-        } else if (!StringUtils.hasText(componentName)) {
+        } else if (StringUtils.isBlank(componentName)) {
             connectionIterable = connectionRepository.findAllByTagId(tagId);
         } else {
             if (connectionVersion == null) {
@@ -111,7 +112,7 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         }
 
-        return com.bytechef.commons.util.CollectionUtils.toList(connectionIterable);
+        return CollectionUtils.toList(connectionIterable);
     }
 
     @Override
@@ -124,12 +125,11 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public Connection update(Connection connection) {
-        Assert.notNull(connection.getId(), "'id' must not be null");
-        Assert.hasText(connection.getName(), "'name' must not be empty");
+        Validate.notBlank(connection.getName(), "'name' must not be empty");
 
-        Connection curConnection = OptionalUtils.get(connectionRepository.findById(connection.getId()));
+        Connection curConnection = OptionalUtils.get(
+            connectionRepository.findById(Validate.notNull(connection.getId(), "id")));
 
         curConnection.setName(connection.getName());
         curConnection.setTagIds(connection.getTagIds());

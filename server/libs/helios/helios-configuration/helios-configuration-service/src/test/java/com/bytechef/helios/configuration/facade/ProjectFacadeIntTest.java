@@ -37,7 +37,7 @@ import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.tag.service.TagService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,7 +79,6 @@ public class ProjectFacadeIntTest {
     private WorkflowCrudRepository workflowRepository;
 
     @AfterEach
-    @SuppressFBWarnings("NP")
     public void afterEach() {
         projectRepository.deleteAll();
 
@@ -89,7 +87,6 @@ public class ProjectFacadeIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testAddWorkflow() {
         Project project = new Project();
 
@@ -98,7 +95,8 @@ public class ProjectFacadeIntTest {
 
         project = projectRepository.save(project);
 
-        Workflow workflow = projectFacade.addProjectWorkflow(project.getId(), "Workflow 1", "Description", null);
+        Workflow workflow = projectFacade.addProjectWorkflow(
+            Validate.notNull(project.getId(), "id"), "Workflow 1", "Description", null);
 
         assertThat(workflow.getDescription()).isEqualTo("Description");
         assertThat(workflow.getLabel()).isEqualTo("Workflow 1");
@@ -190,9 +188,9 @@ public class ProjectFacadeIntTest {
 
         project = projectRepository.save(project);
 
-        assertThat(projectFacade.getProject(project.getId()))
+        assertThat(projectFacade.getProject(Validate.notNull(project.getId(), "id")))
             .hasFieldOrPropertyWithValue("category", category)
-            .hasFieldOrPropertyWithValue("id", project.getId())
+            .hasFieldOrPropertyWithValue("id", Validate.notNull(project.getId(), "id"))
             .hasFieldOrPropertyWithValue("name", "name")
             .hasFieldOrPropertyWithValue("status", Project.Status.UNPUBLISHED)
             .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
@@ -221,14 +219,13 @@ public class ProjectFacadeIntTest {
 
         ProjectDTO projectDTO = projectsDTOs.get(0);
 
-        assertThat(projectFacade.getProject(project.getId()))
+        assertThat(projectFacade.getProject(Validate.notNull(project.getId(), "id")))
             .isEqualTo(projectDTO)
             .hasFieldOrPropertyWithValue("category", category)
             .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testGetProjectTags() {
         Project project = new Project();
 
@@ -251,7 +248,7 @@ public class ProjectFacadeIntTest {
         project.setName("name2");
         project.setStatus(Project.Status.UNPUBLISHED);
 
-        tag1 = OptionalUtils.get(tagRepository.findById(tag1.getId()));
+        tag1 = OptionalUtils.get(tagRepository.findById(Validate.notNull(tag1.getId(), "id")));
 
         project.setTags(List.of(tag1, tagRepository.save(new Tag("tag3"))));
 
@@ -262,7 +259,7 @@ public class ProjectFacadeIntTest {
             .map(Tag::getName)
             .collect(Collectors.toSet())).contains("tag1", "tag2", "tag3");
 
-        projectRepository.deleteById(project.getId());
+        projectRepository.deleteById(Validate.notNull(project.getId(), "id"));
 
         assertThat(projectFacade.getProjectTags()
             .stream()
@@ -271,7 +268,6 @@ public class ProjectFacadeIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testGetProjectWorkflows() {
         Workflow workflow = new Workflow("{\"tasks\":[]}", Workflow.Format.JSON);
 
@@ -283,11 +279,11 @@ public class ProjectFacadeIntTest {
 
         project.setName("name");
         project.setStatus(Project.Status.UNPUBLISHED);
-        project.setWorkflowIds(List.of(Objects.requireNonNull(workflow.getId())));
+        project.setWorkflowIds(List.of(Validate.notNull(workflow.getId(), "id")));
 
         project = projectRepository.save(project);
 
-        List<Workflow> workflows = projectFacade.getProjectWorkflows(project.getId());
+        List<Workflow> workflows = projectFacade.getProjectWorkflows(Validate.notNull(project.getId(), "id"));
 
         assertThat(
             workflows.stream()

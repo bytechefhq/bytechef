@@ -21,13 +21,13 @@ import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import org.apache.commons.lang3.Validate;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -84,8 +84,8 @@ public class FilesystemLsAction {
         private final long size;
 
         public FileInfo(Path root, Path path) {
-            Objects.requireNonNull(root, "Root path is required");
-            Objects.requireNonNull(path, "File path is required");
+            Validate.notNull(root, "Root path is required");
+            Validate.notNull(path, "File path is required");
 
             this.root = root;
             this.path = path;

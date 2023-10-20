@@ -79,13 +79,11 @@ public class WorkflowApiController implements WorkflowApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<WorkflowModel> getWorkflow(String id) {
         return ResponseEntity.ok(conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class));
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<List<WorkflowModel>> getWorkflows() {
         List<WorkflowModel> workflowModels = new ArrayList<>();
 
@@ -97,7 +95,6 @@ public class WorkflowApiController implements WorkflowApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowModel workflowModel) {
         return ResponseEntity.ok(
             conversionService.convert(workflowService.update(id, workflowModel.getDefinition()), WorkflowModel.class));

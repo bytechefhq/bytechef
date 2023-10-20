@@ -26,6 +26,7 @@ import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
@@ -35,7 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -62,7 +62,6 @@ public class DemoProjectConfiguration implements InitializingBean {
 
     @Override
     @Transactional
-    @SuppressFBWarnings("NP")
     public void afterPropertiesSet() throws Exception {
         if (projectService.countProjects() == 0) {
             Project project = projectService.create(
@@ -81,7 +80,7 @@ public class DemoProjectConfiguration implements InitializingBean {
                     resource.getContentAsString(StandardCharsets.UTF_8), Workflow.Format.YAML, SourceType.JDBC,
                     ProjectConstants.PROJECT_TYPE);
 
-                projectService.addWorkflow(Objects.requireNonNull(project.getId()), workflow.getId());
+                projectService.addWorkflow(Validate.notNull(project.getId(), "id"), workflow.getId());
             }
         }
     }

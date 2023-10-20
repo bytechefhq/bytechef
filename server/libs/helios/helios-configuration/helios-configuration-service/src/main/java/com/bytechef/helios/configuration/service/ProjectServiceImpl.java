@@ -24,11 +24,10 @@ import com.bytechef.helios.configuration.repository.ProjectRepository;
 import java.util.List;
 import java.util.Optional;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -45,7 +44,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project addWorkflow(long id, String workflowId) {
-        Assert.notNull(workflowId, "'workflowId' must not be null");
+        Validate.notNull(workflowId, "'workflowId' must not be null");
 
         Project project = getProject(id);
 
@@ -61,10 +60,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project create(Project project) {
-        Assert.notNull(project, "'project' must not be null");
-
-        Assert.isNull(project.getId(), "'id' must be null");
-        Assert.notNull(project.getName(), "'name' must not be null");
+        Validate.notNull(project, "'project' must not be null");
+        Validate.isTrue(project.getId() == null, "'id' must be null");
+        Validate.notNull(project.getName(), "'name' must not be null");
 
         project.setProjectVersion(1);
         project.setStatus(Project.Status.UNPUBLISHED);
@@ -157,18 +155,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public Project update(Project project) {
-        Assert.notNull(project, "'project' must not be null");
+        Validate.notNull(project, "'project' must not be null");
 
-        Assert.notNull(project.getId(), "'id' must not be null");
-        Assert.notNull(project.getName(), "'name' must not be null");
-
-        Project curProject = getProject(project.getId());
+        Project curProject = getProject(Validate.notNull(project.getId(), "id"));
 
         curProject.setCategoryId(project.getCategoryId());
         curProject.setDescription(project.getDescription());
-        curProject.setName(project.getName());
+        curProject.setName(Validate.notNull(project.getName(), "name"));
         curProject.setTagIds(project.getTagIds());
         curProject.setWorkflowIds(project.getWorkflowIds());
 

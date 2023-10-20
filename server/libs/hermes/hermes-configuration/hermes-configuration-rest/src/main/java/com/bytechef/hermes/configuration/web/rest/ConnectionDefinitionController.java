@@ -20,7 +20,6 @@ package com.bytechef.hermes.configuration.web.rest;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionModel;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,7 +47,6 @@ public class ConnectionDefinitionController implements ConnectionDefinitionApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<ConnectionDefinitionModel> getComponentConnectionDefinition(
         String componentName, Integer componentVersion) {
 

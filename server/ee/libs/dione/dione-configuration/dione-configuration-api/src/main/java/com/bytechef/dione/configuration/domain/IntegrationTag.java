@@ -18,7 +18,6 @@
 package com.bytechef.dione.configuration.domain;
 
 import com.bytechef.tag.domain.Tag;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
@@ -42,7 +41,6 @@ public final class IntegrationTag implements Persistable<Long> {
     public IntegrationTag() {
     }
 
-    @SuppressFBWarnings("NP")
     public IntegrationTag(Long tagId) {
         this.tagId = tagId == null ? null : AggregateReference.to(tagId);
     }

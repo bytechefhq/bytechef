@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.apache.commons.lang3.Validate;
 
 import java.util.List;
 
@@ -63,16 +64,16 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<ConnectionModel> getConnection(Long id) {
         return ResponseEntity.ok(
-            conversionService.convert(
-                connectionFacade.getConnection(id), ConnectionModel.class)
+            Validate.notNull(
+                conversionService.convert(
+                    connectionFacade.getConnection(Validate.notNull(id, "id")), ConnectionModel.class),
+                "connection")
                 .parameters(null));
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<List<ConnectionModel>> getConnections(
         String componentName, Integer connectionVersion, Long tagId) {
 

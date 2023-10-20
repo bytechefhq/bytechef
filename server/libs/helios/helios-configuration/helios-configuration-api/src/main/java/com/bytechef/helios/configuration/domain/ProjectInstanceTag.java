@@ -18,7 +18,6 @@
 package com.bytechef.helios.configuration.domain;
 
 import com.bytechef.tag.domain.Tag;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
@@ -42,7 +41,6 @@ public final class ProjectInstanceTag implements Persistable<Long> {
     public ProjectInstanceTag() {
     }
 
-    @SuppressFBWarnings("NP")
     public ProjectInstanceTag(Long tagId) {
         this.tagId = tagId == null ? null : AggregateReference.to(tagId);
     }

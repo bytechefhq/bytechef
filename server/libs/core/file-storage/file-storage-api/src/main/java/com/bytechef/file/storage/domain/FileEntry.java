@@ -19,9 +19,8 @@ package com.bytechef.file.storage.domain;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.util.Assert;
 
 import java.util.Map;
 import java.util.Objects;
@@ -42,10 +41,9 @@ public class FileEntry {
     protected FileEntry() {
     }
 
-    @SuppressFBWarnings("NP")
     public FileEntry(String filename, String url) {
-        Assert.notNull(filename, "'filename' must not be null");
-        Assert.notNull(url, "'url' must not be null");
+        Validate.notNull(filename, "'filename' must not be null");
+        Validate.notNull(url, "'url' must not be null");
 
         this.name = filename.substring(indexOfLastSeparator(filename) + 1);
 

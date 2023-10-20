@@ -31,13 +31,13 @@ import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -80,29 +80,29 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
         taskExecution.setStatus(TaskExecution.Status.COMPLETED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
         TaskExecution sequenceTaskExecution = taskExecutionService.getTaskExecution(
-            Objects.requireNonNull(taskExecution.getParentId()));
+            Validate.notNull(taskExecution.getParentId(), "parentId"));
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             Map<String, Object> newContext = new HashMap<>(
                 workflowFileStorageFacade.readContextValue(
                     contextService.peek(
-                        Objects.requireNonNull(sequenceTaskExecution.getId()), Context.Classname.TASK_EXECUTION)));
+                        Validate.notNull(sequenceTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)));
 
             newContext.put(
                 taskExecution.getName(),
                 workflowFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()));
 
             contextService.push(
-                sequenceTaskExecution.getId(), Context.Classname.TASK_EXECUTION,
+                Validate.notNull(sequenceTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
                 workflowFileStorageFacade.storeContextValue(
-                    sequenceTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext));
+                    Validate.notNull(sequenceTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
+                    newContext));
         }
 
         List<WorkflowTask> subWorkflowTasks = MapUtils.getList(
@@ -121,16 +121,16 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
 
             Map<String, ?> context = workflowFileStorageFacade.readContextValue(
                 contextService.peek(
-                    Objects.requireNonNull(sequenceTaskExecution.getId()), Context.Classname.TASK_EXECUTION));
+                    Validate.notNull(sequenceTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
 
             subTaskExecution.evaluate(context);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 
             contextService.push(
-                Objects.requireNonNull(subTaskExecution.getId()), Context.Classname.TASK_EXECUTION,
+                Validate.notNull(subTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
                 workflowFileStorageFacade.storeContextValue(
-                    subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context));
+                    Validate.notNull(subTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION, context));
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {

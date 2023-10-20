@@ -38,7 +38,7 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.util.CollectionUtils;
+import com.bytechef.commons.util.CollectionUtils;
 
 /**
  * @author Ivica Cardic
@@ -232,7 +232,7 @@ public final class Connection implements Persistable<Long> {
     }
 
     public void setParameters(Map<String, ?> parameters) {
-        if (!CollectionUtils.isEmpty(parameters)) {
+        if (!MapUtils.isEmpty(parameters)) {
             this.parameters = new EncryptedMapWrapper(parameters);
         }
     }
@@ -249,7 +249,7 @@ public final class Connection implements Persistable<Long> {
 
     public void setTags(List<Tag> tags) {
         if (!CollectionUtils.isEmpty(tags)) {
-            setTagIds(com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId));
+            setTagIds(CollectionUtils.map(tags, Tag::getId));
         }
     }
 

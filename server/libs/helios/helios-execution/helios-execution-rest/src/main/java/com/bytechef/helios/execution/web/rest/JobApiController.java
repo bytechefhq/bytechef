@@ -64,7 +64,6 @@ public class JobApiController implements JobApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<JobModel> getJob(Long id) {
         return ResponseEntity.ok(conversionService.convert(jobService.getJob(id), JobModel.class));
     }
@@ -78,7 +77,6 @@ public class JobApiController implements JobApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<JobModel> getLatestJob() {
         return ResponseEntity.ok(
             conversionService.convert(OptionalUtils.orElse(jobService.fetchLatestJob(), null), JobModel.class));

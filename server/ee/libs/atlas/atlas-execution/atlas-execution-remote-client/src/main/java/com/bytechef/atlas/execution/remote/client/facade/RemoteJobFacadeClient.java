@@ -37,7 +37,6 @@ public class RemoteJobFacadeClient implements JobFacade {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public long createJob(JobParameters jobParameters) {
         return loadBalancedWebClient.post(
             uriBuilder -> uriBuilder

@@ -25,10 +25,10 @@ import com.bytechef.helios.configuration.repository.ProjectRepository;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,13 +60,11 @@ public class ProjectServiceIntTest {
     private TagRepository tagRepository;
 
     @BeforeEach
-    @SuppressFBWarnings("NP")
     public void beforeEach() {
         category = categoryRepository.save(new Category("name"));
     }
 
     @AfterEach
-    @SuppressFBWarnings("NP")
     public void afterEach() {
         projectRepository.deleteAll();
 
@@ -75,11 +73,10 @@ public class ProjectServiceIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testAddWorkflow() {
         Project project = projectRepository.save(getProject());
 
-        project = projectService.addWorkflow(project.getId(), "workflow2");
+        project = projectService.addWorkflow(Validate.notNull(project.getId(), "id"), "workflow2");
 
         assertThat(project.getWorkflowIds()).contains("workflow2");
     }
@@ -98,30 +95,27 @@ public class ProjectServiceIntTest {
             .hasFieldOrPropertyWithValue("categoryId", category.getId())
             .hasFieldOrPropertyWithValue("description", "description")
             .hasFieldOrPropertyWithValue("name", "name")
-            .hasFieldOrPropertyWithValue("tagIds", List.of(tag.getId()))
+            .hasFieldOrPropertyWithValue("tagIds", List.of(Validate.notNull(tag.getId(), "id")))
             .hasFieldOrPropertyWithValue("workflowIds", List.of("workflow1"));
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testDelete() {
         Project project = projectRepository.save(getProject());
 
-        projectService.delete(project.getId());
+        projectService.delete(Validate.notNull(project.getId(), "id"));
 
         assertThat(projectRepository.findById(project.getId())).isNotPresent();
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testGetProject() {
         Project project = projectRepository.save(getProject());
 
-        assertThat(project).isEqualTo(projectService.getProject(project.getId()));
+        assertThat(project).isEqualTo(projectService.getProject(Validate.notNull(project.getId(), "id")));
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testGetProjects() {
         Project project = projectRepository.save(getProject());
 
@@ -153,7 +147,6 @@ public class ProjectServiceIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testUpdate() {
         Project project = projectRepository.save(getProject());
 

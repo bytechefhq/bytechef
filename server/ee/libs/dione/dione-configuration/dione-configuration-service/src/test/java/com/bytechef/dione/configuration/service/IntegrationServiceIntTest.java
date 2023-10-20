@@ -25,10 +25,10 @@ import com.bytechef.dione.configuration.repository.IntegrationRepository;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +60,6 @@ public class IntegrationServiceIntTest {
     private TagRepository tagRepository;
 
     @BeforeEach
-    @SuppressFBWarnings("NP")
     public void beforeEach() {
         categoryRepository.deleteAll();
 
@@ -68,18 +67,16 @@ public class IntegrationServiceIntTest {
     }
 
     @AfterEach
-    @SuppressFBWarnings("NP")
     public void afterEach() {
         integrationRepository.deleteAll();
         tagRepository.deleteAll();
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testAddWorkflow() {
         Integration integration = integrationRepository.save(getIntegration());
 
-        integration = integrationService.addWorkflow(integration.getId(), "workflow2");
+        integration = integrationService.addWorkflow(Validate.notNull(integration.getId(), "id"), "workflow2");
 
         assertThat(integration.getWorkflowIds()).contains("workflow2");
     }
@@ -98,30 +95,28 @@ public class IntegrationServiceIntTest {
             .hasFieldOrPropertyWithValue("categoryId", category.getId())
             .hasFieldOrPropertyWithValue("description", "description")
             .hasFieldOrPropertyWithValue("name", "name")
-            .hasFieldOrPropertyWithValue("tagIds", List.of(tag.getId()))
+            .hasFieldOrPropertyWithValue("tagIds", List.of(Validate.notNull(tag.getId(), "id")))
             .hasFieldOrPropertyWithValue("workflowIds", List.of("workflow1"));
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testDelete() {
         Integration integration = integrationRepository.save(getIntegration());
 
-        integrationService.delete(integration.getId());
+        integrationService.delete(Validate.notNull(integration.getId(), "id"));
 
         assertThat(integrationRepository.findById(integration.getId())).isNotPresent();
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testGetIntegration() {
         Integration integration = integrationRepository.save(getIntegration());
 
-        assertThat(integration).isEqualTo(integrationService.getIntegration(integration.getId()));
+        assertThat(integration).isEqualTo(
+            integrationService.getIntegration(Validate.notNull(integration.getId(), "id")));
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testGetIntegrations() {
         Integration integration = integrationRepository.save(getIntegration());
 
@@ -153,7 +148,6 @@ public class IntegrationServiceIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testUpdate() {
         Integration integration = integrationRepository.save(getIntegration());
 
@@ -169,7 +163,7 @@ public class IntegrationServiceIntTest {
         integration.setCategory(category2);
         integration.setDescription("description2");
         integration.setName("name2");
-        integration.setTagIds(List.of(tag.getId()));
+        integration.setTagIds(List.of(Validate.notNull(tag.getId(), "id")));
         integration.setWorkflowIds(List.of("workflow2"));
 
         integration = integrationService.update(integration);

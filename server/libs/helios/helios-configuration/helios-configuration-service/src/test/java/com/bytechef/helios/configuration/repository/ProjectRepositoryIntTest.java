@@ -21,10 +21,10 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,43 +49,42 @@ public class ProjectRepositoryIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testCreate() {
         Project project = projectRepository.save(getProject(Collections.emptyList()));
 
-        assertThat(project).isEqualTo(OptionalUtils.get(projectRepository.findById(project.getId())));
+        assertThat(project).isEqualTo(
+            OptionalUtils.get(projectRepository.findById(Validate.notNull(project.getId(), "id"))));
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testDelete() {
         Project project = projectRepository.save(getProject(Collections.emptyList()));
 
-        Project resultProject = OptionalUtils.get(projectRepository.findById(project.getId()));
+        Project resultProject = OptionalUtils.get(
+            projectRepository.findById(Validate.notNull(project.getId(), "id")));
 
         assertThat(resultProject).isEqualTo(project);
 
-        projectRepository.deleteById(resultProject.getId());
+        projectRepository.deleteById(Validate.notNull(resultProject.getId(), "id"));
 
         assertThat(projectRepository.findById(project.getId())).isEmpty();
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testFindById() {
         Project project = projectRepository.save(getProject(Collections.emptyList()));
 
-        Project resultProject = OptionalUtils.get(projectRepository.findById(project.getId()));
+        Project resultProject = OptionalUtils.get(projectRepository.findById(Validate.notNull(project.getId(), "id")));
 
         assertThat(resultProject).isEqualTo(project);
 
-        projectRepository.deleteById(project.getId());
+        projectRepository.deleteById(Validate.notNull(project.getId(), "id"));
 
         project = getProject(List.of("workflowId"));
 
         project = projectRepository.save(project);
 
-        resultProject = OptionalUtils.get(projectRepository.findById(project.getId()));
+        resultProject = OptionalUtils.get(projectRepository.findById(Validate.notNull(project.getId(), "id")));
 
         assertThat(resultProject.getWorkflowIds()).isEqualTo(project.getWorkflowIds());
 
@@ -93,13 +92,12 @@ public class ProjectRepositoryIntTest {
 
         projectRepository.save(resultProject);
 
-        resultProject = OptionalUtils.get(projectRepository.findById(project.getId()));
+        resultProject = OptionalUtils.get(projectRepository.findById(Validate.notNull(project.getId(), "id")));
 
         assertThat(resultProject.getWorkflowIds()).isEmpty();
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testUpdate() {
         Project project = projectRepository.save(getProject(List.of("workflow1")));
 
@@ -108,7 +106,7 @@ public class ProjectRepositoryIntTest {
 
         projectRepository.save(project);
 
-        assertThat(projectRepository.findById(project.getId())).hasValue(project);
+        assertThat(projectRepository.findById(Validate.notNull(project.getId(), "id"))).hasValue(project);
     }
 
     private static Project getProject(List<String> workflowIds) {

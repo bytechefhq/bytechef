@@ -32,6 +32,7 @@ import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,7 +83,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ProjectDTO createProject(ProjectDTO projectDTO) {
         Project project = projectDTO.toProject();
 
@@ -94,11 +94,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
             project.setCategory(category);
         }
 
-        if (org.springframework.util.CollectionUtils.isEmpty(projectDTO.workflowIds())) {
+        if (CollectionUtils.isEmpty(projectDTO.workflowIds())) {
             Workflow workflow = workflowService.create(
                 null, Format.JSON, SourceType.JDBC, ProjectConstants.PROJECT_TYPE);
 
-            project.setWorkflowIds(List.of(Objects.requireNonNull(workflow.getId())));
+            project.setWorkflowIds(List.of(Validate.notNull(workflow.getId(), "id")));
         }
 
         List<Tag> tags = checkTags(projectDTO.tags());
@@ -257,9 +257,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     private List<Tag> checkTags(List<Tag> tags) {
-        return org.springframework.util.CollectionUtils.isEmpty(tags)
-            ? Collections.emptyList()
-            : tagService.save(tags);
+        return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
     }
 
     private List<String> copyWorkflowIds(List<String> workflowIds) {

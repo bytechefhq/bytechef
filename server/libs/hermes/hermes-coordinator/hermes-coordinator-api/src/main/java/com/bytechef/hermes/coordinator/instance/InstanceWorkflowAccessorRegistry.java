@@ -17,11 +17,11 @@
 
 package com.bytechef.hermes.coordinator.instance;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +41,6 @@ public class InstanceWorkflowAccessorRegistry {
     }
 
     public InstanceWorkflowAccessor getInstanceWorkflowAccessor(int type) {
-        return Objects.requireNonNull(instanceAccessorMap.get(type));
+        return Validate.notNull(instanceAccessorMap.get(type), "instanceWorkflowAccessor");
     }
 }

@@ -30,7 +30,7 @@ import com.bytechef.dione.configuration.repository.IntegrationRepository;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +67,6 @@ public class IntegrationFacadeIntTest {
     private WorkflowCrudRepository workflowRepository;
 
     @AfterEach
-    @SuppressFBWarnings("NP")
     public void afterEach() {
         integrationRepository.deleteAll();
 
@@ -76,7 +75,6 @@ public class IntegrationFacadeIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testAddWorkflow() {
         Integration integration = new Integration();
 
@@ -85,7 +83,8 @@ public class IntegrationFacadeIntTest {
 
         integration = integrationRepository.save(integration);
 
-        Workflow workflow = integrationFacade.addWorkflow(integration.getId(), "Workflow 1", "Description", null);
+        Workflow workflow = integrationFacade.addWorkflow(
+            Validate.notNull(integration.getId(), "id"), "Workflow 1", "Description", null);
 
         assertThat(workflow.getDescription()).isEqualTo("Description");
         assertThat(workflow.getLabel()).isEqualTo("Workflow 1");
@@ -177,7 +176,7 @@ public class IntegrationFacadeIntTest {
 
         integration = integrationRepository.save(integration);
 
-        assertThat(integrationFacade.getIntegration(integration.getId()))
+        assertThat(integrationFacade.getIntegration(Validate.notNull(integration.getId(), "id")))
             .hasFieldOrPropertyWithValue("category", category)
             .hasFieldOrPropertyWithValue("id", integration.getId())
             .hasFieldOrPropertyWithValue("name", "name")
@@ -215,7 +214,6 @@ public class IntegrationFacadeIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testGetIntegrationTags() {
         Integration integration = new Integration();
 
@@ -238,7 +236,7 @@ public class IntegrationFacadeIntTest {
         integration.setName("name2");
         integration.setStatus(Integration.Status.UNPUBLISHED);
 
-        tag1 = OptionalUtils.get(tagRepository.findById(tag1.getId()));
+        tag1 = OptionalUtils.get(tagRepository.findById(Validate.notNull(tag1.getId(), "id")));
 
         integration.setTags(List.of(tag1, tagRepository.save(new Tag("tag3"))));
 
@@ -249,7 +247,7 @@ public class IntegrationFacadeIntTest {
             .map(Tag::getName)
             .collect(Collectors.toSet())).contains("tag1", "tag2", "tag3");
 
-        integrationRepository.deleteById(integration.getId());
+        integrationRepository.deleteById(Validate.notNull(integration.getId(), "id"));
 
         assertThat(integrationFacade.getIntegrationTags()
             .stream()
@@ -258,7 +256,6 @@ public class IntegrationFacadeIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testGetIntegrationWorkflows() {
         Workflow workflow = new Workflow("{\"tasks\":[]}", Workflow.Format.JSON);
 
@@ -270,11 +267,12 @@ public class IntegrationFacadeIntTest {
 
         integration.setName("name");
         integration.setStatus(Integration.Status.UNPUBLISHED);
-        integration.setWorkflowIds(List.of(workflow.getId()));
+        integration.setWorkflowIds(List.of(Validate.notNull(workflow.getId(), "id")));
 
         integration = integrationRepository.save(integration);
 
-        List<Workflow> workflows = integrationFacade.getIntegrationWorkflows(integration.getId());
+        List<Workflow> workflows = integrationFacade.getIntegrationWorkflows(
+            Validate.notNull(integration.getId(), "id"));
 
         assertThat(
             workflows.stream()

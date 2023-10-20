@@ -34,6 +34,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.task.dispatcher.condition.util.ConditionTaskUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDateTime;
@@ -68,7 +69,6 @@ public class ConditionTaskDispatcher implements TaskDispatcher<TaskExecution>, T
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
         taskExecution.setStartDate(LocalDateTime.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
@@ -97,16 +97,16 @@ public class ConditionTaskDispatcher implements TaskDispatcher<TaskExecution>, T
                 .build();
 
             Map<String, ?> context = workflowFileStorageFacade.readContextValue(
-                contextService.peek(Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION));
+                contextService.peek(Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
 
             subTaskExecution.evaluate(context);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 
             contextService.push(
-                Objects.requireNonNull(subTaskExecution.getId()), Context.Classname.TASK_EXECUTION,
+                Validate.notNull(subTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
                 workflowFileStorageFacade.storeContextValue(
-                    subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context));
+                    Validate.notNull(subTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION, context));
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {

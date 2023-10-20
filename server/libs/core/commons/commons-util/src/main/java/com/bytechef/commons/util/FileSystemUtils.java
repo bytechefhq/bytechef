@@ -15,15 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.test.executor;
+package com.bytechef.commons.util;
 
-import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.hermes.execution.dto.JobDTO;
+import org.springframework.lang.Nullable;
+
+import java.io.File;
 
 /**
  * @author Ivica Cardic
  */
-public interface JobTestExecutor {
+public class FileSystemUtils {
 
-    JobDTO execute(JobParameters jobParameters);
+    public static boolean deleteRecursively(@Nullable File root) {
+        return org.springframework.util.FileSystemUtils.deleteRecursively(root);
+    }
 }

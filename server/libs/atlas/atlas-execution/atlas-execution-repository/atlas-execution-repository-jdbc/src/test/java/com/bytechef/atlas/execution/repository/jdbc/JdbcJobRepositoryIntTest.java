@@ -30,7 +30,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,6 @@ public class JdbcJobRepositoryIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void test1FindAll() {
         int pageTotal = jobRepository
             .findAll(PageRequest.of(0, JobRepository.DEFAULT_PAGE_SIZE))
@@ -69,17 +68,16 @@ public class JdbcJobRepositoryIntTest {
 
         Assertions.assertEquals(pageTotal + 1, page.getNumberOfElements());
 
-        Job one = OptionalUtils.get(jobRepository.findById(job.getId()));
+        Job one = OptionalUtils.get(jobRepository.findById(Validate.notNull(job.getId(), "id")));
 
         Assertions.assertNotNull(one);
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testFindById() {
         Job job = jobRepository.save(getJob(Job.Status.CREATED));
 
-        Job resultJob = OptionalUtils.get(jobRepository.findById(job.getId()));
+        Job resultJob = OptionalUtils.get(jobRepository.findById(Validate.notNull(job.getId(), "id")));
 
         resultJob.setId(null);
         resultJob.setStatus(Job.Status.FAILED);
@@ -89,7 +87,7 @@ public class JdbcJobRepositoryIntTest {
 
         job = jobRepository.save(resultJob);
 
-        resultJob = OptionalUtils.get(jobRepository.findById(job.getId()));
+        resultJob = OptionalUtils.get(jobRepository.findById(Validate.notNull(job.getId(), "id")));
 
         Assertions.assertEquals(Job.Status.FAILED, resultJob.getStatus());
     }

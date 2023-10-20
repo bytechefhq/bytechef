@@ -17,8 +17,6 @@
 
 package com.bytechef.commons.util;
 
-import org.springframework.util.StreamUtils;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

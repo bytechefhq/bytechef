@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.workflow.contributor.WorkflowReservedWor
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.FileCopyUtils;
 import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,11 +37,10 @@ import java.util.Map;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
-import org.springframework.util.Assert;
-import org.springframework.util.FileCopyUtils;
 
 /**
  * @author Matija Petanjek
@@ -160,8 +160,8 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
         for (int i = 0; outputs != null && i < outputs.size(); i++) {
             Map<String, Object> output = outputs.get(i);
 
-            Assert.notNull(output.get(WorkflowConstants.NAME), "output definition must specify a 'name'");
-            Assert.notNull(output.get(WorkflowConstants.VALUE), "output definition must specify a 'value'");
+            Validate.notNull(output.get(WorkflowConstants.NAME), "output definition must specify a 'name'");
+            Validate.notNull(output.get(WorkflowConstants.VALUE), "output definition must specify a 'value'");
         }
     }
 
@@ -171,11 +171,11 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
             String k = entry.getKey();
             Object v = entry.getValue();
 
-            Assert.isTrue(
-                CollectionUtils.concat(
-                    WorkflowConstants.WORKFLOW_DEFINITION_CONSTANTS,
-                    additionalWorkflowReservedWords)
-                    .contains(k),
+            Validate.isTrue(
+                CollectionUtils.contains(
+                    CollectionUtils.concat(
+                        WorkflowConstants.WORKFLOW_DEFINITION_CONSTANTS, additionalWorkflowReservedWords),
+                    k),
                 "unknown workflow definition property: " + k);
 
             if (v instanceof List) {

@@ -22,6 +22,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.registry.domain.Help;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 
 import java.util.Objects;
 
@@ -47,11 +48,11 @@ public class TriggerDefinitionBasic {
         this.batch = OptionalUtils.orElse(triggerDefinition.getBatch(), false);
         this.componentName = triggerDefinition.getComponentName();
         this.componentVersion = triggerDefinition.getComponentVersion();
-        this.description = Objects.requireNonNull(getDescription(triggerDefinition));
+        this.description = Validate.notNull(getDescription(triggerDefinition), "description");
         this.help = OptionalUtils.mapOrElse(triggerDefinition.getHelp(), Help::new, null);
-        this.name = Objects.requireNonNull(triggerDefinition.getName());
-        this.title = Objects.requireNonNull(getTitle(triggerDefinition));
-        this.type = Objects.requireNonNull(triggerDefinition.getType());
+        this.name = Validate.notNull(triggerDefinition.getName(), "name");
+        this.title = Validate.notNull(getTitle(triggerDefinition), "title");
+        this.type = Validate.notNull(triggerDefinition.getType(), "type");
     }
 
     public String getComponentName() {

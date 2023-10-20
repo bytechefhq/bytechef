@@ -25,13 +25,13 @@ import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
 import com.github.miachm.sods.SpreadSheet;
+import org.apache.commons.lang3.Validate;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import static com.bytechef.component.odsfile.constant.OdsFileConstants.FILENAME;
@@ -99,7 +99,7 @@ public class OdsFileWriteAction {
     }
 
     private static Object[] getHeaderValues(Set<String> names) {
-        Objects.requireNonNull(names);
+        Validate.notNull(names, "'names' must not be null");
 
         if (names.isEmpty()) {
             throw new ComponentExecutionException("Unable to create header values with empty names collection");

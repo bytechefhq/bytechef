@@ -20,7 +20,8 @@ package com.bytechef.file.storage.filesystem.service;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
 import com.bytechef.file.storage.service.FileStorageService;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -32,7 +33,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -108,18 +108,18 @@ public class FilesystemFileStorageService implements FileStorageService {
 
     @Override
     public FileEntry storeFileContent(String directoryPath, String fileName, byte[] data) throws FileStorageException {
-        Objects.requireNonNull(directoryPath, "directory is required");
-        Objects.requireNonNull(fileName, "fileName is required");
-        Objects.requireNonNull(data, "data is required");
+        Validate.notNull(directoryPath, "directory is required");
+        Validate.notNull(fileName, "fileName is required");
+        Validate.notNull(data, "data is required");
 
         return storeFileContent(directoryPath, fileName, new ByteArrayInputStream(data));
     }
 
     @Override
     public FileEntry storeFileContent(String directoryPath, String fileName, String data) throws FileStorageException {
-        Objects.requireNonNull(directoryPath, "directory is required");
-        Objects.requireNonNull(fileName, "fileName is required");
-        Objects.requireNonNull(data, "data is required");
+        Validate.notNull(directoryPath, "directory is required");
+        Validate.notNull(fileName, "fileName is required");
+        Validate.notNull(data, "data is required");
 
         return storeFileContent(directoryPath, fileName,
             new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
@@ -129,15 +129,15 @@ public class FilesystemFileStorageService implements FileStorageService {
     public FileEntry storeFileContent(String directoryPath, String fileName, InputStream inputStream)
         throws FileStorageException {
 
-        Objects.requireNonNull(directoryPath, "directory is required");
-        Objects.requireNonNull(fileName, "fileName is required");
-        Objects.requireNonNull(inputStream, "inputStream is required");
+        Validate.notNull(directoryPath, "directory is required");
+        Validate.notNull(fileName, "fileName is required");
+        Validate.notNull(inputStream, "inputStream is required");
 
         return doStoreFileContent(directoryPath, fileName, inputStream);
     }
 
     private FileEntry doStoreFileContent(String directory, String fileName, InputStream inputStream) {
-        directory = StringUtils.trimAllWhitespace(directory.replaceAll("[^0-9a-zA-Z/_]", ""));
+        directory = StringUtils.replace(directory.replaceAll("[^0-9a-zA-Z/_]", ""), " ", "");
 
         Path path = resolveDirectoryPath(directory.toLowerCase());
 

@@ -26,14 +26,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.StreamSupport;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -51,8 +50,8 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Tag create(Tag tag) {
-        Assert.notNull(tag, "'tag' must not be null");
-        Assert.isNull(tag.getId(), "'tag.id' must be null");
+        Validate.notNull(tag, "'tag' must not be null");
+        Validate.isTrue(tag.getId() == null, "'tag.id' must be null");
 
         return tagRepository.save(tag);
     }
@@ -71,39 +70,32 @@ public class TagServiceImpl implements TagService {
     @Override
     @Transactional(readOnly = true)
     public List<Tag> getTags() {
-        return StreamSupport.stream(
-            tagRepository.findAll(Sort.by("name"))
-                .spliterator(),
-            false)
-            .toList();
+        return tagRepository.findAll(Sort.by("name"));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Tag> getTags(@NonNull List<Long> ids) {
-        Assert.notNull(ids, "'ids' must not be null");
+        Validate.notNull(ids, "'ids' must not be null");
 
         if (ids.isEmpty()) {
             return Collections.emptyList();
         } else {
-            return StreamSupport.stream(
-                tagRepository.findAllById(ids)
-                    .spliterator(),
-                false)
+            return tagRepository.findAllById(ids)
+                .stream()
                 .sorted(Comparator.comparing(Tag::getName))
                 .toList();
         }
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public List<Tag> save(@NonNull List<Tag> tags) {
-        Assert.notNull(tags, "'tags' must not be null");
+        Validate.notNull(tags, "'tags' must not be null");
 
         List<Tag> resultTags = new ArrayList<>();
 
         for (Tag tag : tags) {
-            Assert.notNull(tag.getName(), "'name' must no be null");
+            Validate.notNull(tag.getName(), "'name' must no be null");
 
             if (tag.isNew()) {
                 OptionalUtils.ifPresentOrElse(
@@ -111,7 +103,7 @@ public class TagServiceImpl implements TagService {
                     resultTags::add,
                     () -> resultTags.add(tagRepository.save(tag)));
             } else {
-                Tag curTag = OptionalUtils.get(tagRepository.findById(tag.getId()));
+                Tag curTag = OptionalUtils.get(tagRepository.findById(Validate.notNull(tag.getId(), "id")));
 
                 if (!Objects.equals(tag.getName(), curTag.getName())) {
                     curTag.setName(tag.getName());
@@ -129,8 +121,8 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Tag update(Tag tag) {
-        Assert.notNull(tag, "'tag' must not be null");
-        Assert.notNull(tag.getId(), "'tag.id' must not be null");
+        Validate.notNull(tag, "'tag' must not be null");
+        Validate.notNull(tag.getId(), "'tag.id' must not be null");
 
         return tagRepository.save(tag);
     }

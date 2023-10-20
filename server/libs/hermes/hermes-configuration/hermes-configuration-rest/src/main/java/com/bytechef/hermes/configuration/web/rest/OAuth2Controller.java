@@ -51,7 +51,6 @@ public class OAuth2Controller implements Oauth2Api {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<OAuth2AuthorizationParametersModel> getOAuth2AuthorizationParameters(
         GetOAuth2AuthorizationParametersRequestModel parametersRequestModel) {
 
@@ -64,7 +63,6 @@ public class OAuth2Controller implements Oauth2Api {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<OAuth2PropertiesModel> getOAuth2Properties() {
         return ResponseEntity.ok(
             new OAuth2PropertiesModel()

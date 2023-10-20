@@ -27,6 +27,7 @@ import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.commons.util.FileSystemUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.configuration.task.CancelControlTask;
@@ -46,10 +47,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.util.FileSystemUtils;
 
 import static com.bytechef.atlas.configuration.constant.WorkflowConstants.FINALIZE;
 import static com.bytechef.atlas.configuration.constant.WorkflowConstants.NAME;
@@ -210,8 +210,8 @@ public class TaskWorkerTest {
                     return taskExecution -> new File(MapUtils.getString(taskExecution.getParameters(), "path"))
                         .mkdirs();
                 } else if ("rm".equals(type)) {
-                    return taskExecution -> FileSystemUtils
-                        .deleteRecursively(new File(MapUtils.getString(taskExecution.getParameters(), "path")));
+                    return taskExecution -> FileSystemUtils.deleteRecursively(
+                        new File(MapUtils.getString(taskExecution.getParameters(), "path")));
                 } else if ("pass".equals(type)) {
                     Assertions.assertTrue(new File(tempDir).exists());
 
@@ -309,7 +309,6 @@ public class TaskWorkerTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void test6() throws InterruptedException {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
@@ -346,7 +345,8 @@ public class TaskWorkerTest {
 
         // cancel the execution of the task
         worker.onCancelControlTaskEvent(
-            new CancelControlTaskEvent(new CancelControlTask(taskExecution.getJobId(), taskExecution.getId())));
+            new CancelControlTaskEvent(new CancelControlTask(
+                Validate.notNull(taskExecution.getJobId(), "jobId"), Validate.notNull(taskExecution.getId(), "id"))));
 
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
@@ -355,7 +355,6 @@ public class TaskWorkerTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void test7() throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
@@ -402,7 +401,8 @@ public class TaskWorkerTest {
 
         // cancel the execution of the task
         worker.onCancelControlTaskEvent(
-            new CancelControlTaskEvent(new CancelControlTask(taskExecution1.getJobId(), taskExecution1.getId())));
+            new CancelControlTaskEvent(new CancelControlTask(
+                Validate.notNull(taskExecution1.getJobId(), "jobId"), Validate.notNull(taskExecution1.getId(), "id"))));
 
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
@@ -411,7 +411,6 @@ public class TaskWorkerTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void test8() throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
@@ -459,7 +458,8 @@ public class TaskWorkerTest {
 
         // cancel the execution of the task
         worker.onCancelControlTaskEvent(
-            new CancelControlTaskEvent(new CancelControlTask(taskExecution1.getJobId(), taskExecution1.getId())));
+            new CancelControlTaskEvent(new CancelControlTask(
+                Validate.notNull(taskExecution1.getJobId(), "jobId"), Validate.notNull(taskExecution1.getId(), "id"))));
 
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);

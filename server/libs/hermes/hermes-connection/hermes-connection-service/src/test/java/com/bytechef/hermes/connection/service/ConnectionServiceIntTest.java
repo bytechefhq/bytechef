@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +59,6 @@ public class ConnectionServiceIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testCreate() {
         Connection connection = getConnection();
 
@@ -71,21 +70,19 @@ public class ConnectionServiceIntTest {
 
         assertThat(connection)
             .hasFieldOrPropertyWithValue("name", "name")
-            .hasFieldOrPropertyWithValue("tagIds", List.of(tag.getId()));
+            .hasFieldOrPropertyWithValue("tagIds", List.of(Validate.notNull(tag.getId(), "id")));
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testDelete() {
         Connection connection = connectionRepository.save(getConnection());
 
-        connectionService.delete(connection.getId());
+        connectionService.delete(Validate.notNull(connection.getId(), "id"));
 
         assertThat(connectionRepository.findById(connection.getId())).isNotPresent();
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testGetConnection() {
         Connection connection = getConnection();
 
@@ -97,15 +94,14 @@ public class ConnectionServiceIntTest {
 
         connection = connectionRepository.save(connection);
 
-        assertThat(connectionService.getConnection(connection.getId())).isEqualTo(connection);
+        assertThat(connectionService.getConnection(Validate.notNull(connection.getId(), "id"))).isEqualTo(connection);
         assertThat(connectionService.getConnections(null, null, tag.getId())).hasSize(1);
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void getGetConnections() {
         for (Connection connection : connectionRepository.findAll()) {
-            connectionRepository.deleteById(connection.getId());
+            connectionRepository.deleteById(Validate.notNull(connection.getId(), "id"));
         }
 
         connectionRepository.save(getConnection());
@@ -114,7 +110,6 @@ public class ConnectionServiceIntTest {
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testUpdate() {
         Connection connection = connectionRepository.save(getConnection());
 

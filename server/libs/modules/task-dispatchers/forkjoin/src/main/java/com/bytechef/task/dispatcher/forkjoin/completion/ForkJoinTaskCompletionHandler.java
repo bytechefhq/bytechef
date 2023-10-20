@@ -33,14 +33,13 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatcherConstants.BRANCH;
 import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatcherConstants.BRANCHES;
@@ -87,13 +86,12 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
         taskExecution.setStatus(TaskExecution.Status.COMPLETED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        Assert.notNull(taskExecution.getParentId(), "'taskExecution.parentId' must not be null");
+        Validate.notNull(taskExecution.getParentId(), "'taskExecution.parentId' must not be null");
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
             int branch = MapUtils.getInteger(taskExecution.getParameters(), BRANCH);
@@ -128,7 +126,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
             WorkflowTask branchWorkflowTask = branchWorkflowTasks.get(taskExecution.getTaskNumber());
 
-            Assert.notNull(taskExecution.getJobId(), "'taskExecution.jobId' must not be null");
+            Validate.notNull(taskExecution.getJobId(), "'taskExecution.jobId' must not be null");
 
             TaskExecution branchTaskExecution = TaskExecution.builder()
                 .jobId(taskExecution.getJobId())
@@ -148,16 +146,14 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
             branchTaskExecution = taskExecutionService.create(branchTaskExecution);
 
-            Assert.notNull(branchTaskExecution.getId(), "'branchTaskExecution.id' must not be null");
-
             contextService.push(
-                Objects.requireNonNull(branchTaskExecution.getId()), Context.Classname.TASK_EXECUTION,
+                Validate.notNull(branchTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
                 workflowFileStorageFacade.storeContextValue(
-                    branchTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context));
+                    Validate.notNull(branchTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION, context));
 
             taskDispatcher.dispatch(branchTaskExecution);
         } else {
-            long branchesLeft = counterService.decrement(taskExecution.getParentId());
+            long branchesLeft = counterService.decrement(Validate.notNull(taskExecution.getParentId(), "id"));
 
             if (branchesLeft == 0) {
                 forkJoinTaskExecution.setEndDate(LocalDateTime.now());

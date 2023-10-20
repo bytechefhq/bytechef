@@ -55,7 +55,6 @@ public class IntegrationApiController implements IntegrationApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<IntegrationModel> getIntegration(Long id) {
         return ResponseEntity.ok(
             conversionService.convert(integrationFacade.getIntegration(id), IntegrationModel.class));
@@ -71,7 +70,6 @@ public class IntegrationApiController implements IntegrationApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<IntegrationModel> createIntegration(IntegrationModel integrationModel) {
         return ResponseEntity.ok(
             conversionService.convert(
@@ -81,7 +79,6 @@ public class IntegrationApiController implements IntegrationApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<WorkflowModel> createIntegrationWorkflow(
         Long id, CreateIntegrationWorkflowRequestModel createIntegrationWorkflowRequestModel) {
 
@@ -95,7 +92,6 @@ public class IntegrationApiController implements IntegrationApi {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<IntegrationModel> updateIntegration(Long id, IntegrationModel integrationModel) {
         return ResponseEntity.ok(
             conversionService.convert(

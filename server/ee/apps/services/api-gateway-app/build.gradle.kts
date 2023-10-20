@@ -6,6 +6,7 @@ springBoot {
 }
 
 dependencies {
+    implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-gateway")
     implementation(project(":server:libs:core:jackson-config"))

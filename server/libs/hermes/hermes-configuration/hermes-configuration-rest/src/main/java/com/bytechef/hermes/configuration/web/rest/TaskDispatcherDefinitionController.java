@@ -20,7 +20,6 @@ package com.bytechef.hermes.configuration.web.rest;
 import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherDefinitionModel;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,7 +47,6 @@ public class TaskDispatcherDefinitionController implements TaskDispatcherDefinit
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public ResponseEntity<TaskDispatcherDefinitionModel> getTaskDispatcherDefinition(
         String taskDispatcherName, Integer taskDispatcherVersion) {
 

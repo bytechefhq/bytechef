@@ -21,7 +21,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.tag.config.TagIntTestConfiguration;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,53 +41,48 @@ public class TagRepositoryIntTest {
     private TagRepository tagRepository;
 
     @AfterEach
-    @SuppressFBWarnings("NP")
     public void afterEach() {
         tagRepository.deleteAll();
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testCreate() {
         Tag tag = tagRepository.save(new Tag("name"));
 
-        assertThat(tag).isEqualTo(tagRepository.findById(tag.getId())
+        assertThat(tag).isEqualTo(tagRepository.findById(Validate.notNull(tag.getId(), "id"))
             .get());
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testDelete() {
         Tag tag = tagRepository.save(new Tag("name"));
 
-        Tag resultTag = OptionalUtils.get(tagRepository.findById(tag.getId()));
+        Tag resultTag = OptionalUtils.get(tagRepository.findById(Validate.notNull(tag.getId(), "id")));
 
         assertThat(resultTag).isEqualTo(tag);
 
-        tagRepository.deleteById(resultTag.getId());
+        tagRepository.deleteById(Validate.notNull(resultTag.getId(), "id"));
 
         assertThat(tagRepository.findById(tag.getId())).isEmpty();
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testFindById() {
         Tag tag = tagRepository.save(new Tag("name"));
 
-        assertThat(tagRepository.findById(tag.getId())).hasValue(tag);
+        assertThat(tagRepository.findById(Validate.notNull(tag.getId(), "id"))).hasValue(tag);
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testUpdate() {
         Tag tag = tagRepository.save(new Tag("name"));
 
-        assertThat(tagRepository.findById(tag.getId())).hasValue(tag);
+        assertThat(tagRepository.findById(Validate.notNull(tag.getId(), "id"))).hasValue(tag);
 
         tag.setName("name2");
 
         tag = tagRepository.save(tag);
 
-        assertThat(tagRepository.findById(tag.getId())).hasValue(tag);
+        assertThat(tagRepository.findById(Validate.notNull(tag.getId(), "id"))).hasValue(tag);
     }
 }

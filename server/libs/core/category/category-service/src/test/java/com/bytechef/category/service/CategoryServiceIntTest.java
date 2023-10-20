@@ -21,7 +21,6 @@ import com.bytechef.category.config.CategoryIntTestConfiguration;
 import com.bytechef.category.repository.CategoryRepository;
 import com.bytechef.category.domain.Category;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,13 +47,11 @@ public class CategoryServiceIntTest {
     private CategoryService categoryService;
 
     @AfterEach
-    @SuppressFBWarnings("NP")
     public void afterEach() {
         categoryRepository.deleteAll();
     }
 
     @Test
-    @SuppressFBWarnings("NP")
     public void testGetCategories() {
         Category category = categoryService.save(new Category("name"));
 

@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.bytechef.commons.util.FileSystemUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
@@ -49,8 +50,7 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.FileSystemUtils;
+import com.bytechef.commons.util.CollectionUtils;
 
 /**
  * @author Arik Cohen

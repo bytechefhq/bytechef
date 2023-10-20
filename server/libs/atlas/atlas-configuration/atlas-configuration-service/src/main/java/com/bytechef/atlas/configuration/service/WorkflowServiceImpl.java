@@ -31,14 +31,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
 
 /**
  * @author Ivica Cardic
@@ -66,11 +66,11 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public Workflow create(
         String definition, @NonNull Workflow.Format format, @NonNull SourceType sourceType, int type) {
-        Assert.notNull(format, "'format' must not be null");
-        Assert.notNull(sourceType, "'sourceType' must not be null");
+
+        Validate.notNull(format, "'format' must not be null");
+        Validate.notNull(sourceType, "'sourceType' must not be null");
 
         if (ObjectUtils.isEmpty(definition)) {
             definition = "{\"label\": \"New Workflow\", \"tasks\": []}";
@@ -85,12 +85,12 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflowCrudRepository -> Objects.equals(workflowCrudRepository.getSourceType(), sourceType),
             workflowCrudRepository -> save(workflow, workflowCrudRepository));
 
-        return getWorkflow(Objects.requireNonNull(savedWorkflow.getId()));
+        return getWorkflow(Validate.notNull(savedWorkflow.getId(), "id"));
     }
 
     @Override
     public void delete(@NonNull String id) {
-        Assert.notNull(id, "'id' must not be null");
+        Validate.notNull(id, "'id' must not be null");
 
         workflowCrudRepositories.stream()
             .filter(workflowCrudRepository -> OptionalUtils.isPresent(workflowCrudRepository.findById(id)))
@@ -118,28 +118,27 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     @Transactional(readOnly = true)
     public Workflow getWorkflow(@NonNull String id) {
-        Assert.notNull(id, "'id' must not be null");
+        Validate.notNull(id, "'id' must not be null");
 
-        Cache cacheOne = Objects.requireNonNull(cacheManager.getCache(CACHE_ONE));
+        Cache cacheOne = Validate.notNull(cacheManager.getCache(CACHE_ONE), "cacheOne");
 
         if (cacheOne.get(id) != null) {
-            Cache.ValueWrapper valueWrapper = Objects.requireNonNull(cacheOne.get(id));
+            Cache.ValueWrapper valueWrapper = Validate.notNull(cacheOne.get(id), "valueWrapper");
 
             return (Workflow) valueWrapper.get();
         }
 
-        Cache cacheAll = Objects.requireNonNull(cacheManager.getCache(CACHE_ALL));
+        Cache cacheAll = Validate.notNull(cacheManager.getCache(CACHE_ALL), "cacheAll");
 
         if (cacheAll.get(CACHE_ALL) != null) {
-            Cache.ValueWrapper valueWrapper = Objects.requireNonNull(cacheAll.get(CACHE_ALL));
+            Cache.ValueWrapper valueWrapper = Validate.notNull(cacheAll.get(CACHE_ALL), "valueWrapper");
 
             @SuppressWarnings("unchecked")
             List<Workflow> workflows = (List<Workflow>) valueWrapper.get();
 
-            for (Workflow workflow : Objects.requireNonNull(workflows)) {
+            for (Workflow workflow : Validate.notNull(workflows, "workflows")) {
                 if (Objects.equals(workflow.getId(), id)) {
                     return workflow;
                 }
@@ -182,9 +181,8 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public void refreshCache(String id) {
-        Assert.notNull(id, "'id' must not be null");
+        Validate.notNull(id, "'id' must not be null");
 
         Workflow workflow = null;
 
@@ -202,7 +200,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             }
         }
 
-        Cache cacheOne = Objects.requireNonNull(cacheManager.getCache(CACHE_ONE));
+        Cache cacheOne = Validate.notNull(cacheManager.getCache(CACHE_ONE), "cacheOne");
 
         if (cacheOne.get(id) != null) {
             if (workflow == null) {
@@ -212,13 +210,13 @@ public class WorkflowServiceImpl implements WorkflowService {
             }
         }
 
-        Cache cacheAll = Objects.requireNonNull(cacheManager.getCache(CACHE_ALL));
+        Cache cacheAll = Validate.notNull(cacheManager.getCache(CACHE_ALL), "cacheAll");
 
         if (cacheAll.get(CACHE_ALL) != null) {
-            Cache.ValueWrapper valueWrapper = Objects.requireNonNull(cacheAll.get(CACHE_ALL));
+            Cache.ValueWrapper valueWrapper = Validate.notNull(cacheAll.get(CACHE_ALL), "valueWrapper");
 
             @SuppressWarnings("unchecked")
-            List<Workflow> workflows = (List<Workflow>) Objects.requireNonNull(valueWrapper.get());
+            List<Workflow> workflows = (List<Workflow>) Validate.notNull(valueWrapper.get(), "workflows");
 
             if (workflow == null) {
                 CollectionUtils.findFirst(workflows, curWorkflow -> Objects.equals(curWorkflow.getId(), id))
@@ -240,13 +238,12 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public List<Workflow> getWorkflows(int type) {
         List<Workflow> workflows;
 
-        Cache cacheAll = Objects.requireNonNull(cacheManager.getCache(CACHE_ALL));
+        Cache cacheAll = Validate.notNull(cacheManager.getCache(CACHE_ALL), "cacheAll");
 
         if (cacheAll.get(CACHE_ALL) == null) {
             workflows = workflowRepositories.stream()
@@ -271,7 +268,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
             cacheAll.put(CACHE_ALL, workflows);
         } else {
-            Cache.ValueWrapper valueWrapper = Objects.requireNonNull(cacheAll.get(CACHE_ALL));
+            Cache.ValueWrapper valueWrapper = Validate.notNull(cacheAll.get(CACHE_ALL), "valueWrapper");
 
             workflows = (List<Workflow>) valueWrapper.get();
         }
@@ -281,8 +278,8 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     public Workflow update(@NonNull String id, @NonNull String definition) {
-        Assert.notNull(id, "'id' must not be null");
-        Assert.notNull(definition, "'definition' must not be null");
+        Validate.notNull(id, "'id' must not be null");
+        Validate.notNull(definition, "'definition' must not be null");
 
         Workflow workflow = getWorkflow(id);
 
@@ -294,7 +291,6 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflowCrudRepository -> save(workflow, workflowCrudRepository));
     }
 
-    @SuppressFBWarnings("NP")
     private Workflow save(Workflow workflow, WorkflowCrudRepository workflowCrudRepository) {
         if (workflow.isNew()) {
             workflow = workflowCrudRepository.save(workflow);
@@ -311,19 +307,19 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         workflow = OptionalUtils.get(workflowCrudRepository.findById(workflow.getId()));
 
-        Cache cacheOne = Objects.requireNonNull(cacheManager.getCache(CACHE_ONE));
+        Cache cacheOne = Validate.notNull(cacheManager.getCache(CACHE_ONE), "cacheOne");
 
-        if (cacheOne.get(Objects.requireNonNull(workflow.getId())) != null) {
-            cacheOne.put(workflow.getId(), workflow);
+        if (cacheOne.get(Validate.notNull(workflow.getId(), "id")) != null) {
+            cacheOne.put(Validate.notNull(workflow.getId(), "id"), workflow);
         }
 
-        Cache cacheAll = Objects.requireNonNull(cacheManager.getCache(CACHE_ALL));
+        Cache cacheAll = Validate.notNull(cacheManager.getCache(CACHE_ALL), "cacheAll");
 
         if (cacheAll.get(CACHE_ALL) != null) {
-            Cache.ValueWrapper valueWrapper = Objects.requireNonNull(cacheAll.get(CACHE_ALL));
+            Cache.ValueWrapper valueWrapper = Validate.notNull(cacheAll.get(CACHE_ALL), "valueWrapper");
 
             @SuppressWarnings("unchecked")
-            List<Workflow> workflows = (List<Workflow>) Objects.requireNonNull(valueWrapper.get());
+            List<Workflow> workflows = (List<Workflow>) Validate.notNull(valueWrapper.get(), "workflows");
 
             int index = workflows.indexOf(workflow);
 

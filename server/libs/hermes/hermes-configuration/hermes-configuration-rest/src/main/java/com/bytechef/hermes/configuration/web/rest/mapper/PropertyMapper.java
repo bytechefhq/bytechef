@@ -49,7 +49,7 @@ import com.bytechef.hermes.configuration.web.rest.model.TimePropertyModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.util.CollectionUtils;
+import com.bytechef.commons.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;

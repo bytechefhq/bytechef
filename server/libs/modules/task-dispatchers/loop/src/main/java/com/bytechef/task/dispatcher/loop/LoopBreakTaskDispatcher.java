@@ -30,8 +30,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -59,7 +59,7 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
     }
 
     private TaskExecution findLoopTaskExecution(Long taskExecutionId) {
-        Assert.notNull(taskExecutionId, "'taskExecutionId' must not be null");
+        Validate.notNull(taskExecutionId, "'taskExecutionId' must not be null");
 
         TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
 

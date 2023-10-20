@@ -21,10 +21,9 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
 import com.bytechef.hermes.execution.repository.TriggerExecutionRepository;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -41,8 +40,8 @@ public class TriggerExecutionServiceImpl implements TriggerExecutionService {
 
     @Override
     public TriggerExecution create(TriggerExecution triggerExecution) {
-        Assert.notNull(triggerExecution, "'triggerExecution' must not be null");
-        Assert.isNull(triggerExecution.getId(), "'triggerExecution.id' must be null");
+        Validate.notNull(triggerExecution, "'triggerExecution' must not be null");
+        Validate.isTrue(triggerExecution.getId() == null, "'triggerExecution.id' must be null");
 
         return triggerExecutionRepository.save(triggerExecution);
     }
@@ -54,13 +53,11 @@ public class TriggerExecutionServiceImpl implements TriggerExecutionService {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public TriggerExecution update(TriggerExecution triggerExecution) {
-        Assert.notNull(triggerExecution, "'triggerExecution' must not be null");
-        Assert.notNull(triggerExecution.getId(), "'triggerExecution.id' must not be null");
+        Validate.notNull(triggerExecution, "'triggerExecution' must not be null");
 
         TriggerExecution currentTriggerExecution = OptionalUtils.get(
-            triggerExecutionRepository.findByIdForUpdate(triggerExecution.getId()));
+            triggerExecutionRepository.findByIdForUpdate(Validate.notNull(triggerExecution.getId(), "id")));
 
         Status currentStatus = currentTriggerExecution.getStatus();
         Status status = triggerExecution.getStatus();

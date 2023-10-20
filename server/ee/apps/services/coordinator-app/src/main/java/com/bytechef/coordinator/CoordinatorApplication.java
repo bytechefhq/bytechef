@@ -27,7 +27,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.core.env.Environment;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ivica Cardic
@@ -59,7 +59,7 @@ public class CoordinatorApplication {
             .orElse("http");
         String serverPort = environment.getProperty("server.port");
         String contextPath = Optional.ofNullable(environment.getProperty("server.servlet.context-path"))
-            .filter(StringUtils::hasText)
+            .filter(StringUtils::isNotBlank)
             .orElse("/");
         String hostAddress = "localhost";
 

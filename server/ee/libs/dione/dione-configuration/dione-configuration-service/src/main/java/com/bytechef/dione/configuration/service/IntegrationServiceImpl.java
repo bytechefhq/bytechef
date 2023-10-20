@@ -23,11 +23,10 @@ import com.bytechef.dione.configuration.repository.IntegrationRepository;
 
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -44,7 +43,7 @@ public class IntegrationServiceImpl implements IntegrationService {
 
     @Override
     public Integration addWorkflow(long id, String workflowId) {
-        Assert.notNull(workflowId, "'workflowId' must not be null");
+        Validate.notNull(workflowId, "'workflowId' must not be null");
 
         Integration integration = getIntegration(id);
 
@@ -55,10 +54,9 @@ public class IntegrationServiceImpl implements IntegrationService {
 
     @Override
     public Integration create(Integration integration) {
-        Assert.notNull(integration, "'integration' must not be null");
-
-        Assert.isNull(integration.getId(), "'id' must be null");
-        Assert.notNull(integration.getName(), "'name' must not be null");
+        Validate.notNull(integration, "'integration' must not be null");
+        Validate.isTrue(integration.getId() == null, "'id' must be null");
+        Validate.notNull(integration.getName(), "'name' must not be null");
 
         integration.setIntegrationVersion(1);
         integration.setStatus(Integration.Status.UNPUBLISHED);
@@ -116,17 +114,13 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    @SuppressFBWarnings("NP")
     public Integration update(Integration integration) {
-        Assert.notNull(integration.getId(), "'id' must not be null");
-        Assert.notNull(integration.getName(), "'name' must not be null");
-
-        Integration curIntegration = getIntegration(integration.getId());
+        Integration curIntegration = getIntegration(Validate.notNull(integration.getId(), "id"));
 
         curIntegration.setCategoryId(integration.getCategoryId());
         curIntegration.setDescription(integration.getDescription());
         curIntegration.setId(integration.getId());
-        curIntegration.setName(integration.getName());
+        curIntegration.setName(Validate.notNull(integration.getName(), "name"));
         curIntegration.setTagIds(integration.getTagIds());
         curIntegration.setWorkflowIds(integration.getWorkflowIds());
 

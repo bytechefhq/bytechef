@@ -30,14 +30,13 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Arik Cohen
@@ -79,12 +78,11 @@ public class JobExecutor {
         }
     }
 
-    @SuppressFBWarnings("NP")
     private void executeNextTask(Job job, Workflow workflow) {
-        Assert.notNull(job.getId(), "'job.id' must not be null");
+        Validate.notNull(job.getId(), "'job.id' must not be null");
 
         Map<String, ?> context = workflowFileStorageFacade.readContextValue(
-            contextService.peek(job.getId(), Context.Classname.JOB));
+            contextService.peek(Validate.notNull(job.getId(), "id"), Context.Classname.JOB));
         TaskExecution nextTaskExecution = nextTaskExecution(job, workflow);
 
         nextTaskExecution = taskExecutionService.create(nextTaskExecution);
@@ -92,14 +90,14 @@ public class JobExecutor {
         nextTaskExecution.evaluate(context);
 
         contextService.push(
-            Objects.requireNonNull(nextTaskExecution.getId()), Context.Classname.TASK_EXECUTION,
+            Validate.notNull(nextTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
             workflowFileStorageFacade.storeContextValue(
-                nextTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context));
+                Validate.notNull(nextTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION, context));
 
         taskDispatcher.dispatch(nextTaskExecution);
 
         if (logger.isDebugEnabled()) {
-            if (!StringUtils.hasText(nextTaskExecution.getName())) {
+            if (StringUtils.isBlank(nextTaskExecution.getName())) {
                 logger.debug("Task id={}, type='{}' executed", nextTaskExecution.getId(), nextTaskExecution.getType());
             } else {
                 logger.debug(
@@ -115,13 +113,12 @@ public class JobExecutor {
         return job.getCurrentTask() < workflowTasks.size();
     }
 
-    @SuppressFBWarnings("NP")
     private TaskExecution nextTaskExecution(Job job, Workflow workflow) {
         List<WorkflowTask> workflowTasks = workflow.getTasks();
 
         WorkflowTask workflowTask = workflowTasks.get(job.getCurrentTask());
 
-        Assert.notNull(job.getId(), "'job.id' must not be null");
+        Validate.notNull(job.getId(), "'job.id' must not be null");
 
         TaskExecution taskExecution = TaskExecution.builder()
             .jobId(job.getId())
