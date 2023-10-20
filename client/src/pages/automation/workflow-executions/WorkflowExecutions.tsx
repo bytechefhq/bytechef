@@ -10,10 +10,10 @@ import PageLoader from 'components/PageLoader/PageLoader';
 import Pagination from 'components/Pagination/Pagination';
 import LayoutContainer from 'layouts/LayoutContainer/LayoutContainer';
 import {
-    WorkflowExecutionModel,
-    WorkflowExecutionModelFromJSON,
-} from 'middleware/automation/project';
-import {GetWorkflowExecutionsJobStatusEnum} from 'middleware/automation/project/apis/WorkflowExecutionsApi';
+    ProjectWorkflowExecutionModel,
+    ProjectWorkflowExecutionModelFromJSON,
+    SearchProjectWorkflowExecutionsJobStatusEnum,
+} from 'middleware/automation/execution';
 import {
     useGetProjectInstancesQuery,
     useGetProjectsQuery,
@@ -30,30 +30,30 @@ import WorkflowExecutionsTable from './components/WorkflowExecutionsTable';
 
 const jobStatusOptions = [
     {
-        label: GetWorkflowExecutionsJobStatusEnum.Started,
-        value: GetWorkflowExecutionsJobStatusEnum.Started,
+        label: SearchProjectWorkflowExecutionsJobStatusEnum.Started,
+        value: SearchProjectWorkflowExecutionsJobStatusEnum.Started,
     },
     {
-        label: GetWorkflowExecutionsJobStatusEnum.Completed,
-        value: GetWorkflowExecutionsJobStatusEnum.Completed,
+        label: SearchProjectWorkflowExecutionsJobStatusEnum.Completed,
+        value: SearchProjectWorkflowExecutionsJobStatusEnum.Completed,
     },
     {
-        label: GetWorkflowExecutionsJobStatusEnum.Created,
-        value: GetWorkflowExecutionsJobStatusEnum.Created,
+        label: SearchProjectWorkflowExecutionsJobStatusEnum.Created,
+        value: SearchProjectWorkflowExecutionsJobStatusEnum.Created,
     },
     {
-        label: GetWorkflowExecutionsJobStatusEnum.Stopped,
-        value: GetWorkflowExecutionsJobStatusEnum.Stopped,
+        label: SearchProjectWorkflowExecutionsJobStatusEnum.Stopped,
+        value: SearchProjectWorkflowExecutionsJobStatusEnum.Stopped,
     },
     {
-        label: GetWorkflowExecutionsJobStatusEnum.Failed,
-        value: GetWorkflowExecutionsJobStatusEnum.Failed,
+        label: SearchProjectWorkflowExecutionsJobStatusEnum.Failed,
+        value: SearchProjectWorkflowExecutionsJobStatusEnum.Failed,
     },
 ];
 
 export const WorkflowExecutions = () => {
     const [filterStatus, setFilterStatus] =
-        useState<GetWorkflowExecutionsJobStatusEnum>();
+        useState<SearchProjectWorkflowExecutionsJobStatusEnum>();
     const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(
         undefined
     );
@@ -104,8 +104,8 @@ export const WorkflowExecutions = () => {
             : 'There is no executed workflows for the current criteria.';
 
     const tableData = WorkflowExecutionsPage?.content?.map(
-        (WorkflowExecution: WorkflowExecutionModel) =>
-            WorkflowExecutionModelFromJSON(WorkflowExecution)
+        (WorkflowExecution: ProjectWorkflowExecutionModel) =>
+            ProjectWorkflowExecutionModelFromJSON(WorkflowExecution)
     );
 
     return (
@@ -152,7 +152,7 @@ export const WorkflowExecutions = () => {
                                 ) => {
                                     if (value) {
                                         setFilterStatus(
-                                            value.value as GetWorkflowExecutionsJobStatusEnum
+                                            value.value as SearchProjectWorkflowExecutionsJobStatusEnum
                                         );
                                     } else {
                                         setFilterStatus(undefined);

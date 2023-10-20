@@ -1,12 +1,12 @@
 import {Cross1Icon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
-import {WorkflowExecutionModel} from 'middleware/automation/project';
+import {ProjectWorkflowExecutionModel} from 'middleware/automation/execution';
 
 const ReadOnlyWorkflow = ({
     setWorkflowExecutionDetailsDialogOpen,
     workflowExecution,
 }: {
-    workflowExecution: WorkflowExecutionModel;
+    workflowExecution: ProjectWorkflowExecutionModel;
     setWorkflowExecutionDetailsDialogOpen: (
         workflowExecutionDetailsDialogOpen: boolean
     ) => void;

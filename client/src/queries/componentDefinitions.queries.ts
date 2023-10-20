@@ -5,7 +5,7 @@ import {
     ComponentDefinitionModel,
     ComponentDefinitionsApi,
     GetComponentDefinitionRequest,
-    GetComponentDefinitionsRequest,
+    SearchComponentDefinitionsRequest,
 } from '../middleware/core/definition-registry';
 
 export const ComponentDefinitionKeys = {
@@ -13,7 +13,7 @@ export const ComponentDefinitionKeys = {
         'componentDefinition',
         request,
     ],
-    componentDefinitions: (request?: GetComponentDefinitionsRequest) => [
+    componentDefinitions: (request?: SearchComponentDefinitionsRequest) => [
         'componentDefinitions',
         request,
     ],
@@ -31,9 +31,9 @@ export const useGetComponentDefinitionQuery = (
     );
 
 export const useGetComponentDefinitionsQuery = (
-    request?: GetComponentDefinitionsRequest
+    request?: SearchComponentDefinitionsRequest
 ) =>
     useQuery<ComponentDefinitionBasicModel[], Error>(
         ComponentDefinitionKeys.componentDefinitions(request),
-        () => new ComponentDefinitionsApi().getComponentDefinitions(request)
+        () => new ComponentDefinitionsApi().searchComponentDefinitions(request)
     );

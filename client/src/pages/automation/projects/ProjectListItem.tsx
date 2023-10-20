@@ -15,7 +15,7 @@ import {
     ProjectModel,
     ProjectModelStatusEnum,
     TagModel,
-} from '../../../middleware/automation/project';
+} from '../../../middleware/automation/configuration';
 import {
     useCreateProjectWorkflowRequestMutation,
     useDeleteProjectMutation,

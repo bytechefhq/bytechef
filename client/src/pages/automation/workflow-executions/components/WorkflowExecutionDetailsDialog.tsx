@@ -22,7 +22,7 @@ const WorkflowExecutionDetailsDialog = () => {
             workflowExecutionDetailsDialogOpen
         );
 
-    const allTasksCompleted = workflowExecution?.taskExecutions?.every(
+    const allTasksCompleted = workflowExecution?.job?.taskExecutions?.every(
         (taskExecution) => taskExecution.status === 'COMPLETED'
     );
 
@@ -35,7 +35,8 @@ const WorkflowExecutionDetailsDialog = () => {
         duration = Math.round(endTime - startTime);
     }
 
-    const taskExecutionsCount = workflowExecution?.taskExecutions?.length || 0;
+    const taskExecutionsCount =
+        workflowExecution?.job?.taskExecutions?.length || 0;
 
     return (
         <Dialog.Root
@@ -86,11 +87,11 @@ const WorkflowExecutionDetailsDialog = () => {
                             </div>
                         </Dialog.Title>
 
-                        {!!workflowExecution?.taskExecutions?.length && (
+                        {!!workflowExecution?.job?.taskExecutions?.length && (
                             <WorkflowTaskListAccordion
                                 allTasksCompleted={!!allTasksCompleted}
                                 taskExecutions={
-                                    workflowExecution.taskExecutions
+                                    workflowExecution.job.taskExecutions
                                 }
                             />
                         )}

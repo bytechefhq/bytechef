@@ -13,7 +13,7 @@ import {
     ProjectInstanceModel,
     ProjectInstanceModelStatusEnum,
     TagModel,
-} from '../../../middleware/automation/project';
+} from '../../../middleware/automation/configuration';
 import {
     useDeleteProjectInstanceMutation,
     useUpdateProjectInstanceTagsMutation,
