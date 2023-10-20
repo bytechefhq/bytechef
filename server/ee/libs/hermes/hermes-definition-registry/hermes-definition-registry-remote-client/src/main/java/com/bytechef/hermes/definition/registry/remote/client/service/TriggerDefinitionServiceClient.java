@@ -18,19 +18,20 @@
 package com.bytechef.hermes.definition.registry.remote.client.service;
 
 import com.bytechef.commons.webclient.DefaultWebClient;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.definition.registry.component.trigger.WebhookRequest;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.definition.registry.component.trigger.TriggerOutput;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 
 import java.util.List;
 import java.util.Map;
-
-import static com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 
 /**
  * @author Ivica Cardic
@@ -42,6 +43,14 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
         DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
         super(defaultWebClient, discoveryClient, objectMapper);
+    }
+
+    @Override
+    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String propertyName, Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
+
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -75,7 +84,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public String executeEditorDescription(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        Map<String, ?> connectionParameters, String authorizationName) {
+        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
 
         throw new UnsupportedOperationException();
     }
@@ -89,7 +98,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public void executeListenerEnable(
+    public void executeOnEnableListener(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         Map<String, ?> connectionParameters, String authorizationName, String workflowExecutionId) {
 
@@ -99,7 +108,8 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String propertyName, Map<String, ?> connectionParameters, String authorizationName, String searchText) {
+        String propertyName, Long connectionId, Map<String, ?> connectionParameters, String authorizationName,
+        String searchText) {
 
         throw new UnsupportedOperationException();
     }
@@ -107,15 +117,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        Map<String, ?> connectionParameters, String authorizationName) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String propertyName, Map<String, ?> connectionParameters, String authorizationName) {
+        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
 
         throw new UnsupportedOperationException();
     }
@@ -123,9 +125,23 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public Object executeSampleOutput(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        Map<String, ?> connectionParameters, String authorizationName) {
+        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
 
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public TriggerOutput executeTrigger(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        Object triggerState, WebhookRequest webhookRequest, Map<String, Long> connectionIdMap) {
+
+        return defaultWebClient.post(
+            uriBuilder -> toUri(
+                uriBuilder, componentName, "/trigger-definition-service/execute-trigger"),
+            new TriggerRequest(
+                componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
+                connectionIdMap),
+            TriggerOutput.class);
     }
 
     @Override
@@ -139,16 +155,40 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
+    public boolean executeWebhookValidate(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        WebhookRequest webhookRequest, Map<String, Long> connectionIdMap) {
+
+        return defaultWebClient.post(
+            uriBuilder -> toUri(
+                uriBuilder, componentName, "/trigger-definition-service/execute-webhook-validate"),
+            new WebhookValidateRequest(
+                componentName, componentVersion, triggerName, inputParameters, webhookRequest,
+                connectionIdMap),
+            Boolean.class);
+    }
+
+    @Override
     public List<TriggerDefinitionDTO> getTriggerDefinitions(String componentName, int componentVersion) {
         return defaultWebClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,
                 "/trigger-definition-service/get-trigger-definitions/{componentName}/{componentVersion}", componentName,
                 componentVersion),
-            new ParameterizedTypeReference<List<TriggerDefinitionDTO>>() {});
+            new ParameterizedTypeReference<>() {});
     }
 
     private record DynamicWebhookRefresh(
         String componentName, int componentVersion, String triggerName, DynamicWebhookEnableOutput output) {
+    }
+
+    private record TriggerRequest(
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters, Object state,
+        WebhookRequest webhookRequest, Map<String, Long> connectionIdMap) {
+    }
+
+    private record WebhookValidateRequest(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        WebhookRequest webhookRequest, Map<String, Long> connectionIdMap) {
     }
 }

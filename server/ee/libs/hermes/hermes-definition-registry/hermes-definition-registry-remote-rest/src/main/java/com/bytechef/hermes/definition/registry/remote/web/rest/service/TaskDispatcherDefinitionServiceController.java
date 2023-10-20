@@ -34,7 +34,7 @@ import java.util.List;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/task-dispatcher-definition-service")
 @ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "coordinator-service-app")
 public class TaskDispatcherDefinitionServiceController {
 
@@ -46,7 +46,7 @@ public class TaskDispatcherDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/task-dispatcher-definition-service/get-task-dispatcher-definition/{name}/{version}",
+        value = "/get-task-dispatcher-definition/{name}/{version}",
         produces = {
             "application/json"
         })
@@ -58,7 +58,7 @@ public class TaskDispatcherDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/task-dispatcher-definition-service/get-task-dispatcher-definitions",
+        value = "/get-task-dispatcher-definitions",
         produces = {
             "application/json"
         })
@@ -68,7 +68,7 @@ public class TaskDispatcherDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/task-dispatcher-definition-service/get-task-dispatcher-definition-versions/{name}",
+        value = "/get-task-dispatcher-definition-versions/{name}",
         produces = {
             "application/json"
         })

@@ -18,8 +18,11 @@
 package com.bytechef.hermes.definition.registry.remote.web.rest.service;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.definition.registry.component.trigger.TriggerOutput;
+import com.bytechef.hermes.definition.registry.component.trigger.WebhookRequest;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -32,13 +35,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/trigger-definition-service")
 @ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
 public class TriggerDefinitionServiceController {
 
@@ -50,7 +54,7 @@ public class TriggerDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-definition-service/execute-dynamic-webhook-refresh",
+        value = "/execute-dynamic-webhook-refresh",
         consumes = {
             "application/json"
         },
@@ -67,8 +71,36 @@ public class TriggerDefinitionServiceController {
     }
 
     @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/execute-trigger",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<TriggerOutput> executeTrigger(@RequestBody TriggerRequest triggerRequest) {
+        return ResponseEntity.ok(
+            triggerDefinitionService.executeTrigger(
+                triggerRequest.componentName, triggerRequest.componentVersion,
+                triggerRequest.triggerName, triggerRequest.inputParameters, triggerRequest.state,
+                triggerRequest.webhookRequest, triggerRequest.connectionIdMap));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/validate-webhook-trigger",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<Boolean> executeWebhookValidate(@RequestBody WebhookValidateRequest webhookValidateRequest) {
+        return ResponseEntity.ok(
+            triggerDefinitionService.executeWebhookValidate(
+                webhookValidateRequest.componentName, webhookValidateRequest.componentVersion,
+                webhookValidateRequest.triggerName, webhookValidateRequest.inputParameters,
+                webhookValidateRequest.webhookRequest, webhookValidateRequest.connectionIdMap));
+    }
+
+    @RequestMapping(
         method = RequestMethod.GET,
-        value = "/trigger-definition-service/get-trigger-definition/{componentName}/{componentVersion}/{triggerName}",
+        value = "/get-trigger-definition/{componentName}/{componentVersion}/{triggerName}",
         produces = {
             "application/json"
         })
@@ -82,7 +114,7 @@ public class TriggerDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/trigger-definition-service/get-trigger-definitions/{componentName}/{componentVersion}",
+        value = "/get-trigger-definitions/{componentName}/{componentVersion}",
         produces = {
             "application/json"
         })
@@ -93,8 +125,21 @@ public class TriggerDefinitionServiceController {
         return ResponseEntity.ok(triggerDefinitionService.getTriggerDefinitions(componentName, componentVersion));
     }
 
-    private record DynamicWebhookRefreshRequest(
+    @SuppressFBWarnings("EI")
+    public record DynamicWebhookRefreshRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
         DynamicWebhookEnableOutput output) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record TriggerRequest(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters, Object state,
+        WebhookRequest webhookRequest, Map<String, Long> connectionIdMap) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record WebhookValidateRequest(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        WebhookRequest webhookRequest, Map<String, Long> connectionIdMap) {
     }
 }

@@ -82,7 +82,7 @@ public class ConnectionDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public Optional<String> fetchBaseUri(
+    public Optional<String> executeFetchBaseUri(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters) {
 
         return Optional.ofNullable(

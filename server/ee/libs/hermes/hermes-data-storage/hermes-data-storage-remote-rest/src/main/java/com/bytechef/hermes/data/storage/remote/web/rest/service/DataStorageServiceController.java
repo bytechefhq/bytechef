@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/data-storage-service")
 public class DataStorageServiceController {
 
     private final DataStorageService dataStorageService;
@@ -45,7 +45,7 @@ public class DataStorageServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/data-storage-service/fetch-value/{scope}/{scopeId}/{key}",
+        value = "/fetch-value/{scope}/{scopeId}/{key}",
         consumes = {
             "application/json"
         })
@@ -59,7 +59,7 @@ public class DataStorageServiceController {
 
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/data-storage-service/save/{scope}/{scopeId}/{key}",
+        value = "/save/{scope}/{scopeId}/{key}",
         consumes = {
             "application/json"
         })

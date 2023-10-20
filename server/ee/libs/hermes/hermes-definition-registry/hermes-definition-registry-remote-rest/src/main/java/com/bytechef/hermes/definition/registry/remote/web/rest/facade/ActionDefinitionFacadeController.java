@@ -20,6 +20,7 @@ package com.bytechef.hermes.definition.registry.remote.web.rest.facade;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,7 +37,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/action-definition-facade")
 @ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
 public class ActionDefinitionFacadeController {
 
@@ -48,7 +49,7 @@ public class ActionDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/action-definition-service/execute-editor-description",
+        value = "/execute-editor-description",
         consumes = {
             "application/json"
         })
@@ -63,7 +64,7 @@ public class ActionDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/action-definition-service/execute-options",
+        value = "/execute-options",
         consumes = {
             "application/json"
         })
@@ -78,7 +79,7 @@ public class ActionDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/action-definition-service/execute-properties",
+        value = "/execute-properties",
         consumes = {
             "application/json"
         })
@@ -93,7 +94,7 @@ public class ActionDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/action-definition-service/execute-output-schema",
+        value = "/execute-output-schema",
         consumes = {
             "application/json"
         })
@@ -108,7 +109,7 @@ public class ActionDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/action-definition-service/execute-sample-output",
+        value = "/execute-sample-output",
         consumes = {
             "application/json"
         })
@@ -119,27 +120,32 @@ public class ActionDefinitionFacadeController {
                 sampleOutputRequest.actionParameters, sampleOutputRequest.connectionId));
     }
 
-    private record EditorDescriptionRequest(
+    @SuppressFBWarnings("EI")
+    public record EditorDescriptionRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
         Map<String, Object> actionParameters, Long connectionId) {
     }
 
-    private record OptionsRequest(
+    @SuppressFBWarnings("EI")
+    public record OptionsRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName, @NotNull String propertyName,
         Map<String, Object> actionParameters, Long connectionId, String searchText) {
     }
 
-    private record OutputSchemaRequest(
+    @SuppressFBWarnings("EI")
+    public record OutputSchemaRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
         Map<String, Object> actionParameters, Long connectionId) {
     }
 
-    private record PropertiesRequest(
+    @SuppressFBWarnings("EI")
+    public record PropertiesRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
         @NotNull String propertyName, Map<String, Object> actionParameters, Long connectionId) {
     }
 
-    private record SampleOutputRequest(
+    @SuppressFBWarnings("EI")
+    public record SampleOutputRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
         Map<String, Object> actionParameters, Long connectionId) {
     }

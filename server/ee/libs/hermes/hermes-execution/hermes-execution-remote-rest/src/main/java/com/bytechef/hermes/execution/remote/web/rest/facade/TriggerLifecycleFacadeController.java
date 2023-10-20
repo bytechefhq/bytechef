@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.execution.remote.web.rest.facade;
 
-import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -47,7 +46,9 @@ public class TriggerLifecycleFacadeController {
         value = "/trigger-lifecycle-facade/execute-trigger-disable")
     public void executeTriggerDisable(TriggerRequest triggerRequest) {
         triggerLifecycleFacade.executeTriggerDisable(
-            triggerRequest.workflowExecutionId, triggerRequest.triggerParameters, triggerRequest.connectionId);
+            triggerRequest.workflowId, triggerRequest.instanceId, triggerRequest.instanceType,
+            triggerRequest.workflowTriggerName, triggerRequest.workflowTriggerType, triggerRequest.triggerParameters,
+            triggerRequest.connectionId);
     }
 
     @RequestMapping(
@@ -55,11 +56,14 @@ public class TriggerLifecycleFacadeController {
         value = "/trigger-lifecycle-facade/execute-trigger-enable")
     public void executeTriggerEnable(TriggerRequest triggerRequest) {
         triggerLifecycleFacade.executeTriggerEnable(
-            triggerRequest.workflowExecutionId, triggerRequest.triggerParameters, triggerRequest.connectionId);
+            triggerRequest.workflowId, triggerRequest.instanceId, triggerRequest.instanceType,
+            triggerRequest.workflowTriggerName, triggerRequest.workflowTriggerType, triggerRequest.triggerParameters,
+            triggerRequest.connectionId);
     }
 
     @SuppressFBWarnings("EI")
     private record TriggerRequest(
-        WorkflowExecutionId workflowExecutionId, Map<String, ?> triggerParameters, long connectionId) {
+        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
+        Map<String, ?> triggerParameters, long connectionId) {
     }
 }
