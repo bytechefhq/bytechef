@@ -22,8 +22,9 @@ import {
     WorkflowModelToJSON,
 } from '../models/index';
 
-export interface DeleteWorkflowRequest {
-    id: string;
+export interface DeleteProjectWorkflowRequest {
+    id: number;
+    workflowId: string;
 }
 
 export interface DuplicateWorkflowRequest {
@@ -53,9 +54,13 @@ export class WorkflowApi extends runtime.BaseAPI {
      * Delete a workflow.
      * Delete a workflow
      */
-    async deleteWorkflowRaw(requestParameters: DeleteWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteProjectWorkflowRaw(requestParameters: DeleteProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deleteWorkflow.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deleteProjectWorkflow.');
+        }
+
+        if (requestParameters.workflowId === null || requestParameters.workflowId === undefined) {
+            throw new runtime.RequiredError('workflowId','Required parameter requestParameters.workflowId was null or undefined when calling deleteProjectWorkflow.');
         }
 
         const queryParameters: any = {};
@@ -63,7 +68,7 @@ export class WorkflowApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/workflows/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/projects/{id}/workflows/{workflowId}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -76,8 +81,8 @@ export class WorkflowApi extends runtime.BaseAPI {
      * Delete a workflow.
      * Delete a workflow
      */
-    async deleteWorkflow(requestParameters: DeleteWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.deleteWorkflowRaw(requestParameters, initOverrides);
+    async deleteProjectWorkflow(requestParameters: DeleteProjectWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteProjectWorkflowRaw(requestParameters, initOverrides);
     }
 
     /**
