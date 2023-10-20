@@ -269,12 +269,12 @@
           "optionsDataSource": null,
           "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,

@@ -42,7 +42,7 @@
     "multipleValues": true,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "JSON_BUILDER"
+    "controlType": "OBJECT_BUILDER"
   } ],
   "title": "Sequence",
   "version": 1

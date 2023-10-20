@@ -163,7 +163,7 @@
             "multipleValues": true,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The list of errors by parameter returned by the operation. For example,\"projectKey\": \"Project keys must start with an uppercase letter, followed by one or more uppercase alphanumeric characters.\"",
@@ -200,7 +200,7 @@
             "options": null,
             "optionsDataSource": null,
             "properties": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -220,11 +220,11 @@
             "optionsDataSource": null,
             "controlType": "INPUT_INTEGER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -529,9 +529,9 @@
               "optionsDataSource": null,
               "sampleDataType": null
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "Whether there is a screen associated with the issue transition.",
@@ -849,16 +849,16 @@
                   "options": null,
                   "optionsDataSource": null,
                   "properties": null,
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 } ],
                 "multipleValues": true,
                 "objectType": null,
                 "options": null,
                 "optionsDataSource": null,
                 "properties": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             }, {
               "advancedOption": null,
               "description": "The name of the field.",
@@ -969,7 +969,7 @@
               "multipleValues": true,
               "options": null,
               "optionsDataSource": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             }, {
               "advancedOption": null,
               "description": "The list of values allowed in the field.",
@@ -1002,12 +1002,12 @@
                 "options": null,
                 "optionsDataSource": null,
                 "properties": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               } ],
               "multipleValues": true,
               "options": null,
               "optionsDataSource": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             }, {
               "advancedOption": null,
               "description": "The default value of the field.",
@@ -1027,7 +1027,7 @@
               "options": null,
               "optionsDataSource": null,
               "properties": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             }, {
               "advancedOption": null,
               "description": "The configuration properties.",
@@ -1060,23 +1060,23 @@
                 "options": null,
                 "optionsDataSource": null,
                 "properties": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               } ],
               "multipleValues": true,
               "objectType": null,
               "options": null,
               "optionsDataSource": null,
               "properties": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
           "multipleValues": true,
           "objectType": null,
           "options": null,
           "optionsDataSource": null,
           "properties": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "Expand options that include additional transition details in the response.",
@@ -1120,7 +1120,7 @@
           } ],
           "controlType": "CHECKBOX"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "List of issue screen fields to update, specifying the sub-field to update and its value for each field. This field provides a straightforward option when setting a sub-field. When multiple sub-fields or other operations are required, use `update`. Fields included in here cannot be included in `update`.",
@@ -1153,14 +1153,14 @@
           "options": null,
           "optionsDataSource": null,
           "properties": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "objectType": null,
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "A Map containing the field field name and a list of operations to perform on the issue screen field. Note that fields included in here cannot be included in `fields`.",
@@ -1191,14 +1191,14 @@
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "objectType": null,
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "Details of issue history metadata.",
@@ -1457,7 +1457,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "Details of user or system associated with a issue history metadata item.",
@@ -1579,7 +1579,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "Details of user or system associated with a issue history metadata item.",
@@ -1701,7 +1701,7 @@
             "optionsDataSource": null,
             "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": "Additional arbitrary information about the history record.",
@@ -1738,9 +1738,9 @@
           "options": null,
           "optionsDataSource": null,
           "properties": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "Details of issue properties to be add or update.",
@@ -1808,16 +1808,16 @@
             "options": null,
             "optionsDataSource": null,
             "properties": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -1947,14 +1947,14 @@
           "options": null,
           "optionsDataSource": null,
           "properties": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "objectType": null,
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "Details of the issue properties identified in the request.",
@@ -1987,14 +1987,14 @@
           "options": null,
           "optionsDataSource": null,
           "properties": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "objectType": null,
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The ID and name of each field present on the issue.",
@@ -2031,7 +2031,7 @@
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The schema describing each field present on the issue.",
@@ -2181,23 +2181,23 @@
               "options": null,
               "optionsDataSource": null,
               "properties": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "objectType": null,
             "options": null,
             "optionsDataSource": null,
             "properties": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "objectType": null,
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The transitions that can be performed on the issue.",
@@ -2471,9 +2471,9 @@
                 "optionsDataSource": null,
                 "sampleDataType": null
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "Whether there is a screen associated with the issue transition.",
@@ -2791,16 +2791,16 @@
                     "options": null,
                     "optionsDataSource": null,
                     "properties": null,
-                    "controlType": "JSON_BUILDER"
+                    "controlType": "OBJECT_BUILDER"
                   } ],
                   "multipleValues": true,
                   "objectType": null,
                   "options": null,
                   "optionsDataSource": null,
                   "properties": null,
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "The name of the field.",
@@ -2911,7 +2911,7 @@
                 "multipleValues": true,
                 "options": null,
                 "optionsDataSource": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "The list of values allowed in the field.",
@@ -2944,12 +2944,12 @@
                   "options": null,
                   "optionsDataSource": null,
                   "properties": null,
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 } ],
                 "multipleValues": true,
                 "options": null,
                 "optionsDataSource": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "The default value of the field.",
@@ -2969,7 +2969,7 @@
                 "options": null,
                 "optionsDataSource": null,
                 "properties": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "The configuration properties.",
@@ -3002,23 +3002,23 @@
                   "options": null,
                   "optionsDataSource": null,
                   "properties": null,
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 } ],
                 "multipleValues": true,
                 "objectType": null,
                 "options": null,
                 "optionsDataSource": null,
                 "properties": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "objectType": null,
             "options": null,
             "optionsDataSource": null,
             "properties": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "Expand options that include additional transition details in the response.",
@@ -3062,12 +3062,12 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "Details of the operations that can be performed on the issue.",
@@ -3290,7 +3290,7 @@
                 "optionsDataSource": null,
                 "controlType": "INPUT_INTEGER"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -3461,21 +3461,21 @@
                   "optionsDataSource": null,
                   "controlType": "INPUT_INTEGER"
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               } ],
               "multipleValues": true,
               "options": null,
               "optionsDataSource": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "A list of editable field details.",
@@ -3686,16 +3686,16 @@
                   "options": null,
                   "optionsDataSource": null,
                   "properties": null,
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 } ],
                 "multipleValues": true,
                 "objectType": null,
                 "options": null,
                 "optionsDataSource": null,
                 "properties": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             }, {
               "advancedOption": null,
               "description": "The name of the field.",
@@ -3806,7 +3806,7 @@
               "multipleValues": true,
               "options": null,
               "optionsDataSource": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             }, {
               "advancedOption": null,
               "description": "The list of values allowed in the field.",
@@ -3839,12 +3839,12 @@
                 "options": null,
                 "optionsDataSource": null,
                 "properties": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               } ],
               "multipleValues": true,
               "options": null,
               "optionsDataSource": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             }, {
               "advancedOption": null,
               "description": "The default value of the field.",
@@ -3864,7 +3864,7 @@
               "options": null,
               "optionsDataSource": null,
               "properties": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             }, {
               "advancedOption": null,
               "description": "The configuration properties.",
@@ -3897,25 +3897,25 @@
                 "options": null,
                 "optionsDataSource": null,
                 "properties": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               } ],
               "multipleValues": true,
               "objectType": null,
               "options": null,
               "optionsDataSource": null,
               "properties": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
           "multipleValues": true,
           "objectType": null,
           "options": null,
           "optionsDataSource": null,
           "properties": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "A page of changelogs.",
@@ -4226,7 +4226,7 @@
                   "optionsDataSource": null,
                   "sampleDataType": null
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "The display name of the user. Depending on the user’s privacy settings, this may return an alternative value.",
@@ -4304,7 +4304,7 @@
                 "optionsDataSource": null,
                 "sampleDataType": null
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             }, {
               "advancedOption": null,
               "description": "The date on which the change took place.",
@@ -4472,12 +4472,12 @@
                   "optionsDataSource": null,
                   "sampleDataType": null
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               } ],
               "multipleValues": true,
               "options": null,
               "optionsDataSource": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             }, {
               "advancedOption": null,
               "description": "Details of issue history metadata.",
@@ -4736,7 +4736,7 @@
                   "optionsDataSource": null,
                   "sampleDataType": null
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "Details of user or system associated with a issue history metadata item.",
@@ -4858,7 +4858,7 @@
                   "optionsDataSource": null,
                   "sampleDataType": null
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "Details of user or system associated with a issue history metadata item.",
@@ -4980,7 +4980,7 @@
                   "optionsDataSource": null,
                   "sampleDataType": null
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "Additional arbitrary information about the history record.",
@@ -5017,18 +5017,18 @@
                 "options": null,
                 "optionsDataSource": null,
                 "properties": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The versions of each field on the issue.",
@@ -5061,14 +5061,14 @@
           "options": null,
           "optionsDataSource": null,
           "properties": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "objectType": null,
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -5121,7 +5121,7 @@
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -5156,7 +5156,7 @@
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -5191,9 +5191,9 @@
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -5226,16 +5226,16 @@
           "options": null,
           "optionsDataSource": null,
           "properties": null,
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "objectType": null,
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -5288,7 +5288,7 @@
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Whether fields in `fields` are referenced by keys rather than IDs. This parameter is useful where fields have been added by a connect app and a field's key may differ from its ID.",
@@ -5365,7 +5365,7 @@
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Whether the project in which the issue is created is added to the user's **Recently viewed** project list, as shown under **Projects** in Jira. This also populates the [JQL issues search](#api-rest-api-3-search-get) `lastViewed` field.",
@@ -5622,14 +5622,14 @@
               "options": null,
               "optionsDataSource": null,
               "properties": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "objectType": null,
             "options": null,
             "optionsDataSource": null,
             "properties": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "Details of the issue properties identified in the request.",
@@ -5662,14 +5662,14 @@
               "options": null,
               "optionsDataSource": null,
               "properties": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "objectType": null,
             "options": null,
             "optionsDataSource": null,
             "properties": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The ID and name of each field present on the issue.",
@@ -5706,7 +5706,7 @@
             "options": null,
             "optionsDataSource": null,
             "properties": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The schema describing each field present on the issue.",
@@ -5856,23 +5856,23 @@
                   "options": null,
                   "optionsDataSource": null,
                   "properties": null,
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 } ],
                 "multipleValues": true,
                 "objectType": null,
                 "options": null,
                 "optionsDataSource": null,
                 "properties": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "objectType": null,
             "options": null,
             "optionsDataSource": null,
             "properties": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The transitions that can be performed on the issue.",
@@ -6146,9 +6146,9 @@
                     "optionsDataSource": null,
                     "sampleDataType": null
                   } ],
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "Whether there is a screen associated with the issue transition.",
@@ -6466,16 +6466,16 @@
                         "options": null,
                         "optionsDataSource": null,
                         "properties": null,
-                        "controlType": "JSON_BUILDER"
+                        "controlType": "OBJECT_BUILDER"
                       } ],
                       "multipleValues": true,
                       "objectType": null,
                       "options": null,
                       "optionsDataSource": null,
                       "properties": null,
-                      "controlType": "JSON_BUILDER"
+                      "controlType": "OBJECT_BUILDER"
                     } ],
-                    "controlType": "JSON_BUILDER"
+                    "controlType": "OBJECT_BUILDER"
                   }, {
                     "advancedOption": null,
                     "description": "The name of the field.",
@@ -6586,7 +6586,7 @@
                     "multipleValues": true,
                     "options": null,
                     "optionsDataSource": null,
-                    "controlType": "JSON_BUILDER"
+                    "controlType": "OBJECT_BUILDER"
                   }, {
                     "advancedOption": null,
                     "description": "The list of values allowed in the field.",
@@ -6619,12 +6619,12 @@
                       "options": null,
                       "optionsDataSource": null,
                       "properties": null,
-                      "controlType": "JSON_BUILDER"
+                      "controlType": "OBJECT_BUILDER"
                     } ],
                     "multipleValues": true,
                     "options": null,
                     "optionsDataSource": null,
-                    "controlType": "JSON_BUILDER"
+                    "controlType": "OBJECT_BUILDER"
                   }, {
                     "advancedOption": null,
                     "description": "The default value of the field.",
@@ -6644,7 +6644,7 @@
                     "options": null,
                     "optionsDataSource": null,
                     "properties": null,
-                    "controlType": "JSON_BUILDER"
+                    "controlType": "OBJECT_BUILDER"
                   }, {
                     "advancedOption": null,
                     "description": "The configuration properties.",
@@ -6677,23 +6677,23 @@
                       "options": null,
                       "optionsDataSource": null,
                       "properties": null,
-                      "controlType": "JSON_BUILDER"
+                      "controlType": "OBJECT_BUILDER"
                     } ],
                     "multipleValues": true,
                     "objectType": null,
                     "options": null,
                     "optionsDataSource": null,
                     "properties": null,
-                    "controlType": "JSON_BUILDER"
+                    "controlType": "OBJECT_BUILDER"
                   } ],
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 } ],
                 "multipleValues": true,
                 "objectType": null,
                 "options": null,
                 "optionsDataSource": null,
                 "properties": null,
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               }, {
                 "advancedOption": null,
                 "description": "Expand options that include additional transition details in the response.",
@@ -6737,12 +6737,12 @@
                 } ],
                 "controlType": "CHECKBOX"
               } ],
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "Details of the operations that can be performed on the issue.",
@@ -6965,7 +6965,7 @@
                     "optionsDataSource": null,
                     "controlType": "INPUT_INTEGER"
                   } ],
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 }, {
                   "advancedOption": null,
                   "description": null,
@@ -7136,21 +7136,21 @@
                       "optionsDataSource": null,
                       "controlType": "INPUT_INTEGER"
                     } ],
-                    "controlType": "JSON_BUILDER"
+                    "controlType": "OBJECT_BUILDER"
                   } ],
                   "multipleValues": true,
                   "options": null,
                   "optionsDataSource": null,
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               } ],
               "multipleValues": true,
               "options": null,
               "optionsDataSource": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "A list of editable field details.",
@@ -7361,16 +7361,16 @@
                       "options": null,
                       "optionsDataSource": null,
                       "properties": null,
-                      "controlType": "JSON_BUILDER"
+                      "controlType": "OBJECT_BUILDER"
                     } ],
                     "multipleValues": true,
                     "objectType": null,
                     "options": null,
                     "optionsDataSource": null,
                     "properties": null,
-                    "controlType": "JSON_BUILDER"
+                    "controlType": "OBJECT_BUILDER"
                   } ],
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 }, {
                   "advancedOption": null,
                   "description": "The name of the field.",
@@ -7481,7 +7481,7 @@
                   "multipleValues": true,
                   "options": null,
                   "optionsDataSource": null,
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 }, {
                   "advancedOption": null,
                   "description": "The list of values allowed in the field.",
@@ -7514,12 +7514,12 @@
                     "options": null,
                     "optionsDataSource": null,
                     "properties": null,
-                    "controlType": "JSON_BUILDER"
+                    "controlType": "OBJECT_BUILDER"
                   } ],
                   "multipleValues": true,
                   "options": null,
                   "optionsDataSource": null,
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 }, {
                   "advancedOption": null,
                   "description": "The default value of the field.",
@@ -7539,7 +7539,7 @@
                   "options": null,
                   "optionsDataSource": null,
                   "properties": null,
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 }, {
                   "advancedOption": null,
                   "description": "The configuration properties.",
@@ -7572,25 +7572,25 @@
                     "options": null,
                     "optionsDataSource": null,
                     "properties": null,
-                    "controlType": "JSON_BUILDER"
+                    "controlType": "OBJECT_BUILDER"
                   } ],
                   "multipleValues": true,
                   "objectType": null,
                   "options": null,
                   "optionsDataSource": null,
                   "properties": null,
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               } ],
               "multipleValues": true,
               "objectType": null,
               "options": null,
               "optionsDataSource": null,
               "properties": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "A page of changelogs.",
@@ -7901,7 +7901,7 @@
                       "optionsDataSource": null,
                       "sampleDataType": null
                     } ],
-                    "controlType": "JSON_BUILDER"
+                    "controlType": "OBJECT_BUILDER"
                   }, {
                     "advancedOption": null,
                     "description": "The display name of the user. Depending on the user’s privacy settings, this may return an alternative value.",
@@ -7979,7 +7979,7 @@
                     "optionsDataSource": null,
                     "sampleDataType": null
                   } ],
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 }, {
                   "advancedOption": null,
                   "description": "The date on which the change took place.",
@@ -8147,12 +8147,12 @@
                       "optionsDataSource": null,
                       "sampleDataType": null
                     } ],
-                    "controlType": "JSON_BUILDER"
+                    "controlType": "OBJECT_BUILDER"
                   } ],
                   "multipleValues": true,
                   "options": null,
                   "optionsDataSource": null,
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 }, {
                   "advancedOption": null,
                   "description": "Details of issue history metadata.",
@@ -8411,7 +8411,7 @@
                       "optionsDataSource": null,
                       "sampleDataType": null
                     } ],
-                    "controlType": "JSON_BUILDER"
+                    "controlType": "OBJECT_BUILDER"
                   }, {
                     "advancedOption": null,
                     "description": "Details of user or system associated with a issue history metadata item.",
@@ -8533,7 +8533,7 @@
                       "optionsDataSource": null,
                       "sampleDataType": null
                     } ],
-                    "controlType": "JSON_BUILDER"
+                    "controlType": "OBJECT_BUILDER"
                   }, {
                     "advancedOption": null,
                     "description": "Details of user or system associated with a issue history metadata item.",
@@ -8655,7 +8655,7 @@
                       "optionsDataSource": null,
                       "sampleDataType": null
                     } ],
-                    "controlType": "JSON_BUILDER"
+                    "controlType": "OBJECT_BUILDER"
                   }, {
                     "advancedOption": null,
                     "description": "Additional arbitrary information about the history record.",
@@ -8692,18 +8692,18 @@
                     "options": null,
                     "optionsDataSource": null,
                     "properties": null,
-                    "controlType": "JSON_BUILDER"
+                    "controlType": "OBJECT_BUILDER"
                   } ],
-                  "controlType": "JSON_BUILDER"
+                  "controlType": "OBJECT_BUILDER"
                 } ],
-                "controlType": "JSON_BUILDER"
+                "controlType": "OBJECT_BUILDER"
               } ],
               "multipleValues": true,
               "options": null,
               "optionsDataSource": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": "The versions of each field on the issue.",
@@ -8736,14 +8736,14 @@
               "options": null,
               "optionsDataSource": null,
               "properties": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "objectType": null,
             "options": null,
             "optionsDataSource": null,
             "properties": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -8796,7 +8796,7 @@
               "multipleValues": true,
               "options": null,
               "optionsDataSource": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -8831,7 +8831,7 @@
               "multipleValues": true,
               "options": null,
               "optionsDataSource": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             }, {
               "advancedOption": null,
               "description": null,
@@ -8866,9 +8866,9 @@
               "multipleValues": true,
               "options": null,
               "optionsDataSource": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           }, {
             "advancedOption": null,
             "description": null,
@@ -8901,21 +8901,21 @@
               "options": null,
               "optionsDataSource": null,
               "properties": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "objectType": null,
             "options": null,
             "optionsDataSource": null,
             "properties": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "Any warnings related to the JQL query.",
@@ -8950,7 +8950,7 @@
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The ID and name of each field in the search results.",
@@ -8987,7 +8987,7 @@
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The schema describing the field types in the search results.",
@@ -9137,25 +9137,25 @@
               "options": null,
               "optionsDataSource": null,
               "properties": null,
-              "controlType": "JSON_BUILDER"
+              "controlType": "OBJECT_BUILDER"
             } ],
             "multipleValues": true,
             "objectType": null,
             "options": null,
             "optionsDataSource": null,
             "properties": null,
-            "controlType": "JSON_BUILDER"
+            "controlType": "OBJECT_BUILDER"
           } ],
-          "controlType": "JSON_BUILDER"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": true,
         "objectType": null,
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -9286,7 +9286,7 @@
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Use [expand](#expansion) to include additional information about issues in the response. This parameter accepts a comma-separated list. Expand options include:\n\n *  `renderedFields` Returns field values rendered in HTML format.\n *  `names` Returns the display name of each field.\n *  `schema` Returns the schema describing a field type.\n *  `transitions` Returns all possible transitions for the issue.\n *  `operations` Returns all possible operations for the issue.\n *  `editmeta` Returns information about how each field can be edited.\n *  `changelog` Returns a list of recent updates to an issue, sorted by date, starting from the most recent.\n *  `versionedRepresentations` Instead of `fields`, returns `versionedRepresentations` a JSON array containing each version of a field's value, with the highest numbered item representing the most recent version.",
@@ -9338,7 +9338,7 @@
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Reference fields by their key (rather than ID).",

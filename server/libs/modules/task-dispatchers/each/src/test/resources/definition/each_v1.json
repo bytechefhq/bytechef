@@ -30,7 +30,7 @@
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -144,7 +144,7 @@
       "options": null,
       "optionsDataSource": null,
       "properties": null,
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -223,7 +223,7 @@
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -337,7 +337,7 @@
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -360,7 +360,7 @@
     "multipleValues": true,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "JSON_BUILDER"
+    "controlType": "OBJECT_BUILDER"
   }, {
     "advancedOption": null,
     "description": "The name of the item variable.",

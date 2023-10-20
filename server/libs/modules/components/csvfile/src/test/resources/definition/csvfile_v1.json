@@ -23,7 +23,7 @@
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -462,12 +462,12 @@
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER"
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.csv\" will be used.",

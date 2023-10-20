@@ -87,7 +87,7 @@
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
+        "controlType": "OBJECT_BUILDER",
         "expressionEnabled": null
       }, {
         "advancedOption": null,
@@ -169,7 +169,7 @@
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER",
+        "controlType": "OBJECT_BUILDER",
         "expressionEnabled": null
       }, {
         "advancedOption": null,
@@ -710,7 +710,7 @@
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
+        "controlType": "OBJECT_BUILDER",
         "expressionEnabled": null
       }, {
         "advancedOption": null,
@@ -792,7 +792,7 @@
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER",
+        "controlType": "OBJECT_BUILDER",
         "expressionEnabled": null
       }, {
         "advancedOption": null,
@@ -916,7 +916,7 @@
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
+        "controlType": "OBJECT_BUILDER",
         "expressionEnabled": null
       }, {
         "advancedOption": null,
@@ -998,7 +998,7 @@
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER",
+        "controlType": "OBJECT_BUILDER",
         "expressionEnabled": null
       }, {
         "advancedOption": null,
@@ -1140,7 +1140,7 @@
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
+        "controlType": "OBJECT_BUILDER",
         "expressionEnabled": null
       }, {
         "advancedOption": null,
@@ -1222,7 +1222,7 @@
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER",
+        "controlType": "OBJECT_BUILDER",
         "expressionEnabled": null
       }, {
         "advancedOption": null,

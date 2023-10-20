@@ -55,12 +55,12 @@
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "multipleValues": true,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "JSON_BUILDER"
+    "controlType": "OBJECT_BUILDER"
   } ],
   "title": "Fork/Join",
   "version": 1

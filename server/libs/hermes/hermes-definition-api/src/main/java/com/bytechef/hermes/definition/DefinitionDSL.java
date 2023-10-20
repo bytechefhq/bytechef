@@ -500,7 +500,7 @@ public class DefinitionDSL {
             @Override
             public ControlType getControlType() {
                 if ((options == null || options.isEmpty()) && optionsDataSource == null) {
-                    return ControlType.JSON_BUILDER;
+                    return ControlType.OBJECT_BUILDER;
                 } else {
                     return ControlType.MULTI_SELECT;
                 }
@@ -1087,7 +1087,7 @@ public class DefinitionDSL {
                 }
 
                 if ((options == null || options.isEmpty()) && optionsDataSource == null) {
-                    return ControlType.JSON_BUILDER;
+                    return ControlType.OBJECT_BUILDER;
                 } else {
                     return ControlType.SELECT;
                 }
