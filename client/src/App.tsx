@@ -22,8 +22,8 @@ const navigation: {
     icon: React.ForwardRefExoticComponent<React.SVGProps<SVGSVGElement>>;
 }[] = [
     {
-        name: 'Integrations',
-        href: '/automation/integrations',
+        name: 'Projects',
+        href: '/automation/projects',
         icon: FolderPlusIcon,
     },
     {name: 'Instances', href: '/automation/instances', icon: LightBulbIcon},
