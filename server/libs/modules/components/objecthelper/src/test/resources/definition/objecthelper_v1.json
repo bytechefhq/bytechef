@@ -11,27 +11,18 @@
         "label": "Convert from JSON string"
       },
       "name": "jsonParse",
-      "inputs": [
+      "output": [
+        {
+          "type": "ANY"
+        }
+      ],
+      "properties": [
         {
           "description": "The JSON string to convert to the data.",
           "label": "Source",
           "name": "source",
-          "type": "STRING",
-          "required": true
-        }
-      ],
-      "outputSchema": [
-        {
-          "type": "ARRAY"
-        },
-        {
-          "type": "BOOLEAN"
-        },
-        {
-          "type": "NUMBER"
-        },
-        {
-          "type": "OBJECT"
+          "required": true,
+          "type": "STRING"
         }
       ]
     },
@@ -41,13 +32,18 @@
         "label": "Convert to JSON string"
       },
       "name": "jsonStringify",
-      "inputs": [
+      "output": [
+        {
+          "type": "STRING"
+        }
+      ],
+      "properties": [
         {
           "description": "The data to convert to JSON string.",
           "label": "Source",
           "name": "source",
-          "type": "ANY",
           "required": true,
+          "type": "ANY",
           "types": [
             {
               "type": "ARRAY"
@@ -65,11 +61,6 @@
               "type": "STRING"
             }
           ]
-        }
-      ],
-      "outputSchema": [
-        {
-          "type": "STRING"
         }
       ]
     }

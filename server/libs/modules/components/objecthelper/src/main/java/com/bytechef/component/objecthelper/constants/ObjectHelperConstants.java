@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.object.helper.constants;
+package com.bytechef.component.objecthelper.constants;
 
 /**
  * @author Ivica Cardic

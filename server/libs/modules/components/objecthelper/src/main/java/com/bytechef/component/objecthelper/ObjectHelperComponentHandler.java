@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.object.helper;
+package com.bytechef.component.objecthelper;
 
-import static com.bytechef.component.object.helper.constants.ObjectHelperConstants.JSON_PARSE;
-import static com.bytechef.component.object.helper.constants.ObjectHelperConstants.JSON_STRINGIFY;
-import static com.bytechef.component.object.helper.constants.ObjectHelperConstants.OBJECT_HELPER;
-import static com.bytechef.component.object.helper.constants.ObjectHelperConstants.SOURCE;
+import static com.bytechef.component.objecthelper.constants.ObjectHelperConstants.JSON_PARSE;
+import static com.bytechef.component.objecthelper.constants.ObjectHelperConstants.JSON_STRINGIFY;
+import static com.bytechef.component.objecthelper.constants.ObjectHelperConstants.OBJECT_HELPER;
+import static com.bytechef.component.objecthelper.constants.ObjectHelperConstants.SOURCE;
 import static com.bytechef.hermes.component.ComponentDSL.action;
 import static com.bytechef.hermes.component.ComponentDSL.any;
+import static com.bytechef.hermes.component.ComponentDSL.array;
+import static com.bytechef.hermes.component.ComponentDSL.bool;
 import static com.bytechef.hermes.component.ComponentDSL.createComponent;
 import static com.bytechef.hermes.component.ComponentDSL.display;
+import static com.bytechef.hermes.component.ComponentDSL.number;
+import static com.bytechef.hermes.component.ComponentDSL.object;
 import static com.bytechef.hermes.component.ComponentDSL.string;
 
 import com.bytechef.commons.json.JsonUtils;
-import com.bytechef.hermes.component.ComponentDSL;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
@@ -45,30 +48,21 @@ public class ObjectHelperComponentHandler implements ComponentHandler {
                     action(JSON_PARSE)
                             .display(display("Convert from JSON string")
                                     .description("Converts the JSON string to object/array."))
-                            .inputs(string(SOURCE)
+                            .properties(string(SOURCE)
                                     .label("Source")
                                     .description("The JSON string to convert to the data.")
                                     .required(true))
-                            .outputSchema(
-                                    ComponentDSL.array(),
-                                    ComponentDSL.bool(),
-                                    ComponentDSL.number(),
-                                    ComponentDSL.object())
+                            .output(any())
                             .performFunction(this::performParse),
                     action(JSON_STRINGIFY)
                             .display(display("Convert to JSON string")
                                     .description("Writes the object/array to a JSON string."))
-                            .inputs(any(SOURCE)
+                            .properties(any(SOURCE)
                                     .label("Source")
                                     .description("The data to convert to JSON string.")
-                                    .types(
-                                            ComponentDSL.array(),
-                                            ComponentDSL.bool(),
-                                            ComponentDSL.number(),
-                                            ComponentDSL.object(),
-                                            ComponentDSL.string())
+                                    .types(array(), bool(), number(), object(), string())
                                     .required(true))
-                            .outputSchema(ComponentDSL.string())
+                            .output(string())
                             .performFunction(this::performStringify));
 
     @Override
