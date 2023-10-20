@@ -22,16 +22,18 @@ const DataPillPanelBody = () => {
     const {componentActions, componentNames, dataPills, setDataPills} =
         useWorkflowDefinitionStore();
 
-    const {focusedInput} = useNodeDetailsDialogStore();
+    const {currentNode, focusedInput} = useNodeDetailsDialogStore();
 
     const taskTypes = componentActions?.map(
         (componentAction) =>
             `${componentAction.componentName}/1/${componentAction.actionName}`
     );
 
+    const currentNodeIndex = componentNames.indexOf(currentNode.name);
+
     const previousComponentNames =
         componentNames.length > 1
-            ? componentNames.slice(0, -1)
+            ? componentNames.slice(0, currentNodeIndex)
             : componentNames;
 
     const {data: previousComponents} = useGetComponentDefinitionsQuery(
@@ -148,7 +150,7 @@ const DataPillPanel = () => {
 
     return (
         <Dialog.Root
-            open={dataPillPanelOpen && nodeDetailsDialogOpen}
+            open={nodeDetailsDialogOpen && dataPillPanelOpen}
             onOpenChange={() => setDataPillPanelOpen(!dataPillPanelOpen)}
             modal={false}
         >
