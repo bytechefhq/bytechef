@@ -21,15 +21,15 @@ import com.bytechef.tag.domain.Tag;
 
 import java.util.Optional;
 
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 /**
  * @author Ivica Cardic
  */
 @Repository
-public interface TagRepository extends PagingAndSortingRepository<Tag, Long>, CrudRepository<Tag, Long> {
+public interface TagRepository extends ListPagingAndSortingRepository<Tag, Long>, ListCrudRepository<Tag, Long> {
 
     Optional<Tag> findByName(String name);
 }

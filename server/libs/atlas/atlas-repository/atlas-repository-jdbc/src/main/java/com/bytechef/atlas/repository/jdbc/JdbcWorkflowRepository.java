@@ -22,7 +22,7 @@ import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 @ConditionalOnProperty(prefix = "bytechef", name = "workflow-repository.jdbc.enabled", havingValue = "true")
 public interface JdbcWorkflowRepository
-    extends PagingAndSortingRepository<Workflow, String>, WorkflowRepository, WorkflowCrudRepository {
+    extends ListPagingAndSortingRepository<Workflow, String>, WorkflowRepository, WorkflowCrudRepository {
 
     @Override
     void deleteById(String id);

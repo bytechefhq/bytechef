@@ -25,7 +25,7 @@ import java.util.Optional;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.jdbc.repository.query.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 @ConditionalOnProperty(prefix = "bytechef", name = "persistence.provider", havingValue = "jdbc")
 public interface JdbcTaskExecutionRepository
-    extends PagingAndSortingRepository<TaskExecution, Long>, TaskExecutionRepository {
+    extends ListPagingAndSortingRepository<TaskExecution, Long>, TaskExecutionRepository {
 
     @Override
     List<TaskExecution> findAllByJobIdOrderByCreatedDate(Long jobId);

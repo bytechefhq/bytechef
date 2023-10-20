@@ -20,7 +20,7 @@ package com.bytechef.helios.project.repository;
 import com.bytechef.helios.project.domain.ProjectInstance;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -32,7 +32,7 @@ import java.util.Optional;
  */
 @Repository
 public interface ProjectInstanceRepository
-    extends PagingAndSortingRepository<ProjectInstance, Long>, CrudRepository<ProjectInstance, Long> {
+    extends ListPagingAndSortingRepository<ProjectInstance, Long>, CrudRepository<ProjectInstance, Long> {
 
     @Query("SELECT project_instance.project_id FROM project_instance")
     List<Long> findAllProjectId();
