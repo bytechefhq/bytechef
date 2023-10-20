@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.function;
+package com.bytechef.component.script;
 
-import static com.bytechef.component.function.constants.FunctionConstants.FUNCTION;
-import static com.bytechef.component.function.constants.FunctionConstants.INPUT;
-import static com.bytechef.component.function.constants.FunctionConstants.JAVA;
-import static com.bytechef.component.function.constants.FunctionConstants.JAVASCRIPT;
-import static com.bytechef.component.function.constants.FunctionConstants.PYTHON;
-import static com.bytechef.component.function.constants.FunctionConstants.R;
-import static com.bytechef.component.function.constants.FunctionConstants.SCRIPT;
+import static com.bytechef.component.script.constants.ScriptConstants.INPUT;
+import static com.bytechef.component.script.constants.ScriptConstants.JAVA;
+import static com.bytechef.component.script.constants.ScriptConstants.JAVASCRIPT;
+import static com.bytechef.component.script.constants.ScriptConstants.PYTHON;
+import static com.bytechef.component.script.constants.ScriptConstants.R;
+import static com.bytechef.component.script.constants.ScriptConstants.SCRIPT;
 import static com.bytechef.hermes.component.ComponentDSL.action;
 import static com.bytechef.hermes.component.ComponentDSL.any;
-import static com.bytechef.hermes.component.ComponentDSL.createComponent;
+import static com.bytechef.hermes.component.ComponentDSL.component;
 import static com.bytechef.hermes.component.ComponentDSL.display;
 import static com.bytechef.hermes.component.ComponentDSL.object;
 import static com.bytechef.hermes.component.ComponentDSL.string;
 
-import com.bytechef.component.function.constants.FunctionConstants;
+import com.bytechef.component.script.constants.ScriptConstants;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
@@ -40,13 +39,13 @@ import com.bytechef.hermes.definition.Property;
 /**
  * @author Matija Petanjek
  */
-public class FunctionComponentHandler implements ComponentHandler {
+public class ScriptComponentHandler implements ComponentHandler {
 
     private static final PolyglotEngine polyglotEngine = new PolyglotEngine();
 
-    private final ComponentDefinition componentDefinition = createComponent(FUNCTION)
+    private final ComponentDefinition componentDefinition = component(SCRIPT)
             .display(
-                    display("Function")
+                    display("Script")
                             .description(
                                     "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages."))
             .actions(
@@ -62,9 +61,9 @@ public class FunctionComponentHandler implements ComponentHandler {
                                     string(SCRIPT)
                                             .label("Java code")
                                             .description("Add your Java custom logic here.")
-                                            .editorType(Property.EditorType.CODE))
+                                            .controlType(Property.ControlType.CODE))
                             .output(any())
-                            .performFunction(this::performJava),
+                            .perform(this::performJava),
                     action(JAVASCRIPT)
                             .display(display("JavaScript").description("Executes custom JavaScript code."))
                             .properties(
@@ -76,9 +75,9 @@ public class FunctionComponentHandler implements ComponentHandler {
                                     string(SCRIPT)
                                             .label("JavaScript code")
                                             .description("Add your JavaScript custom logic here.")
-                                            .editorType(Property.EditorType.CODE))
+                                            .controlType(Property.ControlType.CODE))
                             .output(any())
-                            .performFunction(this::performJavaScript),
+                            .perform(this::performJavaScript),
                     action(PYTHON)
                             .display(display("Python").description("Executes custom Python code."))
                             .properties(
@@ -90,9 +89,9 @@ public class FunctionComponentHandler implements ComponentHandler {
                                     string(SCRIPT)
                                             .label("Python code")
                                             .description("Add your Python custom logic here.")
-                                            .editorType(Property.EditorType.CODE))
+                                            .controlType(Property.ControlType.CODE))
                             .output(any())
-                            .performFunction(this::performPython),
+                            .perform(this::performPython),
                     action(R)
                             .display(display("R").description("Executes custom R code."))
                             .properties(
@@ -104,10 +103,10 @@ public class FunctionComponentHandler implements ComponentHandler {
                                     string(SCRIPT)
                                             .label("R code")
                                             .description("Add your R custom logic here.")
-                                            .editorType(Property.EditorType.CODE))
+                                            .controlType(Property.ControlType.CODE))
                             .output(any())
-                            .performFunction(this::performR),
-                    action(FunctionConstants.RUBY)
+                            .perform(this::performR),
+                    action(ScriptConstants.RUBY)
                             .display(display("Ruby").description("Executes custom Ruby code."))
                             .properties(
                                     object(INPUT)
@@ -118,9 +117,9 @@ public class FunctionComponentHandler implements ComponentHandler {
                                     string(SCRIPT)
                                             .label("Ruby code")
                                             .description("Add your Ruby custom logic here.")
-                                            .editorType(Property.EditorType.CODE))
+                                            .controlType(Property.ControlType.CODE))
                             .output(any())
-                            .performFunction(this::performRuby));
+                            .perform(this::performRuby));
 
     @Override
     public ComponentDefinition getDefinition() {
