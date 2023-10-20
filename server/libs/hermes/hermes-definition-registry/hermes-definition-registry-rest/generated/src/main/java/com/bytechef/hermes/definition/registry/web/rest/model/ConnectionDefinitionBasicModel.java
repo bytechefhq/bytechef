@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinitionBasic", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T08:54:46.758794+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T18:38:21.432374+01:00[Europe/Zagreb]")
 public class ConnectionDefinitionBasicModel {
 
   @JsonProperty("componentName")
@@ -78,11 +78,11 @@ public class ConnectionDefinitionBasicModel {
   }
 
   /**
-   * The version of a component.
+   * The version of a connection.
    * @return version
   */
   @NotNull 
-  @Schema(name = "version", description = "The version of a component.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "version", description = "The version of a connection.", requiredMode = Schema.RequiredMode.REQUIRED)
   public Integer getVersion() {
     return version;
   }

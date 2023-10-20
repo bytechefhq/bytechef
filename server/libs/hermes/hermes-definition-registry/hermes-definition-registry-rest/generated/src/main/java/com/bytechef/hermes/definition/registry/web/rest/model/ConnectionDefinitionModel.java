@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinition", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T08:54:46.758794+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T18:38:21.432374+01:00[Europe/Zagreb]")
 public class ConnectionDefinitionModel {
 
   @JsonProperty("authorizationRequired")
@@ -40,9 +40,6 @@ public class ConnectionDefinitionModel {
   @JsonProperty("componentName")
   private String componentName;
 
-  @JsonProperty("connectionVersion")
-  private String connectionVersion;
-
   @JsonProperty("display")
   private DisplayModel display;
 
@@ -54,7 +51,7 @@ public class ConnectionDefinitionModel {
   private ResourcesModel resources;
 
   @JsonProperty("version")
-  private Double version;
+  private Integer version;
 
   public ConnectionDefinitionModel authorizationRequired(Boolean authorizationRequired) {
     this.authorizationRequired = authorizationRequired;
@@ -119,25 +116,6 @@ public class ConnectionDefinitionModel {
 
   public void setComponentName(String componentName) {
     this.componentName = componentName;
-  }
-
-  public ConnectionDefinitionModel connectionVersion(String connectionVersion) {
-    this.connectionVersion = connectionVersion;
-    return this;
-  }
-
-  /**
-   * The connection version.
-   * @return connectionVersion
-  */
-  
-  @Schema(name = "connectionVersion", description = "The connection version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public String getConnectionVersion() {
-    return connectionVersion;
-  }
-
-  public void setConnectionVersion(String connectionVersion) {
-    this.connectionVersion = connectionVersion;
   }
 
   public ConnectionDefinitionModel display(DisplayModel display) {
@@ -205,22 +183,22 @@ public class ConnectionDefinitionModel {
     this.resources = resources;
   }
 
-  public ConnectionDefinitionModel version(Double version) {
+  public ConnectionDefinitionModel version(Integer version) {
     this.version = version;
     return this;
   }
 
   /**
-   * Get version
+   * The version of a connection.
    * @return version
   */
   
-  @Schema(name = "version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public Double getVersion() {
+  @Schema(name = "version", description = "The version of a connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public Integer getVersion() {
     return version;
   }
 
-  public void setVersion(Double version) {
+  public void setVersion(Integer version) {
     this.version = version;
   }
 
@@ -236,7 +214,6 @@ public class ConnectionDefinitionModel {
     return Objects.equals(this.authorizationRequired, connectionDefinition.authorizationRequired) &&
         Objects.equals(this.authorizations, connectionDefinition.authorizations) &&
         Objects.equals(this.componentName, connectionDefinition.componentName) &&
-        Objects.equals(this.connectionVersion, connectionDefinition.connectionVersion) &&
         Objects.equals(this.display, connectionDefinition.display) &&
         Objects.equals(this.properties, connectionDefinition.properties) &&
         Objects.equals(this.resources, connectionDefinition.resources) &&
@@ -245,7 +222,7 @@ public class ConnectionDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizationRequired, authorizations, componentName, connectionVersion, display, properties, resources, version);
+    return Objects.hash(authorizationRequired, authorizations, componentName, display, properties, resources, version);
   }
 
   @Override
@@ -255,7 +232,6 @@ public class ConnectionDefinitionModel {
     sb.append("    authorizationRequired: ").append(toIndentedString(authorizationRequired)).append("\n");
     sb.append("    authorizations: ").append(toIndentedString(authorizations)).append("\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
-    sb.append("    connectionVersion: ").append(toIndentedString(connectionVersion)).append("\n");
     sb.append("    display: ").append(toIndentedString(display)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
