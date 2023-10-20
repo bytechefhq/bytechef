@@ -99,6 +99,10 @@ public class HttpClientTaskDefinitionTest {
                                     "value":"HEADER_AUTH",
                                     "name":"Header Auth"
                                 },
+                                 {
+                                    "value":"QUERY_AUTH",
+                                    "name":"Query Auth"
+                                },
                                 {
                                     "value":"OAUTH2",
                                     "name":"OAuth2"
