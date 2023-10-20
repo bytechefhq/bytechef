@@ -4,8 +4,8 @@ dependencies {
     api "org.springframework.data:spring-data-commons"
     api "org.springframework.data:spring-data-jdbc"
 
-    implementation libs.testcontainers
-    implementation libs.testcontainers.postgresql
+    implementation libs.org.testcontainers
+    implementation libs.org.testcontainers.postgresql
 
     runtimeOnly "com.zaxxer:HikariCP"
     runtimeOnly "org.postgresql:postgresql"

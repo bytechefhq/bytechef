@@ -23,18 +23,18 @@ subprojects {
     apply from: "${rootDir}/gradle/sonar.gradle"
 
     dependencies {
-        annotationProcessor libs.picocli.codegen
+        annotationProcessor libs.info.picocli.picocli.codegen
 
-        implementation libs.logback.core
-        implementation libs.logback.classic
-        implementation libs.picocli
-        implementation libs.swagger.parser
+        implementation libs.ch.qos.logback.logback.core
+        implementation libs.ch.qos.logback.logback.classic
+        implementation libs.info.picocli
+        implementation libs.io.swagger.parser.v3.swagger.parser
 
-        testImplementation libs.jupiter.engine
+        testImplementation libs.org.junit.jupiter.junit.jupiter.engine
 
         constraints {
-            implementation libs.logback.core
-            implementation libs.logback.classic
+            implementation libs.ch.qos.logback.logback.core
+            implementation libs.ch.qos.logback.logback.classic
         }
     }
 }

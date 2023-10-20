@@ -1,5 +1,5 @@
 version="1.0"
 
 dependencies {
-    implementation libs.poi.ooxml
+    implementation libs.org.apache.poi.poi.ooxml
 }

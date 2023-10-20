@@ -38,26 +38,17 @@ tasks.register("generateOpenAPI") {
 }
 
 dependencies {
-    annotationProcessor libs.mapstruct.processor
-    annotationProcessor libs.mapstruct.spring.extensions
+    annotationProcessor libs.org.mapstruct.mapstruct.processor
+    annotationProcessor libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions
 
     api "org.springframework.data:spring-data-commons"
     api project(":server:libs:atlas:atlas-api")
     api project(":server:libs:atlas:atlas-rest:atlas-rest-api")
 
-//    implementation libs.jackson.databind.nullable
-//    implementation "jakarta.annotation:jakarta.annotation-api"
-//    implementation "jakarta.validation:jakarta.validation-api"
-//    implementation libs.mapstruct
-//    implementation libs.mapstruct.spring.annotations
-//    implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-webflux"
-//
-//    implementation libs.swagger.annotations
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-api")
     implementation project(":server:libs:core:autoconfigure-annotations")
-//    implementation project(":server:libs:core:commons:commons-util")
 
     testImplementation "org.springframework.boot:spring-boot-starter-webflux"
 }

@@ -1,6 +1,6 @@
 dependencies {
     implementation "org.springframework.boot:spring-boot-autoconfigure"
-    implementation libs.tika.core
+    implementation libs.org.apache.tika.tika.core
 
     testImplementation project(":server:libs:atlas:atlas-api")
     testImplementation project(":server:libs:core:commons:commons-util")
