@@ -180,7 +180,6 @@ module.exports = {
     plugins: [
         require('@headlessui/tailwindcss'),
         require('@tailwindcss/forms'),
-        require('@tailwindcss/line-clamp'),
         require('tailwindcss-radix'),
         plugin(function ({addBase, theme}) {
             addBase({
