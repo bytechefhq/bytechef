@@ -17,25 +17,39 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  client:
+    runs-on: ubuntu-latest
 
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up Node 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+      - name: run npm commands
+        working-directory: client
+        run: |
+          npm ci
+          npm run check
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: client/
+
+  server:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-    - name: Set up Node 16
-      uses: actions/setup-node@v3
-      with:
-        node-version: 16
-        cache: 'npm'
-        cache-dependency-path: client/package-lock.json
-    - name: run npm commands
-      working-directory: client
-      run: |
-        npm ci
-        npm run check
     - name: Set up GraalVM 22.3
       uses: graalvm/setup-graalvm@v1
       with:
@@ -59,4 +73,37 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./gradlew build jacocoTestReport sonarqube --info
+      working-directory: server
+      run: ../gradlew build jacocoTestReport sonarqube --info
+
+  cli:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up GraalVM 22.3
+        uses: graalvm/setup-graalvm@v1
+        with:
+          version: '22.3.0'
+          java-version: '17'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache Gradle packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+      - name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        working-directory: cli
+        run: ../gradlew build jacocoTestReport sonarqube --info
