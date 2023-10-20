@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 
 import Input from 'components/Input/Input';
 import Dialog from 'components/Dialog/Dialog';

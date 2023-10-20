@@ -80,7 +80,7 @@ const Projects = () => {
                                         });
                                     },
                                 }}
-                                toLink={''}
+                                toLink=""
                             />
 
                             {!categoriesIsLoading &&
@@ -111,9 +111,7 @@ const Projects = () => {
                     bottomBody={
                         <>
                             {!tagsIsLoading &&
-                                (!tags?.length ? (
-                                    <p className="px-3 text-xs">No tags.</p>
-                                ) : (
+                                (tags && !!tags.length ? (
                                     tags?.map((item) => (
                                         <LeftSidebarMenuItem
                                             key={item.id}
@@ -138,6 +136,10 @@ const Projects = () => {
                                             toLink={`?tagId=${item.id}`}
                                         />
                                     ))
+                                ) : (
+                                    <span className="px-3 text-xs">
+                                        You have not created any tags yet.
+                                    </span>
                                 ))}
                         </>
                     }
