@@ -126,7 +126,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Integration'
-  /integrations/{id}/integration-tags:
+  /integrations/{id}/tags:
     put:
       description: Updates tags of an existing integration.
       summary: Updates tags of an existing integration.
