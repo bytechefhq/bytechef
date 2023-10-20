@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.http.client.auth.resolver;
+package com.bytechef.hermes.component;
 
-import com.bytechef.hermes.component.ConnectionParameters;
-import com.github.mizosoft.methanol.Methanol;
-import java.util.List;
-import java.util.Map;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
 
 /**
- * @author Matija Petanjek
+ * Default component definition factory.
+ *
  * @author Ivica Cardic
  */
-public interface AuthResolver {
-    void apply(
-            Methanol.Builder builder,
-            Map<String, List<String>> headers,
-            Map<String, List<String>> queryParams,
-            ConnectionParameters connectionParameters);
+public interface ComponentDefinitionFactory {
+
+    ComponentDefinition getDefinition();
 }

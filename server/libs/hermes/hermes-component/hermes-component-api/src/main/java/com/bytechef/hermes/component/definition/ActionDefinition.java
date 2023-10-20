@@ -16,7 +16,9 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.PerformFunction;
+import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.definition.Definition;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -25,15 +27,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 /**
  * @author Ivica Cardic
  */
 @Schema(
-        name = "Action",
+        name = "ActionDefinition",
         description =
                 "An action is a a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
-public final class Action {
+public final class ActionDefinition implements Definition {
 
     public static final String ACTION = "action";
     private Display display;
@@ -44,28 +47,28 @@ public final class Action {
     private List<Property<?>> properties;
 
     @JsonIgnore
-    private PerformFunction performFunction;
+    private BiFunction<Context, ExecutionParameters, Object> performFunction;
 
-    private Action() {}
+    private ActionDefinition() {}
 
-    public Action(String name) {
+    public ActionDefinition(String name) {
         this.name = name;
     }
 
-    public Action display(Display display) {
+    public ActionDefinition display(Display display) {
         this.display = display;
 
         return this;
     }
 
-    public Action exampleOutput(Object exampleOutput) {
+    public ActionDefinition exampleOutput(Object exampleOutput) {
         this.exampleOutput = exampleOutput;
 
         return this;
     }
 
     @SuppressWarnings("unchecked")
-    public Action metadata(String key, String value) {
+    public ActionDefinition metadata(String key, String value) {
         if (metadata == null) {
             metadata = new HashMap<>();
         }
@@ -76,25 +79,25 @@ public final class Action {
     }
 
     @SuppressFBWarnings("EI2")
-    public Action metadata(Map<String, Object> metadata) {
+    public ActionDefinition metadata(Map<String, Object> metadata) {
         this.metadata = metadata;
 
         return this;
     }
 
-    public Action output(Property... output) {
+    public ActionDefinition output(Property... output) {
         this.output = List.of(output);
 
         return this;
     }
 
-    public Action performFunction(PerformFunction performFunction) {
+    public ActionDefinition perform(BiFunction<Context, ExecutionParameters, Object> performFunction) {
         this.performFunction = performFunction;
 
         return this;
     }
 
-    public Action properties(Property... properties) {
+    public ActionDefinition properties(Property... properties) {
         this.properties = List.of(properties);
 
         return this;
@@ -129,7 +132,12 @@ public final class Action {
         return properties;
     }
 
-    public PerformFunction getPerformFunction() {
+    /**
+     * The code that should be performed when the action is executed as a task whe running inside the workflow engine.
+     *
+     * @return a perform function implementation
+     */
+    public BiFunction<Context, ExecutionParameters, Object> getPerformFunction() {
         return performFunction;
     }
 }

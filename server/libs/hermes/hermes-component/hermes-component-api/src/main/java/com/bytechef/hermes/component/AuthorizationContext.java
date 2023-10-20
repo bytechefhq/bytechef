@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.http.client.auth.resolver;
+package com.bytechef.hermes.component;
 
-import com.bytechef.hermes.component.ConnectionParameters;
-import com.bytechef.hermes.component.http.client.constants.HttpClientConstants;
-import com.github.mizosoft.methanol.Methanol;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public class BearerTokenAuthResolver implements AuthResolver {
+public interface AuthorizationContext {
 
-    @Override
-    public void apply(
-            Methanol.Builder builder,
-            Map<String, List<String>> headers,
-            Map<String, List<String>> queryParams,
-            ConnectionParameters connectionParameters) {
+    void setHeaders(Map<String, List<String>> headers);
 
-        headers.put("Authorization", List.of("Bearer " + connectionParameters.getParameter(HttpClientConstants.TOKEN)));
-    }
+    void setQueryParameters(Map<String, List<String>> queryParameters);
+
+    void setUsernamePassword(String username, String password);
 }

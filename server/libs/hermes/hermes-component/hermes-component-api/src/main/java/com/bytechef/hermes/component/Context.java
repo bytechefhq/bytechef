@@ -16,6 +16,7 @@
 
 package com.bytechef.hermes.component;
 
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import java.io.InputStream;
 import java.util.Optional;
 
@@ -24,9 +25,11 @@ import java.util.Optional;
  */
 public interface Context {
 
-    Optional<ConnectionParameters> fetchConnection();
+    Optional<ConnectionParameters> fetchConnectionParameters();
 
-    ConnectionParameters getConnection();
+    ConnectionDefinition getConnectionDefinition();
+
+    ConnectionParameters getConnectionParameters();
 
     InputStream getFileStream(FileEntry fileEntry);
 

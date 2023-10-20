@@ -19,8 +19,13 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.hermes.component.constants.Versions;
 import com.bytechef.hermes.definition.Definition;
 import com.bytechef.hermes.definition.Resources;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Used for specifying a component.
@@ -33,10 +38,11 @@ import java.util.List;
                 "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers(TODO) and connections if there is a need for a connection to an outside service.")
 public final class ComponentDefinition implements Definition {
 
-    private List<ConnectionDefinition> connections;
+    private List<ActionDefinition> actionDefinitions;
+    private ConnectionDefinition connectionDefinition;
     private ComponentDisplay display;
+    private Map<String, Object> metadata;
     private String name;
-    private List<Action> actions;
     private Resources resources;
     private int version = Versions.VERSION_1;
 
@@ -46,20 +52,48 @@ public final class ComponentDefinition implements Definition {
         this.name = name;
     }
 
-    public ComponentDefinition actions(Action... actions) {
-        this.actions = List.of(actions);
+    public ComponentDefinition actions(ActionDefinition... actionDefinitions) {
+        this.actionDefinitions = List.of(actionDefinitions);
 
         return this;
     }
 
-    public ComponentDefinition connections(ConnectionDefinition... connections) {
-        this.connections = List.of(connections);
+    public ComponentDefinition actions(List<ActionDefinition>... actionsList) {
+        this.actionDefinitions =
+                Stream.of(actionsList).flatMap(Collection::stream).toList();
 
         return this;
     }
 
-    public ComponentDefinition display(com.bytechef.hermes.component.definition.ComponentDisplay display) {
+    public ComponentDefinition connection(ConnectionDefinition connectionDefinition) {
+        this.connectionDefinition = connectionDefinition;
+
+        this.connectionDefinition.setComponentName(name);
+        this.connectionDefinition.setDisplay(display);
+
+        return this;
+    }
+
+    public ComponentDefinition display(ComponentDisplay display) {
         this.display = display;
+
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ComponentDefinition metadata(String key, String value) {
+        if (metadata == null) {
+            metadata = new HashMap<>();
+        }
+
+        this.metadata.put(key, value);
+
+        return this;
+    }
+
+    @SuppressFBWarnings("EI2")
+    public ComponentDefinition metadata(Map<String, Object> metadata) {
+        this.metadata = metadata;
 
         return this;
     }
@@ -78,14 +112,14 @@ public final class ComponentDefinition implements Definition {
 
     @SuppressWarnings("unchecked")
     @Schema(name = "actions", description = "The list of all available actions the component can perform.")
-    public List<Action> getActions() {
-        return actions;
+    public List<ActionDefinition> getActionDefinitions() {
+        return actionDefinitions;
     }
 
     @SuppressWarnings("unchecked")
-    @Schema(name = "connections", description = " The list of possible connections to an outside service.")
-    public List<ConnectionDefinition> getConnections() {
-        return connections;
+    @Schema(name = "connection", description = "Definition of connection to an outside service.")
+    public ConnectionDefinition getConnectionDefinition() {
+        return connectionDefinition;
     }
 
     @Override
@@ -93,18 +127,20 @@ public final class ComponentDefinition implements Definition {
         return display;
     }
 
-    @Override
+    @Schema(name = "metadata", description = "Additional data that can be used during processing.")
+    public Map<String, Object> getMetadata() {
+        return metadata == null ? null : new HashMap<>(metadata);
+    }
+
     @Schema(name = "name", description = "The connection name.")
     public String getName() {
         return name;
     }
 
-    @Override
     public Resources getResources() {
         return resources;
     }
 
-    @Override
     public int getVersion() {
         return version;
     }

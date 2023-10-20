@@ -16,24 +16,27 @@
 
 package com.bytechef.hermes.component;
 
-import com.bytechef.hermes.component.definition.Action;
+import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
 
 /**
+ * Default component handler.
+ *
  * @author Ivica Cardic
  */
-public interface ComponentHandler extends ComponentFactory {
+public interface ComponentHandler extends ComponentDefinitionFactory {
 
     /**
-     * This can be useful if we still want to have only one method to handle all actions.
+     * This can be useful if we still want to have only one method to handle all actions. It is called when
+     * <code>performFunction</code> of the <code>ActionDefinition</code> instance is null.
      *
-     * @param action
+     * @param actionDefinition
      * @param context
      * @param executionParameters
      * @return the result of execution
      * @throws ActionExecutionException
      */
-    default Object handle(Action action, Context context, ExecutionParameters executionParameters)
+    default Object handle(ActionDefinition actionDefinition, Context context, ExecutionParameters executionParameters)
             throws ActionExecutionException {
 
         return null;
