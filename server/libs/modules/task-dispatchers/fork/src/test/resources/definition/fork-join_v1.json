@@ -4,5 +4,25 @@
     "label": "Fork/Join"
   },
   "name": "fork-join",
-  "version": 1
+  "version": 1,
+  "taskProperties": [
+    {
+      "type": "ARRAY",
+      "description": "The list of sequences of tasks to execute in parallel.",
+      "name": "branches",
+      "items": [
+        {
+          "type": "ARRAY",
+          "description": "The list of tasks that executes sequentially.",
+          "items": [
+            {
+              "description": "The task or task dispatcher to use.",
+              "objectType": "TASK",
+              "type": "OBJECT"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

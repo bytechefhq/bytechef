@@ -16,19 +16,16 @@
 
 package com.bytechef.task.dispatcher.fork;
 
-import com.bytechef.hermes.test.definition.DefinitionAssert;
-import java.io.IOException;
-import org.json.JSONException;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class ForkJoinTaskDispatcherDefinitionFactoryTest {
+public class ForkJoinTaskDispatcherFactoryTest {
 
     @Test
-    public void testGetTaskDispatcherDefinition() throws IOException, JSONException {
-        DefinitionAssert.assertEquals(
-                "definition/fork-join_v1.json", new ForkJoinTaskDispatcherDefinitionFactory().getDefinition());
+    public void testGetTaskDispatcherDefinition() {
+        AssertUtils.assertEquals("definition/fork-join_v1.json", new ForkJoinTaskDispatcherFactory().getDefinition());
     }
 }

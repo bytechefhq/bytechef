@@ -22,4 +22,5 @@ package com.bytechef.task.dispatcher.fork.constants;
 public class ForkJoinTaskDispatcherConstants {
     public static final String FORK_JOIN = "fork-join";
     public static final String FORK = "fork";
+    public static final String BRANCHES = "branches";
 }
