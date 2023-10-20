@@ -86,12 +86,14 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     public void handle(TaskExecution taskExecution) {
         Assert.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
 
-        if (!StringUtils.hasText(taskExecution.getName())) {
-            log.debug("Task id={}, type='{}' completed", taskExecution.getId(), taskExecution.getType());
-        } else {
-            log.debug(
-                "Task id={}, type='{}', name='{}' completed", taskExecution.getId(), taskExecution.getType(),
-                taskExecution.getName());
+        if (log.isDebugEnabled()) {
+            if (!StringUtils.hasText(taskExecution.getName())) {
+                log.debug("Task id={}, type='{}' completed", taskExecution.getId(), taskExecution.getType());
+            } else {
+                log.debug(
+                    "Task id={}, type='{}', name='{}' completed",
+                    taskExecution.getId(), taskExecution.getType(), taskExecution.getName());
+            }
         }
 
         Job job = jobService.getTaskExecutionJob(taskExecution.getId());
@@ -151,7 +153,9 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
 
-        log.debug("Job id={}, label='{}' completed", job.getId(), job.getLabel());
+        if (log.isDebugEnabled()) {
+            log.debug("Job id={}, label='{}' completed", job.getId(), job.getLabel());
+        }
     }
 
     private boolean hasMoreTasks(Job job) {
