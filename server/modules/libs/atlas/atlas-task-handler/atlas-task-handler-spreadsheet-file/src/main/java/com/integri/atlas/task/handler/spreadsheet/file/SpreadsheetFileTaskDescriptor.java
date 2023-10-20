@@ -19,7 +19,6 @@
 package com.integri.atlas.task.handler.spreadsheet.file;
 
 import static com.integri.atlas.engine.core.task.description.TaskDescription.task;
-import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValue;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValues;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
@@ -37,7 +36,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpreadsheetFileTaskDescriptor implements TaskDescriptor {
 
-    private static final TaskDescription TASK_DESCRIPTION = task("spreadsheetFile")
+    public static final TaskDescription TASK_DESCRIPTION = task("spreadsheetFile")
         .displayName("Spreadsheet File")
         .description("Reads and writes data from a spreadsheet file")
         .properties(
@@ -70,7 +69,7 @@ public class SpreadsheetFileTaskDescriptor implements TaskDescriptor {
                     option("XLS", "XLS", "Microsoft Excel"),
                     option("XLSX", "XLSX", "Microsoft Excel")
                 )
-                .defaultValue("csv"),
+                .defaultValue("CSV"),
             STRING_PROPERTY("binaryPropertyName")
                 .displayName("Binary Property")
                 .displayOption(show("operation", "WRITE"))
