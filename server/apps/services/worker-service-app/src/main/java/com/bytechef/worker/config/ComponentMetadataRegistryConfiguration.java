@@ -19,6 +19,7 @@ package com.bytechef.worker.config;
 
 import com.bytechef.discovery.metadata.ServiceMetadataRegistry;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Configuration;
@@ -35,19 +36,21 @@ import java.util.stream.Collectors;
 @Configuration
 public class ComponentMetadataRegistryConfiguration implements InitializingBean {
 
-    private final List<ComponentDefinition> componentDefinitions;
+    private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ServiceMetadataRegistry serviceMetadataRegistry;
 
     @SuppressFBWarnings("EI2")
     public ComponentMetadataRegistryConfiguration(
-        List<ComponentDefinition> componentDefinitions, ServiceMetadataRegistry serviceMetadataRegistry) {
+        ComponentDefinitionRegistry componentDefinitionRegistry, ServiceMetadataRegistry serviceMetadataRegistry) {
 
-        this.componentDefinitions = componentDefinitions;
+        this.componentDefinitionRegistry = componentDefinitionRegistry;
         this.serviceMetadataRegistry = serviceMetadataRegistry;
     }
 
     @Override
     public void afterPropertiesSet() {
+        List<ComponentDefinition> componentDefinitions = componentDefinitionRegistry.getComponentDefinitions();
+
         serviceMetadataRegistry.registerMetadata(
             Map.of(
                 "componentNames",
