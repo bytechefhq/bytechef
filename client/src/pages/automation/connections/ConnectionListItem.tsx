@@ -13,12 +13,15 @@ import {
 import {ComponentDefinitionKeys} from '../../../queries/componentDefinitions.queries';
 import TagList from '../../../components/TagList/TagList';
 
-interface ConnectionItemProps {
+interface ConnectionListItemProps {
     connection: ConnectionModel;
     remainingTags?: TagModel[];
 }
 
-const ConnectionItem = ({connection, remainingTags}: ConnectionItemProps) => {
+const ConnectionListItem = ({
+    connection,
+    remainingTags,
+}: ConnectionListItemProps) => {
     const queryClient = useQueryClient();
 
     const deleteConnectionMutation = useDeleteConnectionMutation({
@@ -103,4 +106,4 @@ const ConnectionItem = ({connection, remainingTags}: ConnectionItemProps) => {
     );
 };
 
-export default ConnectionItem;
+export default ConnectionListItem;
