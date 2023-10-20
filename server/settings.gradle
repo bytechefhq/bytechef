@@ -9,10 +9,8 @@
 
 pluginManagement {
     plugins {
-        id "io.spring.nohttp" version "${noHttpPluginVersion}"
         id "com.diffplug.spotless" version "${spotlessPluginVersion}"
         id "com.github.ben-manes.versions" version "${versionsVersion}"
-        id "com.github.node-gradle.node" version "${gradleNodePluginVersion}"
         id "com.github.spotbugs" version "${spotbugsVersion}"
         id "com.google.cloud.tools.jib" version "${jibPluginVersion}"
         id "com.gorylenko.gradle-git-properties" version "${gitPropertiesPluginVersion}"

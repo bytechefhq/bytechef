@@ -1,0 +1,17 @@
+<FindBugsFilter>
+    <Match>
+        <Class name="com.integri.atlas.config.AtlasProperties" />
+    </Match>
+    <Match>
+        <Class name="com.integri.atlas.config.CoordinatorProperties" />
+    </Match>
+    <Match>
+        <Class name="com.integri.atlas.config.WorkerProperties" />
+    </Match>
+    <Match>
+        <Class name="com.integri.atlas.config.WorkflowRepositoryProperties" />
+    </Match>
+    <Match>
+        <Class name="com.integri.atlas.config.WorkflowRepositoryProperties$GitProperties" />
+    </Match>
+</FindBugsFilter>
