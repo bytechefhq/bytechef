@@ -3,6 +3,7 @@ import {EdgeProps, getBezierPath} from 'reactflow';
 
 import useEdgeClick from '../hooks/useEdgeClick';
 import styles from './EdgeTypes.module.css';
+import PopoverMenu from "../PopoverMenu";
 
 export default function WorkflowEdge({
     id,
@@ -38,22 +39,24 @@ export default function WorkflowEdge({
                 markerEnd={markerEnd}
             />
 
-            <g transform={`translate(${edgeCenterX}, ${edgeCenterY})`}>
-                <rect
-                    onClick={onClick}
-                    x={-10}
-                    y={-10}
-                    width={20}
-                    ry={4}
-                    rx={4}
-                    height={20}
-                    className={styles.edgeButton}
-                />
+            <PopoverMenu>
+                <g transform={`translate(${edgeCenterX}, ${edgeCenterY})`}>
+                    <rect
+                        onClick={onClick}
+                        x={-10}
+                        y={-10}
+                        width={20}
+                        ry={4}
+                        rx={4}
+                        height={20}
+                        className={styles.edgeButton}
+                    />
 
-                <text className={styles.edgeButtonText} y={5} x={-5}>
-                    +
-                </text>
-            </g>
+                    <text className={styles.edgeButtonText} y={5} x={-5}>
+                        +
+                    </text>
+                </g>
+            </PopoverMenu>
         </>
     );
 }
