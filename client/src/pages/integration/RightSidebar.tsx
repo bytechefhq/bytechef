@@ -14,7 +14,7 @@ type SidebarProps = {
     closeSidebar: () => void;
 };
 
-const Sidebar = ({closeSidebar}: SidebarProps) => {
+const RightSidebar = ({closeSidebar}: SidebarProps) => {
     return (
         <Provider>
             <div className="h-full bg-slate-200 dark:bg-gray-800">
@@ -141,4 +141,4 @@ const Sidebar = ({closeSidebar}: SidebarProps) => {
     );
 };
 
-export default Sidebar;
+export default RightSidebar;
