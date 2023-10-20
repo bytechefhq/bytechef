@@ -17,7 +17,6 @@
 package com.bytechef.task.handler.io;
 
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,7 +27,7 @@ import org.springframework.core.io.ClassPathResource;
 public class LsTest {
 
     @Test
-    public void test1() throws IOException {
+    public void test1() throws Exception {
         Ls ls = new Ls();
         ClassPathResource cpr = new ClassPathResource("ls");
         SimpleTaskExecution task = new SimpleTaskExecution();
@@ -41,7 +40,7 @@ public class LsTest {
     }
 
     @Test
-    public void test2() throws IOException {
+    public void test2() throws Exception {
         Ls ls = new Ls();
         ClassPathResource cpr = new ClassPathResource("ls");
         SimpleTaskExecution task = new SimpleTaskExecution();
@@ -54,7 +53,7 @@ public class LsTest {
     }
 
     @Test
-    public void test3() throws IOException {
+    public void test3() throws Exception {
         Ls ls = new Ls();
         ClassPathResource cpr = new ClassPathResource("ls");
         SimpleTaskExecution task = new SimpleTaskExecution();
