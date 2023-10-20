@@ -34,7 +34,7 @@ public class ActionDefinitionMapper {
         extends Converter<ActionDefinitionDTO, ActionDefinitionModel> {
 
         @Override
-        ActionDefinitionModel convert(ActionDefinitionDTO actionDefinition);
+        ActionDefinitionModel convert(ActionDefinitionDTO actionDefinitionDTO);
     }
 
     @Mapper(config = DefinitionMapperSpringConfig.class)
@@ -42,6 +42,6 @@ public class ActionDefinitionMapper {
         extends Converter<ActionDefinitionDTO, ActionDefinitionBasicModel> {
 
         @Override
-        ActionDefinitionBasicModel convert(ActionDefinitionDTO actionDefinition);
+        ActionDefinitionBasicModel convert(ActionDefinitionDTO actionDefinitionDTO);
     }
 }

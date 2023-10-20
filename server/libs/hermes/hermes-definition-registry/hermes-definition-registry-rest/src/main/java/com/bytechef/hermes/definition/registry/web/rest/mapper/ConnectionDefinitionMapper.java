@@ -36,7 +36,7 @@ public class ConnectionDefinitionMapper {
 
         @Override
         @Mapping(target = "baseUri", ignore = true)
-        ConnectionDefinitionModel convert(ConnectionDefinitionDTO connectionDefinition);
+        ConnectionDefinitionModel convert(ConnectionDefinitionDTO connectionDefinitionDTO);
     }
 
     @Mapper(config = DefinitionMapperSpringConfig.class)
@@ -44,6 +44,6 @@ public class ConnectionDefinitionMapper {
         extends Converter<ConnectionDefinitionDTO, ConnectionDefinitionBasicModel> {
 
         @Override
-        ConnectionDefinitionBasicModel convert(ConnectionDefinitionDTO connectionDefinition);
+        ConnectionDefinitionBasicModel convert(ConnectionDefinitionDTO connectionDefinitionDTO);
     }
 }

@@ -24,7 +24,7 @@ import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.event.TaskStartedWorkflowEvent;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.task.CancelControlTask;
 import com.bytechef.atlas.task.ControlTask;
 import com.bytechef.atlas.task.WorkflowTask;
@@ -77,7 +77,7 @@ public class Worker {
     private final TaskHandlerResolver taskHandlerResolver;
     private final MessageBroker messageBroker;
     private final EventPublisher eventPublisher;
-    private final ExecutorService executors;
+    private final ExecutorService executorService;
 
     private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -85,7 +85,7 @@ public class Worker {
         taskHandlerResolver = Objects.requireNonNull(builder.taskHandlerResolver);
         messageBroker = Objects.requireNonNull(builder.messageBroker);
         eventPublisher = Objects.requireNonNull(builder.eventPublisher);
-        executors = Objects.requireNonNull(builder.executorService);
+        executorService = Objects.requireNonNull(builder.executorService);
         taskEvaluator = Objects.requireNonNull(builder.taskEvaluator);
     }
 
@@ -100,14 +100,14 @@ public class Worker {
 
         CountDownLatch latch = new CountDownLatch(1);
 
-        Future<?> future = executors.submit(() -> {
+        Future<?> future = executorService.submit(() -> {
             try {
                 eventPublisher.publishEvent(
                     new TaskStartedWorkflowEvent(taskExecution.getJobId(), taskExecution.getId()));
 
                 TaskExecution completedTaskExecution = doExecuteTask(taskExecution);
 
-                messageBroker.send(Queues.COMPLETIONS, completedTaskExecution);
+                messageBroker.send(TaskQueues.COMPLETIONS, completedTaskExecution);
             } catch (InterruptedException e) {
                 // ignore
             } catch (Exception e) {
@@ -177,7 +177,22 @@ public class Worker {
 
             TaskHandler<?> taskHandler = taskHandlerResolver.resolve(taskExecution);
 
-            Object output = taskHandler.handle(taskExecution);
+            Object output = taskHandler.handle(
+                TaskExecution.builder()
+                    .id(taskExecution.getId())
+                    .jobId(taskExecution.getJobId())
+                    .maxRetries(taskExecution.getMaxRetries())
+                    .parentId(taskExecution.getParentId())
+                    .priority(taskExecution.getPriority())
+                    .progress(taskExecution.getProgress())
+                    .retryAttempts(taskExecution.getRetryAttempts())
+                    .retryDelay(taskExecution.getRetryDelay())
+                    .retryDelayFactor(taskExecution.getRetryDelayFactor())
+                    .status(taskExecution.getStatus())
+                    .startDate(taskExecution.getStartDate())
+                    .taskNumber(taskExecution.getTaskNumber())
+                    .workflowTask(taskExecution.getWorkflowTask())
+                    .build());
 
             if (output != null) {
                 taskExecution.setOutput(output);
@@ -225,7 +240,7 @@ public class Worker {
             new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));
         taskExecution.setStatus(TaskStatus.FAILED);
 
-        messageBroker.send(Queues.ERRORS, taskExecution);
+        messageBroker.send(TaskQueues.ERRORS, taskExecution);
     }
 
     private long calculateTimeout(TaskExecution taskExecution) {

@@ -20,7 +20,7 @@ package com.bytechef.hermes.task.dispatcher.test.workflow;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.job.JobParameters;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
@@ -96,7 +96,7 @@ public class TaskDispatcherWorkflowTestSupport {
             .workflowService(workflowService)
             .build();
 
-        return jobSyncExecutor.execute(new JobParametersDTO(inputs, workflowId));
+        return jobSyncExecutor.execute(new JobParameters(inputs, workflowId));
     }
 
     @FunctionalInterface

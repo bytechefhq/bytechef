@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.test.workflow;
 
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.job.JobParameters;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
@@ -67,7 +67,7 @@ public class ComponentWorkflowTestSupport {
             .workflowService(workflowService)
             .build();
 
-        return jobSyncExecutor.execute(new JobParametersDTO(inputs, workflowId));
+        return jobSyncExecutor.execute(new JobParameters(inputs, workflowId));
     }
 
     public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
@@ -82,6 +82,6 @@ public class ComponentWorkflowTestSupport {
             .workflowService(workflowService)
             .build();
 
-        return jobSyncExecutor.execute(new JobParametersDTO(inputs, workflowId));
+        return jobSyncExecutor.execute(new JobParameters(inputs, workflowId));
     }
 }

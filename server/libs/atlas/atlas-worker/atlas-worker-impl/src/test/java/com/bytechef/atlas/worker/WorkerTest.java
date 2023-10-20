@@ -19,7 +19,7 @@ package com.bytechef.atlas.worker;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.task.CancelControlTask;
 import com.bytechef.atlas.task.WorkflowTask;
@@ -44,9 +44,9 @@ public class WorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         messageBroker.receive(
-            Queues.COMPLETIONS,
+            TaskQueues.COMPLETIONS,
             t -> Assertions.assertEquals("done", ((TaskExecution) t).getOutput()));
-        messageBroker.receive(Queues.EVENTS, t -> {});
+        messageBroker.receive(TaskQueues.EVENTS, t -> {});
 
         Worker worker = Worker.builder()
             .taskHandlerResolver(jt -> t -> "done")
@@ -68,10 +68,10 @@ public class WorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         messageBroker.receive(
-            Queues.ERRORS,
+            TaskQueues.ERRORS,
             t -> Assertions.assertEquals("bad input", ((TaskExecution) t).getError()
                 .getMessage()));
-        messageBroker.receive(Queues.EVENTS, t -> {});
+        messageBroker.receive(TaskQueues.EVENTS, t -> {});
 
         Worker worker = Worker.builder()
             .taskHandlerResolver(jt -> t -> {
@@ -94,13 +94,13 @@ public class WorkerTest {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         messageBroker.receive(
-            Queues.COMPLETIONS, t -> Assertions.assertEquals("done", (((TaskExecution) t).getOutput())));
-        messageBroker.receive(Queues.ERRORS, t -> {
+            TaskQueues.COMPLETIONS, t -> Assertions.assertEquals("done", ((TaskExecution) t).getOutput()));
+        messageBroker.receive(TaskQueues.ERRORS, t -> {
             TaskExecution taskExecution = (TaskExecution) t;
 
             Assertions.assertNull(taskExecution.getError());
         });
-        messageBroker.receive(Queues.EVENTS, t -> {});
+        messageBroker.receive(TaskQueues.EVENTS, t -> {});
 
         Worker worker = Worker.builder()
             .taskHandlerResolver(t1 -> {
@@ -136,10 +136,10 @@ public class WorkerTest {
             .getAbsolutePath();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
-        messageBroker.receive(Queues.COMPLETIONS, t -> {
+        messageBroker.receive(TaskQueues.COMPLETIONS, t -> {
             Assertions.assertFalse(new File(tempDir).exists());
         });
-        messageBroker.receive(Queues.EVENTS, t -> {});
+        messageBroker.receive(TaskQueues.EVENTS, t -> {});
 
         Worker worker = Worker.builder()
             .taskHandlerResolver(t1 -> {
@@ -147,10 +147,10 @@ public class WorkerTest {
                 if ("var".equals(type)) {
                     return t2 -> MapValueUtils.getRequired(t2.getParameters(), "value");
                 } else if ("mkdir".equals(type)) {
-                    return t2 -> (new File(MapValueUtils.getString(t2.getParameters(), "path")).mkdirs());
+                    return t2 -> new File(MapValueUtils.getString(t2.getParameters(), "path")).mkdirs();
                 } else if ("rm".equals(type)) {
                     return t2 -> FileSystemUtils
-                        .deleteRecursively((new File(MapValueUtils.getString(t2.getParameters(), "path"))));
+                        .deleteRecursively(new File(MapValueUtils.getString(t2.getParameters(), "path")));
                 } else if ("pass".equals(type)) {
                     Assertions.assertTrue(new File(tempDir).exists());
                     return t2 -> null;
@@ -182,20 +182,20 @@ public class WorkerTest {
             .getAbsolutePath();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
-        messageBroker.receive(Queues.ERRORS, t -> {
+        messageBroker.receive(TaskQueues.ERRORS, t -> {
             Assertions.assertFalse(new File(tempDir).exists());
         });
-        messageBroker.receive(Queues.EVENTS, t -> {});
+        messageBroker.receive(TaskQueues.EVENTS, t -> {});
         Worker worker = Worker.builder()
             .taskHandlerResolver(t1 -> {
                 String type = t1.getType();
                 if ("var".equals(type)) {
                     return t2 -> MapValueUtils.getRequired(t2.getParameters(), "value");
                 } else if ("mkdir".equals(type)) {
-                    return t2 -> (new File(MapValueUtils.getString(t2.getParameters(), "path")).mkdirs());
+                    return t2 -> new File(MapValueUtils.getString(t2.getParameters(), "path")).mkdirs();
                 } else if ("rm".equals(type)) {
                     return t2 -> FileSystemUtils
-                        .deleteRecursively((new File(MapValueUtils.getString(t2.getParameters(), "path"))));
+                        .deleteRecursively(new File(MapValueUtils.getString(t2.getParameters(), "path")));
                 } else if ("rogue".equals(type)) {
                     Assertions.assertTrue(new File(tempDir).exists());
                     return t2 -> {

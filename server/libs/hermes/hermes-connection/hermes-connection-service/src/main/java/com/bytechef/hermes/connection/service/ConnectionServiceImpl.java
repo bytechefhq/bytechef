@@ -18,13 +18,14 @@
 package com.bytechef.hermes.connection.service;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.commons.util.StringUtils;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -32,6 +33,7 @@ import org.springframework.util.CollectionUtils;
 /**
  * @author Ivica Cardic
  */
+@Service("connectionService")
 @Transactional
 public class ConnectionServiceImpl implements ConnectionService {
 
@@ -45,13 +47,11 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     public Connection create(Connection connection) {
         Assert.notNull(connection, "'connection' must not be null");
-
         Assert.hasText(connection.getComponentName(), "'componentName' must not be empty");
         Assert.hasText(connection.getName(), "'name' must not be empty");
         Assert.isNull(connection.getId(), "'id' must be null");
 
-        connection.setKey(
-            StringUtils.toLowerCase(StringUtils.replaceAll(connection.getName(), "[^a-zA-Z0-9]", "")));
+        connection.setKey(StringUtils.lowerCase(StringUtils.replaceChars(connection.getName(), "[^a-zA-Z0-9]", "")));
 
         return connectionRepository.save(connection);
     }
@@ -110,14 +110,12 @@ public class ConnectionServiceImpl implements ConnectionService {
     public Connection update(long id, String name, List<Long> tagIds, int version) {
         Assert.hasText(name, "'name' must not be empty");
 
-        return OptionalUtils.map(
-            connectionRepository.findById(id),
-            connection -> {
-                connection.setName(name);
-                connection.setTagIds(tagIds);
-                connection.setVersion(version);
+        Connection connection = OptionalUtils.get(connectionRepository.findById(id));
 
-                return connectionRepository.save(connection);
-            });
+        connection.setName(name);
+        connection.setTagIds(tagIds);
+        connection.setVersion(version);
+
+        return connectionRepository.save(connection);
     }
 }

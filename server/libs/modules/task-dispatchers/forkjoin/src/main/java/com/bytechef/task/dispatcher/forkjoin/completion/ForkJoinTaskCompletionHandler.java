@@ -79,7 +79,8 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public boolean canHandle(TaskExecution taskExecution) {
-        return taskExecution.getParentId() != null && MapValueUtils.get(taskExecution.getParameters(), BRANCH) != null;
+        return taskExecution.getParentId() != null
+            && MapValueUtils.get(taskExecution.getParameters(), BRANCH) != null;
     }
 
     @Override
@@ -126,7 +127,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
                 .parentId(taskExecution.getId())
                 .priority(taskExecution.getPriority())
                 .taskNumber(taskExecution.getTaskNumber() + 1)
-                .workflowTask(branchWorkflowTask.putParameter(BRANCH, branch))
+                .workflowTask(WorkflowTask.of(branchWorkflowTask, BRANCH, branch))
                 .build();
 
             Map<String, Object> context = contextService.peek(

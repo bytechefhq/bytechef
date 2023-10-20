@@ -65,10 +65,10 @@ public class ConnectionController implements ConnectionsApi {
     public Mono<ResponseEntity<ConnectionModel>> createConnection(
         Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
 
-        return connectionModelMono.map(connectionModel -> conversionService.convert(
-            connectionFacade.create(
-                conversionService.convert(connectionModel, ConnectionDTO.class)),
-            ConnectionModel.class))
+        return connectionModelMono.map(
+            connectionModel -> conversionService.convert(
+                connectionFacade.create(conversionService.convert(connectionModel, ConnectionDTO.class)),
+                ConnectionModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -83,7 +83,8 @@ public class ConnectionController implements ConnectionsApi {
     @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<ConnectionModel>> getConnection(Long id, ServerWebExchange exchange) {
         return Mono.just(
-            conversionService.convert(connectionFacade.getConnection(id), ConnectionModel.class)
+            conversionService.convert(
+                connectionFacade.getConnection(id), ConnectionModel.class)
                 .parameters(null))
             .map(ResponseEntity::ok);
     }
@@ -96,8 +97,9 @@ public class ConnectionController implements ConnectionsApi {
         return Mono.just(Flux.fromIterable(
             connectionFacade.getConnections(componentNames, tagIds)
                 .stream()
-                .map(connection -> conversionService.convert(connection, ConnectionModel.class)
-                    .parameters(null))
+                .map(
+                    connection -> conversionService.convert(connection, ConnectionModel.class)
+                        .parameters(null))
                 .toList()))
             .map(ResponseEntity::ok);
     }
@@ -109,12 +111,14 @@ public class ConnectionController implements ConnectionsApi {
         return connectionModelMono
             .map(connectionModel -> conversionService.convert(connectionModel, ConnectionDTO.class))
             .map(ConnectionDTO::toConnection)
-            .map(connection -> connectionDefinitionService.getOAuth2Parameters(
-                connection.getComponentName(), connection.getConnectionVersion(),
-                oAuth2Properties.checkPredefinedApp(connection.getComponentName(), connection.getParameters()),
-                connection.getAuthorizationName()))
-            .map(oAuth2AuthorizationParametersDTO -> conversionService.convert(
-                oAuth2AuthorizationParametersDTO, OAuth2AuthorizationParametersModel.class))
+            .map(
+                connection -> connectionDefinitionService.getOAuth2Parameters(
+                    connection.getComponentName(), connection.getConnectionVersion(),
+                    oAuth2Properties.checkPredefinedApp(connection.getComponentName(), connection.getParameters()),
+                    connection.getAuthorizationName()))
+            .map(
+                oAuth2AuthorizationParametersDTO -> conversionService.convert(
+                    oAuth2AuthorizationParametersDTO, OAuth2AuthorizationParametersModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -122,10 +126,11 @@ public class ConnectionController implements ConnectionsApi {
     public Mono<ResponseEntity<ConnectionModel>> updateConnection(
         Long id, Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
 
-        return connectionModelMono.map(connectionModel -> conversionService.convert(
-            connectionFacade.update(
-                conversionService.convert(connectionModel.id(id), ConnectionDTO.class)),
-            ConnectionModel.class))
+        return connectionModelMono.map(
+            connectionModel -> conversionService.convert(
+                connectionFacade.update(
+                    conversionService.convert(connectionModel.id(id), ConnectionDTO.class)),
+                ConnectionModel.class))
             .map(ResponseEntity::ok);
     }
 

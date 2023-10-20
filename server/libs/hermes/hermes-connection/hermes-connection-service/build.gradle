@@ -2,6 +2,7 @@ dependencies {
     api project(":server:libs:hermes:hermes-connection:hermes-connection-api")
 
     implementation "com.fasterxml.jackson.core:jackson-databind"
+    implementation "org.apache.commons:commons-lang3"
     implementation "org.springframework:spring-context"
     implementation project(":server:libs:core:commons:commons-data")
     implementation project(":server:libs:core:commons:commons-util")

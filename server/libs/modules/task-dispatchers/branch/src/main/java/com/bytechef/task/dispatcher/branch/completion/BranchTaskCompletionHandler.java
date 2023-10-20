@@ -37,7 +37,6 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapValueUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -46,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.Assert;
 
 /**
@@ -140,25 +140,24 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
 
     private List<WorkflowTask> resolveCase(TaskExecution taskExecution) {
         Object expression = MapValueUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
-        List<WorkflowTask> caseWorkflowTasks = CollectionUtils.map(
-            MapValueUtils.getList(taskExecution.getParameters(), CASES, Map.class, Collections.emptyList()),
-            WorkflowTask::of);
+        List<WorkflowTask> caseWorkflowTasks = MapValueUtils.getList(
+            taskExecution.getParameters(), CASES, new ParameterizedTypeReference<>() {},
+            Collections.emptyList());
 
         Assert.notNull(caseWorkflowTasks, "you must specify 'cases' in a branch statement");
 
         for (WorkflowTask caseWorkflowTask : caseWorkflowTasks) {
             Object key = MapValueUtils.getRequired(caseWorkflowTask.getParameters(), KEY);
-            List<WorkflowTask> subWorkflowTasks = CollectionUtils.map(
-                MapValueUtils.getList(caseWorkflowTask.getParameters(), TASKS, Map.class, Collections.emptyList()),
-                WorkflowTask::of);
+            List<WorkflowTask> subWorkflowTasks = MapValueUtils.getList(
+                caseWorkflowTask.getParameters(), TASKS, new ParameterizedTypeReference<>() {},
+                Collections.emptyList());
 
             if (key.equals(expression)) {
                 return subWorkflowTasks;
             }
         }
 
-        return CollectionUtils.map(
-            MapValueUtils.getList(taskExecution.getParameters(), DEFAULT, Map.class, Collections.emptyList()),
-            WorkflowTask::of);
+        return MapValueUtils.getList(
+            taskExecution.getParameters(), DEFAULT, new ParameterizedTypeReference<>() {}, Collections.emptyList());
     }
 }

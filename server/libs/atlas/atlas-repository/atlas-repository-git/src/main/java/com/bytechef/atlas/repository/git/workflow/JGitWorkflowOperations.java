@@ -138,7 +138,7 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
         }
 
         try (Git git = cloneCommand.call()) {
-            return (git.getRepository());
+            return git.getRepository();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

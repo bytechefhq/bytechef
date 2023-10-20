@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.component.registrar.jdbc.operation;
 
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.registrar.jdbc.JdbcExecutor;
@@ -49,7 +48,7 @@ public class UpdateJdbcOperation implements JdbcOperation<Map<String, Integer>> 
         String updateKey = inputParameters.getString(JdbcConstants.UPDATE_KEY, "id");
 
         int[] rowsAffected = jdbcExecutor.batchUpdate(
-            OptionalUtils.get(context.fetchConnection()),
+            context.getConnection(),
             "UPDATE "
                 + schema
                 + "."

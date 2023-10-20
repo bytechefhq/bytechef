@@ -26,7 +26,7 @@ import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispat
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.Assert;
 
 /**
@@ -76,11 +77,8 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     @Override
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        List<WorkflowTask> workflowTasks = MapValueUtils
-            .getList(taskExecution.getParameters(), TASKS, Map.class, Collections.emptyList())
-            .stream()
-            .map(WorkflowTask::of)
-            .toList();
+        List<WorkflowTask> workflowTasks = MapValueUtils.getList(
+            taskExecution.getParameters(), TASKS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
 
         Assert.notNull(workflowTasks, "'tasks' property can't be null");
 
@@ -89,7 +87,7 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
-            messageBroker.send(Queues.COMPLETIONS, taskExecution);
+            messageBroker.send(TaskQueues.COMPLETIONS, taskExecution);
         } else {
             counterService.set(taskExecution.getId(), workflowTasks.size());
 

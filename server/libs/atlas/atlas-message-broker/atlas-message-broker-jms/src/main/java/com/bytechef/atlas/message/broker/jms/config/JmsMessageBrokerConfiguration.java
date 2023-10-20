@@ -19,8 +19,8 @@
 
 package com.bytechef.atlas.message.broker.jms.config;
 
-import com.bytechef.atlas.message.broker.Exchanges;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.WorkflowExchange;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.atlas.message.broker.config.MessageBrokerListenerRegistrar;
 import com.bytechef.atlas.message.broker.jms.JmsMessageBroker;
@@ -66,11 +66,12 @@ public class JmsMessageBrokerConfiguration
     private ObjectMapper objectMapper;
 
     @Autowired(required = false)
-    private List<MessageBrokerConfigurer> messageBrokerConfigurers = Collections.emptyList();
+    private List<MessageBrokerConfigurer<JmsListenerEndpointRegistrar>> messageBrokerConfigurers = Collections
+        .emptyList();
 
     @Override
     public void configureJmsListeners(JmsListenerEndpointRegistrar listenerEndpointRegistrar) {
-        for (MessageBrokerConfigurer messageBrokerConfigurer : messageBrokerConfigurers) {
+        for (MessageBrokerConfigurer<JmsListenerEndpointRegistrar> messageBrokerConfigurer : messageBrokerConfigurers) {
             messageBrokerConfigurer.configure(listenerEndpointRegistrar, this);
         }
     }
@@ -80,8 +81,8 @@ public class JmsMessageBrokerConfiguration
         JmsListenerEndpointRegistrar listenerEndpointRegistrar, String queueName, int concurrency, Object delegate,
         String methodName) {
 
-        if (Objects.equals(queueName, Queues.CONTROL)) {
-            queueName = Exchanges.CONTROL + "/" + Exchanges.CONTROL;
+        if (Objects.equals(queueName, TaskQueues.CONTROL)) {
+            queueName = WorkflowExchange.CONTROL + "/" + WorkflowExchange.CONTROL;
         }
 
         logger.info("Registering JMS Listener: {} -> {}:{}", queueName, delegate.getClass(), methodName);

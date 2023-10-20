@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.dto;
+package com.bytechef.atlas.job;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.priority.Prioritizable;
@@ -31,7 +31,7 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-public class JobParametersDTO {
+public class JobParameters {
 
     private Map<String, Object> inputs = Collections.emptyMap();
     private String label;
@@ -40,24 +40,24 @@ public class JobParametersDTO {
     private String workflowId;
     private List<Job.Webhook> webhooks = Collections.emptyList();
 
-    private JobParametersDTO() {
+    private JobParameters() {
     }
 
     @SuppressFBWarnings("EI2")
-    public JobParametersDTO(Map<String, Object> inputs, Long parentTaskExecutionId, String workflowId) {
+    public JobParameters(Map<String, Object> inputs, Long parentTaskExecutionId, String workflowId) {
         this.inputs = inputs;
         this.parentTaskExecutionId = parentTaskExecutionId;
         this.workflowId = workflowId;
     }
 
     @SuppressFBWarnings("EI2")
-    public JobParametersDTO(Map<String, Object> inputs, String workflowId) {
+    public JobParameters(Map<String, Object> inputs, String workflowId) {
         this.inputs = inputs;
         this.workflowId = workflowId;
     }
 
     @Default
-    public JobParametersDTO(
+    public JobParameters(
         Map<String, Object> inputs, String label, Long parentTaskExecutionId, Integer priority, String workflowId,
         List<Job.Webhook> webhooks) {
 
@@ -113,14 +113,14 @@ public class JobParametersDTO {
             return false;
         }
 
-        JobParametersDTO jobParametersDTO = (JobParametersDTO) o;
+        JobParameters jobParameters = (JobParameters) o;
 
-        return Objects.equals(this.inputs, jobParametersDTO.inputs)
-            && Objects.equals(this.label, jobParametersDTO.label)
-            && Objects.equals(this.parentTaskExecutionId, jobParametersDTO.parentTaskExecutionId)
-            && Objects.equals(this.priority, jobParametersDTO.priority)
-            && Objects.equals(this.workflowId, jobParametersDTO.workflowId)
-            && Objects.equals(this.webhooks, jobParametersDTO.webhooks);
+        return Objects.equals(this.inputs, jobParameters.inputs)
+            && Objects.equals(this.label, jobParameters.label)
+            && Objects.equals(this.parentTaskExecutionId, jobParameters.parentTaskExecutionId)
+            && Objects.equals(this.priority, jobParameters.priority)
+            && Objects.equals(this.workflowId, jobParameters.workflowId)
+            && Objects.equals(this.webhooks, jobParameters.webhooks);
     }
 
     @Override

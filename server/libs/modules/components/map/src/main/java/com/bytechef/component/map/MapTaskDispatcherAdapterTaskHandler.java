@@ -22,7 +22,7 @@ package com.bytechef.component.map;
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.error.ExecutionError;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.repository.memory.InMemoryCounterRepository;
@@ -66,7 +66,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
-        messageBroker.receive(Queues.COMPLETIONS, message -> {
+        messageBroker.receive(TaskQueues.COMPLETIONS, message -> {
             TaskExecution completionTaskExecution = (TaskExecution) message;
 
             result.add(completionTaskExecution.getOutput());
@@ -74,7 +74,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
         List<ExecutionError> errors = Collections.synchronizedList(new ArrayList<>());
 
-        messageBroker.receive(Queues.ERRORS, message -> {
+        messageBroker.receive(TaskQueues.ERRORS, message -> {
             TaskExecution erroredTaskExecution = (TaskExecution) message;
 
             ExecutionError error = erroredTaskExecution.getError();

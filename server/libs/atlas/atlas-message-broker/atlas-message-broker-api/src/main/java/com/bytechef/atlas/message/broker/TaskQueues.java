@@ -25,16 +25,16 @@ import java.util.UUID;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-public interface Queues {
+public final class TaskQueues {
 
-    String COMPLETIONS = "completions";
-    String CONTROL = "x.control." + UUID.randomUUID();
-    String DLQ = "dlq";
-    String ERRORS = "errors";
-    String EVENTS = "events";
-    String JOBS = "jobs";
-    String RESTARTS = "restarts";
-    String SUBFLOWS = "subflows";
-    String STOPS = "stops";
-    String TASKS = "tasks";
+    public static final String COMPLETIONS = "completions";
+    public static final String CONTROL = "x.control." + UUID.randomUUID();
+    public static final String DLQ = "dlq";
+    public static final String ERRORS = "errors";
+    public static final String EVENTS = "events";
+    public static final String JOBS = "jobs";
+    public static final String RESTARTS = "restarts";
+    public static final String SUBFLOWS = "subflows";
+    public static final String STOPS = "stops";
+    public static final String TASKS = "tasks";
 }

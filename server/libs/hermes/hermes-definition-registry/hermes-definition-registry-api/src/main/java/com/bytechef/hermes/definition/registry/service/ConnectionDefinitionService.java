@@ -36,11 +36,13 @@ public interface ConnectionDefinitionService {
     boolean connectionExists(String componentName, int connectionVersion);
 
     void executeAuthorizationApply(
-        String componentName, int connectionVersion, Map<String, Object> connectionParameters, String authorizationName,
+        String componentName, int connectionVersion, Map<String, Object> connectionParameters,
+        String authorizationName,
         AuthorizationContext authorizationContext);
 
     AuthorizationCallbackResponse executeAuthorizationCallback(
-        String componentName, int connectionVersion, Map<String, Object> connectionParameters, String authorizationName,
+        String componentName, int connectionVersion, Map<String, Object> connectionParameters,
+        String authorizationName,
         String redirectUri);
 
     Optional<String> fetchBaseUri(

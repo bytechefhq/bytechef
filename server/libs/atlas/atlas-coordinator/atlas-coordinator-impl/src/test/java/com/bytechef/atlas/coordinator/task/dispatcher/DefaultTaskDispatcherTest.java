@@ -20,7 +20,7 @@
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.task.WorkflowTask;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -35,7 +35,7 @@ public class DefaultTaskDispatcherTest {
     @Test
     public void test1() {
         DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
-            (k, m) -> Assertions.assertEquals(Queues.TASKS, k), List.of());
+            (k, m) -> Assertions.assertEquals(TaskQueues.TASKS, k), List.of());
 
         defaultTaskDispatcher.dispatch(new TaskExecution(WorkflowTask.of("type", "test", "value")));
     }

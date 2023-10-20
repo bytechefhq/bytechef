@@ -22,12 +22,12 @@ package com.bytechef.atlas.message.broker;
 /**
  * @author Arik Cohen
  */
-public enum Exchanges {
+public enum WorkflowExchange {
 
     CONTROL("workflow.control"),
     TASKS("workflow.tasks");
 
-    Exchanges(String name) {
+    WorkflowExchange(String name) {
         this.name = name;
     }
 

@@ -23,7 +23,7 @@ import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConst
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
@@ -54,7 +54,7 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
 
         loopTaskExecution.setEndDate(LocalDateTime.now());
 
-        messageBroker.send(Queues.COMPLETIONS, loopTaskExecution);
+        messageBroker.send(TaskQueues.COMPLETIONS, loopTaskExecution);
     }
 
     private TaskExecution findLoopTaskExecution(Long taskExecutionId) {

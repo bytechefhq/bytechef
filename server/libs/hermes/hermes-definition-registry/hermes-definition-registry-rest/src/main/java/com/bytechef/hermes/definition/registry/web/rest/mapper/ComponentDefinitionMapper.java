@@ -30,13 +30,13 @@ public class ComponentDefinitionMapper {
     public interface ComponentDefinitionToComponentDefinitionModelMapper
         extends Converter<ComponentDefinitionDTO, ComponentDefinitionModel> {
 
-        ComponentDefinitionModel convert(ComponentDefinitionDTO componentDefinition);
+        ComponentDefinitionModel convert(ComponentDefinitionDTO componentDefinitionDTO);
     }
 
     @Mapper(config = DefinitionMapperSpringConfig.class)
     public interface ComponentDefinitionToComponentDefinitionBasicModelMapper
         extends Converter<ComponentDefinitionDTO, ComponentDefinitionBasicModel> {
 
-        ComponentDefinitionBasicModel convert(ComponentDefinitionDTO componentDefinition);
+        ComponentDefinitionBasicModel convert(ComponentDefinitionDTO componentDefinitionDTO);
     }
 }

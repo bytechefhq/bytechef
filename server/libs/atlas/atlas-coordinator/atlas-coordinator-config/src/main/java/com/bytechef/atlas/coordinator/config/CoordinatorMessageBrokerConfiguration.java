@@ -19,7 +19,7 @@ package com.bytechef.atlas.coordinator.config;
 
 import com.bytechef.atlas.coordinator.Coordinator;
 import com.bytechef.atlas.coordinator.event.EventListener;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.autoconfigure.annotation.ConditionalOnCoordinator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -55,43 +55,43 @@ public class CoordinatorMessageBrokerConfiguration {
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                Queues.COMPLETIONS,
+                TaskQueues.COMPLETIONS,
                 coordinatorSubscriptions.getCompletions(),
                 coordinator,
                 "complete");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                Queues.ERRORS,
+                TaskQueues.ERRORS,
                 coordinatorSubscriptions.getErrors(),
                 coordinator,
                 "handleError");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                Queues.EVENTS,
+                TaskQueues.EVENTS,
                 coordinatorSubscriptions.getEvents(),
                 applicationContext.getBean(EventListener.class),
                 "onApplicationEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                Queues.JOBS,
+                TaskQueues.JOBS,
                 coordinatorSubscriptions.getJobs(),
                 coordinator,
                 "start");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                Queues.RESTARTS,
+                TaskQueues.RESTARTS,
                 coordinatorSubscriptions.getRequests(),
                 coordinator,
                 "resume");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                Queues.SUBFLOWS,
+                TaskQueues.SUBFLOWS,
                 coordinatorSubscriptions.getJobs(),
                 coordinator,
                 "create");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                Queues.STOPS,
+                TaskQueues.STOPS,
                 coordinatorSubscriptions.getRequests(),
                 coordinator,
                 "stop");

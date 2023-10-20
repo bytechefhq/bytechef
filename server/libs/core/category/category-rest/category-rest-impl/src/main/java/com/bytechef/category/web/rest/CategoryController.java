@@ -72,9 +72,10 @@ public class CategoryController implements CategoriesApi {
     public Mono<ResponseEntity<CategoryModel>> createCategory(
         Mono<CategoryModel> categoryModelMono, ServerWebExchange exchange) {
 
-        return categoryModelMono.map(categoryModel -> conversionService.convert(
-            categoryService.create(conversionService.convert(categoryModel, Category.class)),
-            CategoryModel.class))
+        return categoryModelMono.map(
+            categoryModel -> conversionService.convert(
+                categoryService.create(conversionService.convert(categoryModel, Category.class)),
+                CategoryModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -82,9 +83,10 @@ public class CategoryController implements CategoriesApi {
     public Mono<ResponseEntity<CategoryModel>> updateCategory(
         Long id, Mono<CategoryModel> categoryModelMono, ServerWebExchange exchange) {
 
-        return categoryModelMono.map(tagModel -> conversionService.convert(
-            categoryService.update(conversionService.convert(tagModel.id(id), Category.class)),
-            CategoryModel.class))
+        return categoryModelMono.map(
+            tagModel -> conversionService.convert(
+                categoryService.update(conversionService.convert(tagModel.id(id), Category.class)),
+                CategoryModel.class))
             .map(ResponseEntity::ok);
     }
 }

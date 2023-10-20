@@ -19,7 +19,7 @@
 
 package com.bytechef.atlas.message.broker.amqp;
 
-import com.bytechef.atlas.message.broker.Exchanges;
+import com.bytechef.atlas.message.broker.WorkflowExchange;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.priority.Prioritizable;
 import com.bytechef.atlas.task.Retryable;
@@ -66,7 +66,7 @@ public class AmqpMessageBroker implements MessageBroker {
 
         Assert.isTrue(routingKeyItems.length <= 2, "Invalid routing key: " + queueName);
 
-        return routingKeyItems.length == 2 ? routingKeyItems[0] : Exchanges.TASKS.toString();
+        return routingKeyItems.length == 2 ? routingKeyItems[0] : WorkflowExchange.TASKS.toString();
     }
 
     private String determineRoutingKey(String queueName) {

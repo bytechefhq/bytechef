@@ -29,7 +29,12 @@ import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstan
 
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import org.springframework.stereotype.Component;
 
+/**
+ * @author Ivica Cardic
+ */
+@Component
 public class MapComponentDefinitionFactory implements ComponentDefinitionFactory {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(MAP)

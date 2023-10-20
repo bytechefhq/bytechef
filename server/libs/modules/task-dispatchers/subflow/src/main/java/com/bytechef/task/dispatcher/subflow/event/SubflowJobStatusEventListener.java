@@ -26,7 +26,7 @@ import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
 import com.bytechef.atlas.event.WorkflowEvent;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
@@ -66,7 +66,7 @@ public class SubflowJobStatusEventListener implements EventListener {
         if (JobStatusWorkflowEvent.JOB_STATUS.equals(workflowEvent.getType())) {
             JobStatusWorkflowEvent jobStatusWorkflowEvent = (JobStatusWorkflowEvent) workflowEvent;
 
-            Job.Status status = jobStatusWorkflowEvent.getJobStatus();
+            Job.Status status = jobStatusWorkflowEvent.getStatus();
             Job job = jobService.getJob(jobStatusWorkflowEvent.getJobId());
 
             if (job.getParentTaskExecutionId() == null) {
@@ -81,7 +81,7 @@ public class SubflowJobStatusEventListener implements EventListener {
                     TaskExecution subflowTaskExecution = taskExecutionService.getTaskExecution(
                         job.getParentTaskExecutionId());
 
-                    messageBroker.send(Queues.STOPS, subflowTaskExecution.getJobId());
+                    messageBroker.send(TaskQueues.STOPS, subflowTaskExecution.getJobId());
 
                     break;
                 }
@@ -91,13 +91,14 @@ public class SubflowJobStatusEventListener implements EventListener {
 
                     erroredTaskExecution.setError(new ExecutionError("An error occurred with subflow", List.of()));
 
-                    messageBroker.send(Queues.ERRORS, erroredTaskExecution);
+                    messageBroker.send(TaskQueues.ERRORS, erroredTaskExecution);
 
                     break;
                 }
                 case COMPLETED: {
-                    TaskExecution completionTaskExecution = taskExecutionService
-                        .getTaskExecution(job.getParentTaskExecutionId());
+                    TaskExecution completionTaskExecution = taskExecutionService.getTaskExecution(
+                        job.getParentTaskExecutionId());
+
                     Object output = job.getOutputs();
 
                     if (completionTaskExecution.getOutput() == null) {
@@ -108,7 +109,7 @@ public class SubflowJobStatusEventListener implements EventListener {
                             completionTaskExecution, Map.of("execution", Map.of("output", output)));
                     }
 
-                    messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
+                    messageBroker.send(TaskQueues.COMPLETIONS, completionTaskExecution);
 
                     break;
                 }

@@ -277,7 +277,7 @@ public final class Connection implements Persistable<Long> {
             + authorizationName + '\'' + ", componentName='"
             + componentName + ", connectionVersion='"
             + connectionVersion + ", connectionTags="
-            + connectionTags + ", parameters="
+            + connectionTags + ", queryParameters="
             + parameters + ", version="
             + version + ", createdBy='"
             + createdBy + '\'' + ", createdDate="

@@ -233,9 +233,10 @@ public class IntegrationControllerIntTest {
     @Test
     @SuppressFBWarnings("NP")
     public void testPostIntegrationWorkflows() throws Exception {
-        CreateIntegrationWorkflowRequestModel createIntegrationWorkflowRequestModel = new CreateIntegrationWorkflowRequestModel()
-            .label("workflowLabel")
-            .description("workflowDescription");
+        CreateIntegrationWorkflowRequestModel createIntegrationWorkflowRequestModel =
+            new CreateIntegrationWorkflowRequestModel()
+                .label("workflowLabel")
+                .description("workflowDescription");
         Workflow workflow = new Workflow(
             "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}", "id",
             Workflow.Format.JSON);

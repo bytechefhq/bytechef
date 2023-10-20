@@ -27,7 +27,7 @@ import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatc
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
@@ -128,7 +128,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
-            messageBroker.send(Queues.COMPLETIONS, taskExecution);
+            messageBroker.send(TaskQueues.COMPLETIONS, taskExecution);
         } else {
             Assert.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
 
@@ -148,7 +148,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
                     .parentId(taskExecution.getId())
                     .priority(taskExecution.getPriority())
                     .taskNumber(1)
-                    .workflowTask(branchWorkflowTask.putParameter(BRANCH, i))
+                    .workflowTask(WorkflowTask.of(branchWorkflowTask, BRANCH, i))
                     .build();
 
                 Map<String, Object> context = contextService.peek(

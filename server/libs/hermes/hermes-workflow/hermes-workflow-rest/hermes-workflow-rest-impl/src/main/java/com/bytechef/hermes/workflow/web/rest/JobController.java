@@ -19,10 +19,10 @@
 
 package com.bytechef.hermes.workflow.web.rest;
 
-import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.job.JobParameters;
 import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.hermes.workflow.web.rest.model.CreateJob200ResponseModel;
@@ -76,7 +76,7 @@ public class JobController implements JobsApi {
             .map(jobParametersModel -> new CreateJob200ResponseModel()
                 .jobId(
                     jobFactory.create(
-                        conversionService.convert(jobParametersModel, JobParametersDTO.class))))
+                        conversionService.convert(jobParametersModel, JobParameters.class))))
             .map(ResponseEntity::ok);
     }
 
@@ -101,7 +101,8 @@ public class JobController implements JobsApi {
     @SuppressWarnings("unchecked")
     public Mono<ResponseEntity<Page>> getJobs(Integer pageNumber, ServerWebExchange exchange) {
         return Mono.just(
-            jobService.getJobs(pageNumber)
+            jobService
+                .getJobs(pageNumber)
                 .map(job -> conversionService.convert(job, JobModel.class)))
             .map(ResponseEntity::ok);
     }
@@ -116,14 +117,14 @@ public class JobController implements JobsApi {
 
     @Override
     public Mono<ResponseEntity<Void>> restartJob(Long id, ServerWebExchange exchange) {
-        messageBroker.send(Queues.RESTARTS, id);
+        messageBroker.send(TaskQueues.RESTARTS, id);
 
         return Mono.empty();
     }
 
     @Override
     public Mono<ResponseEntity<Void>> stopJob(Long id, ServerWebExchange exchange) {
-        messageBroker.send(Queues.STOPS, id);
+        messageBroker.send(TaskQueues.STOPS, id);
 
         return Mono.empty();
     }

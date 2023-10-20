@@ -32,6 +32,6 @@ public class AuthorizationMapper {
     public interface AuthorizationToAuthorizationModelMapper extends Converter<AuthorizationDTO, AuthorizationModel> {
 
         @Override
-        AuthorizationModel convert(AuthorizationDTO authorization);
+        AuthorizationModel convert(AuthorizationDTO authorizationDTO);
     }
 }

@@ -26,6 +26,8 @@ import com.bytechef.test.annotation.EmbeddedSql;
 
 import java.util.List;
 import java.util.Map;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +62,7 @@ public class ConnectionServiceIntTest {
     }
 
     @Test
+    @SuppressFBWarnings("NP")
     public void testCreate() {
         Connection connection = getConnection();
 
@@ -75,6 +78,7 @@ public class ConnectionServiceIntTest {
     }
 
     @Test
+    @SuppressFBWarnings("NP")
     public void testDelete() {
         Connection connection = connectionRepository.save(getConnection());
 
@@ -84,6 +88,7 @@ public class ConnectionServiceIntTest {
     }
 
     @Test
+    @SuppressFBWarnings("NP")
     public void testGetConnection() {
         Connection connection = getConnection();
 
@@ -100,6 +105,7 @@ public class ConnectionServiceIntTest {
     }
 
     @Test
+    @SuppressFBWarnings("NP")
     public void getGetConnections() {
         for (Connection connection : connectionRepository.findAll()) {
             connectionRepository.deleteById(connection.getId());
@@ -111,6 +117,7 @@ public class ConnectionServiceIntTest {
     }
 
     @Test
+    @SuppressFBWarnings("NP")
     public void testUpdate() {
         Connection connection = connectionRepository.save(getConnection());
 

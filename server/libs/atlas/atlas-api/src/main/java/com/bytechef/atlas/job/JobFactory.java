@@ -17,12 +17,10 @@
 
 package com.bytechef.atlas.job;
 
-import com.bytechef.atlas.dto.JobParametersDTO;
-
 /**
  * @author Ivica Cardic
  */
 public interface JobFactory {
 
-    long create(JobParametersDTO jobParametersDTO);
+    long create(JobParameters jobParameters);
 }

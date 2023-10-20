@@ -98,10 +98,12 @@ public class IntegrationController implements IntegrationsApi {
     public Mono<ResponseEntity<IntegrationModel>> createIntegration(
         Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
 
-        return integrationModelMono.map(integrationModel -> conversionService.convert(
-            integrationFacade.create(
-                conversionService.convert(integrationModel, IntegrationDTO.class)),
-            IntegrationModel.class))
+        return integrationModelMono
+            .map(
+                integrationModel -> conversionService.convert(
+                    integrationFacade.create(
+                        conversionService.convert(integrationModel, IntegrationDTO.class)),
+                    IntegrationModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -111,10 +113,12 @@ public class IntegrationController implements IntegrationsApi {
         Long id, Mono<CreateIntegrationWorkflowRequestModel> createIntegrationWorkflowRequestModelMono,
         ServerWebExchange exchange) {
 
-        return createIntegrationWorkflowRequestModelMono.map(requestModel -> conversionService.convert(
-            integrationFacade.addWorkflow(
-                id, requestModel.getLabel(), requestModel.getDescription(), requestModel.getDefinition()),
-            WorkflowModel.class))
+        return createIntegrationWorkflowRequestModelMono
+            .map(
+                requestModel -> conversionService.convert(
+                    integrationFacade.addWorkflow(
+                        id, requestModel.getLabel(), requestModel.getDescription(), requestModel.getDefinition()),
+                    WorkflowModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -123,9 +127,11 @@ public class IntegrationController implements IntegrationsApi {
     public Mono<ResponseEntity<IntegrationModel>> updateIntegration(
         Long id, Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
 
-        return integrationModelMono.map(integrationModel -> conversionService.convert(
-            integrationFacade.update(conversionService.convert(integrationModel.id(id), IntegrationDTO.class)),
-            IntegrationModel.class))
+        return integrationModelMono
+            .map(
+                integrationModel -> conversionService.convert(
+                    integrationFacade.update(conversionService.convert(integrationModel.id(id), IntegrationDTO.class)),
+                    IntegrationModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -143,7 +149,8 @@ public class IntegrationController implements IntegrationsApi {
                     .map(tagModel -> conversionService.convert(tagModel, Tag.class))
                     .toList());
 
-            return ResponseEntity.noContent()
+            return ResponseEntity
+                .noContent()
                 .build();
         });
     }

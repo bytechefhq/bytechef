@@ -23,7 +23,7 @@ import com.bytechef.atlas.coordinator.job.executor.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.job.JobParameters;
 import com.bytechef.atlas.error.ErrorHandler;
 import com.bytechef.atlas.error.Errorable;
 import com.bytechef.atlas.error.ExecutionError;
@@ -42,6 +42,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.bytechef.commons.util.ExceptionUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,10 +84,10 @@ public class Coordinator {
     /**
      * Starts a job instance.
      *
-     * @param jobParametersDTO The Key-Value map representing the workflow parameters
+     * @param jobParameters The Key-Value map representing the workflow parameters
      */
-    public void create(JobParametersDTO jobParametersDTO) {
-        long jobId = jobFactory.create(jobParametersDTO);
+    public void create(JobParameters jobParameters) {
+        long jobId = jobFactory.create(jobParameters);
 
         if (log.isDebugEnabled()) {
             Job job = jobService.getJob(jobId);
@@ -181,6 +182,7 @@ public class Coordinator {
         errorHandler.handle(errorable);
     }
 
+    @SuppressFBWarnings("EI")
     public static final class Builder {
         private ErrorHandler<? super Errorable> errorHandler;
         private EventPublisher eventPublisher;

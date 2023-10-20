@@ -29,8 +29,7 @@ public class TaskProgressedWorkflowEvent extends AbstractWorkflowEvent {
     private int progress;
     private Long taskExecutionId;
 
-    public TaskProgressedWorkflowEvent() {
-        this.type = TASK_PROGRESSED;
+    private TaskProgressedWorkflowEvent() {
     }
 
     public TaskProgressedWorkflowEvent(Long taskExecutionId, int progress) {

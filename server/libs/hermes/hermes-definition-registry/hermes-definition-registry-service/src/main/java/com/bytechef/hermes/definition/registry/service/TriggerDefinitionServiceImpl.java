@@ -68,7 +68,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     private TriggerDefinitionDTO toTriggerDefinitionDTO(TriggerDefinition triggerDefinition) {
         return new TriggerDefinitionDTO(
-            triggerDefinition.getBatch(), triggerDefinition.getDisplay(), triggerDefinition.getExampleOutput(),
+            triggerDefinition.isBatch(), triggerDefinition.getDisplay(), triggerDefinition.getExampleOutput(),
             triggerDefinition.getName(), triggerDefinition.getOutputSchema(), triggerDefinition.getProperties(),
             triggerDefinition.getResources(), triggerDefinition.getType());
     }

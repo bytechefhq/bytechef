@@ -21,6 +21,7 @@ import com.bytechef.hermes.definition.DefinitionDSL;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 
@@ -121,6 +122,7 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         }
 
         @Override
+        @SuppressFBWarnings("EI")
         public Resources getResources() {
             return resources;
         }

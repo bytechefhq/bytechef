@@ -34,6 +34,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -44,6 +45,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
@@ -104,6 +106,12 @@ public final class TaskExecution
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
+    @Transient
+    private Map<String, Object> metadata = new HashMap<>();
+
+    @Column
+    private int maxRetries;
+
     @Column
     private MapWrapper output;
 
@@ -115,9 +123,6 @@ public final class TaskExecution
 
     @Column
     private int progress;
-
-    @Column
-    private int maxRetries;
 
     @Column("retry_attempts")
     private int retryAttempts;
@@ -252,6 +257,15 @@ public final class TaskExecution
         return lastModifiedDate;
     }
 
+    @Override
+    public int getMaxRetries() {
+        return maxRetries;
+    }
+
+    public Object getMetadata(String key) {
+        return metadata.get(key);
+    }
+
     @JsonIgnore
     public String getName() {
         return workflowTask.getName();
@@ -316,11 +330,6 @@ public final class TaskExecution
     }
 
     @Override
-    public int getMaxRetries() {
-        return maxRetries;
-    }
-
-    @Override
     public int getRetryAttempts() {
         return retryAttempts;
     }
@@ -364,6 +373,7 @@ public final class TaskExecution
         return status;
     }
 
+    @SuppressFBWarnings("EI")
     public WorkflowTask getWorkflowTask() {
         return workflowTask;
     }
@@ -394,6 +404,10 @@ public final class TaskExecution
         return id == null;
     }
 
+    public void putMetadata(String key, Object value) {
+        metadata.put(key, value);
+    }
+
     public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
 
@@ -420,6 +434,10 @@ public final class TaskExecution
         }
     }
 
+    public void setMaxRetries(int maxRetries) {
+        this.maxRetries = maxRetries;
+    }
+
     public void setOutput(Object output) {
         if (output != null) {
             this.output = new MapWrapper(Map.of("output", output));
@@ -438,10 +456,6 @@ public final class TaskExecution
 
     public void setProgress(int progress) {
         this.progress = progress;
-    }
-
-    public void setMaxRetries(int maxRetries) {
-        this.maxRetries = maxRetries;
     }
 
     public void setRetryDelay(String retryDelay) {
