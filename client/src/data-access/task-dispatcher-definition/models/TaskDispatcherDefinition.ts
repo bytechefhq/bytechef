@@ -31,18 +31,6 @@ import {
     ResourcesFromJSONTyped,
     ResourcesToJSON,
 } from './Resources';
-import type { TaskDispatcherDefinitionOutputInner } from './TaskDispatcherDefinitionOutputInner';
-import {
-    TaskDispatcherDefinitionOutputInnerFromJSON,
-    TaskDispatcherDefinitionOutputInnerFromJSONTyped,
-    TaskDispatcherDefinitionOutputInnerToJSON,
-} from './TaskDispatcherDefinitionOutputInner';
-import type { TaskDispatcherDefinitionPropertiesInner } from './TaskDispatcherDefinitionPropertiesInner';
-import {
-    TaskDispatcherDefinitionPropertiesInnerFromJSON,
-    TaskDispatcherDefinitionPropertiesInnerFromJSONTyped,
-    TaskDispatcherDefinitionPropertiesInnerToJSON,
-} from './TaskDispatcherDefinitionPropertiesInner';
 
 /**
  * A task dispatcher defines a strategy for dispatching tasks to be executed.
@@ -64,16 +52,16 @@ export interface TaskDispatcherDefinition {
     name?: string;
     /**
      * The output schema of a task dispatching result.
-     * @type {Array<TaskDispatcherDefinitionOutputInner>}
+     * @type {Array<Property>}
      * @memberof TaskDispatcherDefinition
      */
-    output?: Array<TaskDispatcherDefinitionOutputInner>;
+    output?: Array<Property>;
     /**
      * The list of task dispatcher properties.
-     * @type {Array<TaskDispatcherDefinitionPropertiesInner>}
+     * @type {Array<Property>}
      * @memberof TaskDispatcherDefinition
      */
-    properties?: Array<TaskDispatcherDefinitionPropertiesInner>;
+    properties?: Array<Property>;
     /**
      * 
      * @type {Resources}
@@ -115,8 +103,8 @@ export function TaskDispatcherDefinitionFromJSONTyped(json: any, ignoreDiscrimin
         
         'display': !exists(json, 'display') ? undefined : DisplayFromJSON(json['display']),
         'name': !exists(json, 'name') ? undefined : json['name'],
-        'output': !exists(json, 'output') ? undefined : ((json['output'] as Array<any>).map(TaskDispatcherDefinitionOutputInnerFromJSON)),
-        'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(TaskDispatcherDefinitionPropertiesInnerFromJSON)),
+        'output': !exists(json, 'output') ? undefined : ((json['output'] as Array<any>).map(PropertyFromJSON)),
+        'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
         'resources': !exists(json, 'resources') ? undefined : ResourcesFromJSON(json['resources']),
         'version': !exists(json, 'version') ? undefined : json['version'],
         'taskProperties': !exists(json, 'taskProperties') ? undefined : ((json['taskProperties'] as Array<any>).map(PropertyFromJSON)),
@@ -134,8 +122,8 @@ export function TaskDispatcherDefinitionToJSON(value?: TaskDispatcherDefinition 
         
         'display': DisplayToJSON(value.display),
         'name': value.name,
-        'output': value.output === undefined ? undefined : ((value.output as Array<any>).map(TaskDispatcherDefinitionOutputInnerToJSON)),
-        'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(TaskDispatcherDefinitionPropertiesInnerToJSON)),
+        'output': value.output === undefined ? undefined : ((value.output as Array<any>).map(PropertyToJSON)),
+        'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyToJSON)),
         'resources': ResourcesToJSON(value.resources),
         'version': value.version,
         'taskProperties': value.taskProperties === undefined ? undefined : ((value.taskProperties as Array<any>).map(PropertyToJSON)),

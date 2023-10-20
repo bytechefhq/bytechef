@@ -17,21 +17,21 @@
  * A type of the editor to show in UI.
  * @export
  */
-export const EditorType = {
+export const ControlType = {
     Code: 'CODE'
 } as const;
-export type EditorType = typeof EditorType[keyof typeof EditorType];
+export type ControlType = typeof ControlType[keyof typeof ControlType];
 
 
-export function EditorTypeFromJSON(json: any): EditorType {
-    return EditorTypeFromJSONTyped(json, false);
+export function ControlTypeFromJSON(json: any): ControlType {
+    return ControlTypeFromJSONTyped(json, false);
 }
 
-export function EditorTypeFromJSONTyped(json: any, ignoreDiscriminator: boolean): EditorType {
-    return json as EditorType;
+export function ControlTypeFromJSONTyped(json: any, ignoreDiscriminator: boolean): ControlType {
+    return json as ControlType;
 }
 
-export function EditorTypeToJSON(value?: EditorType | null): any {
+export function ControlTypeToJSON(value?: ControlType | null): any {
     return value as any;
 }
 

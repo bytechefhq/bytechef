@@ -13,24 +13,24 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { Action } from './Action';
+import type { ActionDefinition } from './ActionDefinition';
 import {
-    ActionFromJSON,
-    ActionFromJSONTyped,
-    ActionToJSON,
-} from './Action';
-import type { ComponentDisplay } from './ComponentDisplay';
-import {
-    ComponentDisplayFromJSON,
-    ComponentDisplayFromJSONTyped,
-    ComponentDisplayToJSON,
-} from './ComponentDisplay';
+    ActionDefinitionFromJSON,
+    ActionDefinitionFromJSONTyped,
+    ActionDefinitionToJSON,
+} from './ActionDefinition';
 import type { ConnectionDefinition } from './ConnectionDefinition';
 import {
     ConnectionDefinitionFromJSON,
     ConnectionDefinitionFromJSONTyped,
     ConnectionDefinitionToJSON,
 } from './ConnectionDefinition';
+import type { Display } from './Display';
+import {
+    DisplayFromJSON,
+    DisplayFromJSONTyped,
+    DisplayToJSON,
+} from './Display';
 import type { Resources } from './Resources';
 import {
     ResourcesFromJSON,
@@ -46,22 +46,28 @@ import {
 export interface ComponentDefinition {
     /**
      * The list of all available actions the component can perform.
-     * @type {Array<Action>}
+     * @type {Array<ActionDefinition>}
      * @memberof ComponentDefinition
      */
-    actions?: Array<Action>;
-    /**
-     * The list of possible connections to an outside service.
-     * @type {Array<ConnectionDefinition>}
-     * @memberof ComponentDefinition
-     */
-    connections?: Array<ConnectionDefinition>;
+    actions?: Array<ActionDefinition>;
     /**
      * 
-     * @type {ComponentDisplay}
+     * @type {ConnectionDefinition}
      * @memberof ComponentDefinition
      */
-    display?: ComponentDisplay;
+    connection?: ConnectionDefinition;
+    /**
+     * 
+     * @type {Display}
+     * @memberof ComponentDefinition
+     */
+    display?: Display;
+    /**
+     * Additional data that can be used during processing.
+     * @type {{ [key: string]: object; }}
+     * @memberof ComponentDefinition
+     */
+    metadata?: { [key: string]: object; };
     /**
      * The connection name.
      * @type {string}
@@ -101,9 +107,10 @@ export function ComponentDefinitionFromJSONTyped(json: any, ignoreDiscriminator:
     }
     return {
         
-        'actions': !exists(json, 'actions') ? undefined : ((json['actions'] as Array<any>).map(ActionFromJSON)),
-        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(ConnectionDefinitionFromJSON)),
-        'display': !exists(json, 'display') ? undefined : ComponentDisplayFromJSON(json['display']),
+        'actions': !exists(json, 'actions') ? undefined : ((json['actions'] as Array<any>).map(ActionDefinitionFromJSON)),
+        'connection': !exists(json, 'connection') ? undefined : ConnectionDefinitionFromJSON(json['connection']),
+        'display': !exists(json, 'display') ? undefined : DisplayFromJSON(json['display']),
+        'metadata': !exists(json, 'metadata') ? undefined : json['metadata'],
         'name': !exists(json, 'name') ? undefined : json['name'],
         'resources': !exists(json, 'resources') ? undefined : ResourcesFromJSON(json['resources']),
         'version': !exists(json, 'version') ? undefined : json['version'],
@@ -119,9 +126,10 @@ export function ComponentDefinitionToJSON(value?: ComponentDefinition | null): a
     }
     return {
         
-        'actions': value.actions === undefined ? undefined : ((value.actions as Array<any>).map(ActionToJSON)),
-        'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(ConnectionDefinitionToJSON)),
-        'display': ComponentDisplayToJSON(value.display),
+        'actions': value.actions === undefined ? undefined : ((value.actions as Array<any>).map(ActionDefinitionToJSON)),
+        'connection': ConnectionDefinitionToJSON(value.connection),
+        'display': DisplayToJSON(value.display),
+        'metadata': value.metadata,
         'name': value.name,
         'resources': ResourcesToJSON(value.resources),
         'version': value.version,

@@ -13,83 +13,83 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { ActionOutputInner } from './ActionOutputInner';
-import {
-    ActionOutputInnerFromJSON,
-    ActionOutputInnerFromJSONTyped,
-    ActionOutputInnerToJSON,
-} from './ActionOutputInner';
-import type { ActionPropertiesInner } from './ActionPropertiesInner';
-import {
-    ActionPropertiesInnerFromJSON,
-    ActionPropertiesInnerFromJSONTyped,
-    ActionPropertiesInnerToJSON,
-} from './ActionPropertiesInner';
 import type { Display } from './Display';
 import {
     DisplayFromJSON,
     DisplayFromJSONTyped,
     DisplayToJSON,
 } from './Display';
+import type { Property } from './Property';
+import {
+    PropertyFromJSON,
+    PropertyFromJSONTyped,
+    PropertyToJSON,
+} from './Property';
 
 /**
  * An action is a a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.
  * @export
- * @interface Action
+ * @interface ActionDefinition
  */
-export interface Action {
+export interface ActionDefinition {
     /**
      * 
      * @type {Display}
-     * @memberof Action
+     * @memberof ActionDefinition
      */
     display?: Display;
     /**
      * The example of the action's output.
      * @type {object}
-     * @memberof Action
+     * @memberof ActionDefinition
      */
     exampleOutput?: object;
     /**
+     * Additional data that can be used during processing.
+     * @type {{ [key: string]: object; }}
+     * @memberof ActionDefinition
+     */
+    metadata?: { [key: string]: object; };
+    /**
      * The action name.
      * @type {string}
-     * @memberof Action
+     * @memberof ActionDefinition
      */
     name?: string;
     /**
      * The output schema of an execution result.
-     * @type {Array<ActionOutputInner>}
-     * @memberof Action
+     * @type {Array<Property>}
+     * @memberof ActionDefinition
      */
-    output?: Array<ActionOutputInner>;
+    output?: Array<Property>;
     /**
      * The list of action properties.
-     * @type {Array<ActionPropertiesInner>}
-     * @memberof Action
+     * @type {Array<Property>}
+     * @memberof ActionDefinition
      */
-    properties?: Array<ActionPropertiesInner>;
+    properties?: Array<Property>;
     /**
-     * The code that should be performed when the action is executed as a task whe running inside the workflow engine.
+     * Contains information required for a connection's authorization.
      * @type {object}
-     * @memberof Action
+     * @memberof ActionDefinition
      */
     performFunction?: object;
 }
 
 /**
- * Check if a given object implements the Action interface.
+ * Check if a given object implements the ActionDefinition interface.
  */
-export function instanceOfAction(value: object): boolean {
+export function instanceOfActionDefinition(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function ActionFromJSON(json: any): Action {
-    return ActionFromJSONTyped(json, false);
+export function ActionDefinitionFromJSON(json: any): ActionDefinition {
+    return ActionDefinitionFromJSONTyped(json, false);
 }
 
-export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Action {
+export function ActionDefinitionFromJSONTyped(json: any, ignoreDiscriminator: boolean): ActionDefinition {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -97,14 +97,15 @@ export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ac
         
         'display': !exists(json, 'display') ? undefined : DisplayFromJSON(json['display']),
         'exampleOutput': !exists(json, 'exampleOutput') ? undefined : json['exampleOutput'],
+        'metadata': !exists(json, 'metadata') ? undefined : json['metadata'],
         'name': !exists(json, 'name') ? undefined : json['name'],
-        'output': !exists(json, 'output') ? undefined : ((json['output'] as Array<any>).map(ActionOutputInnerFromJSON)),
-        'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(ActionPropertiesInnerFromJSON)),
+        'output': !exists(json, 'output') ? undefined : ((json['output'] as Array<any>).map(PropertyFromJSON)),
+        'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
         'performFunction': !exists(json, 'performFunction') ? undefined : json['performFunction'],
     };
 }
 
-export function ActionToJSON(value?: Action | null): any {
+export function ActionDefinitionToJSON(value?: ActionDefinition | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -115,9 +116,10 @@ export function ActionToJSON(value?: Action | null): any {
         
         'display': DisplayToJSON(value.display),
         'exampleOutput': value.exampleOutput,
+        'metadata': value.metadata,
         'name': value.name,
-        'output': value.output === undefined ? undefined : ((value.output as Array<any>).map(ActionOutputInnerToJSON)),
-        'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(ActionPropertiesInnerToJSON)),
+        'output': value.output === undefined ? undefined : ((value.output as Array<any>).map(PropertyToJSON)),
+        'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyToJSON)),
         'performFunction': value.performFunction,
     };
 }

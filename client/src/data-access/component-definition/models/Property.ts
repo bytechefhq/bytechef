@@ -21,7 +21,6 @@ import {
 } from './DisplayOption';
 
 import {
-     AnyPropertyFromJSONTyped,
      ArrayPropertyFromJSONTyped,
      BooleanPropertyFromJSONTyped,
      DatePropertyFromJSONTyped,
@@ -30,6 +29,7 @@ import {
      NullPropertyFromJSONTyped,
      NumberPropertyFromJSONTyped,
      ObjectPropertyFromJSONTyped,
+     OneOfPropertyFromJSONTyped,
      StringPropertyFromJSONTyped
 } from './';
 
@@ -39,6 +39,12 @@ import {
  * @interface Property
  */
 export interface Property {
+    /**
+     * If the property should be grouped under advanced options.
+     * @type {boolean}
+     * @memberof Property
+     */
+    advancedOption?: boolean;
     /**
      * The property description.
      * @type {string}
@@ -51,6 +57,12 @@ export interface Property {
      * @memberof Property
      */
     displayOption?: DisplayOption;
+    /**
+     * If the property should be hidden or not.
+     * @type {boolean}
+     * @memberof Property
+     */
+    hidden?: boolean;
     /**
      * The property label.
      * @type {string}
@@ -95,9 +107,6 @@ export function PropertyFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         return json;
     }
     if (!ignoreDiscriminator) {
-        if (json['type'] === 'ANY') {
-            return AnyPropertyFromJSONTyped(json, true);
-        }
         if (json['type'] === 'ARRAY') {
             return ArrayPropertyFromJSONTyped(json, true);
         }
@@ -122,14 +131,19 @@ export function PropertyFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         if (json['type'] === 'OBJECT') {
             return ObjectPropertyFromJSONTyped(json, true);
         }
+        if (json['type'] === 'ONE_OF') {
+            return OneOfPropertyFromJSONTyped(json, true);
+        }
         if (json['type'] === 'STRING') {
             return StringPropertyFromJSONTyped(json, true);
         }
     }
     return {
         
+        'advancedOption': !exists(json, 'advancedOption') ? undefined : json['advancedOption'],
         'description': !exists(json, 'description') ? undefined : json['description'],
         'displayOption': !exists(json, 'displayOption') ? undefined : DisplayOptionFromJSON(json['displayOption']),
+        'hidden': !exists(json, 'hidden') ? undefined : json['hidden'],
         'label': !exists(json, 'label') ? undefined : json['label'],
         'metadata': !exists(json, 'metadata') ? undefined : json['metadata'],
         'name': !exists(json, 'name') ? undefined : json['name'],
@@ -146,8 +160,10 @@ export function PropertyToJSON(value?: Property | null): any {
     }
     return {
         
+        'advancedOption': value.advancedOption,
         'description': value.description,
         'displayOption': DisplayOptionToJSON(value.displayOption),
+        'hidden': value.hidden,
         'label': value.label,
         'metadata': value.metadata,
         'name': value.name,

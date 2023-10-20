@@ -13,25 +13,31 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { DisplayOption } from './DisplayOption';
+import {
+    DisplayOptionFromJSON,
+    DisplayOptionFromJSONTyped,
+    DisplayOptionToJSON,
+} from './DisplayOption';
 import type { PropertyOption } from './PropertyOption';
 import {
     PropertyOptionFromJSON,
     PropertyOptionFromJSONTyped,
     PropertyOptionToJSON,
 } from './PropertyOption';
-import type { SingleValueProperty } from './SingleValueProperty';
+import type { ValueProperty } from './ValueProperty';
 import {
-    SingleValuePropertyFromJSON,
-    SingleValuePropertyFromJSONTyped,
-    SingleValuePropertyToJSON,
-} from './SingleValueProperty';
+    ValuePropertyFromJSON,
+    ValuePropertyFromJSONTyped,
+    ValuePropertyToJSON,
+} from './ValueProperty';
 
 /**
  * A date-time property type.
  * @export
  * @interface DateTimeProperty
  */
-export interface DateTimeProperty extends SingleValueProperty {
+export interface DateTimeProperty extends ValueProperty {
     /**
      * 
      * @type {string}
@@ -59,7 +65,7 @@ export function DateTimePropertyFromJSONTyped(json: any, ignoreDiscriminator: bo
         return json;
     }
     return {
-        ...SingleValuePropertyFromJSONTyped(json, ignoreDiscriminator),
+        ...ValuePropertyFromJSONTyped(json, ignoreDiscriminator),
         'type': json['type'],
     };
 }
@@ -72,7 +78,7 @@ export function DateTimePropertyToJSON(value?: DateTimeProperty | null): any {
         return null;
     }
     return {
-        ...SingleValuePropertyToJSON(value),
+        ...ValuePropertyToJSON(value),
         'type': value.type,
     };
 }

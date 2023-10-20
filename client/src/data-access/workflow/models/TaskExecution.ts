@@ -33,13 +33,13 @@ import {
  */
 export interface TaskExecution {
     /**
-     * Created by.
+     * The created by.
      * @type {string}
      * @memberof TaskExecution
      */
     readonly createdBy?: string;
     /**
-     * Created date.
+     * The created date.
      * @type {Date}
      * @memberof TaskExecution
      */
@@ -75,13 +75,13 @@ export interface TaskExecution {
      */
     jobId?: string;
     /**
-     * Last modified by.
+     * The last modified by.
      * @type {string}
      * @memberof TaskExecution
      */
     readonly lastModifiedBy?: string;
     /**
-     * Last modified date.
+     * The last modified date.
      * @type {Date}
      * @memberof TaskExecution
      */
@@ -153,17 +153,17 @@ export interface TaskExecution {
      */
     taskNumber?: number;
     /**
-     * 
-     * @type {WorkflowTask}
-     * @memberof TaskExecution
-     */
-    workflowTask?: WorkflowTask;
-    /**
      * The calculated retry delay. i.e. delay * retryAttempts * retryDelayFactor.
      * @type {number}
      * @memberof TaskExecution
      */
     retryDelayMillis?: number;
+    /**
+     * 
+     * @type {WorkflowTask}
+     * @memberof TaskExecution
+     */
+    workflowTask?: WorkflowTask;
     /**
      * The type of the task.
      * @type {string}
@@ -225,8 +225,8 @@ export function TaskExecutionFromJSONTyped(json: any, ignoreDiscriminator: boole
         'startTime': !exists(json, 'startTime') ? undefined : (new Date(json['startTime'])),
         'status': !exists(json, 'status') ? undefined : json['status'],
         'taskNumber': !exists(json, 'taskNumber') ? undefined : json['taskNumber'],
-        'workflowTask': !exists(json, 'workflowTask') ? undefined : WorkflowTaskFromJSON(json['workflowTask']),
         'retryDelayMillis': !exists(json, 'retryDelayMillis') ? undefined : json['retryDelayMillis'],
+        'workflowTask': !exists(json, 'workflowTask') ? undefined : WorkflowTaskFromJSON(json['workflowTask']),
         'type': !exists(json, 'type') ? undefined : json['type'],
     };
 }
@@ -255,8 +255,8 @@ export function TaskExecutionToJSON(value?: TaskExecution | null): any {
         'startTime': value.startTime === undefined ? undefined : (value.startTime.toISOString()),
         'status': value.status,
         'taskNumber': value.taskNumber,
-        'workflowTask': WorkflowTaskToJSON(value.workflowTask),
         'retryDelayMillis': value.retryDelayMillis,
+        'workflowTask': WorkflowTaskToJSON(value.workflowTask),
         'type': value.type,
     };
 }

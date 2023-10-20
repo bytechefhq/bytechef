@@ -32,19 +32,19 @@ export interface Page {
      */
     size?: number;
     /**
-     * Number of elements.
+     * The number of elements.
      * @type {number}
      * @memberof Page
      */
     numberOfElements?: number;
     /**
-     * Total number of pages.
+     * The total number of pages.
      * @type {number}
      * @memberof Page
      */
     totalPages?: number;
     /**
-     * Total number of elements.
+     * The total number of elements.
      * @type {number}
      * @memberof Page
      */

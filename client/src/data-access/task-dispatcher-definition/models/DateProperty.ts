@@ -13,25 +13,31 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { DisplayOption } from './DisplayOption';
+import {
+    DisplayOptionFromJSON,
+    DisplayOptionFromJSONTyped,
+    DisplayOptionToJSON,
+} from './DisplayOption';
 import type { PropertyOption } from './PropertyOption';
 import {
     PropertyOptionFromJSON,
     PropertyOptionFromJSONTyped,
     PropertyOptionToJSON,
 } from './PropertyOption';
-import type { SingleValueProperty } from './SingleValueProperty';
+import type { ValueProperty } from './ValueProperty';
 import {
-    SingleValuePropertyFromJSON,
-    SingleValuePropertyFromJSONTyped,
-    SingleValuePropertyToJSON,
-} from './SingleValueProperty';
+    ValuePropertyFromJSON,
+    ValuePropertyFromJSONTyped,
+    ValuePropertyToJSON,
+} from './ValueProperty';
 
 /**
  * A date property type.
  * @export
  * @interface DateProperty
  */
-export interface DateProperty extends SingleValueProperty {
+export interface DateProperty extends ValueProperty {
     /**
      * 
      * @type {string}
@@ -59,7 +65,7 @@ export function DatePropertyFromJSONTyped(json: any, ignoreDiscriminator: boolea
         return json;
     }
     return {
-        ...SingleValuePropertyFromJSONTyped(json, ignoreDiscriminator),
+        ...ValuePropertyFromJSONTyped(json, ignoreDiscriminator),
         'type': json['type'],
     };
 }
@@ -72,7 +78,7 @@ export function DatePropertyToJSON(value?: DateProperty | null): any {
         return null;
     }
     return {
-        ...SingleValuePropertyToJSON(value),
+        ...ValuePropertyToJSON(value),
         'type': value.type,
     };
 }

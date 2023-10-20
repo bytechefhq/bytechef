@@ -14,55 +14,55 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * TODO
+ * A group of workflows that make one logical integration.
  * @export
  * @interface Integration
  */
 export interface Integration {
     /**
-     * TODO
+     * The created by.
      * @type {string}
      * @memberof Integration
      */
     readonly createdBy?: string;
     /**
-     * TODO
+     * The created date.
      * @type {Date}
      * @memberof Integration
      */
     readonly createdDate?: Date;
     /**
-     * TODO
+     * The id of the integration.
      * @type {string}
      * @memberof Integration
      */
     readonly id?: string;
     /**
-     * TODO
+     * The name of the integration.
      * @type {string}
      * @memberof Integration
      */
     name?: string;
     /**
-     * TODO
+     * The description of the integration.
      * @type {string}
      * @memberof Integration
      */
     description?: string;
     /**
-     * TODO
+     * The last modified by.
      * @type {string}
      * @memberof Integration
      */
     readonly lastModifiedBy?: string;
     /**
-     * TODO
+     * The last modified date.
      * @type {Date}
      * @memberof Integration
      */
     readonly lastModifiedDate?: Date;
     /**
-     * TODO
+     * The workflow ids belonging to this integration.
      * @type {Array<string>}
      * @memberof Integration
      */

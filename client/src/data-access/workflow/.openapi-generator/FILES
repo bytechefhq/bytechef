@@ -1,4 +1,3 @@
-apis/CachesApi.ts
 apis/JobsApi.ts
 apis/TaskExecutionsApi.ts
 apis/WorkflowsApi.ts

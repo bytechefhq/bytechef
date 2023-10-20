@@ -14,29 +14,47 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * Info about the component.
+ * Display information.
  * @export
  * @interface Display
  */
 export interface Display {
     /**
-     * The component description.
+     * The category of the component.
+     * @type {string}
+     * @memberof Display
+     */
+    category?: string;
+    /**
+     * The description.
      * @type {string}
      * @memberof Display
      */
     description?: string;
     /**
-     * The component icon.
+     * The icon.
      * @type {string}
      * @memberof Display
      */
     icon?: string;
     /**
-     * The component label.
+     * The label.
      * @type {string}
      * @memberof Display
      */
     label?: string;
+    /**
+     * Additional explanation.
+     * @type {string}
+     * @memberof Display
+     */
+    subtitle?: string;
+    /**
+     * Tags for the component.
+     * @type {Array<string>}
+     * @memberof Display
+     */
+    tags?: Array<string>;
 }
 
 /**
@@ -58,9 +76,12 @@ export function DisplayFromJSONTyped(json: any, ignoreDiscriminator: boolean): D
     }
     return {
         
+        'category': !exists(json, 'category') ? undefined : json['category'],
         'description': !exists(json, 'description') ? undefined : json['description'],
         'icon': !exists(json, 'icon') ? undefined : json['icon'],
         'label': !exists(json, 'label') ? undefined : json['label'],
+        'subtitle': !exists(json, 'subtitle') ? undefined : json['subtitle'],
+        'tags': !exists(json, 'tags') ? undefined : json['tags'],
     };
 }
 
@@ -73,9 +94,12 @@ export function DisplayToJSON(value?: Display | null): any {
     }
     return {
         
+        'category': value.category,
         'description': value.description,
         'icon': value.icon,
         'label': value.label,
+        'subtitle': value.subtitle,
+        'tags': value.tags,
     };
 }
 

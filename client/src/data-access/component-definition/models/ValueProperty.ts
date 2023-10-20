@@ -25,6 +25,12 @@ import {
     PropertyFromJSONTyped,
     PropertyToJSON,
 } from './Property';
+import type { PropertyOption } from './PropertyOption';
+import {
+    PropertyOptionFromJSON,
+    PropertyOptionFromJSONTyped,
+    PropertyOptionToJSON,
+} from './PropertyOption';
 
 /**
  * A base property for all value based properties.
@@ -45,17 +51,11 @@ export interface ValueProperty extends Property {
      */
     exampleValue?: object;
     /**
-     * The list of property names on which value change the property options should load/reload.
-     * @type {Array<string>}
+     * The list of valid property options.
+     * @type {Array<PropertyOption>}
      * @memberof ValueProperty
      */
-    loadOptionsDependsOn?: Array<string>;
-    /**
-     * The code that should dynamically load options for the property.
-     * @type {object}
-     * @memberof ValueProperty
-     */
-    loadOptionsFunction?: object;
+    options?: Array<PropertyOption>;
 }
 
 /**
@@ -79,8 +79,7 @@ export function ValuePropertyFromJSONTyped(json: any, ignoreDiscriminator: boole
         ...PropertyFromJSONTyped(json, ignoreDiscriminator),
         'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
         'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
-        'loadOptionsDependsOn': !exists(json, 'loadOptionsDependsOn') ? undefined : json['loadOptionsDependsOn'],
-        'loadOptionsFunction': !exists(json, 'loadOptionsFunction') ? undefined : json['loadOptionsFunction'],
+        'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(PropertyOptionFromJSON)),
     };
 }
 
@@ -95,8 +94,7 @@ export function ValuePropertyToJSON(value?: ValueProperty | null): any {
         ...PropertyToJSON(value),
         'defaultValue': value.defaultValue,
         'exampleValue': value.exampleValue,
-        'loadOptionsDependsOn': value.loadOptionsDependsOn,
-        'loadOptionsFunction': value.loadOptionsFunction,
+        'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(PropertyOptionToJSON)),
     };
 }
 

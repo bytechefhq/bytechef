@@ -13,25 +13,25 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { PropertyOption } from './PropertyOption';
+import type { DisplayOption } from './DisplayOption';
 import {
-    PropertyOptionFromJSON,
-    PropertyOptionFromJSONTyped,
-    PropertyOptionToJSON,
-} from './PropertyOption';
-import type { SingleValueProperty } from './SingleValueProperty';
+    DisplayOptionFromJSON,
+    DisplayOptionFromJSONTyped,
+    DisplayOptionToJSON,
+} from './DisplayOption';
+import type { Property } from './Property';
 import {
-    SingleValuePropertyFromJSON,
-    SingleValuePropertyFromJSONTyped,
-    SingleValuePropertyToJSON,
-} from './SingleValueProperty';
+    PropertyFromJSON,
+    PropertyFromJSONTyped,
+    PropertyToJSON,
+} from './Property';
 
 /**
  * A null property type.
  * @export
  * @interface NullProperty
  */
-export interface NullProperty extends SingleValueProperty {
+export interface NullProperty extends Property {
     /**
      * 
      * @type {string}
@@ -59,7 +59,7 @@ export function NullPropertyFromJSONTyped(json: any, ignoreDiscriminator: boolea
         return json;
     }
     return {
-        ...SingleValuePropertyFromJSONTyped(json, ignoreDiscriminator),
+        ...PropertyFromJSONTyped(json, ignoreDiscriminator),
         'type': json['type'],
     };
 }
@@ -72,7 +72,7 @@ export function NullPropertyToJSON(value?: NullProperty | null): any {
         return null;
     }
     return {
-        ...SingleValuePropertyToJSON(value),
+        ...PropertyToJSON(value),
         'type': value.type,
     };
 }
