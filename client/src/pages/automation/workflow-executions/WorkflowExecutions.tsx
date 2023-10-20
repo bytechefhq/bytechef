@@ -264,12 +264,10 @@ export const WorkflowExecutions = () => {
                             className={twMerge(
                                 'w-full px-4 2xl:mx-auto 2xl:w-4/5',
                                 !WorkflowExecutionsPage.content.length &&
-                                    tableData &&
-                                    tableData?.length > 0 &&
                                     'place-self-center'
                             )}
                         >
-                            {tableData ? (
+                            {tableData && tableData.length > 0 ? (
                                 <WorkflowExecutionsTable data={tableData} />
                             ) : (
                                 <EmptyList
