@@ -1020,11 +1020,12 @@ components:
     TriggerType:
       type: "string"
       enum:
-      - "DYNAMIC_WEBHOOK"
-      - "HYBRID"
+      - "HYBRID_DYNAMIC"
+      - "HYBRID_STATIC"
       - "LISTENER"
       - "POLLING"
-      - "STATIC_WEBHOOK"
+      - "WEBHOOK_DYNAMIC"
+      - "WEBHOOK_STATIC"
     ValueProperty:
       description: "A base property for all value based properties."
       type: "object"
