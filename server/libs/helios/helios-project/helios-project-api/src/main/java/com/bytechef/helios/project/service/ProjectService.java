@@ -29,6 +29,8 @@ public interface ProjectService {
 
     Project addWorkflow(long id, String workflowId);
 
+    long countProjects();
+
     Project create(Project project);
 
     void delete(long id);
