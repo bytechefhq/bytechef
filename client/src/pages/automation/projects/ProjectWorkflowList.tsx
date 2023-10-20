@@ -1,5 +1,4 @@
 import DropdownMenu from '@/components/DropdownMenu/DropdownMenu';
-import {Button} from '@/components/ui/button';
 import {
     Tooltip,
     TooltipContent,
@@ -8,32 +7,14 @@ import {
 } from '@/components/ui/tooltip';
 import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
-import WorkflowDialog from 'components/WorkflowDialog/WorkflowDialog';
 import {ProjectModel} from 'middleware/helios/configuration';
-import {useCreateProjectWorkflowRequestMutation} from 'mutations/projects.mutations';
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
 import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
-import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
-import {Link, useNavigate} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
 const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
     const {data: workflows} = useGetProjectWorkflowsQuery(project.id!);
-
-    const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
-
-    const navigate = useNavigate();
-
-    const createProjectWorkflowRequestMutation =
-        useCreateProjectWorkflowRequestMutation({
-            onSuccess: (workflow) => {
-                navigate(
-                    `/automation/projects/${project.id}/workflow/${workflow?.id}`
-                );
-
-                setShowWorkflowDialog(false);
-            },
-        });
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery();
 
@@ -54,19 +35,6 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                 <h3 className="flex justify-start pl-2 text-sm font-semibold uppercase text-gray-500">
                     Workflows
                 </h3>
-
-                <div className="flex justify-end">
-                    <Button
-                        className="flex justify-end"
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => {
-                            setShowWorkflowDialog(true);
-                        }}
-                    >
-                        New Workflow
-                    </Button>
-                </div>
             </div>
 
             <ul>
@@ -191,17 +159,6 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                     );
                 })}
             </ul>
-
-            {showWorkflowDialog && !!project.id && (
-                <WorkflowDialog
-                    id={project.id}
-                    showTrigger={false}
-                    visible
-                    createWorkflowRequestMutation={
-                        createProjectWorkflowRequestMutation
-                    }
-                />
-            )}
         </div>
     );
 };
