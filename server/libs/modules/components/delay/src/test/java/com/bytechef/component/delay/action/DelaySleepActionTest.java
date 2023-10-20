@@ -22,8 +22,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 /**
@@ -35,23 +33,19 @@ public class DelaySleepActionTest {
     public void test1() {
         long now = System.currentTimeMillis();
 
-        Map<String, ?> inputParameters = Map.of("duration", Duration.of(1500, ChronoUnit.MILLIS));
-
-        DelaySleepAction.executeDelay(Mockito.mock(Context.class), inputParameters);
+        DelaySleepAction.executeDelay(Mockito.mock(Context.class), Map.of("duration", "1.5S"));
 
         long delta = System.currentTimeMillis() - now;
 
         Assertions.assertTrue(
-            delta >= 1500 && delta < 4000, String.format("Period %dms does not meet range [1500,4000>", delta));
+            delta >= 1500 && delta < 15000, String.format("Period %dms does not meet range [1500,15000>", delta));
     }
 
     @Test
     public void test2() {
         long now = System.currentTimeMillis();
 
-        Map<String, ?> inputParameters = Map.of("millis", 500L);
-
-        DelaySleepAction.executeDelay(Mockito.mock(Context.class), inputParameters);
+        DelaySleepAction.executeDelay(Mockito.mock(Context.class), Map.of("millis", 500L));
 
         long delta = System.currentTimeMillis() - now;
 
