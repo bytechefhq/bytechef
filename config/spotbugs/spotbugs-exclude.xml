@@ -18,7 +18,7 @@
             <Class name="com.bytechef.atlas.service.ContextServiceIntTest" />
             <Class name="com.bytechef.atlas.service.CounterService" />
             <Class name="com.bytechef.atlas.service.JobService" />
-            <Class name="com.bytechef.atlas.sync.executor.WorkflowExecutor" />
+            <Class name="com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport" />
             <Class name="com.bytechef.hermes.registry.InMemoryDefinitionRegistry" />
             <Class name="com.bytechef.hermes.registry.DefinitionRegistryChain" />
             <Class name="com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain" />

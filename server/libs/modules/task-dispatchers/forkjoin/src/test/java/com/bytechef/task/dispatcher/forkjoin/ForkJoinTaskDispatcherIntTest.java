@@ -19,7 +19,7 @@ package com.bytechef.task.dispatcher.forkjoin;
 
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.sync.executor.WorkflowExecutor;
+import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.task.dispatcher.forkjoin.completion.ForkJoinTaskCompletionHandler;
@@ -49,7 +49,7 @@ public class ForkJoinTaskDispatcherIntTest {
     protected TaskExecutionService taskExecutionService;
 
     @Autowired
-    private WorkflowExecutor workflowExecutor;
+    private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
 
     @BeforeEach
     void beforeEach() {
@@ -58,7 +58,7 @@ public class ForkJoinTaskDispatcherIntTest {
 
     @Test
     public void testDispatch() {
-        workflowExecutor.execute(
+        taskDispatcherWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("fork-join_v1".getBytes(StandardCharsets.UTF_8)),
             (

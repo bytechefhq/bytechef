@@ -19,7 +19,7 @@ package com.bytechef.task.dispatcher.if_;
 
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.sync.executor.WorkflowExecutor;
+import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.task.dispatcher.if_.completion.IfTaskCompletionHandler;
@@ -50,7 +50,7 @@ public class IfTaskDispatcherIntTest {
     protected TaskExecutionService taskExecutionService;
 
     @Autowired
-    private WorkflowExecutor workflowExecutor;
+    private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
 
     @BeforeEach
     void beforeEach() {
@@ -59,7 +59,7 @@ public class IfTaskDispatcherIntTest {
 
     @Test
     public void testDispatchBoolean() {
-        workflowExecutor.execute(
+        taskDispatcherWorkflowTestSupport.execute(
             ENCODER.encodeToString("if_v1-conditions-boolean".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "true", "value2", "false"),
             getGetTaskCompletionHandlers(),
@@ -72,7 +72,7 @@ public class IfTaskDispatcherIntTest {
 
     @Test
     public void testDispatchDateTime() {
-        workflowExecutor.execute(
+        taskDispatcherWorkflowTestSupport.execute(
             ENCODER.encodeToString("if_v1-conditions-dateTime".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "2022-01-01T00:00:00", "value2", "2022-01-01T00:00:01"),
             getGetTaskCompletionHandlers(),
@@ -85,7 +85,7 @@ public class IfTaskDispatcherIntTest {
 
     @Test
     public void testDispatchExpression() {
-        workflowExecutor.execute(
+        taskDispatcherWorkflowTestSupport.execute(
             ENCODER.encodeToString("if_v1-conditions-expression".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", 100, "value2", 200),
             getGetTaskCompletionHandlers(),
@@ -97,7 +97,7 @@ public class IfTaskDispatcherIntTest {
 
     @Test
     public void testDispatchNumber() {
-        workflowExecutor.execute(
+        taskDispatcherWorkflowTestSupport.execute(
             ENCODER.encodeToString("if_v1-conditions-number".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", 100, "value2", 200),
             getGetTaskCompletionHandlers(),
@@ -114,7 +114,7 @@ public class IfTaskDispatcherIntTest {
 
     @Test
     public void testDispatchString() {
-        workflowExecutor.execute(
+        taskDispatcherWorkflowTestSupport.execute(
             ENCODER.encodeToString("if_v1-conditions-string".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "Hello World", "value2", "Hello"),
             getGetTaskCompletionHandlers(),
@@ -131,11 +131,11 @@ public class IfTaskDispatcherIntTest {
         Assertions.assertEquals("false branch", testVarTaskHandler.get("regexResult"));
     }
 
-    private WorkflowExecutor.TaskHandlerMapSupplier getTaskHandlerMap() {
+    private TaskDispatcherWorkflowTestSupport.TaskHandlerMapSupplier getTaskHandlerMap() {
         return () -> Map.of("var", testVarTaskHandler);
     }
 
-    private static WorkflowExecutor.TaskDispatcherResolversFunction getGetTaskDispatcherResolvers() {
+    private static TaskDispatcherWorkflowTestSupport.TaskDispatcherResolversFunction getGetTaskDispatcherResolvers() {
         return (
             contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
             taskExecutionService) -> List.of(
@@ -143,7 +143,7 @@ public class IfTaskDispatcherIntTest {
                     contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService));
     }
 
-    private WorkflowExecutor.TaskCompletionHandlersFunction getGetTaskCompletionHandlers() {
+    private TaskDispatcherWorkflowTestSupport.TaskCompletionHandlersFunction getGetTaskCompletionHandlers() {
         return (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) -> List.of(
             new IfTaskCompletionHandler(
                 contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService));

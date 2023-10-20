@@ -19,7 +19,7 @@ package com.bytechef.task.dispatcher.loop;
 
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.sync.executor.WorkflowExecutor;
+import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.task.dispatcher.if_.IfTaskDispatcher;
@@ -55,7 +55,7 @@ public class LoopTaskDispatcherIntTest {
     protected TaskExecutionService taskExecutionService;
 
     @Autowired
-    private WorkflowExecutor workflowExecutor;
+    private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
 
     @BeforeEach
     void beforeEach() {
@@ -66,7 +66,7 @@ public class LoopTaskDispatcherIntTest {
 
     @Test
     public void testDispatch1() {
-        workflowExecutor.execute(
+        taskDispatcherWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_1".getBytes(StandardCharsets.UTF_8)),
             getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
@@ -80,7 +80,7 @@ public class LoopTaskDispatcherIntTest {
 
     @Test
     public void testDispatch2() {
-        workflowExecutor.execute(
+        taskDispatcherWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_2".getBytes(StandardCharsets.UTF_8)),
             getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
@@ -96,7 +96,7 @@ public class LoopTaskDispatcherIntTest {
 
     @Test
     public void testDispatch3() {
-        workflowExecutor.execute(
+        taskDispatcherWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_3".getBytes(StandardCharsets.UTF_8)),
             getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
@@ -110,7 +110,7 @@ public class LoopTaskDispatcherIntTest {
 
     @Test
     public void testDispatch4() {
-        workflowExecutor.execute(
+        taskDispatcherWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_4".getBytes(StandardCharsets.UTF_8)),
             getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
@@ -124,7 +124,7 @@ public class LoopTaskDispatcherIntTest {
 
     @Test
     public void testDispatch5() {
-        workflowExecutor.execute(
+        taskDispatcherWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_5".getBytes(StandardCharsets.UTF_8)),
             getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
@@ -138,7 +138,7 @@ public class LoopTaskDispatcherIntTest {
 
     @Test
     public void testDispatch6() {
-        workflowExecutor.execute(
+        taskDispatcherWorkflowTestSupport.execute(
             Base64.getEncoder()
                 .encodeToString("loop_v1_6".getBytes(StandardCharsets.UTF_8)),
             getTaskCompletionHandlers(), getTaskDispatcherResolvers(), getTaskHandlerMap());
@@ -150,7 +150,7 @@ public class LoopTaskDispatcherIntTest {
             testVarTaskHandler.get("sumVar2"));
     }
 
-    private WorkflowExecutor.TaskCompletionHandlersFunction getTaskCompletionHandlers() {
+    private TaskDispatcherWorkflowTestSupport.TaskCompletionHandlersFunction getTaskCompletionHandlers() {
         return (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) -> List.of(
             new IfTaskCompletionHandler(
                 contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
@@ -160,7 +160,7 @@ public class LoopTaskDispatcherIntTest {
                 contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService));
     }
 
-    private static WorkflowExecutor.TaskDispatcherResolversFunction getTaskDispatcherResolvers() {
+    private static TaskDispatcherWorkflowTestSupport.TaskDispatcherResolversFunction getTaskDispatcherResolvers() {
         return (
             contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
             taskExecutionService) -> List.of(
@@ -173,7 +173,7 @@ public class LoopTaskDispatcherIntTest {
                     contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService));
     }
 
-    private WorkflowExecutor.TaskHandlerMapSupplier getTaskHandlerMap() {
+    private TaskDispatcherWorkflowTestSupport.TaskHandlerMapSupplier getTaskHandlerMap() {
         return () -> Map.of("var", testVarTaskHandler);
     }
 }
