@@ -7,7 +7,7 @@ const ProjectInstanceWorkflowList = ({projectId}: {projectId: number}) => {
 
     return (
         <div className="border-b border-b-gray-100 px-2 py-4">
-            <h3 className="mb-2 text-sm font-bold uppercase text-gray-600">
+            <h3 className="mb-2 text-sm font-bold uppercase text-gray-500">
                 Workflows
             </h3>
 
