@@ -18,6 +18,7 @@
 package com.bytechef.hermes.component.util;
 
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.context.factory.AuthorizationContextConnection;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.ApplyFunction;
 import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
@@ -477,7 +478,7 @@ public class HttpClientExecutorTest {
     }
 
     @SuppressFBWarnings("NP")
-    private static class MockConnection implements Context.Connection {
+    private static class MockConnection implements Context.Connection, AuthorizationContextConnection {
 
         private final Authorization authorization;
         private final Map<String, Object> parameters = new HashMap<>();

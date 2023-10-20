@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.component.context;
 
+import com.bytechef.hermes.component.context.factory.AuthorizationContextConnection;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.connection.domain.Connection;
@@ -27,7 +28,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-public class ContextConnectionImpl implements Context.Connection {
+public class ContextConnectionImpl implements Context.Connection, AuthorizationContextConnection {
 
     private final String authorizationName;
     private final String componentName;
