@@ -40,10 +40,10 @@ export interface ActionDefinitionModel {
     componentName?: string;
     /**
      * The component version.
-     * @type {string}
+     * @type {number}
      * @memberof ActionDefinitionModel
      */
-    componentVersion?: string;
+    componentVersion?: number;
     /**
      * The description.
      * @type {string}
