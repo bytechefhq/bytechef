@@ -34,8 +34,8 @@ public class EventListenerConfiguration {
 
     @Bean
     @Primary
-    EventListenerChain eventListener(List<EventListener> aEventListeners) {
-        return new EventListenerChain(aEventListeners);
+    EventListener eventListener(List<EventListener> eventListeners) {
+        return new EventListenerChain(eventListeners);
     }
 
     @Bean

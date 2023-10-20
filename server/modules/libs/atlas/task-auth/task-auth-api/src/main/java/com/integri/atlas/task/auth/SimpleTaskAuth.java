@@ -57,9 +57,9 @@ public class SimpleTaskAuth extends MapObject implements TaskAuth {
 
     @Override
     public Accessor getProperties() {
-        Map<String, Object> map = getMap(Constants.PROPERTIES);
+        Map<String, Object> properties = getMap(Constants.PROPERTIES);
 
-        return map != null ? new MapObject(map) : new MapObject();
+        return properties != null ? new MapObject(properties) : new MapObject();
     }
 
     @Override

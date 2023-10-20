@@ -18,6 +18,7 @@
 
 package com.integri.atlas.task.dispatcher.fork;
 
+import com.integri.atlas.engine.Constants;
 import com.integri.atlas.engine.context.MapContext;
 import com.integri.atlas.engine.context.service.ContextService;
 import com.integri.atlas.engine.counter.service.CounterService;
@@ -121,7 +122,7 @@ public class ForkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     @Override
     public TaskDispatcher resolve(Task aTask) {
-        if (aTask.getType().equals("fork")) {
+        if (aTask.getType().equals(Constants.FORK)) {
             return this;
         }
         return null;

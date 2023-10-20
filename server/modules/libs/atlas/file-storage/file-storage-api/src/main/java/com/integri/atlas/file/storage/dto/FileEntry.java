@@ -44,33 +44,11 @@ public class FileEntry {
     }
 
     public static FileEntry of(String fileName) {
-        FileEntry fileEntry = new FileEntry();
-
-        fileEntry.setExtension(FilenameUtils.getExtension(fileName));
-
-        Tika tika = new Tika();
-
-        fileEntry.setMimeType(tika.detect(fileName));
-
-        fileEntry.setName(FilenameUtils.getName(fileName));
-        fileEntry.setUrl(fileName);
-
-        return fileEntry;
+        return getFileEntry(fileName, fileName);
     }
 
     public static FileEntry of(String fileName, String url) {
-        FileEntry fileEntry = new FileEntry();
-
-        fileEntry.setExtension(FilenameUtils.getExtension(fileName));
-
-        Tika tika = new Tika();
-
-        fileEntry.setMimeType(tika.detect(fileName));
-
-        fileEntry.setName(FilenameUtils.getName(fileName));
-        fileEntry.setUrl(url);
-
-        return fileEntry;
+        return getFileEntry(fileName, url);
     }
 
     public String getExtension() {
@@ -103,5 +81,20 @@ public class FileEntry {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    private static FileEntry getFileEntry(String fileName, String url) {
+        FileEntry fileEntry = new FileEntry();
+
+        fileEntry.setExtension(FilenameUtils.getExtension(fileName));
+
+        Tika tika = new Tika();
+
+        fileEntry.setMimeType(tika.detect(fileName));
+
+        fileEntry.setName(FilenameUtils.getName(fileName));
+        fileEntry.setUrl(url);
+
+        return fileEntry;
     }
 }
