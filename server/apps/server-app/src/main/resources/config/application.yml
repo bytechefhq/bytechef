@@ -116,7 +116,7 @@ bytechef:
     provider: filesystem
     file-storage-dir: /tmp/bytechef/files
   oauth2:
-    redirectUri: http://127.0.0.1:5173/callback
+    redirectUri: ${bytechef.publicUrl}/callback
   context-repository:
     provider: jdbc
   message-broker:
@@ -124,6 +124,7 @@ bytechef:
     provider: redis
   persistence:
     provider: jdbc
+  publicUrl: http://127.0.0.1:5173
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
   # When the worker is enabled, subscribe to the default "tasks" queue with 10 concurrent consumers.
@@ -132,6 +133,7 @@ bytechef:
   # E.g. node: captions will route to the captions queue which a worker would subscribe to with workflow.worker.subscriptions.captions.
   # Note: queue must be created before tasks can be routed to it. ByteChef will create the queue if it isn't already there when the worker
   # bootstraps.
+  webhookUrl: http://127.0.0.1:9555
   worker:
     task:
       subscriptions:

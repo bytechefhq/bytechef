@@ -116,7 +116,7 @@ bytechef:
   discovery-service:
     provider: redis
   oauth2:
-    redirectUri: http://127.0.0.1:5173/callback
+    redirectUri: ${bytechef.publicUrl}/callback
   context-repository:
     provider: jdbc
   message-broker:
@@ -124,8 +124,10 @@ bytechef:
     provider: redis
   persistence:
     provider: jdbc
+  publicUrl: http://127.0.0.1:5173
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+  webhookUrl: http://127.0.0.1:9555
   workflow-repository:
     classpath:
       enabled: true
