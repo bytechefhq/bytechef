@@ -20,10 +20,12 @@ import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
-import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
 
-@TestConfiguration
+@ComponentScan(basePackages = "com.bytechef.atlas.web.rest")
+@SpringBootConfiguration
 public class WorkflowRestTestConfiguration {
 
     @MockBean

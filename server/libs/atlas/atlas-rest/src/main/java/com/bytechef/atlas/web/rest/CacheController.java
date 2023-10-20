@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -36,7 +37,8 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 @ConditionalOnApi
-public class CacheController implements CacheControllerApi {
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+public class CacheController implements CachesApi {
 
     private static final Logger logger = LoggerFactory.getLogger(CacheController.class);
 

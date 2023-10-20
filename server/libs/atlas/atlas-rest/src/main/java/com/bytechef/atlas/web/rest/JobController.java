@@ -18,21 +18,25 @@
 
 package com.bytechef.atlas.web.rest;
 
-import com.bytechef.atlas.constants.WorkflowConstants;
+import com.bytechef.atlas.dto.JobParametersDTO;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.service.JobService;
+import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.web.rest.model.JobModel;
+import com.bytechef.atlas.web.rest.model.JobParametersModel;
 import com.bytechef.atlas.web.rest.model.PostJob200ResponseModel;
+import com.bytechef.atlas.web.rest.model.TaskExecutionModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.commons.uuid.UUIDGenerator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Map;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -41,17 +45,24 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 @ConditionalOnApi
-public class JobController implements JobControllerApi {
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+public class JobController implements JobsApi {
 
     private final ConversionService conversionService;
-    private final MessageBroker messageBroker;
     private final JobService jobService;
+    private final MessageBroker messageBroker;
+    private final TaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI2")
-    public JobController(ConversionService conversionService, JobService jobService, MessageBroker messageBroker) {
+    public JobController(
+            ConversionService conversionService,
+            JobService jobService,
+            MessageBroker messageBroker,
+            TaskExecutionService taskExecutionService) {
         this.conversionService = conversionService;
         this.jobService = jobService;
         this.messageBroker = messageBroker;
+        this.taskExecutionService = taskExecutionService;
     }
 
     @Override
@@ -60,9 +71,11 @@ public class JobController implements JobControllerApi {
     }
 
     @Override
-    public Mono<ResponseEntity<JobModel>> getLatestJob(ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(
-                conversionService.convert(jobService.fetchLatestJob().orElse(null), JobModel.class)));
+    public Mono<ResponseEntity<Flux<TaskExecutionModel>>> getJobTaskExecutions(
+            String jobId, ServerWebExchange exchange) {
+        return Mono.just(ResponseEntity.ok(Flux.fromIterable(taskExecutionService.getJobTaskExecutions(jobId).stream()
+                .map(taskExecution -> conversionService.convert(taskExecution, TaskExecutionModel.class))
+                .toList())));
     }
 
     @Override
@@ -73,14 +86,23 @@ public class JobController implements JobControllerApi {
     }
 
     @Override
+    public Mono<ResponseEntity<JobModel>> getLatestJob(ServerWebExchange exchange) {
+        return Mono.just(ResponseEntity.ok(
+                conversionService.convert(jobService.fetchLatestJob().orElse(null), JobModel.class)));
+    }
+
+    @Override
     public Mono<ResponseEntity<PostJob200ResponseModel>> postJob(
-            Mono<Map<String, Object>> requestBody, ServerWebExchange exchange) {
-        return requestBody.map(jobRequestMap -> {
+            Mono<JobParametersModel> workflowParametersModelMono, ServerWebExchange exchange) {
+        return workflowParametersModelMono.map(workflowParametersModel -> {
+            JobParametersDTO jobParametersDTO =
+                    conversionService.convert(workflowParametersModel, JobParametersDTO.class);
+
             String id = UUIDGenerator.generate();
 
-            jobRequestMap.put(WorkflowConstants.ID, id);
+            jobParametersDTO.setJobId(id);
 
-            messageBroker.send(Queues.REQUESTS, jobRequestMap);
+            messageBroker.send(Queues.REQUESTS, jobParametersDTO);
 
             return ResponseEntity.ok(new PostJob200ResponseModel().jobId(id));
         });

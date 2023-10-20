@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
+import com.bytechef.atlas.web.rest.config.WorkflowRestTestConfiguration;
 import com.bytechef.atlas.web.rest.model.WorkflowModel;
 import com.bytechef.atlas.workflow.WorkflowFormat;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -33,13 +34,15 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
  * @author Ivica Cardic
  */
+@ContextConfiguration(classes = {WorkflowRestTestConfiguration.class})
 @WebFluxTest(WorkflowController.class)
-public class WorkflowControllerTest {
+public class WorkflowControllerIntTest {
 
     @Autowired
     private WorkflowService workflowService;
@@ -111,7 +114,7 @@ public class WorkflowControllerTest {
     public void testPostWorkflow() {
         Workflow workflow = getWorkflow();
         WorkflowModel workflowModel = new WorkflowModel()
-                .content("""
+                .definition("""
             {
                 "tasks": []
             }
@@ -132,8 +135,8 @@ public class WorkflowControllerTest {
                     .expectStatus()
                     .isOk()
                     .expectBody()
-                    .jsonPath("$.content")
-                    .isEqualTo(workflow.getContent())
+                    .jsonPath("$.definition")
+                    .isEqualTo(workflow.getDefinition())
                     .jsonPath("$.format")
                     .isEqualTo(workflow.getFormat().toString())
                     .jsonPath("$.id")
@@ -149,7 +152,7 @@ public class WorkflowControllerTest {
         Workflow workflow = getWorkflow();
         WorkflowModel workflowModel = new WorkflowModel()
                 .id("1")
-                .content(
+                .definition(
                         """
             {
                 "label": "label",
@@ -157,7 +160,7 @@ public class WorkflowControllerTest {
             }
             """);
 
-        workflow.setContent(
+        workflow.setDefinition(
                 """
             {
                 "label": "label",
@@ -178,8 +181,8 @@ public class WorkflowControllerTest {
                     .expectStatus()
                     .isOk()
                     .expectBody()
-                    .jsonPath("$.content")
-                    .isEqualTo(workflow.getContent())
+                    .jsonPath("$.definition")
+                    .isEqualTo(workflow.getDefinition())
                     .jsonPath("$.format")
                     .isEqualTo(workflow.getFormat().toString())
                     .jsonPath("$.id")
@@ -193,7 +196,7 @@ public class WorkflowControllerTest {
         Workflow workflow = new Workflow();
 
         workflow.setId("1");
-        workflow.setContent("""
+        workflow.setDefinition("""
             {
                 "tasks": []
             }

@@ -14,21 +14,26 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.web.rest.mapper;
+package com.bytechef.atlas.web.rest;
 
-import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.web.rest.mapper.config.WorkflowMapperSpringConfig;
-import com.bytechef.atlas.web.rest.model.WorkflowModel;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.core.convert.converter.Converter;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = WorkflowMapperSpringConfig.class)
-public interface WorkflowModelMapper extends Converter<WorkflowModel, Workflow> {
+@Disabled
+@WebFluxTest(TaskExecutionController.class)
+public class TaskExecutionControllerIntTest {
 
-    @Mapping(target = "error", ignore = true)
-    Workflow convert(WorkflowModel workflowModel);
+    @Test
+    public void testGetTaskExecution() {
+        // TODO
+    }
+
+    @Test
+    public void testGetTaskExecutions() {
+        // TODO
+    }
 }
