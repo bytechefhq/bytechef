@@ -12,8 +12,7 @@ spring:
   application:
     name: atlas-app
   jackson:
-    default-property-inclusion:
-      non_null
+    default-property-inclusion: non_null
     serialization:
       write-dates-as-timestamps: false
       write-null-map-values: false
@@ -23,4 +22,3 @@ spring:
 atlas:
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
-

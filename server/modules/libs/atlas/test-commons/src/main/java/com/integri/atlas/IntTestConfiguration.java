@@ -30,7 +30,7 @@ import com.integri.atlas.engine.job.repository.jdbc.JdbcJobRepository;
 import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.task.execution.repository.jdbc.JdbcTaskExecutionRepository;
 import com.integri.atlas.engine.workflow.repository.WorkflowRepository;
-import com.integri.atlas.engine.workflow.repository.mapper.JSONWorkflowMapper;
+import com.integri.atlas.engine.workflow.repository.mapper.JsonWorkflowMapper;
 import com.integri.atlas.engine.workflow.repository.mapper.WorkflowMapper;
 import com.integri.atlas.engine.workflow.repository.mapper.WorkflowMapperChain;
 import com.integri.atlas.engine.workflow.repository.mapper.YAMLWorkflowMapper;
@@ -120,7 +120,7 @@ public class IntTestConfiguration {
 
     @Bean
     WorkflowMapper workflowMapper() {
-        return new WorkflowMapperChain(List.of(new JSONWorkflowMapper(), new YAMLWorkflowMapper()));
+        return new WorkflowMapperChain(List.of(new JsonWorkflowMapper(), new YAMLWorkflowMapper()));
     }
 
     @Bean

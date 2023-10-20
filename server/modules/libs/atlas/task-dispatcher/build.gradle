@@ -17,7 +17,7 @@ subprojects {
         testImplementation project(":modules:libs:atlas:engine:engine-job:engine-job-api")
         testImplementation project(":modules:libs:atlas:task-definition")
         testImplementation project(":modules:libs:atlas:task-handler:task-handler-core")
-        testImplementation project(":modules:libs:atlas:test-common")
+        testImplementation project(":modules:libs:atlas:test-commons")
         testImplementation project(":modules:libs:atlas:engine:engine-context:engine-context-repository:engine-context-repository-api")
         testImplementation project(":modules:libs:atlas:engine:engine-counter:engine-counter-repository:engine-counter-repository-api")
         testImplementation project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-repository:engine-task-execution-repository-api")

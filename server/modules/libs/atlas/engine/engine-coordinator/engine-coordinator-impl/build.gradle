@@ -21,7 +21,7 @@ dependencies {
     testImplementation project(":modules:libs:atlas:task-handler:task-handler-time")
     testImplementation project(":modules:libs:atlas:engine:engine-worker:engine-worker-impl")
     testImplementation project(":modules:libs:atlas:engine:engine-message-broker:engine-message-broker-sync")
-    testImplementation project(":modules:libs:atlas:test-common")
+    testImplementation project(":modules:libs:atlas:test-commons")
     testImplementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-resource")
 
     testRuntimeOnly "org.postgresql:postgresql"
