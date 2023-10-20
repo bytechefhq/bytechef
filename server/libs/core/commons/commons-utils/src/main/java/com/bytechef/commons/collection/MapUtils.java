@@ -229,6 +229,12 @@ public class MapUtils {
         return value != null ? value : defaultValue;
     }
 
+    public static Object getMapKey(Map<String, Object> map, String key, String mapKey) {
+        Map<String, Object> value = getMap(map, key);
+
+        return value != null ? value.get(mapKey) : null;
+    }
+
     public static String getRequiredString(Map<String, Object> map, String key) {
         String value = getString(map, key);
 
