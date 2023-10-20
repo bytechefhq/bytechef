@@ -33,7 +33,9 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
-        return modifiableComponentDefinition.icon("path:assets/airtable.svg");
+        return modifiableComponentDefinition
+            .customAction(true)
+            .icon("path:assets/airtable.svg");
     }
 
     @Override

@@ -236,6 +236,11 @@ public class InputParametersImpl implements InputParameters {
     }
 
     @Override
+    public <V> Map<String, V> getRequiredMap(String key) {
+        return MapValueUtils.getRequiredMap(parameters, key);
+    }
+
+    @Override
     public String getRequiredString(String key) {
         return MapValueUtils.getRequiredString(parameters, key);
     }

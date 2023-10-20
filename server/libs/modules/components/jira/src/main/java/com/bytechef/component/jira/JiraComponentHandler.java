@@ -29,6 +29,8 @@ public class JiraComponentHandler extends AbstractJiraComponentHandler {
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
-        return modifiableComponentDefinition.icon("path:assets/jira.svg");
+        return modifiableComponentDefinition
+            .customAction(true)
+            .icon("path:assets/jira.svg");
     }
 }

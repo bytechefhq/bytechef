@@ -36,7 +36,7 @@ public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDe
 
     String getDescription();
 
-    Optional<Object> getExampleOutput();
+    Optional<String> getExampleOutput();
 
     Optional<ExampleOutputDataSource> getExampleOutputDataSource();
 
@@ -54,6 +54,8 @@ public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDe
     String getName();
 
     Optional<List<? extends Property<?>>> getOutputSchema();
+
+    Optional<String> getOutputSchemaProperty();
 
     Optional<OutputSchemaDataSource> getOutputSchemaDataSource();
 

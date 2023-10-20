@@ -693,6 +693,11 @@ public class HttpClientUtilsTest {
         }
 
         @Override
+        public <V> Map<String, V> getRequiredMap(String key) {
+            return null;
+        }
+
+        @Override
         public String getRequiredString(String key) {
             return null;
         }
@@ -916,6 +921,11 @@ public class HttpClientUtilsTest {
 
         @Override
         public LocalDateTime getRequiredLocalDateTime(String key) {
+            return null;
+        }
+
+        @Override
+        public <V> Map<String, V> getRequiredMap(String key) {
             return null;
         }
 

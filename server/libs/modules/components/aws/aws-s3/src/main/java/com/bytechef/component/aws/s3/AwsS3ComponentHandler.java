@@ -42,7 +42,8 @@ public class AwsS3ComponentHandler implements ComponentHandler {
         .actions(
             AwsS3GetObjectAction.ACTION_DEFINITION, AwsS3GetUrlAction.ACTION_DEFINITION,
             AwsS3ListObjectsAction.ACTION_DEFINITION,
-            AwsS3PresignGetObjectAction.ACTION_DEFINITION, AwsS3PutObjectAction.ACTION_DEFINITION);
+            AwsS3PresignGetObjectAction.ACTION_DEFINITION, AwsS3PutObjectAction.ACTION_DEFINITION)
+        .customAction(true);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -27,10 +27,12 @@ import com.bytechef.hermes.definition.registry.dto.ActionDefinitionBasicDTO;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionBasicDTO;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionBasicDTO;
+import com.bytechef.hermes.definition.registry.component.action.CustomAction;
 import com.bytechef.hermes.definition.registry.util.DefinitionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -105,10 +107,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
 
     private ComponentDefinitionDTO toComponentDefinitionDTO(ComponentDefinition componentDefinition) {
         return new ComponentDefinitionDTO(
-            OptionalUtils.mapOrElse(
-                componentDefinition.getActions(),
-                actionDefinitions -> CollectionUtils.map(actionDefinitions, this::toActionDefinitionBasicDTO),
-                Collections.emptyList()),
+            getActions(componentDefinition),
             OptionalUtils.orElse(componentDefinition.getCategory(), null),
             OptionalUtils.mapOrElse(componentDefinition.getConnection(), this::toConnectionDefinitionDTO, null),
             OptionalUtils.orElse(componentDefinition.getDescription(), null),
@@ -120,6 +119,22 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
                 triggerDefinitions -> CollectionUtils.map(triggerDefinitions, this::toTriggerDefinitionBasicDTO),
                 Collections.emptyList()),
             componentDefinition.getTitle(), componentDefinition.getVersion());
+    }
+
+    private List<ActionDefinitionBasicDTO> getActions(ComponentDefinition componentDefinition) {
+        List<ActionDefinitionBasicDTO> actionDefinitionBasicDTOs = OptionalUtils.mapOrElse(
+            componentDefinition.getActions(),
+            actionDefinitions -> CollectionUtils.map(actionDefinitions, this::toActionDefinitionBasicDTO),
+            Collections.emptyList());
+
+        if (OptionalUtils.orElse(componentDefinition.getCustomAction(), false)) {
+            actionDefinitionBasicDTOs = new ArrayList<>(actionDefinitionBasicDTOs);
+
+            actionDefinitionBasicDTOs.add(
+                toActionDefinitionBasicDTO(CustomAction.getCustomActionDefinition(componentDefinition)));
+        }
+
+        return actionDefinitionBasicDTOs;
     }
 
     private ActionDefinitionBasicDTO toActionDefinitionBasicDTO(ActionDefinition actionDefinition) {

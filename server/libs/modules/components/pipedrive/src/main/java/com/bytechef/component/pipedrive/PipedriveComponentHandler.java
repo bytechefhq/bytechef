@@ -44,6 +44,7 @@ public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler
 
         return componentDefinition
             .description("The first CRM designed by salespeople, for salespeople. Do more to grow your business.")
+            .customAction(true)
             .icon("path:assets/pipedrive.svg");
     }
 

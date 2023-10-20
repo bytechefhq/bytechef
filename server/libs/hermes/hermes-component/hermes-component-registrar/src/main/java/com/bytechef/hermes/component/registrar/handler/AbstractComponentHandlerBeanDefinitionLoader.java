@@ -23,6 +23,7 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.hermes.definition.registry.component.action.CustomAction;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
@@ -60,6 +61,17 @@ public abstract class AbstractComponentHandlerBeanDefinitionLoader<T extends Com
                         actionDefinition.getName(),
                         getComponentActionTaskHandlerBeanDefinition(
                             actionDefinition, componentDefinitionFactory))));
+
+            // Custom Actions support
+
+            if (OptionalUtils.orElse(componentDefinition.getCustomAction(), false)) {
+                handlerBeanDefinitionEntries.add(
+                    new HandlerBeanDefinitionEntry(
+                        CustomAction.CUSTOM,
+                        getComponentActionTaskHandlerBeanDefinition(
+                            CustomAction.getCustomActionDefinition(componentDefinition),
+                            componentDefinitionFactory)));
+            }
 
             List<? extends TriggerDefinition> triggerDefinitions = OptionalUtils.orElse(
                 componentDefinition.getTriggers(), Collections.emptyList());

@@ -271,6 +271,11 @@ public class ContextConnectionImpl implements Context.Connection {
     }
 
     @Override
+    public <V> Map<String, V> getRequiredMap(String key) {
+        return inputParameters.getRequiredMap(key);
+    }
+
+    @Override
     public String getRequiredString(String key) {
         return inputParameters.getRequiredString(key);
     }

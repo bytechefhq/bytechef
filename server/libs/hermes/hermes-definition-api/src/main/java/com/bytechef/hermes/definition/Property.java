@@ -83,6 +83,7 @@ public sealed interface Property<P extends Property<P>>
         INPUT_TEXT,
         INPUT_URL,
         MULTI_SELECT,
+        SCHEMA_DESIGNER,
         SELECT,
         TEXT_AREA,
         TIME,
@@ -268,9 +269,13 @@ public sealed interface Property<P extends Property<P>>
     sealed interface StringProperty
         extends ValueProperty<String, StringProperty> permits ModifiableStringProperty {
 
+        enum SampleDataType {CSV, JSON, XML}
+
         Optional<List<Option<?>>> getOptions();
 
         Optional<OptionsDataSource> getOptionsDataSource();
+
+        Optional<SampleDataType> getSampleDataType();
     }
 
     @JsonDeserialize(as = ModifiableTimeProperty.class)
