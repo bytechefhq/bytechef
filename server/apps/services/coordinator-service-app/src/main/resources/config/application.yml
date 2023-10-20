@@ -32,7 +32,7 @@ management:
       enabled: true
   health:
     rabbit:
-      enabled: false # When using Rabbit, set this to true
+      enabled: false # When using Rabbit, will be set to true via post-processor
   metrics:
     enable:
       http: true
