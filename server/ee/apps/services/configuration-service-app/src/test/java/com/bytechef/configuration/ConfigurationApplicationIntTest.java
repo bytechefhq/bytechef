@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform;
+package com.bytechef.configuration;
 
 import com.bytechef.test.annotation.EmbeddedRedis;
 import com.bytechef.test.annotation.EmbeddedSql;

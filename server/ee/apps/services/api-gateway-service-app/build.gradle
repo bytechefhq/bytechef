@@ -2,17 +2,17 @@ group = "com.bytechef.api"
 description = ""
 
 springBoot {
-    mainClassName = "com.bytechef.apigateway.ApiGatewayApplicaton"
+    mainClassName = "com.bytechef.api.gateway.ApiGatewayApplicaton"
 }
 
 dependencies {
 //    implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
     implementation "org.springframework.cloud:spring-cloud-starter-gateway"
-    implementation libs.springdoc.openapi.starter.webflux.ui
+    implementation libs.org.springframework.cloud.spring.cloud.starter.loadbalancer
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
-    implementation project(":server:libs:core:discovery:discovery-config")
-    implementation project(":server:libs:core:discovery:discovery-redis")
+    implementation project(":server:ee:libs:core:discovery:discovery-redis")
+    implementation project(":server:libs:core:config-post-processor")
 
     testImplementation project(":server:libs:test:test-int-support")
 }
