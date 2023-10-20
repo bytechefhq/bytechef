@@ -51,24 +51,29 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
-    public void handle(TaskExecution aTaskExecution) {
-        TaskExecution mtask = new TaskExecution(aTaskExecution);
-        mtask.setStatus(TaskStatus.COMPLETED);
-        taskExecutionService.update(mtask);
-        long subtasksLeft = counterService.decrement(aTaskExecution.getParentId());
+    public void handle(TaskExecution taskExecution) {
+        TaskExecution completedSubTaskExecution = new TaskExecution(taskExecution);
+
+        completedSubTaskExecution.setStatus(TaskStatus.COMPLETED);
+
+        taskExecutionService.update(completedSubTaskExecution);
+
+        long subtasksLeft = counterService.decrement(taskExecution.getParentId());
+
         if (subtasksLeft == 0) {
-            List<TaskExecution> children = taskExecutionService.getParentTaskExecutions(aTaskExecution.getParentId());
-            TaskExecution parentExecution =
-                    new TaskExecution(taskExecutionService.getTaskExecution(aTaskExecution.getParentId()));
+            List<TaskExecution> childTaskExecutions =
+                    taskExecutionService.getParentTaskExecutions(taskExecution.getParentId());
+            TaskExecution mapTaskExecution =
+                    new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
-            parentExecution.setEndTime(LocalDateTime.now());
-            parentExecution.setExecutionTime(LocalDateTimeUtils.getTime(parentExecution.getEndTime())
-                    - LocalDateTimeUtils.getTime(parentExecution.getStartTime()));
-            parentExecution.setOutput(
-                    children.stream().map(TaskExecution::getOutput).collect(Collectors.toList()));
+            mapTaskExecution.setEndTime(LocalDateTime.now());
+            mapTaskExecution.setExecutionTime(LocalDateTimeUtils.getTime(mapTaskExecution.getEndTime())
+                    - LocalDateTimeUtils.getTime(mapTaskExecution.getStartTime()));
+            mapTaskExecution.setOutput(
+                    childTaskExecutions.stream().map(TaskExecution::getOutput).collect(Collectors.toList()));
 
-            taskCompletionHandler.handle(parentExecution);
-            counterService.delete(aTaskExecution.getParentId());
+            taskCompletionHandler.handle(mapTaskExecution);
+            counterService.delete(taskExecution.getParentId());
         }
     }
 

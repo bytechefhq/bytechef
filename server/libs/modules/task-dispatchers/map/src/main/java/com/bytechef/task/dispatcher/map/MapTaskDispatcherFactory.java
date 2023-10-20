@@ -20,12 +20,15 @@ import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.array;
 import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.create;
 import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.display;
 import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.string;
+import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.task;
+import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.ITEM;
 import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.ITEM_INDEX;
 import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.ITEM_VAR;
+import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.ITERATEE;
 import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.LIST;
 import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.MAP;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.springframework.stereotype.Component;
 
@@ -33,23 +36,24 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
+public class MapTaskDispatcherFactory implements TaskDispatcherFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = create(MAP)
             .display(
                     display("Map")
                             .description(
                                     "Produces a new collection of values by mapping each value in `list` through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source `list`."))
-            .inputs(
+            .properties(
                     array(LIST).label("List of items").description("List of items to iterate over."),
                     string(ITEM_VAR)
                             .label("Item Var")
                             .description("The name of the item variable.")
-                            .defaultValue("item"),
+                            .defaultValue(ITEM),
                     string(ITEM_INDEX)
                             .label("Item Index")
                             .description("The name of the index variable.")
-                            .defaultValue("itemIndex"));
+                            .defaultValue(ITEM_INDEX))
+            .taskProperties(task(ITERATEE));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

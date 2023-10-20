@@ -16,17 +16,16 @@
 
 package com.bytechef.task.dispatcher.map;
 
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class MapTaskDispatcherDefinitionFactoryTest {
+public class MapTaskDispatcherFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        DefinitionAssert.assertEquals(
-                "definition/map_v1.json", new MapTaskDispatcherDefinitionFactory().getDefinition());
+        AssertUtils.assertEquals("definition/map_v1.json", new MapTaskDispatcherFactory().getDefinition());
     }
 }

@@ -19,6 +19,11 @@
 package com.bytechef.task.dispatcher.map;
 
 import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.ITEM;
+import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.ITEM_INDEX;
+import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.ITEM_VAR;
+import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.ITERATEE;
+import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.LIST;
 import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.MAP;
 
 import com.bytechef.atlas.domain.Context;
@@ -62,8 +67,8 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        List<Object> list = taskExecution.getList("list", Object.class);
-        WorkflowTask iteratee = taskExecution.getWorkflowTask("iteratee");
+        List<Object> list = taskExecution.getList(LIST, Object.class);
+        WorkflowTask iteratee = taskExecution.getWorkflowTask(ITERATEE);
 
         Assert.notNull(list, "'list' property can't be null");
         Assert.notNull(iteratee, "'iteratee' property can't be null");
@@ -85,8 +90,8 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
 
                 Context context = new Context(contextService.peek(taskExecution.getId()));
 
-                context.put(taskExecution.getString("itemVar", "item"), item);
-                context.put(taskExecution.getString("itemIndex", "itemIndex"), i);
+                context.put(taskExecution.getString(ITEM_VAR, ITEM), item);
+                context.put(taskExecution.getString(ITEM_INDEX, ITEM_INDEX), i);
 
                 contextService.push(iterateeTaskExecution.getId(), context);
 
