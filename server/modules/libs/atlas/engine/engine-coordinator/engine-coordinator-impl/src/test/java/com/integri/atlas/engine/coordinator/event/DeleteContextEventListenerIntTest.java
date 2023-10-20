@@ -20,12 +20,7 @@ import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.context.service.ContextService;
 import com.integri.atlas.engine.job.Job;
 import com.integri.atlas.engine.job.service.JobService;
-import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import com.integri.atlas.task.handler.io.Print;
-import com.integri.atlas.task.handler.random.RandomInt;
-import com.integri.atlas.task.handler.time.Sleep;
 import com.integri.atlas.test.task.handler.BaseTaskIntTest;
-import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -48,16 +43,6 @@ public class DeleteContextEventListenerIntTest extends BaseTaskIntTest {
         Job job = startJob("samples/hello.json", Map.of("yourName", "me"));
 
         Assertions.assertNull(contextRepository.peek(job.getId()));
-    }
-
-    @Override
-    protected Map<String, TaskHandler<?>> getTaskHandlerResolverMap() {
-        Map<String, TaskHandler<?>> handlers = new HashMap<>();
-        handlers.put("io/print", new Print());
-        handlers.put("random/int", new RandomInt());
-        handlers.put("time/sleep", new Sleep());
-
-        return handlers;
     }
 
     @TestConfiguration

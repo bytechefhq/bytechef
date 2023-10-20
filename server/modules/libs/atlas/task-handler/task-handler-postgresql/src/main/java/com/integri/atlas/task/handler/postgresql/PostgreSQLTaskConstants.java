@@ -21,5 +21,6 @@ package com.integri.atlas.task.handler.postgresql;
  */
 public class PostgreSQLTaskConstants {
 
-    public static final String TASK_POSTGRESQL = "postgresql";
+    public static final String POSTGRESQL = "postgresql";
+    public static final float VERSION_1_0 = 1.0f;
 }
