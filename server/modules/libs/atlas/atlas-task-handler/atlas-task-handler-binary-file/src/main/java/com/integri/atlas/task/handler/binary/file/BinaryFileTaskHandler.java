@@ -16,60 +16,55 @@
 
 package com.integri.atlas.task.handler.binary.file;
 
+import com.integri.atlas.engine.core.binary.Binary;
+import com.integri.atlas.engine.core.binary.BinaryHelper;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import com.integri.atlas.json.item.BinaryItem;
-import com.integri.atlas.json.item.BinaryItemHelper;
-import com.integri.atlas.json.item.JSONItem;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
-import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
 @Component("binaryFile")
-public class BinaryFileTaskHandler implements TaskHandler<JSONObject> {
+public class BinaryFileTaskHandler implements TaskHandler<Object> {
 
     private enum Operation {
         READ,
         WRITE,
     }
 
-    private final BinaryItemHelper binaryNodeHelper;
+    private final BinaryHelper binaryNodeHelper;
 
-    public BinaryFileTaskHandler(BinaryItemHelper binaryNodeHelper) {
+    public BinaryFileTaskHandler(BinaryHelper binaryNodeHelper) {
         this.binaryNodeHelper = binaryNodeHelper;
     }
 
     @Override
-    public JSONObject handle(TaskExecution taskExecution) throws Exception {
-        JSONObject jsonObject;
+    public Object handle(TaskExecution taskExecution) throws Exception {
+        Object result;
 
         String fileName = taskExecution.getRequired("fileName");
         Operation operation = Operation.valueOf(taskExecution.getRequired("operation"));
 
         if (operation == Operation.READ) {
             try (InputStream inputStream = new FileInputStream(fileName)) {
-                jsonObject = binaryNodeHelper.writeBinaryData(fileName, inputStream);
+                result = binaryNodeHelper.writeBinaryData(fileName, inputStream);
             }
         } else {
-            BinaryItem binaryItem = BinaryItem.of(taskExecution.getRequired("binaryItem", String.class));
+            Binary binary = taskExecution.getRequired("binary", Binary.class);
 
-            try (InputStream inputStream = binaryNodeHelper.openDataInputStream(binaryItem)) {
-                jsonObject =
-                    JSONItem.of(
-                        "bytes",
-                        Files.copy(inputStream, Path.of(fileName), StandardCopyOption.REPLACE_EXISTING)
-                    );
+            try (InputStream inputStream = binaryNodeHelper.openDataInputStream(binary)) {
+                result =
+                    Map.of("bytes", Files.copy(inputStream, Path.of(fileName), StandardCopyOption.REPLACE_EXISTING));
             }
         }
 
-        return jsonObject;
+        return result;
     }
 }
