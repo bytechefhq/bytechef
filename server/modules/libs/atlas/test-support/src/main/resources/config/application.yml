@@ -1,17 +1,14 @@
 spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/atlas
-    username: atlas
-    password: atlas
-
+    url: jdbc:postgresql://localhost:5432/integri
+    username: postgres
+    password: postgres
     hikari:
       poolName: Hikari
-
   sql:
     init:
       mode: always
-
   application:
     name: atlas-app
   jackson:
