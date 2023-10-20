@@ -32,26 +32,23 @@ import java.util.Optional;
 @SuppressFBWarnings("EI")
 public class TaskDispatcherDefinition {
 
-    private final String description;
-    private final String icon;
-    private final String name;
-    private final Property outputSchema;
-    private final List<? extends Property> properties;
-    private final Resources resources;
-    private final List<? extends Property> taskProperties;
-    private final String title;
-    private final int version;
+    private String description;
+    private String icon;
+    private String name;
+    private Property outputSchema;
+    private List<? extends Property> properties;
+    private Resources resources;
+    private List<? extends Property> taskProperties;
+    private String title;
+    private int version;
+
+    private TaskDispatcherDefinition() {
+    }
 
     public TaskDispatcherDefinition(String name) {
-        this.description = null;
-        this.icon = null;
         this.properties = List.of();
-        this.resources = null;
         this.name = name;
-        this.outputSchema = null;
         this.taskProperties = List.of();
-        this.title = null;
-        this.version = 0;
     }
 
     public TaskDispatcherDefinition(

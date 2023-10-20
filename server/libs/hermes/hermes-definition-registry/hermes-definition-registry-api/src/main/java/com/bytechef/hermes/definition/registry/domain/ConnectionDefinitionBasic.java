@@ -30,11 +30,14 @@ import java.util.Optional;
 @SuppressFBWarnings("EI")
 public class ConnectionDefinitionBasic {
 
-    protected final boolean authorizationRequired;
-    protected final String componentDescription;
-    protected final String componentName;
-    protected final String componentTitle;
-    protected final int version;
+    protected boolean authorizationRequired;
+    protected String componentDescription;
+    protected String componentName;
+    protected String componentTitle;
+    protected int version;
+
+    protected ConnectionDefinitionBasic() {
+    }
 
     public ConnectionDefinitionBasic(ConnectionDefinition connectionDefinition) {
         this.authorizationRequired = OptionalUtils.orElse(connectionDefinition.getAuthorizationRequired(), true);

@@ -33,30 +33,26 @@ import java.util.Optional;
 @SuppressFBWarnings("EI")
 public class ComponentDefinition {
 
-    private final List<ActionDefinitionBasic> actions;
-    private final String category;
-    private final ConnectionDefinitionBasic connection;
-    private final String description;
-    private final String icon;
-    private final String name;
-    private final Resources resources;
-    private final List<String> tags;
-    private final List<TriggerDefinitionBasic> triggers;
-    private final String title;
-    private final int version;
+    private List<ActionDefinitionBasic> actions;
+    private String category;
+    private ConnectionDefinitionBasic connection;
+    private String description;
+    private String icon;
+    private String name;
+    private Resources resources;
+    private List<String> tags;
+    private List<TriggerDefinitionBasic> triggers;
+    private String title;
+    private int version;
+
+    private ComponentDefinition() {
+    }
 
     public ComponentDefinition(String name) {
         this.actions = List.of();
-        this.category = null;
-        this.connection = null;
-        this.description = null;
-        this.icon = null;
-        this.resources = null;
         this.name = name;
         this.tags = List.of();
-        this.title = null;
         this.triggers = List.of();
-        this.version = 0;
     }
 
     public ComponentDefinition(com.bytechef.hermes.component.definition.ComponentDefinition componentDefinition) {
