@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.test.workflow;
+package com.bytechef.atlas.sync.executor;
 
-import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.coordinator.Coordinator;
 import com.bytechef.atlas.coordinator.error.TaskExecutionErrorHandler;
 import com.bytechef.atlas.coordinator.job.executor.JobExecutor;
@@ -27,6 +26,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.dto.JobParametersDTO;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.message.broker.MessageBroker;
@@ -86,7 +86,7 @@ public class WorkflowExecutor {
         return execute(workflowId, Map.of());
     }
 
-    public Job execute(String workflowId, Map<String, ?> inputs) {
+    public Job execute(String workflowId, Map<String, Object> inputs) {
         return execute(
                 workflowId,
                 inputs,
@@ -97,7 +97,7 @@ public class WorkflowExecutor {
                 Collections::emptyMap);
     }
 
-    public Job execute(String workflowId, Map<String, ?> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
+    public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
         return execute(
                 workflowId,
                 inputs,
@@ -123,7 +123,7 @@ public class WorkflowExecutor {
 
     public Job execute(
             String workflowId,
-            Map<String, ?> inputs,
+            Map<String, Object> inputs,
             GetTaskCompletionHandlersFunction getTaskCompletionHandlersFunction,
             GetTaskDispatcherResolversFunction getTaskDispatcherResolversFunction,
             GetTaskHandlerMapSupplier getTaskHandlerMapSupplier) {
@@ -131,9 +131,9 @@ public class WorkflowExecutor {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
         messageBroker.receive(Queues.ERRORS, message -> {
-            TaskExecution errorTaskExecution = (TaskExecution) message;
+            TaskExecution erroredTaskExecution = (TaskExecution) message;
 
-            ExecutionError error = errorTaskExecution.getError();
+            ExecutionError error = erroredTaskExecution.getError();
 
             logger.error(error.getMessage());
         });
@@ -214,7 +214,13 @@ public class WorkflowExecutor {
 
         String jobId = UUIDGenerator.generate();
 
-        coordinator.create(Map.of(WorkflowConstants.ID, jobId, "workflowId", workflowId, "inputs", inputs));
+        JobParametersDTO jobParametersDTO = new JobParametersDTO();
+
+        jobParametersDTO.setInputs(inputs);
+        jobParametersDTO.setJobId(jobId);
+        jobParametersDTO.setWorkflowId(workflowId);
+
+        coordinator.create(jobParametersDTO);
 
         return jobService.getJob(jobId);
     }
