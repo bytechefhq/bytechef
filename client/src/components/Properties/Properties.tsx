@@ -1,7 +1,9 @@
 /// <reference types="vite-plugin-svgr/client" />
 
 import Editor from '@monaco-editor/react';
+import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import Select, {ISelectOption} from 'components/Select/Select';
+import Tooltip from 'components/Tooltip/Tooltip';
 import {TagModel} from 'middleware/core/tag/models/TagModel';
 import {useState} from 'react';
 import {FieldValues} from 'react-hook-form/dist/types';
@@ -27,6 +29,7 @@ export interface PropertyFormProps {
 
 interface PropertyProps {
     property: PropertyType;
+    customClassName?: string;
     actionName?: string;
     formState?: FormState<FieldValues>;
     path?: string;
@@ -35,6 +38,7 @@ interface PropertyProps {
 
 const Property = ({
     actionName,
+    customClassName,
     formState,
     path = 'parameters',
     property,
@@ -47,6 +51,7 @@ const Property = ({
         defaultValue = '',
         description,
         hidden,
+        items,
         label,
         name,
         options,
@@ -70,25 +75,35 @@ const Property = ({
             } as ISelectOption)
     );
 
+    const showTypeIcon = type !== 'OBJECT' && type !== 'ARRAY';
+
     return (
         <li
             className={twMerge(
                 'mb-4 flex w-full items-center',
                 controlType === 'CODE_EDITOR' && 'h-5/6',
-                type === 'OBJECT' && 'flex-col'
+                type === 'OBJECT' && 'flex-col',
+                type === 'ARRAY' && 'flex-col',
+                customClassName
             )}
         >
-            {type === 'OBJECT' && label && (
-                <div className="flex w-full">
-                    <span className={'self-start pb-2 pr-2'} title={type}>
+            {(type === 'OBJECT' || type === 'ARRAY') && label && (
+                <div className="flex w-full items-center py-2">
+                    <span className="pr-2" title={type}>
                         {TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
                     </span>
 
                     <span className="text-sm font-medium">{label}</span>
+
+                    {description && (
+                        <Tooltip text={description}>
+                            <QuestionMarkCircledIcon className="ml-1" />
+                        </Tooltip>
+                    )}
                 </div>
             )}
 
-            {type !== 'OBJECT' && (
+            {showTypeIcon && (
                 <span
                     className={twMerge(
                         'self-end pb-2 pr-2',
@@ -198,18 +213,6 @@ const Property = ({
                 />
             )}
 
-            {controlType === 'CHECKBOX' && (
-                <Select
-                    description={description}
-                    label={label}
-                    options={[
-                        {value: 'true', label: 'True'},
-                        {value: 'false', label: 'False'},
-                    ]}
-                    triggerClassName="w-full bg-gray-100 border-none"
-                />
-            )}
-
             {controlType === 'CODE_EDITOR' && (
                 <div className="h-full w-full border-2">
                     <Editor
@@ -255,24 +258,48 @@ const Property = ({
                 </ul>
             )}
 
+            {type === 'ARRAY' && (
+                <ul className="w-full">
+                    {items?.map((item) => (
+                        <Property
+                            customClassName="border-l ml-2 pl-2 last-of-type:mb-0"
+                            key={item.name}
+                            property={item}
+                        />
+                    ))}
+                </ul>
+            )}
+
+            {type === 'BOOLEAN' && (
+                <Select
+                    description={description}
+                    label={label}
+                    options={[
+                        {value: 'true', label: 'True'},
+                        {value: 'false', label: 'False'},
+                    ]}
+                    triggerClassName="w-full bg-gray-100 border-none"
+                />
+            )}
+
             {type === 'OBJECT' && (
                 <ul className="w-full">
                     {properties?.map((subProperty) => (
                         <Property
+                            customClassName="last-of-type:mb-0"
                             key={subProperty.name}
                             property={subProperty}
                         />
                     ))}
                 </ul>
             )}
-
-            {type === 'ARRAY' && <span>array</span>}
         </li>
     );
 };
 
 interface PropertiesProps {
     properties: Array<PropertyType>;
+    customClassName?: string;
     actionName?: string;
     formState?: FormState<FieldValues>;
     register?: UseFormRegister<PropertyFormProps>;
@@ -280,11 +307,17 @@ interface PropertiesProps {
 
 const Properties = ({
     actionName,
+    customClassName,
     formState,
     properties,
     register,
 }: PropertiesProps): JSX.Element => (
-    <ul className="h-full flex-[1_1_1px] overflow-auto p-4">
+    <ul
+        className={twMerge(
+            'h-full flex-[1_1_1px] overflow-auto',
+            customClassName
+        )}
+    >
         {properties.map((property, index) => (
             <Property
                 actionName={actionName}
