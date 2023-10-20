@@ -3,10 +3,10 @@ import cx from 'classnames';
 import {forwardRef} from 'react';
 
 type InputProps = {
-    label: string;
     name: string;
-    type?: string;
     error?: boolean;
+    label?: string;
+    type?: string;
 } & React.DetailedHTMLProps<
     React.InputHTMLAttributes<HTMLInputElement>,
     HTMLInputElement
@@ -15,12 +15,14 @@ type InputProps = {
 const Input = forwardRef<HTMLInputElement, InputProps>(
     ({label, name, type = 'text', error, ...props}, ref) => (
         <fieldset className="mb-3">
-            <label
-                htmlFor={name}
-                className="block text-sm font-medium text-gray-700 dark:text-gray-400"
-            >
-                {label}
-            </label>
+            {label && (
+                <label
+                    htmlFor={name}
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >
+                    {label}
+                </label>
+            )}
 
             <div
                 className={cx([
