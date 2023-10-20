@@ -14,7 +14,7 @@ tasks:
                 value1: ${itemIndex}
                 operation: GREATER
                 value2: 5
-          combineOperation: aNY
+          combineOperation: ANY
           caseTrue:
             - type: loop-break
           caseFalse:
