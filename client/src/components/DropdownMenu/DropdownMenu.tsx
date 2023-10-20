@@ -10,7 +10,7 @@ import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-export interface DropdownMenuItemProps {
+export interface IDropdownMenuItem {
     icon?: ReactNode;
     integrationId?: number;
     label?: string;
@@ -21,7 +21,7 @@ export interface DropdownMenuItemProps {
 }
 
 interface DropdownMenuProps {
-    menuItems: DropdownMenuItemProps[];
+    menuItems: IDropdownMenuItem[];
     id?: number;
 }
 

@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import DropdownMenu, {
-    DropdownMenuItemProps,
+    IDropdownMenuItem,
 } from '../../components/DropdownMenu/DropdownMenu';
 import {
     IntegrationModel,
@@ -37,7 +37,7 @@ const IntegrationItem = ({
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showWorkflowModal, setShowWorkflowModal] = useState(false);
 
-    const dropdownItems: DropdownMenuItemProps[] = [
+    const dropdownItems: IDropdownMenuItem[] = [
         {
             label: 'Edit',
             onClick: () => {
@@ -163,10 +163,7 @@ const IntegrationItem = ({
                     </div>
                 </Link>
 
-                <DropdownMenu
-                    id={integration.id}
-                    menuItems={dropdownItems}
-                />
+                <DropdownMenu id={integration.id} menuItems={dropdownItems} />
             </div>
 
             {showEditModal && (

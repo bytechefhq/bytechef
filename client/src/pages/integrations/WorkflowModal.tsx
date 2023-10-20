@@ -7,7 +7,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useCreateIntegrationWorkflowRequestMutation} from '../../mutations/integrations.mutations';
 import {WorkflowModel} from 'middleware/integration';
 import TextArea from 'components/TextArea/TextArea';
-import {IntegrationKeys} from "../../queries/integrations";
+import {IntegrationKeys} from '../../queries/integrations';
 
 interface WorkflowModalProps {
     id?: number;
