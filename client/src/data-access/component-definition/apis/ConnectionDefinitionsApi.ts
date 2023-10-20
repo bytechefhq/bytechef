@@ -15,11 +15,11 @@
 
 import * as runtime from '../runtime';
 import type {
-  Connections,
+  ConnectionsModel,
 } from '../models';
 import {
-    ConnectionsFromJSON,
-    ConnectionsToJSON,
+    ConnectionsModelFromJSON,
+    ConnectionsModelToJSON,
 } from '../models';
 
 /**
@@ -30,7 +30,7 @@ export class ConnectionDefinitionsApi extends runtime.BaseAPI {
     /**
      * Returns all connection definitions.
      */
-    async getConnectionDefinitionsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Connections>>> {
+    async getConnectionDefinitionsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConnectionsModel>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -42,13 +42,13 @@ export class ConnectionDefinitionsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ConnectionsFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ConnectionsModelFromJSON));
     }
 
     /**
      * Returns all connection definitions.
      */
-    async getConnectionDefinitions(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Connections>> {
+    async getConnectionDefinitions(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ConnectionsModel>> {
         const response = await this.getConnectionDefinitionsRaw(initOverrides);
         return await response.value();
     }

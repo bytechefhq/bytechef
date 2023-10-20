@@ -15,20 +15,20 @@
 
 import * as runtime from '../runtime';
 import type {
-  GetIntegrationTags200Response,
-  Integration,
-  PostIntegrationWorkflowRequest,
-  PutIntegrationTagsRequest,
+  CategoryModel,
+  IntegrationModel,
+  PostIntegrationWorkflowRequestModel,
+  TagModel,
 } from '../models';
 import {
-    GetIntegrationTags200ResponseFromJSON,
-    GetIntegrationTags200ResponseToJSON,
-    IntegrationFromJSON,
-    IntegrationToJSON,
-    PostIntegrationWorkflowRequestFromJSON,
-    PostIntegrationWorkflowRequestToJSON,
-    PutIntegrationTagsRequestFromJSON,
-    PutIntegrationTagsRequestToJSON,
+    CategoryModelFromJSON,
+    CategoryModelToJSON,
+    IntegrationModelFromJSON,
+    IntegrationModelToJSON,
+    PostIntegrationWorkflowRequestModelFromJSON,
+    PostIntegrationWorkflowRequestModelToJSON,
+    TagModelFromJSON,
+    TagModelToJSON,
 } from '../models';
 
 export interface DeleteIntegrationRequest {
@@ -40,22 +40,22 @@ export interface GetIntegrationRequest {
 }
 
 export interface PostIntegrationRequest {
-    integration: Integration;
+    integrationModel: IntegrationModel;
 }
 
-export interface PostIntegrationWorkflowOperationRequest {
+export interface PostIntegrationWorkflowRequest {
     id: number;
-    postIntegrationWorkflowRequest: PostIntegrationWorkflowRequest;
+    postIntegrationWorkflowRequestModel: PostIntegrationWorkflowRequestModel;
 }
 
 export interface PutIntegrationRequest {
     id: number;
-    integration: Integration;
+    integrationModel: IntegrationModel;
 }
 
-export interface PutIntegrationTagsOperationRequest {
+export interface PutIntegrationTagsRequest {
     id: number;
-    putIntegrationTagsRequest: PutIntegrationTagsRequest;
+    tagModel: Array<TagModel>;
 }
 
 /**
@@ -98,7 +98,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
      * Get an integration by id.
      * Get an integration by id.
      */
-    async getIntegrationRaw(requestParameters: GetIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Integration>> {
+    async getIntegrationRaw(requestParameters: GetIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getIntegration.');
         }
@@ -114,15 +114,43 @@ export class IntegrationsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationModelFromJSON(jsonValue));
     }
 
     /**
      * Get an integration by id.
      * Get an integration by id.
      */
-    async getIntegration(requestParameters: GetIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Integration> {
+    async getIntegration(requestParameters: GetIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationModel> {
         const response = await this.getIntegrationRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get categories.
+     * Get categories.
+     */
+    async getIntegrationCategoriesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<CategoryModel>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/integrations/categories`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(CategoryModelFromJSON));
+    }
+
+    /**
+     * Get categories.
+     * Get categories.
+     */
+    async getIntegrationCategories(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<CategoryModel>> {
+        const response = await this.getIntegrationCategoriesRaw(initOverrides);
         return await response.value();
     }
 
@@ -130,26 +158,26 @@ export class IntegrationsApi extends runtime.BaseAPI {
      * Get integration tags.
      * Get integration tags.
      */
-    async getIntegrationTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetIntegrationTags200Response>> {
+    async getIntegrationTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagModel>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/integration-tags`,
+            path: `/integrations/tags`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => GetIntegrationTags200ResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagModelFromJSON));
     }
 
     /**
      * Get integration tags.
      * Get integration tags.
      */
-    async getIntegrationTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetIntegrationTags200Response> {
+    async getIntegrationTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagModel>> {
         const response = await this.getIntegrationTagsRaw(initOverrides);
         return await response.value();
     }
@@ -158,7 +186,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
      * Get integrations.
      * Get integrations.
      */
-    async getIntegrationsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Integration>>> {
+    async getIntegrationsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<IntegrationModel>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -170,14 +198,14 @@ export class IntegrationsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(IntegrationFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(IntegrationModelFromJSON));
     }
 
     /**
      * Get integrations.
      * Get integrations.
      */
-    async getIntegrations(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Integration>> {
+    async getIntegrations(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<IntegrationModel>> {
         const response = await this.getIntegrationsRaw(initOverrides);
         return await response.value();
     }
@@ -186,9 +214,9 @@ export class IntegrationsApi extends runtime.BaseAPI {
      * Create a new integration.
      * Create a new integration.
      */
-    async postIntegrationRaw(requestParameters: PostIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Integration>> {
-        if (requestParameters.integration === null || requestParameters.integration === undefined) {
-            throw new runtime.RequiredError('integration','Required parameter requestParameters.integration was null or undefined when calling postIntegration.');
+    async postIntegrationRaw(requestParameters: PostIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationModel>> {
+        if (requestParameters.integrationModel === null || requestParameters.integrationModel === undefined) {
+            throw new runtime.RequiredError('integrationModel','Required parameter requestParameters.integrationModel was null or undefined when calling postIntegration.');
         }
 
         const queryParameters: any = {};
@@ -202,17 +230,17 @@ export class IntegrationsApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: IntegrationToJSON(requestParameters.integration),
+            body: IntegrationModelToJSON(requestParameters.integrationModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationModelFromJSON(jsonValue));
     }
 
     /**
      * Create a new integration.
      * Create a new integration.
      */
-    async postIntegration(requestParameters: PostIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Integration> {
+    async postIntegration(requestParameters: PostIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationModel> {
         const response = await this.postIntegrationRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -221,13 +249,13 @@ export class IntegrationsApi extends runtime.BaseAPI {
      * Creates new workflow and adds it to an existing integration.
      * Creates new workflow and adds it to an existing integration.
      */
-    async postIntegrationWorkflowRaw(requestParameters: PostIntegrationWorkflowOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Integration>> {
+    async postIntegrationWorkflowRaw(requestParameters: PostIntegrationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling postIntegrationWorkflow.');
         }
 
-        if (requestParameters.postIntegrationWorkflowRequest === null || requestParameters.postIntegrationWorkflowRequest === undefined) {
-            throw new runtime.RequiredError('postIntegrationWorkflowRequest','Required parameter requestParameters.postIntegrationWorkflowRequest was null or undefined when calling postIntegrationWorkflow.');
+        if (requestParameters.postIntegrationWorkflowRequestModel === null || requestParameters.postIntegrationWorkflowRequestModel === undefined) {
+            throw new runtime.RequiredError('postIntegrationWorkflowRequestModel','Required parameter requestParameters.postIntegrationWorkflowRequestModel was null or undefined when calling postIntegrationWorkflow.');
         }
 
         const queryParameters: any = {};
@@ -241,17 +269,17 @@ export class IntegrationsApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: PostIntegrationWorkflowRequestToJSON(requestParameters.postIntegrationWorkflowRequest),
+            body: PostIntegrationWorkflowRequestModelToJSON(requestParameters.postIntegrationWorkflowRequestModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationModelFromJSON(jsonValue));
     }
 
     /**
      * Creates new workflow and adds it to an existing integration.
      * Creates new workflow and adds it to an existing integration.
      */
-    async postIntegrationWorkflow(requestParameters: PostIntegrationWorkflowOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Integration> {
+    async postIntegrationWorkflow(requestParameters: PostIntegrationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationModel> {
         const response = await this.postIntegrationWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -260,13 +288,13 @@ export class IntegrationsApi extends runtime.BaseAPI {
      * Update an existing integration.
      * Update an existing integration.
      */
-    async putIntegrationRaw(requestParameters: PutIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Integration>> {
+    async putIntegrationRaw(requestParameters: PutIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling putIntegration.');
         }
 
-        if (requestParameters.integration === null || requestParameters.integration === undefined) {
-            throw new runtime.RequiredError('integration','Required parameter requestParameters.integration was null or undefined when calling putIntegration.');
+        if (requestParameters.integrationModel === null || requestParameters.integrationModel === undefined) {
+            throw new runtime.RequiredError('integrationModel','Required parameter requestParameters.integrationModel was null or undefined when calling putIntegration.');
         }
 
         const queryParameters: any = {};
@@ -280,17 +308,17 @@ export class IntegrationsApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: IntegrationToJSON(requestParameters.integration),
+            body: IntegrationModelToJSON(requestParameters.integrationModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationModelFromJSON(jsonValue));
     }
 
     /**
      * Update an existing integration.
      * Update an existing integration.
      */
-    async putIntegration(requestParameters: PutIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Integration> {
+    async putIntegration(requestParameters: PutIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationModel> {
         const response = await this.putIntegrationRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -299,13 +327,13 @@ export class IntegrationsApi extends runtime.BaseAPI {
      * Updates tags of an existing integration.
      * Updates tags of an existing integration.
      */
-    async putIntegrationTagsRaw(requestParameters: PutIntegrationTagsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async putIntegrationTagsRaw(requestParameters: PutIntegrationTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling putIntegrationTags.');
         }
 
-        if (requestParameters.putIntegrationTagsRequest === null || requestParameters.putIntegrationTagsRequest === undefined) {
-            throw new runtime.RequiredError('putIntegrationTagsRequest','Required parameter requestParameters.putIntegrationTagsRequest was null or undefined when calling putIntegrationTags.');
+        if (requestParameters.tagModel === null || requestParameters.tagModel === undefined) {
+            throw new runtime.RequiredError('tagModel','Required parameter requestParameters.tagModel was null or undefined when calling putIntegrationTags.');
         }
 
         const queryParameters: any = {};
@@ -319,7 +347,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: PutIntegrationTagsRequestToJSON(requestParameters.putIntegrationTagsRequest),
+            body: requestParameters.tagModel.map(TagModelToJSON),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -329,7 +357,7 @@ export class IntegrationsApi extends runtime.BaseAPI {
      * Updates tags of an existing integration.
      * Updates tags of an existing integration.
      */
-    async putIntegrationTags(requestParameters: PutIntegrationTagsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async putIntegrationTags(requestParameters: PutIntegrationTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.putIntegrationTagsRaw(requestParameters, initOverrides);
     }
 

@@ -15,11 +15,11 @@
 
 import * as runtime from '../runtime';
 import type {
-  TaskExecution,
+  TaskExecutionModel,
 } from '../models';
 import {
-    TaskExecutionFromJSON,
-    TaskExecutionToJSON,
+    TaskExecutionModelFromJSON,
+    TaskExecutionModelToJSON,
 } from '../models';
 
 export interface GetJobTaskExecutionsRequest {
@@ -39,7 +39,7 @@ export class TaskExecutionsApi extends runtime.BaseAPI {
      * Get task executions of a job.
      * Get task executions of a job.
      */
-    async getJobTaskExecutionsRaw(requestParameters: GetJobTaskExecutionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TaskExecution>>> {
+    async getJobTaskExecutionsRaw(requestParameters: GetJobTaskExecutionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TaskExecutionModel>>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getJobTaskExecutions.');
         }
@@ -55,14 +55,14 @@ export class TaskExecutionsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TaskExecutionFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TaskExecutionModelFromJSON));
     }
 
     /**
      * Get task executions of a job.
      * Get task executions of a job.
      */
-    async getJobTaskExecutions(requestParameters: GetJobTaskExecutionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskExecution>> {
+    async getJobTaskExecutions(requestParameters: GetJobTaskExecutionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskExecutionModel>> {
         const response = await this.getJobTaskExecutionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -71,7 +71,7 @@ export class TaskExecutionsApi extends runtime.BaseAPI {
      * Get a task execution by id.
      * Get a task execution by id.
      */
-    async getTaskExecutionRaw(requestParameters: GetTaskExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TaskExecution>> {
+    async getTaskExecutionRaw(requestParameters: GetTaskExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TaskExecutionModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getTaskExecution.');
         }
@@ -87,14 +87,14 @@ export class TaskExecutionsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => TaskExecutionFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => TaskExecutionModelFromJSON(jsonValue));
     }
 
     /**
      * Get a task execution by id.
      * Get a task execution by id.
      */
-    async getTaskExecution(requestParameters: GetTaskExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TaskExecution> {
+    async getTaskExecution(requestParameters: GetTaskExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TaskExecutionModel> {
         const response = await this.getTaskExecutionRaw(requestParameters, initOverrides);
         return await response.value();
     }
