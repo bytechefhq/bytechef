@@ -45,9 +45,9 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerAccessor;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
-import com.bytechef.hermes.workflow.test.executor.WorkflowTestExecutor;
+import com.bytechef.hermes.workflow.test.executor.WorkflowExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.hermes.workflow.test.executor.WorkflowTestExecutorImpl;
+import com.bytechef.hermes.workflow.test.executor.TestWorkflowExecutor;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
 import com.bytechef.task.dispatcher.each.EachTaskDispatcher;
@@ -79,12 +79,12 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @Configuration
-public class WorkflowTestExecutorConfiguration {
+public class TestWorkflowExecutorConfiguration {
 
-    private static final TaskEvaluator taskEvaluator = TaskEvaluator.create();
+    private static final TaskEvaluator TASK_EVALUATOR = TaskEvaluator.create();
 
     @Bean
-    WorkflowTestExecutor workflowTestExecutor(
+    WorkflowExecutor testWorkflowExecutor(
         ObjectMapper objectMapper, TaskEvaluator taskEvaluator, TaskHandlerAccessor taskHandlerAccessor,
         List<WorkflowRepository> workflowRepositories) {
 
@@ -104,7 +104,7 @@ public class WorkflowTestExecutorConfiguration {
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
-        return new WorkflowTestExecutorImpl(
+        return new TestWorkflowExecutor(
             JobSyncExecutor.builder()
                 .contextService(contextService)
                 .eventPublisher(getEventPublisher(jobService, syncMessageBroker, taskExecutionService))
@@ -130,7 +130,7 @@ public class WorkflowTestExecutorConfiguration {
 
         List<EventListener> eventListeners = List.of(
             new SubflowJobStatusEventListener(
-                jobService, messageBroker, taskExecutionService, taskEvaluator));
+                jobService, messageBroker, taskExecutionService, TASK_EVALUATOR));
 
         return workflowEvent -> {
             for (EventListener eventListener : eventListeners) {

@@ -15,20 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.workflow.web.rest.mapper;
+package com.bytechef.hermes.workflow.test.executor;
 
-import com.bytechef.hermes.workflow.test.dto.WorkflowTestResponse;
-import com.bytechef.hermes.workflow.web.rest.mapper.config.WorkflowMapperSpringConfig;
-import com.bytechef.hermes.workflow.web.rest.model.WorkflowTestResponseModel;
-import org.mapstruct.Mapper;
-import org.springframework.core.convert.converter.Converter;
+import com.bytechef.hermes.workflow.test.dto.WorkflowResponse;
+
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = WorkflowMapperSpringConfig.class)
-public interface WorkflowTestResponseMapper extends Converter<WorkflowTestResponse, WorkflowTestResponseModel> {
+public interface WorkflowExecutor {
 
-    @Override
-    WorkflowTestResponseModel convert(WorkflowTestResponse workflowTestResponse);
+    WorkflowResponse execute(String workflowId);
+
+    WorkflowResponse execute(String workflowId, Map<String, Object> inputs);
 }

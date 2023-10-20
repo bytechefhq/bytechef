@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.hermes.workflow.test.executor.WorkflowTestExecutor;
+import com.bytechef.hermes.workflow.test.executor.WorkflowExecutor;
 import com.bytechef.hermes.workflow.web.rest.config.WorkflowRestTestConfiguration;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowFormatModel;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
@@ -69,7 +69,7 @@ public class WorkflowControllerIntTest {
     private WorkflowService workflowService;
 
     @MockBean
-    private WorkflowTestExecutor workflowTestExecutor;
+    private WorkflowExecutor testWorkflowExecutor;
 
     @Test
     public void testDeleteWorkflow() {

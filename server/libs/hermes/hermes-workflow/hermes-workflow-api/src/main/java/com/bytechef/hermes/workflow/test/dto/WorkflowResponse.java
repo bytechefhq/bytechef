@@ -15,18 +15,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.workflow.test.executor;
+package com.bytechef.hermes.workflow.test.dto;
 
-import com.bytechef.hermes.workflow.test.dto.WorkflowTestResponse;
+import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.domain.TaskExecution;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public interface WorkflowTestExecutor {
-
-    WorkflowTestResponse execute(String workflowId);
-
-    WorkflowTestResponse execute(String workflowId, Map<String, Object> inputs);
+@SuppressFBWarnings("EI")
+public record WorkflowResponse(Job job, List<TaskExecution> taskExecutions) {
 }

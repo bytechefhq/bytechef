@@ -21,11 +21,11 @@ package com.bytechef.hermes.workflow.web.rest;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.hermes.workflow.test.executor.WorkflowTestExecutor;
+import com.bytechef.hermes.workflow.test.executor.WorkflowExecutor;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowFormatModel;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.hermes.workflow.web.rest.model.WorkflowTestResponseModel;
+import com.bytechef.hermes.workflow.web.rest.model.WorkflowResponseModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -50,16 +50,15 @@ public class WorkflowController implements WorkflowsApi {
 
     private final ConversionService conversionService;
     private final WorkflowService workflowService;
-    private final WorkflowTestExecutor workflowTestExecutor;
+    private final WorkflowExecutor testWorkflowExecutor;
 
     @SuppressFBWarnings("EI2")
     public WorkflowController(
-        ConversionService conversionService, WorkflowService workflowService,
-        WorkflowTestExecutor workflowTestExecutor) {
+        ConversionService conversionService, WorkflowService workflowService, WorkflowExecutor testWorkflowExecutor) {
 
         this.conversionService = conversionService;
         this.workflowService = workflowService;
-        this.workflowTestExecutor = workflowTestExecutor;
+        this.testWorkflowExecutor = testWorkflowExecutor;
     }
 
     @Override
@@ -67,16 +66,18 @@ public class WorkflowController implements WorkflowsApi {
         workflowService.delete(id);
 
         return Mono.just(
-            ResponseEntity.ok()
+            ResponseEntity
+                .ok()
                 .build());
     }
 
     @Override
     @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<WorkflowModel>> getWorkflow(String id, ServerWebExchange exchange) {
-        return Mono.just(
-            conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class)
-                .definition(null))
+        return Mono
+            .just(
+                conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class)
+                    .definition(null))
             .map(ResponseEntity::ok);
     }
 
@@ -91,7 +92,8 @@ public class WorkflowController implements WorkflowsApi {
                     .definition(null));
         }
 
-        return Mono.just(Flux.fromIterable(workflowModels))
+        return Mono
+            .just(Flux.fromIterable(workflowModels))
             .map(ResponseEntity::ok);
     }
 
@@ -100,28 +102,21 @@ public class WorkflowController implements WorkflowsApi {
     public Mono<ResponseEntity<WorkflowModel>> createWorkflow(
         Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
 
-        return workflowModelMono.map(workflowModel -> {
-            WorkflowFormatModel workflowFormatModel = workflowModel.getFormat();
-            WorkflowModel.SourceTypeEnum sourceTypeEnum = workflowModel.getSourceType();
-
-            return conversionService.convert(
-                workflowService.create(
-                    workflowModel.getDefinition(),
-                    Workflow.Format.valueOf(workflowFormatModel.name()),
-                    Workflow.SourceType.valueOf(sourceTypeEnum.name())),
-                WorkflowModel.class);
-        })
+        return workflowModelMono
+            .map(this::getWorkflowModel)
             .map(ResponseEntity::ok);
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<WorkflowTestResponseModel>> testWorkflow(
+    public Mono<ResponseEntity<WorkflowResponseModel>> testWorkflow(
         String id, Mono<Map<String, Object>> inputsMono, ServerWebExchange exchange) {
 
-        return inputsMono.map(inputs -> workflowTestExecutor.execute(id, inputs))
-            .map(workflowTestResponse -> conversionService.convert(
-                workflowTestResponse, WorkflowTestResponseModel.class))
+        return inputsMono
+            .map(inputs -> testWorkflowExecutor.execute(id, inputs))
+            .map(
+                workflowResponse -> conversionService.convert(
+                    workflowResponse, WorkflowResponseModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -130,8 +125,22 @@ public class WorkflowController implements WorkflowsApi {
     public Mono<ResponseEntity<WorkflowModel>> updateWorkflow(
         String id, Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
 
-        return workflowModelMono.map(workflowModel -> conversionService.convert(
-            workflowService.update(id, workflowModel.getDefinition()), WorkflowModel.class))
+        return workflowModelMono
+            .map(
+                workflowModel -> conversionService.convert(
+                    workflowService.update(id, workflowModel.getDefinition()), WorkflowModel.class))
             .map(ResponseEntity::ok);
+    }
+
+    private WorkflowModel getWorkflowModel(WorkflowModel workflowModel) {
+        WorkflowFormatModel workflowFormatModel = workflowModel.getFormat();
+        WorkflowModel.SourceTypeEnum sourceTypeEnum = workflowModel.getSourceType();
+
+        return conversionService.convert(
+            workflowService.create(
+                workflowModel.getDefinition(),
+                Workflow.Format.valueOf(workflowFormatModel.name()),
+                Workflow.SourceType.valueOf(sourceTypeEnum.name())),
+            WorkflowModel.class);
     }
 }
