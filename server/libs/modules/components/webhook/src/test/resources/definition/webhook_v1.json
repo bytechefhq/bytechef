@@ -15,6 +15,9 @@
   "title": "Webhook",
   "triggers": [ {
     "batch": null,
+    "componentName": "webhook",
+    "componentDescription": "Webhook is a method utilized by applications to supply real-time information to other apps. Such a process usually delivers data immediately as and when it occurs. Webhook Trigger enables users to receive callouts whenever a service provides the option of distributing signals to a user-defined URL.",
+    "componentTitle": "Webhook",
     "deduplicate": null,
     "deprecated": null,
     "description": "The webhook trigger always replies immediately with an HTTP 200 status code in response to any incoming webhook request. This guarantees execution of the webhook trigger, but does not involve any validation of the received request.",
@@ -35,6 +38,7 @@
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null,
+    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -54,10 +58,12 @@
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
+    "componentName": "webhook",
+    "componentDescription": "Webhook is a method utilized by applications to supply real-time information to other apps. Such a process usually delivers data immediately as and when it occurs. Webhook Trigger enables users to receive callouts whenever a service provides the option of distributing signals to a user-defined URL.",
+    "componentTitle": "Webhook",
     "deduplicate": null,
     "deprecated": null,
     "description": "Upon receiving a webhook request, it goes through a validation process. Once validated, the webhook trigger responds to the sender with an appropriate HTTP status code.",
@@ -85,7 +91,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -96,6 +102,7 @@
     "webhookBodyRaw": null,
     "webhookValidate": { },
     "workflowSyncExecution": null,
+    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -115,10 +122,12 @@
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
+    "componentName": "webhook",
+    "componentDescription": "Webhook is a method utilized by applications to supply real-time information to other apps. Such a process usually delivers data immediately as and when it occurs. Webhook Trigger enables users to receive callouts whenever a service provides the option of distributing signals to a user-defined URL.",
+    "componentTitle": "Webhook",
     "deduplicate": null,
     "deprecated": null,
     "description": "You have the flexibility to set up your preferred response. After a webhook request is received, the webhook trigger enters a waiting state for the workflow's response.",
@@ -146,7 +155,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -168,7 +177,7 @@
       "minValue": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER"
+      "controlType": "INTEGER"
     } ],
     "staticWebhookRequest": { },
     "title": "Await workflow and respond",
@@ -176,6 +185,7 @@
     "webhookBodyRaw": null,
     "webhookValidate": { },
     "workflowSyncExecution": true,
+    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -195,7 +205,6 @@
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   } ]
 }

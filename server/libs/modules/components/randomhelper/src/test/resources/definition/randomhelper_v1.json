@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "randomHelper",
+    "componentDescription": "The Random Helper allows you to generate random values.",
+    "componentTitle": "Random Helper",
     "deprecated": null,
     "description": "Generates a random integer value.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "randomInt",
@@ -25,7 +27,7 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
+      "controlType": "INTEGER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -44,20 +46,23 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
+      "controlType": "INTEGER",
       "optionsDataSource": null
     } ],
     "title": "Int",
     "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null
   }, {
     "batch": null,
+    "componentName": "randomHelper",
+    "componentDescription": "The Random Helper allows you to generate random values.",
+    "componentTitle": "Random Helper",
     "deprecated": null,
     "description": "Generates a random float value.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "randomFloat",
@@ -78,7 +83,7 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
+      "controlType": "INTEGER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -97,11 +102,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
+      "controlType": "INTEGER",
       "optionsDataSource": null
     } ],
     "title": "Float",
     "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null

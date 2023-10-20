@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "xlsxFile",
+    "componentDescription": "Reads and writes data from a XLS/XLSX file.",
+    "componentTitle": "XLSX File",
     "deprecated": null,
     "description": "Reads data from a XLS/XLSX file.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "read",
@@ -40,7 +42,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -58,7 +60,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -76,7 +78,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -94,13 +96,13 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "EXPRESSION"
     }, {
       "advancedOption": true,
       "description": "The first row of the file contains the header names.",
@@ -170,8 +172,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -189,8 +191,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
@@ -231,12 +233,13 @@
       "type": "STRING",
       "defaultValue": "Sheet",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "title": "Read from file",
+    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -254,18 +257,20 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "perform": { }
   }, {
     "batch": null,
+    "componentName": "xlsxFile",
+    "componentDescription": "Reads and writes data from a XLS/XLSX file.",
+    "componentTitle": "XLSX File",
     "deprecated": null,
     "description": "Writes the data to a XLS/XLSX file.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "write",
@@ -314,8 +319,8 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -357,8 +362,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -374,8 +379,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -393,8 +398,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INPUT_INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -428,8 +433,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "INPUT_NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -449,8 +454,8 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -465,7 +470,7 @@
           "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
-          "controlType": "INPUT_TEXT",
+          "controlType": "TEXT",
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -484,20 +489,20 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.xlsx\" will be used.",
@@ -512,7 +517,7 @@
       "type": "STRING",
       "defaultValue": "file.xlsx",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -530,12 +535,13 @@
       "type": "STRING",
       "defaultValue": "Sheet",
       "exampleValue": null,
-      "controlType": "INPUT_TEXT",
+      "controlType": "TEXT",
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "title": "Write to file",
+    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -568,7 +574,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -586,7 +592,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -604,7 +610,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -622,17 +628,17 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "EXPRESSION"
     } ],
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

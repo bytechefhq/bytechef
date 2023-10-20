@@ -59,6 +59,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
 
+    @SuppressFBWarnings("EI")
     public BranchTaskDispatcher(
         ContextService contextService, MessageBroker messageBroker, TaskDispatcher<? super Task> taskDispatcher,
         TaskExecutionService taskExecutionService) {

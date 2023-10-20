@@ -17,7 +17,7 @@
     "type": "STRING",
     "defaultValue": null,
     "exampleValue": null,
-    "controlType": "INPUT_TEXT",
+    "controlType": "TEXT",
     "options": null,
     "sampleDataType": null,
     "optionsDataSource": null
@@ -69,7 +69,7 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
+        "controlType": "TEXT",
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null

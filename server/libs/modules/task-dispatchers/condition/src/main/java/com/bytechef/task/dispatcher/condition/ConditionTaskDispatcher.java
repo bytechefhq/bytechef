@@ -52,6 +52,7 @@ public class ConditionTaskDispatcher implements TaskDispatcher<TaskExecution>, T
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
 
+    @SuppressFBWarnings("EI")
     public ConditionTaskDispatcher(
         ContextService contextService, MessageBroker messageBroker, TaskDispatcher<? super Task> taskDispatcher,
         TaskExecutionService taskExecutionService) {

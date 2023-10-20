@@ -59,12 +59,11 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
 
+    @SuppressFBWarnings("EI")
     public ParallelTaskDispatcher(
-        ContextService contextService,
-        CounterService counterService,
-        MessageBroker messageBroker,
-        TaskDispatcher<? super Task> taskDispatcher,
-        TaskExecutionService taskExecutionService) {
+        ContextService contextService, CounterService counterService, MessageBroker messageBroker,
+        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {
+
         this.contextService = contextService;
         this.counterService = counterService;
         this.messageBroker = messageBroker;

@@ -1,10 +1,12 @@
 {
   "actions": [ {
     "batch": null,
+    "componentName": "delay",
+    "componentDescription": "Sets a value which can then be referenced in other tasks.",
+    "componentTitle": "Delay",
     "deprecated": null,
     "description": "Delay action execution.",
     "sampleOutput": null,
-    "perform": { },
     "help": null,
     "metadata": null,
     "name": "sleep",
@@ -25,11 +27,12 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "title": "Sleep",
     "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null

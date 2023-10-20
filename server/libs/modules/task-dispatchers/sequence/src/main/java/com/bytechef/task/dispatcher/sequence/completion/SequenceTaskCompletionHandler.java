@@ -48,6 +48,7 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final ContextService contextService;
 
+    @SuppressFBWarnings("EI")
     public SequenceTaskCompletionHandler(
         ContextService contextService, TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {

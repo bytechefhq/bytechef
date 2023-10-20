@@ -52,6 +52,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
 
+    @SuppressFBWarnings("EI")
     public LoopTaskCompletionHandler(
         ContextService contextService, TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {
