@@ -72,7 +72,7 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
 
         List<MapObject> subtaskDefinitions;
 
-        if (IfTaskUtil.resolveCase(taskEvaluator, ifTaskExecution)) {
+        if (IfTaskUtil.resolveCase(ifTaskExecution)) {
             subtaskDefinitions = ifTaskExecution.getList("caseTrue", MapObject.class);
         } else {
             subtaskDefinitions = ifTaskExecution.getList("caseFalse", MapObject.class);
