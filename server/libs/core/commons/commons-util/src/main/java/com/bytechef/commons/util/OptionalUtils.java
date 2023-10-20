@@ -17,6 +17,8 @@
 
 package com.bytechef.commons.util;
 
+import org.springframework.util.Assert;
+
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -35,32 +37,46 @@ public final class OptionalUtils {
     }
 
     public static <T> void ifPresent(Optional<T> optional, Consumer<? super T> action) {
+        Assert.notNull(optional, "'optional' must not be null");
+
         optional.ifPresent(action);
     }
 
     public static <T> boolean isPresent(Optional<T> optional) {
+        Assert.notNull(optional, "'optional' must not be null");
+
         return optional.isPresent();
     }
 
     public static <T> T orElse(Optional<T> optional, T elseObject) {
+        Assert.notNull(optional, "'optional' must not be null");
+
         return optional.orElse(elseObject);
     }
 
     public static <T> T orElseGet(Optional<T> optional, Supplier<? extends T> supplier) {
+        Assert.notNull(optional, "'optional' must not be null");
+
         return optional.orElseGet(supplier);
     }
 
     public static <T> void ifPresentOrElse(Optional<T> optional, Consumer<? super T> action, Runnable emptyAction) {
+        Assert.notNull(optional, "'optional' must not be null");
+
         optional.ifPresentOrElse(action, emptyAction);
     }
 
     public static <T, U> U map(Optional<T> optional, Function<? super T, ? extends U> mapper) {
+        Assert.notNull(optional, "'optional' must not be null");
+
         return optional
             .map(mapper)
             .orElseThrow(IllegalArgumentException::new);
     }
 
     public static <T, U> U mapOrElse(Optional<T> optional, Function<? super T, ? extends U> mapper, U other) {
+        Assert.notNull(optional, "'optional' must not be null");
+
         return optional
             .map(mapper)
             .map(u -> (U) u)
