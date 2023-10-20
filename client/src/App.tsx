@@ -30,9 +30,9 @@ const navigation: {
         name: 'Projects',
     },
     {
-        href: '/automation/project-instances',
+        href: '/automation/instances',
         icon: RectangleStackIcon,
-        name: 'Project Instances',
+        name: 'Instances',
     },
     {href: '/automation/connections', icon: LinkIcon, name: 'Connections'},
     {
@@ -46,7 +46,7 @@ const titles: {[key: string]: string} = {
     '/': 'Projects',
     '/automation/connections': 'Connections',
     '/automation/executions': 'Executions',
-    '/automation/project-instances': 'Project Instances',
+    '/automation/instances': 'Instances',
     '/automation/projects': 'Projects',
 };
 

@@ -55,7 +55,7 @@ export const router = createBrowserRouter([
                     },
                     {
                         element: <ProjectInstances />,
-                        path: 'project-instances',
+                        path: 'instances',
                     },
                     {
                         element: <Connections />,
