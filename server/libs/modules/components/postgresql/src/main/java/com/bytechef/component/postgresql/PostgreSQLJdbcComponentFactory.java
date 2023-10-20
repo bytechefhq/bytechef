@@ -16,20 +16,19 @@
 
 package com.bytechef.component.postgresql;
 
+import static com.bytechef.component.postgresql.constants.PostgreSQLConstants.POSTGRESQL;
+import static com.bytechef.hermes.component.ComponentDSL.createJdbcComponent;
 import static com.bytechef.hermes.component.ComponentDSL.display;
 
-import com.bytechef.component.postgresql.constants.PostgreSQLConstants;
-import com.bytechef.hermes.component.jdbc.JdbcComponentDSL;
-import com.bytechef.hermes.component.jdbc.JdbcComponentDefinitionFactory;
-import com.bytechef.hermes.component.jdbc.definition.JdbcComponentDefinition;
+import com.bytechef.hermes.component.JdbcComponentFactory;
+import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
 
 /**
  * @author Ivica Cardic
  */
-public class PostgreSQLJdbcComponentDefinitionFactory implements JdbcComponentDefinitionFactory {
+public class PostgreSQLJdbcComponentFactory implements JdbcComponentFactory {
 
-    private static final JdbcComponentDefinition COMPONENT_DEFINITION = JdbcComponentDSL.createJdbcComponent(
-                    PostgreSQLConstants.POSTGRESQL)
+    private static final JdbcComponentDefinition COMPONENT_DEFINITION = createJdbcComponent(POSTGRESQL)
             .display(display("PostgreSQL").description("Query, insert nd update data from PostgreSQL."))
             .databaseJdbcName("postgresql")
             .jdbcDriverClassName("org.postgresql.Driver");
