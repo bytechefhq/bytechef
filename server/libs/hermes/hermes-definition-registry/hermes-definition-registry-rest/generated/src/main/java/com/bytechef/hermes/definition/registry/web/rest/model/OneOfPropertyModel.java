@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "OneOfProperty", description = "A one of property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-12T08:51:58.173412+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-16T21:36:57.501651+02:00[Europe/Zagreb]")
 public class OneOfPropertyModel extends PropertyModel {
 
   @Valid

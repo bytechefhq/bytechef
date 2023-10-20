@@ -1,12 +1,25 @@
 package com.bytechef.hermes.definition.registry.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.hermes.definition.registry.web.rest.model.PropertiesDataSourceModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.PropertyTypeModel;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -15,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DynamicPropertiesProperty", description = "A dynamic properties property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-12T08:51:58.173412+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-16T21:36:57.501651+02:00[Europe/Zagreb]")
 public class DynamicPropertiesPropertyModel extends PropertyModel {
 
   private PropertiesDataSourceModel propertiesDataSource;
@@ -29,7 +42,7 @@ public class DynamicPropertiesPropertyModel extends PropertyModel {
    * Get propertiesDataSource
    * @return propertiesDataSource
   */
-  @Valid
+  @Valid 
   @Schema(name = "propertiesDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("propertiesDataSource")
   public PropertiesDataSourceModel getPropertiesDataSource() {
