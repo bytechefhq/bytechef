@@ -321,7 +321,6 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     private Long getConnectionId(WorkflowTrigger workflowTrigger) {
         return WorkflowConnection.of(workflowTrigger)
-            .values()
             .stream()
             .findFirst()
             .map(this::getConnectionId)

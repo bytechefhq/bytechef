@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
-import com.bytechef.hermes.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
+import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionModel;
@@ -32,7 +32,7 @@ import java.util.Optional;
  */
 public class ConnectionDefinitionMapper {
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class)
     public interface ConnectionDefinitionToConnectionDefinitionModelMapper
         extends Converter<ConnectionDefinitionDTO, ConnectionDefinitionModel> {
 
@@ -45,7 +45,7 @@ public class ConnectionDefinitionMapper {
         }
     }
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class)
     public interface ConnectionDefinitionToConnectionDefinitionBasicModelMapper
         extends Converter<ConnectionDefinitionDTO, ConnectionDefinitionBasicModel> {
 

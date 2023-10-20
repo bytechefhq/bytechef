@@ -68,16 +68,9 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
 
             // directly coming from .../jobs POST endpoint
 
-            Map<String, Map<String, Long>> taskConnectionMap = jobTaskConnectionMap.get(taskExecution.getName());
-
             taskExecution.putMetadata(
                 MetadataConstants.CONNECTION_IDS,
-                taskConnectionMap.entrySet()
-                    .stream()
-                    .collect(
-                        Collectors.toMap(
-                            Map.Entry::getKey,
-                            entry -> MapValueUtils.getLong(entry.getValue(), WorkflowConnection.ID))));
+                getConnectionIdMap(jobTaskConnectionMap.get(taskExecution.getName())));
         } else {
 
             // defined in the workflow definition
@@ -95,6 +88,15 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
 
         return taskExecution;
+    }
+
+    private static Map<String, Long> getConnectionIdMap(Map<String, Map<String, Long>> taskConnectionMap) {
+        return taskConnectionMap.entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    entry -> MapValueUtils.getLong(entry.getValue(), WorkflowConnection.ID)));
     }
 
     private static Map<String, Map<String, Map<String, Long>>> getJobTaskConnectionMap(Job job) {

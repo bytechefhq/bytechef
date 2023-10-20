@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
-import com.bytechef.hermes.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
+import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.HelpDTO;
 
@@ -34,7 +34,7 @@ import java.util.Optional;
  */
 public class ActionDefinitionMapper {
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class)
     public interface ActionDefinitionToActionDefinitionModelMapper
         extends Converter<ActionDefinitionDTO, ActionDefinitionModel> {
 
@@ -53,7 +53,7 @@ public class ActionDefinitionMapper {
         }
     }
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class)
     public interface ActionDefinitionToActionDefinitionBasicModelMapper
         extends Converter<ActionDefinitionDTO, ActionDefinitionBasicModel> {
 
