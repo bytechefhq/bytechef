@@ -20,6 +20,7 @@ package com.bytechef.hermes.component.registrar.handler;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
+import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestContext;
@@ -37,7 +38,6 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookParameters;
 import com.bytechef.hermes.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.constant.MetadataConstants;
-import com.bytechef.hermes.data.storage.domain.DataStorage.Scope;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactory;
@@ -120,7 +120,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
                     MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class),
                     OptionalUtils.orElse(
                         datStorageService.fetchValue(
-                            Scope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(),
+                            Context.DataStorageScope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(),
                             workflowExecutionId.toString()),
                         null)));
 
@@ -147,7 +147,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
                     triggerContext, inputParametersFactory.createInputParameters(triggerExecution.getParameters()),
                     OptionalUtils.orElse(
                         datStorageService.fetchValue(
-                            Scope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(),
+                            Context.DataStorageScope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(),
                             workflowExecutionId.toString()),
                         null)));
 
@@ -165,7 +165,8 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
 
             if (pollOutput.closureParameters() != null) {
                 datStorageService.save(
-                    Scope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(), workflowExecutionId.toString(),
+                    Context.DataStorageScope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(),
+                    workflowExecutionId.toString(),
                     pollOutput.closureParameters());
             }
 

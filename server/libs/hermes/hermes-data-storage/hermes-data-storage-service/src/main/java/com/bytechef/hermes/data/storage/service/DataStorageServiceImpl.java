@@ -19,7 +19,7 @@ package com.bytechef.hermes.data.storage.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.data.storage.domain.DataStorage;
-import com.bytechef.hermes.data.storage.domain.DataStorage.Scope;
+import com.bytechef.hermes.component.Context.DataStorageScope;
 import com.bytechef.hermes.data.storage.repository.DataStorageRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
@@ -44,7 +44,7 @@ public class DataStorageServiceImpl implements DataStorageService {
     @Override
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
-    public <T> Optional<T> fetchValue(Scope scope, long scopeId, String key) {
+    public <T> Optional<T> fetchValue(DataStorageScope scope, long scopeId, String key) {
         return dataStorageRepository.findByScopeAndScopeIdAndKey(scope.getId(), scopeId, key)
             .map(dataStorage -> (T) dataStorage.getValue());
     }
@@ -56,7 +56,7 @@ public class DataStorageServiceImpl implements DataStorageService {
     }
 
     @Override
-    public void save(Scope scope, long scopeId, String key, Object value) {
+    public void save(DataStorageScope scope, long scopeId, String key, Object value) {
         dataStorageRepository
             .findByScopeAndScopeIdAndKey(scope.getId(), scopeId, key)
             .ifPresentOrElse(

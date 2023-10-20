@@ -24,6 +24,7 @@ import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -46,6 +47,7 @@ public class ContextImpl implements ActionContext, TriggerContext {
 
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
+    private final DataStorageService dataStorageService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
     private final Long taskExecutionId;
@@ -54,12 +56,13 @@ public class ContextImpl implements ActionContext, TriggerContext {
     @SuppressFBWarnings("EI")
     public ContextImpl(
         ConnectionDefinitionService connectionDefinitionService, Map<String, Long> connectionIdMap,
-        ConnectionService connectionService, EventPublisher eventPublisher, FileStorageService fileStorageService,
-        Long taskExecutionId) {
+        ConnectionService connectionService, DataStorageService dataStorageService, EventPublisher eventPublisher,
+        FileStorageService fileStorageService, Long taskExecutionId) {
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionIdMap = connectionIdMap;
         this.connectionService = connectionService;
+        this.dataStorageService = dataStorageService;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
         this.taskExecutionId = taskExecutionId;
@@ -76,6 +79,11 @@ public class ContextImpl implements ActionContext, TriggerContext {
         } else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public <T> Optional<T> fetchValue(DataStorageScope scope, long scopeId, String key) {
+        return dataStorageService.fetchValue(scope, scopeId, key);
     }
 
     @Override
@@ -116,6 +124,11 @@ public class ContextImpl implements ActionContext, TriggerContext {
     public String readFileToString(FileEntry fileEntry) {
         return fileStorageService.readFileToString(new com.bytechef.hermes.file.storage.domain.FileEntry(
             fileEntry.getName(), fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getUrl()));
+    }
+
+    @Override
+    public void saveValue(DataStorageScope scope, long scopeId, String key, Object value) {
+        dataStorageService.save(scope, scopeId, key, value);
     }
 
     @Override

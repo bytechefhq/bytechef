@@ -38,6 +38,7 @@ import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.constant.MetadataConstants;
 import com.bytechef.hermes.component.definition.registry.ComponentDefinitionRegistryImpl;
+import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
@@ -836,6 +837,9 @@ public class OpenApiComponentActionTaskHandlerIntTest {
     @Configuration
     public static class OpenApiComponentTaskHandlerIntTestConfiguration {
 
+        @MockBean
+        DataStorageService dataStorageService;
+
         @Bean
         ObjectMapper objectMapper() {
             return new ObjectMapper();
@@ -849,10 +853,11 @@ public class OpenApiComponentActionTaskHandlerIntTest {
 
         @Bean
         ContextFactory contextFactory(
-            ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService) {
+            ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
+            DataStorageService dataStorageService) {
 
             return new ContextFactoryImpl(
-                connectionDefinitionService, connectionService, e -> {}, FILE_STORAGE_SERVICE);
+                connectionDefinitionService, connectionService, dataStorageService, e -> {}, FILE_STORAGE_SERVICE);
         }
 
         @EnableCaching

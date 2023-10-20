@@ -23,6 +23,7 @@ import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
@@ -153,10 +154,10 @@ public class DefinitionRegistryConfiguration {
     @Bean
     ContextFactory contextFactory(
         ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        EventPublisher eventPublisher, FileStorageService fileStorageService) {
+        DataStorageService dataStorageService, EventPublisher eventPublisher, FileStorageService fileStorageService) {
 
         return new ContextFactoryImpl(
-            connectionDefinitionService, connectionService, eventPublisher, fileStorageService);
+            connectionDefinitionService, connectionService, dataStorageService, eventPublisher, fileStorageService);
     }
 
     @Bean

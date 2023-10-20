@@ -27,7 +27,42 @@ import java.util.Optional;
  */
 public interface Context {
 
+    enum DataStorageScope {
+        ACCOUNT(4, "Account"),
+        CURRENT_EXECUTION(1, "Current Execution"),
+        WORKFLOW(3, "Workflow"),
+        WORKFLOW_INSTANCE(2, "Workflow instance");
+
+        private final int id;
+        private final String label;
+
+        DataStorageScope(int id, String label) {
+            this.id = id;
+            this.label = label;
+        }
+
+        public static DataStorageScope valueOf(int id) {
+            return switch (id) {
+                case 1 -> DataStorageScope.CURRENT_EXECUTION;
+                case 2 -> DataStorageScope.WORKFLOW_INSTANCE;
+                case 3 -> DataStorageScope.WORKFLOW;
+                case 4 -> DataStorageScope.ACCOUNT;
+                default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
+            };
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+    }
+
     Optional<Connection> fetchConnection();
+
+    <T> Optional<T> fetchValue(DataStorageScope scope, long scopeId, String key);
 
     Connection getConnection();
 
@@ -36,6 +71,8 @@ public interface Context {
     void publishActionProgressEvent(int progress);
 
     String readFileToString(FileEntry fileEntry);
+
+    void saveValue(DataStorageScope scope, long scopeId, String key, Object value);
 
     FileEntry storeFileContent(String fileName, String data);
 
