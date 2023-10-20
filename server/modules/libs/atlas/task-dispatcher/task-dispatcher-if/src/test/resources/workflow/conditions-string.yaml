@@ -1,0 +1,164 @@
+label: If Task String Operands
+
+inputs:
+  - name: value1
+    type: string
+    required: true
+
+  - name: value2
+    type: string
+    required: true
+
+outputs:
+  - name: equalsResult
+    value: ${equalsResult}
+
+  - name: notEqualsResult
+    value: ${notEqualsResult}
+
+  - name: containsResult
+    value: ${containsResult}
+
+  - name: notContainsResult
+    value: ${notContainsResult}
+
+  - name: startsWithResult
+    value: ${startsWithResult}
+
+  - name: endsWithResult
+    value: ${endsWithResult}
+
+  - name: isEmptyResult
+    value: ${isEmptyResult}
+
+  - name: regexResult
+    value: ${regexResult}
+
+tasks:
+  - type: if
+    conditions:
+      - string:
+          value1: ${value1}
+          operation: equals
+          value2: ${value2}
+    combineOperation: any
+    caseTrue:
+      - name: equalsResult
+        type: core/var
+        value: "true branch"
+    caseFalse:
+      - name: equalsResult
+        type: core/var
+        value: "false branch"
+
+  - type: if
+    conditions:
+      - string:
+          value1: ${value1}
+          operation: notEquals
+          value2: ${value2}
+    combineOperation: any
+    caseTrue:
+      - name: notEqualsResult
+        type: core/var
+        value: "true branch"
+    caseFalse:
+      - name: notEqualsResult
+        type: core/var
+        value: "false branch"
+
+  - type: if
+    conditions:
+      - string:
+          value1: ${value1}
+          operation: contains
+          value2: ${value2}
+    combineOperation: any
+    caseTrue:
+      - name: containsResult
+        type: core/var
+        value: "true branch"
+    caseFalse:
+      - name: containsResult
+        type: core/var
+        value: "false branch"
+
+  - type: if
+    conditions:
+      - string:
+          value1: ${value1}
+          operation: notContains
+          value2: ${value2}
+    combineOperation: any
+    caseTrue:
+      - name: notContainsResult
+        type: core/var
+        value: "true branch"
+    caseFalse:
+      - name: notContainsResult
+        type: core/var
+        value: "false branch"
+
+  - type: if
+    conditions:
+      - string:
+          value1: ${value1}
+          operation: startsWith
+          value2: ${value2}
+    combineOperation: any
+    caseTrue:
+      - name: startsWithResult
+        type: core/var
+        value: "true branch"
+    caseFalse:
+      - name: startsWithResult
+        type: core/var
+        value: "false branch"
+
+  - type: if
+    conditions:
+      - string:
+          value1: ${value1}
+          operation: endsWith
+          value2: ${value2}
+    combineOperation: any
+    caseTrue:
+      - name: endsWithResult
+        type: core/var
+        value: "true branch"
+    caseFalse:
+      - name: endsWithResult
+        type: core/var
+        value: "false branch"
+
+  - type: if
+    conditions:
+      - string:
+          value1: ${value1}
+          operation: isEmpty
+          value2: ${value2}
+    combineOperation: any
+    caseTrue:
+      - name: isEmptyResult
+        type: core/var
+        value: "true branch"
+    caseFalse:
+      - name: isEmptyResult
+        type: core/var
+        value: "false branch"
+
+  - type: if
+    conditions:
+      - string:
+          value1: ${value1}
+          operation: regex
+          value2: ${value2}
+    combineOperation: any
+    caseTrue:
+      - name: regexResult
+        type: core/var
+        value: "true branch"
+    caseFalse:
+      - name: regexResult
+        type: core/var
+        value: "false branch"
