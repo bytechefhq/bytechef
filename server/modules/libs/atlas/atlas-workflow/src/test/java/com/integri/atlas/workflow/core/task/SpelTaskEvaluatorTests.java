@@ -1,5 +1,5 @@
 
-package com.creactiviti.piper.core.task;
+package com.integri.atlas.workflow.core.task;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.env.Environment;
 
-import com.creactiviti.piper.core.MapObject;
-import com.creactiviti.piper.core.context.MapContext;
+import com.integri.atlas.workflow.core.MapObject;
+import com.integri.atlas.workflow.core.context.MapContext;
 import com.google.common.collect.ImmutableMap;
 
 public class SpelTaskEvaluatorTests {
@@ -280,7 +280,7 @@ public class SpelTaskEvaluatorTests {
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(Arrays.asList("a","b","c",1,2,3),evaluated.get("flattened"));
   }
-  
+
   @Test
   public void test32 () {
     SpelTaskEvaluator evaluator = SpelTaskEvaluator.builder().methodExecutor("tempDir", new TempDir()).build();
@@ -288,7 +288,7 @@ public class SpelTaskEvaluatorTests {
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertEquals(FilenameUtils.getFullPathNoEndSeparator(System.getProperty("java.io.tmpdir")),evaluated.get("tempDir"));
   }
-  
+
   @Test
   public void test33 () {
     SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
@@ -296,7 +296,7 @@ public class SpelTaskEvaluatorTests {
     TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
     Assertions.assertNotNull(evaluated.get("uuid"));
   }
-  
+
   @Test
   public void test34 () {
     SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
@@ -306,7 +306,7 @@ public class SpelTaskEvaluatorTests {
     TaskExecution evaluated = evaluator.evaluate(jt, ctx);
     Assertions.assertEquals("Arik ${lastName}",evaluated.getString("fullName"));
   }
-  
+
   @Test
   public void test35 () {
     SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
@@ -317,7 +317,7 @@ public class SpelTaskEvaluatorTests {
     TaskExecution evaluated = evaluator.evaluate(jt, ctx);
     Assertions.assertEquals(0.5d,evaluated.getDouble("result"));
   }
-  
+
   @Test
   public void test36 () {
     SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
@@ -326,7 +326,7 @@ public class SpelTaskEvaluatorTests {
     TaskExecution evaluated = evaluator.evaluate(jt, ctx);
     Assertions.assertEquals("005",evaluated.getString("number"));
   }
-  
+
   @Test
   public void test37 () {
     SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
@@ -335,7 +335,7 @@ public class SpelTaskEvaluatorTests {
     TaskExecution evaluated = evaluator.evaluate(jt, ctx);
     Assertions.assertEquals("hello world",evaluated.getString("number"));
   }
-  
+
   @Test
   public void test38 () {
     SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
@@ -344,7 +344,7 @@ public class SpelTaskEvaluatorTests {
     TaskExecution evaluated = evaluator.evaluate(jt, ctx);
     Assertions.assertEquals(Arrays.asList(1,2,3),evaluated.getList("sorted",Integer.class));
   }
-  
+
   @Test
   public void test39 () {
     SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
@@ -353,7 +353,7 @@ public class SpelTaskEvaluatorTests {
     TaskExecution evaluated = evaluator.evaluate(jt, ctx);
     Assertions.assertEquals(Arrays.asList("A","B","C"),evaluated.getList("sorted",String.class));
   }
-  
+
   @Test
   public void test40 () {
     SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
@@ -363,7 +363,7 @@ public class SpelTaskEvaluatorTests {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
     Assertions.assertEquals(sdf.format(new Date()),evaluated.getString("date"));
   }
-  
+
   @Test
   public void test41 () {
     Environment env = mock(Environment.class);
@@ -374,7 +374,7 @@ public class SpelTaskEvaluatorTests {
     TaskExecution evaluated = evaluator.evaluate(jt, ctx);
     Assertions.assertEquals("something",evaluated.getString("myValue"));
   }
-  
+
   @Test
   public void test42 () {
     Environment env = mock(Environment.class);
@@ -384,5 +384,5 @@ public class SpelTaskEvaluatorTests {
     TaskExecution evaluated = evaluator.evaluate(jt, ctx);
     Assertions.assertEquals("${config('no.such.property')}",evaluated.getString("myValue"));
   }
-  
+
 }

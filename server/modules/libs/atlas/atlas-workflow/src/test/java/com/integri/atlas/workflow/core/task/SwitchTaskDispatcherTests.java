@@ -1,5 +1,5 @@
 
-package com.creactiviti.piper.core.task;
+package com.integri.atlas.workflow.core.task;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -14,18 +14,18 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import com.creactiviti.piper.core.context.ContextRepository;
-import com.creactiviti.piper.core.context.MapContext;
-import com.creactiviti.piper.core.messagebroker.MessageBroker;
+import com.integri.atlas.workflow.core.context.ContextRepository;
+import com.integri.atlas.workflow.core.context.MapContext;
+import com.integri.atlas.workflow.core.messagebroker.MessageBroker;
 import com.google.common.collect.ImmutableMap;
 
 public class SwitchTaskDispatcherTests {
-  
+
   private TaskExecutionRepository taskRepo = mock(TaskExecutionRepository.class);
   private TaskDispatcher taskDispatcher = mock(TaskDispatcher.class);
   private MessageBroker messageBroker = mock(MessageBroker.class);
   private ContextRepository contextRepository = mock(ContextRepository.class);
-  
+
   @Test
   public void test1 ()  {
     when(contextRepository.peek(any())).thenReturn(new MapContext());
@@ -38,7 +38,7 @@ public class SwitchTaskDispatcherTests {
     verify(taskDispatcher,times(1)).dispatch(argument.capture());
     Assertions.assertEquals("print", argument.getValue().getType());
   }
-  
+
   @Test
   public void test2 ()  {
     when(contextRepository.peek(any())).thenReturn(new MapContext());
@@ -49,7 +49,7 @@ public class SwitchTaskDispatcherTests {
     dispatcher.dispatch(task);
     verify(taskDispatcher,times(0)).dispatch(any());
   }
-  
+
   @Test
   public void test3 ()  {
     when(contextRepository.peek(any())).thenReturn(new MapContext());
@@ -65,7 +65,7 @@ public class SwitchTaskDispatcherTests {
     verify(taskDispatcher,times(1)).dispatch(argument.capture());
     Assertions.assertEquals("sleep", argument.getValue().getType());
   }
-  
+
   @Test
   public void test4 ()  {
     when(contextRepository.peek(any())).thenReturn(new MapContext());
@@ -83,5 +83,5 @@ public class SwitchTaskDispatcherTests {
     verify(messageBroker,times(1)).send(arg1.capture(),arg2.capture());
     Assertions.assertEquals("1234", arg2.getValue().getOutput());
   }
-  
+
 }
