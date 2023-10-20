@@ -26,7 +26,7 @@ com-fasterxml-jackson-datatype-jackson-datatype-jsr310 = "com.fasterxml.jackson.
 com-github-miachm-sods-SODS = "com.github.miachm.sods:SODS:1.5.2"
 com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.7.0"
 com-github-spotbugs-spotbugs-annotations = "com.github.spotbugs:spotbugs-annotations:4.7.3"
-com-github-tomakehurst-wiremock = "com.github.tomakehurst:wiremock:3.0.0-beta-4"
+com-github-tomakehurst-wiremock = "com.github.tomakehurst:wiremock:3.0.0-beta-5"
 com-google-auto-service-auto-service = { module = "com.google.auto.service:auto-service", version.ref = "com-google-auto-service" }
 com-google-auto-service-auto-service-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "com-google-auto-service" }
 com-jayway-jsonpath-json-path = "com.jayway.jsonpath:json-path:2.7.0"
@@ -79,7 +79,7 @@ org-springframework-retry-spring-retry = "org.springframework.retry:spring-retry
 org-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "org-testcontainers" }
 org-testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "org-testcontainers" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.29"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.32"
 
 [plugins]
 com-diffplug-spotless = "com.diffplug.spotless:6.17.0"
