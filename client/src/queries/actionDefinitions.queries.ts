@@ -6,19 +6,17 @@ import {
 } from 'middleware/definition-registry';
 
 export const ActionDefinitionKeys = {
-    actionDefinition: (
-        queryKey = 'actionDefinition',
-        request: GetComponentActionDefinitionRequest
-    ) => [queryKey, request],
+    actionDefinition: (request: GetComponentActionDefinitionRequest) => [
+        request,
+    ],
 };
 
 export const useGetActionDefinitionQuery = (
     request: GetComponentActionDefinitionRequest,
-    queryKey?: string,
     enabledCondition?: boolean
 ) =>
     useQuery<ActionDefinitionModel, Error>(
-        ActionDefinitionKeys.actionDefinition(queryKey, request),
+        ActionDefinitionKeys.actionDefinition(request),
         () => new ActionDefinitionsApi().getComponentActionDefinition(request),
         {enabled: false || enabledCondition}
     );
