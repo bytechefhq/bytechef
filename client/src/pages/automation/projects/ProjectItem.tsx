@@ -4,6 +4,7 @@ import DropdownMenu, {
 } from '../../../components/DropdownMenu/DropdownMenu';
 import {ProjectModel, StatusModel, TagModel} from '../../../middleware/project';
 import {
+    useCreateProjectWorkflowRequestMutation,
     useDeleteProjectMutation,
     useDuplicateProjectMutation,
     useUpdateProjectTagsMutation,
@@ -15,8 +16,8 @@ import {Link} from 'react-router-dom';
 import ProjectDialog from './ProjectDialog';
 import Name from './components/Name';
 import AlertDialog from '../../../components/AlertDialog/AlertDialog';
-import WorkflowDialog from './WorkflowDialog';
 import TagList from '../../../components/TagList/TagList';
+import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
 
 interface ProjectItemProps {
     project: ProjectModel;
@@ -58,6 +59,15 @@ const ProjectItem = ({project, remainingTags}: ProjectItemProps) => {
     ];
 
     const queryClient = useQueryClient();
+
+    const createProjectWorkflowRequestMutation =
+        useCreateProjectWorkflowRequestMutation({
+            onSuccess: () => {
+                queryClient.invalidateQueries(ProjectKeys.projects);
+
+                setShowWorkflowDialog(false);
+            },
+        });
 
     const deleteProjectMutation = useDeleteProjectMutation({
         onSuccess: () => {
@@ -193,7 +203,9 @@ const ProjectItem = ({project, remainingTags}: ProjectItemProps) => {
                 <WorkflowDialog
                     id={project.id}
                     visible
-                    onClose={() => setShowWorkflowDialog(false)}
+                    createWorkflowRequestMutation={
+                        createProjectWorkflowRequestMutation
+                    }
                 />
             )}
         </>

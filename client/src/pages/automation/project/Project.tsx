@@ -28,10 +28,13 @@ import useLeftSidebarStore from './stores/useLeftSidebarStore';
 import {useGetComponentDefinitionsQuery} from '../../../queries/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '../../../queries/taskDispatcherDefinitions.queries';
 import {
+    ProjectKeys,
     useGetProjectQuery,
     useGetProjectWorkflowsQuery,
 } from '../../../queries/projects.queries';
-import WorkflowDialog from 'pages/automation/projects/WorkflowDialog';
+import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
+import {useCreateProjectWorkflowRequestMutation} from '../../../mutations/projects.mutations';
+import {useQueryClient} from '@tanstack/react-query';
 
 const headerToggleItems: ToggleItem[] = [
     {
@@ -52,6 +55,17 @@ const Project: React.FC = () => {
     const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowModel>({});
     const [view, setView] = useState('designer');
     const [filter, setFilter] = useState('');
+
+    const queryClient = useQueryClient();
+
+    const createProjectWorkflowRequestMutation =
+        useCreateProjectWorkflowRequestMutation({
+            onSuccess: () => {
+                queryClient.invalidateQueries(ProjectKeys.projects);
+
+                setShowWorkflowDialog(false);
+            },
+        });
 
     const {data: project} = useGetProjectQuery(
         parseInt(projectId!),
@@ -164,7 +178,9 @@ const Project: React.FC = () => {
                             {showWorkflowDialog && (
                                 <WorkflowDialog
                                     visible
-                                    onClose={() => setShowWorkflowDialog(false)}
+                                    createWorkflowRequestMutation={
+                                        createProjectWorkflowRequestMutation
+                                    }
                                 />
                             )}
 

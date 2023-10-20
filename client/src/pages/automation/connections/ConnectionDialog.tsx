@@ -188,7 +188,7 @@ const ConnectionDialog = () => {
         <Dialog
             description="Create your connection to connect to the chosen service"
             isOpen={isOpen}
-            setIsOpen={(isOpen) => {
+            onOpenChange={(isOpen) => {
                 if (isOpen) {
                     setIsOpen(isOpen);
                 } else {

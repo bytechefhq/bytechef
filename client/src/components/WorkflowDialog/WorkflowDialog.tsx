@@ -1,36 +1,33 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import Input from 'components/Input/Input';
 import Dialog from 'components/Dialog/Dialog';
 import {useForm} from 'react-hook-form';
 import Button from 'components/Button/Button';
-import {useQueryClient} from '@tanstack/react-query';
-import {useCreateIntegrationWorkflowRequestMutation} from '../../../mutations/integrations.mutations';
-import {WorkflowModel} from 'middleware/integration';
+import {UseMutationResult} from '@tanstack/react-query';
+import {WorkflowModel} from 'middleware/project';
 import TextArea from 'components/TextArea/TextArea';
-import {IntegrationKeys} from '../../../queries/integrations.queries';
+import {Close} from '@radix-ui/react-dialog';
 
 interface WorkflowDialogProps {
     id?: number;
     workflowItem?: WorkflowModel | undefined;
     visible?: boolean;
-    version: undefined;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    createWorkflowRequestMutation: UseMutationResult<any, object, any, unknown>;
 }
 
-const WorkflowDialog = ({id, visible = false}: WorkflowDialogProps) => {
+const WorkflowDialog = ({
+    id,
+    visible = false,
+    createWorkflowRequestMutation,
+}: WorkflowDialogProps) => {
     const [isOpen, setIsOpen] = useState(visible);
-
-    useEffect(() => {
-        setIsOpen(visible);
-    }, [visible]);
-
-    const queryClient = useQueryClient();
 
     const {
         formState: {errors, touchedFields},
         handleSubmit,
         getValues,
         register,
-        reset,
     } = useForm({
         defaultValues: {
             name: '',
@@ -38,38 +35,21 @@ const WorkflowDialog = ({id, visible = false}: WorkflowDialogProps) => {
         },
     });
 
-    const {mutate, isLoading} = useCreateIntegrationWorkflowRequestMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries(IntegrationKeys.integrations);
-
-            closeDialog();
-        },
-    });
-
-    function closeDialog() {
-        reset();
-        setIsOpen(false);
-    }
+    const {mutate, isLoading} = createWorkflowRequestMutation;
 
     function createWorkflow() {
         const formData = getValues();
 
         mutate({
             id: id!,
-            createIntegrationWorkflowRequestModel: formData,
+            createProjectWorkflowRequestModel: formData,
         });
     }
 
     return (
         <Dialog
             isOpen={isOpen}
-            setIsOpen={(isOpen) => {
-                if (isOpen) {
-                    setIsOpen(isOpen);
-                } else {
-                    closeDialog();
-                }
-            }}
+            onOpenChange={setIsOpen}
             title="Create Workflow"
         >
             <Input
@@ -85,16 +65,13 @@ const WorkflowDialog = ({id, visible = false}: WorkflowDialogProps) => {
             />
 
             <div className="mt-4 flex justify-end space-x-1">
-                <Button
-                    displayType="lightBorder"
-                    label="Cancel"
-                    type="button"
-                    onClick={() => {
-                        setIsOpen(false);
-
-                        reset();
-                    }}
-                />
+                <Close asChild={true}>
+                    <Button
+                        displayType="lightBorder"
+                        label="Cancel"
+                        type="button"
+                    />
+                </Close>
 
                 <Button
                     label={isLoading ? 'Saving...' : 'Save'}

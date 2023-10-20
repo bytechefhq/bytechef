@@ -147,7 +147,7 @@ const ProjectDialog = ({
                 project?.id ? 'edit' : 'create'
             } your project which will contain related workflows`}
             isOpen={isOpen}
-            setIsOpen={(isOpen) => {
+            onOpenChange={(isOpen) => {
                 if (isOpen) {
                     setIsOpen(isOpen);
                 } else {

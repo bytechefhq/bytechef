@@ -21,18 +21,18 @@ interface DialogProps {
     isOpen: boolean;
     title: string;
     triggerLabel?: string;
-    setIsOpen: Dispatch<SetStateAction<boolean>>;
+    onOpenChange: Dispatch<SetStateAction<boolean>>;
 }
 
 const Dialog = ({
     children,
     description,
     isOpen,
-    setIsOpen,
+    onOpenChange,
     title,
     triggerLabel,
 }: DialogProps): JSX.Element => (
-    <Root open={isOpen} onOpenChange={setIsOpen}>
+    <Root open={isOpen} onOpenChange={onOpenChange}>
         {triggerLabel && (
             <Trigger asChild>
                 <Button label={triggerLabel} />
