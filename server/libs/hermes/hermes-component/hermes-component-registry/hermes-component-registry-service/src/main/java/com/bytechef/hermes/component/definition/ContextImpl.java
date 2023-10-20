@@ -117,27 +117,22 @@ public class ContextImpl implements ActionContext, TriggerContext {
         eventConsumer.accept(event);
     }
 
-    private static class DataImpl implements Data {
-
-        private final DataStorageService dataStorageService;
-
-        private DataImpl(DataStorageService dataStorageService) {
-            this.dataStorageService = dataStorageService;
-        }
+    private record DataImpl(DataStorageService dataStorageService) implements Data {
 
         @Override
-        public <T> Optional<T> fetchValue(String context, int scope, long scopeId, String key) {
-            return dataStorageService.fetch(context, scope, scopeId, key);
-        }
+            public <T> Optional<T> fetchValue(String context, Scope scope, long scopeId, String key) {
+                return dataStorageService.fetch(context, scope.getId(), scopeId, key);
+            }
 
-        @Override
-        public <T> T getValue(String context, int scope, long scopeId, String key) {
-            return dataStorageService.get(context, scope, scopeId, key);
-        }
+            @Override
+            public <T> T getValue(String context, Scope scope, long scopeId, String key) {
+                return dataStorageService.get(context, scope.getId(), scopeId, key);
+            }
 
-        @Override
-        public void setValue(String context, int scope, long scopeId, String key, Object value) {
-            dataStorageService.put(context, scope, scopeId, key, value);
+            @Override
+            public void setValue(String context, Scope scope, long scopeId, String key, Object value) {
+                dataStorageService.put(context, scope.getId(), scopeId, key, value);
+            }
         }
     }
 

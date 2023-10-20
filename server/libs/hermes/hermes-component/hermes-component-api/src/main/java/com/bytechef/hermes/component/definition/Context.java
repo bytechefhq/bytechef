@@ -124,6 +124,39 @@ public interface Context {
      */
     interface Data {
 
+        enum Scope {
+            ACCOUNT(4, "Account"),
+            CURRENT_EXECUTION(1, "Current Execution"),
+            WORKFLOW(2, "Workflow"),
+            INSTANCE(3, "Instance");
+
+            private final int id;
+            private final String label;
+
+            Scope(int id, String label) {
+                this.id = id;
+                this.label = label;
+            }
+
+            public static Scope valueOf(int id) {
+                return switch (id) {
+                    case 1 -> Scope.CURRENT_EXECUTION;
+                    case 2 -> Scope.WORKFLOW;
+                    case 3 -> Scope.INSTANCE;
+                    case 4 -> Scope.ACCOUNT;
+                    default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
+                };
+            }
+
+            public int getId() {
+                return id;
+            }
+
+            public String getLabel() {
+                return label;
+            }
+        }
+
         /**
          *
          *
@@ -134,7 +167,7 @@ public interface Context {
          * @return
          * @param <T>
          */
-        <T> Optional<T> fetchValue(String context, int scope, long scopeId, String key);
+        <T> Optional<T> fetchValue(String context, Scope scope, long scopeId, String key);
 
         /**
          *
@@ -145,7 +178,7 @@ public interface Context {
          * @return
          * @param <T>
          */
-        <T> T getValue(String context, int scope, long scopeId, String key);
+        <T> T getValue(String context, Scope scope, long scopeId, String key);
 
         /**
          * @param scope
@@ -153,7 +186,7 @@ public interface Context {
          * @param key
          * @param data
          */
-        void setValue(String context, int scope, long scopeId, String key, Object data);
+        void setValue(String context, Scope scope, long scopeId, String key, Object data);
     }
 
     /**
