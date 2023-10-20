@@ -28,7 +28,7 @@ import com.integri.atlas.engine.core.error.ErrorObject;
 import com.integri.atlas.engine.core.event.Events;
 import com.integri.atlas.engine.core.event.WorkflowEvent;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
-import com.integri.atlas.engine.core.task.TaskEvaluator;
+import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import java.util.Objects;

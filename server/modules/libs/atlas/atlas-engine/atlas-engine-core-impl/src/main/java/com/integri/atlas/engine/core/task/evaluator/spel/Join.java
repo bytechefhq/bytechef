@@ -16,10 +16,10 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.core.task.spel;
+package com.integri.atlas.engine.core.task.evaluator.spel;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -27,14 +27,15 @@ import org.springframework.expression.TypedValue;
 
 /**
  * @author Arik Cohen
- * @since Mar, 03 2020
+ * @since Feb, 19 2020
  */
-class DateFormat implements MethodExecutor {
+class Join implements MethodExecutor {
 
     @Override
     public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        Date date = (Date) aArguments[0];
-        SimpleDateFormat sdf = new SimpleDateFormat((String) aArguments[1]);
-        return new TypedValue(sdf.format(date));
+        String separator = (String) aArguments[0];
+        List<?> values = (List<?>) aArguments[1];
+        String str = values.stream().map(String::valueOf).collect(Collectors.joining(separator));
+        return new TypedValue(str);
     }
 }

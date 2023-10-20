@@ -16,25 +16,21 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.core.task;
+package com.integri.atlas.engine.core.task.evaluator.spel;
 
-import com.integri.atlas.engine.core.context.Context;
+import org.springframework.expression.AccessException;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.MethodExecutor;
+import org.springframework.expression.TypedValue;
 
 /**
- * Strategy interface for evaluating a JobTask.
- *
  * @author Arik Cohen
- * @since Mar 31, 2017
+ * @since Feb, 19 2020
  */
-public interface TaskEvaluator {
-    /**
-     * Evaluate the {@link TaskExecution}
-     *
-     * @param aJobTask
-     *          The {@link TaskExecution} instance to evaluate
-     * @param aContext
-     *          The context to evaluate the task against
-     * @return the evaluate {@link TaskExecution}.
-     */
-    TaskExecution evaluate(TaskExecution aJobTask, Context aContext);
+class SystemProperty implements MethodExecutor {
+
+    @Override
+    public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
+        return new TypedValue(System.getProperty((String) aArguments[0]));
+    }
 }

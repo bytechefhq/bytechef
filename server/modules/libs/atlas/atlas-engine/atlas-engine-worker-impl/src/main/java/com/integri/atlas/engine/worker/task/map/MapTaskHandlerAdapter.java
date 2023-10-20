@@ -24,7 +24,7 @@ import com.integri.atlas.engine.core.error.Error;
 import com.integri.atlas.engine.core.messagebroker.Queues;
 import com.integri.atlas.engine.core.messagebroker.SyncMessageBroker;
 import com.integri.atlas.engine.core.task.dispatcher.MapTaskDispatcher;
-import com.integri.atlas.engine.core.task.TaskEvaluator;
+import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.Worker;
 import com.integri.atlas.engine.worker.task.TaskHandler;

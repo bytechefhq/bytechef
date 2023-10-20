@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.core.task.spel;
+package com.integri.atlas.engine.core.task.evaluator.spel;
 
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;

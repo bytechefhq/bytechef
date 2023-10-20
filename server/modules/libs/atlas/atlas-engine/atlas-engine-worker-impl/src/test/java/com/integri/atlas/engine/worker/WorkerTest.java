@@ -24,7 +24,7 @@ import com.integri.atlas.engine.core.messagebroker.SyncMessageBroker;
 import com.integri.atlas.engine.core.task.CancelTask;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.spel.SpelTaskEvaluator;
+import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
 import com.integri.atlas.engine.worker.task.TaskHandlerResolver;
 import com.integri.atlas.engine.worker.task.map.MapTaskHandlerAdapter;

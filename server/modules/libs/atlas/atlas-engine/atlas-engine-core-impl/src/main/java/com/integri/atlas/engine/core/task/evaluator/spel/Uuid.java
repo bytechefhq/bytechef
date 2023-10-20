@@ -16,10 +16,9 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.core.task.spel;
+package com.integri.atlas.engine.core.task.evaluator.spel;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.integri.atlas.engine.core.uuid.UUIDGenerator;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -29,13 +28,10 @@ import org.springframework.expression.TypedValue;
  * @author Arik Cohen
  * @since Feb, 19 2020
  */
-class Join implements MethodExecutor {
+class Uuid implements MethodExecutor {
 
     @Override
     public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        String separator = (String) aArguments[0];
-        List<?> values = (List<?>) aArguments[1];
-        String str = values.stream().map(String::valueOf).collect(Collectors.joining(separator));
-        return new TypedValue(str);
+        return new TypedValue(UUIDGenerator.generate());
     }
 }
