@@ -18,12 +18,12 @@
 package com.bytechef.component.xmlfile.action;
 
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.component.util.MapUtils;
-import com.bytechef.hermes.component.util.TypeReference;
-import com.bytechef.hermes.component.util.XmlUtils;
+
+import com.bytechef.hermes.component.definition.ParameterMap;
 
 import java.io.InputStream;
 import java.util.List;
@@ -82,26 +82,30 @@ public class XmlFileReadAction {
         .outputSchema(getOutputSchemaFunction())
         .perform(XmlFileReadAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters, ActionContext context) {
-        FileEntry fileEntry = MapUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
-        boolean isArray = MapUtils.getBoolean(inputParameters, IS_ARRAY, true);
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
+        FileEntry fileEntry = inputParameters.getRequired(FILE_ENTRY, FileEntry.class);
+        boolean isArray = inputParameters.getBoolean(IS_ARRAY, true);
         Object result;
 
         if (isArray) {
-            String path = MapUtils.getString(inputParameters, PATH);
-            InputStream inputStream = context.getFileStream(fileEntry);
+            String path = inputParameters.getString(PATH);
+            InputStream inputStream = context.file(file -> file.getStream(fileEntry));
             List<Map<String, ?>> items;
 
             if (path == null) {
-                try (Stream<Map<String, ?>> stream = XmlUtils.stream(context.getFileStream(fileEntry))) {
+                try (Stream<Map<String, ?>> stream = context.xml(
+                    xml -> xml.stream(context.file(file -> file.getStream(fileEntry))))) {
+
                     items = stream.toList();
                 }
             } else {
-                items = XmlUtils.readList(inputStream, path, new TypeReference<>() {});
+                items = context.xml(xml -> xml.readList(inputStream, path, new Context.TypeReference<>() {}));
             }
 
-            Integer pageSize = MapUtils.getInteger(inputParameters, PAGE_SIZE);
-            Integer pageNumber = MapUtils.getInteger(inputParameters, PAGE_NUMBER);
+            Integer pageSize = inputParameters.getInteger(PAGE_SIZE);
+            Integer pageNumber = inputParameters.getInteger(PAGE_NUMBER);
             Integer rangeStartIndex = null;
             Integer rangeEndIndex = null;
 
@@ -118,7 +122,7 @@ public class XmlFileReadAction {
 
             result = items;
         } else {
-            result = XmlUtils.read(context.readFileToString(fileEntry));
+            result = context.xml(xml -> xml.read((String) context.file(file -> file.readToString(fileEntry))));
         }
 
         return result;
@@ -126,8 +130,8 @@ public class XmlFileReadAction {
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> {
-            if (MapUtils.getBoolean(inputParameters, IS_ARRAY, false)) {
+        return (inputParameters, connection) -> {
+            if (inputParameters.getBoolean(IS_ARRAY, false)) {
                 return object();
             } else {
                 return array();

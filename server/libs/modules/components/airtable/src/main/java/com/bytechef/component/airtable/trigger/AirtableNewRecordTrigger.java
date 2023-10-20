@@ -18,10 +18,12 @@
 package com.bytechef.component.airtable.trigger;
 
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.hermes.component.definition.Context.Http;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.component.util.HttpClientUtils;
-import com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
-import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
-import static com.bytechef.hermes.component.util.HttpClientUtils.responseType;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
@@ -61,31 +62,30 @@ public class AirtableNewRecordTrigger {
                 .required(true))
         .poll(AirtableNewRecordTrigger::poll);
 
-    protected static TriggerDefinition.PollOutput poll(TriggerDefinition.PollContext context) {
-        Map<String, ?> inputParameters = context.inputParameters();
-        Map<String, ?> closureParameters = context.closureParameters();
+    protected static PollOutput poll(
+        ParameterMap inputParameters, ParameterMap closureParameters, TriggerContext context)
+        throws ComponentExecutionException {
 
-        LocalDateTime startDate = MapUtils.getLocalDateTime(closureParameters, LAST_TIME_CHECKED, LocalDateTime.now());
+        LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now());
         LocalDateTime endDate = LocalDateTime.now();
 
         @SuppressWarnings("unchecked")
-        List<Map<?, ?>> records = (List<Map<?, ?>>) HttpClientUtils
-            .get(
-                "/{%s}/{%s}".formatted(
-                    MapUtils.getRequiredString(inputParameters, TABLE_ID),
-                    MapUtils.getRequiredString(inputParameters, BASE_ID)))
+        List<Map<?, ?>> records = (List<Map<?, ?>>) context.http(http -> http.get(
+            "/{%s}/{%s}".formatted(
+                inputParameters.getRequiredString(TABLE_ID),
+                inputParameters.getRequiredString(BASE_ID))))
             .queryParameters(
                 Map.of(
                     "filterByFormula",
                     List.of(
                         "IS_AFTER({%s}, DATETIME_PARSE(\"%s\", \"YYYY-MM-DD HH:mm:ss\"))"
                             .formatted(
-                                MapUtils.getRequiredString(inputParameters, TRIGGER_FIELD),
+                                inputParameters.getRequiredString(TRIGGER_FIELD),
                                 startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))))
-            .configuration(responseType(ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .body();
 
-        return new TriggerDefinition.PollOutput(records, Map.of(LAST_TIME_CHECKED, endDate), false);
+        return new PollOutput(records, Map.of(LAST_TIME_CHECKED, endDate), false);
     }
 }

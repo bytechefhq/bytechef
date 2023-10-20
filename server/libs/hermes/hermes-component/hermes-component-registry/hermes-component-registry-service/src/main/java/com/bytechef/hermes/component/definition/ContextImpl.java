@@ -17,141 +17,524 @@
 
 package com.bytechef.hermes.component.definition;
 
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.execution.event.TaskProgressedEvent;
 import com.bytechef.file.storage.service.FileStorageService;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.lang.Nullable;
 
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * @author Ivica Cardic
  */
-public class ContextImpl implements ActionDefinition.ActionContext, TriggerDefinition.TriggerContext {
+public class ContextImpl implements ActionContext, TriggerContext {
 
-    private final ConnectionDefinitionService connectionDefinitionService;
-    private final Map<String, Long> connectionIdMap;
-    private final ConnectionService connectionService;
-    private final DataStorageService dataStorageService;
-    private final EventPublisher eventPublisher;
-    private final FileStorageService fileStorageService;
-    private final Long taskExecutionId;
+    private final Data data;
+    private final Event event;
+    private final File file;
+    private final Http http;
+    private final Json json;
+    private final Xml xml;
 
     @SuppressFBWarnings("EI")
     public ContextImpl(
-        ConnectionDefinitionService connectionDefinitionService, Map<String, Long> connectionIdMap,
-        ConnectionService connectionService, DataStorageService dataStorageService, EventPublisher eventPublisher,
-        FileStorageService fileStorageService, Long taskExecutionId) {
+        @Nullable Connection connection, DataStorageService dataStorageService, EventPublisher eventPublisher,
+        ObjectMapper objectMapper, FileStorageService fileStorageService, HttpClientExecutor httpClientExecutor,
+        Long taskExecutionId, XmlMapper xmlMapper) {
 
-        this.connectionDefinitionService = connectionDefinitionService;
-        this.connectionIdMap = connectionIdMap;
-        this.connectionService = connectionService;
-        this.dataStorageService = dataStorageService;
-        this.eventPublisher = eventPublisher;
-        this.fileStorageService = fileStorageService;
-        this.taskExecutionId = taskExecutionId;
+        this.data = new DataImpl(dataStorageService);
+        this.event = taskExecutionId == null ? null : new EventImpl(eventPublisher, taskExecutionId);
+        this.file = new FileImpl(fileStorageService);
+        this.http = new HttpImpl(connection, httpClientExecutor);
+        this.json = new JsonImpl(objectMapper);
+        this.xml = new XmlImpl(xmlMapper);
     }
 
     @Override
-    public Optional<Connection> fetchConnection() {
-        Collection<Long> connectionIds = connectionIdMap.values();
-
-        Iterator<Long> iterator = connectionIds.iterator();
-
-        if (iterator.hasNext()) {
-            return fetchConnection(iterator.next()).map(this::toContextConnection);
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public Optional<Connection> fetchConnection(String taskConnectionKey) {
-        return fetchConnection(connectionIdMap.get(taskConnectionKey)).map(this::toContextConnection);
-    }
-
-    @Override
-    public <T> Optional<T> fetchValue(String context, int scope, long scopeId, String key) {
-        return dataStorageService.fetch(context, scope, scopeId, key);
-    }
-
-    @Override
-    public Connection getConnection() {
-        Collection<Long> connectionIds = connectionIdMap.values();
-
-        Iterator<Long> iterator = connectionIds.iterator();
-
-        if (!iterator.hasNext()) {
-            throw new IllegalStateException("Connection is not defined");
-        }
-
-        return toContextConnection(connectionService.getConnection(iterator.next()));
-    }
-
-    @Override
-    public Connection getConnection(String workflowConnectionKey) {
-        return toContextConnection(connectionService.getConnection(connectionIdMap.get(workflowConnectionKey)));
-    }
-
-    @Override
-    public <T> T getValue(String context, int scope, long scopeId, String key) {
-        return dataStorageService.get(context, scope, scopeId, key);
-    }
-
-    @Override
-    public InputStream getFileStream(Context.FileEntry fileEntry) {
-        return fileStorageService.getFileStream(
-            FileEntryConstants.DOCUMENTS_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry());
-    }
-
-    @Override
-    public void publishActionProgressEvent(int progress) {
-        eventPublisher.publishEvent(new TaskProgressedEvent(taskExecutionId, progress));
-    }
-
-    @Override
-    public String readFileToString(Context.FileEntry fileEntry) {
-        return fileStorageService.readFileToString(
-            FileEntryConstants.DOCUMENTS_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry());
-    }
-
-    @Override
-    public void setValue(String context, int scope, long scopeId, String key, Object value) {
-        dataStorageService.put(context, scope, scopeId, key, value);
-    }
-
-    @Override
-    public FileEntry storeFileContent(String fileName, String data) {
-        return new ContextFileEntryImpl(
-            fileStorageService.storeFileContent(FileEntryConstants.DOCUMENTS_DIR, fileName, data));
-    }
-
-    @Override
-    public FileEntry storeFileContent(String fileName, InputStream inputStream) {
+    public <R> R data(ContextFunction<Data, R> dataFunction) {
         try {
-            return new ContextFileEntryImpl(
-                fileStorageService.storeFileContent(FileEntryConstants.DOCUMENTS_DIR, fileName, inputStream));
-        } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to store file " + fileName, exception);
+            return dataFunction.apply(data);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e.getMessage(), e);
         }
     }
 
-    private Optional<com.bytechef.hermes.connection.domain.Connection> fetchConnection(Long connectionId) {
-        return connectionId == null
-            ? Optional.empty()
-            : Optional.of(connectionService.getConnection(connectionId));
+    @Override
+    public <R> R file(ContextFunction<File, R> fileFunction) {
+        try {
+            return fileFunction.apply(file);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e.getMessage(), e);
+        }
     }
 
-    private Connection toContextConnection(com.bytechef.hermes.connection.domain.Connection connection) {
-        return new ContextConnectionImpl(connection, connectionDefinitionService);
+    @Override
+    public <R> R http(ContextFunction<Http, R> httpFunction) {
+        try {
+            return httpFunction.apply(http);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public <R> R json(ContextFunction<Json, R> jsonFunction) {
+        try {
+            return jsonFunction.apply(json);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public <R> R xml(ContextFunction<Xml, R> xmlFunction) {
+        try {
+            return xmlFunction.apply(xml);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void event(Consumer<Event> eventConsumer) {
+        eventConsumer.accept(event);
+    }
+
+    private static class DataImpl implements Data {
+
+        private final DataStorageService dataStorageService;
+
+        private DataImpl(DataStorageService dataStorageService) {
+            this.dataStorageService = dataStorageService;
+        }
+
+        @Override
+        public <T> Optional<T> fetchValue(String context, int scope, long scopeId, String key) {
+            return dataStorageService.fetch(context, scope, scopeId, key);
+        }
+
+        @Override
+        public <T> T getValue(String context, int scope, long scopeId, String key) {
+            return dataStorageService.get(context, scope, scopeId, key);
+        }
+
+        @Override
+        public void setValue(String context, int scope, long scopeId, String key, Object value) {
+            dataStorageService.put(context, scope, scopeId, key, value);
+        }
+    }
+
+    private static class EventImpl implements Event {
+
+        private final EventPublisher eventPublisher;
+        private final long taskExecutionId;
+
+        public EventImpl(EventPublisher eventPublisher, long taskExecutionId) {
+            this.eventPublisher = eventPublisher;
+            this.taskExecutionId = taskExecutionId;
+        }
+
+        @Override
+        public void publishActionProgressEvent(int progress) {
+            eventPublisher.publishEvent(new TaskProgressedEvent(taskExecutionId, progress));
+        }
+    }
+
+    private class FileImpl implements File {
+
+        private final FileStorageService fileStorageService;
+
+        public FileImpl(FileStorageService fileStorageService) {
+            this.fileStorageService = fileStorageService;
+        }
+
+        @Override
+        public InputStream getStream(Context.FileEntry fileEntry) {
+            return fileStorageService.getFileStream(
+                FileEntryConstants.DOCUMENTS_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry());
+        }
+
+        @Override
+        public String readToString(Context.FileEntry fileEntry) {
+            return fileStorageService.readFileToString(
+                FileEntryConstants.DOCUMENTS_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry());
+        }
+
+        @Override
+        public FileEntry storeContent(String fileName, String data) {
+            return new ContextFileEntryImpl(
+                fileStorageService.storeFileContent(FileEntryConstants.DOCUMENTS_DIR, fileName, data));
+        }
+
+        @Override
+        public FileEntry storeContent(String fileName, InputStream inputStream) {
+            try {
+                return new ContextFileEntryImpl(
+                    fileStorageService.storeFileContent(FileEntryConstants.DOCUMENTS_DIR, fileName, inputStream));
+            } catch (Exception exception) {
+                throw new ComponentExecutionException("Unable to store file " + fileName, exception);
+            }
+        }
+    }
+
+    private static class HttpImpl implements Http {
+
+        private final Connection connection;
+        private final HttpClientExecutor httpClientExecutor;
+
+        private HttpImpl(Connection connection, HttpClientExecutor httpClientExecutor) {
+            this.connection = connection;
+            this.httpClientExecutor = httpClientExecutor;
+        }
+
+        @Override
+        public Executor delete(String url) {
+            return new ExecutorImpl(url, RequestMethod.DELETE, connection, httpClientExecutor);
+        }
+
+        @Override
+        public Executor exchange(String url, RequestMethod requestMethod) {
+            return new ExecutorImpl(url, requestMethod, connection, httpClientExecutor);
+        }
+
+        @Override
+        public Executor head(String url) {
+            return new ExecutorImpl(url, RequestMethod.HEAD, connection, httpClientExecutor);
+        }
+
+        @Override
+        public Executor get(String url) {
+            return new ExecutorImpl(url, RequestMethod.GET, connection, httpClientExecutor);
+        }
+
+        @Override
+        public Executor patch(String url) {
+            return new ExecutorImpl(url, RequestMethod.PATCH, connection, httpClientExecutor);
+        }
+
+        @Override
+        public Executor post(String url) {
+            return new ExecutorImpl(url, RequestMethod.POST, connection, httpClientExecutor);
+        }
+
+        @Override
+        public Executor put(String url) {
+            return new ExecutorImpl(url, RequestMethod.PUT, connection, httpClientExecutor);
+        }
+
+        private static class ExecutorImpl implements Executor {
+
+            private Http.Body body;
+            private Configuration configuration = new Configuration();
+            private final Connection connection;
+            private final HttpClientExecutor httpClientExecutor;
+            private Map<String, List<String>> headers = new HashMap<>();
+            private Map<String, List<String>> queryParameters = new HashMap<>();
+            private final RequestMethod requestMethod;
+            private final String url;
+
+            private ExecutorImpl(
+                String url, RequestMethod requestMethod, Connection connection, HttpClientExecutor httpClientExecutor) {
+
+                this.connection = connection;
+                this.httpClientExecutor = httpClientExecutor;
+                this.url = url;
+                this.requestMethod = requestMethod;
+            }
+
+            @Override
+            public Executor configuration(Configuration.ConfigurationBuilder configurationBuilder) {
+                this.configuration = Objects.requireNonNull(configurationBuilder)
+                    .build();
+
+                return this;
+            }
+
+            @Override
+            public Executor header(String name, String value) {
+                headers.put(Objects.requireNonNull(name), List.of(Objects.requireNonNull(value)));
+
+                return this;
+            }
+
+            @Override
+            public Executor headers(Map<String, List<String>> headers) {
+                this.headers = new HashMap<>(Objects.requireNonNull(headers));
+
+                return this;
+            }
+
+            @Override
+            public Executor queryParameter(String name, String value) {
+                queryParameters.put(Objects.requireNonNull(name), List.of(Objects.requireNonNull(value)));
+
+                return this;
+            }
+
+            @Override
+            public Executor queryParameters(Map<String, List<String>> queryParameters) {
+                this.queryParameters = new HashMap<>(Objects.requireNonNull(queryParameters));
+
+                return this;
+            }
+
+            @Override
+            public Executor body(Http.Body body) {
+                this.body = body;
+
+                return this;
+            }
+
+            @Override
+            public Http.Response execute() throws ComponentExecutionException {
+                try {
+                    return httpClientExecutor.execute(
+                        url, headers, queryParameters, body, configuration, requestMethod, connection);
+                } catch (Exception e) {
+                    throw new ComponentExecutionException("Unable to execute HTTP request", e);
+                }
+            }
+        }
+    }
+
+    private static class JsonImpl implements Json {
+
+        private final ObjectMapper objectMapper;
+
+        public JsonImpl(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
+
+        @Override
+        public Object read(InputStream inputStream) {
+            return JsonUtils.read(inputStream, objectMapper);
+        }
+
+        @Override
+        public <T> T read(InputStream inputStream, Class<T> valueType) {
+            return JsonUtils.read(inputStream, valueType, objectMapper);
+        }
+
+        @Override
+        public <T> T read(InputStream inputStream, TypeReference<T> typeReference) {
+            return JsonUtils.read(inputStream, typeReference.getType(), objectMapper);
+        }
+
+        @Override
+        public Object read(InputStream inputStream, String path) {
+            return JsonUtils.read(inputStream, path, objectMapper);
+        }
+
+        @Override
+        public <T> T read(InputStream inputStream, String path, Class<T> valueType) {
+            return JsonUtils.read(inputStream, path, valueType, objectMapper);
+        }
+
+        @Override
+        public <T> T read(InputStream inputStream, String path, TypeReference<T> typeReference) {
+            return JsonUtils.read(inputStream, path, typeReference.getType(), objectMapper);
+        }
+
+        @Override
+        public Object read(String json) {
+            return JsonUtils.read(json, objectMapper);
+        }
+
+        @Override
+        public <T> T read(String json, Class<T> valueType) {
+            return JsonUtils.read(json, valueType, objectMapper);
+        }
+
+        @Override
+        public <T> T read(String json, TypeReference<T> typeReference) {
+            return JsonUtils.read(json, typeReference.getType(), objectMapper);
+        }
+
+        @Override
+        public Object read(String json, String path) {
+            return JsonUtils.read(json, path, objectMapper);
+        }
+
+        @Override
+        public <T> T read(String json, String path, Class<T> valueType) {
+            return JsonUtils.read(json, path, valueType, objectMapper);
+        }
+
+        @Override
+        public <T> T read(String json, String path, TypeReference<T> typeReference) {
+            return JsonUtils.read(json, path, typeReference.getType(), objectMapper);
+        }
+
+        @Override
+        public List<?> readList(InputStream inputStream) {
+            return JsonUtils.readList(inputStream, objectMapper);
+        }
+
+        @Override
+        public <T> List<T> readList(InputStream inputStream, Class<T> elementType) {
+            return JsonUtils.readList(inputStream, elementType, objectMapper);
+        }
+
+        @Override
+        public List<?> readList(InputStream inputStream, String path) {
+            return JsonUtils.readList(inputStream, path, objectMapper);
+        }
+
+        @Override
+        public <T> List<T> readList(InputStream inputStream, String path, Class<T> elementType) {
+            return JsonUtils.readList(inputStream, path, elementType, objectMapper);
+        }
+
+        @Override
+        public List<?> readList(String json) {
+            return JsonUtils.readList(json, objectMapper);
+        }
+
+        @Override
+        public <T> List<T> readList(String json, Class<T> elementType) {
+            return JsonUtils.readList(json, elementType, objectMapper);
+        }
+
+        @Override
+        public List<?> readList(String json, String path) {
+            return JsonUtils.readList(json, path, objectMapper);
+        }
+
+        @Override
+        public <T> List<T> readList(String json, String path, Class<T> elementType) {
+            return JsonUtils.readList(json, path, elementType, objectMapper);
+        }
+
+        @Override
+        public <V> Map<String, V> readMap(InputStream inputStream, Class<V> valueType) {
+            return JsonUtils.readMap(inputStream, valueType, objectMapper);
+        }
+
+        @Override
+        public Map<String, ?> readMap(InputStream inputStream, String path) {
+            return JsonUtils.readMap(inputStream, path, objectMapper);
+        }
+
+        @Override
+        public <V> Map<String, V> readMap(InputStream inputStream, String path, Class<V> valueType) {
+            return JsonUtils.readMap(inputStream, path, valueType, objectMapper);
+        }
+
+        @Override
+        public Map<String, ?> readMap(String json) {
+            return JsonUtils.readMap(json, objectMapper);
+        }
+
+        @Override
+        public <V> Map<String, V> readMap(String json, Class<V> valueType) {
+            return JsonUtils.readMap(json, valueType, objectMapper);
+        }
+
+        @Override
+        public Map<String, ?> readMap(String json, String path) {
+            return JsonUtils.readMap(json, path, objectMapper);
+        }
+
+        @Override
+        public <V> Map<String, V> readMap(String json, String path, Class<V> valueType) {
+            return JsonUtils.readMap(json, path, valueType, objectMapper);
+        }
+
+        @Override
+        public Stream<Map<String, ?>> stream(InputStream inputStream) {
+            return JsonUtils.stream(inputStream, objectMapper);
+        }
+
+        @Override
+        public String write(Object object) {
+            return JsonUtils.write(object, objectMapper);
+        }
+    }
+
+    private static class XmlImpl implements Xml {
+
+        private final XmlMapper xmlMapper;
+
+        public XmlImpl(XmlMapper xmlMapper) {
+            this.xmlMapper = xmlMapper;
+        }
+
+        @Override
+        public Map<String, ?> read(InputStream inputStream) {
+            return XmlUtils.read(inputStream, xmlMapper);
+        }
+
+        @Override
+        public <T> Map<String, T> read(InputStream inputStream, Class<T> valueType) {
+            return XmlUtils.read(inputStream, valueType, xmlMapper);
+        }
+
+        @Override
+        public <T> Map<String, T> read(InputStream inputStream, TypeReference<T> valueTypeReference) {
+            return XmlUtils.read(inputStream, valueTypeReference.getType(), xmlMapper);
+        }
+
+        @Override
+        public Map<String, ?> read(String xml) {
+            return XmlUtils.read(xml, xmlMapper);
+        }
+
+        @Override
+        public <T> Map<String, T> read(String xml, Class<T> valueType) {
+            return XmlUtils.read(xml, valueType, xmlMapper);
+        }
+
+        @Override
+        public <T> Map<String, T> read(String xml, TypeReference<T> valueTypeReference) {
+            return XmlUtils.read(xml, valueTypeReference.getType(), xmlMapper);
+        }
+
+        @Override
+        public List<?> readList(InputStream inputStream, String path) {
+            return XmlUtils.readList(inputStream, path, xmlMapper);
+        }
+
+        @Override
+        public <T> List<T> readList(InputStream inputStream, String path, Class<T> elementType) {
+            return XmlUtils.readList(inputStream, path, elementType, xmlMapper);
+        }
+
+        @Override
+        public <T> List<T> readList(InputStream inputStream, String path, TypeReference<T> elementTypeReference) {
+            return XmlUtils.readList(inputStream, path, elementTypeReference.getType(), xmlMapper);
+        }
+
+        @Override
+        public Stream<Map<String, ?>> stream(InputStream inputStream) {
+            return XmlUtils.stream(inputStream, xmlMapper);
+        }
+
+        @Override
+        public String write(Object object) {
+            return XmlUtils.write(object, xmlMapper);
+        }
+
+        @Override
+        public String write(Object object, String rootName) {
+            return XmlUtils.write(object, rootName, xmlMapper);
+        }
     }
 }

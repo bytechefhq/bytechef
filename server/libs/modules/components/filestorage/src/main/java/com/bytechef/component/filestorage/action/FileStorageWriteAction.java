@@ -17,12 +17,9 @@
 
 package com.bytechef.component.filestorage.action;
 
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.FileEntry;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.util.MapUtils;
-
-import java.util.Map;
+import com.bytechef.hermes.component.definition.ParameterMap;
 
 import static com.bytechef.component.filestorage.constant.FileStorageConstants.CONTENT;
 import static com.bytechef.component.filestorage.constant.FileStorageConstants.FILENAME;
@@ -53,10 +50,13 @@ public class FileStorageWriteAction {
         .outputSchema(fileEntry())
         .perform(FileStorageWriteAction::perform);
 
-    protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
-        Object content = MapUtils.getRequired(inputParameters, CONTENT);
-        String fileName = MapUtils.getString(inputParameters, FILENAME, "file.txt");
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
 
-        return context.storeFileContent(fileName, content instanceof String ? (String) content : content.toString());
+        Object content = inputParameters.getRequired(CONTENT);
+        String fileName = inputParameters.getString(FILENAME, "file.txt");
+
+        return context.file(
+            file -> file.storeContent(fileName, content instanceof String ? (String) content : content.toString()));
     }
 }

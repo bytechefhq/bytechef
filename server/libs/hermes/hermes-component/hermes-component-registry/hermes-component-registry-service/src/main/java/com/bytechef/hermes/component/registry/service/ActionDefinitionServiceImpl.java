@@ -18,7 +18,6 @@
 package com.bytechef.hermes.component.registry.service;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
@@ -28,20 +27,21 @@ import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
-import com.bytechef.hermes.component.definition.factory.ContextConnectionFactory;
 import com.bytechef.hermes.component.definition.factory.ContextFactory;
 import com.bytechef.hermes.component.registry.ComponentDefinitionRegistry;
+import com.bytechef.hermes.component.definition.ParameterMapImpl;
+import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.definition.DynamicOptionsProperty;
 import com.bytechef.hermes.definition.OptionsDataSource;
 import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
-import com.bytechef.hermes.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.component.registry.domain.ActionDefinition;
 import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.registry.domain.Property;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -54,142 +54,119 @@ import java.util.Map;
 public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
-    private final ContextConnectionFactory contextConnectionFactory;
     private final ContextFactory contextFactory;
 
     @SuppressFBWarnings("EI2")
     public ActionDefinitionServiceImpl(
-        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory,
-        ContextFactory contextFactory) {
+        ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory) {
 
         this.componentDefinitionRegistry = componentDefinitionRegistry;
-        this.contextConnectionFactory = contextConnectionFactory;
         this.contextFactory = contextFactory;
     }
 
     @Override
     public List<? extends ValueProperty<?>> executeDynamicProperties(
-        String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, Object> actionParameters, Long connectionId, Map<String, ?> connectionParameters,
-        String authorizationName) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
+        @NonNull Map<String, ?> inputParameters, Connection connection) {
 
         ComponentPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
             componentName, componentVersion, actionName, propertyName);
 
-        return ComponentContextSupplier.get(
-            getActionContext(componentName, connectionId),
-            () -> {
-                List<? extends com.bytechef.hermes.definition.Property.ValueProperty<?>> valueProperties =
-                    propertiesFunction.apply(
-                        contextConnectionFactory.createConnection(
-                            componentName, componentVersion, connectionParameters, authorizationName),
-                        actionParameters);
+        List<? extends com.bytechef.hermes.definition.Property.ValueProperty<?>> valueProperties =
+            propertiesFunction.apply(
+                new ParameterMapImpl(inputParameters),
+                connection == null ? null : new ParameterMapImpl(connection.getParameters()),
+                contextFactory.createActionContext(connection));
 
-                return valueProperties.stream()
-                    .map(valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty))
-                    .toList();
-            });
+        return valueProperties.stream()
+            .map(valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty))
+            .toList();
     }
 
     @Override
     public String executeEditorDescription(
-        String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,
-        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters,
+        Connection connection) {
 
         EditorDescriptionFunction editorDescriptionFunction = getEditorDescriptionFunction(
             componentName, componentVersion, actionName);
 
-        return ComponentContextSupplier.get(
-            getActionContext(componentName, connectionId),
-            () -> editorDescriptionFunction.apply(
-                contextConnectionFactory.createConnection(
-                    componentName, componentVersion, connectionParameters, authorizationName),
-                actionParameters));
+        return editorDescriptionFunction.apply(
+            new ParameterMapImpl(inputParameters),
+            connection == null ? null : new ParameterMapImpl(connection.getParameters()));
     }
 
     @Override
     public List<Option> executeOptions(
-        String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, Object> actionParameters, String searchText, Long connectionId, Map<String, ?> connectionParameters,
-        String authorizationName) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
+        @NonNull Map<String, ?> inputParameters, String searchText, Connection connection) {
 
         ComponentOptionsFunction optionsFunction = getComponentOptionsFunction(
             componentName, componentVersion, actionName, propertyName);
 
-        return ComponentContextSupplier.get(
-            getActionContext(componentName, connectionId),
-            () -> {
-                List<com.bytechef.hermes.definition.Option<?>> options = optionsFunction.apply(
-                    contextConnectionFactory.createConnection(
-                        componentName, componentVersion, connectionParameters, authorizationName),
-                    actionParameters, searchText);
+        List<com.bytechef.hermes.definition.Option<?>> options = optionsFunction.apply(
+            new ParameterMapImpl(inputParameters),
+            connection == null ? null : new ParameterMapImpl(connection.getParameters()),
+            searchText, contextFactory.createActionContext(connection));
 
-                return options.stream()
-                    .map(Option::new)
-                    .toList();
-            });
+        return options.stream()
+            .map(Option::new)
+            .toList();
     }
 
     @Override
     public List<? extends ValueProperty<?>> executeOutputSchema(
-        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
-        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> inputParameters,
+        Connection connection) {
 
         OutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(
             componentName, componentVersion, actionName);
 
-        return ComponentContextSupplier.get(
-            getActionContext(componentName, connectionId),
-            () -> {
-                return Property.toProperty(
-                    outputSchemaFunction.apply(
-                        contextConnectionFactory.createConnection(
-                            componentName, componentVersion, connectionParameters, authorizationName),
-                        actionParameters));
-            });
+        return Property.toProperty(
+            outputSchemaFunction.apply(
+                new ParameterMapImpl(inputParameters),
+                connection == null ? null : new ParameterMapImpl(connection.getParameters())));
     }
 
     @Override
     public Object executePerform(
-        String componentName, int componentVersion, String actionName, long taskExecutionId,
-        Map<String, ?> inputParameters, Map<String, Long> connectionIdMap) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, long taskExecutionId,
+        @NonNull Map<String, ?> inputParameters, Connection connection) {
 
         com.bytechef.hermes.component.definition.ActionDefinition actionDefinition =
             resolveActionDefinition(componentName, componentVersion, actionName);
-        com.bytechef.hermes.component.definition.ActionDefinition.ActionContext context =
-            contextFactory.createActionContext(connectionIdMap, taskExecutionId);
 
-        return ComponentContextSupplier.get(
-            context,
-            () -> OptionalUtils.mapOrElse(
-                actionDefinition.getPerform(), performFunction -> performFunction.apply(
-                    inputParameters, context),
-                null));
+        return OptionalUtils.mapOrElse(
+            actionDefinition.getPerform(), performFunction -> performFunction.apply(
+                new ParameterMapImpl(inputParameters),
+                connection == null ? null : new ParameterMapImpl(connection.getParameters()),
+                contextFactory.createActionContext(connection, taskExecutionId)),
+            null);
     }
 
     @Override
     public Object executeSampleOutput(
-        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
-        Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName,
+        @NonNull Map<String, ?> actionParameters, Connection connection) {
 
         SampleOutputFunction sampleOutputFunction = getSampleOutputFunction(
             componentName, componentVersion, actionName);
 
-        return ComponentContextSupplier.get(
-            getActionContext(componentName, connectionId),
-            () -> sampleOutputFunction.apply(
-                contextConnectionFactory.createConnection(
-                    componentName, componentVersion, connectionParameters, authorizationName),
-                actionParameters));
+        return sampleOutputFunction.apply(
+            new ParameterMapImpl(actionParameters),
+            connection == null ? null : new ParameterMapImpl(connection.getParameters()));
     }
 
     @Override
-    public ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName) {
+    public ActionDefinition
+        getActionDefinition(@NonNull String componentName, int componentVersion, @NonNull String actionName) {
         return new ActionDefinition(resolveActionDefinition(componentName, componentVersion, actionName));
     }
 
     @Override
-    public List<ActionDefinition> getActionDefinitions(String componentName, int componentVersion) {
+    public List<ActionDefinition> getActionDefinitions(@NonNull String componentName, int componentVersion) {
         return componentDefinitionRegistry.getActionDefinitions(componentName, componentVersion)
             .stream()
             .map(ActionDefinition::new)
@@ -197,18 +174,12 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public List<ActionDefinition> getActionDefinitions(List<ComponentOperation> componentOperations) {
+    public List<ActionDefinition> getActionDefinitions(@NonNull List<ComponentOperation> componentOperations) {
         return componentOperations.stream()
             .map(componentOperation -> getActionDefinition(
                 componentOperation.componentName(), componentOperation.componentVersion(),
                 componentOperation.operationName()))
             .toList();
-    }
-
-    private com.bytechef.hermes.component.definition.ActionDefinition.ActionContext
-        getActionContext(String componentName, Long connectionId) {
-        return contextFactory.createActionContext(
-            connectionId == null ? Map.of() : Map.of(componentName, connectionId));
     }
 
     private ComponentOptionsFunction getComponentOptionsFunction(
@@ -250,11 +221,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return OptionalUtils.mapOrElse(
             actionDefinition.getEditorDescriptionDataSource(),
             EditorDescriptionDataSource::getEditorDescription,
-            (
-                Connection connection,
-                Map<String, ?> inputParameters) -> OptionalUtils.orElse(componentDefinition.getTitle(),
-                    componentDefinition.getName()) + ": " +
-                    OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName()));
+            (inputParameters, connectionParameters) -> OptionalUtils.orElse(componentDefinition.getTitle(),
+                componentDefinition.getName()) + ": " +
+                OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName()));
     }
 
     private OutputSchemaFunction

@@ -151,7 +151,7 @@
   "description": "Logs a value to the system log.",
   "icon": "path:assets/logger.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "logger",
   "resources": null,

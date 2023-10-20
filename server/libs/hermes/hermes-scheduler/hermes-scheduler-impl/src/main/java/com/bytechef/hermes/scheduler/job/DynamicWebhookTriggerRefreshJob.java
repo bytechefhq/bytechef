@@ -107,7 +107,7 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
 
         output = triggerDefinitionService.executeDynamicWebhookRefresh(
             componentOperation.componentName(), componentOperation.componentVersion(),
-            componentOperation.operationName(), output);
+            componentOperation.operationName(), output.parameters());
 
         if (output != null) {
             triggerStateService.save(workflowExecutionId, output);

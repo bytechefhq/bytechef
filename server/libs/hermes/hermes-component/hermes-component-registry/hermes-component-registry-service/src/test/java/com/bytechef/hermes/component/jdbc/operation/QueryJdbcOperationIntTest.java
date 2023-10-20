@@ -17,22 +17,18 @@
 
 package com.bytechef.hermes.component.jdbc.operation;
 
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.component.jdbc.sql.DataSourceFactory;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
 import com.bytechef.hermes.component.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import javax.sql.DataSource;
 
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -77,16 +73,11 @@ public class QueryJdbcOperationIntTest {
 
     @Test
     public void testQuery() {
-        Context context = Mockito.mock(Context.class);
-
-        Mockito.when(context.fetchConnection())
-            .thenReturn(Optional.of(Mockito.mock(Connection.class)));
-
         Map<String, ?> inputParameters = Map.of(
             JdbcConstants.PARAMETERS, Map.of("id", "id2"),
             JdbcConstants.QUERY, "SELECT count(*) FROM test where id=:id");
 
-        List<Map<String, Object>> result = queryJdbcOperation.execute(context, inputParameters);
+        List<Map<String, Object>> result = queryJdbcOperation.execute(inputParameters, Map.of());
 
         Assertions.assertEquals(1, result.size());
     }
@@ -105,7 +96,7 @@ public class QueryJdbcOperationIntTest {
 
                     @Override
                     public DataSource getDataSource(
-                        Connection connection, String databaseJdbcName, String jdbcDriverClassNamee) {
+                        Map<String, ?> connectionParameters, String databaseJdbcName, String jdbcDriverClassNamee) {
 
                         return dataSource;
                     }

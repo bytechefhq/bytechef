@@ -17,12 +17,11 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.definition.Context.Connection;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property.ValueProperty;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -31,9 +30,11 @@ import java.util.Map;
 public interface ComponentPropertiesFunction extends PropertiesDataSource.PropertiesFunction {
 
     /**
-     * @param connection
      * @param inputParameters
+     * @param connectionParameters
      * @return
      */
-    List<? extends ValueProperty<?>> apply(Connection connection, Map<String, ?> inputParameters);
+    List<? extends ValueProperty<?>> apply(
+        ParameterMap inputParameters, ParameterMap connectionParameters, Context context)
+        throws ComponentExecutionException;
 }

@@ -17,9 +17,9 @@
 
 package com.bytechef.component.filesystem.action;
 
-import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.component.definition.ParameterMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +28,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Map;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.RM;
@@ -57,8 +56,10 @@ public class FilesystemRmAction {
      * A directory to be deleted does not have to be empty.
      * </p>
      */
-    protected static Object perform(Map<String, ?> inputParameters, Context context) {
-        File file = new File(MapUtils.getRequiredString(inputParameters, PATH));
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
+        File file = new File(inputParameters.getRequiredString(PATH));
 
         try {
             return deleteRecursively(file.toPath());

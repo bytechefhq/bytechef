@@ -18,12 +18,10 @@
 package com.bytechef.component.jsonfile.action;
 
 import com.bytechef.component.jsonfile.constant.JsonFileConstants;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.FileEntry;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.JsonUtils;
-import com.bytechef.hermes.component.util.MapUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -92,28 +90,30 @@ public class JsonFileWriteAction {
         .perform(JsonFileWriteAction::perform);
 
     @SuppressWarnings("unchecked")
-    protected static FileEntry perform(Map<String, ?> inputParameters, Context context)
-        throws ComponentExecutionException {
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
         JsonFileConstants.FileType fileType = JsonFileReadAction.getFileType(inputParameters);
-        Object source = MapUtils.getRequired(inputParameters, SOURCE);
+        Object source = inputParameters.getRequired(SOURCE);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         if (fileType == JsonFileConstants.FileType.JSON) {
             try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream, false, StandardCharsets.UTF_8)) {
-                printWriter.println(JsonUtils.write(source));
+                printWriter.println((String) context.json(json -> json.write(source)));
             }
         } else {
             try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream, false, StandardCharsets.UTF_8)) {
                 for (Map<String, ?> item : (List<Map<String, ?>>) source) {
-                    printWriter.println(JsonUtils.write(item));
+                    printWriter.println((String) context.json(json -> json.write(item)));
                 }
             }
         }
 
         try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
-            return context.storeFileContent(
-                getDefaultFileName(fileType, MapUtils.getString(inputParameters, FILENAME)), inputStream);
+            return context.file(
+                file -> file.storeContent(
+                    getDefaultFileName(fileType, inputParameters.getString(FILENAME)), inputStream));
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to create json file", ioException);
         }

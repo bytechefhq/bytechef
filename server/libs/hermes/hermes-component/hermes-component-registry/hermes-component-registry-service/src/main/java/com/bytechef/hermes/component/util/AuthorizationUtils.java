@@ -27,6 +27,8 @@ import com.bytechef.hermes.component.definition.Authorization.ClientIdFunction;
 import com.bytechef.hermes.component.definition.Authorization.ClientSecretFunction;
 import com.bytechef.hermes.component.definition.Authorization.TokenUrlFunction;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mizosoft.methanol.FormBodyPublisher;
@@ -55,55 +57,56 @@ public class AuthorizationUtils {
 
     public static Authorization.ApplyFunction getDefaultApply(Authorization.AuthorizationType type) {
         return switch (type) {
-            case API_KEY -> (Map<String, ?> connectionParameters) -> {
+            case API_KEY -> (ParameterMap connectionParameters) -> {
                 String addTo = MapUtils.getString(
-                    connectionParameters, Authorization.ADD_TO, ApiTokenLocation.HEADER.name());
+                    connectionParameters, AuthorizationConstants.ADD_TO, ApiTokenLocation.HEADER.name());
 
                 if (ApiTokenLocation.valueOf(addTo.toUpperCase()) == ApiTokenLocation.HEADER) {
                     return ApplyResponse.ofHeaders(
                         Map.of(
                             MapUtils.getString(
-                                connectionParameters, Authorization.KEY, Authorization.API_TOKEN),
+                                connectionParameters, AuthorizationConstants.KEY, AuthorizationConstants.API_TOKEN),
                             List.of(
-                                MapUtils.getString(connectionParameters, Authorization.VALUE, ""))));
+                                MapUtils.getString(connectionParameters, AuthorizationConstants.VALUE, ""))));
                 } else {
                     return ApplyResponse.ofQueryParameters(
                         Map.of(
                             MapUtils.getString(
-                                connectionParameters, Authorization.KEY, Authorization.API_TOKEN),
+                                connectionParameters, AuthorizationConstants.KEY, AuthorizationConstants.API_TOKEN),
                             List.of(
-                                MapUtils.getString(connectionParameters, Authorization.VALUE, ""))));
+                                MapUtils.getString(connectionParameters, AuthorizationConstants.VALUE, ""))));
                 }
             };
-            case BASIC_AUTH, DIGEST_AUTH -> (Map<String, ?> connectionParameters) -> {
+            case BASIC_AUTH, DIGEST_AUTH -> (ParameterMap connectionParameters) -> {
                 String valueToEncode =
-                    MapUtils.getString(connectionParameters, Authorization.USERNAME) +
+                    MapUtils.getString(connectionParameters, AuthorizationConstants.USERNAME) +
                         ":" +
-                        MapUtils.getString(connectionParameters, Authorization.PASSWORD);
+                        MapUtils.getString(connectionParameters, AuthorizationConstants.PASSWORD);
 
                 return ApplyResponse.ofHeaders(
                     Map.of(
                         "Authorization",
                         List.of("Basic " + ENCODER.encodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8)))));
             };
-            case BEARER_TOKEN -> (Map<String, ?> connectionParameters) -> ApplyResponse.ofHeaders(
+            case BEARER_TOKEN -> (ParameterMap connectionParameters) -> ApplyResponse.ofHeaders(
                 Map.of(
-                    Authorization.AUTHORIZATION,
+                    AuthorizationConstants.AUTHORIZATION,
                     List.of(
-                        Authorization.BEARER + " " +
-                            MapUtils.getString(connectionParameters, Authorization.TOKEN))));
-            case CUSTOM -> (Map<String, ?> connectionParameters) -> null;
+                        AuthorizationConstants.BEARER + " " +
+                            MapUtils.getString(connectionParameters, AuthorizationConstants.TOKEN))));
+            case CUSTOM -> (ParameterMap connectionParameters) -> null;
             case OAUTH2_AUTHORIZATION_CODE, OAUTH2_AUTHORIZATION_CODE_PKCE, OAUTH2_CLIENT_CREDENTIALS,
                 OAUTH2_IMPLICIT_CODE, OAUTH2_RESOURCE_OWNER_PASSWORD -> (
-                    Map<String, ?> connectionParameters) -> ApplyResponse.ofHeaders(
+                    ParameterMap connectionParameters) -> ApplyResponse.ofHeaders(
                         Map.of(
-                            Authorization.AUTHORIZATION,
+                            AuthorizationConstants.AUTHORIZATION,
                             List.of(
                                 MapUtils.getString(
-                                    connectionParameters, Authorization.HEADER_PREFIX, Authorization.BEARER) +
+                                    connectionParameters, AuthorizationConstants.HEADER_PREFIX,
+                                    AuthorizationConstants.BEARER) +
                                     " " +
                                     MapUtils.getString(
-                                        connectionParameters, Authorization.ACCESS_TOKEN))));
+                                        connectionParameters, AuthorizationConstants.ACCESS_TOKEN))));
         };
     }
 
@@ -151,34 +154,33 @@ public class AuthorizationUtils {
             Map<?, ?> body = JsonUtils.read(httpResponse.body(), Map.class, objectMapper);
 
             return new Authorization.AuthorizationCallbackResponse(
-                (String) body.get(Authorization.ACCESS_TOKEN), (String) body.get(Authorization.REFRESH_TOKEN));
+                (String) body.get(AuthorizationConstants.ACCESS_TOKEN),
+                (String) body.get(AuthorizationConstants.REFRESH_TOKEN));
         };
     }
 
-    public static String getDefaultAuthorizationUrl(Map<String, ?> connectionParameters) {
-        return MapUtils.getString(connectionParameters, Authorization.AUTHORIZATION_URL);
+    public static String getDefaultAuthorizationUrl(ParameterMap connectionParameters) {
+        return MapUtils.getString(connectionParameters, AuthorizationConstants.AUTHORIZATION_URL);
     }
 
-    public static String getDefaultBaseUri(Map<String, ?> connectionParameters) {
+    public static String getDefaultBaseUri(ParameterMap connectionParameters) {
         return MapUtils.getString(connectionParameters, ConnectionDefinition.BASE_URI);
     }
 
-    public static String getDefaultClientId(Map<String, ?> connectionParameters) {
-        return MapUtils.getString(connectionParameters, Authorization.CLIENT_ID);
+    public static String getDefaultClientId(ParameterMap connectionParameters) {
+        return MapUtils.getString(connectionParameters, AuthorizationConstants.CLIENT_ID);
     }
 
-    public static String getDefaultClientSecret(Map<String, ?> connectionParameters) {
-        return MapUtils.getString(connectionParameters, Authorization.CLIENT_SECRET);
+    public static String getDefaultClientSecret(ParameterMap connectionParameters) {
+        return MapUtils.getString(connectionParameters, AuthorizationConstants.CLIENT_SECRET);
     }
 
     public static Authorization.PkceFunction getDefaultPkce() {
         return Authorization.Pkce::new;
     }
 
-    public static String getDefaultRefreshUrl(
-        Map<String, Object> connectionParameters, TokenUrlFunction tokenUrlFunction) {
-
-        String refreshUrl = MapUtils.getString(connectionParameters, Authorization.REFRESH_URL);
+    public static String getDefaultRefreshUrl(ParameterMap connectionParameters, TokenUrlFunction tokenUrlFunction) {
+        String refreshUrl = MapUtils.getString(connectionParameters, AuthorizationConstants.REFRESH_URL);
 
         if (refreshUrl == null) {
             refreshUrl = tokenUrlFunction.apply(connectionParameters);
@@ -188,8 +190,8 @@ public class AuthorizationUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<String> getDefaultScopes(Map<String, ?> connectionParameters) {
-        Object scopes = MapUtils.get(connectionParameters, Authorization.SCOPES);
+    public static List<String> getDefaultScopes(ParameterMap connectionParameters) {
+        Object scopes = MapUtils.get(connectionParameters, AuthorizationConstants.SCOPES);
 
         if (scopes == null) {
             return Collections.emptyList();
@@ -204,7 +206,7 @@ public class AuthorizationUtils {
         }
     }
 
-    public static String getDefaultTokenUrl(Map<String, ?> connectionParameters) {
-        return MapUtils.getString(connectionParameters, Authorization.TOKEN_URL);
+    public static String getDefaultTokenUrl(ParameterMap connectionParameters) {
+        return MapUtils.getString(connectionParameters, AuthorizationConstants.TOKEN_URL);
     }
 }

@@ -15,20 +15,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.util;
+package com.bytechef.hermes.component.definition;
 
 import com.bytechef.commons.util.MimeTypeUtils;
+import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
-import com.bytechef.hermes.component.definition.AuthorizationContextConnection;
-import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.FileEntry;
-import com.bytechef.hermes.component.util.HttpClientUtils.Body;
-import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
-import com.bytechef.hermes.component.util.HttpClientUtils.Configuration;
-import com.bytechef.hermes.component.util.HttpClientUtils.HttpClientExecutor;
-import com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
-import com.bytechef.hermes.component.util.HttpClientUtils.Response;
-import com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
+import com.bytechef.hermes.component.definition.Context.Http;
+import com.bytechef.hermes.component.definition.Context.Http.Body;
+import com.bytechef.hermes.component.definition.Context.Http.Configuration;
+import com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
+import com.bytechef.hermes.component.definition.Context.Http.Response;
+import com.bytechef.hermes.component.definition.Context.Http.ResponseType;
+import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.github.mizosoft.methanol.FormBodyPublisher;
@@ -36,6 +38,8 @@ import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.Methanol;
 import com.github.mizosoft.methanol.MoreBodyPublishers;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.net.ssl.SSLContext;
@@ -51,6 +55,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
+import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
@@ -62,34 +67,36 @@ import java.util.stream.Collectors;
 /**
  * @author Ivica Cardic
  */
-public class HttpClientExecutorImpl implements HttpClientExecutor {
+@Component
+public class HttpClientExecutor {
 
-    static ObjectMapper objectMapper;
-    static XmlMapper xmlMapper;
+    private final ConnectionDefinitionService connectionDefinitionService;
+    private final FileStorageService fileStorageService;
+    private final ObjectMapper objectMapper;
+    private final XmlMapper xmlMapper;
 
-    @org.springframework.context.annotation.Configuration
-    static class XmlOperationsConfiguration {
+    @SuppressFBWarnings("EI")
+    public HttpClientExecutor(
+        ConnectionDefinitionService connectionDefinitionService, FileStorageService fileStorageService,
+        ObjectMapper objectMapper, XmlMapper xmlMapper) {
 
-        public XmlOperationsConfiguration(ObjectMapper objectMapper, XmlMapper xmlMapper) {
-            HttpClientExecutorImpl.objectMapper = objectMapper;
-            HttpClientExecutorImpl.xmlMapper = xmlMapper;
-        }
+        this.connectionDefinitionService = connectionDefinitionService;
+        this.fileStorageService = fileStorageService;
+        this.objectMapper = objectMapper;
+        this.xmlMapper = xmlMapper;
     }
 
-    @Override
     public Response execute(
         String urlString, Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Body body,
-        Configuration configuration, RequestMethod requestMethod) throws Exception {
+        Configuration configuration, RequestMethod requestMethod, Connection connection) throws Exception {
 
-        Context context = ComponentContextThreadLocal.get();
-
-        HttpClient httpClient = createHttpClient(context, headers, queryParameters, configuration);
+        HttpClient httpClient = createHttpClient(headers, queryParameters, configuration, connection);
         HttpRequest httpRequest = createHTTPRequest(
-            context, urlString, requestMethod, headers, queryParameters, body);
+            urlString, requestMethod, headers, queryParameters, body, connection);
 
         HttpResponse<?> httpResponse = httpClient.send(httpRequest, createBodyHandler(configuration));
 
-        return handleResponse(context, httpResponse, configuration);
+        return handleResponse(httpResponse, configuration);
     }
 
     HttpResponse.BodyHandler<?> createBodyHandler(Configuration configuration) {
@@ -99,7 +106,7 @@ public class HttpClientExecutorImpl implements HttpClientExecutor {
         if (responseType == null) {
             bodyHandler = HttpResponse.BodyHandlers.discarding();
         } else {
-            if (responseType == ResponseType.BINARY) {
+            if (responseType == Http.ResponseType.BINARY) {
                 bodyHandler = HttpResponse.BodyHandlers.ofInputStream();
             } else {
                 bodyHandler = HttpResponse.BodyHandlers.ofString();
@@ -109,21 +116,22 @@ public class HttpClientExecutorImpl implements HttpClientExecutor {
         return bodyHandler;
     }
 
-    BodyPublisher createBodyPublisher(Context context, Body body) {
+    BodyPublisher createBodyPublisher(Body body) {
         BodyPublisher bodyPublisher;
 
         if (body == null) {
-            bodyPublisher = HttpRequest.BodyPublishers.noBody();
+            bodyPublisher = BodyPublishers.noBody();
         } else {
-            if (body.getContentType() == BodyContentType.BINARY && body.getContent() instanceof FileEntry fileEntry) {
-                bodyPublisher = getBinaryBodyPublisher(context, body, fileEntry);
-            } else if (body.getContentType() == BodyContentType.FORM_DATA) {
-                bodyPublisher = getFormDataBodyPublisher(context, body);
-            } else if (body.getContentType() == BodyContentType.FORM_URL_ENCODED) {
+            if (body.getContentType() == Http.BodyContentType.BINARY
+                && body.getContent() instanceof FileEntry fileEntry) {
+                bodyPublisher = getBinaryBodyPublisher(body, fileEntry);
+            } else if (body.getContentType() == Http.BodyContentType.FORM_DATA) {
+                bodyPublisher = getFormDataBodyPublisher(body);
+            } else if (body.getContentType() == Http.BodyContentType.FORM_URL_ENCODED) {
                 bodyPublisher = getFormUrlEncodedBodyPublisher(body);
-            } else if (body.getContentType() == BodyContentType.JSON) {
+            } else if (body.getContentType() == Http.BodyContentType.JSON) {
                 bodyPublisher = getJsonBodyPublisher(body);
-            } else if (body.getContentType() == BodyContentType.XML) {
+            } else if (body.getContentType() == Http.BodyContentType.XML) {
                 bodyPublisher = getXmlBodyPublisher(body);
             } else {
                 bodyPublisher = getStringBodyPublisher(body);
@@ -134,8 +142,8 @@ public class HttpClientExecutorImpl implements HttpClientExecutor {
     }
 
     HttpClient createHttpClient(
-        Context context, Map<String, List<String>> headers, Map<String, List<String>> queryParameters,
-        Configuration configuration) {
+        Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Configuration configuration,
+        Connection connection) {
 
         Methanol.Builder builder = Methanol.newBuilder()
             .version(HttpClient.Version.HTTP_1_1);
@@ -154,7 +162,7 @@ public class HttpClientExecutorImpl implements HttpClientExecutor {
             }
         }
 
-        applyAuthorization(context, headers, queryParameters);
+        applyAuthorization(headers, queryParameters, connection);
 
         if (configuration.isFollowRedirect()) {
             builder.followRedirects(HttpClient.Redirect.NORMAL);
@@ -178,11 +186,11 @@ public class HttpClientExecutorImpl implements HttpClientExecutor {
     }
 
     HttpRequest createHTTPRequest(
-        Context context, String urlString, RequestMethod requestMethod, Map<String, List<String>> headers,
-        Map<String, List<String>> queryParameters, Body body) {
+        String urlString, RequestMethod requestMethod, Map<String, List<String>> headers,
+        Map<String, List<String>> queryParameters, Body body, Connection connection) {
 
         HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
-            .method(requestMethod.name(), createBodyPublisher(context, body));
+            .method(requestMethod.name(), createBodyPublisher(body));
 
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             for (String value : entry.getValue()) {
@@ -192,13 +200,13 @@ public class HttpClientExecutorImpl implements HttpClientExecutor {
 
         httpRequestBuilder.uri(
             createURI(
-                getConnectionUrl(urlString, context),
+                getConnectionUrl(urlString, connection),
                 Objects.requireNonNullElse(queryParameters, Collections.emptyMap())));
 
         return httpRequestBuilder.build();
     }
 
-    Response handleResponse(Context context, HttpResponse<?> httpResponse, Configuration configuration) {
+    Response handleResponse(HttpResponse<?> httpResponse, Configuration configuration) {
         Response response;
         HttpHeaders httpHeaders = httpResponse.headers();
 
@@ -212,12 +220,12 @@ public class HttpClientExecutorImpl implements HttpClientExecutor {
 
             Object body;
 
-            if (!isEmpty(httpResponseBody) && responseType == ResponseType.BINARY) {
-                body = storeBinaryResponseBody(context, configuration, headers, (InputStream) httpResponseBody);
-            } else if (responseType == ResponseType.JSON) {
+            if (!isEmpty(httpResponseBody) && responseType == Http.ResponseType.BINARY) {
+                body = storeBinaryResponseBody(configuration, headers, (InputStream) httpResponseBody);
+            } else if (responseType == Http.ResponseType.JSON) {
                 body = isEmpty(httpResponseBody) ? null
                     : com.bytechef.commons.util.JsonUtils.read(httpResponseBody.toString(), objectMapper);
-            } else if (responseType == ResponseType.TEXT) {
+            } else if (responseType == Http.ResponseType.TEXT) {
                 body = isEmpty(httpResponseBody) ? null : httpResponseBody.toString();
             } else {
                 body = isEmpty(httpResponseBody) ? null
@@ -230,35 +238,27 @@ public class HttpClientExecutorImpl implements HttpClientExecutor {
         return response;
     }
 
-    private static void addFileEntry(
-        Context context, MultipartBodyPublisher.Builder builder, String name, FileEntry fileEntry) {
-
-        Objects.requireNonNull(context, "'context' must not be null");
-
+    private void addFileEntry(MultipartBodyPublisher.Builder builder, String name, FileEntry fileEntry) {
         builder.formPart(
             name, fileEntry.getName(),
             MoreBodyPublishers.ofMediaType(
-                HttpRequest.BodyPublishers.ofInputStream(() -> context.getFileStream(fileEntry)),
+                BodyPublishers.ofInputStream(() -> fileStorageService.getFileStream(
+                    FileEntryConstants.DOCUMENTS_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry())),
                 MediaType.parse(fileEntry.getMimeType())));
     }
 
-    private static void applyAuthorization(
-        Context context, Map<String, List<String>> headers, Map<String, List<String>> queryParameters) {
+    private void applyAuthorization(
+        Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Connection connection) {
 
-        if (context == null) {
-            return;
+        ApplyResponse applyResponse = connectionDefinitionService.executeAuthorizationApply(connection);
+
+        if (applyResponse != null) {
+            headers.putAll(applyResponse.getHeaders());
+            queryParameters.putAll(applyResponse.getQueryParameters());
         }
-
-        context.fetchConnection()
-            .ifPresent(connection -> {
-                ApplyResponse applyResponse = ((AuthorizationContextConnection) connection).applyAuthorization();
-
-                headers.putAll(applyResponse.getHeaders());
-                queryParameters.putAll(applyResponse.getQueryParameters());
-            });
     }
 
-    private static URI createURI(String urlString, @Nonnull Map<String, List<String>> queryParameters) {
+    private URI createURI(String urlString, @Nonnull Map<String, List<String>> queryParameters) {
         URI uri;
 
         if (queryParameters.isEmpty()) {
@@ -277,38 +277,35 @@ public class HttpClientExecutorImpl implements HttpClientExecutor {
         return uri;
     }
 
-    private static String getConnectionUrl(String urlString, Context context) {
+    private String getConnectionUrl(String urlString, Connection connection) {
         if (urlString.startsWith("http://") || urlString.startsWith("https://")) {
             return urlString;
         }
 
-        if (context == null) {
+        if (connection == null) {
             return urlString;
+        } else {
+            return OptionalUtils.map(
+                connectionDefinitionService.executeBaseUri(connection),
+                baseUri -> baseUri + urlString);
         }
-
-        return context.fetchConnection()
-            .map(connection -> (AuthorizationContextConnection) connection)
-            .flatMap(AuthorizationContextConnection::fetchBaseUri)
-            .map(baseUri -> baseUri + urlString)
-            .orElse(urlString);
     }
 
-    private static BodyPublisher getBinaryBodyPublisher(Context context, Body body, FileEntry fileEntry) {
-        Objects.requireNonNull(context, "'context' must not be null");
-
+    private BodyPublisher getBinaryBodyPublisher(Body body, FileEntry fileEntry) {
         return MoreBodyPublishers.ofMediaType(
-            HttpRequest.BodyPublishers.ofInputStream(() -> context.getFileStream(fileEntry)),
+            BodyPublishers.ofInputStream(() -> fileStorageService.getFileStream(
+                FileEntryConstants.DOCUMENTS_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry())),
             MediaType.parse(body.getMimeType() == null ? fileEntry.getMimeType() : body.getMimeType()));
     }
 
-    private static BodyPublisher getFormDataBodyPublisher(Context context, Body body) {
+    private BodyPublisher getFormDataBodyPublisher(Body body) {
         Map<?, ?> bodyParameters = (Map<?, ?>) body.getContent();
 
         MultipartBodyPublisher.Builder builder = MultipartBodyPublisher.newBuilder();
 
         for (Map.Entry<?, ?> parameter : bodyParameters.entrySet()) {
             if (parameter.getValue() instanceof FileEntry fileEntry) {
-                addFileEntry(context, builder, (String) parameter.getKey(), fileEntry);
+                addFileEntry(builder, (String) parameter.getKey(), fileEntry);
             } else {
                 builder.textPart((String) parameter.getKey(), parameter.getValue());
             }
@@ -317,7 +314,7 @@ public class HttpClientExecutorImpl implements HttpClientExecutor {
         return builder.build();
     }
 
-    private static BodyPublisher getFormUrlEncodedBodyPublisher(Body body) {
+    private BodyPublisher getFormUrlEncodedBodyPublisher(Body body) {
         Map<?, ?> bodyParameters = (Map<?, ?>) body.getContent();
 
         FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
@@ -331,15 +328,15 @@ public class HttpClientExecutorImpl implements HttpClientExecutor {
         return builder.build();
     }
 
-    private static BodyPublisher getStringBodyPublisher(Body body) {
+    private BodyPublisher getStringBodyPublisher(Body body) {
         Object content = body.getContent();
 
         return MoreBodyPublishers.ofMediaType(
-            HttpRequest.BodyPublishers.ofString(content.toString()),
+            BodyPublishers.ofString(content.toString()),
             MediaType.parse(body.getMimeType()));
     }
 
-    private static boolean isEmpty(final Object object) {
+    private boolean isEmpty(final Object object) {
         if (object == null) {
             return true;
         }
@@ -351,11 +348,8 @@ public class HttpClientExecutorImpl implements HttpClientExecutor {
         return false;
     }
 
-    private static FileEntry storeBinaryResponseBody(
-        Context context, Configuration configuration, Map<String, List<String>> headers,
-        InputStream httpResponseBody) {
-
-        Objects.requireNonNull(context, "'context' must not be null");
+    private FileEntry storeBinaryResponseBody(
+        Configuration configuration, Map<String, List<String>> headers, InputStream httpResponseBody) {
 
         String filename = configuration.getFilename();
 
@@ -369,19 +363,20 @@ public class HttpClientExecutorImpl implements HttpClientExecutor {
             }
         }
 
-        return context.storeFileContent(filename, httpResponseBody);
+        return new ContextFileEntryImpl(
+            fileStorageService.storeFileContent(FileEntryConstants.DOCUMENTS_DIR, filename, httpResponseBody));
     }
 
     private BodyPublisher getJsonBodyPublisher(Body body) {
         return MoreBodyPublishers.ofMediaType(
-            HttpRequest.BodyPublishers
+            BodyPublishers
                 .ofString(com.bytechef.commons.util.JsonUtils.write(body.getContent(), objectMapper)),
             MediaType.APPLICATION_JSON);
     }
 
     private BodyPublisher getXmlBodyPublisher(Body body) {
         return MoreBodyPublishers.ofMediaType(
-            HttpRequest.BodyPublishers.ofString(com.bytechef.commons.util.XmlUtils.write(body.getContent(), xmlMapper)),
+            BodyPublishers.ofString(com.bytechef.commons.util.XmlUtils.write(body.getContent(), xmlMapper)),
             MediaType.APPLICATION_XML);
     }
 

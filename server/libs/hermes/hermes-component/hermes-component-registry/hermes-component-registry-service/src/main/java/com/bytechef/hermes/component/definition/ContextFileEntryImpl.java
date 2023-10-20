@@ -23,6 +23,9 @@ import org.springframework.core.convert.converter.Converter;
 
 import java.util.Map;
 
+/**
+ * @author Ivica Cardic
+ */
 public class ContextFileEntryImpl implements Context.FileEntry {
 
     private final String extension;

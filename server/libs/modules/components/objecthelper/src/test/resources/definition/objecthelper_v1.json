@@ -150,7 +150,7 @@
   "description": "Object Helper allows you to do various operations on objects.",
   "icon": "path:assets/objecthelper.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "objectHelper",
   "resources": null,

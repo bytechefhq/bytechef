@@ -51,6 +51,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -93,6 +94,7 @@ public class TaskCoordinatorConfiguration {
     private TaskExecutionService taskExecutionService;
 
     @Autowired
+    @Qualifier("workflowAsyncFileStorageFacade")
     private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @Autowired

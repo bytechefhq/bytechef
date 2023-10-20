@@ -149,7 +149,7 @@
   "description": "RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system.",
   "icon": "path:assets/rabbitmq.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "rabbitMQ",
   "resources": null,

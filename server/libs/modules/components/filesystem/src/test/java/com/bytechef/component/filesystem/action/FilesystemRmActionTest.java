@@ -17,16 +17,15 @@
 
 package com.bytechef.component.filesystem.action;
 
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+
+import com.bytechef.hermes.component.definition.ParameterMap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
 
@@ -37,18 +36,17 @@ public class FilesystemRmActionTest {
 
     @Test
     public void testDelete() throws IOException {
+        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
         File tempDir = java.nio.file.Files.createTempDirectory("rm_")
             .toFile();
 
         Assertions.assertTrue(tempDir.exists());
 
-        try (MockedStatic<MapUtils> mockedStatic = Mockito.mockStatic(MapUtils.class)) {
-            mockedStatic.when(() -> MapUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH)))
-                .thenReturn(tempDir.getAbsolutePath());
+        Mockito.when(parameterMap.getRequiredString(Mockito.eq(PATH)))
+            .thenReturn(tempDir.getAbsolutePath());
 
-            FilesystemRmAction.perform(Map.of(), Mockito.mock(Context.class));
+        FilesystemRmAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
 
-            Assertions.assertFalse(tempDir.exists());
-        }
+        Assertions.assertFalse(tempDir.exists());
     }
 }

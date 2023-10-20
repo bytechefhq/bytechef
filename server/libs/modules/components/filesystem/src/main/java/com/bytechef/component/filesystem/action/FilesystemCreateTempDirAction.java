@@ -17,15 +17,15 @@
 
 package com.bytechef.component.filesystem.action;
 
-import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.CREATE_TEMP_DIR;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
@@ -40,7 +40,9 @@ public class FilesystemCreateTempDirAction {
         .description("Creates a temporary directory on the filesystem.")
         .perform(FilesystemCreateTempDirAction::perform);
 
-    protected static String perform(Map<String, ?> inputParameters, Context context) {
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
         try {
             Path path = Files.createTempDirectory("createTempDir_");
 

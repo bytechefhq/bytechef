@@ -26,6 +26,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -45,6 +46,7 @@ public class SequenceTaskDispatcherConfiguration {
     private TaskExecutionService taskExecutionService;
 
     @Autowired
+    @Qualifier("workflowAsyncFileStorageFacade")
     private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @Bean("sequenceTaskCompletionHandlerFactory_v1")

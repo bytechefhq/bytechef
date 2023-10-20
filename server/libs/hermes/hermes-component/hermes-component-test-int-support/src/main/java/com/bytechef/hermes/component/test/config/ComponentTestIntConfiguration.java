@@ -43,7 +43,7 @@ import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.configuration.service.WorkflowServiceImpl;
+import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;

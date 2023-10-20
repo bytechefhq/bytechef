@@ -17,13 +17,15 @@
 
 package com.bytechef.component.httpclient.util;
 
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.FileEntry;
-import com.bytechef.hermes.component.util.HttpClientUtils;
-import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
-import com.bytechef.hermes.component.util.HttpClientUtils.Body;
-import com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
-import com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
-import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.component.definition.Context.Http;
+import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
+import com.bytechef.hermes.component.definition.Context.Http.Body;
+import com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
+import com.bytechef.hermes.component.definition.Context.Http.ResponseType;
+
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
 
 import java.time.Duration;
@@ -46,8 +48,6 @@ import static com.bytechef.component.httpclient.constant.HttpClientConstants.RES
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.TIMEOUT;
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.URI;
-import static com.bytechef.hermes.component.util.HttpClientUtils.exchange;
-import static com.bytechef.hermes.component.util.HttpClientUtils.allowUnauthorizedCerts;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
@@ -67,11 +67,11 @@ public class HttpClientActionUtils {
                 .description("Content-Type to use when sending body parameters.")
                 .options(
                     option("None", ""),
-                    option("JSON", BodyContentType.JSON.name()),
-                    option("Form-Data", BodyContentType.FORM_DATA.name()),
-                    option("Form-Urlencoded", BodyContentType.FORM_URL_ENCODED.name()),
-                    option("Raw", BodyContentType.RAW.name()),
-                    option("Binary", BodyContentType.BINARY.name()))
+                    option("JSON", Http.BodyContentType.JSON.name()),
+                    option("Form-Data", Http.BodyContentType.FORM_DATA.name()),
+                    option("Form-Urlencoded", Http.BodyContentType.FORM_URL_ENCODED.name()),
+                    option("Raw", Http.BodyContentType.RAW.name()),
+                    option("Binary", Http.BodyContentType.BINARY.name()))
                 .defaultValue("")
                 .advancedOption(true));
         }
@@ -82,8 +82,8 @@ public class HttpClientActionUtils {
                 .description("Mime-Type to use when sending raw body content.")
                 .displayCondition(
                     "['%s', '%s'].includes('%s')".formatted(
-                        BodyContentType.BINARY.name(),
-                        BodyContentType.RAW.name(),
+                        Http.BodyContentType.BINARY.name(),
+                        Http.BodyContentType.RAW.name(),
                         BODY_CONTENT_TYPE))
                 .defaultValue("text/plain")
                 .placeholder("text/plain")
@@ -131,23 +131,23 @@ public class HttpClientActionUtils {
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
-    public static Object execute(Map<String, ?> inputParameters, RequestMethod requestMethod) {
-        HttpClientUtils.Response response = exchange(
-            MapUtils.getRequiredString(inputParameters, URI), requestMethod)
+    public static Object execute(ParameterMap inputParameters, RequestMethod requestMethod, Context context) {
+        Http.Response response =
+            context.http(http -> http.exchange(inputParameters.getRequiredString(URI), requestMethod))
                 .configuration(
-                    allowUnauthorizedCerts(MapUtils.getBoolean(inputParameters, ALLOW_UNAUTHORIZED_CERTS, false))
-                        .filename(MapUtils.getString(inputParameters, RESPONSE_FILENAME))
-                        .followAllRedirects(MapUtils.getBoolean(inputParameters, FOLLOW_ALL_REDIRECTS, false))
-                        .followRedirect(MapUtils.getBoolean(inputParameters, FOLLOW_REDIRECT, false))
-                        .proxy(MapUtils.getString(inputParameters, PROXY))
+                    Http.allowUnauthorizedCerts(inputParameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
+                        .filename(inputParameters.getString(RESPONSE_FILENAME))
+                        .followAllRedirects(inputParameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
+                        .followRedirect(inputParameters.getBoolean(FOLLOW_REDIRECT, false))
+                        .proxy(inputParameters.getString(PROXY))
                         .responseType(getResponseType(inputParameters))
-                        .timeout(Duration.ofMillis(MapUtils.getInteger(inputParameters, TIMEOUT, 10000))))
-                .headers((Map) MapUtils.getMap(inputParameters, HEADERS, List.class))
-                .queryParameters((Map) MapUtils.getMap(inputParameters, QUERY_PARAMETERS, List.class))
+                        .timeout(Duration.ofMillis(inputParameters.getInteger(TIMEOUT, 10000))))
+                .headers((Map) inputParameters.getMap(HEADERS, List.class))
+                .queryParameters((Map) inputParameters.getMap(QUERY_PARAMETERS, List.class))
                 .body(getPayload(inputParameters, getBodyContentType(inputParameters)))
                 .execute();
 
-        if (MapUtils.getBoolean(inputParameters, FULL_RESPONSE, false)) {
+        if (inputParameters.getBoolean(FULL_RESPONSE, false)) {
             return response;
         } else {
             return response.body();
@@ -165,44 +165,44 @@ public class HttpClientActionUtils {
         return allProperties.toArray(ModifiableInputProperty[]::new);
     }
 
-    private static BodyContentType getBodyContentType(Map<String, ?> inputParameters) {
-        String bodyContentTypeParameter = MapUtils.getString(inputParameters, BODY_CONTENT_TYPE);
+    private static BodyContentType getBodyContentType(ParameterMap inputParameters) {
+        String bodyContentTypeParameter = inputParameters.getString(BODY_CONTENT_TYPE);
 
         return bodyContentTypeParameter == null
             ? null
-            : BodyContentType.valueOf(bodyContentTypeParameter.toUpperCase());
+            : Http.BodyContentType.valueOf(bodyContentTypeParameter.toUpperCase());
     }
 
-    private static Body getPayload(Map<String, ?> inputParameters, BodyContentType bodyContentType) {
+    private static Body getPayload(ParameterMap inputParameters, BodyContentType bodyContentType) {
         Body body = null;
 
         if (inputParameters.containsKey(BODY_CONTENT)) {
-            if (bodyContentType == BodyContentType.BINARY) {
-                body = Body.of(
-                    MapUtils.getRequired(inputParameters, BODY_CONTENT, FileEntry.class),
-                    MapUtils.getString(inputParameters, BODY_CONTENT_MIME_TYPE));
-            } else if (bodyContentType == BodyContentType.FORM_DATA) {
-                body = Body.of(
-                    MapUtils.getMap(inputParameters, BODY_CONTENT, List.of(FileEntry.class), Map.of()),
+            if (bodyContentType == Http.BodyContentType.BINARY) {
+                body = Http.Body.of(
+                    inputParameters.getRequired(BODY_CONTENT, FileEntry.class),
+                    inputParameters.getString(BODY_CONTENT_MIME_TYPE));
+            } else if (bodyContentType == Http.BodyContentType.FORM_DATA) {
+                body = Http.Body.of(
+                    inputParameters.getMap(BODY_CONTENT, List.of(FileEntry.class), Map.of()),
                     bodyContentType);
-            } else if (bodyContentType == BodyContentType.FORM_URL_ENCODED) {
-                body = Body.of(MapUtils.getMap(inputParameters, BODY_CONTENT, Map.of()), bodyContentType);
-            } else if (bodyContentType == BodyContentType.JSON || bodyContentType == BodyContentType.XML) {
-                body = Body.of(
-                    MapUtils.getMap(inputParameters, BODY_CONTENT, Map.of()), bodyContentType);
+            } else if (bodyContentType == Http.BodyContentType.FORM_URL_ENCODED) {
+                body = Http.Body.of(inputParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
+            } else if (bodyContentType == Http.BodyContentType.JSON || bodyContentType == Http.BodyContentType.XML) {
+                body = Http.Body.of(
+                    inputParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
             } else {
-                body = Body.of(
-                    MapUtils.getString(inputParameters, BODY_CONTENT),
-                    MapUtils.getString(inputParameters, BODY_CONTENT_MIME_TYPE, "text/plain"));
+                body = Http.Body.of(
+                    inputParameters.getString(BODY_CONTENT),
+                    inputParameters.getString(BODY_CONTENT_MIME_TYPE, "text/plain"));
             }
         }
 
         return body;
     }
 
-    private static ResponseType getResponseType(Map<String, ?> inputParameters) {
+    private static ResponseType getResponseType(ParameterMap inputParameters) {
         return inputParameters.containsKey(RESPONSE_FORMAT)
-            ? ResponseType.valueOf(MapUtils.getString(inputParameters, RESPONSE_FORMAT))
+            ? Http.ResponseType.valueOf(inputParameters.getString(RESPONSE_FORMAT))
             : null;
     }
 }

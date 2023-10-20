@@ -18,13 +18,12 @@
 package com.bytechef.component.jsonfile.action;
 
 import com.bytechef.component.jsonfile.constant.JsonFileConstants;
-import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.JsonUtils;
-import com.bytechef.hermes.component.util.MapUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -97,26 +96,27 @@ public class JsonFileReadAction {
         .perform(JsonFileReadAction::perform);
 
     @SuppressWarnings("unchecked")
-    protected static Object perform(Map<String, ?> inputParameters, Context context)
-        throws ComponentExecutionException {
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
 
         JsonFileConstants.FileType fileType = getFileType(inputParameters);
-        FileEntry fileEntry = MapUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
-        boolean isArray = MapUtils.getBoolean(inputParameters, IS_ARRAY, true);
+        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
+        boolean isArray = inputParameters.getBoolean(IS_ARRAY, true);
         Object result;
 
         if (isArray) {
-            String path = MapUtils.getString(inputParameters, PATH);
-            InputStream inputStream = context.getFileStream(fileEntry);
+            String path = inputParameters.getString(PATH);
+            InputStream inputStream = context.file(file -> file.getStream(fileEntry));
             List<Map<String, ?>> items;
 
             if (fileType == JsonFileConstants.FileType.JSON) {
                 if (path == null) {
-                    try (Stream<Map<String, ?>> stream = JsonUtils.stream(inputStream)) {
+                    try (Stream<Map<String, ?>> stream = context.json(json -> json.stream(inputStream))) {
                         items = stream.toList();
                     }
                 } else {
-                    items = (List<Map<String, ?>>) JsonUtils.read(inputStream, path);
+                    items =
+                        (List<Map<String, ?>>) context.json(jsonOperations -> jsonOperations.read(inputStream, path));
                 }
             } else {
                 try (BufferedReader bufferedReader = new BufferedReader(
@@ -124,15 +124,15 @@ public class JsonFileReadAction {
 
                     items = bufferedReader
                         .lines()
-                        .map(line -> (Map<String, ?>) JsonUtils.read(line))
+                        .map(line -> (Map<String, ?>) context.json(json -> json.read(line)))
                         .collect(Collectors.toList());
                 } catch (IOException ioException) {
                     throw new ComponentExecutionException("Unable to open json file " + inputParameters, ioException);
                 }
             }
 
-            Integer pageSize = MapUtils.getInteger(inputParameters, PAGE_SIZE);
-            Integer pageNumber = MapUtils.getInteger(inputParameters, PAGE_NUMBER);
+            Integer pageSize = inputParameters.getInteger(PAGE_SIZE);
+            Integer pageNumber = inputParameters.getInteger(PAGE_NUMBER);
             Integer rangeStartIndex = null;
             Integer rangeEndIndex = null;
 
@@ -149,20 +149,20 @@ public class JsonFileReadAction {
 
             result = items;
         } else {
-            result = JsonUtils.read(context.readFileToString(fileEntry));
+            result = context.json(json -> json.read((String) context.file(file -> file.readToString(fileEntry))));
         }
 
         return result;
     }
 
-    protected static JsonFileConstants.FileType getFileType(Map<String, ?> inputParameters) {
-        String fileType = MapUtils.getString(inputParameters, FILE_TYPE, JsonFileConstants.FileType.JSON.name());
+    protected static JsonFileConstants.FileType getFileType(ParameterMap inputParameters) {
+        String fileType = inputParameters.getString(FILE_TYPE, JsonFileConstants.FileType.JSON.name());
 
         return JsonFileConstants.FileType.valueOf(fileType.toUpperCase());
     }
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> null;
+        return (inputParameters, connection) -> null;
     }
 }

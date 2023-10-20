@@ -20,7 +20,6 @@ package com.bytechef.hermes.component.registry.remote.web.rest.service;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
 import io.swagger.v3.oas.annotations.Hidden;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +34,6 @@ import java.util.List;
 @Hidden
 @RestController
 @RequestMapping("/internal/component-definition-service")
-@ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
 public class ComponentDefinitionServiceController {
 
     private final ComponentDefinitionService componentDefinitionService;

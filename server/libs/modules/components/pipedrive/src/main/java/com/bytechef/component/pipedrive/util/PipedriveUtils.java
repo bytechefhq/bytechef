@@ -18,10 +18,9 @@
 package com.bytechef.component.pipedrive.util;
 
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
-import com.bytechef.hermes.component.util.HttpClientUtils;
-import com.bytechef.hermes.component.util.HttpClientUtils.Body;
-import com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
-import com.bytechef.hermes.component.util.MapUtils;
+
+import com.bytechef.hermes.component.definition.Context.Http;
+import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.definition.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.bytechef.hermes.component.util.HttpClientUtils.responseType;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 
 /**
@@ -40,38 +38,41 @@ public class PipedriveUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(PipedriveUtils.class);
 
-    public static String subscribeWebhook(String eventObject, String eventAction, String webhookUrl) {
-        Map<?, ?> result = (Map<?, ?>) HttpClientUtils
-            .post("/api/v1/webhooks")
+    public static String subscribeWebhook(
+        String eventObject, String eventAction, String webhookUrl, TriggerContext context) {
+
+        Map<?, ?> result = (Map<?, ?>) context
+            .http(http -> http.post("/api/v1/webhooks"))
             .body(
-                Body.of(
+                Http.Body.of(
                     Map.of(
                         "event_object", eventObject,
                         "event_action", eventAction,
                         "subscription_url", webhookUrl)))
-            .configuration(responseType(HttpClientUtils.ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .body();
 
         return (String) result.get("id");
     }
 
-    public static void unsubscribeWebhook(String webhookId) {
-        HttpClientUtils
-            .delete("/api/v1/webhooks/%s".formatted(webhookId))
-            .configuration(responseType(ResponseType.JSON))
+    public static void unsubscribeWebhook(String webhookId, TriggerContext context) {
+        context
+            .http(http -> http.delete("/api/v1/webhooks/%s".formatted(webhookId)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
     }
 
+    @SuppressWarnings("unchecked")
     public static ComponentOptionsFunction getOptions(String path, String dependsOn) {
-        return (connection, inputParameters, searchText) -> {
-            Map<String, ?> response = HttpClientUtils
-                .get(path)
+        return (inputParameters, connectionParameters, searchText, context) -> {
+            Map<String, ?> response = context
+                .http(http -> http.get(path))
                 .queryParameters(
                     dependsOn == null
                         ? Map.of()
-                        : Map.of(dependsOn, List.of(MapUtils.getString(inputParameters, dependsOn, ""))))
-                .configuration(responseType(HttpClientUtils.ResponseType.JSON))
+                        : Map.of(dependsOn, List.of(inputParameters.getString(dependsOn, ""))))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
                 .getBody();
 
@@ -81,7 +82,7 @@ public class PipedriveUtils {
 
             List<Option<?>> options = new ArrayList<>();
 
-            for (Map<?, ?> list : MapUtils.getRequiredList(response, "data", Map.class)) {
+            for (Map<?, ?> list : (List<Map<?, ?>>) response.get("data")) {
                 options.add(option((String) list.get("name"), list.get("id")));
             }
 

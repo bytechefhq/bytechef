@@ -36,7 +36,7 @@ import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.configuration.service.WorkflowServiceImpl;
+import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.event.listener.EventListenerChain;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
@@ -101,7 +101,8 @@ public class TaskDispatcherIntTestConfiguration {
         TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport(
             ContextService contextService, CounterService counterService, EventPublisher eventPublisher,
             JobService jobService, ObjectMapper objectMapper, TaskExecutionService taskExecutionService,
-            WorkflowFileStorageFacade workflowFileStorageFacade, WorkflowService workflowService) {
+            WorkflowFileStorageFacade workflowFileStorageFacade,
+            WorkflowService workflowService) {
 
             return new TaskDispatcherWorkflowTestSupport(
                 contextService, counterService, jobService, eventPublisher, objectMapper, taskExecutionService,

@@ -17,9 +17,9 @@
 
 package com.bytechef.component.httpclient.constant;
 
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
-import com.bytechef.hermes.component.util.HttpClientUtils;
-import com.bytechef.hermes.component.util.MapUtils;
+
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
 
 import java.util.Arrays;
@@ -27,8 +27,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
-import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
+import static com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
+import static com.bytechef.hermes.component.definition.Context.Http.ResponseType;
 import static com.bytechef.hermes.definition.DefinitionDSL.any;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
@@ -106,8 +106,8 @@ public class HttpClientConstants {
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))));
 
     public static final OutputSchemaDataSource.OutputSchemaFunction OUTPUT_PROPERTIES =
-        (connection, inputParameters) -> {
-            if (MapUtils.getBoolean(inputParameters, FULL_RESPONSE, false)) {
+        (inputParameters, connection) -> {
+            if (inputParameters.getBoolean(FULL_RESPONSE, false)) {
                 return object()
                     .properties(any("body"), object("headers"), integer("status"));
             } else {
@@ -143,7 +143,7 @@ public class HttpClientConstants {
                         "The response is automatically converted to object/array."),
                     option(
                         "XML",
-                        HttpClientUtils.ResponseType.XML.name(),
+                        Context.Http.ResponseType.XML.name(),
                         "The response is automatically converted to object/array."),
                     option("Text", ResponseType.TEXT.name(), "The response is returned as a text."),
                     option(

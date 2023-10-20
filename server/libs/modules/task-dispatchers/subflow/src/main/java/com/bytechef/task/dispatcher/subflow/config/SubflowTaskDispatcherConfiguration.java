@@ -25,6 +25,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.SubflowJobStatusEventListener;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -47,7 +48,7 @@ public class SubflowTaskDispatcherConfiguration {
         @Bean
         SubflowJobStatusEventListener subflowJobStatusEventListener(
             JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService,
-            WorkflowFileStorageFacade workflowFileStorageFacade) {
+            @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade) {
 
             return new SubflowJobStatusEventListener(
                 jobService, messageBroker, taskExecutionService, workflowFileStorageFacade);

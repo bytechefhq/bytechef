@@ -55,7 +55,7 @@ public class WebhookValidateAndRespondTrigger {
 
     protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> object()
+        return (inputParameters, connectionParameters) -> object()
             .properties(
                 string(METHOD),
                 object(HEADERS),

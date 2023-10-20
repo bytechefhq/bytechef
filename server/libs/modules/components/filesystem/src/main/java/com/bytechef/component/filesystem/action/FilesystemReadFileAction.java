@@ -17,17 +17,15 @@
 
 package com.bytechef.component.filesystem.action;
 
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.FileEntry;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.MapUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.READ_FILE;
@@ -50,11 +48,13 @@ public class FilesystemReadFileAction {
         .outputSchema(ComponentDSL.fileEntry())
         .perform(FilesystemReadFileAction::perform);
 
-    protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
-        String filename = MapUtils.getRequiredString(inputParameters, FILENAME);
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
+        String filename = inputParameters.getRequiredString(FILENAME);
 
         try (InputStream inputStream = new FileInputStream(filename)) {
-            return context.storeFileContent(filename, inputStream);
+            return context.file(file -> file.storeContent(filename, inputStream));
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to open file " + inputParameters, ioException);
         }

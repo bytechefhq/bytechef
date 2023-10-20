@@ -27,6 +27,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -49,6 +50,7 @@ public class ParallelTaskDispatcherConfiguration {
     private TaskExecutionService taskExecutionService;
 
     @Autowired
+    @Qualifier("workflowAsyncFileStorageFacade")
     private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @Bean("parallelTaskCompletionHandlerFactory_v1")

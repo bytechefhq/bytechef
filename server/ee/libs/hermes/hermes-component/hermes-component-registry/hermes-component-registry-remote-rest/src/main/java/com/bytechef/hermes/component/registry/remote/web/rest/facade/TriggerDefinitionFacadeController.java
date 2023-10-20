@@ -18,13 +18,14 @@
 package com.bytechef.hermes.component.registry.remote.web.rest.facade;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
+import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +40,6 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/internal/trigger-definition-facade")
-@ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
 public class TriggerDefinitionFacadeController {
 
     private final TriggerDefinitionFacade triggerDefinitionFacade;
@@ -60,7 +60,7 @@ public class TriggerDefinitionFacadeController {
         triggerDefinitionFacade.executeDynamicWebhookDisable(
             dynamicWebhookDisableRequest.componentName, dynamicWebhookDisableRequest.componentVersion,
             dynamicWebhookDisableRequest.triggerName, dynamicWebhookDisableRequest.triggerParameters,
-            dynamicWebhookDisableRequest.workflowExecutionId, dynamicWebhookDisableRequest.output,
+            dynamicWebhookDisableRequest.workflowExecutionId, dynamicWebhookDisableRequest.outputParameters,
             dynamicWebhookDisableRequest.connectionId);
 
         return ResponseEntity.noContent()
@@ -200,18 +200,48 @@ public class TriggerDefinitionFacadeController {
             sampleOutputRequest.triggerParameters, sampleOutputRequest.connectionId);
     }
 
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/execute-trigger",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<TriggerOutput> executeTrigger(@Valid @RequestBody TriggerRequest triggerRequest) {
+        return ResponseEntity.ok(
+            triggerDefinitionFacade.executeTrigger(
+                triggerRequest.componentName, triggerRequest.componentVersion,
+                triggerRequest.triggerName, triggerRequest.triggerParameter, triggerRequest.state,
+                triggerRequest.webhookRequest, triggerRequest.connectionId));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/validate-webhook-trigger",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<Boolean> executeWebhookValidate(
+        @Valid @RequestBody WebhookValidateRequest webhookValidateRequest) {
+
+        return ResponseEntity.ok(
+            triggerDefinitionFacade.executeWebhookValidate(
+                webhookValidateRequest.componentName, webhookValidateRequest.componentVersion,
+                webhookValidateRequest.triggerName, webhookValidateRequest.triggerParameter,
+                webhookValidateRequest.webhookRequest, webhookValidateRequest.connectionId));
+    }
+
     @SuppressFBWarnings("EI")
     public record DynamicWebhookDisableRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        Map<String, Object> triggerParameters, DynamicWebhookEnableOutput output, @NotNull String workflowExecutionId,
-        Long connectionId) {
+        @NotNull Map<String, Object> triggerParameters, @NotNull Map<String, ?> outputParameters,
+        @NotNull String workflowExecutionId, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record DynamicWebhookEnableRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        Map<String, Object> triggerParameters, @NotNull String workflowExecutionId, Long connectionId,
-        String webhookUrl) {
+        @NotNull Map<String, Object> triggerParameters, @NotNull String workflowExecutionId, @NotNull String webhookUrl,
+        Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
@@ -223,36 +253,48 @@ public class TriggerDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record ListenerDisableRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        Map<String, ?> triggerParameters, @NotNull String workflowExecutionId, Long connectionId) {
+        @NotNull Map<String, ?> triggerParameters, @NotNull String workflowExecutionId, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record ListenerEnableRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        Map<String, ?> triggerParameters, @NotNull String workflowExecutionId, Long connectionId) {
+        @NotNull Map<String, ?> triggerParameters, @NotNull String workflowExecutionId, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record OptionsRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName, @NotNull String propertyName,
-        Map<String, ?> triggerParameters, Long connectionId, String searchText) {
+        @NotNull Map<String, ?> triggerParameters, Long connectionId, String searchText) {
     }
 
     @SuppressFBWarnings("EI")
     public record OutputSchemaRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        Map<String, ?> triggerParameters, Long connectionId) {
+        @NotNull Map<String, ?> triggerParameters, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record PropertiesRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName, @NotNull String propertyName,
-        Map<String, Object> triggerParameters, Long connectionId) {
+        @NotNull Map<String, Object> triggerParameters, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record SampleOutputRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        Map<String, ?> triggerParameters, Long connectionId) {
+        @NotNull Map<String, ?> triggerParameters, Long connectionId) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record TriggerRequest(
+        String componentName, int componentVersion, String triggerName, @NotNull Map<String, ?> triggerParameter,
+        Object state, @NotNull WebhookRequest webhookRequest, Long connectionId) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record WebhookValidateRequest(
+        @NotNull String componentName, int componentVersion, @NotNull String triggerName,
+        @NotNull Map<String, ?> triggerParameter, @NotNull WebhookRequest webhookRequest, Long connectionId) {
     }
 }

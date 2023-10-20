@@ -143,7 +143,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         String componentName, Integer componentVersion, String actionName,
         ComponentOperationRequestModel componentOperationRequestModel) {
 
-        return ResponseEntity.ok(triggerDefinitionFacade.executeSampleOutput(
+        return ResponseEntity.ok(actionDefinitionFacade.executeSampleOutput(
             componentName, componentVersion, actionName, componentOperationRequestModel.getParameters(),
             componentOperationRequestModel.getConnectionId()));
     }

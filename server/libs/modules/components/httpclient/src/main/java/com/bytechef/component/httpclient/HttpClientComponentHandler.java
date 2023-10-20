@@ -51,7 +51,7 @@ public class HttpClientComponentHandler implements ComponentHandler {
             HttpClientHeadAction.ACTION_DEFINITION);
 // Each http based connector supports custom actions, so maybe there is no need to connect to unsupported endpoints
 // via httpclient connector but instead use custom actions feature
-//        .filterCompatibleConnectionDefinitions(
+//        .filterCompatibleConnections(
 //            (componentDefinition, connectionDefinitions) -> connectionDefinitions.stream()
 //                .filter(ConnectionDefinition::containsAuthorizations)
 //                .toList())

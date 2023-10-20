@@ -18,12 +18,14 @@
 package com.bytechef.hermes.component.util;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType;
-import com.bytechef.hermes.component.util.HttpClientUtils.Body;
-import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
-import com.bytechef.hermes.component.util.HttpClientUtils.Response;
-import com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
+import com.bytechef.hermes.component.definition.Context.Http;
+import com.bytechef.hermes.component.definition.Context.Http.Body;
+import com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
+import com.bytechef.hermes.component.definition.Context.Http.Response;
+import com.bytechef.hermes.component.definition.Context.Http.ResponseType;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.InputProperty;
 import com.bytechef.hermes.definition.Property.OutputProperty;
@@ -37,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
+import static com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
 
 /**
  * @author Ivica Cardic
@@ -48,12 +50,11 @@ public class OpenApiClientUtils {
 
     public static Response execute(
         Map<String, ?> inputParameters, List<? extends InputProperty> properties,
-        @Nullable OutputProperty<?> outputSchema, Map<String, Object> metadata) {
+        @Nullable OutputProperty<?> outputSchema, Map<String, Object> metadata, Context context) {
 
-        return HttpClientUtils.exchange(
-            createUrl(inputParameters, metadata, properties),
-            MapUtils.get(metadata, "method", RequestMethod.class))
-            .configuration(HttpClientUtils.responseType(
+        return context.http(http -> http.exchange(
+            createUrl(inputParameters, metadata, properties), MapUtils.get(metadata, "method", RequestMethod.class)))
+            .configuration(Http.responseType(
                 outputSchema == null
                     ? null
                     : MapUtils.get(outputSchema.getMetadata(), "responseType", ResponseType.class)))
@@ -94,27 +95,27 @@ public class OpenApiClientUtils {
                 MapUtils.get(property.getMetadata(), TYPE, PropertyType.class), PropertyType.BODY)) {
 
                 return switch (bodyContentType) {
-                    case BINARY -> Body.of(
+                    case BINARY -> Http.Body.of(
                         MapUtils.get(inputParameters, property.getName(), FileEntry.class), mimeType);
-                    case FORM_DATA -> Body.of(
+                    case FORM_DATA -> Http.Body.of(
                         MapUtils.getMap(inputParameters, property.getName(), List.of(FileEntry.class), Map.of()),
                         bodyContentType);
-                    case FORM_URL_ENCODED -> Body.of(
+                    case FORM_URL_ENCODED -> Http.Body.of(
                         MapUtils.getMap(inputParameters, property.getName(), Map.of()), bodyContentType);
                     case JSON, XML -> {
                         if (property.getType() == Type.ARRAY) {
-                            yield Body.of(
+                            yield Http.Body.of(
                                 MapUtils.getList(inputParameters, property.getName(), Object.class, List.of()),
                                 bodyContentType);
                         } else if (property.getType() == Type.OBJECT) {
-                            yield Body.of(
+                            yield Http.Body.of(
                                 MapUtils.getMap(inputParameters, property.getName(), Map.of()), bodyContentType);
                         } else {
-                            yield Body.of(
+                            yield Http.Body.of(
                                 MapUtils.getRequiredString(inputParameters, property.getName()), bodyContentType);
                         }
                     }
-                    case RAW -> Body.of(MapUtils.getString(inputParameters, property.getName()), mimeType);
+                    case RAW -> Http.Body.of(MapUtils.getString(inputParameters, property.getName()), mimeType);
                 };
             }
         }

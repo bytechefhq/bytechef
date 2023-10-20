@@ -20,7 +20,6 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.hermes.definition.Property.InputProperty;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -96,7 +95,7 @@ public interface ConnectionDefinition {
          * @param connectionParameters
          * @return
          */
-        String apply(Map<String, ?> connectionParameters);
+        String apply(ParameterMap connectionParameters);
     }
 
     /**
@@ -109,6 +108,6 @@ public interface ConnectionDefinition {
          *
          * @param connectionParameters
          */
-        void accept(Map<String, ?> connectionParameters);
+        void accept(ParameterMap connectionParameters);
     }
 }

@@ -18,11 +18,12 @@
 package com.bytechef.component.schedule.trigger;
 
 import com.bytechef.component.schedule.util.ScheduleUtils;
-import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
-import com.bytechef.hermes.component.util.MapUtils;
+
+import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 
@@ -99,24 +100,26 @@ public class ScheduleEveryWeekTrigger {
     }
 
     protected void listenerDisable(
-        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
+        TriggerContext context) {
 
         triggerScheduler.cancelScheduleTrigger(workflowExecutionId);
     }
 
     protected void listenerEnable(
-        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId,
-        ListenerEmitter listenerEmitter) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
+        ListenerEmitter listenerEmitter, TriggerContext context) {
 
         triggerScheduler.scheduleScheduleTrigger(
             "0 %s %s ? * %s".formatted(
-                MapUtils.getInteger(inputParameters, MINUTE), MapUtils.getInteger(inputParameters, HOUR),
-                MapUtils.getInteger(inputParameters, DAY_OF_WEEK)),
-            MapUtils.getString(inputParameters, TIMEZONE), Map.of(
-                HOUR, MapUtils.getInteger(inputParameters, HOUR),
-                MINUTE, MapUtils.getInteger(inputParameters, MINUTE),
-                DAY_OF_WEEK, MapUtils.getInteger(inputParameters, DAY_OF_WEEK),
-                TIMEZONE, MapUtils.getString(inputParameters, TIMEZONE)),
+                inputParameters.getInteger(MINUTE), inputParameters.getInteger(HOUR),
+                inputParameters.getInteger(DAY_OF_WEEK)),
+            inputParameters.getString(TIMEZONE),
+            Map.of(
+                HOUR, inputParameters.getInteger(HOUR),
+                MINUTE, inputParameters.getInteger(MINUTE),
+                DAY_OF_WEEK, inputParameters.getInteger(DAY_OF_WEEK),
+                TIMEZONE, inputParameters.getString(TIMEZONE)),
             WorkflowExecutionId.parse(workflowExecutionId));
     }
 }

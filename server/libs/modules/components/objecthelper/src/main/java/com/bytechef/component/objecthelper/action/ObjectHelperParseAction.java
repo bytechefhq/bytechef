@@ -20,10 +20,7 @@ package com.bytechef.component.objecthelper.action;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.component.util.JsonUtils;
-import com.bytechef.hermes.component.util.MapUtils;
-
-import java.util.Map;
+import com.bytechef.hermes.component.definition.ParameterMap;
 
 import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.PARSE;
 import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.SOURCE;
@@ -46,14 +43,16 @@ public class ObjectHelperParseAction {
         .outputSchema(getOutputSchemaFunction())
         .perform(ObjectHelperParseAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters, Context context) {
-        Object input = MapUtils.getRequired(inputParameters, SOURCE);
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap getConnectionParameters, Context context) {
 
-        return JsonUtils.read((String) input);
+        Object input = inputParameters.getRequired(SOURCE);
+
+        return context.json(json -> json.read((String) input));
     }
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> null;
+        return (inputParameters, connection) -> null;
     }
 }

@@ -21,8 +21,7 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-
-import java.util.Map;
+import com.bytechef.hermes.component.definition.ParameterMap;
 
 import static com.bytechef.component.datamapper.constant.DataMapperConstants.FIELD_KEY;
 import static com.bytechef.component.datamapper.constant.DataMapperConstants.FIELD_VALUE;
@@ -56,14 +55,16 @@ public class DataMapperMapListToObjectAction {
         .outputSchema(getOutputSchemaFunction())
         .perform(DataMapperMapListToObjectAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters, ActionDefinition.ActionContext context) {
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionDefinition.ActionContext context) {
+
         // TODO
         return null;
     }
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> {
+        return (inputParameters, connection) -> {
             return object();
         };
     }

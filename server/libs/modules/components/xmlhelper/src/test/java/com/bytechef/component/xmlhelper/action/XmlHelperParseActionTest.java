@@ -17,11 +17,10 @@
 
 package com.bytechef.component.xmlhelper.action;
 
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.util.MapUtils;
-import com.bytechef.hermes.component.util.XmlUtils;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+
+import com.bytechef.hermes.component.definition.ParameterMap;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.util.List;
@@ -37,45 +36,40 @@ public class XmlHelperParseActionTest {
 
     @Test
     public void testPerformParse() {
-        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class);
-            MockedStatic<XmlUtils> xmlUtilsMockedStatic = Mockito.mockStatic(XmlUtils.class)) {
+        ActionContext context = Mockito.mock(ActionContext.class);
+        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
-            mapValueUtilsMockedStatic.when(() -> MapUtils.getRequiredString(
-                Mockito.anyMap(), Mockito.eq(SOURCE)))
-                .thenReturn("""
+        Mockito.when(parameterMap.getRequiredString(
+            Mockito.eq(SOURCE)))
+            .thenReturn("""
+                <Flower id="45">
+                    <name>Poppy</name>
+                </Flower>
+                """);
+        Mockito.when(context.xml(Mockito.any()))
+            .thenReturn(Map.of("id", "45", "name", "Poppy"));
+
+        assertThat((Map<String, ?>) XmlHelperParseAction.perform(parameterMap, parameterMap, context))
+            .isEqualTo(Map.of("id", "45", "name", "Poppy"));
+
+        Mockito.when(parameterMap.getRequiredString(
+            Mockito.eq(SOURCE)))
+            .thenReturn("""
+                <Flowers>
                     <Flower id="45">
                         <name>Poppy</name>
                     </Flower>
-                    """);
-            xmlUtilsMockedStatic.when(() -> XmlUtils.read(Mockito.anyString()))
-                .thenReturn(Map.of("id", "45", "name", "Poppy"));
+                    <Flower id="50">
+                        <name>Rose</name>
+                    </Flower>
+                </Flowers>
+                """);
+        Mockito.when(context.xml(Mockito.any()))
+            .thenReturn(
+                Map.of("Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose"))));
 
-            assertThat((Map<String, ?>) XmlHelperParseAction.perform(Map.of(), Mockito.mock(Context.class)))
-                .isEqualTo(Map.of("id", "45", "name", "Poppy"));
-        }
-
-        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class);
-            MockedStatic<XmlUtils> xmlUtilsMockedStatic = Mockito.mockStatic(XmlUtils.class)) {
-
-            mapValueUtilsMockedStatic.when(() -> MapUtils.getRequiredString(
-                Mockito.anyMap(), Mockito.eq(SOURCE)))
-                .thenReturn("""
-                    <Flowers>
-                        <Flower id="45">
-                            <name>Poppy</name>
-                        </Flower>
-                        <Flower id="50">
-                            <name>Rose</name>
-                        </Flower>
-                    </Flowers>
-                    """);
-            xmlUtilsMockedStatic.when(() -> XmlUtils.read(Mockito.anyString()))
-                .thenReturn(
-                    Map.of("Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose"))));
-
-            assertThat(XmlHelperParseAction.perform(Map.of(), Mockito.mock(Context.class)))
-                .isEqualTo(
-                    Map.of("Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose"))));
-        }
+        assertThat(XmlHelperParseAction.perform(parameterMap, parameterMap, context))
+            .isEqualTo(
+                Map.of("Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose"))));
     }
 }

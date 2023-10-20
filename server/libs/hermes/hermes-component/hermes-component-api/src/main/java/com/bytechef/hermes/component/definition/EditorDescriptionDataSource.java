@@ -17,9 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.definition.Context.Connection;
-
-import java.util.Map;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
 /**
  * @author Ivica Cardic
@@ -31,12 +29,12 @@ public interface EditorDescriptionDataSource {
     interface EditorDescriptionFunction {
 
         /**
-         *
-         * @param connection
          * @param inputParameters
+         * @param connectionParameters
          * @return
          */
-        String apply(Connection connection, Map<String, ?> inputParameters);
+        String apply(ParameterMap inputParameters, ParameterMap connectionParameters)
+            throws ComponentExecutionException;
 
     }
 }

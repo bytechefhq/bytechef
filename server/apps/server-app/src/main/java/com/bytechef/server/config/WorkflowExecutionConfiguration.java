@@ -35,6 +35,7 @@ import com.bytechef.atlas.execution.service.ContextServiceImpl;
 import com.bytechef.atlas.execution.service.CounterServiceImpl;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -57,7 +58,8 @@ public class WorkflowExecutionConfiguration {
     @Bean
     JobFacade jobFacade(
         ContextService contextService, EventPublisher eventPublisher, JobService jobService,
-        MessageBroker messageBroker, WorkflowFileStorageFacade workflowFileStorageFacade,
+        MessageBroker messageBroker,
+        @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade,
         WorkflowService workflowService) {
 
         return new JobFacadeImpl(

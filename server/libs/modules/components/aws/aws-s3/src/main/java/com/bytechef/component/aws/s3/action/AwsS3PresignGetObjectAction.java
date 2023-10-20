@@ -19,15 +19,14 @@ package com.bytechef.component.aws.s3.action;
 
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.util.MapUtils;
+
+import com.bytechef.hermes.component.definition.ParameterMap;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.net.URL;
 import java.time.Duration;
-import java.util.Map;
 
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.KEY;
@@ -57,21 +56,17 @@ public class AwsS3PresignGetObjectAction {
         .outputSchema(string())
         .perform(AwsS3PresignGetObjectAction::perform);
 
-    protected static String perform(Map<String, ?> inputParameters, Context context) {
-        Connection connection = context.getConnection();
-
-        Map<String, Object> connectionParameters = connection.getParameters();
-
-        try (S3Presigner s3Presigner = AwsS3Utils.buildS3Presigner(connection)) {
+    protected static String perform(ParameterMap inputParameters, ParameterMap connectionParameters, Context context) {
+        try (S3Presigner s3Presigner = AwsS3Utils.buildS3Presigner(connectionParameters)) {
             PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(
                 presignedObjectBuilder -> presignedObjectBuilder
                     .signatureDuration(
                         Duration.parse(
-                            "PT" + MapUtils.getRequiredString(connectionParameters, SIGNATURE_DURATION)))
+                            "PT" + connectionParameters.getRequiredString(SIGNATURE_DURATION)))
                     .getObjectRequest(
                         requestBuilder -> requestBuilder
-                            .bucket(MapUtils.getRequiredString(connectionParameters, BUCKET_NAME))
-                            .key(MapUtils.getRequiredString(inputParameters, KEY))));
+                            .bucket(connectionParameters.getRequiredString(BUCKET_NAME))
+                            .key(inputParameters.getRequiredString(KEY))));
 
             URL url = presignedGetObjectRequest.url();
 

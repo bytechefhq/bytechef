@@ -188,7 +188,7 @@ public final class Connection implements Persistable<Long> {
      * Return the connection parameters.
      */
     public Map<String, ?> getParameters() {
-        return Collections.unmodifiableMap(parameters.getMap());
+        return Collections.unmodifiableMap(parameters == null ? Map.of() : parameters.getMap());
     }
 
     public List<Long> getTagIds() {

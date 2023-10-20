@@ -19,13 +19,16 @@ package com.bytechef.execution.config;
 
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.registry.ComponentOperation;
-import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
+import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -34,10 +37,10 @@ import java.util.Objects;
 @Configuration
 public class WorkerHandlerConfiguration {
 
-    private final ActionDefinitionService actionDefinitionService;
+    private final ActionDefinitionFacade actionDefinitionFacade;
 
-    public WorkerHandlerConfiguration(ActionDefinitionService actionDefinitionService) {
-        this.actionDefinitionService = actionDefinitionService;
+    public WorkerHandlerConfiguration(ActionDefinitionFacade actionDefinitionService) {
+        this.actionDefinitionFacade = actionDefinitionService;
     }
 
     @Bean
@@ -45,11 +48,14 @@ public class WorkerHandlerConfiguration {
         return type -> (TaskHandler<?>) taskExecution -> {
             ComponentOperation componentOperation = ComponentOperation.ofType(type);
 
-            return actionDefinitionService.executePerform(
+            Map<String, Long> connectIdMap = MapUtils.getMap(
+                taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
+
+            return actionDefinitionFacade.executePerform(
                 componentOperation.componentName(), componentOperation.componentVersion(),
                 componentOperation.operationName(), Objects.requireNonNull(taskExecution.getId()),
                 taskExecution.getParameters(),
-                MapUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class));
+                OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
         };
     }
 }

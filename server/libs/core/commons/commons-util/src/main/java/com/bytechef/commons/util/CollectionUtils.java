@@ -90,10 +90,24 @@ public final class CollectionUtils {
             .toList();
     }
 
+    public static <T> Optional<T> findFirst(Collection<T> list) {
+        return list.stream()
+            .findFirst();
+    }
+
     public static <T> Optional<T> findFirst(Collection<T> list, Predicate<? super T> filter) {
         return list.stream()
             .filter(filter)
             .findFirst();
+    }
+
+    public static <T> T findFirstOrElse(Collection<T> list, T elseObject) {
+        Objects.requireNonNull(list, "'list' must not be null");
+
+        return OptionalUtils.orElse(
+            list.stream()
+                .findFirst(),
+            elseObject);
     }
 
     public static <T> T findFirstOrElse(Collection<T> list, Predicate<? super T> filter, T elseObject) {

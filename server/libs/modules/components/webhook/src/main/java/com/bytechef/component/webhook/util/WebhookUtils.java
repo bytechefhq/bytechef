@@ -17,12 +17,15 @@
 
 package com.bytechef.component.webhook.util;
 
-import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.TriggerDefinition.HttpHeaders;
+import com.bytechef.hermes.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestFunction;
+import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookValidateFunction;
-import com.bytechef.hermes.component.util.MapUtils;
 
 import java.util.Map;
 import java.util.Objects;
@@ -39,33 +42,36 @@ import static com.bytechef.component.webhook.constant.WebhookConstants.PARAMETER
 public class WebhookUtils {
 
     public static StaticWebhookRequestFunction getStaticWebhookRequestFunction() {
-        return context -> {
-            WebhookBody webhookBody = context.body();
+        return (
+            ParameterMap inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
+            WebhookMethod method, TriggerContext triggerContext) -> {
 
-            if (webhookBody == null) {
+            if (body == null) {
                 return WebhookOutput.map(
                     Map.of(
-                        METHOD, context.method(),
-                        HEADERS, context.headers(),
-                        PARAMETERS, context.parameters()));
+                        METHOD, method,
+                        HEADERS, headers,
+                        PARAMETERS, parameters));
             } else {
                 return WebhookOutput.map(
                     Map.of(
-                        BODY, webhookBody.content(),
-                        METHOD, context.method(),
-                        HEADERS, context.headers(),
-                        PARAMETERS, context.parameters()));
+                        BODY, body.content(),
+                        METHOD, method,
+                        HEADERS, headers,
+                        PARAMETERS, parameters));
             }
         };
     }
 
     public static WebhookValidateFunction getWebhookValidateFunction() {
-        return context -> Objects.equals(
-            getCsrfToken(context), MapUtils.getRequiredString(context.inputParameters(), CSRF_TOKEN));
+        return (
+            ParameterMap inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
+            WebhookMethod method, TriggerContext triggerContext) -> Objects.equals(
+                getCsrfToken(headers), inputParameters.getRequiredString(CSRF_TOKEN));
     }
 
-    private static String getCsrfToken(TriggerDefinition.WebhookValidateContext context) {
-        return context.headers()
+    private static String getCsrfToken(HttpHeaders headers) {
+        return headers
             .firstValue("x-csrf-token")
             .orElse(null);
     }

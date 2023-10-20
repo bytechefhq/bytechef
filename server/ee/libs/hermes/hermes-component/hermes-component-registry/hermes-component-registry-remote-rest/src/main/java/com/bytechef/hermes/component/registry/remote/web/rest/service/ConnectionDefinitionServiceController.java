@@ -17,17 +17,17 @@
 
 package com.bytechef.hermes.component.registry.remote.web.rest.service;
 
+import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
-import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,31 +44,33 @@ import java.util.Map;
 @Hidden
 @RestController
 @RequestMapping("/internal/connection-definition-service")
-@ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
 public class ConnectionDefinitionServiceController {
 
     private final ConnectionDefinitionService connectionDefinitionService;
+    private final ConnectionService connectionService;
 
-    public ConnectionDefinitionServiceController(ConnectionDefinitionService connectionDefinitionService) {
+    @SuppressFBWarnings("EI")
+    public ConnectionDefinitionServiceController(
+        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService) {
+
         this.connectionDefinitionService = connectionDefinitionService;
+        this.connectionService = connectionService;
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-authorization-apply",
+        value = "/execute-authorization-apply/{connectionId}",
         consumes = {
             "application/json"
         },
         produces = {
             "application/json"
         })
-    public ResponseEntity<ApplyResponse> executeAuthorizationApply(
-        @Valid @RequestBody ConnectionDefinitionServiceController.ConnectionRequest connection) {
+    public ResponseEntity<Authorization.ApplyResponse> executeAuthorizationApply(
+        @PathVariable Long connectionId) {
 
         return ResponseEntity.ok(
-            connectionDefinitionService.executeAuthorizationApply(
-                connection.componentName, connection.connectionVersion, connection.parameters,
-                connection.authorizationName));
+            connectionDefinitionService.executeAuthorizationApply(connectionService.getConnection(connectionId)));
     }
 
     @RequestMapping(
@@ -93,10 +95,9 @@ public class ConnectionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-base-uri")
-    public ResponseEntity<String> executeBaseUri(ConnectionRequest connection) {
-        return connectionDefinitionService.executeBaseUri(
-            connection.componentName, connection.connectionVersion, connection.parameters)
+        value = "/execute-base-uri/{connectionId}")
+    public ResponseEntity<String> executeBaseUri(@PathVariable long connectionId) {
+        return connectionDefinitionService.executeBaseUri(connectionService.getConnection(connectionId))
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.noContent()
                 .build());
@@ -114,7 +115,7 @@ public class ConnectionDefinitionServiceController {
         @PathVariable("authorizationName") String authorizationName) {
 
         return ResponseEntity.ok(
-            connectionDefinitionService.getAuthorizationType(authorizationName, componentName, connectionVersion));
+            connectionDefinitionService.getAuthorizationType(componentName, connectionVersion, authorizationName));
     }
 
     @RequestMapping(
@@ -172,12 +173,12 @@ public class ConnectionDefinitionServiceController {
     }
 
     @SuppressFBWarnings("EI")
-    public record AuthorizationCallbackRequest(ConnectionRequest connection, String redirectUri) {
+    public record AuthorizationCallbackRequest(@NotNull ConnectionRequest connection, @NotNull String redirectUri) {
     }
 
     @SuppressFBWarnings("EI")
     public record ConnectionRequest(
-        @NotNull String componentName, int connectionVersion, Map<String, Object> parameters,
-        String authorizationName) {
+        @NotNull String componentName, int connectionVersion, @NotNull Map<String, Object> parameters,
+        @NotNull String authorizationName) {
     }
 }

@@ -50,7 +50,7 @@ public class ComponentDefinitionTest {
         ActionDefinition action = ComponentDSL.action("name")
             .title("title")
             .description("description")
-            .perform((inputParameters, context) -> null);
+            .perform((inputParameters, connectionParameters, context) -> null);
 
         jsonAssertEquals(
             """
@@ -102,7 +102,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"actions":null,"category":null,"connection":null,"customAction":null,"customActionHelp":null,"description":"description","icon":"icon","tags":null,"filterCompatibleConnectionDefinitions":null,"metadata":null,"name":"name","resources":null,"version":1,"title":"title","triggers":null}
+                {"actions":null,"category":null,"connection":null,"customAction":null,"customActionHelp":null,"description":"description","icon":"icon","tags":null,"filterCompatibleConnections":null,"metadata":null,"name":"name","resources":null,"version":1,"title":"title","triggers":null}
                   """,
             componentDefinition);
     }

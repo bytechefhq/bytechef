@@ -17,11 +17,9 @@
 
 package com.bytechef.component.var.action;
 
-import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.util.MapUtils;
-
-import java.util.Map;
+import com.bytechef.hermes.component.definition.ParameterMap;
 
 import static com.bytechef.component.var.constant.VarConstants.SET;
 import static com.bytechef.component.var.constant.VarConstants.TYPE;
@@ -116,7 +114,9 @@ public class VarSetAction {
         .outputSchema(any())
         .perform(VarSetAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters, Context context) {
-        return MapUtils.getRequired(inputParameters, VALUE);
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
+        return inputParameters.getRequired(VALUE);
     }
 }

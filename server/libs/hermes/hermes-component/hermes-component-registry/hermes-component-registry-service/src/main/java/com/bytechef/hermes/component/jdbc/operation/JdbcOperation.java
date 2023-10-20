@@ -17,8 +17,6 @@
 
 package com.bytechef.hermes.component.jdbc.operation;
 
-import com.bytechef.hermes.component.definition.Context;
-
 import java.util.Map;
 
 /**
@@ -28,5 +26,5 @@ import java.util.Map;
  */
 public interface JdbcOperation<T> {
 
-    T execute(Context context, Map<String, ?> inputParameters);
+    T execute(Map<String, ?> inputParameters, Map<String, ?> connectionParameters);
 }

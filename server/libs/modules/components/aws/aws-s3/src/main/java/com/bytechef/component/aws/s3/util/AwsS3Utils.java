@@ -17,8 +17,7 @@
 
 package com.bytechef.component.aws.s3.util;
 
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.component.definition.ParameterMap;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -35,25 +34,25 @@ import static com.bytechef.component.aws.s3.constant.AwsS3Constants.SECRET_ACCES
  */
 public class AwsS3Utils {
 
-    public static S3Client buildS3Client(Context.Connection connection) {
+    public static S3Client buildS3Client(ParameterMap connectionParameters) {
         S3ClientBuilder builder = S3Client.builder()
-            .credentialsProvider(getCredentialsProvider(connection))
-            .region(Region.of(MapUtils.getRequiredString(connection.getParameters(), REGION)));
+            .credentialsProvider(getCredentialsProvider(connectionParameters))
+            .region(Region.of(connectionParameters.getRequiredString(REGION)));
 
         return builder.build();
     }
 
-    public static S3Presigner buildS3Presigner(Context.Connection connection) {
+    public static S3Presigner buildS3Presigner(ParameterMap connectionParameters) {
         S3Presigner.Builder builder = S3Presigner.builder()
-            .credentialsProvider(getCredentialsProvider(connection))
-            .region(Region.of(MapUtils.getRequiredString(connection.getParameters(), REGION)));
+            .credentialsProvider(getCredentialsProvider(connectionParameters))
+            .region(Region.of(connectionParameters.getRequiredString(REGION)));
 
         return builder.build();
     }
 
-    private static StaticCredentialsProvider getCredentialsProvider(Context.Connection connection) {
+    private static StaticCredentialsProvider getCredentialsProvider(ParameterMap connectionParameters) {
         return StaticCredentialsProvider.create(AwsBasicCredentials.create(
-            MapUtils.getRequiredString(connection.getParameters(), ACCESS_KEY_ID),
-            MapUtils.getRequiredString(connection.getParameters(), SECRET_ACCESS_KEY)));
+            connectionParameters.getRequiredString(ACCESS_KEY_ID),
+            connectionParameters.getRequiredString(SECRET_ACCESS_KEY)));
     }
 }

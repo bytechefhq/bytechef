@@ -22,7 +22,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDef
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import com.bytechef.hermes.component.util.HttpClientUtils.Response;
+import com.bytechef.hermes.component.definition.Context.Http.Response;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
 

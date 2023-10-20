@@ -837,7 +837,7 @@
   "description": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
   "icon": "path:assets/awss3.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "aws-s3",
   "resources": null,

@@ -456,7 +456,7 @@
   "description": "Reads and writes data from a JSON file.",
   "icon": "path:assets/jsonfile.svg",
   "tags": null,
-  "filterCompatibleConnectionDefinitions": null,
+  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "jsonFile",
   "resources": null,

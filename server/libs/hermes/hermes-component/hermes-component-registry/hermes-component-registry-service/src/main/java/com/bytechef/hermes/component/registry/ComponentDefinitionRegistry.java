@@ -119,20 +119,9 @@ public class ComponentDefinitionRegistry {
     }
 
     public Authorization getAuthorization(String componentName, int connectionVersion, String authorizationName) {
-        ConnectionDefinition connectionDefinition = getComponentConnectionDefinition(componentName, connectionVersion);
+        ConnectionDefinition connectionDefinition = getConnectionDefinition(componentName, connectionVersion);
 
         return connectionDefinition.getAuthorization(authorizationName);
-    }
-
-    public ConnectionDefinition getComponentConnectionDefinition(String componentName, int connectionVersion) {
-        return componentDefinitions.stream()
-            .filter(componentDefinition -> componentDefinition.getConnection()
-                .map(connectionDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
-                    connectionDefinition.getVersion() == connectionVersion)
-                .orElse(false))
-            .findFirst()
-            .flatMap(ComponentDefinition::getConnection)
-            .orElseThrow(IllegalStateException::new);
     }
 
     public ComponentDefinition getComponentDefinition(String name, Integer version) {
@@ -162,6 +151,12 @@ public class ComponentDefinitionRegistry {
 
     public List<ComponentDefinition> getComponentDefinitions() {
         return componentDefinitions;
+    }
+
+    public ConnectionDefinition getConnectionDefinition(String componentName, int connectionVersion) {
+        return CollectionUtils.getFirst(
+            connectionDefinitions,
+            connectionDefinition -> componentName.equalsIgnoreCase(connectionDefinition.getComponentName()));
     }
 
     public List<ConnectionDefinition> getConnectionDefinitions(
@@ -210,8 +205,8 @@ public class ComponentDefinitionRegistry {
     private List<ConnectionDefinition> applyFilterCompatibleConnectionDefinitions(
         ComponentDefinition componentDefinition, List<ConnectionDefinition> connectionDefinitions) {
 
-        return componentDefinition.getFilterCompatibleConnectionDefinitions()
-            .map(filterCompatibleConnectionDefinitionsFunction -> filterCompatibleConnectionDefinitionsFunction
+        return componentDefinition.getFilterCompatibleConnections()
+            .map(filterCompatibleConnectionsFunction -> filterCompatibleConnectionsFunction
                 .apply(componentDefinition, connectionDefinitions))
             .orElse(Collections.emptyList());
     }
