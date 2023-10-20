@@ -24,36 +24,35 @@ import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
- * Provides schema definition.
+ * Provides properties definition built from OpenAPI schema.
  *
  * @generated
  */
 public class PetstoreUserProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
-        List.of(
-            integer("id").label("Id")
-                .required(false)
-                .exampleValue(10),
-            string("username").label("Username")
-                .required(false)
-                .exampleValue("theUser"),
-            string("firstName").label("First Name")
-                .required(false)
-                .exampleValue("John"),
-            string("lastName").label("Last Name")
-                .required(false)
-                .exampleValue("James"),
-            string("email").label("Email")
-                .required(false)
-                .exampleValue("john@email.com"),
-            string("password").label("Password")
-                .required(false)
-                .exampleValue("12345"),
-            string("phone").label("Phone")
-                .required(false)
-                .exampleValue("12345"),
-            integer("userStatus").label("User Status")
-                .description("User Status")
-                .required(false)
-                .exampleValue(1));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        integer("id").label("Id")
+            .required(false)
+            .exampleValue(10),
+        string("username").label("Username")
+            .required(false)
+            .exampleValue("theUser"),
+        string("firstName").label("First Name")
+            .required(false)
+            .exampleValue("John"),
+        string("lastName").label("Last Name")
+            .required(false)
+            .exampleValue("James"),
+        string("email").label("Email")
+            .required(false)
+            .exampleValue("john@email.com"),
+        string("password").label("Password")
+            .required(false)
+            .exampleValue("12345"),
+        string("phone").label("Phone")
+            .required(false)
+            .exampleValue("12345"),
+        integer("userStatus").label("User Status")
+            .description("User Status")
+            .required(false)
+            .exampleValue(1));
 }

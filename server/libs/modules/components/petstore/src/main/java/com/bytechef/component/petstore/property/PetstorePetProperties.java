@@ -27,32 +27,31 @@ import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
 
 /**
- * Provides schema definition.
+ * Provides properties definition built from OpenAPI schema.
  *
  * @generated
  */
 public class PetstorePetProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
-        List.of(
-            integer("id").label("Id")
-                .required(false)
-                .exampleValue(10),
-            string("name").label("Name")
-                .required(true)
-                .exampleValue("doggie"),
-            object("category").properties(PetstoreCategoryProperties.PROPERTIES)
-                .label("Category")
-                .required(false),
-            array("photoUrls").items(string())
-                .placeholder("Add to Photo Urls")
-                .label("Photo Urls")
-                .required(true),
-            array("tags").items(object().properties(PetstoreTagProperties.PROPERTIES))
-                .placeholder("Add to Tags")
-                .label("Tags")
-                .required(false),
-            string("status").label("Status")
-                .description("pet status in the store")
-                .options(option("Available", "available"), option("Pending", "pending"), option("Sold", "sold"))
-                .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        integer("id").label("Id")
+            .required(false)
+            .exampleValue(10),
+        string("name").label("Name")
+            .required(true)
+            .exampleValue("doggie"),
+        object("category").properties(PetstoreCategoryProperties.PROPERTIES)
+            .label("Category")
+            .required(false),
+        array("photoUrls").items(string())
+            .placeholder("Add to Photo Urls")
+            .label("Photo Urls")
+            .required(true),
+        array("tags").items(object().properties(PetstoreTagProperties.PROPERTIES))
+            .placeholder("Add to Tags")
+            .label("Tags")
+            .required(false),
+        string("status").label("Status")
+            .description("pet status in the store")
+            .options(option("Available", "available"), option("Pending", "pending"), option("Sold", "sold"))
+            .required(false));
 }
