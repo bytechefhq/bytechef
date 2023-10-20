@@ -14,9 +14,9 @@ import {
     ProjectTagsApi,
     ProjectsApi,
     TagModel,
-} from 'middleware/project';
+} from 'middleware/automation/project';
 
-import {WorkflowModel} from '../middleware/workflow';
+import {WorkflowModel} from '../middleware/core/workflow';
 
 export const ProjectKeys = {
     project: (id: number) => ['project', id],

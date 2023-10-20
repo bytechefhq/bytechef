@@ -1,5 +1,5 @@
 import Button from 'components/Button/Button';
-import {ProjectExecutionModel} from 'middleware/project';
+import {ProjectExecutionModel} from 'middleware/automation/project';
 
 const ReadOnlyWorkflow = ({execution}: {execution: ProjectExecutionModel}) => {
     const {instance, project, workflow} = execution;

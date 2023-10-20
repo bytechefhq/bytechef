@@ -12,7 +12,7 @@ import {
     CategoryModel,
     ProjectModel,
     TagModel,
-} from '../../../middleware/project';
+} from '../../../middleware/automation/project';
 import {
     useCreateProjectMutation,
     useUpdateProjectMutation,

@@ -11,7 +11,7 @@ import {
     OneOfPropertyModel,
     StringPropertyModel,
     TimePropertyModel,
-} from 'middleware/definition-registry';
+} from 'middleware/core/definition-registry';
 
 export type PropertyType = ArrayPropertyModel &
     BooleanPropertyModel &

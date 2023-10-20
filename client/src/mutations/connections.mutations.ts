@@ -4,7 +4,7 @@ import {
     ConnectionModel,
     ConnectionsApi,
     UpdateConnectionTagsRequest,
-} from '../middleware/connection';
+} from '../middleware/automation/connection';
 
 type CreateConnectionMutationProps = {
     onSuccess?: (result: ConnectionModel, variables: ConnectionModel) => void;

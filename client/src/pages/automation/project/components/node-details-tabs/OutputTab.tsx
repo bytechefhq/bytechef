@@ -1,6 +1,6 @@
 /// <reference types="vite-plugin-svgr/client" />
 
-import {PropertyModel} from 'middleware/definition-registry';
+import {PropertyModel} from 'middleware/core/definition-registry';
 
 import {ReactComponent as ArrayIcon} from '../../../../../assets/array.svg';
 import {ReactComponent as BooleanIcon} from '../../../../../assets/boolean.svg';

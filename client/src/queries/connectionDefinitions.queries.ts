@@ -4,7 +4,7 @@ import {
     ConnectionDefinitionModel,
     ConnectionDefinitionsApi,
     GetComponentConnectionDefinitionRequest,
-} from '../middleware/definition-registry';
+} from '../middleware/core/definition-registry';
 
 export const ConnectDefinitionKeys = {
     connectionDefinition: ['connectionDefinition'] as const,

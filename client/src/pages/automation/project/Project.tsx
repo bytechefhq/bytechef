@@ -15,8 +15,8 @@ import ToggleGroup, {
 } from '../../../components/ToggleGroup/ToggleGroup';
 import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
 import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
-import {ProjectModel} from '../../../middleware/project';
-import {WorkflowModel} from '../../../middleware/workflow';
+import {ProjectModel} from '../../../middleware/automation/project';
+import {WorkflowModel} from '../../../middleware/core/workflow';
 import {useCreateProjectWorkflowRequestMutation} from '../../../mutations/projects.mutations';
 import {useGetComponentDefinitionsQuery} from '../../../queries/componentDefinitions.queries';
 import {

@@ -1,6 +1,6 @@
 import Input from 'components/Input/Input';
 import TextArea from 'components/TextArea/TextArea';
-import {ComponentDefinitionModel} from 'middleware/definition-registry';
+import {ComponentDefinitionModel} from 'middleware/core/definition-registry';
 
 const DescriptionTab = ({component}: {component: ComponentDefinitionModel}) => (
     <>
