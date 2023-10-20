@@ -4,6 +4,7 @@
     "componentName": "email",
     "componentDescription": "The Email connector sends emails using an SMTP email server.",
     "componentTitle": "Email",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Send an email to any address.",
     "help": null,

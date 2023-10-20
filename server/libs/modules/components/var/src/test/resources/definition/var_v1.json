@@ -4,6 +4,7 @@
     "componentName": "var",
     "componentDescription": "Sets a value which can then be referenced in other tasks.",
     "componentTitle": "Var",
+    "componentVersion": 1,
     "deprecated": null,
     "description": "Assign value to a variable that can be used in the following steps.",
     "sampleOutput": null,

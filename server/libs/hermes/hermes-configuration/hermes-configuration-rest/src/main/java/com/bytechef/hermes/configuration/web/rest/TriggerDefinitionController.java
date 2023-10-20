@@ -19,10 +19,9 @@ package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionModel;
 import com.bytechef.hermes.component.registry.ComponentOperation;
-import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionModel;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,25 +35,24 @@ import java.util.List;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
 @ConditionalOnEnabled("coordinator")
-public class ActionDefinitionController implements ActionDefinitionsApi {
+public class TriggerDefinitionController implements TriggerDefinitionsApi {
 
-    private final ActionDefinitionService actionDefinitionService;
     private final ConversionService conversionService;
+    private final TriggerDefinitionService triggerDefinitionService;
 
-    @SuppressFBWarnings("EI")
-    public ActionDefinitionController(
-        ActionDefinitionService actionDefinitionService, ConversionService conversionService) {
+    public TriggerDefinitionController(
+        ConversionService conversionService, TriggerDefinitionService triggerDefinitionService) {
 
-        this.actionDefinitionService = actionDefinitionService;
         this.conversionService = conversionService;
+        this.triggerDefinitionService = triggerDefinitionService;
     }
 
     @Override
-    public ResponseEntity<List<ActionDefinitionModel>> getActionDefinitions(List<String> taskTypes) {
+    public ResponseEntity<List<TriggerDefinitionModel>> getTriggerDefinitions(List<String> triggerTypes) {
         return ResponseEntity.ok(
             CollectionUtils.map(
-                actionDefinitionService.getActionDefinitions(
-                    taskTypes == null ? List.of() : CollectionUtils.map(taskTypes, ComponentOperation::ofType)),
-                actionDefinition -> conversionService.convert(actionDefinition, ActionDefinitionModel.class)));
+                triggerDefinitionService.getTriggerDefinitions(
+                    triggerTypes == null ? List.of() : CollectionUtils.map(triggerTypes, ComponentOperation::ofType)),
+                triggerDefinition -> conversionService.convert(triggerDefinition, TriggerDefinitionModel.class)));
     }
 }

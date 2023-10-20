@@ -98,11 +98,19 @@ public class ComponentDefinitionRegistry {
                     "The component '%s' does not contain the '%s' action.".formatted(componentName, actionName)));
     }
 
+    public List<ActionDefinition> getActionDefinitions() {
+        return componentDefinitions.stream()
+            .flatMap(componentDefinition -> CollectionUtils.stream(
+                OptionalUtils.orElse(componentDefinition.getActions(), List.of())))
+            .distinct()
+            .map(actionDefinition -> (ActionDefinition) actionDefinition)
+            .toList();
+    }
+
     public List<? extends ActionDefinition> getActionDefinitions(String componentName, int componentVersion) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
-        return componentDefinition.getActions()
-            .orElse(Collections.emptyList());
+        return OptionalUtils.orElse(componentDefinition.getActions(), Collections.emptyList());
     }
 
     public Property getActionProperty(
@@ -110,12 +118,9 @@ public class ComponentDefinitionRegistry {
 
         ActionDefinition actionDefinition = getActionDefinition(componentName, componentVersion, actionName);
 
-        return actionDefinition.getProperties()
-            .orElseThrow(IllegalStateException::new)
-            .stream()
-            .filter(property -> Objects.equals(propertyName, property.getName()))
-            .findFirst()
-            .orElseThrow(IllegalStateException::new);
+        return CollectionUtils.getFirst(
+            OptionalUtils.get(actionDefinition.getProperties()),
+            property -> Objects.equals(propertyName, property.getName()));
     }
 
     public Authorization getAuthorization(String componentName, int connectionVersion, String authorizationName) {
@@ -181,6 +186,15 @@ public class ComponentDefinitionRegistry {
                 () -> new IllegalArgumentException(
                     "The component '%s' does not contain the '%s' trigger.".formatted(
                         componentName, triggerName)));
+    }
+
+    public List<TriggerDefinition> getTriggerDefinitions() {
+        return componentDefinitions.stream()
+            .flatMap(componentDefinition -> CollectionUtils.stream(
+                OptionalUtils.orElse(componentDefinition.getTriggers(), List.of())))
+            .distinct()
+            .map(triggerDefinition -> (TriggerDefinition) triggerDefinition)
+            .toList();
     }
 
     public List<? extends TriggerDefinition> getTriggerDefinitions(String componentName, int componentVersion) {

@@ -32,6 +32,8 @@ import java.util.Optional;
 public class ActionDefinitionBasic {
 
     protected boolean batch;
+    protected String componentName;
+    protected int componentVersion;
     protected String description;
     protected Help help;
     protected String name;
@@ -42,14 +44,20 @@ public class ActionDefinitionBasic {
 
     public ActionDefinitionBasic(ActionDefinition actionDefinition) {
         this.batch = OptionalUtils.orElse(actionDefinition.getBatch(), false);
+        this.componentName = actionDefinition.getComponentName();
+        this.componentVersion = actionDefinition.getComponentVersion();
         this.description = Objects.requireNonNull(getDescription(actionDefinition));
         this.help = OptionalUtils.mapOrElse(actionDefinition.getHelp(), Help::new, null);
         this.name = Objects.requireNonNull(actionDefinition.getName());
         this.title = Objects.requireNonNull(getTitle(actionDefinition));
     }
 
-    public boolean isBatch() {
-        return batch;
+    public String getComponentName() {
+        return componentName;
+    }
+
+    public int getComponentVersion() {
+        return componentVersion;
     }
 
     public String getDescription() {
@@ -94,6 +102,10 @@ public class ActionDefinitionBasic {
     @Override
     public int hashCode() {
         return Objects.hash(batch, description, help, name, title);
+    }
+
+    public boolean isBatch() {
+        return batch;
     }
 
     @Override

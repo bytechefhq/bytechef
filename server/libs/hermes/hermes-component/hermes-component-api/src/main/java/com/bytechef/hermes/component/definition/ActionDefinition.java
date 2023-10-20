@@ -46,11 +46,29 @@ public interface ActionDefinition {
      */
     Optional<Boolean> getDeprecated();
 
+    /**
+     *
+     * @return
+     */
     Optional<String> getComponentDescription();
 
+    /**
+     *
+     * @return
+     */
     String getComponentName();
 
+    /**
+     *
+     * @return
+     */
     Optional<String> getComponentTitle();
+
+    /**
+     *
+     * @return
+     */
+    int getComponentVersion();
 
     /**
      *
