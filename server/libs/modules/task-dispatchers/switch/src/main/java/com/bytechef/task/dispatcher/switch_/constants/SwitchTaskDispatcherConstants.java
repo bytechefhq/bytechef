@@ -22,4 +22,8 @@ package com.bytechef.task.dispatcher.switch_.constants;
 public class SwitchTaskDispatcherConstants {
     public static final String SWITCH = "switch";
     public static final String EXPRESSION = "expression";
+    public static final String TASKS = "tasks";
+    public static final String CASES = "cases";
+    public static final String KEY = "key";
+    public static final String DEFAULT = "default";
 }

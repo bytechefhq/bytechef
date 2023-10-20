@@ -19,6 +19,7 @@
 package com.bytechef.task.dispatcher.switch_;
 
 import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.EXPRESSION;
 import static com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants.SWITCH;
 
 import com.bytechef.atlas.domain.Context;
@@ -34,6 +35,7 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.collection.MapUtils;
+import com.bytechef.task.dispatcher.switch_.constants.SwitchTaskDispatcherConstants;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -78,13 +80,14 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
         Map<String, Object> selectedCase = resolveCase(taskExecution);
 
-        if (selectedCase.containsKey("tasks")) {
-            List<WorkflowTask> subWorkflowTasks =
-                    MapUtils.getList(selectedCase, "tasks", Map.class, Collections.emptyList()).stream()
-                            .map(WorkflowTask::new)
-                            .toList();
+        if (selectedCase.containsKey(SwitchTaskDispatcherConstants.TASKS)) {
+            List<WorkflowTask> subWorkflowTasks = MapUtils.getList(
+                            selectedCase, SwitchTaskDispatcherConstants.TASKS, Map.class, Collections.emptyList())
+                    .stream()
+                    .map(WorkflowTask::new)
+                    .toList();
 
-            if (subWorkflowTasks.size() > 0) {
+            if (!subWorkflowTasks.isEmpty()) {
                 WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
                 TaskExecution subTaskExecution = TaskExecution.of(
@@ -118,6 +121,7 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
             completionTaskExecution.setStartTime(LocalDateTime.now());
             completionTaskExecution.setEndTime(LocalDateTime.now());
             completionTaskExecution.setExecutionTime(0);
+            // TODO check, it seems wrong
             completionTaskExecution.setOutput(selectedCase.get("value"));
 
             messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
@@ -134,19 +138,19 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
     }
 
     private Map<String, Object> resolveCase(TaskExecution taskExecution) {
-        Object expression = taskExecution.getRequired("expression");
-        List<Map<String, Object>> cases = (List) taskExecution.getList("cases", Map.class);
+        Object expression = taskExecution.getRequired(EXPRESSION);
+        List<Map<String, Object>> cases = (List) taskExecution.getList(SwitchTaskDispatcherConstants.CASES, Map.class);
 
         Assert.notNull(cases, "you must specify 'cases' in a switch statement");
 
         for (Map<String, Object> oneCase : cases) {
-            Object key = MapUtils.getRequired(oneCase, "key");
+            Object key = MapUtils.getRequired(oneCase, SwitchTaskDispatcherConstants.KEY);
 
             if (key.equals(expression)) {
                 return oneCase;
             }
         }
 
-        return taskExecution.getMap("default", Collections.emptyMap());
+        return taskExecution.getMap(SwitchTaskDispatcherConstants.DEFAULT, Collections.emptyMap());
     }
 }

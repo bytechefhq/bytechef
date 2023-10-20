@@ -20,9 +20,9 @@ tasks:
             type: var
             value: bye
     default:
-          -  name: output
-             type: var
-             value: other
+      -  name: output
+         type: var
+         value: other
 
   - type: time/sleep
     millis: ${selector*1000}

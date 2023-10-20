@@ -29,6 +29,7 @@ import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
 import java.util.Arrays;
@@ -56,13 +57,13 @@ public class SwitchTaskDispatcherTest {
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
-        TaskExecution taskExecution = new TaskExecution(Map.of(
-                "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))), "expression", "k1"));
+        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
+                "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))), "expression", "k1")));
 
         taskExecution.setId("id");
         taskExecution.setJobId("jobId");
 
-        when(taskExecutionService.add(any())).thenReturn(new TaskExecution(Map.of("type", "print")));
+        when(taskExecutionService.add(any())).thenReturn(TaskExecution.of(new WorkflowTask(Map.of("type", "print"))));
 
         switchTaskDispatcher.dispatch(taskExecution);
 
@@ -78,8 +79,8 @@ public class SwitchTaskDispatcherTest {
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
-        TaskExecution taskExecution = new TaskExecution(Map.of(
-                "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))), "expression", "k2"));
+        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
+                "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))), "expression", "k2")));
 
         switchTaskDispatcher.dispatch(taskExecution);
 
@@ -92,18 +93,18 @@ public class SwitchTaskDispatcherTest {
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
-        TaskExecution taskExecution = new TaskExecution(Map.of(
+        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
                 "cases",
                 Arrays.asList(
                         Map.of("key", "k1", "tasks", List.of(Map.of("type", "print"))),
                         Map.of("key", "k2", "tasks", List.of(Map.of("type", "sleep")))),
                 "expression",
-                "k2"));
+                "k2")));
 
         taskExecution.setId("id");
         taskExecution.setJobId("jobId");
 
-        when(taskExecutionService.add(any())).thenReturn(new TaskExecution(Map.of("type", "sleep")));
+        when(taskExecutionService.add(any())).thenReturn(TaskExecution.of(new WorkflowTask(Map.of("type", "sleep"))));
 
         switchTaskDispatcher.dispatch(taskExecution);
 
@@ -119,7 +120,7 @@ public class SwitchTaskDispatcherTest {
 
         SwitchTaskDispatcher switchTaskDispatcher = new SwitchTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskExecutionService, SpelTaskEvaluator.create());
-        TaskExecution taskExecution = new TaskExecution(Map.of(
+        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
                 "cases",
                 Arrays.asList(
                         Map.of("key", "k1", "tasks", List.of(Map.of("type", "print"))),
@@ -127,7 +128,7 @@ public class SwitchTaskDispatcherTest {
                 "default",
                 Collections.singletonMap("value", "1234"),
                 "expression",
-                "k99"));
+                "k99")));
 
         switchTaskDispatcher.dispatch(taskExecution);
 
