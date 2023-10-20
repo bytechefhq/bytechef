@@ -90,7 +90,7 @@ export class TriggerDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get a trigger definition of a component.
-     * Get a trigger definition of a component.
+     * Get a trigger definition of a component
      */
     async getComponentTriggerDefinitionRaw(requestParameters: GetComponentTriggerDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TriggerDefinitionModel>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -121,7 +121,7 @@ export class TriggerDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get a trigger definition of a component.
-     * Get a trigger definition of a component.
+     * Get a trigger definition of a component
      */
     async getComponentTriggerDefinition(requestParameters: GetComponentTriggerDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TriggerDefinitionModel> {
         const response = await this.getComponentTriggerDefinitionRaw(requestParameters, initOverrides);
@@ -130,7 +130,7 @@ export class TriggerDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get a list of trigger definitionss for a component.
-     * Get a list of trigger definitionss for a component.
+     * Get a list of trigger definitionss for a component
      */
     async getComponentTriggerDefinitionsRaw(requestParameters: GetComponentTriggerDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TriggerDefinitionBasicModel>>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -157,7 +157,7 @@ export class TriggerDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get a list of trigger definitionss for a component.
-     * Get a list of trigger definitionss for a component.
+     * Get a list of trigger definitionss for a component
      */
     async getComponentTriggerDefinitions(requestParameters: GetComponentTriggerDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TriggerDefinitionBasicModel>> {
         const response = await this.getComponentTriggerDefinitionsRaw(requestParameters, initOverrides);
@@ -166,7 +166,7 @@ export class TriggerDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get an trigger description shown in the editor.
-     * Get an trigger description shown in the editor.
+     * Get an trigger description shown in the editor
      */
     async getComponentTriggerEditorDescriptionRaw(requestParameters: GetComponentTriggerEditorDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -204,7 +204,7 @@ export class TriggerDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get an trigger description shown in the editor.
-     * Get an trigger description shown in the editor.
+     * Get an trigger description shown in the editor
      */
     async getComponentTriggerEditorDescription(requestParameters: GetComponentTriggerEditorDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
         const response = await this.getComponentTriggerEditorDescriptionRaw(requestParameters, initOverrides);
@@ -213,7 +213,7 @@ export class TriggerDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get a trigger output schema shown in the editor.
-     * Get a trigger output schema shown in the editor.
+     * Get a trigger output schema shown in the editor
      */
     async getComponentTriggerOutputSchemaRaw(requestParameters: GetComponentTriggerOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PropertyModel>>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -247,7 +247,7 @@ export class TriggerDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get a trigger output schema shown in the editor.
-     * Get a trigger output schema shown in the editor.
+     * Get a trigger output schema shown in the editor
      */
     async getComponentTriggerOutputSchema(requestParameters: GetComponentTriggerOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PropertyModel>> {
         const response = await this.getComponentTriggerOutputSchemaRaw(requestParameters, initOverrides);
@@ -256,7 +256,7 @@ export class TriggerDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get dynamic properties for a trigger property shown in the editor.
-     * Get dynamic properties for a trigger property shown in the editor.
+     * Get dynamic properties for a trigger property shown in the editor
      */
     async getComponentTriggerPropertyDynamicPropertiesRaw(requestParameters: GetComponentTriggerPropertyDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PropertyModel>>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -294,7 +294,7 @@ export class TriggerDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get dynamic properties for a trigger property shown in the editor.
-     * Get dynamic properties for a trigger property shown in the editor.
+     * Get dynamic properties for a trigger property shown in the editor
      */
     async getComponentTriggerPropertyDynamicProperties(requestParameters: GetComponentTriggerPropertyDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PropertyModel>> {
         const response = await this.getComponentTriggerPropertyDynamicPropertiesRaw(requestParameters, initOverrides);
@@ -302,8 +302,8 @@ export class TriggerDefinitionsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an trigger description shown in the editor.
-     * Get an trigger description shown in the editor.
+     * Get a trigger property options shown in the editor.
+     * Get a trigger property options shown in the editor
      */
     async getComponentTriggerPropertyOptionsRaw(requestParameters: GetComponentTriggerPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<OptionModel>>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -344,8 +344,8 @@ export class TriggerDefinitionsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get an trigger description shown in the editor.
-     * Get an trigger description shown in the editor.
+     * Get a trigger property options shown in the editor.
+     * Get a trigger property options shown in the editor
      */
     async getComponentTriggerPropertyOptions(requestParameters: GetComponentTriggerPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<OptionModel>> {
         const response = await this.getComponentTriggerPropertyOptionsRaw(requestParameters, initOverrides);
@@ -354,7 +354,7 @@ export class TriggerDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get a trigger sample output shown in the editor.
-     * Get a trigger sample output shown in the editor.
+     * Get a trigger sample output shown in the editor
      */
     async getComponentTriggerSampleOutputRaw(requestParameters: GetComponentTriggerSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -388,7 +388,7 @@ export class TriggerDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get a trigger sample output shown in the editor.
-     * Get a trigger sample output shown in the editor.
+     * Get a trigger sample output shown in the editor
      */
     async getComponentTriggerSampleOutput(requestParameters: GetComponentTriggerSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.getComponentTriggerSampleOutputRaw(requestParameters, initOverrides);

@@ -1,6 +1,10 @@
+apis/ProjectCategoriesApi.ts
+apis/ProjectInstanceJobsApi.ts
+apis/ProjectInstanceTagsApi.ts
 apis/ProjectInstancesApi.ts
+apis/ProjectTagsApi.ts
+apis/ProjectWorkflowsApi.ts
 apis/ProjectsApi.ts
-apis/WorkflowsApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts

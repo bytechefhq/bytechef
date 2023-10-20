@@ -1,5 +1,7 @@
+apis/IntegrationCategoriesApi.ts
+apis/IntegrationTagsApi.ts
+apis/IntegrationWorkflowsApi.ts
 apis/IntegrationsApi.ts
-apis/WorkflowsApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts

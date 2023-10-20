@@ -25,7 +25,7 @@ import {
 /**
  * 
  */
-export class ConnectionOauth2PropertiesApi extends runtime.BaseAPI {
+export class ConnectionOauth2Api extends runtime.BaseAPI {
 
     /**
      * Get OAuth2 properties.

@@ -1,3 +1,3 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './ConnectionOauth2PropertiesApi';
+export * from './ConnectionOauth2Api';

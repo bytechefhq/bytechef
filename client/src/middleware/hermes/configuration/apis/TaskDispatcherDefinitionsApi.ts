@@ -41,7 +41,7 @@ export class TaskDispatcherDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get a task dispatcher definition.
-     * Get a task dispatcher definition.
+     * Get a task dispatcher definition
      */
     async getTaskDispatcherDefinitionRaw(requestParameters: GetTaskDispatcherDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TaskDispatcherDefinitionModel>> {
         if (requestParameters.taskDispatcherName === null || requestParameters.taskDispatcherName === undefined) {
@@ -68,7 +68,7 @@ export class TaskDispatcherDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get a task dispatcher definition.
-     * Get a task dispatcher definition.
+     * Get a task dispatcher definition
      */
     async getTaskDispatcherDefinition(requestParameters: GetTaskDispatcherDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TaskDispatcherDefinitionModel> {
         const response = await this.getTaskDispatcherDefinitionRaw(requestParameters, initOverrides);
@@ -77,7 +77,7 @@ export class TaskDispatcherDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get all task dispatcher definition versions of a task dispatcher.
-     * Get all task dispatcher definition versions of a task dispatcher.
+     * Get all task dispatcher definition versions of a task dispatcher
      */
     async getTaskDispatcherDefinitionVersionsRaw(requestParameters: GetTaskDispatcherDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TaskDispatcherDefinitionBasicModel>>> {
         if (requestParameters.taskDispatcherName === null || requestParameters.taskDispatcherName === undefined) {
@@ -100,7 +100,7 @@ export class TaskDispatcherDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get all task dispatcher definition versions of a task dispatcher.
-     * Get all task dispatcher definition versions of a task dispatcher.
+     * Get all task dispatcher definition versions of a task dispatcher
      */
     async getTaskDispatcherDefinitionVersions(requestParameters: GetTaskDispatcherDefinitionVersionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskDispatcherDefinitionBasicModel>> {
         const response = await this.getTaskDispatcherDefinitionVersionsRaw(requestParameters, initOverrides);
@@ -109,7 +109,7 @@ export class TaskDispatcherDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get all task dispatcher definitions.
-     * Get all task dispatcher definitions.
+     * Get all task dispatcher definitions
      */
     async getTaskDispatcherDefinitionsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TaskDispatcherDefinitionModel>>> {
         const queryParameters: any = {};
@@ -128,7 +128,7 @@ export class TaskDispatcherDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get all task dispatcher definitions.
-     * Get all task dispatcher definitions.
+     * Get all task dispatcher definitions
      */
     async getTaskDispatcherDefinitions(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskDispatcherDefinitionModel>> {
         const response = await this.getTaskDispatcherDefinitionsRaw(initOverrides);

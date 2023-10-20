@@ -16,16 +16,10 @@
 import * as runtime from '../runtime';
 import type {
   ConnectionModel,
-  TagModel,
-  UpdateTagsRequestModel,
 } from '../models';
 import {
     ConnectionModelFromJSON,
     ConnectionModelToJSON,
-    TagModelFromJSON,
-    TagModelToJSON,
-    UpdateTagsRequestModelFromJSON,
-    UpdateTagsRequestModelToJSON,
 } from '../models';
 
 export interface CreateConnectionRequest {
@@ -49,11 +43,6 @@ export interface GetConnectionsRequest {
 export interface UpdateConnectionRequest {
     id: number;
     connectionModel: ConnectionModel;
-}
-
-export interface UpdateConnectionTagsRequest {
-    id: number;
-    updateTagsRequestModel: UpdateTagsRequestModel;
 }
 
 /**
@@ -160,34 +149,6 @@ export class ConnectionsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get connection tags.
-     * Get connection tags
-     */
-    async getConnectionTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagModel>>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/connections/tags`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagModelFromJSON));
-    }
-
-    /**
-     * Get connection tags.
-     * Get connection tags
-     */
-    async getConnectionTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagModel>> {
-        const response = await this.getConnectionTagsRaw(initOverrides);
-        return await response.value();
-    }
-
-    /**
      * Get all connections.
      * Get all connections
      */
@@ -264,44 +225,6 @@ export class ConnectionsApi extends runtime.BaseAPI {
     async updateConnection(requestParameters: UpdateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectionModel> {
         const response = await this.updateConnectionRaw(requestParameters, initOverrides);
         return await response.value();
-    }
-
-    /**
-     * Updates tags of an existing connection.
-     * Updates tags of an existing connection
-     */
-    async updateConnectionTagsRaw(requestParameters: UpdateConnectionTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateConnectionTags.');
-        }
-
-        if (requestParameters.updateTagsRequestModel === null || requestParameters.updateTagsRequestModel === undefined) {
-            throw new runtime.RequiredError('updateTagsRequestModel','Required parameter requestParameters.updateTagsRequestModel was null or undefined when calling updateConnectionTags.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/connections/{id}/tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-            body: UpdateTagsRequestModelToJSON(requestParameters.updateTagsRequestModel),
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     * Updates tags of an existing connection.
-     * Updates tags of an existing connection
-     */
-    async updateConnectionTags(requestParameters: UpdateConnectionTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.updateConnectionTagsRaw(requestParameters, initOverrides);
     }
 
 }
