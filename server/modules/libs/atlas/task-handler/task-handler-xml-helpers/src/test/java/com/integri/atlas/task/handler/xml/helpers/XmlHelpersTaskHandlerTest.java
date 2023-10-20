@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.xml.converter;
+package com.integri.atlas.task.handler.xml.helpers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
-import com.integri.atlas.task.handler.xml.helper.XMLHelper;
+import com.integri.atlas.task.handler.xml.helper.XmlHelper;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -29,14 +29,11 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class XMLConverterTaskHandlerTest {
+public class XmlHelpersTaskHandlerTest {
 
     private static final JSONHelper jsonHelper = new JSONHelper(new ObjectMapper());
-    private static final XMLHelper xmlHelper = new XMLHelper();
-    private static final XMLConverterTaskHandler xmlConverterTaskHandler = new XMLConverterTaskHandler(
-        jsonHelper,
-        xmlHelper
-    );
+    private static final XmlHelper xmlHelper = new XmlHelper();
+    private static final XmlHelpersTaskHandler xmlHelpersTaskHandler = new XmlHelpersTaskHandler(jsonHelper, xmlHelper);
 
     @Test
     public void testJSONToObject() {
@@ -50,9 +47,9 @@ public class XMLConverterTaskHandlerTest {
             """;
 
         taskExecution.put("input", input);
-        taskExecution.put("operation", "FROM_XML");
+        taskExecution.put("operation", "XML_TO_JSON");
 
-        assertThat(xmlConverterTaskHandler.handle(taskExecution)).isEqualTo(Map.of("id", "45", "name", "Poppy"));
+        assertThat(xmlHelpersTaskHandler.handle(taskExecution)).isEqualTo(Map.of("id", "45", "name", "Poppy"));
 
         input =
             """
@@ -67,9 +64,9 @@ public class XMLConverterTaskHandlerTest {
             """;
 
         taskExecution.put("input", input);
-        taskExecution.put("operation", "FROM_XML");
+        taskExecution.put("operation", "XML_TO_JSON");
 
-        assertThat(xmlConverterTaskHandler.handle(taskExecution))
+        assertThat(xmlHelpersTaskHandler.handle(taskExecution))
             .isEqualTo(
                 Map.of("Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose")))
             );
@@ -82,8 +79,8 @@ public class XMLConverterTaskHandlerTest {
         Map<String, ?> input = Map.of("id", 45, "name", "Poppy");
 
         taskExecution.put("input", input);
-        taskExecution.put("operation", "TO_XML");
+        taskExecution.put("operation", "JSON_TO_XML");
 
-        assertThat(xmlConverterTaskHandler.handle(taskExecution)).isEqualTo(xmlHelper.write(input));
+        assertThat(xmlHelpersTaskHandler.handle(taskExecution)).isEqualTo(xmlHelper.write(input));
     }
 }

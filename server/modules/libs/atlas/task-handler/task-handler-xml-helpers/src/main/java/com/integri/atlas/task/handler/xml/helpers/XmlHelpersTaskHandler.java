@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.xml.converter;
+package com.integri.atlas.task.handler.xml.helpers;
 
-import static com.integri.atlas.task.handler.xml.converter.XMLConverterTaskConstants.*;
+import static com.integri.atlas.task.handler.xml.helpers.XmlHelpersTaskConstants.*;
 
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
-import com.integri.atlas.task.handler.xml.converter.XMLConverterTaskConstants.Operation;
-import com.integri.atlas.task.handler.xml.helper.XMLHelper;
+import com.integri.atlas.task.handler.xml.helper.XmlHelper;
+import com.integri.atlas.task.handler.xml.helpers.XmlHelpersTaskConstants.Operation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component(TASK_XML_CONVERTER)
-public class XMLConverterTaskHandler implements TaskHandler<Object> {
+@Component(TASK_XML_HELPERS)
+public class XmlHelpersTaskHandler implements TaskHandler<Object> {
 
     private final JSONHelper jsonHelper;
-    private final XMLHelper xmlHelper;
+    private final XmlHelper xmlHelper;
 
-    public XMLConverterTaskHandler(JSONHelper jsonHelper, XMLHelper xmlHelper) {
+    public XmlHelpersTaskHandler(JSONHelper jsonHelper, XmlHelper xmlHelper) {
         this.jsonHelper = jsonHelper;
         this.xmlHelper = xmlHelper;
     }
@@ -44,12 +44,12 @@ public class XMLConverterTaskHandler implements TaskHandler<Object> {
     public Object handle(TaskExecution taskExecution) {
         Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired(PROPERTY_OPERATION)));
 
-        if (operation == Operation.FROM_XML) {
-            String input = taskExecution.getRequiredString(PROPERTY_INPUT);
+        if (operation == Operation.XML_TO_JSON) {
+            String input = taskExecution.getRequiredString(PROPERTY_SOURCE);
 
             return xmlHelper.read(input);
         } else {
-            Object input = jsonHelper.check(taskExecution.getRequired(PROPERTY_INPUT));
+            Object input = jsonHelper.check(taskExecution.getRequired(PROPERTY_SOURCE));
 
             return xmlHelper.write(input);
         }
