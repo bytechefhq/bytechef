@@ -4,7 +4,7 @@ import EmptyList from 'components/EmptyList/EmptyList';
 import Select from 'components/Select/Select';
 import {ComponentDefinitionModel} from 'middleware/core/definition-registry';
 import ConnectionDialog from 'pages/automation/connections/components/ConnectionDialog';
-import {useGetConnectionsQuery} from 'queries/connections.queries';
+import {useGetComponentConnectionsQuery} from 'queries/connections.queries';
 import {useState} from 'react';
 
 import {useConnectionNoteStore} from '../../stores/useNodeDetailsDialogStore';
@@ -13,9 +13,10 @@ const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
     const [showEditConnectionDialog, setShowEditConnectionDialog] =
         useState(false);
 
-    const {data: connections} = useGetConnectionsQuery(
+    const {data: connections} = useGetComponentConnectionsQuery(
         {
-            componentNames: [component.connection!.componentName!],
+            componentName: component.name!,
+            componentVersion: component.version!,
         },
         !!component.connection?.componentName
     );
@@ -34,11 +35,13 @@ const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
                             label: connection.name,
                             value: connection.id!.toString(),
                         }))}
+                        placeholder="Choose Connection..."
                         triggerClassName="w-full bg-gray-100"
                     />
 
                     <Button
-                        className="mt-auto bg-blue-500 p-2"
+                        displayType={'secondary'}
+                        className="mt-auto p-2"
                         icon={<PlusIcon className="h-5 w-5" />}
                         onClick={() => setShowEditConnectionDialog(true)}
                         title="Create a new connection"

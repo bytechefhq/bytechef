@@ -41,6 +41,7 @@ type SelectProps = {
     label?: string;
     leadingIcon?: ReactNode;
     onValueChange?(value: string): void;
+    placeholder?: string;
     triggerClassName?: string;
     value?: string;
 };
@@ -54,6 +55,7 @@ const Select = ({
     leadingIcon,
     onValueChange,
     options,
+    placeholder,
     triggerClassName,
     value,
 }: SelectProps): JSX.Element => (
@@ -76,7 +78,7 @@ const Select = ({
         )}
 
         <Root
-            defaultValue={defaultValue || options[0]?.value}
+            defaultValue={defaultValue}
             onValueChange={onValueChange}
             value={value}
         >
@@ -94,7 +96,7 @@ const Select = ({
                         </div>
                     )}
 
-                    <Value placeholder="Select..." />
+                    <Value placeholder={placeholder || 'Select...'} />
 
                     <Icon className="ml-auto pl-2">
                         <ChevronDownIcon />
