@@ -37,8 +37,7 @@ const DataPill = ({
 
         mentionInput.insertItem(
             {
-                component,
-                icon: component.icon,
+                componentIcon: component.icon,
                 id: dataPill.name,
                 value: dataPillLabel,
             },
