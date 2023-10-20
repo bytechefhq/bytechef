@@ -12,7 +12,7 @@ import {
     ConnectionDefinitionsApi,
     GetOAuth2AuthorizationParametersRequestModel,
     OAuth2AuthorizationParametersModel,
-} from '../middleware/core/definition-registry';
+} from '../middleware/core/workflow/configuration';
 
 export const ConnectionKeys = {
     componentConnectionList: (request: GetComponentConnectionsRequest) => [

@@ -5,7 +5,7 @@ import {
     ConnectionDefinitionsApi,
     GetComponentConnectionDefinitionRequest,
     GetComponentConnectionDefinitionsRequest,
-} from '../middleware/core/definition-registry';
+} from '../middleware/core/workflow/configuration';
 
 export const ConnectDefinitionKeys = {
     connectionDefinition: ['connectionDefinition'],

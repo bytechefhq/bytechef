@@ -2,7 +2,7 @@ import {Component1Icon} from '@radix-ui/react-icons';
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
-} from 'middleware/core/definition-registry';
+} from 'middleware/core/workflow/configuration';
 import React, {HTMLAttributes} from 'react';
 import InlineSVG from 'react-inlinesvg';
 

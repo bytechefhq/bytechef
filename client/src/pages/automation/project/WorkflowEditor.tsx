@@ -2,7 +2,7 @@ import {PlayIcon} from '@heroicons/react/24/outline';
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionBasicModel,
-} from 'middleware/core/definition-registry';
+} from 'middleware/core/workflow/configuration';
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';
 import ReactFlow, {
     Controls,
