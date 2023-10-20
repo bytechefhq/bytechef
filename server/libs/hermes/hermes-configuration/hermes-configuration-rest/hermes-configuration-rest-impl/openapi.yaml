@@ -16,8 +16,6 @@ tags:
   description: "The Core Task Dispatcher Definitions API"
 - name: "trigger-definitions"
   description: "The Core Trigger Definitions API"
-- name: "workflows"
-  description: "The Core Workflows API"
 paths:
   /action-definitions:
     get:

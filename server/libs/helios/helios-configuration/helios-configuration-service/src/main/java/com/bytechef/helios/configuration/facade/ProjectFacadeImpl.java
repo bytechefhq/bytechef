@@ -184,14 +184,14 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjectDTO> getProjects(List<Long> categoryIds, boolean projectInstances, List<Long> tagIds) {
+    public List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId) {
         List<Long> projectIds = null;
 
         if (projectInstances) {
             projectIds = projectInstanceService.getProjectIds();
         }
 
-        List<Project> projects = projectService.getProjects(categoryIds, projectIds, tagIds);
+        List<Project> projects = projectService.getProjects(categoryId, projectIds, tagId);
 
         return CollectionUtils.map(
             projects,

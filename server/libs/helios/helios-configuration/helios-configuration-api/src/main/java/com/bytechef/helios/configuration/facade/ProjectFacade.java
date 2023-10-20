@@ -45,7 +45,7 @@ public interface ProjectFacade {
 
     List<WorkflowDTO> getProjectWorkflows(long id);
 
-    List<ProjectDTO> getProjects(List<Long> categoryIds, boolean projectInstances, List<Long> tagIds);
+    List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId);
 
     ProjectDTO updateProject(ProjectDTO projectDTO);
 

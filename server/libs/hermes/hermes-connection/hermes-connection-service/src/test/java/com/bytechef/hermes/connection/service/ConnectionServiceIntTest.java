@@ -97,7 +97,7 @@ public class ConnectionServiceIntTest {
         connection = connectionRepository.save(connection);
 
         assertThat(connectionService.getConnection(connection.getId())).isEqualTo(connection);
-        assertThat(connectionService.getConnections(null, List.of(tag.getId()))).hasSize(1);
+        assertThat(connectionService.getConnections(null, null, tag.getId())).hasSize(1);
     }
 
     @Test
@@ -109,7 +109,7 @@ public class ConnectionServiceIntTest {
 
         connectionRepository.save(getConnection());
 
-        assertThat(connectionService.getConnections(null, null)).hasSize(1);
+        assertThat(connectionService.getConnections(null, null, null)).hasSize(1);
     }
 
     @Test

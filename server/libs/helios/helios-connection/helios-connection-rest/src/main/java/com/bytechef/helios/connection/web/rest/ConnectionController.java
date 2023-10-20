@@ -82,24 +82,12 @@ public class ConnectionController implements ConnectionsApi {
     }
 
     @Override
-    public ResponseEntity<List<ConnectionModel>> getComponentConnections(
-        String componentName, Integer componentVersion) {
-
-        return ResponseEntity.ok(
-            connectionFacade.getConnections(componentName, componentVersion)
-                .stream()
-                .map(connection -> conversionService.convert(connection, ConnectionModel.class)
-                    .parameters(null))
-                .toList());
-    }
-
-    @Override
     @SuppressFBWarnings("NP")
     public ResponseEntity<List<ConnectionModel>> getConnections(
-        List<String> componentNames, List<Long> tagIds) {
+        String componentName, Integer connectionVersion, Long tagId) {
 
         return ResponseEntity.ok(
-            connectionFacade.getConnections(componentNames, tagIds)
+            connectionFacade.getConnections(componentName, connectionVersion, tagId)
                 .stream()
                 .map(connection -> conversionService.convert(connection, ConnectionModel.class)
                     .parameters(null))

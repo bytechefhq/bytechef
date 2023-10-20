@@ -113,7 +113,7 @@ public class ProjectServiceClient implements ProjectService {
     }
 
     @Override
-    public List<Project> getProjects(List<Long> categoryIds, List<Long> ids, List<Long> tagIds) {
+    public List<Project> getProjects(Long categoryId, List<Long> ids, Long tagId) {
         throw new UnsupportedOperationException();
     }
 

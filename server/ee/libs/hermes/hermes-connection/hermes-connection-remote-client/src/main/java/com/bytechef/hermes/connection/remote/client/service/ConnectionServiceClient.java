@@ -93,7 +93,7 @@ public class ConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public List<Connection> getConnections(List<String> componentNames, List<Long> tagIds) {
+    public List<Connection> getConnections(String componentName, Integer connectionVersion, Long tagId) {
         throw new UnsupportedOperationException();
     }
 

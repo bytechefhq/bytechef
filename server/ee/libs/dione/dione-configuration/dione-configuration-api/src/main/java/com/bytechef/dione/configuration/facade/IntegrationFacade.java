@@ -45,7 +45,7 @@ public interface IntegrationFacade {
 
     List<WorkflowDTO> getIntegrationWorkflows(long id);
 
-    List<IntegrationDTO> getIntegrations(List<Long> categoryIds, List<Long> tagIds);
+    List<IntegrationDTO> getIntegrations(Long categoryId, Long tagId);
 
     IntegrationDTO update(long id, List<Tag> tags);
 

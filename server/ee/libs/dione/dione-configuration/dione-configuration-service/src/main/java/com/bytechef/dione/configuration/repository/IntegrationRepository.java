@@ -33,23 +33,23 @@ import java.util.List;
 public interface IntegrationRepository
     extends ListPagingAndSortingRepository<Integration, Long>, ListCrudRepository<Integration, Long> {
 
-    List<Integration> findAllByCategoryIdInOrderByName(List<Long> categoryIds);
+    List<Integration> findAllByCategoryIdOrderByName(long categoryId);
 
     @Query("""
             SELECT integration.* FROM integration
             JOIN integration_tag ON integration.id = integration_tag.integration_id
-            WHERE integration_tag.tag_id in (:tagIds)
+            WHERE integration_tag.tag_id == :tagId
             ORDER BY name
         """)
-    List<Integration> findAllByTagIdInOrderByName(@Param("tagIds") List<Long> tagIds);
+    List<Integration> findAllByTagIdOrderByName(@Param("tagId") long tagId);
 
     @Query("""
             SELECT integration.* FROM integration
             JOIN integration_tag ON integration.id = integration_tag.integration_id
-            WHERE integration.category_id IN (:categoryIds)
-            AND integration_tag.tag_id IN (:tagId)
+            WHERE integration.category_id == :categoryId
+            AND integration_tag.tag_id == :tagId
             ORDER BY name
         """)
-    List<Integration> findAllByCategoryIdsAndTagIdsOrderByName(
-        @Param("categoryIds") List<Long> categoryIds, @Param("tagIds") List<Long> tagIds);
+    List<Integration> findAllByCategoryIdAndTagIdOrderByName(
+        @Param("categoryId") long categoryId, @Param("tagId") long tagId);
 }

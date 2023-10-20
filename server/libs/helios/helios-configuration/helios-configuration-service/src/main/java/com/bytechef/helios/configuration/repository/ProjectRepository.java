@@ -34,23 +34,23 @@ import java.util.Optional;
 public interface ProjectRepository
     extends ListPagingAndSortingRepository<Project, Long>, CrudRepository<Project, Long> {
 
-    List<Project> findAllByCategoryIdInOrderByName(List<Long> categoryIds);
+    List<Project> findAllByCategoryIdOrderByName(Long categoryId);
 
     @Query("""
             SELECT project.* FROM project
             JOIN project_tag ON project.id = project_tag.project_id
-            WHERE project.category_id IN (:categoryIds)
-            AND project_tag.tag_id IN (:tagId)
+            WHERE project.category_id == :categoryId
+            AND project_tag.tag_id == :tagId
         """)
-    List<Project> findAllByCategoryIdsAndTagIdsOrderByName(
-        @Param("categoryIds") List<Long> categoryIds, @Param("tagIds") List<Long> tagIds);
+    List<Project> findAllByCategoryIdAndTagIdOrderByName(
+        @Param("categoryId") long categoryId, @Param("tagId") long tagId);
 
     @Query("""
             SELECT project.* FROM project
             JOIN project_tag ON project.id = project_tag.project_id
-            WHERE project_tag.tag_id in (:tagIds)
+            WHERE project_tag.tag_id == :tagId
         """)
-    List<Project> findAllByTagIdInOrderByName(@Param("tagIds") List<Long> tagIds);
+    List<Project> findAllByTagIdOrderByName(@Param("tagId") long tagId);
 
     Optional<Project> findByName(String name);
 

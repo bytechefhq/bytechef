@@ -6,6 +6,8 @@ info:
 servers:
 - url: "http://localhost:5173/api/automation"
 tags:
+- name: "jobs"
+  description: "The Automation Jobs API"
 - name: "project-workflow-executions"
   description: "The Automation Project Workflow Executions API"
 paths:
