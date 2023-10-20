@@ -23,6 +23,8 @@ import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksCo
 import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.hermes.data.storage.db.converter.DataStorageValueToStringConverter;
+import com.bytechef.hermes.data.storage.db.converter.StringToDataStorageValueConverter;
 import com.bytechef.hermes.execution.converter.StringToTriggerStateValueConverter;
 import com.bytechef.hermes.execution.converter.StringToWorkflowExecutionIdConverter;
 import com.bytechef.hermes.execution.converter.StringToWorkflowTriggerConverter;
@@ -72,8 +74,10 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
     @Override
     protected List<?> userConverters() {
         return Arrays.asList(
+            new DataStorageValueToStringConverter(objectMapper),
             new ExecutionErrorToStringConverter(objectMapper),
             new MapWrapperToStringConverter(objectMapper),
+            new StringToDataStorageValueConverter(objectMapper),
             new StringToExecutionErrorConverter(objectMapper),
             new StringToMapWrapperConverter(objectMapper),
             new StringToWebhooksConverter(objectMapper),
