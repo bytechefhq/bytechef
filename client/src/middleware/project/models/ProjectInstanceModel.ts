@@ -13,18 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { ProjectBasicModel } from './ProjectBasicModel';
+import {
+    ProjectBasicModelFromJSON,
+    ProjectBasicModelFromJSONTyped,
+    ProjectBasicModelToJSON,
+} from './ProjectBasicModel';
 import type { ProjectInstanceWorkflowModel } from './ProjectInstanceWorkflowModel';
 import {
     ProjectInstanceWorkflowModelFromJSON,
     ProjectInstanceWorkflowModelFromJSONTyped,
     ProjectInstanceWorkflowModelToJSON,
 } from './ProjectInstanceWorkflowModel';
-import type { ProjectModel } from './ProjectModel';
-import {
-    ProjectModelFromJSON,
-    ProjectModelFromJSONTyped,
-    ProjectModelToJSON,
-} from './ProjectModel';
 import type { TagModel } from './TagModel';
 import {
     TagModelFromJSON,
@@ -88,10 +88,10 @@ export interface ProjectInstanceModel {
     name: string;
     /**
      * 
-     * @type {ProjectModel}
+     * @type {ProjectBasicModel}
      * @memberof ProjectInstanceModel
      */
-    project?: ProjectModel;
+    project?: ProjectBasicModel;
     /**
      * Th id of a project.
      * @type {number}
@@ -163,7 +163,7 @@ export function ProjectInstanceModelFromJSONTyped(json: any, ignoreDiscriminator
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
-        'project': !exists(json, 'project') ? undefined : ProjectModelFromJSON(json['project']),
+        'project': !exists(json, 'project') ? undefined : ProjectBasicModelFromJSON(json['project']),
         'projectId': !exists(json, 'projectId') ? undefined : json['projectId'],
         'projectInstanceWorkflows': !exists(json, 'projectInstanceWorkflows') ? undefined : ((json['projectInstanceWorkflows'] as Array<any>).map(ProjectInstanceWorkflowModelFromJSON)),
         'status': !exists(json, 'status') ? undefined : json['status'],
@@ -183,7 +183,7 @@ export function ProjectInstanceModelToJSON(value?: ProjectInstanceModel | null):
         
         'description': value.description,
         'name': value.name,
-        'project': ProjectModelToJSON(value.project),
+        'project': ProjectBasicModelToJSON(value.project),
         'projectId': value.projectId,
         'projectInstanceWorkflows': value.projectInstanceWorkflows === undefined ? undefined : ((value.projectInstanceWorkflows as Array<any>).map(ProjectInstanceWorkflowModelToJSON)),
         'status': value.status,
