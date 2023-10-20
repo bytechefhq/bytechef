@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.category.servicee.impl;
+package com.bytechef.category.service.impl;
 
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.repository.CategoryRepository;
@@ -49,10 +49,29 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public Category create(Category category) {
+        Assert.notNull(category, "'category' must not be null");
+        Assert.isNull(category.getId(), "'category.id' must be null");
+
+        return categoryRepository.save(category);
+    }
+
+    @Override
+    public void delete(long id) {
+        categoryRepository.deleteById(id);
+    }
+
+    @Override
     public List<Category> getCategories() {
         return StreamSupport.stream(categoryRepository.findAll()
             .spliterator(), false)
             .toList();
+    }
+
+    @Override
+    public Category getCategory(long id) {
+        return categoryRepository.findById(id)
+            .orElseThrow();
     }
 
     @Override
@@ -82,5 +101,13 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         return category;
+    }
+
+    @Override
+    public Category update(Category category) {
+        Assert.notNull(category, "'category' must not be null");
+        Assert.notNull(category.getId(), "'category.id' must not be null");
+
+        return categoryRepository.save(category);
     }
 }

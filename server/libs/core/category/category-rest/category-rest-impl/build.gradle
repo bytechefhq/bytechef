@@ -1,0 +1,46 @@
+plugins {
+    alias(libs.plugins.org.openapi.generator)
+}
+
+task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    apiPackage = "com.bytechef.category.web.rest"
+    configOptions = [
+        "dateLibrary": "java8-localdatetime",
+        "interfaceOnly": "true",
+        "reactive": "true",
+        "useSpringBoot3": "true"
+    ]
+    generatorName = "spring"
+    inputSpec = "$projectDir/openapi.yaml".toString()
+    modelNameSuffix = "Model"
+    modelPackage = "com.bytechef.category.web.rest.model"
+    outputDir = "$projectDir/../category-rest-api/generated".toString()
+}
+
+sourceSets.main.java.srcDir "${projectDir}/generated/src/main/java"
+
+task generateOpenAPITypeScriptFetch(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName = "typescript-fetch"
+    inputSpec = "$projectDir/openapi.yaml".toString()
+    modelNameSuffix = "Model"
+    outputDir = "$rootDir/client/src/middleware/category".toString()
+    typeMappings = [
+        DateTime: "Date"
+    ]
+}
+
+tasks.register("generateOpenAPI") {
+    dependsOn tasks.generateOpenAPISpring, tasks.generateOpenAPITypeScriptFetch
+}
+
+dependencies {
+    api project(":server:libs:core:category:category-rest:category-rest-api")
+
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework:spring-webflux"
+    implementation libs.io.swagger.core.v3.swagger.annotations
+    implementation project(":server:libs:core:autoconfigure-annotations")
+
+    testImplementation "org.springframework.boot:spring-boot-starter-webflux"
+}

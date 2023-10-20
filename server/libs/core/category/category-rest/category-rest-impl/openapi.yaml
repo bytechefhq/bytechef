@@ -1,0 +1,143 @@
+openapi: 3.0.1
+info:
+  title:  OpenAPI definition
+  version: v1
+servers:
+  - url: http://localhost:5173/api
+paths:
+  /categories:
+    get:
+      description: Get all categories.
+      summary: Get all categories.
+      tags:
+        - categories
+      operationId: getCategories
+      responses:
+        "200":
+          description: The list of categories.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+    post:
+      description: Create a new category.
+      summary: Create a new category.
+      tags:
+        - categories
+      operationId: postCategory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+        required: true
+      responses:
+        "200":
+          description: The category object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+  /categories/{id}:
+    delete:
+      description: Delete a category.
+      summary: Delete a category.
+      tags:
+        - categories
+      operationId: deleteCategory
+      parameters:
+        - name: id
+          description: The id of a category.
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Successful operation.
+    get:
+      description: Get a category by id.
+      summary: Get a category by id.
+      tags:
+        - categories
+      operationId: getCategory
+      parameters:
+        - name: id
+          description: The id of a category.
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: The category object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+    put:
+      description: Update an existing category.
+      summary: Update an existing category.
+      tags:
+        - categories
+      operationId: putCategory
+      parameters:
+        - name: id
+          description: The id of a category.
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+        required: true
+      responses:
+        "200":
+          description: The updated category object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+components:
+  schemas:
+    Category:
+      description: A category.
+      required:
+        - name
+      properties:
+        createdBy:
+          description: The created by.
+          type: string
+          readOnly: true
+        createdDate:
+          description: The created date.
+          type: string
+          format: date-time
+          readOnly: true
+        id:
+          description: The id of the category.
+          type: integer
+          format: int64
+        name:
+          description: The name of the category.
+          type: string
+        lastModifiedBy:
+          description: The last modified by.
+          type: string
+          readOnly: true
+        lastModifiedDate:
+          description: The last modified date.
+          type: string
+          format: date-time
+          readOnly: true
+        version:
+          type: integer
+          format: int32
