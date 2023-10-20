@@ -73,3 +73,14 @@ and using Consul for the service discovery:
 ```bash
 docker compose -f docker-compose.dev.consul.yml up
 ```
+
+## Troubleshooting
+
+### Out of date schema
+
+If you see `Either revert the changes to the migration, or run repair to update the schema history` in the terminal log when experiencing errors, execute the following command which will remove the out of date schemas:
+
+```bash
+docker compose -f deploy/docker/docker-compose.dev.server.yml down -v
+
+```
