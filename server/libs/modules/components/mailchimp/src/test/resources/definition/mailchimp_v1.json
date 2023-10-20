@@ -1211,7 +1211,7 @@
       "label": null,
       "placeholder": null,
       "required": null,
-      "name": null,
+      "name": "__item",
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
@@ -1292,8 +1292,18 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "INPUT_TEXT",
-        "options": null,
+        "controlType": "SELECT",
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "Html",
+          "value": "html"
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "Text",
+          "value": "text"
+        } ],
         "optionsDataSource": null,
         "sampleDataType": null
       }, {
