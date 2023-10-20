@@ -1,3 +1,4 @@
+---
 # Conditionally disable springdoc on missing api-docs profile
 spring:
   config:
@@ -8,16 +9,31 @@ springdoc:
     enabled: false
 ---
 
-health:
-  metrics:
-    export:
-      # Prometheus is the default metrics backend
-      prometheus:
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: when_authorized
+      roles: 'ROLE_ADMIN'
+      probes:
         enabled: true
-        step: 60
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState,db
+  info:
+    git:
+      mode: full
+    env:
+      enabled: true
   health:
     rabbit:
       enabled: false # When using Rabbit, set this to true
+  metrics:
     enable:
       http: true
       jvm: true
@@ -36,27 +52,12 @@ health:
         request:
           autotime:
             enabled: true
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include:
-          '*'
-  endpoint:
-    health:
-      show-details: when_authorized
-      roles: 'ROLE_ADMIN'
-      probes:
+  # Prometheus is the default metrics backend
+  prometheus:
+    metrics:
+      export:
         enabled: true
-      group:
-        liveness:
-          include: livenessState
-        readiness:
-          include: readinessState,db
-  info:
-    git:
-      mode: full
+        step: 60
 
 openapi:
   openAPIDefinition:
