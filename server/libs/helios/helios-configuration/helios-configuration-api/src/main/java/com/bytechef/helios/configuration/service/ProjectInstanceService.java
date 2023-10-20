@@ -30,6 +30,8 @@ public interface ProjectInstanceService {
 
     void delete(long id);
 
+    boolean isProjectInstanceEnabled(long projectInstanceId);
+
     ProjectInstance getProjectInstance(long id);
 
     List<Long> getProjectIds();
