@@ -30,6 +30,7 @@ import com.bytechef.helios.project.job.ProjectInstanceJobFactory;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.project.service.ProjectService;
+import com.bytechef.hermes.trigger.executor.TriggerLifecycleExecutor;
 import com.bytechef.tag.service.TagService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,11 +45,11 @@ public class ProjectConfiguration {
     ProjectInstanceFacade projectInstanceFacade(
         ProjectInstanceJobFactory projectInstanceJobFactory, ProjectInstanceService projectInstanceService,
         ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
-        TagService tagService) {
+        TagService tagService, TriggerLifecycleExecutor triggerLifecycleExecutor) {
 
         return new ProjectInstanceFacadeImpl(
             projectInstanceJobFactory, projectInstanceService, projectInstanceWorkflowService, projectService,
-            tagService);
+            tagService, triggerLifecycleExecutor);
     }
 
     @Bean

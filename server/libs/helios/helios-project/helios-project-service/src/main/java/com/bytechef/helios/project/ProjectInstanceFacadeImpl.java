@@ -26,6 +26,7 @@ import com.bytechef.helios.project.job.ProjectInstanceJobFactory;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.project.service.ProjectService;
+import com.bytechef.hermes.trigger.executor.TriggerLifecycleExecutor;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -49,18 +50,20 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final ProjectService projectService;
     private final TagService tagService;
+    private final TriggerLifecycleExecutor triggerLifecycleExecutor;
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceFacadeImpl(
         ProjectInstanceJobFactory projectInstanceJobFactory, ProjectInstanceService projectInstanceService,
         ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
-        TagService tagService) {
+        TagService tagService, TriggerLifecycleExecutor triggerLifecycleExecutor) {
 
         this.projectInstanceJobFactory = projectInstanceJobFactory;
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.projectService = projectService;
         this.tagService = tagService;
+        this.triggerLifecycleExecutor = triggerLifecycleExecutor;
     }
 
     @Override
