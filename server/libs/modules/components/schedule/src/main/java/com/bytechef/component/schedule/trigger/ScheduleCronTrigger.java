@@ -71,18 +71,17 @@ public class ScheduleCronTrigger {
     protected void listenerEnable(
         Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
-        triggerScheduler.scheduleExecuteWorkflowTask(
-            workflowExecutionId,
+        triggerScheduler.scheduleScheduleTrigger(
             "0 " + MapValueUtils.getString(inputParameters, EXPRESSION),
-            MapValueUtils.getString(inputParameters, TIMEZONE),
-            Map.of(
+            MapValueUtils.getString(inputParameters, TIMEZONE), Map.of(
                 EXPRESSION, MapValueUtils.getString(inputParameters, EXPRESSION),
-                TIMEZONE, MapValueUtils.getString(inputParameters, TIMEZONE)));
+                TIMEZONE, MapValueUtils.getString(inputParameters, TIMEZONE)),
+            workflowExecutionId);
     }
 
     protected void listenerDisable(
         Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
-        triggerScheduler.cancelExecuteWorkflowTask(workflowExecutionId);
+        triggerScheduler.cancelScheduleTrigger(workflowExecutionId);
     }
 }

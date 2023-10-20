@@ -27,18 +27,18 @@ import java.util.Map;
  */
 public interface TriggerScheduler {
 
-    void cancelDynamicWebhookRefreshTask(String workflowExecutionId);
+    void cancelDynamicWebhookTriggerRefresh(String workflowExecutionId);
 
-    void cancelExecuteWorkflowTask(String workflowExecutionId);
+    void cancelScheduleTrigger(String workflowExecutionId);
 
-    void cancelPollTask(String workflowExecutionId);
+    void cancelPollingTrigger(String workflowExecutionId);
 
-    void scheduleDynamicWebhookRefreshTask(
-        WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate, String componentName,
-        int componentVersion);
+    void scheduleDynamicWebhookTriggerRefresh(
+        LocalDateTime webhookExpirationDate, String componentName, int componentVersion,
+        WorkflowExecutionId workflowExecutionId);
 
-    void scheduleExecuteWorkflowTask(
-        String workflowExecutionId, String pattern, String zoneId, Map<String, Object> output);
+    void scheduleScheduleTrigger(
+        String pattern, String zoneId, Map<String, Object> output, String workflowExecutionId);
 
-    void schedulePollTask(WorkflowExecutionId workflowExecutionId);
+    void schedulePollingTrigger(WorkflowExecutionId workflowExecutionId);
 }

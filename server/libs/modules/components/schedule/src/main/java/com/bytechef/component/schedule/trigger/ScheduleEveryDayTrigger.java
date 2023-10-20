@@ -114,17 +114,16 @@ public class ScheduleEveryDayTrigger {
     protected void listenerEnable(
         Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
-        triggerScheduler.scheduleExecuteWorkflowTask(
-            workflowExecutionId,
+        triggerScheduler.scheduleScheduleTrigger(
             "0 %s %s ? * %s".formatted(
                 MapValueUtils.getInteger(inputParameters, MINUTE), MapValueUtils.getInteger(inputParameters, HOUR),
                 getDayOfWeek(inputParameters)),
-            MapValueUtils.getString(inputParameters, TIMEZONE),
-            Map.of(
+            MapValueUtils.getString(inputParameters, TIMEZONE), Map.of(
                 HOUR, MapValueUtils.getInteger(inputParameters, HOUR),
                 MINUTE, MapValueUtils.getInteger(inputParameters, MINUTE),
                 DAY_OF_WEEK, MapValueUtils.getMap(inputParameters, DAY_OF_WEEK),
-                TIMEZONE, MapValueUtils.getString(inputParameters, TIMEZONE)));
+                TIMEZONE, MapValueUtils.getString(inputParameters, TIMEZONE)),
+            workflowExecutionId);
     }
 
     private static String getDayOfWeek(Map<String, ?> inputParameters) {
@@ -139,6 +138,6 @@ public class ScheduleEveryDayTrigger {
     protected void listenerDisable(
         Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
-        triggerScheduler.cancelExecuteWorkflowTask(workflowExecutionId);
+        triggerScheduler.cancelScheduleTrigger(workflowExecutionId);
     }
 }
