@@ -17,19 +17,35 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Gets or Sets WorkflowFormat
+ * Authorization type.
  */
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-18T21:42:43.525064+02:00[Europe/Zagreb]")
-public enum WorkflowFormatModel {
+public enum AuthorizationTypeModel {
   
-  JSON("JSON"),
+  API_KEY("API_KEY"),
   
-  YAML("YAML");
+  BASIC_AUTH("BASIC_AUTH"),
+  
+  BEARER_TOKEN("BEARER_TOKEN"),
+  
+  CUSTOM("CUSTOM"),
+  
+  DIGEST_AUTH("DIGEST_AUTH"),
+  
+  OAUTH2_AUTHORIZATION_CODE("OAUTH2_AUTHORIZATION_CODE"),
+  
+  OAUTH2_AUTHORIZATION_CODE_PKCE("OAUTH2_AUTHORIZATION_CODE_PKCE"),
+  
+  OAUTH2_CLIENT_CREDENTIALS("OAUTH2_CLIENT_CREDENTIALS"),
+  
+  OAUTH2_IMPLICIT_CODE("OAUTH2_IMPLICIT_CODE"),
+  
+  OAUTH2_RESOURCE_OWNER_PASSWORD("OAUTH2_RESOURCE_OWNER_PASSWORD");
 
   private String value;
 
-  WorkflowFormatModel(String value) {
+  AuthorizationTypeModel(String value) {
     this.value = value;
   }
 
@@ -44,8 +60,8 @@ public enum WorkflowFormatModel {
   }
 
   @JsonCreator
-  public static WorkflowFormatModel fromValue(String value) {
-    for (WorkflowFormatModel b : WorkflowFormatModel.values()) {
+  public static AuthorizationTypeModel fromValue(String value) {
+    for (AuthorizationTypeModel b : AuthorizationTypeModel.values()) {
       if (b.value.equals(value)) {
         return b;
       }
