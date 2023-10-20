@@ -28,8 +28,11 @@ import com.bytechef.hermes.integration.facade.IntegrationFacade;
 import com.bytechef.hermes.integration.service.IntegrationService;
 import com.bytechef.hermes.integration.web.rest.config.IntegrationRestTestConfiguration;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
+import com.bytechef.hermes.integration.web.rest.model.PutIntegrationTagsRequestModel;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -102,19 +105,43 @@ public class IntegrationControllerIntTest {
     }
 
     @Test
-    public void testGetIntegrations() {
-        Integration integration = getIntegration();
+    public void testGetIntegrationTags() {
+        try {
+            Integration integration = getIntegration();
 
-        when(integrationService.getIntegrations()).thenReturn(List.of(integration));
+            when(integrationService.getIntegration(anyLong())).thenReturn(integration);
+
+            this.webTestClient
+                .get()
+                .uri("/integrations/1")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(IntegrationModel.class);
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+    }
+
+    @Test
+    public void testGetIntegrations() {
+        when(integrationFacade.getIntegrationTags()).thenReturn(new LinkedHashSet<>(List.of("tag1", "tag2")));
 
         try {
             this.webTestClient
                 .get()
-                .uri("/integrations")
+                .uri("/integration-tags")
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBodyList(IntegrationModel.class);
+                .expectBody()
+                .jsonPath("$.tags")
+                .isArray()
+                .jsonPath("$.tags[0]")
+                .isEqualTo("tag1")
+                .jsonPath("$.tags[1]")
+                .isEqualTo("tag2");
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -124,7 +151,8 @@ public class IntegrationControllerIntTest {
     @SuppressFBWarnings("NP")
     public void testPostIntegration() {
         Integration integration = getIntegration();
-        IntegrationModel integrationModel = new IntegrationModel().name("name")
+        IntegrationModel integrationModel = new IntegrationModel()
+            .name("name")
             .description("description");
 
         when(integrationFacade.create(anyString(), anyString(), isNull(), isNull(), isNull())).thenReturn(integration);
@@ -158,13 +186,14 @@ public class IntegrationControllerIntTest {
     @SuppressFBWarnings("NP")
     public void testPutIntegration() {
         Integration integration = getIntegration();
-        IntegrationModel integrationModel = new IntegrationModel().id(1L)
-            .name("name");
+        IntegrationModel integrationModel = new IntegrationModel()
+            .id(1L)
+            .name("name2");
 
         integration.setName("name2");
 
-        when(integrationFacade.update(
-            anyLong(), anyString(), isNull(), isNull(), isNull(), isNull())).thenReturn(integration);
+        when(integrationFacade.update(anyLong(), anyString(), isNull(), isNull(), isNull(), isNull()))
+            .thenReturn(integration);
 
         try {
             this.webTestClient
@@ -188,6 +217,33 @@ public class IntegrationControllerIntTest {
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
+    }
+
+    @Test
+    @SuppressFBWarnings("NP")
+    public void testPutIntegrationTags() {
+        PutIntegrationTagsRequestModel integrationModel = new PutIntegrationTagsRequestModel().tags(List.of("tag1"));
+
+        try {
+            this.webTestClient
+                .put()
+                .uri("/integrations/1/tags")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(integrationModel)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
+
+        ArgumentCaptor<List<String>> tagsArgumentCaptor = ArgumentCaptor.forClass(List.class);
+
+        verify(integrationFacade).update(anyLong(), isNull(), isNull(), isNull(), isNull(),
+            tagsArgumentCaptor.capture());
+
+        Assertions.assertEquals(List.of("tag1"), tagsArgumentCaptor.getValue());
     }
 
     private static Integration getIntegration() {
