@@ -36,7 +36,7 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public Integration add(Integration integration) {
+    public Integration create(Integration integration) {
         integration.setId(null);
 
         return integrationRepository.save(integration);
