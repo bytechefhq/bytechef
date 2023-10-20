@@ -40,9 +40,6 @@ import com.integri.atlas.file.storage.converter.FileEntryConverter;
 import com.integri.atlas.file.storage.service.FileStorageService;
 import java.util.List;
 import javax.annotation.PostConstruct;
-import org.jobrunr.jobs.mappers.JobMapper;
-import org.jobrunr.storage.InMemoryStorageProvider;
-import org.jobrunr.storage.StorageProvider;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -65,11 +62,6 @@ public class IntTestConfiguration {
     }
 
     @Bean
-    CounterRepository counterRepository(JdbcTemplate jdbcTemplate) {
-        return new JdbcCounterRepository(jdbcTemplate);
-    }
-
-    @Bean
     @Primary
     EventListenerChain eventListener(List<EventListener> eventListeners) {
         return new EventListenerChain(eventListeners);
@@ -86,6 +78,11 @@ public class IntTestConfiguration {
     }
 
     @Bean
+    CounterRepository jdbcCounterRepository(JdbcTemplate jdbcTemplate) {
+        return new JdbcCounterRepository(jdbcTemplate);
+    }
+
+    @Bean
     TaskExecutionRepository jdbcJobTaskExecutionRepository(
         NamedParameterJdbcTemplate namedParameterJdbcTemplate,
         ObjectMapper objectMapper
@@ -99,16 +96,6 @@ public class IntTestConfiguration {
     }
 
     @Bean
-    JobRepository jdbcJobRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate, ObjectMapper objectMapper) {
-        JdbcJobRepository jdbcJobRepository = new JdbcJobRepository();
-
-        jdbcJobRepository.setJdbcTemplate(namedParameterJdbcTemplate);
-        jdbcJobRepository.setObjectMapper(objectMapper);
-
-        return jdbcJobRepository;
-    }
-
-    @Bean
     ContextRepository jdbcContextRepository(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
         JdbcContextRepository jdbcContextRepository = new JdbcContextRepository();
 
@@ -119,12 +106,13 @@ public class IntTestConfiguration {
     }
 
     @Bean
-    public StorageProvider storageProvider(JobMapper jobMapper) {
-        InMemoryStorageProvider storageProvider = new InMemoryStorageProvider();
+    JobRepository jdbcJobRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate, ObjectMapper objectMapper) {
+        JdbcJobRepository jdbcJobRepository = new JdbcJobRepository();
 
-        storageProvider.setJobMapper(jobMapper);
+        jdbcJobRepository.setJdbcTemplate(namedParameterJdbcTemplate);
+        jdbcJobRepository.setObjectMapper(objectMapper);
 
-        return storageProvider;
+        return jdbcJobRepository;
     }
 
     @Bean

@@ -16,16 +16,16 @@
 
 package com.integri.atlas.task.dispatcher.if_;
 
-import static com.integri.atlas.task.definition.dsl.DSL.ARRAY_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.BOOLEAN_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.DATE_TIME_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.NUMBER_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.OBJECT_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.OPERATION;
-import static com.integri.atlas.task.definition.dsl.DSL.STRING_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.hideWhen;
-import static com.integri.atlas.task.definition.dsl.DSL.option;
-import static com.integri.atlas.task.definition.dsl.DSL.showWhen;
+import static com.integri.atlas.task.definition.model.DSL.ARRAY_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.BOOLEAN_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.DATE_TIME_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.NUMBER_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.OBJECT_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.OPERATION;
+import static com.integri.atlas.task.definition.model.DSL.STRING_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.hideWhen;
+import static com.integri.atlas.task.definition.model.DSL.option;
+import static com.integri.atlas.task.definition.model.DSL.showWhen;
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.CombineOperation;
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.Operation;
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_BOOLEAN;
@@ -40,17 +40,17 @@ import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_VAL
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_VALUE_2;
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.TASK_IF;
 
-import com.integri.atlas.task.definition.TaskDefinitionHandler;
-import com.integri.atlas.task.definition.dsl.DSL;
-import com.integri.atlas.task.definition.dsl.TaskDefinition;
+import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.model.DSL;
+import com.integri.atlas.task.definition.model.TaskDefinition;
 
 /**
  * @author Ivica Cardic
  */
-public class IfTaskDefinitionHandler implements TaskDefinitionHandler {
+public class IfTaskDefinitionHandler extends AbstractTaskDefinitionHandler {
 
     private static final TaskDefinition TASK_DEFINITION = DSL
-        .create(TASK_IF)
+        .createTaskDefinition(TASK_IF)
         .displayName("If")
         .description("Directs a stream based on true/false results of comparisons")
         .operations(

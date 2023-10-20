@@ -16,17 +16,17 @@
 
 package com.integri.atlas.task.handler.json.file;
 
-import static com.integri.atlas.task.definition.dsl.DSL.ANY_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.ARRAY_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.BOOLEAN_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.FILE_ENTRY_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.INTEGER_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.OBJECT_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.OPERATION;
-import static com.integri.atlas.task.definition.dsl.DSL.OPTIONS;
-import static com.integri.atlas.task.definition.dsl.DSL.STRING_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.option;
-import static com.integri.atlas.task.definition.dsl.DSL.showWhen;
+import static com.integri.atlas.task.definition.model.DSL.ANY_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.ARRAY_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.BOOLEAN_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.FILE_ENTRY_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.INTEGER_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.OBJECT_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.OPERATION;
+import static com.integri.atlas.task.definition.model.DSL.OPTIONS;
+import static com.integri.atlas.task.definition.model.DSL.STRING_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.option;
+import static com.integri.atlas.task.definition.model.DSL.showWhen;
 import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.FileType.JSON;
 import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.FileType.JSONL;
 import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.PROPERTY_FILE_ENTRY;
@@ -39,19 +39,19 @@ import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.PRO
 import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.PROPERTY_SOURCE;
 import static com.integri.atlas.task.handler.json.file.JsonFileTaskConstants.TASK_JSON_FILE;
 
-import com.integri.atlas.task.definition.TaskDefinitionHandler;
-import com.integri.atlas.task.definition.dsl.DSL;
-import com.integri.atlas.task.definition.dsl.TaskDefinition;
+import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.model.DSL;
+import com.integri.atlas.task.definition.model.TaskDefinition;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class JsonFileTaskDefinitionHandler implements TaskDefinitionHandler {
+public class JsonFileTaskDefinitionHandler extends AbstractTaskDefinitionHandler {
 
     private static final TaskDefinition TASK_DEFINITION = DSL
-        .create(TASK_JSON_FILE)
+        .createTaskDefinition(TASK_JSON_FILE)
         .displayName("JSON File")
         .description("Reads and writes data from a JSON file.")
         .operations(

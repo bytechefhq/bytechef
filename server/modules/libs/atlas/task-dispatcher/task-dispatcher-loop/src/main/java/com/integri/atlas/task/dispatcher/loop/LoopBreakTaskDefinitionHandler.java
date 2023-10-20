@@ -18,17 +18,17 @@ package com.integri.atlas.task.dispatcher.loop;
 
 import static com.integri.atlas.task.dispatcher.loop.LoopBreakTaskConstants.TASK_LOOP_BREAK;
 
-import com.integri.atlas.task.definition.TaskDefinitionHandler;
-import com.integri.atlas.task.definition.dsl.DSL;
-import com.integri.atlas.task.definition.dsl.TaskDefinition;
+import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.model.DSL;
+import com.integri.atlas.task.definition.model.TaskDefinition;
 
 /**
  * @author Ivica Cardic
  */
-public class LoopBreakTaskDefinitionHandler implements TaskDefinitionHandler {
+public class LoopBreakTaskDefinitionHandler extends AbstractTaskDefinitionHandler {
 
     private static final TaskDefinition TASK_DEFINITION = DSL
-        .create(TASK_LOOP_BREAK)
+        .createTaskDefinition(TASK_LOOP_BREAK)
         .displayName("Loop Break")
         .description("Breaks loop execution.");
 

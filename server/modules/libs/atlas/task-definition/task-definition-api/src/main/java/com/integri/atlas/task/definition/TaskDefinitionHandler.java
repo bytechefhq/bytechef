@@ -16,11 +16,15 @@
 
 package com.integri.atlas.task.definition;
 
-import com.integri.atlas.task.definition.dsl.TaskDefinition;
+import com.integri.atlas.task.definition.model.TaskAuthDefinition;
+import com.integri.atlas.task.definition.model.TaskDefinition;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
 public interface TaskDefinitionHandler {
+    List<TaskAuthDefinition> getTaskAuthDefinitions();
+
     TaskDefinition getTaskDefinition();
 }

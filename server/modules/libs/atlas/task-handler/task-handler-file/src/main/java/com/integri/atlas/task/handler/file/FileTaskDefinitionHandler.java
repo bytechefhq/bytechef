@@ -16,27 +16,27 @@
 
 package com.integri.atlas.task.handler.file;
 
-import static com.integri.atlas.task.definition.dsl.DSL.FILE_ENTRY_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.OPERATION;
-import static com.integri.atlas.task.definition.dsl.DSL.STRING_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.FILE_ENTRY_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.OPERATION;
+import static com.integri.atlas.task.definition.model.DSL.STRING_PROPERTY;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_CONTENT;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_FILE_ENTRY;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_FILE_NAME;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.TASK_FILE;
 
-import com.integri.atlas.task.definition.TaskDefinitionHandler;
-import com.integri.atlas.task.definition.dsl.DSL;
-import com.integri.atlas.task.definition.dsl.TaskDefinition;
+import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.model.DSL;
+import com.integri.atlas.task.definition.model.TaskDefinition;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class FileTaskDefinitionHandler implements TaskDefinitionHandler {
+public class FileTaskDefinitionHandler extends AbstractTaskDefinitionHandler {
 
     private static final TaskDefinition TASK_DEFINITION = DSL
-        .create(TASK_FILE)
+        .createTaskDefinition(TASK_FILE)
         .displayName("File")
         .description("Reads and writes data from a file")
         .operations(

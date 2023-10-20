@@ -16,18 +16,24 @@
 
 package com.integri.atlas.task.handler.http.client;
 
-import static com.integri.atlas.task.definition.dsl.DSL.ANY_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.ARRAY_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.BOOLEAN_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.FILE_ENTRY_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.INTEGER_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.OBJECT_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.OPERATION;
-import static com.integri.atlas.task.definition.dsl.DSL.STRING_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.DSL.create;
-import static com.integri.atlas.task.definition.dsl.DSL.option;
-import static com.integri.atlas.task.definition.dsl.DSL.showWhen;
-import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.AuthenticationType;
+import static com.integri.atlas.task.definition.model.DSL.ANY_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.ARRAY_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.BOOLEAN_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.FILE_ENTRY_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.INTEGER_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.OBJECT_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.OPERATION;
+import static com.integri.atlas.task.definition.model.DSL.STRING_PROPERTY;
+import static com.integri.atlas.task.definition.model.DSL.createTaskAuthDefinition;
+import static com.integri.atlas.task.definition.model.DSL.createTaskDefinition;
+import static com.integri.atlas.task.definition.model.DSL.option;
+import static com.integri.atlas.task.definition.model.DSL.showWhen;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.*;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.AuthType.API_KEY;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.AuthType.BASIC_AUTH;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.AuthType.BEARER_TOKEN;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.AuthType.DIGEST_AUTH;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.AuthType.OAUTH2;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.BodyContentType;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_ALLOW_UNAUTHORIZED_CERTS;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_BODY_CONTENT_TYPE;
@@ -51,10 +57,12 @@ import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.ResponseFormat;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.TASK_HTTP_CLIENT;
 
-import com.integri.atlas.task.definition.TaskDefinitionHandler;
-import com.integri.atlas.task.definition.dsl.DSL;
-import com.integri.atlas.task.definition.dsl.TaskDefinition;
-import com.integri.atlas.task.definition.dsl.TaskProperty;
+import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.model.DSL;
+import com.integri.atlas.task.definition.model.TaskAuthDefinition;
+import com.integri.atlas.task.definition.model.TaskDefinition;
+import com.integri.atlas.task.definition.model.TaskProperty;
+import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Component;
 
@@ -62,7 +70,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class HttpClientTaskDefinitionHandler implements TaskDefinitionHandler {
+public class HttpClientTaskDefinitionHandler extends AbstractTaskDefinitionHandler {
 
     private static final TaskProperty[] COMMON_PROPERTIES = {
         //
@@ -188,15 +196,48 @@ public class HttpClientTaskDefinitionHandler implements TaskDefinitionHandler {
         FILE_ENTRY_PROPERTY().displayOption(showWhen(PROPERTY_RESPONSE_FORMAT).in(ResponseFormat.FILE.name())),
     };
 
-    private static final TaskDefinition TASK_DEFINITION = create(TASK_HTTP_CLIENT)
+    private static final List<TaskAuthDefinition> TASK_AUTH_DEFINITION = List.of(
+        createTaskAuthDefinition(API_KEY.name().toLowerCase())
+            .displayName("API Key")
+            .properties(
+                STRING_PROPERTY(PROPERTY_KEY).displayName("Key").required(true).defaultValue("api_token"),
+                STRING_PROPERTY(PROPERTY_VALUE).displayName("Value").required(true),
+                STRING_PROPERTY(PROPERTY_ADD_TO)
+                    .displayName("Add to")
+                    .required(true)
+                    .options(
+                        option("Header", ApiTokenLocation.HEADER.name()),
+                        option("QueryParams", ApiTokenLocation.QUERY_PARAMS.name())
+                    )
+                    .required(true)
+            ),
+        createTaskAuthDefinition(BEARER_TOKEN.name().toLowerCase())
+            .displayName("Bearer Token")
+            .properties(STRING_PROPERTY(PROPERTY_TOKEN).displayName("Token").required(true)),
+        createTaskAuthDefinition(BASIC_AUTH.name().toLowerCase())
+            .displayName("Basic Auth")
+            .properties(
+                STRING_PROPERTY(PROPERTY_USERNAME).displayName("Username").required(true),
+                STRING_PROPERTY(PROPERTY_PASSWORD).displayName("Password").required(true)
+            ),
+        createTaskAuthDefinition(DIGEST_AUTH.name().toLowerCase())
+            .displayName("Digest Auth")
+            .properties(
+                STRING_PROPERTY(PROPERTY_USERNAME).displayName("Username").required(true),
+                STRING_PROPERTY(PROPERTY_PASSWORD).displayName("Password").required(true)
+            ),
+        createTaskAuthDefinition(OAUTH2.name().toLowerCase()).displayName("OAuth2").properties()
+    );
+
+    private static final TaskDefinition TASK_DEFINITION = createTaskDefinition(TASK_HTTP_CLIENT)
         .displayName("HTTP Client")
         .description("Makes an HTTP request and returns the response data.")
         .auth(
-            option("API Key", AuthenticationType.HTTP_API_KEY.name()),
-            option("Bearer Token", AuthenticationType.HTTP_BEARER_TOKEN.name()),
-            option("Basic Auth", AuthenticationType.HTTP_BASIC_AUTH.name()),
-            option("Digest Auth", AuthenticationType.HTTP_DIGEST_AUTH.name()),
-            option("OAuth2", AuthenticationType.OAUTH2.name())
+            option(API_KEY.name().toLowerCase()),
+            option(BEARER_TOKEN.name().toLowerCase()),
+            option(BASIC_AUTH.name().toLowerCase()),
+            option(DIGEST_AUTH.name().toLowerCase()),
+            option(OAUTH2.name().toLowerCase())
         )
         .operations(
             OPERATION("get")
@@ -340,6 +381,11 @@ public class HttpClientTaskDefinitionHandler implements TaskDefinitionHandler {
                 )
                 .outputs(OUTPUTS_PROPERTIES)
         );
+
+    @Override
+    public List<TaskAuthDefinition> getTaskAuthDefinitions() {
+        return TASK_AUTH_DEFINITION;
+    }
 
     @Override
     public TaskDefinition getTaskDefinition() {
