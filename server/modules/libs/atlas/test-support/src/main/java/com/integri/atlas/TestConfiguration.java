@@ -56,6 +56,11 @@ public class TestConfiguration {
     }
 
     @Bean
+    FileStorageService fileStorageService() {
+        return new Base64FileStorageService();
+    }
+
+    @Bean
     TaskExecutionRepository jdbcJobTaskRepository(
         NamedParameterJdbcTemplate namedParameterJdbcTemplate,
         JSONHelper jsonHelper
@@ -95,12 +100,7 @@ public class TestConfiguration {
     }
 
     @Bean
-    FileStorageService fileStorageService() {
-        return new Base64FileStorageService();
-    }
-
-    @Bean
-    public XMLHelper xmlHelper() {
+    XMLHelper xmlHelper() {
         return new XMLHelper();
     }
 }
