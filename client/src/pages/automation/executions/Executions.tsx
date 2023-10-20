@@ -1,9 +1,9 @@
 /* eslint-disable react/jsx-key */
 import LayoutContainer from 'layouts/LayoutContainer/LayoutContainer';
 import PageHeader from 'components/PageHeader/PageHeader';
-import {useTable} from 'react-table';
 import Input from 'components/Input/Input';
 import {DATA} from './ExecutionsData';
+import {useReactTable} from "@tanstack/react-table";
 
 const columns = [
     {
@@ -29,7 +29,7 @@ const columns = [
 ];
 
 export const Executions = () => {
-    const tableInstance = useTable({
+    const tableInstance = useReactTable({
         columns,
         data: DATA,
     });
