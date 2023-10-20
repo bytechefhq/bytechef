@@ -39,8 +39,6 @@ public interface JobService {
 
     Optional<Job> fetchLatestJob();
 
-    List<Job> getJobs();
-
     Page<Job> getJobs(
         String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
         Integer pageNumber);

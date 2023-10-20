@@ -60,8 +60,8 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
         return defaultWebClient.post(
             uriBuilder -> toUri(
                 uriBuilder, connection.getComponentName(),
-                CONNECTION_DEFINITION_SERVICE + "/execute-authorization-apply/{connectionId}", connection.getId()),
-            null, ApplyResponse.class);
+                CONNECTION_DEFINITION_SERVICE + "/execute-authorization-apply", connection),
+            connection, ApplyResponse.class);
     }
 
     @Override
@@ -84,8 +84,8 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
             defaultWebClient.post(
                 uriBuilder -> toUri(
                     uriBuilder, connection.getComponentName(),
-                    CONNECTION_DEFINITION_SERVICE + "/execute-base-uri/{connectionId}", connection.getId()),
-                null, String.class));
+                    CONNECTION_DEFINITION_SERVICE + "/execute-base-uri"),
+                connection, String.class));
     }
 
     @Override
