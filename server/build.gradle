@@ -31,7 +31,10 @@ subprojects {
     dependencies {
         implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
 
-        testImplementation "org.springframework.boot:spring-boot-starter-test"
+        testImplementation ('org.springframework.boot:spring-boot-starter-test') {
+            exclude group: 'org.mockito', module :'mockito-core'
+        }
+        testImplementation "org.mockito:mockito-inline"
 
         testRuntimeOnly "com.zaxxer:HikariCP"
         testRuntimeOnly "org.postgresql:postgresql"
