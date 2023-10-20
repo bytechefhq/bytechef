@@ -18,6 +18,7 @@
 
 package com.bytechef.atlas.coordinator.event;
 
+import com.bytechef.atlas.event.EventListener;
 import com.bytechef.atlas.event.WorkflowEvent;
 import java.util.List;
 
@@ -34,9 +35,9 @@ public class EventListenerChain implements EventListener {
     }
 
     @Override
-    public void onApplicationEvent(WorkflowEvent aEvent) {
+    public void onApplicationEvent(WorkflowEvent workflowEvent) {
         for (EventListener listener : listeners) {
-            listener.onApplicationEvent(aEvent);
+            listener.onApplicationEvent(workflowEvent);
         }
     }
 }

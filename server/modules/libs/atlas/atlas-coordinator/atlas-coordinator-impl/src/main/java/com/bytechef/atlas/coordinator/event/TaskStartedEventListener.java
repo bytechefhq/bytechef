@@ -18,6 +18,7 @@
 
 package com.bytechef.atlas.coordinator.event;
 
+import com.bytechef.atlas.event.EventListener;
 import com.bytechef.atlas.event.Events;
 import com.bytechef.atlas.event.WorkflowEvent;
 import com.bytechef.atlas.job.JobStatus;
@@ -52,9 +53,9 @@ public class TaskStartedEventListener implements EventListener {
     }
 
     @Override
-    public void onApplicationEvent(WorkflowEvent aEvent) {
-        if (Events.TASK_STARTED.equals(aEvent.getType())) {
-            String taskId = aEvent.getString("taskId");
+    public void onApplicationEvent(WorkflowEvent workflowEvent) {
+        if (Events.TASK_STARTED.equals(workflowEvent.getType())) {
+            String taskId = workflowEvent.getString("taskId");
             TaskExecution task = taskExecutionService.getTaskExecution(taskId);
             if (task == null) {
                 logger.error("Unkown task: {}", taskId);
@@ -68,7 +69,7 @@ public class TaskStartedEventListener implements EventListener {
             } else {
                 SimpleTaskExecution mtask = SimpleTaskExecution.of(task);
                 if (mtask.getStartTime() == null && mtask.getStatus() != TaskStatus.STARTED) {
-                    mtask.setStartTime(aEvent.getCreateTime());
+                    mtask.setStartTime(workflowEvent.getCreateTime());
                     mtask.setStatus(TaskStatus.STARTED);
                     taskExecutionService.merge(mtask);
                 }

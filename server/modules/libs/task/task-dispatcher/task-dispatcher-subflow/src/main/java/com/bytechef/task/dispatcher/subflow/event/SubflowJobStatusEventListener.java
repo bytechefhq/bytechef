@@ -20,8 +20,8 @@ package com.bytechef.task.dispatcher.subflow.event;
 
 import com.bytechef.atlas.context.domain.MapContext;
 import com.bytechef.atlas.coordinator.Coordinator;
-import com.bytechef.atlas.coordinator.event.EventListener;
 import com.bytechef.atlas.error.ErrorObject;
+import com.bytechef.atlas.event.EventListener;
 import com.bytechef.atlas.event.Events;
 import com.bytechef.atlas.event.WorkflowEvent;
 import com.bytechef.atlas.job.JobStatus;
@@ -62,10 +62,10 @@ public class SubflowJobStatusEventListener implements EventListener {
     }
 
     @Override
-    public void onApplicationEvent(WorkflowEvent aEvent) {
-        if (aEvent.getType().equals(Events.JOB_STATUS)) {
-            String jobId = aEvent.getRequiredString("jobId");
-            JobStatus status = JobStatus.valueOf(aEvent.getRequiredString("status"));
+    public void onApplicationEvent(WorkflowEvent workflowEvent) {
+        if (workflowEvent.getType().equals(Events.JOB_STATUS)) {
+            String jobId = workflowEvent.getRequiredString("jobId");
+            JobStatus status = JobStatus.valueOf(workflowEvent.getRequiredString("status"));
             Job job = jobService.getJob(jobId);
 
             if (job.getParentTaskExecutionId() == null) {

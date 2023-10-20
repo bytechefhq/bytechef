@@ -5,6 +5,7 @@ subprojects {
         compileOnly "org.springframework:spring-expression"
         compileOnly project(":modules:libs:atlas:atlas-api")
         compileOnly project(":modules:libs:atlas:atlas-coordinator:atlas-coordinator-api")
+        compileOnly project(":modules:libs:atlas:atlas-event:atlas-event-api")
         compileOnly project(":modules:libs:atlas:atlas-service")
         compileOnly project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-api")
         compileOnly project(":modules:libs:hermes:hermes-descriptor:hermes-descriptor-api")
