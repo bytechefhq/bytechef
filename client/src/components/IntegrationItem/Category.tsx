@@ -1,6 +1,6 @@
 import {Squares2X2Icon} from '@heroicons/react/24/outline';
 import React from 'react';
-import {CategoryModel} from '../../../data-access/integration';
+import {CategoryModel} from '../../data-access/integration';
 
 export const Category: React.FC<{category: CategoryModel}> = ({category}) => {
     return (
