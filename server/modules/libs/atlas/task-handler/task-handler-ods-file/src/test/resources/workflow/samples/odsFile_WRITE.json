@@ -1,0 +1,26 @@
+{
+  "label": "ODS File - WRITE operation",
+  "inputs": [
+    {
+      "name": "rows",
+      "label": "Array of objects",
+      "type": "JSON",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "writeOdsFile",
+      "value": "${writeOdsFile}"
+    }
+  ],
+  "tasks": [
+    {
+      "name": "writeOdsFile",
+      "label": "Write to the ODS file",
+      "type": "odsFile",
+      "operation": "WRITE",
+      "rows": "${rows}"
+    }
+  ]
+}
