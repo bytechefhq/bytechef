@@ -20,7 +20,6 @@ package com.bytechef.hermes.connection.rsocket.client.service;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
@@ -39,18 +38,7 @@ public class ConnectionServiceRSocketClient implements ConnectionService {
     }
 
     @Override
-    public Connection create(
-        String name, String componentName, int componentVersion, String authorizationName,
-        Map<String, Object> parameters) {
-
-        Connection connection = new Connection();
-
-        connection.setAuthorizationName(authorizationName);
-        connection.setComponentName(componentName);
-        connection.setComponentVersion(componentVersion);
-        connection.setName(name);
-        connection.setParameters(parameters);
-
+    public Connection create(Connection connection) {
         return rSocketRequester
             .route("createConnection")
             .data(connection)
@@ -84,12 +72,7 @@ public class ConnectionServiceRSocketClient implements ConnectionService {
     }
 
     @Override
-    public Connection update(long id, String name) {
-        Connection connection = new Connection();
-
-        connection.setId(id);
-        connection.setName(name);
-
+    public Connection update(Connection connection) {
         return rSocketRequester
             .route("updateConnection")
             .data(connection)
