@@ -18,8 +18,11 @@ plugins {
 
 val check by tasks.existing
 
+//https://melix.github.io/blog/2021/03/version-catalogs-faq.html#_can_i_use_the_version_catalog_in_buildsrc
+val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
+
 checkstyle {
-    toolVersion = "10.12.3"
+    toolVersion = "${libs.findVersion("checkstyle").get()}"
     configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
 }
 
@@ -38,7 +41,7 @@ idea {
 }
 
 jacoco {
-    toolVersion = "0.8.10"
+    toolVersion = "${libs.findVersion("jacoco").get()}"
 }
 
 tasks.withType(JacocoReport::class) {
@@ -54,12 +57,12 @@ tasks.withType(JacocoReport::class) {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(20))
+        languageVersion.set(JavaLanguageVersion.of("${libs.findVersion("java").get()}"))
     }
 }
 
 pmd {
-    toolVersion = "6.55.0"
+    toolVersion = "${libs.findVersion("pmd").get()}"
     ruleSetFiles = files("${rootDir}/config/pmd/pmd-ruleset.xml")
     ruleSets()
 }
@@ -83,7 +86,7 @@ repositories {
 }
 
 spotbugs {
-    toolVersion.set("4.7.3")
+    toolVersion.set("${libs.findVersion("spotbugs").get()}")
     reportsDir.set(file("${layout.buildDirectory.get()}/reports/spotbugs"))
     excludeFilter.set(file("${rootDir}/config/spotbugs/spotbugs-exclude.xml"))
 

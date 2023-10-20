@@ -1,16 +1,21 @@
 [versions]
 ch-qos-logback = "1.4.11"
+checkstyle = "10.12.3"
 com-google-auto-service = "1.1.1"
-gradle-git-properties="2.4.1"
+gradle-git-properties = "2.4.1"
 info-picocli = "4.7.5"
+jacoco = "0.8.10"
+java = "20"
 jib-gradle-plugin="3.3.2"
 org-mapstruct = "1.5.5.Final"
 org-mapstruct-extensions-spring = "1.0.2"
 org-springdoc = "2.2.0"
 org-springframework-cloud-dependencies = "2022.0.4"
-spotless-plugin-gradle="6.21.0"
-spotbugs-gradle-plugin="6.0.0-beta.3"
-spring-boot="3.1.4"
+pmd = "6.55.0"
+spotbugs = "4.7.3"
+spotless-plugin-gradle = "6.21.0"
+spotbugs-gradle-plugin = "6.0.0-beta.3"
+spring-boot = "3.1.4"
 
 [libraries]
 ch-qos-logback-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback" }
