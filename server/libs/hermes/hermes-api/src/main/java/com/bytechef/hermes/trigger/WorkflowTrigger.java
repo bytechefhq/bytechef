@@ -19,10 +19,10 @@ package com.bytechef.hermes.trigger;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.commons.typeconverter.TypeConverter;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.util.ComponentUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
@@ -184,17 +184,12 @@ public class WorkflowTrigger implements Serializable, Trigger {
             + parameters + '\'' + '}';
     }
 
-    public static class WorkflowTriggerConverter implements TypeConverter.Conversion<WorkflowTrigger> {
+    public static class WorkflowTriggerConverter implements Converter<Map, WorkflowTrigger> {
 
-        public Object[] getTypeKeys() {
-            return new Object[] {
-                WorkflowTrigger.class
-            };
-        }
-
+        @Override
         @SuppressWarnings("unchecked")
-        public WorkflowTrigger convert(Object value, Object typeKey) {
-            return new WorkflowTrigger((Map<String, ?>) value);
+        public WorkflowTrigger convert(Map source) {
+            return new WorkflowTrigger(source);
         }
     }
 }
