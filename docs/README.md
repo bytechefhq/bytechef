@@ -44,6 +44,10 @@ The two suggested workflows are:
 
 ### Conventions
 
+- Name directories and files using lowercase letters. Use dash `-` as word separator.
+  Example:
+    - `/docs/components/components/sap-component.md`
+    - `/docs/how-to/bulk-database-updates.md`
 - The front matter for every markdown file should include the `id` and a `title`. `id` will be used to reference the file in `sidebar.js`
   ```yaml
   ---
@@ -51,11 +55,6 @@ The two suggested workflows are:
   title: Building custom component with ByteChef
   ---
   ```
-
-- Use lowercase for file and folder names and dashes `-` as separators.
-  For example:
-    - `/docs/components/components/airbyte-component.md`
-    - `/docs/how-to/bulk-update-airbyte-rows.md`
 
 - Images are important to bring the product to life and clarify the written content. For images you're adding to the repo, store them in the `img` subfolder inside `static` folder. For every topic there needs to be a folder inside `\static\img\` section, for example: `static\img\component-reference\components\airtable\airtable-component.png`.
   When you link to an image, the path and filename are case-sensitive. The convention is for image filenames to be all lowercase and use dashes `-` for separators.
@@ -72,17 +71,16 @@ The two suggested workflows are:
 ## Local setup
 
 ### Requirements
-
-Node.js >= 16
+Rely to the latest LTS Node.js version 16 and its minors. Use nvm or other tool to setup or upgrade your OS environment. One may use [nvm](https://github.com/nvm-sh/nvm) to manage versions.
 
 ### Installation
-
+Position to ../docs directory and install local instance of documentation manager
 ```
 $ npm install
 ```
 
 ### Local Development
-
+Assuming all previous steps succeed one can start documentation manager application from ../docs directory: 
 ```
 $ npm start
 ```
