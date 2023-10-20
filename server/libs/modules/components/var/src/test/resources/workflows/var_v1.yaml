@@ -1,0 +1,16 @@
+label: Alter output
+
+outputs:
+  - name: stringNumber
+    value: ${stringNumber}
+  - name: intNumber
+    value: ${intNumber}
+
+tasks:
+  - name: stringNumber
+    type: var/v1/set
+    value: "1234"
+
+  - name: intNumber
+    type: var/v1/set
+    value: ${int(stringNumber)}

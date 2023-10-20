@@ -1,0 +1,25 @@
+{
+  "display": {
+    "description": "Sets a value which can then be referenced in other tasks.",
+    "label": "Var"
+  },
+  "name": "var",
+  "actions": [
+    {
+      "display": {
+        "label": "Set value"
+      },
+      "name": "set",
+      "inputs": [
+        {
+          "description": "Value of any type to set.",
+          "label": "Value",
+          "name": "value",
+          "type": "ANY",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "version": 1
+}
