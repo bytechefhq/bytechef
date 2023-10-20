@@ -13,7 +13,6 @@ const IntegrationList: React.FC = () => {
         isLoading,
         error,
         data: integrations,
-        refetch,
     } = useGetIntegrationsQuery({
         categoryId: searchParams.get('categoryId')
             ? +searchParams.get('categoryId')!
@@ -66,9 +65,6 @@ const IntegrationList: React.FC = () => {
                                                         (x) => x.id === tag.id
                                                     ) === -1
                                             )}
-                                            onChangeState={() => {
-                                                refetch;
-                                            }}
                                         />
                                     </li>
                                 </Link>
