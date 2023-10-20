@@ -16,21 +16,29 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.core.task;
+package com.integri.atlas.engine.core.task.dispatcher;
+
+import com.integri.atlas.engine.core.task.Task;
+import com.integri.atlas.engine.core.task.TaskExecution;
 
 /**
- * A strategy interface for dispatching {@link Task}
- * instances to be executed.
+ * The strategey interface used for resolving the
+ * apprpriate {@link TaskDispatcher} instance for a
+ * given {@link TaskExecution}.
  *
  * @author Arik Cohen
  * @since Mar 26, 2017
  */
-public interface TaskDispatcher<T extends Task> {
+public interface TaskDispatcherResolver {
     /**
-     * Dispatches a {@link Task} instance.
+     * Resolves a {@link TaskDispatcher} for the given
+     * {@link TaskExecution} instance or <code>null</code>
+     * if one can not be resolved.
      *
      * @param aTask
-     *          The task to dispatch
+     *           The {@link TaskExecution} instance
+     * @return a {@link TaskDispatcher} instance to execute the given task or <code>null</code> if
+     *         unable to resolve one.
      */
-    void dispatch(T aTask);
+    TaskDispatcher resolve(Task aTask);
 }

@@ -18,8 +18,7 @@
 
 package com.integri.atlas.engine.coordinator.task.completion;
 
-import com.integri.atlas.engine.coordinator.task.ParallelTaskDispatcher;
-import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
+import com.integri.atlas.engine.coordinator.task.dispatcher.ParallelTaskDispatcher;
 import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
