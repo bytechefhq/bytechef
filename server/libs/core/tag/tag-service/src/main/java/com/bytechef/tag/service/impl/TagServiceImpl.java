@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.tag.service;
+package com.bytechef.tag.service.impl;
 
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.StreamSupport;
 
+import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
