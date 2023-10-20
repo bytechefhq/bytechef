@@ -23,11 +23,11 @@ import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.task.dispatcher.fork.completion.ForkJoinTaskCompletionHandler;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -37,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @TaskDispatcherIntTest
 public class ForkJoinTaskDispatcherIntTest {
 
-    private TestVarTaskHandler<List<Object>, Object> testVarTaskHandler;
+    private TestVarTaskHandler<Object, Object> testVarTaskHandler;
 
     @Autowired
     protected ContextService contextService;
@@ -50,36 +50,26 @@ public class ForkJoinTaskDispatcherIntTest {
 
     @BeforeEach
     void beforeEach() {
-        testVarTaskHandler = new TestVarTaskHandler<>(
-            (valueMap, name, value) -> valueMap.computeIfAbsent(name, key -> new ArrayList<>())
-                .add(value));
+        testVarTaskHandler = new TestVarTaskHandler<>(Map::put);
     }
 
-    @Disabled
     @Test
     public void testDispatch() {
         workflowExecutor.execute(
             "fork-join_v1",
             (
-                counterService, taskCompletionHandler, taskDispatcher, taskEvaluator,
-                taskExecutionService) -> List.of(new ForkJoinTaskCompletionHandler(
-                    taskExecutionService,
-                    taskCompletionHandler,
-                    counterService,
-                    taskDispatcher,
-                    contextService,
-                    taskEvaluator)),
+                counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) -> List.of(
+                    new ForkJoinTaskCompletionHandler(
+                        taskExecutionService, taskCompletionHandler, counterService, taskDispatcher, contextService,
+                        taskEvaluator)),
             (
                 contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
                 taskExecutionService) -> List.of(new ForkJoinTaskDispatcher(
-                    contextService,
-                    counterService,
-                    messageBroker,
-                    taskDispatcher,
-                    taskEvaluator,
+                    contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
                     taskExecutionService)),
             () -> Map.of("var", testVarTaskHandler));
 
-        // TODO
+        Assertions.assertEquals(85, testVarTaskHandler.get("sumVar1"));
+        Assertions.assertEquals(112, testVarTaskHandler.get("sumVar2"));
     }
 }
