@@ -1,5 +1,9 @@
 def profiles = "prod"
 
+if (project.hasProperty("api-docs")) {
+    profiles += ",api-docs"
+}
+
 springBoot {
     buildInfo()
 }
