@@ -18,7 +18,7 @@
 
 package com.bytechef.atlas.message.broker;
 
-import com.bytechef.atlas.uuid.UUIDGenerator;
+import com.bytechef.commons.uuid.UUIDGenerator;
 
 /**
  * @author Arik Cohen
