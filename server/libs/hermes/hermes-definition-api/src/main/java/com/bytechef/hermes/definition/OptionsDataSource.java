@@ -31,5 +31,7 @@ public interface OptionsDataSource {
      *
      * @return
      */
-    List<String> getLoadOptionsDependsOn();
+    default List<String> getLoadOptionsDependsOn() {
+        return List.of();
+    }
 }

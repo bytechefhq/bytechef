@@ -18,18 +18,30 @@
 package com.bytechef.component.mailchimp;
 
 import com.bytechef.component.mailchimp.trigger.MailchimpSubscribeTrigger;
+import com.bytechef.component.mailchimp.util.MailchimpUtils;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableStringProperty;
+import com.bytechef.hermes.definition.Property;
 import com.google.auto.service.AutoService;
 
 import java.util.List;
+import java.util.Objects;
+
+import static com.bytechef.hermes.component.definition.Authorization.ACCESS_TOKEN;
 
 /**
  * @author Ivica Cardic
  */
 @AutoService(OpenApiComponentHandler.class)
 public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler {
+
+    @Override
+    public List<TriggerDefinition> getTriggers() {
+        return List.of(MailchimpSubscribeTrigger.TRIGGER_DEFINITION);
+    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
@@ -39,7 +51,17 @@ public class MailchimpComponentHandler extends AbstractMailchimpComponentHandler
     }
 
     @Override
-    public List<TriggerDefinition> getTriggers() {
-        return List.of(MailchimpSubscribeTrigger.TRIGGER_DEFINITION);
+    public ModifiableConnectionDefinition modifyConnection(ModifiableConnectionDefinition connectionDefinition) {
+        return connectionDefinition.baseUri(connectionInputParameters -> "https://%s.api.mailchimp.com/3.0".formatted(
+            MailchimpUtils.getMailChimpServer(connectionInputParameters.getRequiredString(ACCESS_TOKEN))));
+    }
+
+    @Override
+    public Property<?> modifyProperty(Property<?> property) {
+        if (Objects.equals(property.getName(), "listId")) {
+            ((ModifiableStringProperty) property).options(MailchimpUtils.getListIdOptionsDataSource());
+        }
+
+        return property;
     }
 }
