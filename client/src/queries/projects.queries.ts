@@ -1,8 +1,10 @@
 import {useQuery} from '@tanstack/react-query';
 import {
     CategoryModel,
+    ProjectCategoriesApi,
     ProjectModel,
     ProjectsApi,
+    ProjectTagsApi,
     TagModel,
 } from 'middleware/project';
 import {WorkflowModel} from '../middleware/workflow';
@@ -19,10 +21,19 @@ export const ProjectKeys = {
     projects: ['projects'] as const,
 };
 
+export const useGetProjectCategoriesQuery = () =>
+    useQuery<CategoryModel[], Error>(
+        ProjectKeys.projectCategories,
+        () => new ProjectCategoriesApi().getProjectCategories(),
+        {
+            staleTime: 1 * 60 * 1000,
+        }
+    );
+
 export const useGetProjectTagsQuery = () =>
     useQuery<TagModel[], Error>(
         ProjectKeys.projectTags,
-        () => new ProjectsApi().getProjectTags(),
+        () => new ProjectTagsApi().getProjectTags(),
         {
             staleTime: 1 * 60 * 1000,
         }
@@ -45,15 +56,6 @@ export const useGetProjectsQuery = (filters: {
     useQuery<ProjectModel[], Error>(
         ProjectKeys.projectList(filters),
         () => new ProjectsApi().getProjects(filters),
-        {
-            staleTime: 1 * 60 * 1000,
-        }
-    );
-
-export const useGetProjectCategoriesQuery = () =>
-    useQuery<CategoryModel[], Error>(
-        ProjectKeys.projectCategories,
-        () => new ProjectsApi().getProjectCategories(),
         {
             staleTime: 1 * 60 * 1000,
         }

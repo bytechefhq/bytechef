@@ -2,7 +2,11 @@ import {useState} from 'react';
 import DropdownMenu, {
     IDropdownMenuItem,
 } from '../../../components/DropdownMenu/DropdownMenu';
-import {ProjectModel, StatusModel, TagModel} from '../../../middleware/project';
+import {
+    ProjectModel,
+    ProjectModelStatusEnum,
+    TagModel,
+} from '../../../middleware/project';
 import {
     useCreateProjectWorkflowRequestMutation,
     useDeleteProjectMutation,
@@ -151,18 +155,21 @@ const ProjectItem = ({project, remainingTags}: ProjectItemProps) => {
                             <span
                                 className={twMerge(
                                     'mr-4 rounded px-2.5 py-0.5 text-sm font-medium',
-                                    project.status === StatusModel.Published
+                                    project.status ===
+                                        ProjectModelStatusEnum.Published
                                         ? 'bg-green-100 text-green-800 dark:bg-green-200 dark:text-green-900'
                                         : 'bg-gray-100 text-gray-800 dark:bg-gray-200 dark:text-gray-900'
                                 )}
                             >
-                                {project.status === StatusModel.Published
+                                {project.status ===
+                                ProjectModelStatusEnum.Published
                                     ? `Published V${project.projectVersion}`
                                     : 'Not Published'}
                             </span>
 
                             <span className="mr-4 w-[76px] text-center text-sm text-gray-500">
-                                {project.status === StatusModel.Published
+                                {project.status ===
+                                ProjectModelStatusEnum.Published
                                     ? project.lastPublishedDate?.toLocaleDateString()
                                     : '-'}
                             </span>

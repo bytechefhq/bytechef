@@ -4,7 +4,7 @@ import DropdownMenu, {
 } from '../../../components/DropdownMenu/DropdownMenu';
 import {
     IntegrationModel,
-    StatusModel,
+    IntegrationModelStatusEnum,
     TagModel,
 } from '../../../middleware/integration';
 import {
@@ -147,18 +147,21 @@ const IntegrationItem = ({
                             <span
                                 className={twMerge(
                                     'mr-4 rounded px-2.5 py-0.5 text-sm font-medium',
-                                    integration.status === StatusModel.Published
+                                    integration.status ===
+                                        IntegrationModelStatusEnum.Published
                                         ? 'bg-green-100 text-green-800 dark:bg-green-200 dark:text-green-900'
                                         : 'bg-gray-100 text-gray-800 dark:bg-gray-200 dark:text-gray-900'
                                 )}
                             >
-                                {integration.status === StatusModel.Published
+                                {integration.status ===
+                                IntegrationModelStatusEnum.Published
                                     ? `Published V${integration.integrationVersion}`
                                     : 'Not Published'}
                             </span>
 
                             <span className="mr-4 w-[76px] text-center text-sm text-gray-500">
-                                {integration.status === StatusModel.Published
+                                {integration.status ===
+                                IntegrationModelStatusEnum.Published
                                     ? integration.lastPublishedDate?.toLocaleDateString()
                                     : '-'}
                             </span>
