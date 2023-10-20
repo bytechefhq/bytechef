@@ -18,7 +18,7 @@
 package com.bytechef.atlas.rsocket;
 
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.service.JobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -41,8 +41,8 @@ public class JobRSocketController {
     }
 
     @MessageMapping("createJob")
-    public Mono<Job> createJob(JobParametersDTO workflowParameters) {
-        return Mono.create(sink -> sink.success(jobService.add(workflowParameters)));
+    public Mono<Job> createJob(JobParameters workflowParameters) {
+        return Mono.create(sink -> sink.success(jobService.create(workflowParameters)));
     }
 
     @MessageMapping("getJob")

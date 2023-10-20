@@ -27,7 +27,7 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-public class JobParametersDTO {
+public class JobParameters {
 
     private String jobId;
 
@@ -124,7 +124,7 @@ public class JobParametersDTO {
             return false;
         }
 
-        JobParametersDTO workflowParameters = (JobParametersDTO) o;
+        JobParameters workflowParameters = (JobParameters) o;
 
         return Objects.equals(this.jobId, workflowParameters.jobId)
             && Objects.equals(this.inputs, workflowParameters.inputs)

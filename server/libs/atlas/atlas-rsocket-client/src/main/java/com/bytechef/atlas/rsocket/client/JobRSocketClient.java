@@ -18,7 +18,7 @@
 package com.bytechef.atlas.rsocket.client;
 
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.service.JobService;
 import java.util.List;
 import java.util.Optional;
@@ -40,10 +40,10 @@ public class JobRSocketClient implements JobService {
     }
 
     @Override
-    public Job add(JobParametersDTO jobParametersDTO) {
+    public Job create(JobParameters jobParameters) {
         return rSocketRequester
             .route("createJob")
-            .data(jobParametersDTO)
+            .data(jobParameters)
             .retrieveMono(Job.class)
             .block();
     }
