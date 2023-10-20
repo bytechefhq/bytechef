@@ -1,0 +1,5 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.bytechef.discovery.redis.config.RedisRegistryAutoConfiguration
+
+org.springframework.cloud.bootstrap.BootstrapConfiguration=\
+com.bytechef.discovery.redis.config.RedisDiscoveryClientBootstrapConfiguration
