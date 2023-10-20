@@ -99,6 +99,6 @@ public class InitSubcommand implements Callable<Integer> {
 
         new OpenApiComponentGenerator(basePackageName, componentName.toLowerCase(), version, internalComponent,
             openApiPath, outputPath)
-                .generate();
+            .generate();
     }
 }

@@ -130,7 +130,7 @@ paths:
           default: "available"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           content:
             application/xml:
               schema:
@@ -168,7 +168,7 @@ paths:
             type: "string"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           content:
             application/xml:
               schema:
@@ -203,7 +203,7 @@ paths:
           format: "int64"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           content:
             application/xml:
               schema:
@@ -301,7 +301,7 @@ paths:
           type: "string"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           content:
             application/json:
               schema:
@@ -326,7 +326,7 @@ paths:
       x-swagger-router-controller: "OrderController"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           content:
             application/json:
               schema:
@@ -346,7 +346,7 @@ paths:
       x-swagger-router-controller: "OrderController"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           content:
             application/json:
               schema:
@@ -383,7 +383,7 @@ paths:
           format: "int64"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           content:
             application/xml:
               schema:
@@ -494,7 +494,7 @@ paths:
           type: "string"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           headers:
             X-Rate-Limit:
               description: "calls per hour allowed by the user"
@@ -542,7 +542,7 @@ paths:
           type: "string"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           content:
             application/xml:
               schema:
@@ -800,7 +800,7 @@ components:
             type: "array"
             items:
               $ref: "#/components/schemas/User"
-      description: "List of user object"
+      description: "The list of user objects"
   securitySchemes:
     petstore_auth:
       type: "oauth2"

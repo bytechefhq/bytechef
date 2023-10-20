@@ -86,10 +86,10 @@ public class OpenApiComponentGenerator {
     public static final String COM_BYTECHEF_HERMES_COMPONENT_PACKAGE = "com.bytechef.hermes.component";
     public static final ClassName COMPONENT_DEFINITION_CLASS_NAME = ClassName
         .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ComponentDefinition");
+    public static final ClassName CONNECTION_DEFINITION_CLASS_NAME = ClassName
+        .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ConnectionDefinition");
     public static final ClassName COMPONENT_DSL_CLASS_NAME = ClassName
         .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ComponentDSL");
-    private static final ClassName COMPONENT_CONSTANTS_CLASS_NAME = ClassName
-        .get("com.bytechef.hermes.component.constant", "ComponentConstants");
     private static final ClassName HTTP_CLIENT_UTILS_CLASS = ClassName
         .get("com.bytechef.hermes.component.util", "HttpClientUtils");
     private static final ClassName OPEN_API_COMPONENT_HANDLER_CLASS = ClassName
@@ -160,27 +160,25 @@ public class OpenApiComponentGenerator {
                 Paths.get(getAbsolutePathname("src" + File.separator + "test" + File.separator + "java")));
 
             writeAbstractComponentHandlerTest(sourceTestJavaDirPath);
-            writeComponentHandlerDefinition(
-                componentHandlerSourcePath, getPackageName(), getComponentHandlerClassName(componentName), version);
+            writeComponentHandlerDefinition(componentHandlerSourcePath, getPackageName(), version);
             writeComponentHandlerTest(sourceTestJavaDirPath);
         }
     }
 
     private JavaFile.Builder addStaticImport(JavaFile.Builder builder) {
-        return builder.addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ADD_TO")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "AUTHORIZATION_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "BASE_URI")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_ID")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "CLIENT_SECRET")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "HEADER_PREFIX")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "KEY")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "PASSWORD")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "REFRESH_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "SCOPES")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "TOKEN_URL")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "USERNAME")
-            .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "VALUE")
+        return builder.addStaticImport(AUTHORIZATION_CLASS_NAME, "ADD_TO")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "AUTHORIZATION_URL")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "CLIENT_ID")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "CLIENT_SECRET")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "HEADER_PREFIX")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "KEY")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "PASSWORD")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "REFRESH_URL")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "SCOPES")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "TOKEN")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "TOKEN_URL")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "USERNAME")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "VALUE")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "authorization")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "component")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "connection")
@@ -198,7 +196,8 @@ public class OpenApiComponentGenerator {
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
             .addStaticImport(HTTP_CLIENT_UTILS_CLASS, "BodyContentType", "ResponseFormat")
-            .addStaticImport(OPEN_API_COMPONENT_HANDLER_CLASS, "PropertyType");
+            .addStaticImport(OPEN_API_COMPONENT_HANDLER_CLASS, "PropertyType")
+            .addStaticImport(CONNECTION_DEFINITION_CLASS_NAME, "BASE_URI");
     }
 
     @SuppressWarnings("rawtypes")
@@ -245,7 +244,7 @@ public class OpenApiComponentGenerator {
         }
     }
 
-    private Path compileComponentHandlerSource(Path sourcePath, String simpleClassName) {
+    private Path compileComponentHandlerSource(Path sourcePath) {
         JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
         List<String> javacOpts = new ArrayList<>();
 
@@ -284,8 +283,13 @@ public class OpenApiComponentGenerator {
 
         javacOpts.add("-d");
         javacOpts.add(tempDirPath.toString());
+
+        String simpleClassName = getComponentHandlerClassName(componentName);
+
         javacOpts.add(sourcePath.getParent() + "/Abstract" + simpleClassName + ".java");
         javacOpts.add(sourcePath.getParent() + "/" + simpleClassName + ".java");
+        javacOpts.add(
+            sourcePath.getParent() + "/connection/" + StringUtils.capitalize(componentName) + "Connection.java");
 
         javaCompiler.run(null, null, null, javacOpts.toArray(new String[0]));
 
@@ -445,6 +449,45 @@ public class OpenApiComponentGenerator {
 
         SecurityScheme.In in = securityScheme.getIn();
 
+        CodeBlock apiKeyCodeBlock;
+
+        if (securityScheme.getName() == null || Objects.equals(securityScheme.getName(), "api_token")) {
+            apiKeyCodeBlock = CodeBlock.builder()
+                .build();
+        } else {
+            apiKeyCodeBlock = CodeBlock.of(
+                """
+                    string(KEY)
+                         .label($S)
+                         .required($L)
+                         .defaultValue($L)
+                         .hidden($L),""",
+                "Key",
+                true,
+                CodeBlock.of("$S", securityScheme.getName()),
+                true);
+        }
+
+        CodeBlock addToCodeBlock;
+
+        if (in == SecurityScheme.In.HEADER) {
+            addToCodeBlock = CodeBlock.builder()
+                .build();
+        } else {
+            addToCodeBlock = CodeBlock.of(
+                """
+                    ,string(ADD_TO)
+                        .label($S)
+                        .required($L)
+                        .defaultValue($L)
+                        .hidden($L)
+                    """,
+                "Add to",
+                true,
+                CodeBlock.of("$T.ApiTokenLocation.QUERY_PARAMETERS.name()", AUTHORIZATION_CLASS_NAME),
+                true);
+        }
+
         builder.add(
             """
                 authorization(
@@ -455,38 +498,20 @@ public class OpenApiComponentGenerator {
                     display($S)
                 )
                 .properties(
-                    string(KEY)
-                        .label($S)
-                        .required($L)
-                        .defaultValue($L)
-                        .hidden($L),
+                    $L
                     string(VALUE)
                         .label($S)
-                        .required($L),
-                    string(ADD_TO)
-                        .label($S)
                         .required($L)
-                        .defaultValue($L)
-                        .hidden($L)
+                    $L
                 )
                 """,
             AUTHORIZATION_CLASS_NAME,
             AUTHORIZATION_CLASS_NAME,
             "API Key",
-            "Key",
-            true,
-            securityScheme.getName() == null
-                ? CodeBlock.of("$L", "API_TOKEN")
-                : CodeBlock.of("$S", securityScheme.getName()),
-            true,
+            apiKeyCodeBlock,
             "Value",
             true,
-            "Add to",
-            true,
-            in == SecurityScheme.In.HEADER
-                ? CodeBlock.of("$T.ApiTokenLocation.HEADER.name()", AUTHORIZATION_CLASS_NAME)
-                : CodeBlock.of("$T.ApiTokenLocation.QUERY_PARAMETERS.name()", AUTHORIZATION_CLASS_NAME),
-            true);
+            addToCodeBlock);
 
         return builder.build();
     }
@@ -552,6 +577,7 @@ public class OpenApiComponentGenerator {
 
     private CodeBlock getAuthorizationOAuth2AuthorizationCodeCodeBlock(OAuthFlow oAuthFlow) {
         CodeBlock.Builder builder = CodeBlock.builder();
+        String oAuth2Scopes = getOAUth2Scopes(oAuthFlow.getScopes());
 
         builder.add(
             """
@@ -571,7 +597,7 @@ public class OpenApiComponentGenerator {
                         .required($L)
                 )
                 .authorizationUrl(connection -> $S)
-                .scopes(connection -> $T.of($L))
+                $L
                 .tokenUrl(connection -> $S)
                 """,
             AUTHORIZATION_CLASS_NAME,
@@ -582,8 +608,10 @@ public class OpenApiComponentGenerator {
             "Client Secret",
             true,
             oAuthFlow.getAuthorizationUrl(),
-            List.class,
-            getOAUth2Scopes(oAuthFlow.getScopes()),
+            StringUtils.isEmpty(oAuth2Scopes)
+                ? CodeBlock.builder()
+                    .build()
+                : CodeBlock.of(".scopes(connection -> $T.of($L))", List.class, getOAUth2Scopes(oAuthFlow.getScopes())),
             oAuthFlow.getTokenUrl());
 
         if (oAuthFlow.getRefreshUrl() != null) {
@@ -736,7 +764,7 @@ public class OpenApiComponentGenerator {
                     } else if (Objects.equals(scheme, "bearer")) {
                         codeBlocks.add(getAuthorizationBearerCodeBlock());
                     } else {
-                        throw new IllegalStateException("Security scheme %s not supported: ".formatted(scheme));
+                        throw new IllegalStateException("Security scheme %s not supported".formatted(scheme));
                     }
                 } else if (securityScheme.getType() == SecurityScheme.Type.OAUTH2) {
                     OAuthFlows flows = securityScheme.getFlows();
@@ -807,7 +835,11 @@ public class OpenApiComponentGenerator {
             if (servers.size() == 1) {
                 Server server = servers.get(0);
 
-                builder.add(".baseUri(connection -> $S)", server.getUrl());
+                if (Objects.equals(server.getUrl(), "/")) {
+                    builder.add(".baseUri(connection -> null)");
+                } else {
+                    builder.add(".baseUri(connection -> $S)", server.getUrl());
+                }
             } else {
                 List<CodeBlock> codeBlocks = new ArrayList<>();
 
@@ -1325,7 +1357,7 @@ public class OpenApiComponentGenerator {
             }
 
             if (codeBlock.isEmpty()) {
-                throw new IllegalStateException("Schema is not supported: " + schema);
+                throw new IllegalStateException("Schema is not supported: %s".formatted(schema));
             } else {
                 codeBlocks.add(codeBlock);
             }
@@ -1532,7 +1564,7 @@ public class OpenApiComponentGenerator {
                     .build())
                 .build())
             .addStaticImport(AUTHORIZATION_CLASS_NAME, "ApiTokenLocation", "AuthorizationType"))
-                .build();
+            .build();
 
         return javaFile.writeToPath(sourceDirPath);
     }
@@ -1585,7 +1617,7 @@ public class OpenApiComponentGenerator {
                     .initializer(actionsCodeBlock)
                     .build())
                 .build()))
-                    .build();
+            .build();
 
         javaFile.writeTo(componentHandlerDirPath);
     }
@@ -1612,7 +1644,7 @@ public class OpenApiComponentGenerator {
                     .initializer(connectionCodeBlock)
                     .build())
                 .build()))
-                    .build();
+            .build();
 
         javaFile.writeTo(componentHandlerDirPath);
     }
@@ -1673,21 +1705,22 @@ public class OpenApiComponentGenerator {
     }
 
     private void writeComponentHandlerDefinition(
-        Path componentHandlerSourcePath, String packageName, String simpleClassName, int version) throws Exception {
+        Path componentHandlerSourcePath, String packageName, int version) throws Exception {
 
         Path definitionDirPath = Files.createDirectories(
-            Paths.get(getAbsolutePathname("src" + File.separator + "test" + File.separator + "resources")
-                + File.separator + "definition"));
+            Paths.get(
+                getAbsolutePathname("src" + File.separator + "test" + File.separator + "resources") + File.separator +
+                    "definition"));
 
         Path defintionFilePath = definitionDirPath.resolve(componentName + "_v" + version + ".json");
 
         File definitionFile = defintionFilePath.toFile();
 
         if (!definitionFile.exists()) {
-            Path classPath = compileComponentHandlerSource(componentHandlerSourcePath, simpleClassName);
+            Path classPath = compileComponentHandlerSource(componentHandlerSourcePath);
 
             OpenApiComponentHandler openApiComponentHandler = runComponentHandlerClass(
-                classPath, packageName + "." + simpleClassName);
+                classPath, packageName + "." + getComponentHandlerClassName(componentName));
 
             OBJECT_MAPPER.writeValue(definitionFile, openApiComponentHandler.getDefinition());
         }
@@ -1714,7 +1747,7 @@ public class OpenApiComponentGenerator {
                     .initializer("$T.of($L)", List.class, componentSchemaCodeBlock)
                     .build())
                 .build()))
-                    .build();
+            .build();
 
         javaFile.writeTo(componentHandlerDirPath);
     }
