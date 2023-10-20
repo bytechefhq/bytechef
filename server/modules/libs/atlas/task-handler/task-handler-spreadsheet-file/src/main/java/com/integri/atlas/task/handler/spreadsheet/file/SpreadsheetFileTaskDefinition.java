@@ -33,7 +33,7 @@ import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTas
 import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_FILE_NAME;
 import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_HEADER_ROW;
 import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_INCLUDE_EMPTY_CELLS;
-import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_INPUT;
+import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_ITEMS;
 import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_OPERATION;
 import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_PAGE_NUMBER;
 import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_PAGE_SIZE;
@@ -81,9 +81,9 @@ public class SpreadsheetFileTaskDefinition implements TaskDefinition {
                     option("ODS", FileFormat.ODS.name(), "Open Office")
                 )
                 .defaultValue("CSV"),
-            JSON_PROPERTY(PROPERTY_INPUT)
-                .displayName("Input")
-                .description("Object or array of objects to write to the file.")
+            JSON_PROPERTY(PROPERTY_ITEMS)
+                .displayName("Items")
+                .description("The array of objects to write to the file.")
                 .displayOption(show(PROPERTY_OPERATION, Operation.WRITE.name()))
                 .required(true),
             COLLECTION_PROPERTY("options")

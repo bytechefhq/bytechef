@@ -24,7 +24,7 @@ public class SpreadsheetFileTaskConstants {
     public static final String PROPERTY_OPERATION = "operation";
     public static final String PROPERTY_FILE_ENTRY = "fileEntry";
     public static final String PROPERTY_FILE_FORMAT = "fileFormat";
-    public static final String PROPERTY_INPUT = "input";
+    public static final String PROPERTY_ITEMS = "items";
     public static final String PROPERTY_DELIMITER = "delimiter";
     public static final String PROPERTY_FILE_NAME = "fileName";
     public static final String PROPERTY_HEADER_ROW = "headerRow";

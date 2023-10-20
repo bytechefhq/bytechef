@@ -115,8 +115,8 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
                 StringUtils.upperCase(taskExecution.getRequired(PROPERTY_FILE_FORMAT))
             );
             String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, getaDefaultFileName(fileFormat));
-            List<Map<String, ?>> input = jsonHelper.checkJSONArray(
-                taskExecution.getRequired(PROPERTY_INPUT),
+            List<Map<String, ?>> items = jsonHelper.checkJSONArray(
+                taskExecution.getRequired(PROPERTY_ITEMS),
                 new TypeReference<>() {}
             );
 
@@ -127,7 +127,7 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
             return fileStorageService.storeFileContent(
                 fileName,
                 new ByteArrayInputStream(
-                    spreadsheetProcessor.write(input, new SpreadsheetProcessor.WriteConfiguration(fileName, sheetName))
+                    spreadsheetProcessor.write(items, new SpreadsheetProcessor.WriteConfiguration(fileName, sheetName))
                 )
             );
         }
