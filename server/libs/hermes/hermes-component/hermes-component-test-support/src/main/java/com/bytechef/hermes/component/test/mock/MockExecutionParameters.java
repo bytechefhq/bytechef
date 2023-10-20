@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.test;
+package com.bytechef.hermes.component.test.mock;
 
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.impl.FileEntryImpl;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +62,7 @@ public class MockExecutionParameters implements ExecutionParameters {
     @Override
     @SuppressWarnings("unchecked")
     public FileEntry getFileEntry(String key) {
-        return new FileEntryImpl(
+        return new MockFileEntry(
                 com.bytechef.hermes.file.storage.domain.FileEntry.of((Map<String, String>) map.get(key)));
     }
 
@@ -75,7 +74,7 @@ public class MockExecutionParameters implements ExecutionParameters {
     @Override
     @SuppressWarnings("unchecked")
     public FileEntry getFileEntry(Map<String, ?> map, String key) {
-        return new FileEntryImpl(
+        return new MockFileEntry(
                 com.bytechef.hermes.file.storage.domain.FileEntry.of((Map<String, String>) map.get(key)));
     }
 

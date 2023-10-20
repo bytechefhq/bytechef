@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.test;
+package com.bytechef.hermes.component.test.mock;
 
 import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.impl.FileEntryImpl;
 import java.util.Map;
 
-/**
- * @author Ivica Cardic
- */
-public class MockFileEntry implements FileEntry {
+class MockFileEntry implements FileEntry {
+    private final com.bytechef.hermes.file.storage.domain.FileEntry fileEntry;
 
-    private final FileEntryImpl fileEntry;
-
-    @SuppressWarnings("unchecked")
-    public MockFileEntry(Map<String, Object> map, String key) {
-        this.fileEntry = new FileEntryImpl(com.bytechef.hermes.file.storage.domain.FileEntry.of((Map) map.get(key)));
+    public MockFileEntry(com.bytechef.hermes.file.storage.domain.FileEntry fileEntry) {
+        this.fileEntry = fileEntry;
     }
 
     @Override
