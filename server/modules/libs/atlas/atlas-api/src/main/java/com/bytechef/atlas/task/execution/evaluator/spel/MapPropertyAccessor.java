@@ -24,6 +24,7 @@ import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.PropertyAccessor;
 import org.springframework.expression.TypedValue;
+import org.springframework.lang.NonNull;
 
 /**
  * Simple {@link PropertyAccessor} that can access {@link Map} properties.
@@ -47,7 +48,7 @@ class MapPropertyAccessor implements PropertyAccessor {
     }
 
     @Override
-    public TypedValue read(EvaluationContext aContext, Object aTarget, String aName) throws AccessException {
+    public TypedValue read(EvaluationContext aContext, @NonNull Object aTarget, String aName) throws AccessException {
         Map<String, Object> map = (Map<String, Object>) aTarget;
         Object value = map.get(aName);
         return new TypedValue(value, TypeDescriptor.forObject(value));

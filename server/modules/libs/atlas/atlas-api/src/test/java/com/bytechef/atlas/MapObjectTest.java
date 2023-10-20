@@ -105,10 +105,17 @@ public class MapObjectTest {
 
     @Test
     public void test13() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        Throwable throwable = null;
+
+        try {
             MapObject mo = new MapObject(Collections.singletonMap("key", "value")) {};
-            Assertions.assertEquals("value", mo.getRequiredString("anotherKey"));
-        });
+            mo.getRequiredString("anotherKey");
+        } catch (Exception exception) {
+            throwable = exception;
+        }
+
+        Assertions.assertNotNull(throwable);
+        Assertions.assertEquals(IllegalArgumentException.class, throwable.getClass());
     }
 
     @Test
