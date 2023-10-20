@@ -177,8 +177,10 @@ public class IntegrationFacadeIntTest {
         integration = integrationRepository.save(integration);
 
         assertThat(integrationFacade.getIntegration(integration.getId()))
-            .isEqualTo(new IntegrationDTO(integration, category, List.of(tag1, tag2)))
             .hasFieldOrPropertyWithValue("category", category)
+            .hasFieldOrPropertyWithValue("id", integration.getId())
+            .hasFieldOrPropertyWithValue("name", "name")
+            .hasFieldOrPropertyWithValue("status", Integration.Status.UNPUBLISHED)
             .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
     }
 

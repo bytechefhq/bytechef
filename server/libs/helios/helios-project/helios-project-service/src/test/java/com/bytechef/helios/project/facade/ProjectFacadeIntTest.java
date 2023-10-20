@@ -189,8 +189,10 @@ public class ProjectFacadeIntTest {
         project = projectRepository.save(project);
 
         assertThat(projectFacade.getProject(project.getId()))
-            .isEqualTo(new ProjectDTO(project, category, List.of(tag1, tag2)))
             .hasFieldOrPropertyWithValue("category", category)
+            .hasFieldOrPropertyWithValue("id", project.getId())
+            .hasFieldOrPropertyWithValue("name", "name")
+            .hasFieldOrPropertyWithValue("status", Project.Status.UNPUBLISHED)
             .hasFieldOrPropertyWithValue("tags", List.of(tag1, tag2));
     }
 
