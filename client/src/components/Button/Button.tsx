@@ -1,5 +1,5 @@
 import {forwardRef, ReactNode} from 'react';
-import cx from 'classnames';
+import {twMerge} from 'tailwind-merge';
 import './button.css';
 
 type Size = 'small' | 'large';
@@ -52,7 +52,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref
     ) => (
         <button
-            className={cx(
+            className={twMerge(
                 'btn',
                 displayTypes[displayType],
                 size && sizes[size],

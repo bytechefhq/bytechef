@@ -1,5 +1,5 @@
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
-import cx from 'classnames';
+import {twMerge} from 'tailwind-merge';
 import React from 'react';
 import ReactSelectCreatable from 'react-select/creatable';
 import {Props} from 'react-select/dist/declarations/src';
@@ -33,7 +33,7 @@ const CreatableSelect = ({
         )}
 
         <div
-            className={cx([
+            className={twMerge([
                 label ? 'mt-1' : '',
                 error ? 'relative rounded-md shadow-sm' : null,
             ])}

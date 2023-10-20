@@ -1,4 +1,4 @@
-import cx from 'classnames';
+import {twMerge} from 'tailwind-merge';
 
 type Size = 'small' | 'medium' | 'large';
 
@@ -17,7 +17,7 @@ const sizes: Record<Size, string> = {
 const EmptyAvatar = ({size = 'medium'}: Pick<AvatarProps, 'size'>) => (
     <span
         data-testid="empty-avatar"
-        className={cx(
+        className={twMerge(
             'inline-block overflow-hidden rounded-full bg-gray-200',
             sizes[size]
         )}
@@ -39,7 +39,10 @@ export default function Avatar({size = 'medium', src, alt}: AvatarProps) {
 
     return (
         <img
-            className={cx('mx-auto block h-10 w-10 rounded-full', sizes[size])}
+            className={twMerge(
+                'mx-auto block h-10 w-10 rounded-full',
+                sizes[size]
+            )}
             src={src}
             alt={alt}
         />
