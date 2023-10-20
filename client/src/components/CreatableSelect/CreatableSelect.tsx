@@ -59,7 +59,7 @@ const CreatableSelect = <
             {label && (
                 <label
                     htmlFor={name || field?.name}
-                    className="text-sm font-medium text-gray-700 dark:text-gray-400"
+                    className="text-sm font-medium text-gray-700"
                 >
                     {label}
                 </label>

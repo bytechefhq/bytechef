@@ -29,7 +29,7 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, NativeSelectProps>(
             {label && (
                 <label
                     htmlFor={name}
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-400"
+                    className="block text-sm font-medium text-gray-700"
                 >
                     {label}
                 </label>
@@ -38,7 +38,7 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, NativeSelectProps>(
             <div className={twMerge([label && 'mt-1'])}>
                 <select
                     className={twMerge(
-                        'block w-full rounded-md border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:focus:ring-sky-500 sm:text-sm',
+                        'block w-full rounded-md border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 sm:text-sm',
                         className
                     )}
                     id={name}

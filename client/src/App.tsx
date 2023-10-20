@@ -61,7 +61,7 @@ function App() {
     }, [location]);
 
     return (
-        <div className="flex h-full bg-gray-100">
+        <div className="flex h-full">
             <MobileSidebar
                 user={user}
                 navigation={navigation}

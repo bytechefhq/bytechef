@@ -114,17 +114,17 @@ const Select = ({
                     position="popper"
                     sideOffset={5}
                 >
-                    <ScrollUpButton className="flex items-center justify-center text-gray-700 dark:text-gray-300">
+                    <ScrollUpButton className="flex items-center justify-center text-gray-700">
                         <ChevronUpIcon />
                     </ScrollUpButton>
 
-                    <Viewport className="rounded-lg border border-gray-100 bg-white p-2 shadow-lg dark:bg-gray-800">
+                    <Viewport className="rounded-lg border border-gray-100 bg-white p-2 shadow-lg">
                         <Group>
                             {options.map((option) => (
                                 <Item
                                     key={option.value}
                                     value={option.value}
-                                    className="relative cursor-pointer select-none items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none radix-disabled:opacity-50 dark:text-gray-300 dark:focus:bg-gray-900"
+                                    className="radix-disabled:opacity-50 relative cursor-pointer select-none items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none"
                                 >
                                     <ItemIndicator className="absolute left-2 inline-flex items-center">
                                         <CheckIcon />
@@ -147,7 +147,7 @@ const Select = ({
                         </Group>
                     </Viewport>
 
-                    <ScrollDownButton className="flex items-center justify-center text-gray-700 dark:text-gray-300">
+                    <ScrollDownButton className="flex items-center justify-center text-gray-700">
                         <ChevronDownIcon />
                     </ScrollDownButton>
                 </Content>
