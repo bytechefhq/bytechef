@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.repository.engine.jdbc.job;
+package com.integri.atlas.engine.repository.jdbc.job;
 
 import com.integri.atlas.engine.coordinator.data.Page;
 import com.integri.atlas.engine.coordinator.data.ResultPage;

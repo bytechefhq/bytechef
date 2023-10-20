@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.repository.engine.jdbc.task;
+package com.integri.atlas.engine.repository.jdbc.task;
 
 import com.integri.atlas.engine.core.json.JsonMapper;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;

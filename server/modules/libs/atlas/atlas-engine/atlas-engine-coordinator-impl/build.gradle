@@ -19,7 +19,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
     testImplementation "org.testcontainers:mysql"
     testImplementation "org.testcontainers:postgresql"
-    testImplementation project(":modules:libs:atlas:atlas-repository:atlas-repository-engine-jdbc")
+    testImplementation project(":modules:libs:atlas:atlas-engine-repository:atlas-engine-repository-jdbc")
     testImplementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-io")
     testImplementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-random")
     testImplementation project(":modules:libs:atlas:atlas-task-handler:atlas-task-handler-time")
