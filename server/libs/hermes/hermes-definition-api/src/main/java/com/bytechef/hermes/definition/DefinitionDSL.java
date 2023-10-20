@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-public class DefinitionDSL {
+public abstract class DefinitionDSL {
 
     public static ModifiableAnyProperty any() {
         return new ModifiableAnyProperty();
@@ -192,6 +192,7 @@ public class DefinitionDSL {
 
     protected static ModifiableObjectProperty buildObject(
         String name, String description, String objectType) {
+
         return new ModifiableObjectProperty(name)
             .description(description)
             .objectType(objectType);
@@ -200,13 +201,14 @@ public class DefinitionDSL {
     @SafeVarargs
     protected static <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty buildObject(
         String name, String description, String objectType, P... properties) {
+
         return new ModifiableObjectProperty(name)
             .description(description)
             .objectType(objectType)
             .properties(properties);
     }
 
-    protected static <P extends ModifiableValueProperty<?, ?>> List<? extends P> checkPropertyNames(
+    protected static <P extends ModifiableProperty<?>> List<? extends P> checkPropertyNames(
         List<? extends P> properties) {
 
         if (properties != null && properties.size() > 0) {
@@ -430,7 +432,7 @@ public class DefinitionDSL {
             extends ModifiableValueProperty<Object[], ModifiableArrayProperty>
             implements Property.ArrayProperty, ModifiableInputProperty, ModifiableOutputProperty<Object[]> {
 
-            private List<? extends ModifiableValueProperty<?, ?>> items;
+            private List<? extends ModifiableProperty<?>> items;
             private Boolean multipleValues;
             private List<String> loadOptionsDependsOn;
             private List<Option<?>> options;
@@ -442,49 +444,6 @@ public class DefinitionDSL {
 
             private ModifiableArrayProperty(String name) {
                 super(name, Type.ARRAY);
-            }
-
-            public ModifiableArrayProperty exampleValue(Boolean... exampleValue) {
-                this.exampleValue = exampleValue;
-
-                return this;
-            }
-
-            public ModifiableArrayProperty exampleValue(Integer... exampleValue) {
-                this.exampleValue = exampleValue;
-
-                return this;
-            }
-
-            public ModifiableArrayProperty exampleValue(Long... exampleValue) {
-                this.exampleValue = exampleValue;
-
-                return this;
-            }
-
-            public ModifiableArrayProperty exampleValue(Float... exampleValue) {
-                this.exampleValue = exampleValue;
-
-                return this;
-            }
-
-            public ModifiableArrayProperty exampleValue(Double... exampleValue) {
-                this.exampleValue = exampleValue;
-
-                return this;
-            }
-
-            public ModifiableArrayProperty exampleValue(String... exampleValue) {
-                this.exampleValue = exampleValue;
-
-                return this;
-            }
-
-            @SafeVarargs
-            public final ModifiableArrayProperty exampleValue(Map<String, ?>... exampleValue) {
-                this.exampleValue = exampleValue;
-
-                return this;
             }
 
             public ModifiableArrayProperty defaultValue(Boolean... defaultValue) {
@@ -530,12 +489,55 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableArrayProperty exampleValue(Boolean... exampleValue) {
+                this.exampleValue = exampleValue;
+
+                return this;
+            }
+
+            public ModifiableArrayProperty exampleValue(Integer... exampleValue) {
+                this.exampleValue = exampleValue;
+
+                return this;
+            }
+
+            public ModifiableArrayProperty exampleValue(Long... exampleValue) {
+                this.exampleValue = exampleValue;
+
+                return this;
+            }
+
+            public ModifiableArrayProperty exampleValue(Float... exampleValue) {
+                this.exampleValue = exampleValue;
+
+                return this;
+            }
+
+            public ModifiableArrayProperty exampleValue(Double... exampleValue) {
+                this.exampleValue = exampleValue;
+
+                return this;
+            }
+
+            public ModifiableArrayProperty exampleValue(String... exampleValue) {
+                this.exampleValue = exampleValue;
+
+                return this;
+            }
+
             @SafeVarargs
-            public final <P extends ModifiableValueProperty<?, ?>> ModifiableArrayProperty items(P... properties) {
+            public final ModifiableArrayProperty exampleValue(Map<String, ?>... exampleValue) {
+                this.exampleValue = exampleValue;
+
+                return this;
+            }
+
+            @SafeVarargs
+            public final <P extends ModifiableProperty<?>> ModifiableArrayProperty items(P... properties) {
                 return items(properties == null ? List.of() : List.of(properties));
             }
 
-            public <P extends ModifiableValueProperty<?, ?>> ModifiableArrayProperty items(List<P> properties) {
+            public <P extends ModifiableProperty<?>> ModifiableArrayProperty items(List<P> properties) {
                 this.items = checkPropertyNames(properties);
 
                 return this;
@@ -564,6 +566,12 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableArrayProperty options(List<? extends Option<?>> options) {
+                this.options = new ArrayList<>(options);
+
+                return this;
+            }
+
             public ModifiableArrayProperty options(OptionsFunction optionsFunction) {
                 this.optionsFunction = optionsFunction;
 
@@ -580,7 +588,7 @@ public class DefinitionDSL {
             }
 
             @Override
-            public Optional<List<? extends ValueProperty<?>>> getItems() {
+            public Optional<List<? extends Property>> getItems() {
                 return Optional.ofNullable(items);
             }
 
@@ -1103,13 +1111,13 @@ public class DefinitionDSL {
             extends ModifiableValueProperty<Object, ModifiableObjectProperty>
             implements ModifiableInputProperty, ModifiableOutputProperty<Object>, Property.ObjectProperty {
 
-            private List<? extends ModifiableValueProperty<?, ?>> additionalProperties;
+            private List<? extends ModifiableProperty<?>> additionalProperties;
             private List<String> loadOptionsDependsOn;
             private Boolean multipleValues;
             private String objectType;
             private List<Option<?>> options;
             private OptionsFunction optionsFunction;
-            private List<? extends ModifiableValueProperty<?, ?>> properties;
+            private List<? extends ModifiableProperty<?>> properties;
 
             private ModifiableObjectProperty() {
                 this(null);
@@ -1132,13 +1140,13 @@ public class DefinitionDSL {
             }
 
             @SafeVarargs
-            public final <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty additionalProperties(
+            public final <P extends ModifiableProperty<?>> ModifiableObjectProperty additionalProperties(
                 P... properties) {
 
                 return additionalProperties(properties == null ? List.of() : List.of(properties));
             }
 
-            public <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty additionalProperties(
+            public <P extends ModifiableProperty<?>> ModifiableObjectProperty additionalProperties(
                 List<? extends P> properties) {
 
                 this.additionalProperties = checkPropertyNames(properties);
@@ -1182,12 +1190,13 @@ public class DefinitionDSL {
             }
 
             @SafeVarargs
-            public final <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty
-                properties(P... properties) {
+            public final <P extends ModifiableProperty<?>> ModifiableObjectProperty properties(
+                P... properties) {
+
                 return properties(List.of(properties));
             }
 
-            public <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty properties(List<P> properties) {
+            public <P extends ModifiableProperty<?>> ModifiableObjectProperty properties(List<P> properties) {
                 if (properties != null) {
                     for (Property property : properties) {
                         String name = property.getName();
@@ -1206,7 +1215,7 @@ public class DefinitionDSL {
             }
 
             @Override
-            public Optional<List<? extends ValueProperty<?>>> getAdditionalProperties() {
+            public Optional<List<? extends Property>> getAdditionalProperties() {
                 return Optional.ofNullable(
                     additionalProperties == null ? null : new ArrayList<>(additionalProperties));
             }
@@ -1247,7 +1256,7 @@ public class DefinitionDSL {
             }
 
             @Override
-            public Optional<List<? extends ValueProperty<?>>> getProperties() {
+            public Optional<List<? extends Property>> getProperties() {
                 return Optional.ofNullable(properties == null ? null : new ArrayList<>(properties));
             }
         }
