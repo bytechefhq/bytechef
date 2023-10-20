@@ -61,7 +61,7 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
             workflowTrigger.getComponentVersion());
 
         switch (triggerDefinition.type()) {
-            case HYBRID_DYNAMIC, WEBHOOK_DYNAMIC -> {
+            case HYBRID, DYNAMIC_WEBHOOK -> {
                 triggerDefinitionService.executeDynamicWebhookDisable(
                     workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
                     workflowTrigger.getComponentVersion(),
@@ -91,7 +91,7 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
             workflowTrigger.getComponentVersion());
 
         switch (triggerDefinition.type()) {
-            case HYBRID_DYNAMIC, WEBHOOK_DYNAMIC -> {
+            case HYBRID, DYNAMIC_WEBHOOK -> {
                 DynamicWebhookEnableOutput output = triggerDefinitionService.executeDynamicWebhookEnable(
                     workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(),
                     workflowTrigger.getComponentVersion(),

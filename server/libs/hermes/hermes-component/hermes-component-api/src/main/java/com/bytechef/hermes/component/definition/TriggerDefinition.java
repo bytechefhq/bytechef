@@ -38,12 +38,11 @@ public interface TriggerDefinition {
      * @return
      */
     enum TriggerType {
-        HYBRID_DYNAMIC,
-        HYBRID_STATIC,
+        DYNAMIC_WEBHOOK,
+        HYBRID,
         LISTENER,
         POLLING,
-        WEBHOOK_DYNAMIC,
-        WEBHOOK_STATIC
+        STATIC_WEBHOOK
     }
 
     /**
