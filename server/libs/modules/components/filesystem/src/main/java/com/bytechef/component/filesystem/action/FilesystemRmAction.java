@@ -49,7 +49,7 @@ public class FilesystemRmAction {
      * A directory to be deleted does not have to be empty.
      * </p>
      */
-    public static Object executeRm(Context context, InputParameters inputParameters) {
+    protected static Object executeRm(Context context, InputParameters inputParameters) {
         File file = new File(inputParameters.getRequiredString("path"));
 
         try {

@@ -39,7 +39,7 @@ public class VarSetAction {
             .required(true))
         .execute(VarSetAction::executeSetValue);
 
-    public static Object executeSetValue(Context context, InputParameters inputParameters) {
+    protected static Object executeSetValue(Context context, InputParameters inputParameters) {
         return inputParameters.get(VarConstants.VALUE);
     }
 }

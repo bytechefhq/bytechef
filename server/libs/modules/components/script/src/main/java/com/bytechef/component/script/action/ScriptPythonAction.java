@@ -53,7 +53,7 @@ public class ScriptPythonAction {
         .outputSchema(oneOf())
         .execute(ScriptPythonAction::executePython);
 
-    public static Object executePython(Context context, InputParameters inputParameters) {
+    protected static Object executePython(Context context, InputParameters inputParameters) {
         return ScriptConstants.POLYGLOT_ENGINE.execute("python", inputParameters);
     }
 }

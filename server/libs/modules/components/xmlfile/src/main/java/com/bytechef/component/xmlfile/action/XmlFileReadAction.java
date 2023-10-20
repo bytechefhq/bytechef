@@ -82,7 +82,7 @@ public class XmlFileReadAction {
             object().displayCondition("%s === false".formatted(IS_ARRAY)))
         .execute(XmlFileReadAction::executeRead);
 
-    public static Object executeRead(Context context, InputParameters inputParameters) {
+    protected static Object executeRead(Context context, InputParameters inputParameters) {
         Context.FileEntry fileEntry = inputParameters.get(FILE_ENTRY, Context.FileEntry.class);
         boolean isArray = inputParameters.getBoolean(IS_ARRAY, true);
         Object result;

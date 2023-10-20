@@ -99,7 +99,7 @@ public class JsonFileReadAction {
         .execute(JsonFileReadAction::executeRead);
 
     @SuppressWarnings("unchecked")
-    public static Object executeRead(Context context, InputParameters inputParameters)
+    protected static Object executeRead(Context context, InputParameters inputParameters)
         throws ComponentExecutionException {
 
         JsonFileTaskConstants.FileType fileType = getFileType(inputParameters);

@@ -50,7 +50,7 @@ public class HttpClientDeleteAction {
         .outputSchema(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
         .execute(HttpClientDeleteAction::executeDelete);
 
-    public static Object executeDelete(Context context, InputParameters inputParameters) {
+    protected static Object executeDelete(Context context, InputParameters inputParameters) {
         return HttpClientActionUtils.execute(context, inputParameters, RequestMethod.DELETE);
     }
 }

@@ -41,7 +41,7 @@ public class LoggerErrorAction {
         .properties(string(TEXT))
         .execute(LoggerErrorAction::executeError);
 
-    public static Object executeError(Context context, InputParameters inputParameters) {
+    protected static Object executeError(Context context, InputParameters inputParameters) {
         logger.error(inputParameters.getString(TEXT));
 
         return null;

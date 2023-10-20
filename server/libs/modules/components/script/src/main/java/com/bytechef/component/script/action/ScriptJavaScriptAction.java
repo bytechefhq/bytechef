@@ -53,7 +53,7 @@ public class ScriptJavaScriptAction {
         .outputSchema(oneOf())
         .execute(ScriptJavaScriptAction::executeJavaScript);
 
-    public static Object executeJavaScript(Context context, InputParameters inputParameters) {
+    protected static Object executeJavaScript(Context context, InputParameters inputParameters) {
         return ScriptConstants.POLYGLOT_ENGINE.execute("js", inputParameters);
     }
 }

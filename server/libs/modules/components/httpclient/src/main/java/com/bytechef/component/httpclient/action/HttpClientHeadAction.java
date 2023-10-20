@@ -49,7 +49,7 @@ public class HttpClientHeadAction {
         .outputSchema(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
         .execute(HttpClientHeadAction::executeHead);
 
-    public static Object executeHead(Context context, InputParameters inputParameters) {
+    protected static Object executeHead(Context context, InputParameters inputParameters) {
         return HttpClientActionUtils.execute(context, inputParameters, RequestMethod.HEAD);
     }
 }

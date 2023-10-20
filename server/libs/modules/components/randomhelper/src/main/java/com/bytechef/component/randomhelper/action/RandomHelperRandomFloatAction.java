@@ -39,7 +39,7 @@ public class RandomHelperRandomFloatAction {
     /**
      * Generates a random float.
      */
-    public static Object executeNextFloat(Context context, InputParameters inputParameters) {
+    protected static Object executeNextFloat(Context context, InputParameters inputParameters) {
         int startInclusive = inputParameters.getInteger("startInclusive", 0);
         int endInclusive = inputParameters.getInteger("endInclusive", 100);
 

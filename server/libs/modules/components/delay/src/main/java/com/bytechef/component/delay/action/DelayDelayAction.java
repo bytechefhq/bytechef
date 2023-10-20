@@ -23,6 +23,7 @@ import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import static com.bytechef.component.delay.constant.DelayConstants.DELAY;
@@ -45,13 +46,14 @@ public class DelayDelayAction {
             .defaultValue(1))
         .execute(DelayDelayAction::executeDelay);
 
-    public static Object executeDelay(Context context, InputParameters inputParameters) {
+    protected static Object executeDelay(Context context, InputParameters inputParameters) {
         try {
             if (inputParameters.containsKey("millis")) {
                 Thread.sleep(inputParameters.getLong("millis"));
             } else if (inputParameters.containsKey("duration")) {
-                Thread.sleep(inputParameters.getDuration("duration")
-                    .toMillis());
+                Duration duration = inputParameters.getDuration("duration");
+
+                Thread.sleep(duration.toMillis());
             } else {
                 TimeUnit.SECONDS.sleep(1);
             }

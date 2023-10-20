@@ -45,7 +45,7 @@ public class FilesystemMkdirAction {
      * <p>
      * An exception is not thrown if the directory could not be created because it already exists.
      */
-    public static Object executeMkdir(Context context, InputParameters inputParameters) {
+    protected static Object executeMkdir(Context context, InputParameters inputParameters) {
         try {
             return Files.createDirectories(Paths.get(inputParameters.getRequiredString("path")));
         } catch (IOException ioException) {
