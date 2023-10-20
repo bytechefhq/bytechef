@@ -32,7 +32,6 @@ import com.bytechef.component.jsonfile.action.JsonFileWriteAction;
 import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FileType;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
-import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -77,13 +76,13 @@ public class JsonFileComponentHandlerTest {
     public void testPerformReadJSON() throws JSONException, IOException {
         File file = getFile("sample.json");
 
-        Mockito.when(context.readFileToString(Mockito.any(FileEntry.class)))
+        Mockito.when(context.readFileToString(Mockito.any(Context.FileEntry.class)))
             .thenReturn(java.nio.file.Files.readString(Path.of(file.getAbsolutePath())));
 
         Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameters.getRequired(FILE_ENTRY, FileEntry.class))
-            .thenReturn(Mockito.mock(FileEntry.class));
+        Mockito.when(parameters.getRequired(FILE_ENTRY, Context.FileEntry.class))
+            .thenReturn(Mockito.mock(Context.FileEntry.class));
         Mockito.when(parameters.getString(FILE_TYPE, FileType.JSON.name()))
             .thenReturn("JSON");
         Mockito.when(parameters.getBoolean(IS_ARRAY))
@@ -99,13 +98,13 @@ public class JsonFileComponentHandlerTest {
     public void testPerformReadJSONArray() throws JSONException, FileNotFoundException {
         File file = getFile("sample_array.json");
 
-        Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
+        Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
         Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameters.getRequired(FILE_ENTRY, FileEntry.class))
-            .thenReturn(Mockito.mock(FileEntry.class));
+        Mockito.when(parameters.getRequired(FILE_ENTRY, Context.FileEntry.class))
+            .thenReturn(Mockito.mock(Context.FileEntry.class));
         Mockito.when(parameters.getString(FILE_TYPE, FileType.JSON.name()))
             .thenReturn("JSON");
         Mockito.when(parameters.getBoolean(IS_ARRAY, true))
@@ -120,13 +119,13 @@ public class JsonFileComponentHandlerTest {
             new JSONArray((List<?>) JsonFileReadAction.performRead(context, parameters)),
             true);
 
-        Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
+        Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
         parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameters.getRequired(FILE_ENTRY, FileEntry.class))
-            .thenReturn(Mockito.mock(FileEntry.class));
+        Mockito.when(parameters.getRequired(FILE_ENTRY, Context.FileEntry.class))
+            .thenReturn(Mockito.mock(Context.FileEntry.class));
         Mockito.when(parameters.getString(FILE_TYPE, FileType.JSON.name()))
             .thenReturn("JSON");
         Mockito.when(parameters.getBoolean(IS_ARRAY, true))
@@ -144,13 +143,13 @@ public class JsonFileComponentHandlerTest {
     public void testPerformReadJSONL() throws JSONException, IOException {
         File file = getFile("sample.jsonl");
 
-        Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
+        Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
         Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameters.getRequired(FILE_ENTRY, FileEntry.class))
-            .thenReturn(Mockito.mock(FileEntry.class));
+        Mockito.when(parameters.getRequired(FILE_ENTRY, Context.FileEntry.class))
+            .thenReturn(Mockito.mock(Context.FileEntry.class));
         Mockito.when(parameters.getString(FILE_TYPE, FileType.JSON.name()))
             .thenReturn("JSONL");
         Mockito.when(parameters.getBoolean(IS_ARRAY, true))
@@ -165,13 +164,13 @@ public class JsonFileComponentHandlerTest {
             new JSONArray((List<?>) JsonFileReadAction.performRead(context, parameters)),
             true);
 
-        Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
+        Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
         parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameters.getRequired(FILE_ENTRY, FileEntry.class))
-            .thenReturn(Mockito.mock(FileEntry.class));
+        Mockito.when(parameters.getRequired(FILE_ENTRY, Context.FileEntry.class))
+            .thenReturn(Mockito.mock(Context.FileEntry.class));
         Mockito.when(parameters.getString(FILE_TYPE, FileType.JSON.name()))
             .thenReturn("JSONL");
         Mockito.when(parameters.getBoolean(IS_ARRAY, true))

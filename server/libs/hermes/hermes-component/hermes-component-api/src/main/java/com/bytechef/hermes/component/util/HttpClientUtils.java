@@ -17,9 +17,7 @@
 
 package com.bytechef.hermes.component.util;
 
-import com.bytechef.hermes.component.AuthorizationContext;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
 import com.github.mizosoft.methanol.FormBodyPublisher;
@@ -197,7 +195,8 @@ public final class HttpClientUtils {
         if (payload == null) {
             bodyPublisher = HttpRequest.BodyPublishers.noBody();
         } else {
-            if (payload.bodyContentType == BodyContentType.BINARY && payload.value instanceof FileEntry fileEntry) {
+            if (payload.bodyContentType == BodyContentType.BINARY
+                && payload.value instanceof Context.FileEntry fileEntry) {
                 bodyPublisher = getBinaryBodyPublisher(context, payload, fileEntry);
             } else if (payload.bodyContentType == BodyContentType.FORM_DATA) {
                 bodyPublisher = getFormDataBodyPublisher(context, payload);
@@ -236,7 +235,7 @@ public final class HttpClientUtils {
             }
         }
 
-        acceptAuthorizationApplyConsumer(context, builder, headers, queryParameters);
+        acceptAuthorizationApplyConsumer(context, headers, queryParameters);
 
         if (configuration.isFollowRedirect()) {
             builder.followRedirects(java.net.http.HttpClient.Redirect.NORMAL);
@@ -327,7 +326,7 @@ public final class HttpClientUtils {
     }
 
     private static void addFileEntry(
-        Context context, MultipartBodyPublisher.Builder builder, String name, FileEntry fileEntry) {
+        Context context, MultipartBodyPublisher.Builder builder, String name, Context.FileEntry fileEntry) {
 
         Objects.requireNonNull(context, "'context' must not be null");
 
@@ -339,17 +338,13 @@ public final class HttpClientUtils {
     }
 
     private static void acceptAuthorizationApplyConsumer(
-        Context context, Methanol.Builder builder, Map<String, List<String>> headers,
-        Map<String, List<String>> queryParameters) {
+        Context context, Map<String, List<String>> headers, Map<String, List<String>> queryParameters) {
 
         if (context == null) {
             return;
         }
 
-        context.fetchConnectionAuthorization()
-            .map(Authorization::getApplyConsumer)
-            .ifPresent(applyConsumer -> applyConsumer.accept(
-                new AuthorizationContextImpl(builder, headers, queryParameters), context.getConnection()));
+        context.applyConnectionAuthorization(new AuthorizationContextImpl(headers, queryParameters));
     }
 
     private static URI createURI(String uriString, @Nonnull Map<String, List<String>> queryParameters) {
@@ -382,7 +377,7 @@ public final class HttpClientUtils {
     }
 
     private static HttpRequest.BodyPublisher getBinaryBodyPublisher(
-        Context context, Payload payload, FileEntry fileEntry) {
+        Context context, Payload payload, Context.FileEntry fileEntry) {
 
         Objects.requireNonNull(context, "'context' must not be null");
 
@@ -397,7 +392,7 @@ public final class HttpClientUtils {
         MultipartBodyPublisher.Builder builder = MultipartBodyPublisher.newBuilder();
 
         for (Map.Entry<?, ?> parameter : bodyParameters.entrySet()) {
-            if (parameter.getValue()instanceof FileEntry fileEntry) {
+            if (parameter.getValue()instanceof Context.FileEntry fileEntry) {
                 addFileEntry(context, builder, (String) parameter.getKey(), fileEntry);
             } else {
                 builder.textPart((String) parameter.getKey(), parameter.getValue());
@@ -439,7 +434,7 @@ public final class HttpClientUtils {
             MediaType.APPLICATION_XML);
     }
 
-    private static FileEntry storeBinaryResponseBody(
+    private static Context.FileEntry storeBinaryResponseBody(
         Context context, Configuration configuration, Map<String, List<String>> headersMap,
         InputStream httpResponseBody) throws MimeTypeException {
 
@@ -674,11 +669,11 @@ public final class HttpClientUtils {
             this.mimeType = mimeType;
         }
 
-        public static Payload of(FileEntry fileEntry) {
+        public static Payload of(Context.FileEntry fileEntry) {
             return new Payload(fileEntry, BodyContentType.BINARY);
         }
 
-        public static Payload of(FileEntry fileEntry, String mimeType) {
+        public static Payload of(Context.FileEntry fileEntry, String mimeType) {
             Objects.requireNonNull(fileEntry);
 
             return new Payload(fileEntry, BodyContentType.BINARY, mimeType);

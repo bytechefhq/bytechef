@@ -19,7 +19,6 @@ package com.bytechef.component.xmlfile.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
-import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.util.XmlUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -83,7 +82,7 @@ public class XmlFileReadAction {
         .perform(XmlFileReadAction::performRead);
 
     public static Object performRead(Context context, Parameters parameters) {
-        FileEntry fileEntry = parameters.get(FILE_ENTRY, FileEntry.class);
+        Context.FileEntry fileEntry = parameters.get(FILE_ENTRY, Context.FileEntry.class);
         boolean isArray = parameters.getBoolean(IS_ARRAY, true);
         Object result;
 

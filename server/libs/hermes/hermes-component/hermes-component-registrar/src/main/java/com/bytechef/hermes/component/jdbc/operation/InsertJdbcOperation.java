@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.component.jdbc.operation;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.jdbc.JdbcExecutor;
@@ -46,7 +47,7 @@ public class InsertJdbcOperation implements JdbcOperation<Map<String, Integer>> 
         String table = parameters.getRequiredString(JdbcConstants.TABLE);
 
         int[] rowsAffected = jdbcExecutor.batchUpdate(
-            context.getConnection(),
+            OptionalUtils.get(context.fetchConnection()),
             "INSERT INTO "
                 + schema
                 + "."

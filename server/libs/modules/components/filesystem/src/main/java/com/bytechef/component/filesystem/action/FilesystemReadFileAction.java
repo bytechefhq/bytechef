@@ -19,7 +19,6 @@ package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
-import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
@@ -49,7 +48,7 @@ public class FilesystemReadFileAction {
         .outputSchema(ComponentDSL.fileEntry())
         .perform(FilesystemReadFileAction::performReadFile);
 
-    public static FileEntry performReadFile(Context context, Parameters parameters) {
+    public static Context.FileEntry performReadFile(Context context, Parameters parameters) {
         String filename = parameters.getRequiredString(FILENAME);
 
         try (InputStream inputStream = new FileInputStream(filename)) {

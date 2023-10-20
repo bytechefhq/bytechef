@@ -21,7 +21,6 @@ import com.bytechef.component.csvfile.CsvFileComponentHandler;
 import com.bytechef.component.csvfile.constant.CsvFileConstants;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
-import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
 import com.bytechef.hermes.component.util.ValueUtils;
@@ -113,7 +112,7 @@ public class CsvFileReadAction {
         Integer pageNumber = parameters.getInteger(PAGE_NUMBER);
         boolean readAsString = parameters.getBoolean(READ_AS_STRING, false);
 
-        try (InputStream inputStream = context.getFileStream(parameters.get(FILE_ENTRY, FileEntry.class))) {
+        try (InputStream inputStream = context.getFileStream(parameters.get(FILE_ENTRY, Context.FileEntry.class))) {
             Integer rangeStartRow = null;
             Integer rangeEndRow = null;
 

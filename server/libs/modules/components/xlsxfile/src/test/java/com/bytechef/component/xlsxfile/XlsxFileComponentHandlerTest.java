@@ -33,7 +33,6 @@ import com.bytechef.component.xlsxfile.action.XlsxFileWriteAction;
 import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
-import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -261,9 +260,9 @@ public class XlsxFileComponentHandlerTest {
         throws FileNotFoundException {
 
         Parameters parameters = Mockito.mock(Parameters.class);
-        FileEntry fileEntry = Mockito.mock(FileEntry.class);
+        Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
 
-        Mockito.when(parameters.get(FILE_ENTRY, FileEntry.class))
+        Mockito.when(parameters.get(FILE_ENTRY, Context.FileEntry.class))
             .thenReturn(fileEntry);
         Mockito.when(parameters.getBoolean(HEADER_ROW, true))
             .thenReturn(headerRow);
@@ -280,7 +279,7 @@ public class XlsxFileComponentHandlerTest {
             .thenReturn(extension);
 
         if (file != null) {
-            Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
+            Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
                 .thenReturn(new FileInputStream(file));
         }
 

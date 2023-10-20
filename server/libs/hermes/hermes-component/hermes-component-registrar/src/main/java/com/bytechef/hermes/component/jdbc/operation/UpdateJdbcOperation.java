@@ -23,6 +23,7 @@ import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.SCHEMA;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.TABLE;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.UPDATE_KEY;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.jdbc.JdbcExecutor;
@@ -52,7 +53,7 @@ public class UpdateJdbcOperation implements JdbcOperation<Map<String, Integer>> 
         String updateKey = parameters.getString(UPDATE_KEY, "id");
 
         int[] rowsAffected = jdbcExecutor.batchUpdate(
-            context.getConnection(),
+            OptionalUtils.get(context.fetchConnection()),
             "UPDATE "
                 + schema
                 + "."

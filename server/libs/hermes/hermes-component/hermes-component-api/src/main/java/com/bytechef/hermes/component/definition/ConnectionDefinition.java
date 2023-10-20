@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.Connection;
+import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
@@ -38,19 +38,19 @@ public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConn
 
     boolean isAuthorizationRequired();
 
+    boolean containsAuthorizations();
+
     List<? extends Authorization> getAuthorizations();
 
-    Function<Connection, String> getBaseUriFunction();
+    Function<Context.Connection, String> getBaseUriFunction();
+
+    Display getComponentDisplay();
 
     String getComponentName();
-
-    Display getDisplay();
 
     List<? extends Property<?>> getProperties();
 
     Resources getResources();
 
-    Optional<Consumer<Connection>> getTestConsumer();
-
-    int getVersion();
+    Optional<Consumer<Context.Connection>> getTestConsumer();
 }

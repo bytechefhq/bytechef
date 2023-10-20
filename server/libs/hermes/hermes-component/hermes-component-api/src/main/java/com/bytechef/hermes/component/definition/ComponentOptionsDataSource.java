@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.Connection;
+import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.definition.Option;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -37,5 +37,5 @@ public sealed interface ComponentOptionsDataSource
      *
      * @return The function implementation
      */
-    BiFunction<Connection, Parameters, List<Option>> getOptionsFunction();
+    BiFunction<Context.Connection, Parameters, List<Option>> getOptionsFunction();
 }

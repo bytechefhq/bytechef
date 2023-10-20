@@ -29,7 +29,6 @@ import com.bytechef.component.xmlfile.action.XmlFileReadAction;
 import com.bytechef.component.xmlfile.action.XmlFileWriteAction;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
-import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.util.XmlUtils;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -78,13 +77,13 @@ public class XmlFileComponentHandlerTest {
     public void testPerformRead() throws IOException {
         File file = getFile(SAMPLE_XML);
 
-        Mockito.when(context.readFileToString(Mockito.any(FileEntry.class)))
+        Mockito.when(context.readFileToString(Mockito.any(Context.FileEntry.class)))
             .thenReturn(java.nio.file.Files.readString(Path.of(file.getAbsolutePath())));
 
         Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameters.get(FILE_ENTRY, FileEntry.class))
-            .thenReturn(Mockito.mock(FileEntry.class));
+        Mockito.when(parameters.get(FILE_ENTRY, Context.FileEntry.class))
+            .thenReturn(Mockito.mock(Context.FileEntry.class));
         Mockito.when(parameters.getBoolean(IS_ARRAY, true))
             .thenReturn(false);
 
@@ -96,13 +95,13 @@ public class XmlFileComponentHandlerTest {
     public void testPerformReadArray() throws FileNotFoundException {
         File file = getFile(SAMPLE_ARRAY_XML);
 
-        Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
+        Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
         Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameters.get(FILE_ENTRY, FileEntry.class))
-            .thenReturn(Mockito.mock(FileEntry.class));
+        Mockito.when(parameters.get(FILE_ENTRY, Context.FileEntry.class))
+            .thenReturn(Mockito.mock(Context.FileEntry.class));
         Mockito.when(parameters.getBoolean(IS_ARRAY, true))
             .thenReturn(true);
         Mockito.when(parameters.getInteger(PAGE_NUMBER))
@@ -113,13 +112,13 @@ public class XmlFileComponentHandlerTest {
         assertThat((List<?>) XmlFileReadAction.performRead(context, parameters))
             .isEqualTo(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), List.class));
 
-        Mockito.when(context.getFileStream(Mockito.any(FileEntry.class)))
+        Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
             .thenReturn(new FileInputStream(file));
 
         parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameters.get(FILE_ENTRY, FileEntry.class))
-            .thenReturn(Mockito.mock(FileEntry.class));
+        Mockito.when(parameters.get(FILE_ENTRY, Context.FileEntry.class))
+            .thenReturn(Mockito.mock(Context.FileEntry.class));
         Mockito.when(parameters.getBoolean(IS_ARRAY, true))
             .thenReturn(true);
         Mockito.when(parameters.getInteger(PAGE_NUMBER))
