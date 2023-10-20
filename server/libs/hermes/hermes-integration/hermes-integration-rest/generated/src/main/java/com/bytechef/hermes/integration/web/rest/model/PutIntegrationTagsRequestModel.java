@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "putIntegrationTags_request", description = "The request object that contains the array of tags.")
 @JsonTypeName("putIntegrationTags_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-16T08:29:28.643031+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-28T11:24:35.597268+01:00[Europe/Zagreb]")
 public class PutIntegrationTagsRequestModel {
 
   @JsonProperty("tags")
