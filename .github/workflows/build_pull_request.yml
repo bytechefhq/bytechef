@@ -9,7 +9,7 @@ name: CI Build
 
 on:
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master", "bytechefhq/bytechef:master" ]
 
 permissions:
   contents: read
