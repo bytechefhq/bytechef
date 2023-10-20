@@ -7,6 +7,8 @@ import LeftSidebarMenuItem from '../../layouts/LeftSidebarMenu/LeftSidebarMenuIt
 import {TagIcon} from '@heroicons/react/20/solid';
 import {useGetComponentDefinitionsQuery} from '../../queries/componentDefinitions';
 import {useGetConnectionTagsQuery} from '../../queries/connections';
+import ConnectionModal from './ConnectionModal';
+import ConnectionList from './ConnectionList';
 
 export enum Type {
     Component,
@@ -15,21 +17,57 @@ export enum Type {
 
 const Connections = () => {
     const [searchParams] = useSearchParams();
-    const [current, setCurrent] = useState<{id?: number | string; type: Type}>({
+
+    const defaultCurrentState = {
         id: searchParams.get('componentName')
             ? +searchParams.get('componentName')!
             : searchParams.get('tagId')
             ? +searchParams.get('tagId')!
             : undefined,
         type: searchParams.get('tagId') ? Type.Tag : Type.Component,
-    });
+    };
+
+    const [current, setCurrent] = useState<{id?: number | string; type: Type}>(
+        defaultCurrentState
+    );
     const {isLoading: componentsIsLoading, data: components} =
         useGetComponentDefinitionsQuery({connectionInstances: true});
     const {isLoading: tagsIsLoading, data: tags} = useGetConnectionTagsQuery();
 
+    const title: string = getTitle();
+
+    function getTitle(): string {
+        if (
+            !componentsIsLoading &&
+            current.type === Type.Component &&
+            current.id &&
+            components &&
+            components.length > 0
+        ) {
+            return components.filter(
+                (component) => component.name === current.id
+            )[0].name!;
+        } else if (
+            !tagsIsLoading &&
+            current.type === Type.Tag &&
+            tags &&
+            tags.length > 0
+        ) {
+            return tags && tags.filter((tag) => tag.id === current.id)[0].name!;
+        } else {
+            return 'All Components';
+        }
+    }
+
     return (
         <LayoutContainer
-            header={<PageHeader position={'main'} title="All Connections" />}
+            header={
+                <PageHeader
+                    position="main"
+                    right={<ConnectionModal />}
+                    title={title}
+                />
+            }
             leftSidebarHeader={<PageHeader leftSidebar title="Connections" />}
             leftSidebarBody={
                 <LeftSidebarMenu
@@ -109,7 +147,9 @@ const Connections = () => {
                     }
                 />
             }
-        />
+        >
+            <ConnectionList />
+        </LayoutContainer>
     );
 };
 
