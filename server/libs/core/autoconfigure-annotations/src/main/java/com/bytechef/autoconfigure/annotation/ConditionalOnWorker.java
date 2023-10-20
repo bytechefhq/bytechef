@@ -36,5 +36,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
-@ConditionalOnProperty(prefix = "workflow", name = "worker.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(
+        prefix = "bytechef.workflow",
+        name = "worker.enabled",
+        havingValue = "true",
+        matchIfMissing = true)
 public @interface ConditionalOnWorker {}

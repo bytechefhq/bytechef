@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2021 <your company/name>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,8 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
 package com.bytechef.autoconfigure.annotation;
@@ -26,15 +24,13 @@ import java.lang.annotation.Target;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
- * Configuration annotation for a conditional element that depends on the property
- * <code>workflow.coordinator.enabled</code> containing the value <code>true</code>
+ * Configuration annotation for a conditional element that depends on the property <code>workflow.api.enabled</code>
+ * containing the value <code>true</code>
  *
- * @author Arik Cohen
  * @author Ivica Cardic
- * @since Apr 4, 2017
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
-@ConditionalOnProperty(prefix = "workflow", name = "coordinator.enabled", havingValue = "true", matchIfMissing = true)
-public @interface ConditionalOnCoordinator {}
+@ConditionalOnProperty(prefix = "bytechef.workflow", name = "worker.api", havingValue = "true", matchIfMissing = true)
+public @interface ConditionalOnApi {}
