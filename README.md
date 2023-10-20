@@ -304,7 +304,7 @@ Supported types are `job.status` and `task.started`.
 # Task Handlers
 
 
-[core/var](src/main/java/com/integri/atlas/taskhandler/core/Var.java)
+[core/var](src/main/java/com/integri/atlas/task/handler/core/Var.java)
 
 ```
   name: pi
@@ -312,14 +312,14 @@ Supported types are `job.status` and `task.started`.
   value: 3.14159
 ```
 
-[io/createTempDir](src/main/java/com/integri/atlas/taskhandler/io/CreateTempDir.java)
+[io/createTempDir](src/main/java/com/integri/atlas/task/handler/io/CreateTempDir.java)
 
 ```
   name: tempDir
   type: io/create-temp-dir
 ```
 
-[io/filepath](src/main/java/com/integri/atlas/taskhandler/io/FilePath.java)
+[io/filepath](src/main/java/com/integri/atlas/task/handler/io/FilePath.java)
 
 ```
   name: myFilePath
@@ -327,7 +327,7 @@ Supported types are `job.status` and `task.started`.
   filename: /path/to/my/file.txt
 ```
 
-[io/ls](src/main/java/com/integri/atlas/taskhandler/io/Ls.java)
+[io/ls](src/main/java/com/integri/atlas/task/handler/io/Ls.java)
 
 ```
   name: listOfFiles
@@ -336,28 +336,28 @@ Supported types are `job.status` and `task.started`.
   path: /path/to/directory
 ```
 
-[io/mkdir](src/main/java/com/integri/atlas/taskhandler/io/Mkdir.java)
+[io/mkdir](src/main/java/com/integri/atlas/task/handler/io/Mkdir.java)
 
 ```
   type: io/mkdir
   path: /path/to/directory
 ```
 
-[io/print](src/main/java/com/integri/atlas/taskhandler/io/Print.java)
+[io/print](src/main/java/com/integri/atlas/task/handler/io/Print.java)
 
 ```
   type: io/print
   text: hello world
 ```
 
-[io/rm](src/main/java/com/integri/atlas/taskhandler/io/Rm.java)
+[io/rm](src/main/java/com/integri/atlas/task/handler/io/Rm.java)
 
 ```
   type: io/rm
   path: /some/directory
 ```
 
-[media/dar](src/main/java/com/integri/atlas/taskhandler/media/Dar.java)
+[media/dar](src/main/java/com/integri/atlas/task/handler/media/Dar.java)
 
 ```
   name: myDar
@@ -365,7 +365,7 @@ Supported types are `job.status` and `task.started`.
   input: /path/to/my/video/mp4
 ```
 
-[media/ffmpeg](src/main/java/com/integri/atlas/taskhandler/media/Ffmpeg.java)
+[media/ffmpeg](src/main/java/com/integri/atlas/task/handler/media/Ffmpeg.java)
 
 ```
   type: media/ffmpeg
@@ -384,7 +384,7 @@ Supported types are `job.status` and `task.started`.
   ]
 ```
 
-[media/ffprobe](src/main/java/com/integri/atlas/taskhandler/media/Ffprobe.java)
+[media/ffprobe](src/main/java/com/integri/atlas/task/handler/media/Ffprobe.java)
 
 ```
   name: ffprobeResults
@@ -392,7 +392,7 @@ Supported types are `job.status` and `task.started`.
   input: /path/to/my/media/file.mov
 ```
 
-[media/framerate](src/main/java/com/integri/atlas/taskhandler/media/Framerate.java)
+[media/framerate](src/main/java/com/integri/atlas/task/handler/media/Framerate.java)
 
 ```
   name: framerate
@@ -400,7 +400,7 @@ Supported types are `job.status` and `task.started`.
   input: /path/to/my/video/file.mov
 ```
 
-[media/mediainfo](src/main/java/com/integri/atlas/taskhandler/media/Mediainfo.java)
+[media/mediainfo](src/main/java/com/integri/atlas/task/handler/media/Mediainfo.java)
 
 ```
   name: mediainfoResult
@@ -408,7 +408,7 @@ Supported types are `job.status` and `task.started`.
   input: /path/to/my/media/file.mov
 ```
 
-[media/vduration](src/main/java/com/integri/atlas/taskhandler/media/Vduration.java)
+[media/vduration](src/main/java/com/integri/atlas/task/handler/media/Vduration.java)
 
 ```
   name: duration
@@ -416,7 +416,7 @@ Supported types are `job.status` and `task.started`.
   input: /path/to/my/video/file.mov
 ```
 
-[media/vsplit](src/main/java/com/integri/atlas/taskhandler/media/Vsplit.java)
+[media/vsplit](src/main/java/com/integri/atlas/task/handler/media/Vsplit.java)
 
 ```
   name: chunks
@@ -425,7 +425,7 @@ Supported types are `job.status` and `task.started`.
   chunkSize: 30s
 ```
 
-[media/vstitch](src/main/java/com/integri/atlas/taskhandler/media/Vstitch.java)
+[media/vstitch](src/main/java/com/integri/atlas/task/handler/media/Vstitch.java)
 
 ```
   type: media/vstitch
@@ -438,7 +438,7 @@ Supported types are `job.status` and `task.started`.
 ```
 
 
-[random/int](src/main/java/com/integri/atlas/taskhandler/random/RandomInt.java)
+[random/int](src/main/java/com/integri/atlas/task/handler/random/RandomInt.java)
 
 ```
   name: someRandomNumber
@@ -447,14 +447,14 @@ Supported types are `job.status` and `task.started`.
   endInclusive: 9999 # default 100
 ```
 
-[random/rogue](src/main/java/com/integri/atlas/taskhandler/random/Rogue.java)
+[random/rogue](src/main/java/com/integri/atlas/task/handler/random/Rogue.java)
 
 ```
   type: random/rogue
   probabilty: 0.25 # default 0.5
 ```
 
-[s3/getObject](src/main/java/com/integri/atlas/taskhandler/s3/S3GetObject.java)
+[s3/getObject](src/main/java/com/integri/atlas/task/handler/s3/S3GetObject.java)
 
 ```
   type: s3/getObject
@@ -462,7 +462,7 @@ Supported types are `job.status` and `task.started`.
   filepath: /path/to/my/file.mp4
 ```
 
-[s3/listObjects](src/main/java/com/integri/atlas/taskhandler/s3/S3ListObjects.java)
+[s3/listObjects](src/main/java/com/integri/atlas/task/handler/s3/S3ListObjects.java)
 
 ```
   type: s3/listObjects
@@ -470,14 +470,14 @@ Supported types are `job.status` and `task.started`.
   prefix: some/path/
 ```
 
-[s3/getUrl](src/main/java/com/integri/atlas/taskhandler/s3/S3GetUrl.java)
+[s3/getUrl](src/main/java/com/integri/atlas/task/handler/s3/S3GetUrl.java)
 
 ```
   type: s3/getUrl
   uri: s3://my-bucket/path/to/file.mp4
 ```
 
-[s3/presignGetObject](src/main/java/com/integri/atlas/taskhandler/s3/S3PresignedGetObject.java)
+[s3/presignGetObject](src/main/java/com/integri/atlas/task/handler/s3/S3PresignedGetObject.java)
 
 ```
   name: url
@@ -486,7 +486,7 @@ Supported types are `job.status` and `task.started`.
   signatureDuration: 60s
 ```
 
-[s3/putObject](src/main/java/com/integri/atlas/taskhandler/s3/S3PutObject.java)
+[s3/putObject](src/main/java/com/integri/atlas/task/handler/s3/S3PutObject.java)
 
 ```
   type: s3/putObject
@@ -494,7 +494,7 @@ Supported types are `job.status` and `task.started`.
   filepath: /path/to/my/file.mp4
 ```
 
-[shell/bash](src/main/java/com/integri/atlas/taskhandler/shell/Bash.java)
+[shell/bash](src/main/java/com/integri/atlas/task/handler/shell/Bash.java)
 
 ```
   name: listOfFiles
@@ -506,7 +506,7 @@ Supported types are `job.status` and `task.started`.
         done
 ```
 
-[time/sleep](src/main/java/com/integri/atlas/taskhandler/time/Sleep.java)
+[time/sleep](src/main/java/com/integri/atlas/task/handler/time/Sleep.java)
 
 ```
   type: time/sleep
@@ -515,119 +515,112 @@ Supported types are `job.status` and `task.started`.
 
 # Expression Functions
 
-[boolean](src/main/java/com/integri/atlas/engine/core/spel/Cast.java)
+[boolean](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Cast.java)
 
 ```
   type: core/var
   value: "${boolean('false')}"
 ```
 
-[byte](src/main/java/com/integri/atlas/engine/core/spel/Cast.java)
+[byte](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Cast.java)
 
 ```
   type: core/var
   value: "${byte('42')}"
 ```
 
-[char](src/main/java/com/integri/atlas/engine/core/spel/Cast.java)
+[char](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Cast.java)
 
 ```
   type: core/var
   value: "${char('1')}"
 ```
 
-[short](src/main/java/com/integri/atlas/engine/core/spel/Cast.java)
+[short](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Cast.java)
 
 ```
   type: core/var
   value: "${short('42')}"
 ```
 
-[int](src/main/java/com/integri/atlas/engine/core/spel/Cast.java)
+[int](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Cast.java)
 
 ```
   type: core/var
   value: "${int('42')}"
 ```
 
-[long](src/main/java/com/integri/atlas/engine/core/spel/Cast.java)
+[long](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Cast.java)
 
 ```
   type: core/var
   value: "${long('42')}"
 ```
 
-[float](src/main/java/com/integri/atlas/engine/core/spel/Cast.java)
+[float](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Cast.java)
 
 ```
   type: core/var
   value: "${float('4.2')}"
 ```
 
-[double](src/main/java/com/integri/atlas/engine/core/spel/Cast.java)
+[double](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Cast.java)
 
 ```
   type: core/var
   value: "${float('4.2')}"
 ```
 
-[systemProperty](src/main/java/com/integri/atlas/engine/core/spel/SystemProperty.java)
+[systemProperty](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/SystemProperty.java)
 
 ```
   type: core/var
   value: "${systemProperty('java.home')}"
 ```
 
-[range](src/main/java/com/integri/atlas/engine/core/spel/Range.java)
+[range](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Range.java)
 
 ```
   type: core/var
   value: "${range(0,100)}" # [0,1,...,100]
 ```
 
-[join](src/main/java/com/integri/atlas/engine/core/spel/Join.java)
+[join](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Join.java)
 
 ```
   type: core/var
   value: "${join('A','B','C')}" # ABC
 ```
 
-[concat](src/main/java/com/integri/atlas/engine/core/spel/Concat.java)
-
-```
-  type: core/var
-  value: "${join('A','B','C')"}
-```
-
-[concat](src/main/java/com/integri/atlas/engine/core/spel/Concat.java)
+[concat](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Concat.java)
 
 ```
   type: core/var
   value: ${concat(['A','B'],['C'])} # ['A','B','C']
 ```
 
-[flatten](src/main/java/com/integri/atlas/engine/core/spel/Flatten.java)
+[flatten](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Flatten.java)
 
 ```
   type: core/var
   value: ${flatten([['A'],['B']])} # ['A','B']
 ```
 
-[sort](src/main/java/com/integri/atlas/engine/core/spel/Sort.java)
+[sort](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Sort.java)
 
 ```
   type: core/var
   value: ${sort([3,1,2])} # [1,2,3]
 ```
 
-[tempDir](src/main/java/com/integri/atlas/engine/core/spel/TempDir.java)
+[tempDir](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/TempDir.java)
 
 ```
   type: core/var
   value: "${tempDir()}"  # e.g. /tmp
 ```
 
-[uuid](src/main/java/com/integri/atlas/engine/core/spel/Uuid.java)
+[uuid](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Uuid.java)
 
 ```
   name: workDir
@@ -635,40 +628,52 @@ Supported types are `job.status` and `task.started`.
   value: "${tempDir()}/${uuid()}"
 ```
 
-[stringf](src/main/java/com/integri/atlas/engine/core/spel/StringFormat.java)
+[stringf](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/StringFormat.java)
 
 ```
   type: core/var
   value: "${stringf('%03d',5)}"  # 005
 ```
 
-[now](src/main/java/com/integri/atlas/engine/core/spel/Now.java)
+[now](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Now.java)
 
 ```
   type: core/var
   value: "${dateFormat(now(),'yyyy')}"  # e.g. 2020
 ```
 
-[timestamp](src/main/java/com/integri/atlas/engine/core/spel/Timestamp.java)
+[timestamp](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Timestamp.java)
 
 ```
   type: core/var
   value: "${timestamp()}"  # e.g. 1583268621423
 ```
 
-[dateFormat](src/main/java/com/integri/atlas/engine/core/spel/DateFormat.java)
+[dateFormat](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/DateFormat.java)
 
 ```
   type: core/var
   value: "${dateFormat(now(),'yyyy')}"  # e.g. 2020
 ```
 
-[config](src/main/java/com/integri/atlas/engine/core/spel/Config.java)
+[config](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/Config.java)
 
 ```
   type: core/var
   value: "${config('some.config.property')}"
 ```
+
+[config](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/ReadJSON.java)
+
+[config](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/WriteJSON.java)
+
+[config](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/ReadXML.java)
+
+[config](src/main/java/com/integri/atlas/engine/core/task/evaluator/spel/WriteJSON.java)
+
+[config](src/main/java/com/integri/atlas/file/storage/task/evaluator/spel/ReadFileContent.java)
+
+[config](src/main/java/com/integri/atlas/file/storage/task/evaluator/spel/StoreFileContent.java)
 
 # Tutorials
 
