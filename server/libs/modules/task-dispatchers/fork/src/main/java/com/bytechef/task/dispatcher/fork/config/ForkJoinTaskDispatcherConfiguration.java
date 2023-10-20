@@ -18,20 +18,20 @@ package com.bytechef.task.dispatcher.fork.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.service.context.ContextService;
-import com.bytechef.atlas.service.counter.CounterService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
+import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.CounterService;
+import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
-import com.bytechef.task.dispatcher.fork.ForkTaskDispatcher;
-import com.bytechef.task.dispatcher.fork.completion.ForkTaskCompletionHandler;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
+import com.bytechef.task.dispatcher.fork.ForkJoinTaskDispatcher;
+import com.bytechef.task.dispatcher.fork.completion.ForkJoinTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 
 /**
  * @author Ivica Cardic
  */
-public class ForkTaskDispatcherConfiguration {
+public class ForkJoinTaskDispatcherConfiguration {
 
     @Autowired
     private ContextService contextService;
@@ -48,9 +48,9 @@ public class ForkTaskDispatcherConfiguration {
     @Autowired
     private TaskExecutionService taskExecutionService;
 
-    @Bean("forkTaskCompletionHandlerFactory")
+    @Bean("forkJoinTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory forkTaskCompletionHandlerFactory() {
-        return (taskCompletionHandler, taskDispatcher) -> new ForkTaskCompletionHandler(
+        return (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
                 taskExecutionService,
                 taskCompletionHandler,
                 counterService,
@@ -59,19 +59,9 @@ public class ForkTaskDispatcherConfiguration {
                 taskEvaluator);
     }
 
-    @Bean("forkTaskDispatcherFactory")
+    @Bean("forkJoinTaskDispatcherFactory_v1")
     TaskDispatcherResolverFactory forkTaskDispatcherFactory() {
-        return (taskDispatcher) -> {
-            ForkTaskDispatcher forkTaskDispatcher = new ForkTaskDispatcher();
-
-            forkTaskDispatcher.setTaskDispatcher(taskDispatcher);
-            forkTaskDispatcher.setTaskEvaluator(taskEvaluator);
-            forkTaskDispatcher.setTaskExecutionService(taskExecutionService);
-            forkTaskDispatcher.setMessageBroker(messageBroker);
-            forkTaskDispatcher.setContextService(contextService);
-            forkTaskDispatcher.setCounterService(counterService);
-
-            return forkTaskDispatcher;
-        };
+        return (taskDispatcher) -> new ForkJoinTaskDispatcher(
+                contextService, counterService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService);
     }
 }
