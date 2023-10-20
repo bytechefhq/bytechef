@@ -29,7 +29,7 @@ import static com.integri.atlas.engine.core.task.description.TaskProperty.minVal
 import static com.integri.atlas.engine.core.task.description.TaskProperty.multipleValues;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
-import static com.integri.atlas.engine.core.task.description.TaskSpecification.task;
+import static com.integri.atlas.engine.core.task.description.TaskSpecification.create;
 
 import com.integri.atlas.engine.core.task.TaskDefinition;
 import com.integri.atlas.engine.core.task.description.TaskSpecification;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class HttpClientTaskDefinition implements TaskDefinition {
 
-    public static final TaskSpecification TASK_DESCRIPTION = task("httpClient")
+    public static final TaskSpecification TASK_DESCRIPTION = create("httpClient")
         .displayName("HTTP Client")
         .description("Makes an HTTP request and returns the response data")
         .authentication(
