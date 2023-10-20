@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -90,17 +91,17 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
 
         String uri = resourceURI.toString();
 
-        String id = ENCODER.encodeToString(
-            uri.substring(
-                uri.lastIndexOf(PREFIX) + PREFIX.length(), uri.lastIndexOf('.'))
-                .getBytes(StandardCharsets.UTF_8));
+        String substring = uri.substring(uri.lastIndexOf(PREFIX) + PREFIX.length(), uri.lastIndexOf('.'));
 
-        return readWorkflow(new WorkflowResource(id, resource, Workflow.Format.parse(uri)));
+        return readWorkflow(
+            new WorkflowResource(
+                ENCODER.encodeToString(substring.getBytes(StandardCharsets.UTF_8)), Map.of("path", uri), resource,
+                Workflow.Format.parse(uri)));
     }
 
-    private static Workflow readWorkflow(WorkflowResource resource) {
+    private static Workflow readWorkflow(WorkflowResource workflowResource) {
         try {
-            return WorkflowReader.readWorkflow(resource);
+            return WorkflowReader.readWorkflow(workflowResource);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
