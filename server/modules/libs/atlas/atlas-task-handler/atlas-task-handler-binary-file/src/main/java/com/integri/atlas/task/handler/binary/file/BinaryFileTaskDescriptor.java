@@ -18,11 +18,11 @@
 
 package com.integri.atlas.task.handler.binary.file;
 
-import static com.integri.atlas.engine.core.task.TaskDescriptor.task;
-import static com.integri.atlas.engine.core.task.description.TaskDescription.property;
+import static com.integri.atlas.engine.core.task.description.TaskDescription.task;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyType.SELECT;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyType.STRING;
 
 import com.integri.atlas.engine.core.task.TaskDescriptor;
 import com.integri.atlas.engine.core.task.description.TaskDescription;
@@ -33,28 +33,38 @@ public class BinaryFileTaskDescriptor implements TaskDescriptor {
 
     private static final TaskDescription TASK_DESCRIPTION = task("binaryFile")
         .displayName("Binary File")
-        .description("Directs a stream based on true/false results of comparisons")
+        .description("Reads or writes a binary file from/toto disk")
         .properties(
-            property("operation")
+            SELECT_PROPERTY("operation")
                 .displayName("Operation")
-                .type(SELECT)
-                .description("Operation to do with the file.")
-                .options(option("Read", "READ"), option("Write", "WRITE"))
+                .description("The operation to perform.")
+                .options(option("Read to file", "READ"), option("Write from file", "WRITE"))
                 .defaultValue("read")
                 .required(true),
-            property("filePath")
-                .displayName("File Path")
-                .type(STRING)
-                .description("Path of the file to read or path to which the file should be written.")
+            STRING_PROPERTY("fileName")
+                .displayName("File Name")
+                .displayOption(show("operation", "READ"))
+                .description("The path of the file to read.")
                 .defaultValue("")
                 .placeholder("/data/your_file.pdf")
                 .required(true),
-            property("dataPropertyName")
+            STRING_PROPERTY("dataPropertyName")
                 .displayName("Property Name")
-                .type(STRING)
-                .description(
-                    "Name of the binary property to which to write the data of the read file or which contains the data for the file to be written."
-                )
+                .displayOption(show("operation", "READ"))
+                .description("The name of the binary property to which to write the data of the read file.")
+                .defaultValue("data")
+                .required(true),
+            STRING_PROPERTY("fileName")
+                .displayName("File Name")
+                .displayOption(show("operation", "WRITE"))
+                .description("The path to which the file should be written.")
+                .defaultValue("")
+                .placeholder("/data/your_file.pdf")
+                .required(true),
+            STRING_PROPERTY("dataPropertyName")
+                .displayName("Property Name")
+                .displayOption(show("operation", "WRITE"))
+                .description("The name of the binary property which contains the data for the file to be written.")
                 .defaultValue("data")
                 .required(true)
         );

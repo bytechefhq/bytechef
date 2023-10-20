@@ -18,20 +18,18 @@
 
 package com.integri.atlas.task.dispatcher.if_;
 
-import static com.integri.atlas.engine.core.task.TaskDescriptor.task;
-import static com.integri.atlas.engine.core.task.description.TaskDescription.property;
+import static com.integri.atlas.engine.core.task.description.TaskDescription.task;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.DATE_TIME_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.GROUP_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.NUMBER_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.hide;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.multipleValues;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.properties;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.group;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyType.BOOLEAN;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyType.COLLECTION;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyType.DATE_TIME;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyType.NUMBER;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyType.SELECT;
-import static com.integri.atlas.engine.core.task.description.TaskPropertyType.STRING;
 
 import com.integri.atlas.engine.core.task.TaskDescriptor;
 import com.integri.atlas.engine.core.task.description.TaskDescription;
@@ -45,69 +43,55 @@ public class IfTaskDescriptor implements TaskDescriptor {
         .displayName("IF")
         .description("Directs a stream based on true/false results of comparisons")
         .properties(
-            property("conditions")
+            COLLECTION_PROPERTY("conditions")
                 .displayName("Conditions")
                 .placeholder("Add Condition")
-                .type(COLLECTION)
-                .propertyTypeOption(multipleValues(true))
                 .description("The type of values to compare.")
+                .typeOption(multipleValues(true))
                 .options(
-                    group(
-                        "boolean",
-                        "Boolean",
-                        properties(
-                            property("value1")
+                    GROUP_PROPERTY("boolean")
+                        .displayName("Boolean")
+                        .fields(
+                            BOOLEAN_PROPERTY("value1")
                                 .displayName("Value 1")
-                                .type(BOOLEAN)
                                 .description("The boolean value to compare with the second one.")
                                 .defaultValue(false),
-                            property("operation")
+                            SELECT_PROPERTY("operation")
                                 .displayName("Operation")
-                                .type(SELECT)
                                 .description("Compare operation to decide where to map data.")
                                 .options(option("Equal", "equal"), option("Not Equal", "notEqual"))
                                 .defaultValue("equal"),
-                            property("value2")
+                            BOOLEAN_PROPERTY("value2")
                                 .displayName("Value 2")
-                                .type(BOOLEAN)
                                 .description("The boolean value to compare with the first one.")
                                 .defaultValue(false)
-                        )
-                    ),
-                    group(
-                        "dateTime",
-                        "Date & Time",
-                        properties(
-                            property("value1")
+                        ),
+                    GROUP_PROPERTY("dateTime")
+                        .displayName("Date & Time")
+                        .fields(
+                            DATE_TIME_PROPERTY("value1")
                                 .displayName("Value 1")
-                                .type(DATE_TIME)
                                 .description("The date & time value to compare with the second one.")
-                                .defaultValue(""),
-                            property("operation")
+                                .defaultValue(null),
+                            SELECT_PROPERTY("operation")
                                 .displayName("Operation")
-                                .type(SELECT)
                                 .description("Compare operation to decide where to map data.")
                                 .options(option("After", "after"), option("Before", "before"))
                                 .defaultValue("after"),
-                            property("value2")
+                            DATE_TIME_PROPERTY("value2")
                                 .displayName("Value 2")
-                                .type(DATE_TIME)
                                 .description("The date & time value to compare with the first one.")
-                                .defaultValue("")
-                        )
-                    ),
-                    group(
-                        "number",
-                        "Number",
-                        properties(
-                            property("value1")
+                                .defaultValue(null)
+                        ),
+                    GROUP_PROPERTY("number")
+                        .displayName("Number")
+                        .fields(
+                            NUMBER_PROPERTY("value1")
                                 .displayName("Value 1")
-                                .type(NUMBER)
                                 .description("The number value to compare with the second one.")
                                 .defaultValue(0),
-                            property("operation")
+                            SELECT_PROPERTY("operation")
                                 .displayName("Operation")
-                                .type(SELECT)
                                 .description("Compare operation to decide where to map data.")
                                 .options(
                                     option("Smaller", "smaller"),
@@ -119,26 +103,21 @@ public class IfTaskDescriptor implements TaskDescriptor {
                                     option("Empty", "empty")
                                 )
                                 .defaultValue("smaller"),
-                            property("value2")
+                            NUMBER_PROPERTY("value2")
                                 .displayName("Value 2")
-                                .type(NUMBER)
                                 .description("The number value to compare with the first one.")
                                 .defaultValue(0)
                                 .displayOption(hide("operation"))
-                        )
-                    ),
-                    group(
-                        "string",
-                        "String",
-                        properties(
-                            property("value1")
+                        ),
+                    GROUP_PROPERTY("string")
+                        .displayName("String")
+                        .fields(
+                            STRING_PROPERTY("value1")
                                 .displayName("Value 1")
-                                .type(STRING)
                                 .description("The string value to compare with the second one.")
                                 .defaultValue(""),
-                            property("operation")
+                            SELECT_PROPERTY("operation")
                                 .displayName("Operation")
-                                .type(SELECT)
                                 .description("Compare operation to decide where to map data.")
                                 .options(
                                     option("Equal", "equal"),
@@ -151,25 +130,21 @@ public class IfTaskDescriptor implements TaskDescriptor {
                                     option("Empty", "empty")
                                 )
                                 .defaultValue("equal"),
-                            property("value2")
+                            STRING_PROPERTY("value2")
                                 .displayName("Value 2")
-                                .type(STRING)
                                 .description("The string value to compare with the first one.")
                                 .defaultValue("")
                                 .displayOption(hide("operation", "empty", "regex")),
-                            property("value2")
+                            STRING_PROPERTY("value2")
                                 .displayName("Regex")
-                                .type(STRING)
                                 .description("The regex value to compare with the first one.")
                                 .placeholder("/text/i")
                                 .defaultValue("")
                                 .displayOption(show("operation", "regex"))
                         )
-                    )
                 ),
-            property("combineOperation")
+            SELECT_PROPERTY("combineOperation")
                 .displayName("Combine")
-                .type(SELECT)
                 .options(
                     option("All", "all", "Only if all conditions are met, the workflow goes into \"true\" branch."),
                     option("Any", "any", "If all conditions are met, the workflow goes into \"true\" branch.")
