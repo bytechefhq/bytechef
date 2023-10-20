@@ -1,25 +1,32 @@
-import Button from 'components/Button/Button';
 import React, {ReactNode} from 'react';
+import cx from 'classnames';
 
 const PageHeader: React.FC<{
-    title: string;
-    buttonLabel?: string;
-    buttonOnClick?: () => void;
+    leftSidebar?: boolean;
+    className?: string;
     right?: ReactNode;
-}> = ({title, right, buttonLabel, buttonOnClick}) => (
-    <div className="mb-6 flex justify-center py-4">
+    title: string;
+}> = ({title, className, leftSidebar = false, right}) => (
+    <header
+        className={cx(
+            'mb-4 flex justify-center',
+            leftSidebar ? 'py-4 px-2' : 'p-4',
+            className
+        )}
+    >
         <div className="flex w-full items-center justify-between">
-            <h2 className="text-xl tracking-tight text-gray-900 dark:text-gray-200">
+            <div
+                className={cx(
+                    'flex h-[40px] items-center text-xl tracking-tight text-gray-900 dark:text-gray-200',
+                    leftSidebar ? 'font-semibold' : ''
+                )}
+            >
                 {title}
-            </h2>
+            </div>
 
             {right && <div>{right}</div>}
-
-            {buttonLabel && buttonOnClick && (
-                <Button label={buttonLabel} onClick={buttonOnClick} />
-            )}
         </div>
-    </div>
+    </header>
 );
 
 export default PageHeader;

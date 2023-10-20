@@ -1,24 +1,28 @@
 import React, {Fragment, PropsWithChildren, ReactNode, useState} from 'react';
 import {Dialog, Transition} from '@headlessui/react';
 import {XMarkIcon} from '@heroicons/react/24/outline';
-import PageHeader from '../PageHeader/PageHeader';
+import cx from 'classnames';
 
-type Props = {
-    headerProps: {
-        subTitle: string;
-        buttonLabel?: string;
-        buttonOnClick?: () => void;
-        right?: ReactNode;
-    };
-    sidebar?: ReactNode;
-    title: string;
-    topRight?: ReactNode;
+type SidebarContentLayoutProps = {
+    className?: string;
+    header: ReactNode;
+    leftSidebarBody?: ReactNode;
+    leftSidebarHeader?: ReactNode;
+    leftSidebarOpen?: boolean;
+    rightToolbarBody?: ReactNode;
+    rightToolbarOpen?: boolean;
 };
 
-const SidebarContentLayout: React.FC<PropsWithChildren<Props>> = ({
-    headerProps,
-    title,
-    sidebar,
+const SidebarContentLayout: React.FC<
+    PropsWithChildren<SidebarContentLayoutProps>
+> = ({
+    className,
+    header,
+    leftSidebarBody,
+    leftSidebarHeader,
+    leftSidebarOpen = true,
+    rightToolbarBody,
+    rightToolbarOpen = false,
     children,
 }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -85,7 +89,7 @@ const SidebarContentLayout: React.FC<PropsWithChildren<Props>> = ({
                                 <div className="mt-5 h-0 flex-1 overflow-y-auto">
                                     <nav className="flex h-full flex-col">
                                         <div className="space-y-1">
-                                            {sidebar}
+                                            {leftSidebarBody}
                                         </div>
                                     </nav>
                                 </div>
@@ -98,33 +102,41 @@ const SidebarContentLayout: React.FC<PropsWithChildren<Props>> = ({
                 </Dialog>
             </Transition.Root>
 
-            <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
-                <nav className="flex h-full flex-col border-l border-gray-100 bg-gray-50 px-2 dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
-                    <h1
-                        aria-labelledby="primary-heading"
-                        className="py-4 px-2 pr-4 text-xl font-semibold tracking-tight text-gray-900 dark:text-gray-200"
-                    >
-                        {title}
-                    </h1>
+            {leftSidebarOpen && (
+                <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col">
+                    <nav className="flex h-full flex-col border-l border-gray-100 bg-gray-50 dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
+                        {leftSidebarHeader}
 
-                    <div>{sidebar}</div>
-                </nav>
-            </aside>
+                        <div className="overflow-y-auto">
+                            <div>{leftSidebarBody}</div>
+                        </div>
+                    </nav>
+                </aside>
+            )}
 
-            <div className="h-full md:pl-64">
-                <div className="flex h-full flex-col px-4">
-                    <PageHeader
-                        buttonLabel={headerProps.buttonLabel}
-                        buttonOnClick={headerProps.buttonOnClick}
-                        right={headerProps.right}
-                        title={headerProps.subTitle}
-                    />
+            <div className={cx('h-full', leftSidebarOpen ? 'md:pl-72' : '')}>
+                <div className={cx('flex h-full', className)}>
+                    <div className="flex h-full w-full flex-col">
+                        {header}
 
-                    <main className="flex flex-1 overflow-y-auto">
-                        <section className="flex h-full min-w-0 flex-1 flex-col lg:order-last">
-                            {children}
-                        </section>
-                    </main>
+                        <div className="flex h-full">
+                            <main className="flex flex-1 overflow-y-auto">
+                                <section className="flex h-full min-w-0 flex-1 flex-col lg:order-last">
+                                    {children}
+                                </section>
+                            </main>
+
+                            {rightToolbarOpen && rightToolbarBody && (
+                                <aside className="flex">
+                                    <nav className="flex h-full flex-col border-l border-gray-100 bg-gray-50 dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
+                                        <div className="overflow-y-auto">
+                                            <div>{rightToolbarBody}</div>
+                                        </div>
+                                    </nav>
+                                </aside>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
         </>
