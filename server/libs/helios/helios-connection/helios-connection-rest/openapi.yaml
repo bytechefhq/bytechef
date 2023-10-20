@@ -6,9 +6,9 @@ info:
 servers:
 - url: "http://localhost:5173/api/automation"
 tags:
-- name: "connection-tags"
+- name: "automation-connection-tags"
   description: "The Automation Connection Tags API"
-- name: "connections"
+- name: "automation-connections"
   description: "The Automation Connections API"
 paths:
   /connection-tags:
@@ -16,7 +16,7 @@ paths:
       description: "Get connection tags."
       summary: "Get connection tags"
       tags:
-      - "connection-tags"
+      - "automation-connection-tags"
       operationId: "getConnectionTags"
       responses:
         "200":
@@ -33,7 +33,7 @@ paths:
       description: "Get all connections."
       summary: "Get all connections"
       tags:
-      - "connections"
+      - "automation-connections"
       operationId: "getConnections"
       parameters:
       - name: "componentName"
@@ -68,7 +68,7 @@ paths:
       description: "Create a new connection."
       summary: "Create a new connection"
       tags:
-      - "connections"
+      - "automation-connections"
       operationId: "createConnection"
       requestBody:
         content:
@@ -88,7 +88,7 @@ paths:
       description: "Delete a connection."
       summary: "Delete a connection"
       tags:
-      - "connections"
+      - "automation-connections"
       operationId: "deleteConnection"
       parameters:
       - name: "id"
@@ -105,7 +105,7 @@ paths:
       description: "Get a connection by id."
       summary: "Get a connection by id"
       tags:
-      - "connections"
+      - "automation-connections"
       operationId: "getConnection"
       parameters:
       - name: "id"
@@ -126,7 +126,7 @@ paths:
       description: "Update an existing connection."
       summary: "Update an existing connection"
       tags:
-      - "connections"
+      - "automation-connections"
       operationId: "updateConnection"
       parameters:
       - name: "id"
@@ -154,7 +154,7 @@ paths:
       description: "Updates tags of an existing connection."
       summary: "Updates tags of an existing connection"
       tags:
-      - "connection-tags"
+      - "automation-connection-tags"
       operationId: "updateConnectionTags"
       parameters:
       - name: "id"
