@@ -30,6 +30,9 @@ import java.util.List;
  */
 public class HttpClientHelper {
 
+    private final HttpClient httpClient;
+    private final HttpAuthentication httpAuthentication;
+
     public HttpClientHelper(HttpAuthentication httpAuthentication, long timeout) {
         this.httpAuthentication = httpAuthentication;
 
@@ -61,7 +64,4 @@ public class HttpClientHelper {
 
         return httpClient.send(httpRequestBuilder.build(), bodyHandler);
     }
-
-    private final HttpClient httpClient;
-    private final HttpAuthentication httpAuthentication;
 }
