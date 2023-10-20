@@ -1,0 +1,12 @@
+dependencies {
+    api project(":server:libs:atlas:atlas-worker:atlas-worker-api")
+    api project(":server:libs:hermes:hermes-api")
+
+    implementation "com.fasterxml.jackson.core:jackson-databind"
+    implementation libs.commons.io
+    implementation "org.skyscreamer:jsonassert"
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation "org.springframework.boot:spring-boot-test"
+    implementation project(":server:libs:core:encryption:encryption-api")
+    implementation project(":server:libs:test-support")
+}
