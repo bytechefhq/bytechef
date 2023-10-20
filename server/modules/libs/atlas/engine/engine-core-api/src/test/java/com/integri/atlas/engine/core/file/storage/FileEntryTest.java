@@ -14,34 +14,33 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.binary;
+package com.integri.atlas.engine.core.file.storage;
 
-import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class BinaryTest {
+public class FileEntryTest {
 
     @Test
-    public void testOf() {
+    public void testOf1() {
         Assertions
-            .assertThat(Binary.of("/tmp/fileName.txt", "data"))
-            .hasFieldOrPropertyWithValue("data", "data")
+            .assertThat(FileEntry.of("/tmp/fileName.txt"))
             .hasFieldOrPropertyWithValue("extension", "txt")
             .hasFieldOrPropertyWithValue("mimeType", "text/plain")
             .hasFieldOrPropertyWithValue("name", "fileName.txt")
-            .hasFieldOrPropertyWithValue("__type__", "BINARY");
+            .hasFieldOrPropertyWithValue("url", "/tmp/fileName.txt");
+    }
 
+    @Test
+    public void testOf2() {
         Assertions
-            .assertThat(Binary.of("/tmp/fileName.txt", "data", Map.of("key", "value")))
-            .hasFieldOrPropertyWithValue("data", "data")
+            .assertThat(FileEntry.of("name.txt", "/tmp/fileName.txt"))
             .hasFieldOrPropertyWithValue("extension", "txt")
             .hasFieldOrPropertyWithValue("mimeType", "text/plain")
-            .hasFieldOrPropertyWithValue("name", "fileName.txt")
-            .hasFieldOrPropertyWithValue("key", "value")
-            .hasFieldOrPropertyWithValue("__type__", "BINARY");
+            .hasFieldOrPropertyWithValue("name", "name.txt")
+            .hasFieldOrPropertyWithValue("url", "/tmp/fileName.txt");
     }
 }

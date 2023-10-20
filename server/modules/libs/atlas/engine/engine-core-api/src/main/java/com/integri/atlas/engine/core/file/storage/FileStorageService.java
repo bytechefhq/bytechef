@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.storage.exception;
+package com.integri.atlas.engine.core.file.storage;
 
-public class StorageException extends RuntimeException {
+import com.integri.atlas.engine.core.file.storage.exception.FileStorageException;
+import java.io.InputStream;
 
-    public StorageException(String message) {
-        super(message);
-    }
+/**
+ * @author Ivica Cardic
+ */
+public interface FileStorageService {
+    FileEntry write(String fileName, String data) throws FileStorageException;
 
-    public StorageException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    FileEntry write(String fileName, InputStream inputStream) throws FileStorageException;
+
+    InputStream openInputStream(String url) throws FileStorageException;
+
+    String read(String url) throws FileStorageException;
 }

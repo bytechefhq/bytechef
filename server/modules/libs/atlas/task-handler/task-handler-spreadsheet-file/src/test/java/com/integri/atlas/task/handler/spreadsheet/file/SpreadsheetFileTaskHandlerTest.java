@@ -22,13 +22,12 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import com.atlas.json.JSONArrayUtil;
 import com.atlas.json.JSONObjectUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.core.binary.Binary;
-import com.integri.atlas.engine.core.binary.BinaryHelper;
+import com.integri.atlas.engine.core.file.storage.FileEntry;
+import com.integri.atlas.engine.core.file.storage.FileStorageService;
 import com.integri.atlas.engine.core.json.DefaultJSONHelper;
 import com.integri.atlas.engine.core.json.JSONHelper;
-import com.integri.atlas.engine.core.storage.StorageService;
-import com.integri.atlas.engine.core.storage.base64.Base64StorageService;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
+import com.integri.atlas.file.storage.base64.Base64FileStorageService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -47,11 +46,10 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class SpreadsheetFileTaskHandlerTest {
 
-    private static final StorageService storageService = new Base64StorageService();
-    private static final BinaryHelper binaryHelper = new BinaryHelper(storageService);
+    private static final FileStorageService fileStorageService = new Base64FileStorageService();
     private static final JSONHelper jsonHelper = new DefaultJSONHelper(new ObjectMapper());
     private static final SpreadsheetFileTaskHandler spreadsheetFileTaskHandler = new SpreadsheetFileTaskHandler(
-        binaryHelper,
+        fileStorageService,
         jsonHelper
     );
 
@@ -289,9 +287,7 @@ public class SpreadsheetFileTaskHandlerTest {
             includeEmptyCells,
             range,
             readAsString,
-            file == null
-                ? null
-                : Binary.of(file.getAbsolutePath(), storageService.write("bucketName", new FileInputStream(file)))
+            file == null ? null : fileStorageService.write(file.getName(), new FileInputStream(file))
         );
     }
 
@@ -300,11 +296,11 @@ public class SpreadsheetFileTaskHandlerTest {
         boolean includeEmptyCells,
         Map<String, Integer> range,
         boolean readAsString,
-        Binary binary
+        FileEntry fileEntry
     ) {
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
-        taskExecution.put("binary", binary);
+        taskExecution.put("fileEntry", fileEntry);
         taskExecution.put("headerRow", headerRow);
         taskExecution.put("includeEmptyCells", includeEmptyCells);
         taskExecution.put("operation", "READ");
@@ -314,15 +310,19 @@ public class SpreadsheetFileTaskHandlerTest {
         return taskExecution;
     }
 
-    private SimpleTaskExecution getWriteSimpleTaskExecution(String fileFormat, Binary binary, List<Object> items) {
+    private SimpleTaskExecution getWriteSimpleTaskExecution(
+        String fileFormat,
+        FileEntry fileEntry,
+        List<Object> items
+    ) {
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
         taskExecution.put("fileFormat", fileFormat);
 
-        if (binary == null) {
+        if (fileEntry == null) {
             taskExecution.put("items", items);
         } else {
-            taskExecution.put("binary", binary);
+            taskExecution.put("fileEntry", fileEntry);
         }
 
         taskExecution.put("operation", "WRITE");
@@ -447,7 +447,7 @@ public class SpreadsheetFileTaskHandlerTest {
     }
 
     private void writeFile(String fileFormat) throws Exception {
-        Binary binary = (Binary) spreadsheetFileTaskHandler.handle(
+        FileEntry fileEntry = (FileEntry) spreadsheetFileTaskHandler.handle(
             getWriteSimpleTaskExecution(
                 fileFormat,
                 null,
@@ -458,18 +458,20 @@ public class SpreadsheetFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
             JSONArrayUtil.of(
-                (List<?>) spreadsheetFileTaskHandler.handle(getReadSimpleTaskExecution(true, true, null, false, binary))
+                (List<?>) spreadsheetFileTaskHandler.handle(
+                    getReadSimpleTaskExecution(true, true, null, false, fileEntry)
+                )
             ),
             true
         );
 
-        assertThat(binary.getName()).isEqualTo("spreadsheet." + fileFormat);
+        assertThat(fileEntry.getName()).isEqualTo("spreadsheet." + fileFormat);
 
-        binary =
-            (Binary) spreadsheetFileTaskHandler.handle(
+        fileEntry =
+            (FileEntry) spreadsheetFileTaskHandler.handle(
                 getWriteSimpleTaskExecution(
                     fileFormat,
-                    binaryHelper.writeBinaryData(
+                    fileStorageService.write(
                         "sample.json",
                         Files.contentOf(getFile("sample.json"), Charset.defaultCharset())
                     ),
@@ -480,11 +482,13 @@ public class SpreadsheetFileTaskHandlerTest {
         assertEquals(
             JSONArrayUtil.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
             JSONArrayUtil.of(
-                (List<?>) spreadsheetFileTaskHandler.handle(getReadSimpleTaskExecution(true, true, null, false, binary))
+                (List<?>) spreadsheetFileTaskHandler.handle(
+                    getReadSimpleTaskExecution(true, true, null, false, fileEntry)
+                )
             ),
             true
         );
 
-        assertThat(binary.getName()).isEqualTo("spreadsheet." + fileFormat);
+        assertThat(fileEntry.getName()).isEqualTo("spreadsheet." + fileFormat);
     }
 }

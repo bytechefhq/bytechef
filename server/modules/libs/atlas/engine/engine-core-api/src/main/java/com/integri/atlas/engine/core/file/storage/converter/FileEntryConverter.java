@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.storage;
+package com.integri.atlas.engine.core.file.storage.converter;
 
-import com.integri.atlas.engine.core.storage.exception.StorageException;
-import java.io.InputStream;
+import com.integri.atlas.engine.core.file.storage.FileEntry;
+import java.util.Map;
+import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-public interface StorageService {
-    String write(String bucketName, String data) throws StorageException;
+public class FileEntryConverter implements Converter<Map<?, ?>, FileEntry> {
 
-    String write(String bucketName, InputStream inputStream) throws StorageException;
-
-    InputStream openInputStream(String bucketName, String fileName) throws StorageException;
-
-    String read(String bucketName, String fileName) throws StorageException;
+    @Override
+    @SuppressWarnings("unchecked")
+    public FileEntry convert(Map<?, ?> source) {
+        return FileEntry.of((Map<String, String>) source);
+    }
 }
