@@ -39,7 +39,8 @@ export const Executions = () => {
 
     return (
         <LayoutContainer
-            header={<PageHeader title="Workflow History" />}
+            bodyClassName="p-4"
+            header={<PageHeader position="main" title="Workflow History" />}
             leftSidebarHeader={
                 <>
                     <PageHeader leftSidebar title="Executions" />
@@ -64,7 +65,10 @@ export const Executions = () => {
                 </>
             }
         >
-            <table {...getTableProps()} className="mx-auto w-3/4 border-4">
+            <table
+                {...getTableProps()}
+                className="w-full border text-sm 2xl:mx-auto 2xl:w-4/5"
+            >
                 <thead>
                     {headerGroups.map((headerGroup) => (
                         <tr

@@ -4,6 +4,7 @@ import {XMarkIcon} from '@heroicons/react/24/outline';
 import {twMerge} from 'tailwind-merge';
 
 type SidebarContentLayoutProps = {
+    bodyClassName?: string;
     className?: string;
     header: ReactNode;
     leftSidebarBody?: ReactNode;
@@ -16,6 +17,7 @@ type SidebarContentLayoutProps = {
 const LayoutContainer: React.FC<
     PropsWithChildren<SidebarContentLayoutProps>
 > = ({
+    bodyClassName,
     className,
     header,
     leftSidebarBody,
@@ -120,7 +122,7 @@ const LayoutContainer: React.FC<
                     <div className="flex h-full w-full flex-col">
                         {header}
 
-                        <div className="flex h-full">
+                        <div className={twMerge('flex h-full', bodyClassName)}>
                             <main className="flex flex-1 overflow-y-auto">
                                 <section className="flex h-full min-w-0 flex-1 flex-col lg:order-last">
                                     {children}
