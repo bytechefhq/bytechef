@@ -1,5 +1,4 @@
-.openapi-generator-ignore
-apis/WorkflowsApi.ts
+apis/WorkflowTestsApi.ts
 apis/index.ts
 index.ts
 models/ComponentDefinitionModel.ts
