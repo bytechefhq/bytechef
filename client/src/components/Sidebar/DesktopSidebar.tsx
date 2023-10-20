@@ -2,6 +2,7 @@ import {Link} from 'react-router-dom';
 
 import reactLogo from '../../assets/logo.svg';
 import Avatar from '../Avatar/Avatar';
+import {Tooltip} from '../Tooltip/Tooltip';
 
 export function DesktopSidebar({
     navigation,
@@ -37,10 +38,12 @@ export function DesktopSidebar({
                                     to={item.href}
                                     className="flex items-center rounded-lg p-4 hover:text-blue-600 dark:text-gray-400 dark:hover:text-sky-500"
                                 >
-                                    <item.icon
-                                        className="h-7 w-7"
-                                        aria-hidden="true"
-                                    />
+                                    <Tooltip side="right" text={item.name}>
+                                        <item.icon
+                                            className="h-7 w-7"
+                                            aria-hidden="true"
+                                        />
+                                    </Tooltip>
 
                                     <span className="sr-only">{item.name}</span>
                                 </Link>
