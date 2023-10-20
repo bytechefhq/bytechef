@@ -22,7 +22,6 @@ import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.facade.IntegrationFacade;
 import com.bytechef.hermes.integration.service.CategoryService;
-import com.bytechef.hermes.integration.service.IntegrationService;
 import com.bytechef.hermes.integration.web.rest.model.CategoryModel;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
 import com.bytechef.hermes.integration.web.rest.model.PostIntegrationWorkflowRequestModel;
@@ -49,17 +48,14 @@ public class IntegrationController implements IntegrationsApi {
     private final CategoryService categoryService;
     private final ConversionService conversionService;
     private final IntegrationFacade integrationFacade;
-    private final IntegrationService integrationService;
 
     @SuppressFBWarnings("EI2")
     public IntegrationController(
-        CategoryService categoryService, ConversionService conversionService, IntegrationFacade integrationFacade,
-        IntegrationService integrationService) {
+        CategoryService categoryService, ConversionService conversionService, IntegrationFacade integrationFacade) {
 
         this.categoryService = categoryService;
         this.conversionService = conversionService;
         this.integrationFacade = integrationFacade;
-        this.integrationService = integrationService;
     }
 
     @Override
@@ -75,7 +71,7 @@ public class IntegrationController implements IntegrationsApi {
     public Mono<ResponseEntity<IntegrationModel>> getIntegration(Long id, ServerWebExchange exchange) {
         return Mono.just(
             ResponseEntity.ok(
-                conversionService.convert(integrationService.getIntegration(id), IntegrationModel.class)));
+                conversionService.convert(integrationFacade.getIntegration(id), IntegrationModel.class)));
     }
 
     @Override
@@ -95,7 +91,7 @@ public class IntegrationController implements IntegrationsApi {
         return Mono.just(
             ResponseEntity.ok(
                 Flux.fromIterable(
-                    integrationService.getIntegrations(categoryId, tagId)
+                    integrationFacade.getIntegrations(categoryId, tagId)
                         .stream()
                         .map(integration -> conversionService.convert(integration, IntegrationModel.class))
                         .toList())));

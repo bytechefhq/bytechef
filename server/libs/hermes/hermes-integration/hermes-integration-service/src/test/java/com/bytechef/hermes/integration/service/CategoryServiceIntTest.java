@@ -53,10 +53,15 @@ public class CategoryServiceIntTest {
     }
 
     @Test
+    @SuppressFBWarnings("NP")
     public void testGetCategories() {
         Category category = categoryService.save(new Category("name"));
 
         assertThat(categoryService.getCategories()).isEqualTo(List.of(category));
+
+        assertThat(categoryService.getCategories(List.of())).isEmpty();
+
+        assertThat(categoryService.getCategories(List.of(category.getId()))).isEqualTo(List.of(category));
     }
 
     @Test

@@ -34,6 +34,10 @@ public interface IntegrationFacade {
 
     void delete(Long id);
 
+    Integration getIntegration(Long id);
+
+    List<Integration> getIntegrations(Long categoryId, Long tagId);
+
     List<Tag> getIntegrationTags();
 
     List<Workflow> getIntegrationWorkflows(Long id);
