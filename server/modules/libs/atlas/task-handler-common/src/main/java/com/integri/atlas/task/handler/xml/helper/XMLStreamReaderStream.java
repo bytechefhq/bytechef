@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.xml;
+package com.integri.atlas.task.handler.xml.helper;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.io.InputStream;

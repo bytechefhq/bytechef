@@ -51,6 +51,7 @@ dependencies {
     implementation project(":modules:libs:atlas:task-handler:task-handler-shell")
     implementation project(":modules:libs:atlas:task-handler:task-handler-time")
     implementation project(":modules:libs:atlas:task-handler:task-handler-xml-file")
+    implementation project(":modules:libs:atlas:task-handler-common")
     implementation project(":modules:libs:atlas:workflow-repository:workflow-repository-git")
     implementation project(":modules:libs:atlas:workflow-repository:workflow-repository-jdbc")
     implementation project(":modules:libs:atlas:workflow-repository:workflow-repository-resource")
