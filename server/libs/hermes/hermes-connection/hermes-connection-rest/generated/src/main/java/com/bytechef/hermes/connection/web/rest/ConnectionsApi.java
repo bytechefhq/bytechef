@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-04T07:15:34.685557+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-28T17:57:21.937957+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "connections", description = "the connections API")
 public interface ConnectionsApi {
@@ -96,7 +96,7 @@ public interface ConnectionsApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("*/*"))) {
-                String exampleString = "{ \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"componentVersion\" : \"componentVersion\", \"id\" : \"id\", \"label\" : \"label\", \"parameters\" : { \"key\" : \"{}\" } }";
+                String exampleString = "{ \"authorizationName\" : \"authorizationName\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"componentVersion\" : \"componentVersion\", \"id\" : \"id\", \"parameters\" : { \"key\" : \"{}\" } }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -133,7 +133,7 @@ public interface ConnectionsApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"componentVersion\" : \"componentVersion\", \"id\" : \"id\", \"label\" : \"label\", \"parameters\" : { \"key\" : \"{}\" } }";
+                String exampleString = "{ \"authorizationName\" : \"authorizationName\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"componentVersion\" : \"componentVersion\", \"id\" : \"id\", \"parameters\" : { \"key\" : \"{}\" } }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -173,7 +173,7 @@ public interface ConnectionsApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("*/*"))) {
-                String exampleString = "{ \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"componentVersion\" : \"componentVersion\", \"id\" : \"id\", \"label\" : \"label\", \"parameters\" : { \"key\" : \"{}\" } }";
+                String exampleString = "{ \"authorizationName\" : \"authorizationName\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"componentVersion\" : \"componentVersion\", \"id\" : \"id\", \"parameters\" : { \"key\" : \"{}\" } }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -215,7 +215,7 @@ public interface ConnectionsApi {
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("*/*"))) {
-                String exampleString = "{ \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"componentVersion\" : \"componentVersion\", \"id\" : \"id\", \"label\" : \"label\", \"parameters\" : { \"key\" : \"{}\" } }";
+                String exampleString = "{ \"authorizationName\" : \"authorizationName\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"componentVersion\" : \"componentVersion\", \"id\" : \"id\", \"parameters\" : { \"key\" : \"{}\" } }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
