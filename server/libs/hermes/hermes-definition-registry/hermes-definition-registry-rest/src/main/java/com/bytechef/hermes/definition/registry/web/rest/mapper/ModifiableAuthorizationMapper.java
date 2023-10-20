@@ -17,19 +17,21 @@
 
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.AuthorizationModel;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
 @Mapper(config = DefinitionMapperSpringConfig.class)
-public interface ConnectionDefinitionMapper
-    extends Converter<ConnectionDefinition, ConnectionDefinitionModel> {
+public interface ModifiableAuthorizationMapper
+    extends Converter<ComponentDSL.ModifiableAuthorization, AuthorizationModel> {
 
     @Override
-    ConnectionDefinitionModel convert(ConnectionDefinition connectionDefinition);
+    @Mapping(target = "redirectUri", ignore = true)
+    AuthorizationModel convert(ComponentDSL.ModifiableAuthorization authorization);
 }

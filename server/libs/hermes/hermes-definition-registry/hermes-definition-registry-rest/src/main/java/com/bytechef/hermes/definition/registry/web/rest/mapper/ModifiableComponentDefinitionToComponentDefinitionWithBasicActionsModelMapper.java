@@ -17,9 +17,11 @@
 
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
+import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionBasicModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionWithBasicActionsModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -27,9 +29,11 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = DefinitionMapperSpringConfig.class)
-public interface ConnectionDefinitionMapper
-    extends Converter<ConnectionDefinition, ConnectionDefinitionModel> {
+public interface ModifiableComponentDefinitionToComponentDefinitionWithBasicActionsModelMapper
+    extends Converter<ComponentDSL.ModifiableComponentDefinition, ComponentDefinitionWithBasicActionsModel> {
 
     @Override
-    ConnectionDefinitionModel convert(ConnectionDefinition connectionDefinition);
+    ComponentDefinitionWithBasicActionsModel convert(ComponentDSL.ModifiableComponentDefinition componentDefinition);
+
+    ActionDefinitionBasicModel map(ActionDefinition actionDefinition);
 }

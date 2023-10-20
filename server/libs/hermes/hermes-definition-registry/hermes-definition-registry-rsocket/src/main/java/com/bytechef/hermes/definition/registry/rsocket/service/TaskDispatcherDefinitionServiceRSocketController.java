@@ -41,7 +41,7 @@ public class TaskDispatcherDefinitionServiceRSocketController {
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
     }
 
-    @MessageMapping("getTaskDispatcherDefinitions")
+    @MessageMapping("TaskDispatcherDefinitionService.getTaskDispatcherDefinitions")
     public Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitions() {
         return taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono();
     }

@@ -56,7 +56,7 @@ public class ComponentDefinitionServiceRSocketClient implements ComponentDefinit
                 .stream()
                 .map(serviceInstance -> rSocketRequesterBuilder
                     .websocket(ServiceInstanceUtils.toWebSocketUri(serviceInstance))
-                    .route("Service.getComponentDefinitions")
+                    .route("ComponentDefinitionService.getComponentDefinitions")
                     .retrieveMono(new ParameterizedTypeReference<List<ComponentDefinition>>() {}))
                 .toList(),
             ServiceInstanceUtils::toComponentDefinitions);
@@ -69,7 +69,7 @@ public class ComponentDefinitionServiceRSocketClient implements ComponentDefinit
                 .stream()
                 .map(serviceInstance -> rSocketRequesterBuilder
                     .websocket(ServiceInstanceUtils.toWebSocketUri(serviceInstance))
-                    .route("Service.getComponentDefinitionsForName")
+                    .route("ComponentDefinitionService.getComponentDefinitionsForName")
                     .data(name)
                     .retrieveMono(new ParameterizedTypeReference<List<ComponentDefinition>>() {}))
                 .toList(),
@@ -82,7 +82,7 @@ public class ComponentDefinitionServiceRSocketClient implements ComponentDefinit
             .websocket(ServiceInstanceUtils.toWebSocketUri(
                 ServiceInstanceUtils.filterServiceInstance(
                     discoveryClient.getInstances(WORKER_SERVICE_APP), name)))
-            .route("Service.getComponentDefinition")
+            .route("ComponentDefinitionService.getComponentDefinition")
             .data(Map.of("name", name, "version", version))
             .retrieveMono(ComponentDefinition.class);
     }

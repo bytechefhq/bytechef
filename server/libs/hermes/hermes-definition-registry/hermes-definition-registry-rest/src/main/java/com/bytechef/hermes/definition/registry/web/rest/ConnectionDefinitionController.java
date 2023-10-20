@@ -20,7 +20,6 @@ package com.bytechef.hermes.definition.registry.web.rest;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionBasicModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionModel;
 
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -46,30 +45,6 @@ public class ConnectionDefinitionController implements ConnectionDefinitionsApi 
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.conversionService = conversionService;
-    }
-
-    @Override
-    public Mono<ResponseEntity<Flux<ConnectionDefinitionBasicModel>>> getComponentConnectionDefinitions(
-        String componentName, ServerWebExchange exchange) {
-
-        return Mono.just(
-            ResponseEntity.ok(
-                connectionDefinitionService.getConnectionDefinitionsMono(componentName)
-                    .mapNotNull(connectionDefinitions -> connectionDefinitions.stream()
-                        .map(connectionDefinition -> conversionService.convert(
-                            connectionDefinition, ConnectionDefinitionBasicModel.class))
-                        .toList())
-                    .flatMapMany(Flux::fromIterable)));
-    }
-
-    @Override
-    public Mono<ResponseEntity<ConnectionDefinitionModel>> getConnectionDefinition(
-        String componentName, Integer componentVersion, ServerWebExchange exchange) {
-
-        return connectionDefinitionService.getConnectionDefinitionMono(componentName, componentVersion)
-            .mapNotNull(componentDefinition -> conversionService.convert(
-                componentDefinition, ConnectionDefinitionModel.class))
-            .map(ResponseEntity::ok);
     }
 
     @Override

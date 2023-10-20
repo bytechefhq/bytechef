@@ -17,9 +17,7 @@
 
 package com.bytechef.hermes.component.util;
 
-import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.constant.ComponentConstants;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDSL;
@@ -31,7 +29,6 @@ import com.github.mizosoft.methanol.internal.extensions.MimeBodyPublisherAdapter
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
@@ -39,6 +36,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +51,7 @@ import org.mockito.Mockito;
  */
 public class HttpClientUtilsTest {
 
+    public static final Base64.Encoder ENCODER = Base64.getEncoder();
     private final Context context = Mockito.mock(Context.class);
 
     @Test
@@ -175,7 +174,7 @@ public class HttpClientUtilsTest {
     @SuppressWarnings("checkstyle:methodlengthcheck")
     public void testCreateHTTPClient() {
         HttpClient httpClient = HttpClientUtils.createHttpClient(
-            context, Map.of(), Map.of(), HttpClientUtils.allowUnauthorizedCerts(true));
+            context, new HashMap<>(), new HashMap<>(), HttpClientUtils.allowUnauthorizedCerts(true));
 
         Assertions.assertTrue(httpClient.authenticator()
             .isEmpty());
@@ -184,139 +183,86 @@ public class HttpClientUtilsTest {
 
         //
 
-        Mockito.when(context.fetchConnectionAuthorization())
-            .thenReturn(
-                Optional.of(
-                    ComponentDSL.authorization(
-                        Authorization.AuthorizationType.API_KEY.name(),
-                        Authorization.AuthorizationType.API_KEY)));
-
-        MockConnection connection = new MockConnection();
-
-        connection.setAuthorizationName(Authorization.AuthorizationType.API_KEY.name());
-        connection.setParameters(
-            Map.of(ComponentConstants.KEY, Authorization.API_TOKEN, ComponentConstants.VALUE, "token_value"));
-
-        Mockito.when(context.getConnection())
-            .thenReturn(connection);
+        doAnswer(
+            ComponentDSL.authorization(
+                Authorization.AuthorizationType.API_KEY.name(), Authorization.AuthorizationType.API_KEY),
+            new MockConnection().parameters(
+                Map.of(ComponentConstants.KEY, Authorization.API_TOKEN, ComponentConstants.VALUE, "token_value")));
 
         Map<String, List<String>> headers = new HashMap<>();
 
-        HttpClientUtils.createHttpClient(context, headers, Map.of(), Configuration.configuration());
+        HttpClientUtils.createHttpClient(context, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), headers);
 
-        connection = new MockConnection();
-
-        connection.setAuthorizationName(Authorization.AuthorizationType.API_KEY.name());
-        connection.setParameters(Map.of(
-            ComponentConstants.KEY, Authorization.API_TOKEN,
-            ComponentConstants.VALUE, "token_value",
-            ComponentConstants.ADD_TO, Authorization.ApiTokenLocation.QUERY_PARAMETERS.name()));
-
-        Mockito.when(context.getConnection())
-            .thenReturn(connection);
+        doAnswer(
+            ComponentDSL.authorization(
+                Authorization.AuthorizationType.API_KEY.name(), Authorization.AuthorizationType.API_KEY),
+            new MockConnection().parameters(Map.of(
+                ComponentConstants.KEY, Authorization.API_TOKEN,
+                ComponentConstants.VALUE, "token_value",
+                ComponentConstants.ADD_TO, Authorization.ApiTokenLocation.QUERY_PARAMETERS.name())));
 
         Map<String, List<String>> queryParameters = new HashMap<>();
 
         HttpClientUtils.createHttpClient(
-            context, Map.of(), queryParameters, Configuration.configuration());
+            context, new HashMap<>(), queryParameters, Configuration.configuration());
 
         Assertions.assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), queryParameters);
 
-        Mockito.when(context.fetchConnectionAuthorization())
-            .thenReturn(
-                Optional.of(
-                    ComponentDSL.authorization(
-                        Authorization.AuthorizationType.BASIC_AUTH.name(),
-                        Authorization.AuthorizationType.BASIC_AUTH)));
-
-        connection = new MockConnection();
-
-        connection.setAuthorizationName(Authorization.AuthorizationType.BASIC_AUTH.name());
-        connection.setParameters(
-            Map.of(ComponentConstants.USERNAME, "username", ComponentConstants.PASSWORD, "password"));
-
-        Mockito.when(context.getConnection())
-            .thenReturn(connection);
-
-        httpClient = HttpClientUtils.createHttpClient(
-            context, Map.of(), Map.of(), Configuration.configuration());
-
-        PasswordAuthentication passwordAuthentication = httpClient
-            .authenticator()
-            .get()
-            .requestPasswordAuthenticationInstance(null, null, 0, null, null, null, null, null);
-
-        Assertions.assertArrayEquals(passwordAuthentication.getPassword(), "password".toCharArray());
-        Assertions.assertEquals(passwordAuthentication.getUserName(), "username");
-
-        Mockito.when(context.fetchConnectionAuthorization())
-            .thenReturn(
-                Optional.of(
-                    ComponentDSL.authorization(
-                        Authorization.AuthorizationType.BEARER_TOKEN.name(),
-                        Authorization.AuthorizationType.BEARER_TOKEN)));
-
-        connection = new MockConnection();
-
-        connection.setAuthorizationName(Authorization.AuthorizationType.BEARER_TOKEN.name());
-        connection.setParameters(Map.of(ComponentConstants.TOKEN, "token"));
-
-        Mockito.when(context.getConnection())
-            .thenReturn(connection);
+        doAnswer(
+            ComponentDSL.authorization(
+                Authorization.AuthorizationType.BASIC_AUTH.name(), Authorization.AuthorizationType.BASIC_AUTH),
+            new MockConnection().parameters(
+                Map.of(ComponentConstants.USERNAME, "username", ComponentConstants.PASSWORD, "password")));
 
         headers = new HashMap<>();
 
-        HttpClientUtils.createHttpClient(context, headers, Map.of(), Configuration.configuration());
+        HttpClientUtils.createHttpClient(context, headers, new HashMap<>(), Configuration.configuration());
+
+        Assertions.assertEquals(
+            Map.of(
+                "Authorization",
+                List.of("Basic " + ENCODER
+                    .encodeToString("username:password".getBytes(StandardCharsets.UTF_8)))),
+            headers);
+
+        doAnswer(
+            ComponentDSL.authorization(
+                Authorization.AuthorizationType.BEARER_TOKEN.name(), Authorization.AuthorizationType.BEARER_TOKEN),
+            new MockConnection().parameters(Map.of(ComponentConstants.TOKEN, "token")));
+
+        headers = new HashMap<>();
+
+        HttpClientUtils.createHttpClient(context, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(Map.of("Authorization", List.of("Bearer token")), headers);
 
-        Mockito.when(context.fetchConnectionAuthorization())
-            .thenReturn(
-                Optional.of(
-                    ComponentDSL.authorization(
-                        Authorization.AuthorizationType.DIGEST_AUTH.name(),
-                        Authorization.AuthorizationType.DIGEST_AUTH)));
-
-        connection = new MockConnection();
-
-        connection.setAuthorizationName(Authorization.AuthorizationType.DIGEST_AUTH.name());
-        connection.setParameters(
-            Map.of(ComponentConstants.USERNAME, "username", ComponentConstants.PASSWORD, "password"));
-
-        Mockito.when(context.getConnection())
-            .thenReturn(connection);
-
-        httpClient = HttpClientUtils.createHttpClient(
-            context, Map.of(), Map.of(), Configuration.configuration());
-
-        passwordAuthentication = httpClient
-            .authenticator()
-            .get()
-            .requestPasswordAuthenticationInstance(null, null, 0, null, null, null, null, null);
-
-        Assertions.assertArrayEquals(passwordAuthentication.getPassword(), "password".toCharArray());
-        Assertions.assertEquals(passwordAuthentication.getUserName(), "username");
-
-        Mockito.when(context.fetchConnectionAuthorization())
-            .thenReturn(
-                Optional.of(
-                    ComponentDSL.authorization(
-                        Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE.name(),
-                        Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)));
-
-        connection = new MockConnection();
-
-        connection.setAuthorizationName(Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE.name());
-        connection.setParameters(Map.of(Authorization.ACCESS_TOKEN, "access_token"));
-
-        Mockito.when(context.getConnection())
-            .thenReturn(connection);
+        doAnswer(
+            ComponentDSL.authorization(
+                Authorization.AuthorizationType.DIGEST_AUTH.name(), Authorization.AuthorizationType.DIGEST_AUTH),
+            new MockConnection().parameters(
+                Map.of(ComponentConstants.USERNAME, "username", ComponentConstants.PASSWORD, "password")));
 
         headers = new HashMap<>();
 
-        HttpClientUtils.createHttpClient(context, headers, Map.of(), Configuration.configuration());
+        HttpClientUtils.createHttpClient(context, headers, new HashMap<>(), Configuration.configuration());
+
+        Assertions.assertEquals(
+            Map.of(
+                "Authorization",
+                List.of("Basic " + ENCODER.encodeToString("username:password".getBytes(StandardCharsets.UTF_8)))),
+            headers);
+
+        doAnswer(
+            ComponentDSL.authorization(
+                Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE.name(),
+                Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE),
+            new MockConnection().parameters(Map.of(Authorization.ACCESS_TOKEN, "access_token")));
+
+        headers = new HashMap<>();
+
+        HttpClientUtils.createHttpClient(context, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(Map.of("Authorization", List.of("Bearer access_token")), headers);
 
@@ -373,7 +319,7 @@ public class HttpClientUtilsTest {
 
         //
 
-        FileEntry fileEntry = Mockito.mock(FileEntry.class);
+        Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
 
         Mockito.when(context.storeFileContent(Mockito.anyString(), (InputStream) Mockito.any()))
             .thenReturn(fileEntry);
@@ -436,6 +382,19 @@ public class HttpClientUtilsTest {
                 HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.TEXT)));
     }
 
+    private void doAnswer(Authorization authorization, Context.Connection connection) {
+        Mockito.doAnswer(invocation -> {
+            Authorization.AuthorizationContext authorizationContext = invocation.getArgument(0);
+
+            authorization.getApplyConsumer()
+                .accept(authorizationContext, connection);
+
+            return null;
+        })
+            .when(context)
+            .applyConnectionAuthorization(Mockito.any());
+    }
+
     private static class TestHttpResponse implements HttpResponse<Object> {
 
         private final Object body;
@@ -491,10 +450,8 @@ public class HttpClientUtilsTest {
         }
     }
 
-    private static class MockConnection implements Connection {
-        private String authorizationName;
-        private String name;
-        private Map<String, Object> parameters;
+    private static class MockConnection implements Context.Connection {
+        private final Map<String, Object> parameters = new HashMap<>();
 
         public MockConnection() {
         }
@@ -502,16 +459,6 @@ public class HttpClientUtilsTest {
         @Override
         public boolean containsParameter(String name) {
             return parameters.containsKey(name);
-        }
-
-        @Override
-        public String getAuthorizationName() {
-            return authorizationName;
-        }
-
-        @Override
-        public String getName() {
-            return name;
         }
 
         @Override
@@ -528,16 +475,10 @@ public class HttpClientUtilsTest {
             return value == null ? defaultValue : value;
         }
 
-        public void setAuthorizationName(String authorizationName) {
-            this.authorizationName = authorizationName;
-        }
+        public MockConnection parameters(Map<String, Object> parameters) {
+            this.parameters.putAll(parameters);
 
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public void setParameters(Map<String, Object> parameters) {
-            this.parameters = parameters;
+            return this;
         }
     }
 }

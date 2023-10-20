@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Used for specifying a component.
@@ -31,6 +32,8 @@ import java.util.Map;
  */
 @JsonDeserialize(as = ComponentDSL.ModifiableComponentDefinition.class)
 public sealed interface ComponentDefinition permits ComponentDSL.ModifiableComponentDefinition {
+
+    Function<List<ConnectionDefinition>, List<ConnectionDefinition>> getFilterCompatibleConnectionDefinitionsFunction();
 
     List<? extends ActionDefinition> getActions();
 

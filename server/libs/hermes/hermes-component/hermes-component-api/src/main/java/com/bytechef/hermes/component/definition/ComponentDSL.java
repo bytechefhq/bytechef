@@ -542,6 +542,10 @@ public final class ComponentDSL extends DefinitionDSL {
         private List<? extends ActionDefinition> actions;
         private ConnectionDefinition connection;
         private Display display;
+
+        @JsonIgnore
+        private Function<List<ConnectionDefinition>, List<ConnectionDefinition>> filterCompatibleConnectionDefinitionsFunction;
+
         private Map<String, Object> metadata;
         private String name;
         private Resources resources;
@@ -587,6 +591,14 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableComponentDefinition display(ModifiableDisplay display) {
             this.display = display;
+
+            return this;
+        }
+
+        public ModifiableComponentDefinition filterCompatibleConnectionDefinitionsFunction(
+            Function<List<ConnectionDefinition>, List<ConnectionDefinition>> filterCompatibleConnectionDefinitionsFunction) {
+
+            this.filterCompatibleConnectionDefinitionsFunction = filterCompatibleConnectionDefinitionsFunction;
 
             return this;
         }
@@ -638,6 +650,11 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public int hashCode() {
             return Objects.hash(name, version);
+        }
+
+        @Override
+        public Function<List<ConnectionDefinition>, List<ConnectionDefinition>> getFilterCompatibleConnectionDefinitionsFunction() {
+            return filterCompatibleConnectionDefinitionsFunction;
         }
 
         @SuppressWarnings("unchecked")

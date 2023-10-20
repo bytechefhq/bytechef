@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.service.impl;
+package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -32,37 +31,32 @@ import java.util.stream.Collectors;
  */
 public class ComponentDefinitionServiceImpl implements ComponentDefinitionService {
 
-    private final List<ComponentDefinitionFactory> componentDefinitionFactories;
+    private final List<ComponentDefinition> componentDefinitions;
 
     @SuppressFBWarnings("EI2")
-    public ComponentDefinitionServiceImpl(List<ComponentDefinitionFactory> componentDefinitionFactories) {
-        this.componentDefinitionFactories = componentDefinitionFactories;
+    public ComponentDefinitionServiceImpl(List<ComponentDefinition> componentDefinitions) {
+        this.componentDefinitions = componentDefinitions;
     }
 
     @Override
     public Mono<ComponentDefinition> getComponentDefinitionMono(String name, Integer version) {
         return Mono.just(
-            componentDefinitionFactories.stream()
-                .map(ComponentDefinitionFactory::getDefinition)
+            componentDefinitions.stream()
                 .filter(componentDefinition -> name.equalsIgnoreCase(componentDefinition.getName())
                     && version == componentDefinition.getVersion())
                 .findFirst()
-                .orElseThrow());
+                .orElseThrow(IllegalArgumentException::new));
     }
 
     @Override
     public Mono<List<ComponentDefinition>> getComponentDefinitionsMono() {
-        return Mono.just(
-            componentDefinitionFactories.stream()
-                .map(ComponentDefinitionFactory::getDefinition)
-                .collect(Collectors.toList()));
+        return Mono.just(new ArrayList<>(componentDefinitions));
     }
 
     @Override
     public Mono<List<ComponentDefinition>> getComponentDefinitionsMono(String name) {
         return Mono.just(
-            componentDefinitionFactories.stream()
-                .map(ComponentDefinitionFactory::getDefinition)
+            componentDefinitions.stream()
                 .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), name))
                 .collect(Collectors.toList()));
     }

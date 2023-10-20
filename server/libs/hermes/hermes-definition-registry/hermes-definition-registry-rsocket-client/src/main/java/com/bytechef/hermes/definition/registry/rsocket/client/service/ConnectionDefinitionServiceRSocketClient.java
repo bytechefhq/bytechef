@@ -17,7 +17,10 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
+import com.bytechef.commons.util.MonoUtils;
+import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
+import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.definition.registry.rsocket.client.util.ServiceInstanceUtils;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,7 +31,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -50,14 +53,25 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
     }
 
     @Override
-    public Mono<ConnectionDefinition> getConnectionDefinitionMono(String componentName, Integer componentVersion) {
+    public void applyAuthorization(Connection connection, Authorization.AuthorizationContext authorizationContext) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<String> fetchBaseUri(Connection connection) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Mono<ConnectionDefinition> getConnectionDefinitionMono(String componentName) {
         return rSocketRequesterBuilder
             .websocket(ServiceInstanceUtils.toWebSocketUri(
                 ServiceInstanceUtils.filterServiceInstance(
                     discoveryClient.getInstances(WORKER_SERVICE_APP), componentName)))
-            .route("Service.getConnectionDefinition")
-            .data(Map.of("componentName", componentName, "componentVersion", componentVersion))
-            .retrieveMono(ConnectionDefinition.class);
+            .route("ConnectionDefinitionService.getConnectionDefinition")
+            .data(componentName)
+            .retrieveMono(ConnectionDefinition.class)
+            .map(connectionDefinition -> connectionDefinition);
     }
 
     @Override
@@ -67,7 +81,7 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
                 .stream()
                 .map(serviceInstance -> rSocketRequesterBuilder
                     .websocket(ServiceInstanceUtils.toWebSocketUri(serviceInstance))
-                    .route("Service.getConnectionDefinitions")
+                    .route("ConnectionDefinitionService.getConnectionDefinitions")
                     .retrieveMono(new ParameterizedTypeReference<List<ConnectionDefinition>>() {}))
                 .toList(),
             ServiceInstanceUtils::toConnectionDefinitions);
@@ -75,7 +89,7 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
 
     @Override
     public List<ConnectionDefinition> getConnectionDefinitions(String componentName) {
-        throw new UnsupportedOperationException();
+        return MonoUtils.get(getConnectionDefinitionsMono(componentName));
     }
 
     @Override
@@ -85,7 +99,7 @@ public class ConnectionDefinitionServiceRSocketClient implements ConnectionDefin
                 .stream()
                 .map(serviceInstance -> rSocketRequesterBuilder
                     .websocket(ServiceInstanceUtils.toWebSocketUri(serviceInstance))
-                    .route("Service.getComponentConnectionDefinitions")
+                    .route("ConnectionDefinitionService.getComponentConnectionDefinitions")
                     .data(componentName)
                     .retrieveMono(new ParameterizedTypeReference<List<ConnectionDefinition>>() {}))
                 .toList(),

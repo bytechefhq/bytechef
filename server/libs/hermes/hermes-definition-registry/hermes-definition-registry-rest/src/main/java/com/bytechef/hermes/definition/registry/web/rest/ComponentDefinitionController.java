@@ -21,9 +21,12 @@ import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionWithBasicActionsModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionBasicModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import org.springframework.core.convert.ConversionService;
@@ -44,15 +47,18 @@ import reactor.core.publisher.Mono;
 public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
     private final ActionDefinitionService actionDefinitionService;
+    private final ConnectionDefinitionService connectionDefinitionService;
     private final ConversionService conversionService;
     private final ComponentDefinitionFacade componentDefinitionFacade;
     private final ComponentDefinitionService componentDefinitionService;
 
     public ComponentDefinitionController(
-        ActionDefinitionService actionDefinitionService, ConversionService conversionService,
-        ComponentDefinitionFacade componentDefinitionFacade, ComponentDefinitionService componentDefinitionService) {
+        ActionDefinitionService actionDefinitionService, ConnectionDefinitionService connectionDefinitionService,
+        ConversionService conversionService, ComponentDefinitionFacade componentDefinitionFacade,
+        ComponentDefinitionService componentDefinitionService) {
 
         this.actionDefinitionService = actionDefinitionService;
+        this.connectionDefinitionService = connectionDefinitionService;
         this.componentDefinitionFacade = componentDefinitionFacade;
         this.conversionService = conversionService;
         this.componentDefinitionService = componentDefinitionService;
@@ -60,9 +66,9 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
     @Override
     public Mono<ResponseEntity<ActionDefinitionModel>> getActionDefinition(
-        String componentName, Integer componentVersion, String actionName, ServerWebExchange exchange) {
+        String name, Integer version, String actionName, ServerWebExchange exchange) {
 
-        return actionDefinitionService.getComponentDefinitionActionMono(componentName, componentVersion, actionName)
+        return actionDefinitionService.getComponentDefinitionActionMono(name, version, actionName)
             .mapNotNull(actionDefinition -> conversionService.convert(actionDefinition, ActionDefinitionModel.class))
             .map(ResponseEntity::ok);
     }
@@ -75,6 +81,30 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
             .mapNotNull(componentDefinition -> conversionService.convert(
                 componentDefinition, ComponentDefinitionWithBasicActionsModel.class))
             .map(ResponseEntity::ok);
+    }
+
+    @Override
+    public Mono<ResponseEntity<ConnectionDefinitionModel>> getComponentConnectionDefinition(
+        String componentName, ServerWebExchange exchange) {
+
+        return connectionDefinitionService.getConnectionDefinitionMono(componentName)
+            .mapNotNull(componentDefinition -> conversionService.convert(
+                componentDefinition, ConnectionDefinitionModel.class))
+            .map(ResponseEntity::ok);
+    }
+
+    @Override
+    public Mono<ResponseEntity<Flux<ConnectionDefinitionBasicModel>>> getComponentConnectionDefinitions(
+        String componentName, ServerWebExchange exchange) {
+
+        return Mono.just(
+            ResponseEntity.ok(
+                connectionDefinitionService.getConnectionDefinitionsMono(componentName)
+                    .mapNotNull(connectionDefinitions -> connectionDefinitions.stream()
+                        .map(connectionDefinition -> conversionService.convert(
+                            connectionDefinition, ConnectionDefinitionBasicModel.class))
+                        .toList())
+                    .flatMapMany(Flux::fromIterable)));
     }
 
     @Override

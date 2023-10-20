@@ -17,21 +17,29 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
+import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
+import com.bytechef.hermes.connection.domain.Connection;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 public interface ConnectionDefinitionService {
 
-    Mono<ConnectionDefinition> getConnectionDefinitionMono(String componentName, Integer componentVersion);
+    void applyAuthorization(Connection connection, Authorization.AuthorizationContext authorizationContext);
+
+    Optional<String> fetchBaseUri(Connection connection);
+
+    Mono<ConnectionDefinition> getConnectionDefinitionMono(String componentName);
 
     Mono<List<ConnectionDefinition>> getConnectionDefinitionsMono();
 
     List<ConnectionDefinition> getConnectionDefinitions(String componentName);
 
     Mono<List<ConnectionDefinition>> getConnectionDefinitionsMono(String componentName);
+
 }

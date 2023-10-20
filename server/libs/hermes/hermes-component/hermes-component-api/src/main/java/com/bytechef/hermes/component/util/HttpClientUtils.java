@@ -27,9 +27,7 @@ import com.github.mizosoft.methanol.MoreBodyPublishers;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
-import java.net.Authenticator;
 import java.net.InetSocketAddress;
-import java.net.PasswordAuthentication;
 import java.net.ProxySelector;
 import java.net.Socket;
 import java.net.URI;
@@ -727,8 +725,8 @@ public final class HttpClientUtils {
     }
 
     private record AuthorizationContextImpl(
-        Methanol.Builder builder, Map<String, List<String>> headers, Map<String, List<String>> queryParameters)
-        implements AuthorizationContext {
+        Map<String, List<String>> headers, Map<String, List<String>> queryParameters)
+        implements Authorization.AuthorizationContext {
 
         @Override
         public void setHeaders(Map<String, List<String>> headers) {
@@ -738,17 +736,6 @@ public final class HttpClientUtils {
         @Override
         public void setQueryParameters(Map<String, List<String>> queryParameters) {
             this.queryParameters.putAll(queryParameters);
-        }
-
-        @Override
-        public void setUsernamePassword(String username, String password) {
-            this.builder.authenticator(new Authenticator() {
-
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(username, password.toCharArray());
-                }
-            });
         }
     }
 

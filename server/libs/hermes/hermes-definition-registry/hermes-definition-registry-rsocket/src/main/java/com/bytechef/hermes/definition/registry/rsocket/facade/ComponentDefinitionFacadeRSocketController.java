@@ -40,7 +40,7 @@ public class ComponentDefinitionFacadeRSocketController {
         this.componentDefinitionFacade = componentDefinitionFacade;
     }
 
-    @MessageMapping("Facade.getComponentDefinitions")
+    @MessageMapping("ComponentDefinitionFacade.getComponentDefinitions")
     public Mono<List<ComponentDefinition>> getComponentDefinitions(Map<String, Boolean> map) {
 
         return componentDefinitionFacade.getComponentDefinitions(

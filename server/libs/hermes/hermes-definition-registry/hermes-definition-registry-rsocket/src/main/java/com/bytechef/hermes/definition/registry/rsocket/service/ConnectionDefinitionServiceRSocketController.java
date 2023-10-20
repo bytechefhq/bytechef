@@ -25,7 +25,6 @@ import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -40,18 +39,17 @@ public class ConnectionDefinitionServiceRSocketController {
         this.connectionDefinitionService = connectionDefinitionService;
     }
 
-    @MessageMapping("Service.getComponentConnectionDefinitions")
+    @MessageMapping("ConnectionDefinitionService.getComponentConnectionDefinitions")
     public Mono<List<ConnectionDefinition>> getComponentConnectionDefinitions(String componentName) {
         return connectionDefinitionService.getConnectionDefinitionsMono(componentName);
     }
 
-    @MessageMapping("Service.getConnectionDefinition")
-    public Mono<ConnectionDefinition> getConnectionDefinition(Map<String, Object> map) {
-        return connectionDefinitionService.getConnectionDefinitionMono(
-            (String) map.get("componentName"), (Integer) map.get("componentVersion"));
+    @MessageMapping("ConnectionDefinitionService.getConnectionDefinition")
+    public Mono<ConnectionDefinition> getConnectionDefinition(String componentName) {
+        return connectionDefinitionService.getConnectionDefinitionMono(componentName);
     }
 
-    @MessageMapping("Service.getConnectionDefinitions")
+    @MessageMapping("ConnectionDefinitionService.getConnectionDefinitions")
     public Mono<List<ConnectionDefinition>> getConnectionDefinitions() {
         return connectionDefinitionService.getConnectionDefinitionsMono();
     }

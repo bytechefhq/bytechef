@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.service.impl;
+package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import reactor.core.publisher.Mono;
 
@@ -30,11 +29,11 @@ import java.util.List;
  */
 public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
-    private final List<ComponentDefinitionFactory> componentDefinitionFactories;
+    private final List<ComponentDefinition> componentDefinitions;
 
     @SuppressFBWarnings("EI2")
-    public ActionDefinitionServiceImpl(List<ComponentDefinitionFactory> componentDefinitionFactories) {
-        this.componentDefinitionFactories = componentDefinitionFactories;
+    public ActionDefinitionServiceImpl(List<ComponentDefinition> componentDefinitions) {
+        this.componentDefinitions = componentDefinitions;
     }
 
     @Override
@@ -42,8 +41,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         String componentName, int componentVersion, String actionName) {
 
         return Mono.just(
-            componentDefinitionFactories.stream()
-                .map(ComponentDefinitionFactory::getDefinition)
+            componentDefinitions.stream()
                 .filter(componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
                     componentVersion == componentDefinition.getVersion())
                 .flatMap(componentDefinition -> componentDefinition.getActions()
@@ -51,6 +49,6 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 .filter(actionDefinition -> actionName.equalsIgnoreCase(actionDefinition.getName()))
                 .map(actionDefinition -> (ActionDefinition) actionDefinition)
                 .findFirst()
-                .orElseThrow());
+                .orElseThrow(IllegalArgumentException::new));
     }
 }

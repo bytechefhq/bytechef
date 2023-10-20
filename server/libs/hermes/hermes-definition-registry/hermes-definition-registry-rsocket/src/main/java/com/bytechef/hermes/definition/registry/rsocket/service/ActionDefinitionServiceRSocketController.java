@@ -39,7 +39,7 @@ public class ActionDefinitionServiceRSocketController {
         this.actionDefinitionService = actionDefinitionService;
     }
 
-    @MessageMapping("Service.getComponentDefinitionAction")
+    @MessageMapping("ActionDefinitionService.getComponentDefinitionAction")
     public Mono<ActionDefinition> getComponentDefinitionAction(Map<String, Object> map) {
         return actionDefinitionService.getComponentDefinitionActionMono(
             (String) map.get("componentName"), (Integer) map.get("componentVersion"), (String) map.get("actionName"));
