@@ -22,7 +22,6 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhook
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.message.broker.TriggerMessageRoute;
 import com.bytechef.hermes.service.TriggerLifecycleService;
-import com.bytechef.hermes.trigger.WorkflowTrigger;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import com.bytechef.message.broker.MessageBroker;
 import org.springframework.stereotype.Component;
@@ -49,7 +48,7 @@ public class ScheduledTriggerExecutor {
     }
 
     public LocalDateTime executeTriggerDynamicWebhookRefresh(
-        WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId) {
+        WorkflowExecutionId workflowExecutionId, String componentName, int componentVersion) {
 
         LocalDateTime webhookExpirationDate = null;
 
@@ -57,8 +56,7 @@ public class ScheduledTriggerExecutor {
             triggerLifecycleService.fetchValue(workflowExecutionId.getInstanceId(), workflowExecutionId.toString()));
 
         output = triggerDefinitionService.executeDynamicWebhookRefresh(
-            workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
-            output);
+            workflowExecutionId.getTriggerName(), componentName, componentVersion, output);
 
         if (output != null) {
             webhookExpirationDate = output.webhookExpirationDate();
