@@ -1,8 +1,8 @@
 import {useQuery} from '@tanstack/react-query';
 
 import {
+    TaskDispatcherDefinitionApi,
     TaskDispatcherDefinitionModel,
-    TaskDispatcherDefinitionsApi,
 } from '../middleware/hermes/configuration';
 
 export const TaskDispatcherKeys = {
@@ -12,5 +12,5 @@ export const TaskDispatcherKeys = {
 export const useGetTaskDispatcherDefinitionsQuery = () =>
     useQuery<TaskDispatcherDefinitionModel[], Error>(
         TaskDispatcherKeys.taskDispatcherDefinitions,
-        () => new TaskDispatcherDefinitionsApi().getTaskDispatcherDefinitions()
+        () => new TaskDispatcherDefinitionApi().getTaskDispatcherDefinitions()
     );
