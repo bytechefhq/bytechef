@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Component
 public class InstanceWorkflowAccessorRegistry {
 
-    private final Map<String, InstanceWorkflowAccessor> instanceAccessorMap;
+    private final Map<Integer, InstanceWorkflowAccessor> instanceAccessorMap;
 
     public InstanceWorkflowAccessorRegistry(List<InstanceWorkflowAccessor> instanceWorkflowAccessors) {
         this.instanceAccessorMap = instanceWorkflowAccessors
@@ -40,7 +40,7 @@ public class InstanceWorkflowAccessorRegistry {
                     InstanceWorkflowAccessor::getType, instanceWorkflowAccessor -> instanceWorkflowAccessor));
     }
 
-    public InstanceWorkflowAccessor getInstanceWorkflowAccessor(String type) {
+    public InstanceWorkflowAccessor getInstanceWorkflowAccessor(int type) {
         return Objects.requireNonNull(instanceAccessorMap.get(type));
     }
 }

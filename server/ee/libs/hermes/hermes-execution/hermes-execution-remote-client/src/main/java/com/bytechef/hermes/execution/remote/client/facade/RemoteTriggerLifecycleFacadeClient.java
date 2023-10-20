@@ -42,7 +42,7 @@ public class RemoteTriggerLifecycleFacadeClient implements RemoteTriggerLifecycl
 
     @Override
     public void executeTriggerDisable(
-        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, long connectionId) {
 
         post(
@@ -54,7 +54,7 @@ public class RemoteTriggerLifecycleFacadeClient implements RemoteTriggerLifecycl
 
     @Override
     public void executeTriggerEnable(
-        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
 
         post(
@@ -75,7 +75,7 @@ public class RemoteTriggerLifecycleFacadeClient implements RemoteTriggerLifecycl
 
     @SuppressFBWarnings("EI")
     private record TriggerRequest(
-        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
     }
 }

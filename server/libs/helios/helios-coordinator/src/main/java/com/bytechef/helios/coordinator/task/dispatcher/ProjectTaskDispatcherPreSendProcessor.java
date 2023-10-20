@@ -82,7 +82,7 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
         projectInstanceService.fetchWorkflowProjectInstance(Objects.requireNonNull(job.getWorkflowId()))
             .ifPresent(projectInstance -> taskExecution
                 .putMetadata(MetadataConstants.INSTANCE_ID, projectInstance.getId())
-                .putMetadata(MetadataConstants.INSTANCE_TYPE, ProjectConstants.PROJECT));
+                .putMetadata(MetadataConstants.INSTANCE_TYPE, ProjectConstants.PROJECT_TYPE));
 
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
 

@@ -309,7 +309,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             triggerLifecycleFacade.executeTriggerDisable(
-                workflow.getId(), projectInstanceWorkflow.getProjectInstanceId(), ProjectConstants.PROJECT,
+                workflow.getId(), projectInstanceWorkflow.getProjectInstanceId(), ProjectConstants.PROJECT_TYPE,
                 workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getParameters(),
                 getConnectionId(workflowTrigger));
         }
@@ -322,7 +322,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             triggerLifecycleFacade.executeTriggerEnable(
-                workflow.getId(), projectInstanceWorkflow.getProjectInstanceId(), ProjectConstants.PROJECT,
+                workflow.getId(), projectInstanceWorkflow.getProjectInstanceId(), ProjectConstants.PROJECT_TYPE,
                 workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getParameters(),
                 getConnectionId(workflowTrigger), webhookUrl);
         }

@@ -53,7 +53,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade, Remot
 
     @Override
     public void executeTriggerDisable(
-        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, long connectionId) {
 
         ComponentOperation componentOperation = ComponentOperation.ofType(workflowTriggerType);
@@ -88,7 +88,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade, Remot
 
     @Override
     public void executeTriggerEnable(
-        String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
 
         ComponentOperation componentOperation = ComponentOperation.ofType(workflowTriggerType);
