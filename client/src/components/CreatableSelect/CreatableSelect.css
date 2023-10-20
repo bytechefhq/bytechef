@@ -1,6 +1,6 @@
 .react-select__control {
-    @apply border-gray-300;
-    @apply shadow-sm;
+    @apply border-gray-300 !important;
+    @apply rounded-md !important;
     @apply sm:text-sm;
     @apply dark:border-gray-700;
     @apply dark:text-white;
@@ -9,13 +9,10 @@
 }
 
 .react-select__control--is-focused {
-    @apply border-blue-500;
-    @apply ring-blue-500;
-    @apply ring-1 !important;
-    @apply hover:border-blue-500;
-    @apply dark:border-sky-500;
-    @apply dark:ring-sky-500;
-    @apply dark:hover:border-sky-500 !important;
+    @apply border-transparent !important;
+    @apply ring !important;
+    @apply ring-blue-500 !important;
+    @apply dark:ring-sky-500 !important;
 }
 
 .react-select__menu {
@@ -23,6 +20,15 @@
     @apply dark:text-white;
     @apply sm:text-sm;
 }
+
+.react-select__multi-value {
+    @apply rounded-md !important;
+}
+
+.react-select__multi-value__remove {
+    @apply rounded-r-md !important;
+}
+
 
 .react-select__option--is-focused {
     @apply dark:text-black;

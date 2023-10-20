@@ -21,18 +21,13 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
                 {label}
             </label>
 
-            <div
-                className={twMerge([
-                    'mt-1',
-                    error ? 'relative rounded-md shadow-sm' : null,
-                ])}
-            >
+            <div className={twMerge([label && 'mt-1'])}>
                 <textarea
                     className={twMerge([
-                        'block w-full rounded-md border focus:outline-none focus:ring-1 dark:bg-gray-800',
+                        'block w-full rounded-md border focus:outline-none focus:ring-1 dark:bg-gray-800 sm:text-sm',
                         error
-                            ? 'border-red-300 pr-10 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500 dark:text-red-500 sm:text-sm'
-                            : 'border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:text-white dark:focus:border-sky-500 dark:focus:ring-sky-500 sm:text-sm',
+                            ? 'border-red-300 pr-10 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500 dark:text-red-500'
+                            : 'border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-transparent focus:ring focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:placeholder:text-gray-600 dark:focus:ring-sky-500',
                     ])}
                     id={name}
                     name={name}

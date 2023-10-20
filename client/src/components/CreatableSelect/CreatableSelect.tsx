@@ -61,12 +61,7 @@ const CreatableSelect = <
                 </label>
             )}
 
-            <div
-                className={twMerge([
-                    label ? 'mt-1' : '',
-                    error ? 'relative rounded-md shadow-sm' : null,
-                ])}
-            >
+            <div className={twMerge([label && 'mt-1'])}>
                 <ReactSelectCreatable
                     {...field}
                     classNamePrefix="react-select"
