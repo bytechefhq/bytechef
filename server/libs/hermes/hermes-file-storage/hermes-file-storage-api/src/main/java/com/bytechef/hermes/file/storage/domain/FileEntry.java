@@ -26,77 +26,47 @@ import org.apache.tika.Tika;
  */
 public class FileEntry {
 
-    private String extension;
-    private String mimeType;
-    private String name;
-    private String url;
+    private final String extension;
+    private final String mimeType;
+    private final String name;
+    private final String url;
 
-    public FileEntry() {}
-
-    public static FileEntry of(Map<String, String> map) {
-        FileEntry fileEntry = new FileEntry();
-
-        fileEntry.extension = map.get("extension");
-        fileEntry.mimeType = map.get("mimeType");
-        fileEntry.name = map.get("name");
-        fileEntry.url = map.get("url");
-
-        return fileEntry;
+    public FileEntry(String name, String extension, String mimeType, String url) {
+        this.extension = extension;
+        this.mimeType = mimeType;
+        this.name = name;
+        this.url = url;
     }
 
-    public static FileEntry of(String fileName) {
-        return getFileEntry(fileName, fileName);
+    public FileEntry(String fileName) {
+        this(fileName, fileName);
     }
 
-    public static FileEntry of(String fileName, String url) {
-        return getFileEntry(fileName, url);
-    }
-
-    public static FileEntry getFileEntry(String fileName, String url) {
-        FileEntry fileEntry = new FileEntry();
-
-        fileEntry.setExtension(FilenameUtils.getExtension(fileName));
+    public FileEntry(String fileName, String url) {
+        this.extension = FilenameUtils.getExtension(fileName);
 
         Tika tika = new Tika();
 
-        fileEntry.setMimeType(tika.detect(fileName));
+        this.mimeType = tika.detect(fileName);
 
-        fileEntry.setName(FilenameUtils.getName(fileName));
-        fileEntry.setUrl(url);
-
-        return fileEntry;
+        this.name = FilenameUtils.getName(fileName);
+        this.url = url;
     }
 
     public String getExtension() {
         return extension;
     }
 
-    public void setExtension(String extension) {
-        this.extension = extension;
-    }
-
     public String getMimeType() {
         return mimeType;
-    }
-
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getUrl() {
         return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     public boolean equals(Object o) {
