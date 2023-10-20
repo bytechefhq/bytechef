@@ -73,7 +73,11 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
         logger.error("Task {}: {}\n{}", taskExecution.getId(), error.getMessage(), error.getStackTrace());
 
         // set task status to FAILED and persist
-        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.FAILED, null, LocalDateTime.now());
+
+        taskExecution.setEndTime(LocalDateTime.now());
+        taskExecution.setStatus(TaskStatus.FAILED);
+
+        taskExecution = taskExecutionService.update(taskExecution);
 
         // if the task is retryable, then retry it
         if (taskExecution.getRetryAttempts() < taskExecution.getRetry()) {
@@ -89,10 +93,11 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
         else {
             while (taskExecution.getParentId() != null) { // mark parent tasks as FAILED as well
                 taskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
-                taskExecution.setStatus(TaskStatus.FAILED);
-                taskExecution.setEndTime(LocalDateTime.now());
 
-                taskExecutionService.update(taskExecution);
+                taskExecution.setEndTime(LocalDateTime.now());
+                taskExecution.setStatus(TaskStatus.FAILED);
+
+                taskExecution = taskExecutionService.update(taskExecution);
             }
 
             Job job = jobService.getTaskExecutionJob(taskExecution.getId());

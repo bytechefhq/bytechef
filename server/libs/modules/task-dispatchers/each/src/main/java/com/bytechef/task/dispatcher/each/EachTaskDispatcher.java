@@ -86,7 +86,10 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         Map<String, Object> iteratee = MapUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
         List<Object> list = MapUtils.getRequiredList(taskExecution.getParameters(), LIST, Object.class);
 
-        taskExecutionService.updateStatus(taskExecution.getId(), TaskStatus.STARTED, LocalDateTime.now(), null);
+        taskExecution.setStartTime(LocalDateTime.now());
+        taskExecution.setStatus(TaskStatus.STARTED);
+
+        taskExecution = taskExecutionService.update(taskExecution);
 
         if (list.isEmpty()) {
             taskExecution.setStartTime(LocalDateTime.now());

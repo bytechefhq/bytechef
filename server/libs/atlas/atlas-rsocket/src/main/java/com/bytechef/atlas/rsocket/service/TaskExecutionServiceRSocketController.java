@@ -53,18 +53,4 @@ public class TaskExecutionServiceRSocketController {
     public Mono<List<TaskExecution>> getParentTaskExecutions(Long parentId) {
         return Mono.create(sink -> sink.success(taskExecutionService.getParentTaskExecutions(parentId)));
     }
-
-    @MessageMapping("updateTaskExecution")
-    public Mono<TaskExecution> updateTaskExecution(TaskExecution taskExecution) {
-        return Mono.create(sink -> sink.success(taskExecutionService.update(taskExecution)));
-    }
-
-    @MessageMapping("updateTaskExecutionStatus")
-    @SuppressFBWarnings("NP")
-    public Mono<Void> updateTaskExecutionStatus(TaskExecution taskExecution) {
-        taskExecutionService.updateStatus(taskExecution.getId(),
-            taskExecution.getStatus(), taskExecution.getStartTime(), taskExecution.getEndTime());
-
-        return Mono.empty();
-    }
 }

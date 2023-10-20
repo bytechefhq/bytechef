@@ -79,6 +79,8 @@ public class EachTaskDispatcherTest {
         taskExecution.setId(1L);
         taskExecution.setJobId(1L);
 
+        when(taskExecutionService.update(any())).thenReturn(taskExecution);
+
         dispatcher.dispatch(taskExecution);
 
         verify(taskDispatcher, times(3)).dispatch(any());
@@ -92,6 +94,8 @@ public class EachTaskDispatcherTest {
             TaskEvaluator.create());
         TaskExecution taskExecution = new TaskExecution(
             1L, new WorkflowTask(Map.of("list", List.of(), "iteratee", Collections.singletonMap("type", "print"))));
+
+        when(taskExecutionService.update(any())).thenReturn(taskExecution);
 
         dispatcher.dispatch(taskExecution);
 

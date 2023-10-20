@@ -22,13 +22,10 @@ package com.bytechef.atlas.repository;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import com.bytechef.atlas.task.execution.TaskStatus;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
-import org.springframework.data.repository.query.Param;
 
 /**
  * @author Arik Cohen
@@ -82,12 +79,4 @@ public interface TaskExecutionRepository {
      * @param taskExecution
      */
     TaskExecution save(TaskExecution taskExecution);
-
-    void updateStatus(long id, TaskStatus taskStatus);
-
-    void updateStatusAndStartTime(
-        @Param("id") long id, @Param("status") TaskStatus status, @Param("startTime") LocalDateTime startTime);
-
-    void updateStatusAndEndTime(
-        @Param("id") long id, @Param("status") TaskStatus status, @Param("endTime") LocalDateTime endTime);
 }

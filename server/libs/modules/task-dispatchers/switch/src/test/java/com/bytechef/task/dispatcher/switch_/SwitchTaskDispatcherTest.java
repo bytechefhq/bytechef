@@ -70,6 +70,8 @@ public class SwitchTaskDispatcherTest {
         when(taskExecutionService.create(any()))
             .thenReturn(new TaskExecution(2L, new WorkflowTask(Map.of("type", "print"))));
 
+        when(taskExecutionService.update(any())).thenReturn(taskExecution);
+
         switchTaskDispatcher.dispatch(taskExecution);
 
         ArgumentCaptor<TaskExecution> argument = ArgumentCaptor.forClass(TaskExecution.class);
@@ -88,6 +90,8 @@ public class SwitchTaskDispatcherTest {
         TaskExecution taskExecution = new TaskExecution(
             1L, new WorkflowTask(Map.of(
                 "cases", List.of(Map.of("key", "k1", "tasks", List.of(Map.of("type", "print")))), "expression", "k2")));
+
+        when(taskExecutionService.update(any())).thenReturn(taskExecution);
 
         switchTaskDispatcher.dispatch(taskExecution);
 
@@ -111,6 +115,8 @@ public class SwitchTaskDispatcherTest {
 
         taskExecution.setId(1L);
         taskExecution.setJobId(2L);
+
+        when(taskExecutionService.update(any())).thenReturn(taskExecution);
 
         when(taskExecutionService.create(any()))
             .thenReturn(new TaskExecution(2L, new WorkflowTask(Map.of("type", "sleep"))));
@@ -141,6 +147,8 @@ public class SwitchTaskDispatcherTest {
             Collections.singletonMap("value", "1234"),
             "expression",
             "k99")));
+
+        when(taskExecutionService.update(any())).thenReturn(taskExecution);
 
         switchTaskDispatcher.dispatch(taskExecution);
 

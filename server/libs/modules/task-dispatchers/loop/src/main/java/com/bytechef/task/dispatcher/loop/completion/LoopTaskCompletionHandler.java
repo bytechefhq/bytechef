@@ -89,7 +89,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
     public void handle(TaskExecution taskExecution) {
         taskExecution.setStatus(TaskStatus.COMPLETED);
 
-        taskExecutionService.update(taskExecution);
+        taskExecution = taskExecutionService.update(taskExecution);
 
         TaskExecution loopTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
