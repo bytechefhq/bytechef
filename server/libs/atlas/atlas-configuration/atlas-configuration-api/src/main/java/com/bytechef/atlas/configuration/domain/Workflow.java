@@ -356,6 +356,10 @@ public final class Workflow implements Persistable<String>, Serializable {
         this.id = id;
     }
 
+    public void setDefinition(String definition) {
+        this.definition = definition;
+    }
+
     public void setNew(boolean isNew) {
         this.isNew = isNew;
     }
@@ -398,7 +402,6 @@ public final class Workflow implements Persistable<String>, Serializable {
         return WorkflowReader.readWorkflowMap(
             new WorkflowResource(
                 id, Map.of(), new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)),
-                Format.valueOf(format))
-        );
+                Format.valueOf(format)));
     }
 }

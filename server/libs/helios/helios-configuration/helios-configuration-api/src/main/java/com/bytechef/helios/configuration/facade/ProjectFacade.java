@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.category.domain.Category;
 import com.bytechef.helios.configuration.dto.ProjectDTO;
 import com.bytechef.tag.domain.Tag;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -29,17 +30,17 @@ import java.util.List;
  */
 public interface ProjectFacade {
 
-    Workflow addProjectWorkflow(long id, String label, String description, String definition);
+    Workflow addProjectWorkflow(long id, @NonNull String definition);
 
-    ProjectDTO createProject(ProjectDTO projectDTO);
+    ProjectDTO createProject(@NonNull ProjectDTO projectDTO);
 
     void deleteProject(long id);
 
-    void deleteWorkflow(long id, String workflowId);
+    void deleteWorkflow(long id, @NonNull String workflowId);
 
     ProjectDTO duplicateProject(long id);
 
-    Workflow duplicateWorkflow(long id, String workflowId);
+    Workflow duplicateWorkflow(long id, @NonNull String workflowId);
 
     ProjectDTO getProject(long id);
 
@@ -51,7 +52,7 @@ public interface ProjectFacade {
 
     List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Boolean published);
 
-    ProjectDTO updateProject(ProjectDTO projectDTO);
+    ProjectDTO updateProject(@NonNull ProjectDTO projectDTO);
 
-    void updateProjectTags(long id, List<Tag> tags);
+    void updateProjectTags(long id, @NonNull List<Tag> tags);
 }

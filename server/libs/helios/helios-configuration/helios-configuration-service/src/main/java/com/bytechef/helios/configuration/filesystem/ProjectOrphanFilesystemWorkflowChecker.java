@@ -28,6 +28,7 @@ import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -37,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -107,7 +107,7 @@ public class ProjectOrphanFilesystemWorkflowChecker {
                             .tagIds(getTagIds(workflow.getSourceType()))
                             .build()));
 
-                projectService.addWorkflow(Objects.requireNonNull(project.getId()), workflow.getId());
+                projectService.addWorkflow(Validate.notNull(project.getId(), "id"), workflow.getId());
             }
         }
     }

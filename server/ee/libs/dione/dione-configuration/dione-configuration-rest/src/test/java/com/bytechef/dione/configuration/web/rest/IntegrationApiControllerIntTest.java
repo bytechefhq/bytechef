@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.category.domain.Category;
 import com.bytechef.dione.configuration.dto.IntegrationDTO;
 import com.bytechef.dione.configuration.facade.IntegrationFacade;
@@ -31,10 +32,10 @@ import com.bytechef.category.service.CategoryService;
 import com.bytechef.dione.configuration.web.rest.config.IntegrationRestTestConfiguration;
 import com.bytechef.dione.configuration.web.rest.mapper.IntegrationMapper;
 import com.bytechef.dione.configuration.web.rest.model.CategoryModel;
-import com.bytechef.dione.configuration.web.rest.model.CreateIntegrationWorkflowRequestModel;
 import com.bytechef.dione.configuration.web.rest.model.IntegrationModel;
 import com.bytechef.dione.configuration.web.rest.model.TagModel;
 import com.bytechef.dione.configuration.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.dione.configuration.web.rest.model.WorkflowRequestModel;
 import com.bytechef.tag.domain.Tag;
 
 import org.apache.commons.lang3.Validate;
@@ -172,7 +173,7 @@ public class IntegrationApiControllerIntTest {
     @Test
     public void testGetIntegrationWorkflows() {
         try {
-            Workflow workflow = new Workflow("workflow1", "{}", Workflow.Format.JSON, 0);
+            Workflow workflow = new Workflow("workflow1", "{}", Format.JSON, 0);
 
             when(integrationFacade.getIntegrationWorkflows(1L)).thenReturn(
                 List.of(workflow));
@@ -288,14 +289,11 @@ public class IntegrationApiControllerIntTest {
     }
 
     @Test
-    public void testPostIntegrationWorkflows() throws Exception {
-        CreateIntegrationWorkflowRequestModel createIntegrationWorkflowRequestModel =
-            new CreateIntegrationWorkflowRequestModel()
-                .label("workflowLabel")
-                .description("workflowDescription");
-        Workflow workflow = new Workflow(
-            "id", "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}",
-            Workflow.Format.JSON, 0);
+    public void testPostIntegrationWorkflows() {
+        String definition = "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}";
+
+        WorkflowRequestModel workflowRequestModel = new WorkflowRequestModel().definition(definition);
+        Workflow workflow = new Workflow("id", definition, Format.JSON, 0);
 
         when(integrationFacade.addWorkflow(anyLong(), any()))
             .thenReturn(workflow);
@@ -306,7 +304,7 @@ public class IntegrationApiControllerIntTest {
                 .uri("/integrations/1/workflows")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(createIntegrationWorkflowRequestModel)
+                .bodyValue(workflowRequestModel)
                 .exchange()
                 .expectStatus()
                 .isOk()

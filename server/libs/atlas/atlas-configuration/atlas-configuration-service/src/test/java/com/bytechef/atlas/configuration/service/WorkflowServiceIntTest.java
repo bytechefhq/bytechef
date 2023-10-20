@@ -23,6 +23,7 @@ import com.bytechef.atlas.configuration.config.WorkflowConfigurationIntTestConfi
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,7 @@ public class WorkflowServiceIntTest {
     public void testDelete() {
         Workflow workflow = workflowCrudRepository.save(getWorkflow());
 
-        workflowService.delete(workflow.getId());
+        workflowService.delete(Validate.notNull(workflow.getId(), "id"));
 
         Assertions.assertFalse(OptionalUtils.isPresent(workflowCrudRepository.findById(workflow.getId())));
     }
@@ -68,7 +69,7 @@ public class WorkflowServiceIntTest {
     public void testGetWorkflow() {
         Workflow workflow = workflowCrudRepository.save(getWorkflow());
 
-        Assertions.assertEquals(workflow, workflowService.getWorkflow(workflow.getId()));
+        Assertions.assertEquals(workflow, workflowService.getWorkflow(Validate.notNull(workflow.getId(), "id")));
     }
 
     @Test
@@ -87,7 +88,7 @@ public class WorkflowServiceIntTest {
         String definition = "{\"label\": \"Label\",\"tasks\": []}";
         Workflow workflow = workflowCrudRepository.save(getWorkflow());
 
-        Workflow updatedWorkflow = workflowService.update(workflow.getId(), definition, );
+        Workflow updatedWorkflow = workflowService.update(Validate.notNull(workflow.getId(), "id"), definition);
 
         Assertions.assertEquals(definition, updatedWorkflow.getDefinition());
     }

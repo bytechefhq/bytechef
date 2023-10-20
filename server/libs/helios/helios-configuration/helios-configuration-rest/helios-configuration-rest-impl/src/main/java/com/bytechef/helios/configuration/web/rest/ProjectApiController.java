@@ -18,11 +18,12 @@
 package com.bytechef.helios.configuration.web.rest;
 
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
-import com.bytechef.helios.configuration.web.rest.model.CreateProjectWorkflowRequestModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
 import com.bytechef.helios.configuration.dto.ProjectDTO;
 import com.bytechef.helios.configuration.facade.ProjectFacade;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.Validate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -53,19 +54,16 @@ public class ProjectApiController implements ProjectApi {
 
         return ResponseEntity.ok(
             conversionService.convert(
-                projectFacade.createProject(conversionService.convert(projectModel, ProjectDTO.class)),
+                projectFacade.createProject(
+                    Validate.notNull(conversionService.convert(projectModel, ProjectDTO.class), "projectDTO")),
                 ProjectModel.class));
     }
 
     @Override
-    public ResponseEntity<WorkflowModel> createProjectWorkflow(
-        Long id, CreateProjectWorkflowRequestModel createProjectWorkflowRequestModel) {
-
-        return ResponseEntity.ok(conversionService.convert(
-            projectFacade.addProjectWorkflow(
-                id, createProjectWorkflowRequestModel.getLabel(), createProjectWorkflowRequestModel.getDescription(),
-                createProjectWorkflowRequestModel.getDefinition()),
-            WorkflowModel.class));
+    public ResponseEntity<WorkflowModel> createProjectWorkflow(Long id, WorkflowRequestModel workflowRequestModel) {
+        return ResponseEntity.ok(
+            conversionService.convert(
+                projectFacade.addProjectWorkflow(id, workflowRequestModel.getDefinition()), WorkflowModel.class));
     }
 
     @Override
@@ -101,7 +99,8 @@ public class ProjectApiController implements ProjectApi {
     @Override
     public ResponseEntity<ProjectModel> updateProject(Long id, ProjectModel projectModel) {
         return ResponseEntity.ok(conversionService.convert(
-            projectFacade.updateProject(conversionService.convert(projectModel.id(id), ProjectDTO.class)),
+            projectFacade.updateProject(
+                Validate.notNull(conversionService.convert(projectModel.id(id), ProjectDTO.class), "projectDTO")),
             ProjectModel.class));
     }
 }

@@ -21,7 +21,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.category.domain.Category;
 import com.bytechef.dione.configuration.dto.IntegrationDTO;
 import com.bytechef.tag.domain.Tag;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -30,17 +30,16 @@ import java.util.List;
  */
 public interface IntegrationFacade {
 
-    Workflow addWorkflow(long id, String definition);
+    Workflow addWorkflow(long id, @NonNull String definition);
 
-    IntegrationDTO create(IntegrationDTO integrationDTO);
+    IntegrationDTO create(@NonNull IntegrationDTO integrationDTO);
 
     void delete(long id);
 
-    void deleteWorkflow(long id, String workflowId);
+    void deleteWorkflow(long id, @NonNull String workflowId);
 
     IntegrationDTO getIntegration(long id);
 
-    @Transactional(readOnly = true)
     List<Category> getIntegrationCategories();
 
     List<Tag> getIntegrationTags();
@@ -49,7 +48,7 @@ public interface IntegrationFacade {
 
     List<IntegrationDTO> getIntegrations(Long categoryId, Long tagId);
 
-    IntegrationDTO update(long id, List<Tag> tags);
+    IntegrationDTO update(long id, @NonNull List<Tag> tags);
 
-    IntegrationDTO update(IntegrationDTO integration);
+    IntegrationDTO update(@NonNull IntegrationDTO integration);
 }
