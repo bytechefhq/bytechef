@@ -17,10 +17,12 @@
 
 package com.bytechef.hermes.component.web.rest;
 
+import com.bytechef.hermes.component.service.ComponentDefinitionService;
 import com.bytechef.hermes.component.web.rest.config.ComponentDefinitionRestTestConfiguration;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -29,6 +31,9 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration(classes = ComponentDefinitionRestTestConfiguration.class)
 @WebFluxTest(ConnectionDefinitionController.class)
 public class ConnectionDefinitionControllerIntTest {
+
+    @MockBean
+    private ComponentDefinitionService componentDefinitionService;
 
     @Disabled
     @Test
