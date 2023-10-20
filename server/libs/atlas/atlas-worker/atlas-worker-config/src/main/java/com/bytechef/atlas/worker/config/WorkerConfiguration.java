@@ -27,16 +27,13 @@ import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistrar;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 import com.bytechef.autoconfigure.annotation.ConditionalOnWorker;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,24 +48,11 @@ import org.springframework.context.annotation.Primary;
 @EnableConfigurationProperties(WorkerProperties.class)
 public class WorkerConfiguration {
 
-    @Autowired
-    private ConfigurableListableBeanFactory beanFactory;
-
     @Autowired(required = false)
     List<TaskDispatcherAdapterFactory> taskDispatcherAdapterTaskHandlerFactories = Collections.emptyList();
 
-    @Autowired(required = false)
-    private List<TaskHandlerRegistrar> taskHandlerRegistrars = Collections.emptyList();
-
     @Autowired
     private TaskEvaluator taskEvaluator;
-
-    @PostConstruct
-    public void afterPropertiesSet() {
-        for (TaskHandlerRegistrar taskHandlerRegistrar : taskHandlerRegistrars) {
-            taskHandlerRegistrar.registerTaskHandlers(beanFactory);
-        }
-    }
 
     @Bean
     TaskHandlerResolver defaultTaskHandlerResolver(Map<String, TaskHandler<?>> taskHandlers) {

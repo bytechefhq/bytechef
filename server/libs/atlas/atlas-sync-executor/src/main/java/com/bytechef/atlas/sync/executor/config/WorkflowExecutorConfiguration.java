@@ -37,34 +37,19 @@ import com.bytechef.atlas.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.service.WorkflowServiceImpl;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistrar;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class WorkflowExecutorConfiguration implements InitializingBean {
-
-    @Autowired
-    private ConfigurableListableBeanFactory beanFactory;
-
-    @Autowired(required = false)
-    private TaskHandlerRegistrar taskHandlerRegistrar;
-
-    public void afterPropertiesSet() {
-        if (taskHandlerRegistrar != null) {
-            taskHandlerRegistrar.registerTaskHandlers(beanFactory);
-        }
-    }
+public class WorkflowExecutorConfiguration {
 
     @Bean
     ContextService contextService() {

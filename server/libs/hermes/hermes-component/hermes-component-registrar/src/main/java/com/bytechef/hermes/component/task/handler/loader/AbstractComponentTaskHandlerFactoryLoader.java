@@ -49,7 +49,7 @@ abstract class AbstractComponentTaskHandlerFactoryLoader<T extends ComponentDefi
                     componentDefinition,
                     componentDefinition.getActions()
                         .stream()
-                        .map(actionDefinition -> new TaskHandlerFactoryItem(
+                        .map(actionDefinition -> new TaskHandlerFactoryEntry(
                             actionDefinition.getName(),
                             createTaskHandlerFactory(
                                 actionDefinition, componentDefinition.getConnection(), componentDefinitionFactory)))
