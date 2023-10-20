@@ -10,6 +10,7 @@ import {
 } from '@/mutations/projects.mutations';
 import {ProjectKeys} from '@/queries/projects.queries';
 import {CalendarIcon, ChevronDownIcon} from '@heroicons/react/24/outline';
+import {AccordionTrigger} from '@radix-ui/react-accordion';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 
@@ -70,8 +71,8 @@ const ProjectInstanceListItem = ({
 
     return (
         <>
-            <div className="flex items-center">
-                <div className="flex-1 pr-8">
+            <div className="flex items-center justify-between">
+                <AccordionTrigger className="group w-9/12">
                     <div className="flex items-center justify-between">
                         <div className="flex w-full items-center justify-between">
                             {projectInstance.description ? (
@@ -85,10 +86,6 @@ const ProjectInstanceListItem = ({
                                     {projectInstance.name}
                                 </span>
                             )}
-
-                            <div className="flex items-center">
-                                <Switch />
-                            </div>
                         </div>
 
                         <div className="ml-2 flex shrink-0">
@@ -156,12 +153,18 @@ const ProjectInstanceListItem = ({
                             )}
                         </div>
                     </div>
+                </AccordionTrigger>
+
+                <div className="flex w-2/12 items-center justify-center">
+                    <Switch />
                 </div>
 
-                <DropdownMenu
-                    id={projectInstance.id}
-                    menuItems={dropdownItems}
-                />
+                <div className="flex w-1/12 justify-end">
+                    <DropdownMenu
+                        id={projectInstance.id}
+                        menuItems={dropdownItems}
+                    />
+                </div>
             </div>
 
             {showDeleteDialog && (
