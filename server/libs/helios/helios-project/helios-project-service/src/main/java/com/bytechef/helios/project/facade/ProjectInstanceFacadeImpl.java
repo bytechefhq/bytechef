@@ -24,6 +24,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.project.constant.ProjectConstants;
 import com.bytechef.helios.project.domain.Project;
 import com.bytechef.helios.project.domain.ProjectInstance;
+import com.bytechef.helios.project.domain.ProjectInstance.Status;
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.project.dto.ProjectInstanceDTO;
 import com.bytechef.helios.project.job.ProjectInstanceJobFactory;
@@ -101,21 +102,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         // TODO activate only enabled workflows
 
-        for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
-            Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
-
-            List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
-
-            for (WorkflowTrigger workflowTrigger : workflowTriggers) {
-                triggerLifecycleExecutor.executeTriggerEnable(
-                    workflowTrigger,
-                    WorkflowExecutionId.of(
-                        workflow.getId(), projectInstanceDTO.id(), ProjectConstants.PROJECT,
-                        workflowTrigger.getTriggerName()),
-                    getConnection(workflowTrigger),
-                    projectInstanceWorkflow.getInputs());
-            }
-        }
+        enableWorkflowTriggers(projectInstanceDTO.id(), projectInstanceWorkflows);
 
         return new ProjectInstanceDTO(
             getLastExecutionDate(Objects.requireNonNull(projectInstance.getId())), projectInstance,
@@ -139,24 +126,37 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
             .getProjectInstanceWorkflows(projectInstanceId);
 
-        for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
-            Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
-
-            List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
-
-            for (WorkflowTrigger workflowTrigger : workflowTriggers) {
-                triggerLifecycleExecutor.executeTriggerDisable(
-                    workflowTrigger,
-                    WorkflowExecutionId.of(
-                        workflow.getId(), projectInstanceId, ProjectConstants.PROJECT,
-                        workflowTrigger.getTriggerName()),
-                    getConnection(workflowTrigger));
-            }
-        }
+        disableWorkflowTriggers(projectInstanceId, projectInstanceWorkflows);
 
 // TODO find a way to delete ll tags not referenced anymore
 //        project.getTagIds()
 //            .forEach(tagService::delete);
+    }
+
+    @Override
+    public void enableProjectInstance(long id, boolean enable) {
+        projectInstanceService.update(id, enable ? Status.ENABLED : Status.DISABLED);
+
+        List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
+            .getProjectInstanceWorkflows(id);
+
+        if (enable) {
+            enableWorkflowTriggers(id, projectInstanceWorkflows);
+        } else {
+            disableWorkflowTriggers(id, projectInstanceWorkflows);
+        }
+    }
+
+    @Override
+    public void enableProjectInstanceWorkflow(long id, String workflowId, boolean enable) {
+        ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
+            id, workflowId);
+
+        if (enable) {
+            enableWorkflowTriggers(id, List.of(projectInstanceWorkflow));
+        } else {
+            disableWorkflowTriggers(id, List.of(projectInstanceWorkflow));
+        }
     }
 
     @Override
@@ -259,6 +259,38 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         List<Long> curTagIds = projectInstance.getTagIds();
 
         return curTagIds.contains(tag.getId());
+    }
+
+    private void disableWorkflowTriggers(long id, List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
+        for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
+            Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
+
+            List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+
+            for (WorkflowTrigger workflowTrigger : workflowTriggers) {
+                triggerLifecycleExecutor.executeTriggerDisable(
+                    workflowTrigger,
+                    WorkflowExecutionId.of(
+                        workflow.getId(), id, ProjectConstants.PROJECT, workflowTrigger.getTriggerName()),
+                    getConnection(workflowTrigger));
+            }
+        }
+    }
+
+    private void enableWorkflowTriggers(long id, List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
+        for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
+            Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
+
+            List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+
+            for (WorkflowTrigger workflowTrigger : workflowTriggers) {
+                triggerLifecycleExecutor.executeTriggerEnable(
+                    workflowTrigger,
+                    WorkflowExecutionId.of(
+                        workflow.getId(), id, ProjectConstants.PROJECT, workflowTrigger.getTriggerName()),
+                    getConnection(workflowTrigger), projectInstanceWorkflow.getInputs());
+            }
+        }
     }
 
     private List<Tag> filterTags(List<Tag> tags, ProjectInstance projectInstance) {

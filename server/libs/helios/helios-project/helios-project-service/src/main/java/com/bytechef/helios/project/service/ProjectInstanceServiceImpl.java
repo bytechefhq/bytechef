@@ -119,6 +119,15 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     }
 
     @Override
+    public ProjectInstance update(long id, Status status) {
+        ProjectInstance projectInstance = getProjectInstance(id);
+
+        projectInstance.setStatus(status);
+
+        return projectInstanceRepository.save(projectInstance);
+    }
+
+    @Override
     public ProjectInstance update(
         long id, String description, String name, Status status, List<Long> tagIds, int version) {
 

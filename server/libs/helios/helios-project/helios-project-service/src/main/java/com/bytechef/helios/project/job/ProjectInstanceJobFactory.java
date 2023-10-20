@@ -49,7 +49,7 @@ public class ProjectInstanceJobFactory implements InstanceJobFactory {
     @SuppressFBWarnings("NP")
     public long createJob(String workflowId, long instanceId) {
         ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
-            workflowId, instanceId);
+            instanceId, workflowId);
 
         long jobId = jobFactory.create(new JobParameters(projectInstanceWorkflow.getInputs(), workflowId));
 

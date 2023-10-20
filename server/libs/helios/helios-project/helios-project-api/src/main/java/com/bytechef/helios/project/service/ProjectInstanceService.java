@@ -18,6 +18,7 @@
 package com.bytechef.helios.project.service;
 
 import com.bytechef.helios.project.domain.ProjectInstance;
+import com.bytechef.helios.project.domain.ProjectInstance.Status;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,7 @@ public interface ProjectInstanceService {
 
     ProjectInstance update(long id, List<Long> tagIds);
 
-    ProjectInstance update(
-        long id, String description, String name, ProjectInstance.Status status, List<Long> tagIds, int version);
+    ProjectInstance update(long id, Status status);
+
+    ProjectInstance update(long id, String description, String name, Status status, List<Long> tagIds, int version);
 }
