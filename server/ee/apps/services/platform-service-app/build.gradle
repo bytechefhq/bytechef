@@ -65,6 +65,8 @@ dependencies {
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-rest")
     implementation project(":server:libs:hermes:hermes-execution:hermes-execution-rest:hermes-execution-rest-impl")
     implementation project(":server:libs:hermes:hermes-execution:hermes-execution-service")
+    implementation project(":server:libs:hermes:hermes-test:hermes-test-rest")
+    implementation project(":server:libs:hermes:hermes-test:hermes-test-service")
 
     testImplementation project(":server:libs:test:test-int-support")
 }
