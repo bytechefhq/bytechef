@@ -35,13 +35,13 @@ public class PetstoreOrderProperties {
     public static final List<Property> PROPERTIES = List.of(integer("id").label("Id")
         .required(false)
         .exampleValue(10),
-        integer("petId").label("PetId")
+        integer("petId").label("Pet Id")
             .required(false)
             .exampleValue(198772),
         integer("quantity").label("Quantity")
             .required(false)
             .exampleValue(7),
-        dateTime("shipDate").label("ShipDate")
+        dateTime("shipDate").label("Ship Date")
             .required(false),
         string("status").label("Status")
             .description("Order Status")

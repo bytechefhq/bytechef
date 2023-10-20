@@ -48,20 +48,20 @@ public class MailchimpAddMemberToListAction {
                 "application/json"
 
             ))
-        .properties(string("listId").label("ListId")
+        .properties(string("listId").label("List Id")
             .description("The unique ID for the list.")
             .required(true)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            bool("skip_merge_validation").label("Skip_merge_validation")
+            bool("skip_merge_validation").label("Skip Merge Validation")
                 .description(
                     "If skip_merge_validation is true, member data will be accepted without merge field values, even if the merge field is usually required. This defaults to false.")
                 .required(false)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            object().properties(string("email_address").label("Email_address")
+            object().properties(string("email_address").label("Email Address")
                 .description("Email address for a subscriber.")
                 .required(true),
                 string("status").label("Status")
@@ -70,12 +70,12 @@ public class MailchimpAddMemberToListAction {
                         option("Cleaned", "cleaned"), option("Pending", "pending"),
                         option("Transactional", "transactional"))
                     .required(true),
-                string("email_type").label("Email_type")
+                string("email_type").label("Email Type")
                     .description("Type of email this member asked to get ('html' or 'text').")
                     .required(false),
                 object("merge_fields").additionalProperties(string())
                     .placeholder("Add")
-                    .label("Merge_fields")
+                    .label("Merge Fields")
                     .description("A dictionary of merge fields where the keys are the merge tags.")
                     .required(false),
                 object("interests").additionalProperties(string())
@@ -99,7 +99,7 @@ public class MailchimpAddMemberToListAction {
                     .description("Subscriber location information.")
                     .required(false),
                 array("marketing_permissions")
-                    .items(object().properties(string("marketing_permission_id").label("Marketing_permission_id")
+                    .items(object().properties(string("marketing_permission_id").label("Marketing Permission Id")
                         .description("The id for the marketing permission on the list.")
                         .required(false),
                         bool("enabled").label("Enabled")
@@ -107,19 +107,19 @@ public class MailchimpAddMemberToListAction {
                             .required(false))
                         .description("The marketing permissions for the subscriber."))
                     .placeholder("Add")
-                    .label("Marketing_permissions")
+                    .label("Marketing Permissions")
                     .description("The marketing permissions for the subscriber.")
                     .required(false),
-                string("ip_signup").label("Ip_signup")
+                string("ip_signup").label("Ip Signup")
                     .description("IP address the subscriber signed up from.")
                     .required(false),
-                string("timestamp_signup").label("Timestamp_signup")
+                string("timestamp_signup").label("Timestamp Signup")
                     .description("The date and time the subscriber signed up for the list in ISO 8601 format.")
                     .required(false),
-                string("ip_opt").label("Ip_opt")
+                string("ip_opt").label("Ip Opt")
                     .description("The IP address the subscriber used to confirm their opt-in status.")
                     .required(false),
-                string("timestamp_opt").label("Timestamp_opt")
+                string("timestamp_opt").label("Timestamp Opt")
                     .description("The date and time the subscriber confirmed their opt-in status in ISO 8601 format.")
                     .required(false),
                 array("tags").items(string().description("The tags that are associated with a member."))
@@ -133,24 +133,24 @@ public class MailchimpAddMemberToListAction {
         .outputSchema(object().properties(string("id").label("Id")
             .description("The MD5 hash of the lowercase version of the list member's email address.")
             .required(false),
-            string("email_address").label("Email_address")
+            string("email_address").label("Email Address")
                 .description("Email address for a subscriber.")
                 .required(false),
-            string("unique_email_id").label("Unique_email_id")
+            string("unique_email_id").label("Unique Email Id")
                 .description("An identifier for the address across all of Mailchimp.")
                 .required(false),
-            string("contact_id").label("Contact_id")
+            string("contact_id").label("Contact Id")
                 .description(
                     "As Mailchimp evolves beyond email, you may eventually have contacts without email addresses. While the id is the MD5 hash of their email address, this contact_id is agnostic of contact’s inclusion of an email address.")
                 .required(false),
-            string("full_name").label("Full_name")
+            string("full_name").label("Full Name")
                 .description("The contact's full name.")
                 .required(false),
-            string("web_id").label("Web_id")
+            string("web_id").label("Web Id")
                 .description(
                     "The ID used in the Mailchimp web application. View this member in your Mailchimp account at https://{dc}.admin.mailchimp.com/lists/members/view?id={web_id}.")
                 .required(false),
-            string("email_type").label("Email_type")
+            string("email_type").label("Email Type")
                 .description("Type of email this member asked to get ('html' or 'text').")
                 .required(false),
             string("status").label("Status")
@@ -159,15 +159,15 @@ public class MailchimpAddMemberToListAction {
                     option("Cleaned", "cleaned"), option("Pending", "pending"),
                     option("Transactional", "transactional"))
                 .required(false),
-            string("unsubscribe_reason").label("Unsubscribe_reason")
+            string("unsubscribe_reason").label("Unsubscribe Reason")
                 .description("A subscriber's reason for unsubscribing.")
                 .required(false),
-            bool("consents_to_one_to_one_messaging").label("Consents_to_one_to_one_messaging")
+            bool("consents_to_one_to_one_messaging").label("Consents To One To One Messaging")
                 .description("Indicates whether a contact consents to 1:1 messaging.")
                 .required(false),
             object("merge_fields").additionalProperties(string())
                 .placeholder("Add")
-                .label("Merge_fields")
+                .label("Merge Fields")
                 .description(
                     "A dictionary of merge fields where the keys are the merge tags. See the Merge Fields documentation for more about the structure.")
                 .required(false),
@@ -176,43 +176,43 @@ public class MailchimpAddMemberToListAction {
                 .label("Interests")
                 .description("The key of this object's properties is the ID of the interest in question.")
                 .required(false),
-            object("stats").properties(number("avg_open_rate").label("Avg_open_rate")
+            object("stats").properties(number("avg_open_rate").label("Avg Open Rate")
                 .description("A subscriber's average open rate.")
                 .required(false),
-                number("avg_click_rate").label("Avg_click_rate")
+                number("avg_click_rate").label("Avg Click Rate")
                     .description("A subscriber's average clickthrough rate.")
                     .required(false),
-                object("ecommerce_data").properties(number("total_revenue").label("Total_revenue")
+                object("ecommerce_data").properties(number("total_revenue").label("Total Revenue")
                     .description("The total revenue the list member has brought in.")
                     .required(false),
-                    number("number_of_orders").label("Number_of_orders")
+                    number("number_of_orders").label("Number Of Orders")
                         .description("The total number of orders placed by the list member.")
                         .required(false),
-                    string("currency_code").label("Currency_code")
+                    string("currency_code").label("Currency Code")
                         .description("The three-letter ISO 4217 code for the currency that the store accepts.")
                         .required(false))
-                    .label("Ecommerce_data")
+                    .label("Ecommerce Data")
                     .description("Ecommerce stats for the list member if the list is attached to a store.")
                     .required(false))
                 .label("Stats")
                 .description("Open and click rates for this subscriber.")
                 .required(false),
-            string("ip_signup").label("Ip_signup")
+            string("ip_signup").label("Ip Signup")
                 .description("IP address the subscriber signed up from.")
                 .required(false),
-            string("timestamp_signup").label("Timestamp_signup")
+            string("timestamp_signup").label("Timestamp Signup")
                 .description("The date and time the subscriber signed up for the list in ISO 8601 format.")
                 .required(false),
-            string("ip_opt").label("Ip_opt")
+            string("ip_opt").label("Ip Opt")
                 .description("The IP address the subscriber used to confirm their opt-in status.")
                 .required(false),
-            string("timestamp_opt").label("Timestamp_opt")
+            string("timestamp_opt").label("Timestamp Opt")
                 .description("The date and time the subscriber confirmed their opt-in status in ISO 8601 format.")
                 .required(false),
-            integer("member_rating").label("Member_rating")
+            integer("member_rating").label("Member Rating")
                 .description("Star rating for this member, between 1 and 5.")
                 .required(false),
-            string("last_changed").label("Last_changed")
+            string("last_changed").label("Last Changed")
                 .description("The date and time the member's info was last changed in ISO 8601 format.")
                 .required(false),
             string("language").label("Language")
@@ -221,7 +221,7 @@ public class MailchimpAddMemberToListAction {
             bool("vip").label("Vip")
                 .description("VIP status for subscriber.")
                 .required(false),
-            string("email_client").label("Email_client")
+            string("email_client").label("Email Client")
                 .description("The list member's email client.")
                 .required(false),
             object("location").properties(number("latitude").label("Latitude")
@@ -236,7 +236,7 @@ public class MailchimpAddMemberToListAction {
                 integer("dstoff").label("Dstoff")
                     .description("The offset for timezones where daylight saving time is observed.")
                     .required(false),
-                string("country_code").label("Country_code")
+                string("country_code").label("Country Code")
                     .description("The unique code for the location country.")
                     .required(false),
                 string("timezone").label("Timezone")
@@ -249,7 +249,7 @@ public class MailchimpAddMemberToListAction {
                 .description("Subscriber location information.")
                 .required(false),
             array("marketing_permissions")
-                .items(object().properties(string("marketing_permission_id").label("Marketing_permission_id")
+                .items(object().properties(string("marketing_permission_id").label("Marketing Permission Id")
                     .description("The id for the marketing permission on the list")
                     .required(false),
                     string("text").label("Text")
@@ -260,28 +260,28 @@ public class MailchimpAddMemberToListAction {
                         .required(false))
                     .description("The marketing permissions for the subscriber."))
                 .placeholder("Add")
-                .label("Marketing_permissions")
+                .label("Marketing Permissions")
                 .description("The marketing permissions for the subscriber.")
                 .required(false),
-            object("last_note").properties(integer("note_id").label("Note_id")
+            object("last_note").properties(integer("note_id").label("Note Id")
                 .description("The note id.")
                 .required(false),
-                string("created_at").label("Created_at")
+                string("created_at").label("Created At")
                     .description("The date and time the note was created in ISO 8601 format.")
                     .required(false),
-                string("created_by").label("Created_by")
+                string("created_by").label("Created By")
                     .description("The author of the note.")
                     .required(false),
                 string("note").label("Note")
                     .description("The content of the note.")
                     .required(false))
-                .label("Last_note")
+                .label("Last Note")
                 .description("The most recent Note added about this member.")
                 .required(false),
             string("source").label("Source")
                 .description("The source from which the subscriber was added to this list.")
                 .required(false),
-            integer("tags_count").label("Tags_count")
+            integer("tags_count").label("Tags Count")
                 .description("The number of tags applied to this member.")
                 .required(false),
             object("tags").properties(integer("id").label("Id")
@@ -293,7 +293,7 @@ public class MailchimpAddMemberToListAction {
                 .label("Tags")
                 .description("Returns up to 50 tags applied to this member.")
                 .required(false),
-            string("list_id").label("List_id")
+            string("list_id").label("List Id")
                 .description("The list id.")
                 .required(false),
             array("_links").items(object().properties(string("rel").label("Rel")
@@ -307,7 +307,7 @@ public class MailchimpAddMemberToListAction {
                     .description(
                         "The HTTP method that should be used when accessing the URL defined in 'href'. Possible values: \"GET\", \"POST\", \"PUT\", \"PATCH\", \"DELETE\", \"OPTIONS\", or \"HEAD\".")
                     .required(false),
-                string("targetSchema").label("TargetSchema")
+                string("targetSchema").label("Target Schema")
                     .description("For GETs, this is a URL representing the schema that the response should conform to.")
                     .required(false),
                 string("schema").label("Schema")
@@ -316,7 +316,7 @@ public class MailchimpAddMemberToListAction {
                     .required(false))
                 .description("A list of link types and descriptions for the API schema documents."))
                 .placeholder("Add")
-                .label("_links")
+                .label("Links")
                 .description("A list of link types and descriptions for the API schema documents.")
                 .required(false))
             .metadata(

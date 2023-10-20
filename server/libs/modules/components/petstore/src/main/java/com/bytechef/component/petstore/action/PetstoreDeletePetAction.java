@@ -40,13 +40,13 @@ public class PetstoreDeletePetAction {
                 "path", "/pet/{petId}"
 
             ))
-        .properties(string("api_key").label("Api_key")
+        .properties(string("api_key").label("Api Key")
             .description("")
             .required(false)
             .metadata(
                 Map.of(
                     "type", PropertyType.HEADER)),
-            integer("petId").label("PetId")
+            integer("petId").label("Pet Id")
                 .description("Pet id to delete")
                 .required(true)
                 .metadata(

@@ -32,7 +32,7 @@ public class JiraNestedResponseProperties {
     public static final List<Property> PROPERTIES = List.of(integer("status").label("Status")
         .required(false),
         object("errorCollection").properties(JiraErrorCollectionProperties.PROPERTIES)
-            .label("ErrorCollection")
+            .label("Error Collection")
             .description("Error messages from an operation.")
             .required(false));
 }

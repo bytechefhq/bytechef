@@ -31,16 +31,16 @@ public class JiraHistoryMetadataParticipantProperties {
     public static final List<Property> PROPERTIES = List.of(string("id").label("Id")
         .description("The ID of the user or system associated with a history record.")
         .required(false),
-        string("displayName").label("DisplayName")
+        string("displayName").label("Display Name")
             .description("The display name of the user or system associated with a history record.")
             .required(false),
-        string("displayNameKey").label("DisplayNameKey")
+        string("displayNameKey").label("Display Name Key")
             .description("The key of the display name of the user or system associated with a history record.")
             .required(false),
         string("type").label("Type")
             .description("The type of the user or system associated with a history record.")
             .required(false),
-        string("avatarUrl").label("AvatarUrl")
+        string("avatarUrl").label("Avatar Url")
             .description("The URL to an avatar for the user or system associated with a history record.")
             .required(false),
         string("url").label("Url")

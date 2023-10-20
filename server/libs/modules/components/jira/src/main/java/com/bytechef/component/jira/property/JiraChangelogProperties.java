@@ -53,7 +53,7 @@ public class JiraChangelogProperties {
             .description("The list of items changed.")
             .required(false),
         object("historyMetadata").properties(JiraHistoryMetadataProperties.PROPERTIES)
-            .label("HistoryMetadata")
+            .label("History Metadata")
             .description("Details of issue history metadata.")
             .required(false));
 }

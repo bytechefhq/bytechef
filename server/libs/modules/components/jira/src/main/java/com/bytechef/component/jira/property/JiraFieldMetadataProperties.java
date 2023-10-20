@@ -44,10 +44,10 @@ public class JiraFieldMetadataProperties {
         string("key").label("Key")
             .description("The key of the field.")
             .required(true),
-        string("autoCompleteUrl").label("AutoCompleteUrl")
+        string("autoCompleteUrl").label("Auto Complete Url")
             .description("The URL that can be used to automatically complete the field.")
             .required(false),
-        bool("hasDefaultValue").label("HasDefaultValue")
+        bool("hasDefaultValue").label("Has Default Value")
             .description("Whether the field has a default value.")
             .required(false),
         array("operations").items(string().description("The list of operations that can be performed on the field."))
@@ -57,10 +57,10 @@ public class JiraFieldMetadataProperties {
             .required(true),
         array("allowedValues").items(object().description("The list of values allowed in the field."))
             .placeholder("Add")
-            .label("AllowedValues")
+            .label("Allowed Values")
             .description("The list of values allowed in the field.")
             .required(false),
-        object("defaultValue").label("DefaultValue")
+        object("defaultValue").label("Default Value")
             .description("The default value of the field.")
             .required(false),
         object("configuration").additionalProperties(object())

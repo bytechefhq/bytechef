@@ -40,7 +40,7 @@ public class PetstoreDeleteOrderAction {
                 "path", "/store/order/{orderId}"
 
             ))
-        .properties(integer("orderId").label("OrderId")
+        .properties(integer("orderId").label("Order Id")
             .description("ID of the order that needs to be deleted")
             .required(true)
             .metadata(

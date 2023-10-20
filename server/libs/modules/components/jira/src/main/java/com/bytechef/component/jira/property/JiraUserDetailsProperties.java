@@ -41,29 +41,29 @@ public class JiraUserDetailsProperties {
             .description(
                 "This property is no longer available and will be removed from the documentation soon. See the [deprecation notice](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/) for details.")
             .required(false),
-        string("accountId").label("AccountId")
+        string("accountId").label("Account Id")
             .description(
                 "The account ID of the user, which uniquely identifies the user across all Atlassian products. For example, *5b10ac8d82e05b22cc7d4ef5*.")
             .required(false),
-        string("emailAddress").label("EmailAddress")
+        string("emailAddress").label("Email Address")
             .description(
                 "The email address of the user. Depending on the user’s privacy settings, this may be returned as null.")
             .required(false),
         object("avatarUrls").properties(JiraAvatarUrlsBeanProperties.PROPERTIES)
-            .label("AvatarUrls")
+            .label("Avatar Urls")
             .required(false),
-        string("displayName").label("DisplayName")
+        string("displayName").label("Display Name")
             .description(
                 "The display name of the user. Depending on the user’s privacy settings, this may return an alternative value.")
             .required(false),
         bool("active").label("Active")
             .description("Whether the user is active.")
             .required(false),
-        string("timeZone").label("TimeZone")
+        string("timeZone").label("Time Zone")
             .description(
                 "The time zone specified in the user's profile. Depending on the user’s privacy settings, this may be returned as null.")
             .required(false),
-        string("accountType").label("AccountType")
+        string("accountType").label("Account Type")
             .description(
                 "The type of account represented by this user. This will be one of 'atlassian' (normal users), 'app' (application user) or 'customer' (Jira Service Desk customer user)")
             .required(false));

@@ -43,7 +43,7 @@ public class PetstoreGetOrderByIdAction {
                 "path", "/store/order/{orderId}"
 
             ))
-        .properties(integer("orderId").label("OrderId")
+        .properties(integer("orderId").label("Order Id")
             .description("ID of order that needs to be fetched")
             .required(true)
             .metadata(

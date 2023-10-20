@@ -30,10 +30,10 @@ import java.util.List;
  * @generated
  */
 public class JiraPageOfChangelogsProperties {
-    public static final List<Property> PROPERTIES = List.of(integer("startAt").label("StartAt")
+    public static final List<Property> PROPERTIES = List.of(integer("startAt").label("Start At")
         .description("The index of the first item returned on the page.")
         .required(false),
-        integer("maxResults").label("MaxResults")
+        integer("maxResults").label("Max Results")
             .description("The maximum number of results that could be on the page.")
             .required(false),
         integer("total").label("Total")

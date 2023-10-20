@@ -34,7 +34,7 @@ public class JiraErrorCollectionProperties {
     public static final List<Property> PROPERTIES = List.of(array("errorMessages").items(string().description(
         "The list of error messages produced by this operation. For example, \"input parameter 'key' must be provided\""))
         .placeholder("Add")
-        .label("ErrorMessages")
+        .label("Error Messages")
         .description(
             "The list of error messages produced by this operation. For example, \"input parameter 'key' must be provided\"")
         .required(false),

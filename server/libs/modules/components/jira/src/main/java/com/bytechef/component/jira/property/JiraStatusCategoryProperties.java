@@ -38,7 +38,7 @@ public class JiraStatusCategoryProperties {
         string("key").label("Key")
             .description("The key of the status category.")
             .required(false),
-        string("colorName").label("ColorName")
+        string("colorName").label("Color Name")
             .description("The name of the color used to represent the status category.")
             .required(false),
         string("name").label("Name")

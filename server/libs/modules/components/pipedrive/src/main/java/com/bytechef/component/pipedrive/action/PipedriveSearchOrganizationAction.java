@@ -63,7 +63,7 @@ public class PipedriveSearchOrganizationAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            bool("exact_match").label("Exact_match")
+            bool("exact_match").label("Exact Match")
                 .description(
                     "When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive.")
                 .required(false)
@@ -88,7 +88,7 @@ public class PipedriveSearchOrganizationAction {
                 .properties(
                     object("data")
                         .properties(array("items")
-                            .items(object().properties(number("result_score").label("Result_score")
+                            .items(object().properties(number("result_score").label("Result Score")
                                 .description("Search result relevancy")
                                 .required(false),
                                 object("item").properties(integer("id").label("Id")
@@ -103,7 +103,7 @@ public class PipedriveSearchOrganizationAction {
                                     string("address").label("Address")
                                         .description("The address of the organization")
                                         .required(false),
-                                    integer("visible_to").label("Visible_to")
+                                    integer("visible_to").label("Visible To")
                                         .description("The visibility of the organization")
                                         .required(false),
                                     object("owner").properties(integer("id").label("Id")
@@ -113,7 +113,7 @@ public class PipedriveSearchOrganizationAction {
                                         .required(false),
                                     array("custom_fields").items(string().description("Custom fields"))
                                         .placeholder("Add")
-                                        .label("Custom_fields")
+                                        .label("Custom Fields")
                                         .description("Custom fields")
                                         .required(false),
                                     array("notes").items(string().description("An array of notes"))
@@ -139,16 +139,16 @@ public class PipedriveSearchOrganizationAction {
                         integer("limit").label("Limit")
                             .description("Items shown per page")
                             .required(false),
-                        bool("more_items_in_collection").label("More_items_in_collection")
+                        bool("more_items_in_collection").label("More Items In Collection")
                             .description("Whether there are more list items in the collection than displayed")
                             .required(false),
-                        integer("next_start").label("Next_start")
+                        integer("next_start").label("Next Start")
                             .description("Next pagination start")
                             .required(false))
                         .label("Pagination")
                         .description("Pagination details of the list")
                         .required(false))
-                        .label("Additional_data")
+                        .label("Additional Data")
                         .required(false))
                 .metadata(
                     Map.of(

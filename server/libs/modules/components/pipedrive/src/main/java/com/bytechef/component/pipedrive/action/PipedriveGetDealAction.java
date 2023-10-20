@@ -56,34 +56,34 @@ public class PipedriveGetDealAction {
         .outputSchema(object().properties(bool("success").label("Success")
             .description("If the response is successful or not")
             .required(false),
-            integer("email_messages_count").label("Email_messages_count")
+            integer("email_messages_count").label("Email Messages Count")
                 .description("The number of emails associated with the deal")
                 .required(false),
-            string("cc_email").label("Cc_email")
+            string("cc_email").label("Cc Email")
                 .description("The BCC email of the deal")
                 .required(false),
-            object("stay_in_pipeline_stages").properties(object("times_in_stages").label("Times_in_stages")
+            object("stay_in_pipeline_stages").properties(object("times_in_stages").label("Times In Stages")
                 .description("The number of seconds a deal has been in each stage of the pipeline")
                 .required(false),
                 array("order_of_stages")
                     .items(integer(null).description("The order of the deal progression through the pipeline stages"))
                     .placeholder("Add")
-                    .label("Order_of_stages")
+                    .label("Order Of Stages")
                     .description("The order of the deal progression through the pipeline stages")
                     .required(false))
-                .label("Stay_in_pipeline_stages")
+                .label("Stay In Pipeline Stages")
                 .description("The details of the duration of the deal being in each stage of the pipeline")
                 .required(false),
-            integer("products_count").label("Products_count")
+            integer("products_count").label("Products Count")
                 .description("The number of products associated with the deal")
                 .required(false),
-            string("next_activity_date").label("Next_activity_date")
+            string("next_activity_date").label("Next Activity Date")
                 .description("The date of the next activity associated with the deal")
                 .required(false),
-            string("next_activity_type").label("Next_activity_type")
+            string("next_activity_type").label("Next Activity Type")
                 .description("The type of the next activity associated with the deal")
                 .required(false),
-            string("next_activity_duration").label("Next_activity_duration")
+            string("next_activity_duration").label("Next Activity Duration")
                 .description("The duration of the next activity associated with the deal")
                 .required(false),
             integer("id").label("Id")
@@ -92,7 +92,7 @@ public class PipedriveGetDealAction {
             string("name").label("Name")
                 .description("The name of the person associated with the deal")
                 .required(false),
-            bool("active_flag").label("Active_flag")
+            bool("active_flag").label("Active Flag")
                 .description("Whether the associated person is active or not")
                 .required(false),
             array("phone").items(object().properties(string("label").label("Label")
@@ -126,7 +126,7 @@ public class PipedriveGetDealAction {
                 .label("Email")
                 .description("The emails of the person associated with the deal")
                 .required(false),
-            integer("owner_id").label("Owner_id")
+            integer("owner_id").label("Owner Id")
                 .description("The ID of the owner of the person that is associated with the deal")
                 .required(false),
             object("creator_user_id").properties(integer("id").label("Id")
@@ -138,76 +138,76 @@ public class PipedriveGetDealAction {
                 string("email").label("Email")
                     .description("The email of the deal creator")
                     .required(false),
-                bool("has_pic").label("Has_pic")
+                bool("has_pic").label("Has Pic")
                     .description("If the creator has a picture or not")
                     .required(false),
-                string("pic_hash").label("Pic_hash")
+                string("pic_hash").label("Pic Hash")
                     .description("The creator picture hash")
                     .required(false),
-                bool("active_flag").label("Active_flag")
+                bool("active_flag").label("Active Flag")
                     .description("Whether the creator is active or not")
                     .required(false),
                 integer("value").label("Value")
                     .description("The ID of the deal creator")
                     .required(false))
-                .label("Creator_user_id")
+                .label("Creator User Id")
                 .description("The creator of the deal")
                 .required(false),
-            date("expected_close_date").label("Expected_close_date")
+            date("expected_close_date").label("Expected Close Date")
                 .description("The expected close date of the deal")
                 .required(false),
-            integer("participants_count").label("Participants_count")
+            integer("participants_count").label("Participants Count")
                 .description("The number of participants associated with the deal")
                 .required(false),
-            string("owner_name").label("Owner_name")
+            string("owner_name").label("Owner Name")
                 .description("The name of the deal owner")
                 .required(false),
-            integer("stage_id").label("Stage_id")
+            integer("stage_id").label("Stage Id")
                 .description("The ID of the deal stage")
                 .required(false),
             number("probability").label("Probability")
                 .description("The success probability percentage of the deal")
                 .required(false),
-            integer("undone_activities_count").label("Undone_activities_count")
+            integer("undone_activities_count").label("Undone Activities Count")
                 .description("The number of incomplete activities associated with the deal")
                 .required(false),
             bool("active").label("Active")
                 .description("Whether the deal is active or not")
                 .required(false),
-            string("last_activity_date").label("Last_activity_date")
+            string("last_activity_date").label("Last Activity Date")
                 .description("The date of the last activity associated with the deal")
                 .required(false),
-            string("person_name").label("Person_name")
+            string("person_name").label("Person Name")
                 .description("The name of the person associated with the deal")
                 .required(false),
-            string("close_time").label("Close_time")
+            string("close_time").label("Close Time")
                 .description("The date and time of closing the deal")
                 .required(false),
-            integer("next_activity_id").label("Next_activity_id")
+            integer("next_activity_id").label("Next Activity Id")
                 .description("The ID of the next activity associated with the deal")
                 .required(false),
-            string("weighted_value_currency").label("Weighted_value_currency")
+            string("weighted_value_currency").label("Weighted Value Currency")
                 .description("The currency associated with the deal")
                 .required(false),
-            bool("org_hidden").label("Org_hidden")
+            bool("org_hidden").label("Org Hidden")
                 .description("If the organization that is associated with the deal is hidden or not")
                 .required(false),
-            integer("stage_order_nr").label("Stage_order_nr")
+            integer("stage_order_nr").label("Stage Order Nr")
                 .description("The order number of the deal stage associated with the deal")
                 .required(false),
-            string("next_activity_subject").label("Next_activity_subject")
+            string("next_activity_subject").label("Next Activity Subject")
                 .description("The subject of the next activity associated with the deal")
                 .required(false),
-            string("rotten_time").label("Rotten_time")
+            string("rotten_time").label("Rotten Time")
                 .description("The date and time of changing the deal status as rotten")
                 .required(false),
             string("name").label("Name")
                 .description("The name of the user")
                 .required(false),
-            bool("has_pic").label("Has_pic")
+            bool("has_pic").label("Has Pic")
                 .description("If the user has a picture or not")
                 .required(false),
-            bool("active_flag").label("Active_flag")
+            bool("active_flag").label("Active Flag")
                 .description("Whether the user is active or not")
                 .required(false),
             integer("id").label("Id")
@@ -219,55 +219,55 @@ public class PipedriveGetDealAction {
             string("email").label("Email")
                 .description("The email of the user")
                 .required(false),
-            string("pic_hash").label("Pic_hash")
+            string("pic_hash").label("Pic Hash")
                 .description("The user picture hash")
                 .required(false),
-            string("visible_to").label("Visible_to")
+            string("visible_to").label("Visible To")
                 .description("The visibility of the deal")
                 .required(false),
-            number("average_stage_progress").label("Average_stage_progress")
+            number("average_stage_progress").label("Average Stage Progress")
                 .description("The average of the deal stage progression")
                 .required(false),
             string("address").label("Address")
                 .description("The address of the organization that is associated with the deal")
                 .required(false),
-            integer("owner_id").label("Owner_id")
+            integer("owner_id").label("Owner Id")
                 .description("The ID of the owner of the organization that is associated with the deal")
                 .required(false),
-            string("cc_email").label("Cc_email")
+            string("cc_email").label("Cc Email")
                 .description("The BCC email of the organization associated with the deal")
                 .required(false),
             string("name").label("Name")
                 .description("The name of the organization associated with the deal")
                 .required(false),
-            bool("active_flag").label("Active_flag")
+            bool("active_flag").label("Active Flag")
                 .description("Whether the associated organization is active or not")
                 .required(false),
-            integer("people_count").label("People_count")
+            integer("people_count").label("People Count")
                 .description("The number of people connected with the organization that is associated with the deal")
                 .required(false),
             integer("value").label("Value")
                 .description("The ID of the organization associated with the deal")
                 .required(false),
-            integer("notes_count").label("Notes_count")
+            integer("notes_count").label("Notes Count")
                 .description("The number of notes associated with the deal")
                 .required(false),
-            string("next_activity_time").label("Next_activity_time")
+            string("next_activity_time").label("Next Activity Time")
                 .description("The time of the next activity associated with the deal")
                 .required(false),
-            string("formatted_value").label("Formatted_value")
+            string("formatted_value").label("Formatted Value")
                 .description("The deal value formatted with selected currency. E.g. US$500")
                 .required(false),
             string("status").label("Status")
                 .description("The status of the deal")
                 .required(false),
-            string("formatted_weighted_value").label("Formatted_weighted_value")
+            string("formatted_weighted_value").label("Formatted Weighted Value")
                 .description("The weighted_value formatted with selected currency. E.g. US$500")
                 .required(false),
-            string("first_won_time").label("First_won_time")
+            string("first_won_time").label("First Won Time")
                 .description("The date and time of the first time changing the deal status as won")
                 .required(false),
-            string("last_outgoing_mail_time").label("Last_outgoing_mail_time")
+            string("last_outgoing_mail_time").label("Last Outgoing Mail Time")
                 .description("The date and time of the last outgoing email associated with the deal")
                 .required(false),
             object("average_time_to_won").properties(integer("y").label("Y")
@@ -288,83 +288,83 @@ public class PipedriveGetDealAction {
                 integer("s").label("S")
                     .description("Seconds")
                     .required(false),
-                integer("total_seconds").label("Total_seconds")
+                integer("total_seconds").label("Total Seconds")
                     .description("The total time in seconds")
                     .required(false))
-                .label("Average_time_to_won")
+                .label("Average Time To Won")
                 .description("The average time to win the deal")
                 .required(false),
             string("title").label("Title")
                 .description("The title of the deal")
                 .required(false),
-            integer("last_activity_id").label("Last_activity_id")
+            integer("last_activity_id").label("Last Activity Id")
                 .description("The ID of the last activity associated with the deal")
                 .required(false),
-            string("update_time").label("Update_time")
+            string("update_time").label("Update Time")
                 .description("The last updated date and time of the deal")
                 .required(false),
-            object("last_activity").label("Last_activity")
+            object("last_activity").label("Last Activity")
                 .description("The details of the last activity associated with the deal")
                 .required(false),
-            object("next_activity").label("Next_activity")
+            object("next_activity").label("Next Activity")
                 .description("The details of the next activity associated with the deal")
                 .required(false),
-            integer("activities_count").label("Activities_count")
+            integer("activities_count").label("Activities Count")
                 .description("The number of activities associated with the deal")
                 .required(false),
-            integer("pipeline_id").label("Pipeline_id")
+            integer("pipeline_id").label("Pipeline Id")
                 .description("The ID of pipeline associated with the deal")
                 .required(false),
-            string("lost_time").label("Lost_time")
+            string("lost_time").label("Lost Time")
                 .description("The date and time of changing the deal status as lost")
                 .required(false),
             string("currency").label("Currency")
                 .description("The currency associated with the deal")
                 .required(false),
-            number("weighted_value").label("Weighted_value")
+            number("weighted_value").label("Weighted Value")
                 .description(
                     "Probability times deal value. Probability can either be deal probability or if not set, then stage probability.")
                 .required(false),
-            string("org_name").label("Org_name")
+            string("org_name").label("Org Name")
                 .description("The name of the organization associated with the deal")
                 .required(false),
             number("value").label("Value")
                 .description("The value of the deal")
                 .required(false),
-            string("next_activity_note").label("Next_activity_note")
+            string("next_activity_note").label("Next Activity Note")
                 .description("The note of the next activity associated with the deal")
                 .required(false),
-            bool("person_hidden").label("Person_hidden")
+            bool("person_hidden").label("Person Hidden")
                 .description("If the person that is associated with the deal is hidden or not")
                 .required(false),
-            integer("files_count").label("Files_count")
+            integer("files_count").label("Files Count")
                 .description("The number of files associated with the deal")
                 .required(false),
-            string("last_incoming_mail_time").label("Last_incoming_mail_time")
+            string("last_incoming_mail_time").label("Last Incoming Mail Time")
                 .description("The date and time of the last incoming email associated with the deal")
                 .required(false),
             integer("label").label("Label")
                 .description("The label assigned to the deal")
                 .required(false),
-            string("lost_reason").label("Lost_reason")
+            string("lost_reason").label("Lost Reason")
                 .description("The reason for losing the deal")
                 .required(false),
             bool("deleted").label("Deleted")
                 .description("Whether the deal is deleted or not")
                 .required(false),
-            string("won_time").label("Won_time")
+            string("won_time").label("Won Time")
                 .description("The date and time of changing the deal status as won")
                 .required(false),
-            integer("followers_count").label("Followers_count")
+            integer("followers_count").label("Followers Count")
                 .description("The number of followers associated with the deal")
                 .required(false),
-            string("stage_change_time").label("Stage_change_time")
+            string("stage_change_time").label("Stage Change Time")
                 .description("The last updated date and time of the deal stage")
                 .required(false),
-            string("add_time").label("Add_time")
+            string("add_time").label("Add Time")
                 .description("The creation date and time of the deal")
                 .required(false),
-            integer("done_activities_count").label("Done_activities_count")
+            integer("done_activities_count").label("Done Activities Count")
                 .description("The number of completed activities associated with the deal")
                 .required(false),
             object("age").properties(integer("y").label("Y")
@@ -385,16 +385,16 @@ public class PipedriveGetDealAction {
                 integer("s").label("S")
                     .description("Seconds")
                     .required(false),
-                integer("total_seconds").label("Total_seconds")
+                integer("total_seconds").label("Total Seconds")
                     .description("The total time in seconds")
                     .required(false))
                 .label("Age")
                 .description("The lifetime of the deal")
                 .required(false),
-            object("additional_data").properties(string("dropbox_email").label("Dropbox_email")
+            object("additional_data").properties(string("dropbox_email").label("Dropbox Email")
                 .description("The BCC email of the deal")
                 .required(false))
-                .label("Additional_data")
+                .label("Additional Data")
                 .required(false),
             object("related_objects").properties(object("user").properties(integer("id").label("Id")
                 .description("The ID of the user")
@@ -405,13 +405,13 @@ public class PipedriveGetDealAction {
                 string("email").label("Email")
                     .description("The email of the user")
                     .required(false),
-                bool("has_pic").label("Has_pic")
+                bool("has_pic").label("Has Pic")
                     .description("If the user has a picture or not")
                     .required(false),
-                string("pic_hash").label("Pic_hash")
+                string("pic_hash").label("Pic Hash")
                     .description("The user picture hash")
                     .required(false),
-                bool("active_flag").label("Active_flag")
+                bool("active_flag").label("Active Flag")
                     .description("Whether the user is active or not")
                     .required(false))
                 .label("User")
@@ -420,26 +420,26 @@ public class PipedriveGetDealAction {
                 object("organization").properties(string("name").label("Name")
                     .description("The name of the organization associated with the deal")
                     .required(false),
-                    integer("people_count").label("People_count")
+                    integer("people_count").label("People Count")
                         .description(
                             "The number of people connected with the organization that is associated with the deal")
                         .required(false),
-                    integer("owner_id").label("Owner_id")
+                    integer("owner_id").label("Owner Id")
                         .description("The ID of the owner of the organization that is associated with the deal")
                         .required(false),
                     string("address").label("Address")
                         .description("The address of the organization that is associated with the deal")
                         .required(false),
-                    bool("active_flag").label("Active_flag")
+                    bool("active_flag").label("Active Flag")
                         .description("Whether the associated organization is active or not")
                         .required(false),
-                    string("cc_email").label("Cc_email")
+                    string("cc_email").label("Cc Email")
                         .description("The BCC email of the organization associated with the deal")
                         .required(false))
                     .label("Organization")
                     .description("The organization which is associated with the deal")
                     .required(false),
-                object("person").properties(bool("active_flag").label("Active_flag")
+                object("person").properties(bool("active_flag").label("Active Flag")
                     .description("Whether the associated person is active or not")
                     .required(false),
                     string("name").label("Name")
@@ -473,13 +473,13 @@ public class PipedriveGetDealAction {
                         .label("Phone")
                         .description("The phone numbers of the person associated with the deal")
                         .required(false),
-                    integer("owner_id").label("Owner_id")
+                    integer("owner_id").label("Owner Id")
                         .description("The ID of the owner of the person that is associated with the deal")
                         .required(false))
                     .label("Person")
                     .description("The person who is associated with the deal")
                     .required(false))
-                .label("Related_objects")
+                .label("Related Objects")
                 .required(false))
             .metadata(
                 Map.of(

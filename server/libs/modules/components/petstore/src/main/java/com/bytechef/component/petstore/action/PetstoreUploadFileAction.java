@@ -46,13 +46,13 @@ public class PetstoreUploadFileAction {
                 "application/octet-stream"
 
             ))
-        .properties(integer("petId").label("PetId")
+        .properties(integer("petId").label("Pet Id")
             .description("ID of pet to update")
             .required(true)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            string("additionalMetadata").label("AdditionalMetadata")
+            string("additionalMetadata").label("Additional Metadata")
                 .description("Additional Metadata")
                 .required(false)
                 .metadata(

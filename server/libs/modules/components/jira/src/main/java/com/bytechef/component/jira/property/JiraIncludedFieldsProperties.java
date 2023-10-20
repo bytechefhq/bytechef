@@ -31,7 +31,7 @@ import java.util.List;
 public class JiraIncludedFieldsProperties {
     public static final List<Property> PROPERTIES = List.of(array("actuallyIncluded").items(string())
         .placeholder("Add")
-        .label("ActuallyIncluded")
+        .label("Actually Included")
         .required(false),
         array("excluded").items(string())
             .placeholder("Add")

@@ -35,10 +35,10 @@ public class PetstoreUserProperties {
         string("username").label("Username")
             .required(false)
             .exampleValue("theUser"),
-        string("firstName").label("FirstName")
+        string("firstName").label("First Name")
             .required(false)
             .exampleValue("John"),
-        string("lastName").label("LastName")
+        string("lastName").label("Last Name")
             .required(false)
             .exampleValue("James"),
         string("email").label("Email")
@@ -50,7 +50,7 @@ public class PetstoreUserProperties {
         string("phone").label("Phone")
             .required(false)
             .exampleValue("12345"),
-        integer("userStatus").label("UserStatus")
+        integer("userStatus").label("User Status")
             .description("User Status")
             .required(false)
             .exampleValue(1));

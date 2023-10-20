@@ -62,28 +62,28 @@ public class PipedriveSearchLeadsAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            bool("exact_match").label("Exact_match")
+            bool("exact_match").label("Exact Match")
                 .description(
                     "When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive.")
                 .required(false)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            integer("person_id").label("Person_id")
+            integer("person_id").label("Person Id")
                 .description(
                     "Will filter leads by the provided person ID. The upper limit of found leads associated with the person is 2000.")
                 .required(false)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            integer("organization_id").label("Organization_id")
+            integer("organization_id").label("Organization Id")
                 .description(
                     "Will filter leads by the provided organization ID. The upper limit of found leads associated with the organization is 2000.")
                 .required(false)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            string("include_fields").label("Include_fields")
+            string("include_fields").label("Include Fields")
                 .description("Supports including optional fields in the results which are not provided by default")
                 .options(option("Lead.was_seen", "lead.was_seen"))
                 .required(false)
@@ -108,7 +108,7 @@ public class PipedriveSearchLeadsAction {
                 .properties(
                     object("data")
                         .properties(array("items")
-                            .items(object().properties(number("result_score").label("Result_score")
+                            .items(object().properties(number("result_score").label("Result Score")
                                 .description("Search result relevancy")
                                 .required(false),
                                 object("item").properties(string("id").label("Id")
@@ -151,7 +151,7 @@ public class PipedriveSearchLeadsAction {
                                         .required(false),
                                     array("custom_fields").items(string().description("Custom fields"))
                                         .placeholder("Add")
-                                        .label("Custom_fields")
+                                        .label("Custom Fields")
                                         .description("Custom fields")
                                         .required(false),
                                     array("notes").items(string().description("An array of notes"))
@@ -165,10 +165,10 @@ public class PipedriveSearchLeadsAction {
                                     string("currency").label("Currency")
                                         .description("The currency of the lead")
                                         .required(false),
-                                    integer("visible_to").label("Visible_to")
+                                    integer("visible_to").label("Visible To")
                                         .description("The visibility of the lead")
                                         .required(false),
-                                    bool("is_archived").label("Is_archived")
+                                    bool("is_archived").label("Is Archived")
                                         .description("A flag indicating whether the lead is archived or not")
                                         .required(false))
                                     .label("Item")
@@ -189,16 +189,16 @@ public class PipedriveSearchLeadsAction {
                         integer("limit").label("Limit")
                             .description("Items shown per page")
                             .required(false),
-                        bool("more_items_in_collection").label("More_items_in_collection")
+                        bool("more_items_in_collection").label("More Items In Collection")
                             .description("Whether there are more list items in the collection than displayed")
                             .required(false),
-                        integer("next_start").label("Next_start")
+                        integer("next_start").label("Next Start")
                             .description("Next pagination start")
                             .required(false))
                         .label("Pagination")
                         .description("Pagination details of the list")
                         .required(false))
-                        .label("Additional_data")
+                        .label("Additional Data")
                         .required(false))
                 .metadata(
                     Map.of(
