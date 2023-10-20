@@ -72,7 +72,7 @@ const columns = [
         header: 'Completed date',
         cell: (info) => (
             <>
-                {`${info.getValue()?.endDate?.toLocaleDateString()} ${info
+                {info.getValue()?.endDate && `${info.getValue()?.endDate?.toLocaleDateString()} ${info
                     .getValue()
                     ?.endDate?.toLocaleTimeString()}`}
             </>
