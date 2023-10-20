@@ -16,26 +16,12 @@
 
 package com.bytechef.hermes.component;
 
-import com.bytechef.hermes.component.definition.Action;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
 
 /**
  * @author Ivica Cardic
  */
-public interface ComponentHandler extends ComponentFactory {
+public interface JdbcComponentFactory {
 
-    /**
-     * This can be useful if we still want to have only one method to handle all actions.
-     *
-     * @param action
-     * @param context
-     * @param executionParameters
-     * @return the result of execution
-     * @throws ActionExecutionException
-     */
-    default Object handle(Action action, Context context, ExecutionParameters executionParameters)
-            throws ActionExecutionException {
-
-        return null;
-    }
+    JdbcComponentDefinition getJdbcComponentDefinition();
 }

@@ -16,23 +16,12 @@
 
 package com.bytechef.hermes.component;
 
-import com.bytechef.hermes.component.definition.Action;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
 
 /**
  * @author Ivica Cardic
  */
-public interface GenericComponentHandler extends ComponentHandler {
+public interface ComponentFactory {
 
-    /**
-     * This can be useful if we still want to have only one method to handle all operations
-     *
-     * @param action
-     * @param context
-     * @param executionParameters
-     * @return
-     * @throws ActionExecutionException
-     */
-    Object handle(Action action, Context context, ExecutionParameters executionParameters)
-            throws ActionExecutionException;
+    ComponentDefinition getDefinition();
 }

@@ -21,6 +21,7 @@ import com.bytechef.hermes.definition.Definition;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 /**
@@ -28,11 +29,12 @@ import java.util.List;
  *
  * @author Ivica Cardic
  */
+@Schema(name = "ConnectionDefinition", description = "A connection to an outside service.")
 public final class ConnectionDefinition implements Definition {
 
     private Display display;
     private String name;
-    private List<Property<?>> properties;
+    private List<Property> properties;
     private Resources resources;
     private String subtitle;
     private int version = Versions.VERSION_1;
@@ -55,7 +57,7 @@ public final class ConnectionDefinition implements Definition {
         return this;
     }
 
-    public ConnectionDefinition properties(Property<?>... properties) {
+    public ConnectionDefinition properties(Property... properties) {
         this.properties = List.of(properties);
 
         return this;
@@ -83,25 +85,28 @@ public final class ConnectionDefinition implements Definition {
         return display;
     }
 
-    @Override
-    public Resources getResources() {
-        return resources;
-    }
-
+    @Schema(name = "name", description = "The connection name.")
     public String getName() {
         return name;
     }
 
     @Override
-    public int getVersion() {
-        return version;
+    public Resources getResources() {
+        return resources;
     }
 
-    public List<Property<?>> getProperties() {
+    @Schema(name = "properties", description = "Properties of the connection.")
+    public List<Property> getProperties() {
         return properties;
     }
 
+    @Schema(name = "subtitle", description = "Additional explanation.")
     public String getSubtitle() {
         return subtitle;
+    }
+
+    @Override
+    public int getVersion() {
+        return version;
     }
 }
