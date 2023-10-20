@@ -71,6 +71,7 @@ public class JobController implements JobsApi {
     @Override
     public Mono<ResponseEntity<CreateJob200ResponseModel>> createJob(
         Mono<JobParametersModel> workflowParametersModelMono, ServerWebExchange exchange) {
+
         return workflowParametersModelMono.map(workflowParametersModel -> {
             JobParametersDTO jobParametersDTO = conversionService.convert(
                 workflowParametersModel, JobParametersDTO.class);
@@ -83,31 +84,35 @@ public class JobController implements JobsApi {
 
     @Override
     public Mono<ResponseEntity<JobModel>> getJob(Long id, ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(conversionService.convert(jobService.getJob(id), JobModel.class)));
+        return Mono.just(conversionService.convert(jobService.getJob(id), JobModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override
     public Mono<ResponseEntity<Flux<TaskExecutionModel>>> getJobTaskExecutions(
         Long jobId, ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(taskExecutionService.getJobTaskExecutions(jobId)
+        return Mono.just(Flux.fromIterable(taskExecutionService.getJobTaskExecutions(jobId)
             .stream()
             .map(taskExecution -> conversionService.convert(taskExecution, TaskExecutionModel.class))
-            .toList())));
+            .toList()))
+            .map(ResponseEntity::ok);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Mono<ResponseEntity<Page>> getJobs(Integer pageNumber, ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(
+        return Mono.just(
             jobService.getJobs(pageNumber)
-                .map(job -> conversionService.convert(job, JobModel.class))));
+                .map(job -> conversionService.convert(job, JobModel.class)))
+            .map(ResponseEntity::ok);
     }
 
     @Override
     public Mono<ResponseEntity<JobModel>> getLatestJob(ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(
+        return Mono.just(
             conversionService.convert(jobService.fetchLatestJob()
-                .orElse(null), JobModel.class)));
+                .orElse(null), JobModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override

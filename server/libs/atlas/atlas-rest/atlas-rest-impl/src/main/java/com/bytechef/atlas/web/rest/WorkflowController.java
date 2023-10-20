@@ -68,9 +68,9 @@ public class WorkflowController implements WorkflowsApi {
     @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<WorkflowModel>> getWorkflow(String id, ServerWebExchange exchange) {
         return Mono.just(
-            ResponseEntity.ok(
-                Objects.requireNonNull(conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class))
-                    .definition(null)));
+            Objects.requireNonNull(conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class))
+                .definition(null))
+            .map(ResponseEntity::ok);
     }
 
     @Override
@@ -79,36 +79,39 @@ public class WorkflowController implements WorkflowsApi {
         List<WorkflowModel> workflowModels = new ArrayList<>();
 
         for (Workflow workflow : workflowService.getWorkflows()) {
-            workflowModels.add(Objects.requireNonNull(conversionService.convert(workflow, WorkflowModel.class))
-                .definition(null));
+            workflowModels.add(
+                Objects.requireNonNull(conversionService.convert(workflow, WorkflowModel.class))
+                    .definition(null));
         }
 
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(workflowModels)));
+        return Mono.just(Flux.fromIterable(workflowModels))
+            .map(ResponseEntity::ok);
     }
 
     @Override
     public Mono<ResponseEntity<WorkflowModel>> createWorkflow(
         Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
+
         return workflowModelMono.map(workflowModel -> {
             WorkflowFormatModel workflowFormatModel = workflowModel.getFormat();
             WorkflowModel.SourceTypeEnum sourceTypeEnum = workflowModel.getSourceType();
 
-            return ResponseEntity.ok(
-                conversionService.convert(
-                    workflowService.create(
-                        workflowModel.getDefinition(),
-                        Workflow.Format.valueOf(workflowFormatModel.name()),
-                        Workflow.SourceType.valueOf(sourceTypeEnum.name())),
-                    WorkflowModel.class));
-        });
+            return conversionService.convert(
+                workflowService.create(
+                    workflowModel.getDefinition(),
+                    Workflow.Format.valueOf(workflowFormatModel.name()),
+                    Workflow.SourceType.valueOf(sourceTypeEnum.name())),
+                WorkflowModel.class);
+        })
+            .map(ResponseEntity::ok);
     }
 
     @Override
     public Mono<ResponseEntity<WorkflowModel>> updateWorkflow(
         String id, Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
-        return workflowModelMono.map(workflowModel -> ResponseEntity.ok(
-            conversionService.convert(
-                workflowService.update(id, workflowModel.getDefinition()),
-                WorkflowModel.class)));
+
+        return workflowModelMono.map(workflowModel -> conversionService.convert(
+            workflowService.update(id, workflowModel.getDefinition()), WorkflowModel.class))
+            .map(ResponseEntity::ok);
     }
 }

@@ -49,11 +49,11 @@ public class IntegrationTagController implements IntegrationTagsApi {
     @Override
     public Mono<ResponseEntity<Flux<TagModel>>> getIntegrationTags(ServerWebExchange exchange) {
         return Mono.just(
-            ResponseEntity.ok(
-                Flux.fromIterable(
-                    integrationFacade.getIntegrationTags()
-                        .stream()
-                        .map(tag -> conversionService.convert(tag, TagModel.class))
-                        .toList())));
+            Flux.fromIterable(
+                integrationFacade.getIntegrationTags()
+                    .stream()
+                    .map(tag -> conversionService.convert(tag, TagModel.class))
+                    .toList()))
+            .map(ResponseEntity::ok);
     }
 }

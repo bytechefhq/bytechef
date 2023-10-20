@@ -65,11 +65,11 @@ public class ConnectionController implements ConnectionsApi {
     public Mono<ResponseEntity<ConnectionModel>> createConnection(
         Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
 
-        return connectionModelMono.map(connectionModel -> ResponseEntity.ok(
-            conversionService.convert(
-                connectionFacade.create(
-                    conversionService.convert(connectionModel, ConnectionDTO.class)),
-                ConnectionModel.class)));
+        return connectionModelMono.map(connectionModel -> conversionService.convert(
+            connectionFacade.create(
+                conversionService.convert(connectionModel, ConnectionDTO.class)),
+            ConnectionModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override
@@ -82,9 +82,10 @@ public class ConnectionController implements ConnectionsApi {
     @Override
     @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<ConnectionModel>> getConnection(Long id, ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(
+        return Mono.just(
             conversionService.convert(connectionFacade.getConnection(id), ConnectionModel.class)
-                .parameters(null)));
+                .parameters(null))
+            .map(ResponseEntity::ok);
     }
 
     @Override
@@ -92,11 +93,13 @@ public class ConnectionController implements ConnectionsApi {
     public Mono<ResponseEntity<Flux<ConnectionModel>>> getConnections(
         List<String> componentNames, List<Long> tagIds, ServerWebExchange exchange) {
 
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(connectionFacade.getConnections(componentNames, tagIds)
-            .stream()
-            .map(connection -> conversionService.convert(connection, ConnectionModel.class)
-                .parameters(null))
-            .toList())));
+        return Mono.just(Flux.fromIterable(
+            connectionFacade.getConnections(componentNames, tagIds)
+                .stream()
+                .map(connection -> conversionService.convert(connection, ConnectionModel.class)
+                    .parameters(null))
+                .toList()))
+            .map(ResponseEntity::ok);
     }
 
     @Override
@@ -117,11 +120,11 @@ public class ConnectionController implements ConnectionsApi {
     public Mono<ResponseEntity<ConnectionModel>> updateConnection(
         Long id, Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
 
-        return connectionModelMono.map(connectionModel -> ResponseEntity.ok(
-            conversionService.convert(
-                connectionFacade.update(
-                    conversionService.convert(connectionModel.id(id), ConnectionDTO.class)),
-                ConnectionModel.class)));
+        return connectionModelMono.map(connectionModel -> conversionService.convert(
+            connectionFacade.update(
+                conversionService.convert(connectionModel.id(id), ConnectionDTO.class)),
+            ConnectionModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override

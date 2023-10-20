@@ -60,10 +60,10 @@ public class ProjectController implements ProjectsApi {
     public Mono<ResponseEntity<ProjectModel>> createProject(
         Mono<ProjectModel> projectModelMono, ServerWebExchange exchange) {
 
-        return projectModelMono.map(projectModel -> ResponseEntity.ok(
-            conversionService.convert(
-                projectFacade.createProject(conversionService.convert(projectModel, ProjectDTO.class)),
-                ProjectModel.class)));
+        return projectModelMono.map(projectModel -> conversionService.convert(
+            projectFacade.createProject(conversionService.convert(projectModel, ProjectDTO.class)),
+            ProjectModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override
@@ -71,11 +71,11 @@ public class ProjectController implements ProjectsApi {
         Long id, Mono<CreateProjectWorkflowRequestModel> createProjectWorkflowRequestModelMono,
         ServerWebExchange exchange) {
 
-        return createProjectWorkflowRequestModelMono.map(requestModel -> ResponseEntity.ok(
-            conversionService.convert(
-                projectFacade.addWorkflow(
-                    id, requestModel.getLabel(), requestModel.getDescription(), requestModel.getDefinition()),
-                WorkflowModel.class)));
+        return createProjectWorkflowRequestModelMono.map(requestModel -> conversionService.convert(
+            projectFacade.addWorkflow(
+                id, requestModel.getLabel(), requestModel.getDescription(), requestModel.getDefinition()),
+            WorkflowModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override
@@ -90,15 +90,15 @@ public class ProjectController implements ProjectsApi {
     @Override
     public Mono<ResponseEntity<ProjectModel>> duplicateProject(Long id, ServerWebExchange exchange) {
         return Mono.just(
-            ResponseEntity.ok(
-                conversionService.convert(projectFacade.duplicateProject(id), ProjectModel.class)));
+            conversionService.convert(projectFacade.duplicateProject(id), ProjectModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override
     public Mono<ResponseEntity<ProjectModel>> getProject(Long id, ServerWebExchange exchange) {
         return Mono.just(
-            ResponseEntity.ok(
-                conversionService.convert(projectFacade.getProject(id), ProjectModel.class)));
+            conversionService.convert(projectFacade.getProject(id), ProjectModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override
@@ -106,33 +106,33 @@ public class ProjectController implements ProjectsApi {
         List<Long> categoryIds, Boolean projectInstances, List<Long> tagIds, ServerWebExchange exchange) {
 
         return Mono.just(
-            ResponseEntity.ok(
-                Flux.fromIterable(
-                    projectFacade.searchProjects(categoryIds, projectInstances != null, tagIds)
-                        .stream()
-                        .map(project -> conversionService.convert(project, ProjectModel.class))
-                        .toList())));
+            Flux.fromIterable(
+                projectFacade.searchProjects(categoryIds, projectInstances != null, tagIds)
+                    .stream()
+                    .map(project -> conversionService.convert(project, ProjectModel.class))
+                    .toList()))
+            .map(ResponseEntity::ok);
     }
 
     @Override
     public Mono<ResponseEntity<Flux<WorkflowModel>>> getProjectWorkflows(Long id, ServerWebExchange exchange) {
         return Mono.just(
-            ResponseEntity.ok(
-                Flux.fromIterable(
-                    projectFacade.getProjectWorkflows(id)
-                        .stream()
-                        .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
-                        .toList())));
+            Flux.fromIterable(
+                projectFacade.getProjectWorkflows(id)
+                    .stream()
+                    .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
+                    .toList()))
+            .map(ResponseEntity::ok);
     }
 
     @Override
     public Mono<ResponseEntity<ProjectModel>> updateProject(
         Long id, Mono<ProjectModel> projectModelMono, ServerWebExchange exchange) {
 
-        return projectModelMono.map(projectModel -> ResponseEntity.ok(
-            conversionService.convert(
-                projectFacade.update(conversionService.convert(projectModel.id(id), ProjectDTO.class)),
-                ProjectModel.class)));
+        return projectModelMono.map(projectModel -> conversionService.convert(
+            projectFacade.update(conversionService.convert(projectModel.id(id), ProjectDTO.class)),
+            ProjectModel.class))
+            .map(ResponseEntity::ok);
     }
 
     @Override

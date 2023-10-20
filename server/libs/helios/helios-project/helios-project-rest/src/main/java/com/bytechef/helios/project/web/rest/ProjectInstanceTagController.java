@@ -49,11 +49,11 @@ public class ProjectInstanceTagController implements ProjectInstanceTagsApi {
     @Override
     public Mono<ResponseEntity<Flux<TagModel>>> getProjectInstanceTags(ServerWebExchange exchange) {
         return Mono.just(
-            ResponseEntity.ok(
-                Flux.fromIterable(
-                    projectFacade.getProjectInstanceTags()
-                        .stream()
-                        .map(tag -> conversionService.convert(tag, TagModel.class))
-                        .toList())));
+            Flux.fromIterable(
+                projectFacade.getProjectInstanceTags()
+                    .stream()
+                    .map(tag -> conversionService.convert(tag, TagModel.class))
+                    .toList()))
+            .map(ResponseEntity::ok);
     }
 }

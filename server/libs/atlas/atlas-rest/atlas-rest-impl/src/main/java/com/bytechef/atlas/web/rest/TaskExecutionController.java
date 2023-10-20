@@ -50,7 +50,8 @@ public class TaskExecutionController implements TaskExecutionsApi {
 
     @Override
     public Mono<ResponseEntity<TaskExecutionModel>> getTaskExecution(Long id, ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(
-            conversionService.convert(taskExecutionService.getTaskExecution(id), TaskExecutionModel.class)));
+        return Mono.just(
+            conversionService.convert(taskExecutionService.getTaskExecution(id), TaskExecutionModel.class))
+            .map(ResponseEntity::ok);
     }
 }

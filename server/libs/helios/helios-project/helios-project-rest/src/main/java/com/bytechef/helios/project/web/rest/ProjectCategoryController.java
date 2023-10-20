@@ -49,11 +49,11 @@ public class ProjectCategoryController implements ProjectCategoriesApi {
     @Override
     public Mono<ResponseEntity<Flux<CategoryModel>>> getProjectCategories(ServerWebExchange exchange) {
         return Mono.just(
-            ResponseEntity.ok(
-                Flux.fromIterable(
-                    projectFacade.getProjectCategories()
-                        .stream()
-                        .map(category -> conversionService.convert(category, CategoryModel.class))
-                        .toList())));
+            Flux.fromIterable(
+                projectFacade.getProjectCategories()
+                    .stream()
+                    .map(category -> conversionService.convert(category, CategoryModel.class))
+                    .toList()))
+            .map(ResponseEntity::ok);
     }
 }

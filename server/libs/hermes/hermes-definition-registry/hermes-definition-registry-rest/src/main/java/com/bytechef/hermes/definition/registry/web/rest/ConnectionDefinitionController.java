@@ -52,12 +52,12 @@ public class ConnectionDefinitionController implements ConnectionDefinitionsApi 
         ServerWebExchange exchange) {
 
         return Mono.just(
-            ResponseEntity.ok(
-                connectionDefinitionService.getConnectionDefinitionsMono()
-                    .mapNotNull(connectionDefinitions -> connectionDefinitions.stream()
-                        .map(connectionDefinition -> conversionService.convert(
-                            connectionDefinition, ConnectionDefinitionBasicModel.class))
-                        .toList())
-                    .flatMapMany(Flux::fromIterable)));
+            connectionDefinitionService.getConnectionDefinitionsMono()
+                .mapNotNull(connectionDefinitions -> connectionDefinitions.stream()
+                    .map(connectionDefinition -> conversionService.convert(
+                        connectionDefinition, ConnectionDefinitionBasicModel.class))
+                    .toList())
+                .flatMapMany(Flux::fromIterable))
+            .map(ResponseEntity::ok);
     }
 }
