@@ -62,7 +62,7 @@ public class DiscoveryClientConfiguration {
             @Bean
             ServiceInstanceListSupplier coordinatorServiceInstanceListSupplier(
                     DiscoveryClientPropertyProperties properties) {
-                return new ConfigServiceInstanceListSuppler(
+                return new PropertyServiceInstanceListSupplier(
                         properties.getCoordinatorServiceApp().getInstances(), "coordinator-service-app");
             }
         }
@@ -72,7 +72,7 @@ public class DiscoveryClientConfiguration {
             @Bean
             ServiceInstanceListSupplier platformServiceInstanceListSupplier(
                     DiscoveryClientPropertyProperties properties) {
-                return new ConfigServiceInstanceListSuppler(
+                return new PropertyServiceInstanceListSupplier(
                         properties.getPlatformServiceApp().getInstances(), "platform-service-app");
             }
         }
@@ -82,17 +82,17 @@ public class DiscoveryClientConfiguration {
             @Bean
             ServiceInstanceListSupplier workerServiceInstanceListSupplier(
                     DiscoveryClientPropertyProperties properties) {
-                return new ConfigServiceInstanceListSuppler(
+                return new PropertyServiceInstanceListSupplier(
                         properties.getWorkerServiceApp().getInstances(), "worker-service-app");
             }
         }
 
-        static class ConfigServiceInstanceListSuppler implements ServiceInstanceListSupplier {
+        static class PropertyServiceInstanceListSupplier implements ServiceInstanceListSupplier {
 
             private final List<DiscoveryClientPropertyProperties.Instance> instances;
             private final String serviceId;
 
-            ConfigServiceInstanceListSuppler(
+            PropertyServiceInstanceListSupplier(
                     List<DiscoveryClientPropertyProperties.Instance> instances, String serviceId) {
                 this.instances = instances;
                 this.serviceId = serviceId;
