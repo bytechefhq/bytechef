@@ -360,7 +360,7 @@ public class DefinitionDSL {
             extends ModifiableValueProperty<Object[], ModifiableArrayProperty, ArrayProperty>
             implements Property.ArrayProperty {
 
-            private List<Property<?>> items;
+            private List<? extends Property<?>> items;
             private Boolean multipleValues;
             private List<String> loadOptionsDependsOn;
             private List<Option<?>> options;
@@ -460,7 +460,26 @@ public class DefinitionDSL {
 
             public ModifiableArrayProperty items(Property<?>... items) {
                 if (items != null) {
-                    this.items = List.of(items);
+                    items(List.of(items));
+                }
+
+                return this;
+            }
+
+            public ModifiableArrayProperty items(List<Property<?>> items) {
+                if (items != null && items.size() > 0) {
+                    for (Property<?> property : items) {
+                        String name = property.getName();
+
+                        if (name != null && !name.isEmpty()) {
+                            throw new IllegalArgumentException(
+                                "Defined properties under items cannot have defined names.");
+                        }
+                    }
+
+                    this.items = items.stream()
+                        .map(property -> (Property<?>) property)
+                        .toList();
                 }
 
                 return this;
@@ -502,7 +521,7 @@ public class DefinitionDSL {
             }
 
             @Override
-            public Optional<List<Property<?>>> getItems() {
+            public Optional<List<? extends Property<?>>> getItems() {
                 return Optional.ofNullable(items);
             }
 
@@ -1021,7 +1040,7 @@ public class DefinitionDSL {
 
             public ModifiableObjectProperty additionalProperties(Property<?>... additionalProperties) {
                 if (additionalProperties != null) {
-                    this.additionalProperties = List.of(additionalProperties);
+                    additionalProperties(List.of(additionalProperties));
                 }
 
                 return this;
@@ -1029,24 +1048,22 @@ public class DefinitionDSL {
 
             @SuppressWarnings("rawtypes")
             public ModifiableObjectProperty additionalProperties(List<Property> additionalProperties) {
-                if (additionalProperties != null) {
-                    if (properties.size() > 0) {
-                        Property<?> firstProperty = properties.get(0);
+                if (additionalProperties != null && additionalProperties.size() > 0) {
+                    Property<?> firstProperty = additionalProperties.get(0);
 
-                        String firstName = firstProperty.getName();
+                    String firstName = firstProperty.getName();
 
-                        boolean emptyName = firstName == null || firstName.isEmpty();
+                    boolean emptyName = firstName == null || firstName.isEmpty();
 
-                        for (Property<?> property : properties) {
-                            String name = property.getName();
+                    for (Property<?> property : additionalProperties) {
+                        String name = property.getName();
 
-                            if (emptyName && !(name == null || name.isEmpty()) ||
-                                !emptyName && (name == null || name.isEmpty())) {
+                        if (emptyName && !(name == null || name.isEmpty()) ||
+                            !emptyName && (name == null || name.isEmpty())) {
 
-                                throw new IllegalArgumentException(
-                                    "Defined additional properties either have to have all names defined or no " +
-                                        "defined names.");
-                            }
+                            throw new IllegalArgumentException(
+                                "Defined additional properties either have to have all names defined or no " +
+                                    "defined names.");
                         }
                     }
 
