@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.xmlhelpers.v1_0;
+package com.bytechef.component.xml.helper;
 
-import static com.bytechef.task.handler.xmlhelpers.v1_0.XmlHelpersTaskHandler.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.task.commons.xml.XmlHelper;
+import com.bytechef.commons.xml.XmlUtils;
+import com.bytechef.hermes.component.test.MockContext;
+import com.bytechef.hermes.component.test.MockExecutionParameters;
+import com.bytechef.hermes.test.definition.DefinitionAssert;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -28,17 +30,19 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class XmlHelpersTaskHandlerTest {
+public class XmlUtilsComponentHandlerTest {
 
-    private static final XmlHelper xmlHelper = new XmlHelper();
-    private static final XmlHelpersParseTaskHandler xmlHelpersParseTaskHandler =
-            new XmlHelpersParseTaskHandler(xmlHelper);
-    private static final XmlHelpersStringifyTaskHandler xmlHelpersStringifyTaskHandler =
-            new XmlHelpersStringifyTaskHandler(xmlHelper);
+    private static final MockContext context = new MockContext();
+    private static final XmlHelperComponentHandler xmlHelperComponentHandler = new XmlHelperComponentHandler();
 
     @Test
-    public void testParse() {
-        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+    public void testGetComponentDefinition() throws IOException {
+        DefinitionAssert.assertEquals("definition/xml-helper_v1.json", new XmlHelperComponentHandler().getDefinition());
+    }
+
+    @Test
+    public void testPerformParse() {
+        MockExecutionParameters parameters = new MockExecutionParameters();
 
         String source =
                 """
@@ -47,10 +51,10 @@ public class XmlHelpersTaskHandlerTest {
             </Flower>
             """;
 
-        taskExecution.put("source", source);
-        taskExecution.put("operation", "XML_TO_JSON");
+        parameters.set("source", source);
 
-        assertThat(xmlHelpersParseTaskHandler.handle(taskExecution)).isEqualTo(Map.of("id", "45", "name", "Poppy"));
+        assertThat((Map<String, ?>) xmlHelperComponentHandler.performParse(context, parameters))
+                .isEqualTo(Map.of("id", "45", "name", "Poppy"));
 
         source =
                 """
@@ -64,23 +68,22 @@ public class XmlHelpersTaskHandlerTest {
             </Flowers>
             """;
 
-        taskExecution.put("source", source);
-        taskExecution.put("operation", "XML_TO_JSON");
+        parameters.set("source", source);
 
-        assertThat(xmlHelpersParseTaskHandler.handle(taskExecution))
+        assertThat(xmlHelperComponentHandler.performParse(context, parameters))
                 .isEqualTo(Map.of(
                         "Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose"))));
     }
 
     @Test
-    public void testStringify() {
-        SimpleTaskExecution taskExecution = new SimpleTaskExecution();
+    public void testPerformStringify() {
+        MockExecutionParameters parameters = new MockExecutionParameters();
 
         Map<String, ?> source = Map.of("id", 45, "name", "Poppy");
 
-        taskExecution.put("source", source);
-        taskExecution.put("operation", "JSON_TO_XML");
+        parameters.set("source", source);
 
-        assertThat(xmlHelpersStringifyTaskHandler.handle(taskExecution)).isEqualTo(xmlHelper.write(source));
+        assertThat(xmlHelperComponentHandler.performStringify(context, parameters))
+                .isEqualTo(XmlUtils.write(source));
     }
 }
