@@ -16,33 +16,55 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * CreateJob200ResponseModel
+ * OutputModel
  */
 
-@JsonTypeName("createJob_200_response")
+@JsonTypeName("Output")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-30T15:38:20.908568+02:00[Europe/Zagreb]")
-public class CreateJob200ResponseModel {
+public class OutputModel {
 
-  @JsonProperty("jobId")
-  private Long jobId;
+  @JsonProperty("name")
+  private String name;
 
-  public CreateJob200ResponseModel jobId(Long jobId) {
-    this.jobId = jobId;
+  @JsonProperty("value")
+  private Object value;
+
+  public OutputModel name(String name) {
+    this.name = name;
     return this;
   }
 
   /**
-   * The id of an executed job.
-   * @return jobId
+   * The name of an output
+   * @return name
   */
-  
-  @Schema(name = "jobId", description = "The id of an executed job.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public Long getJobId() {
-    return jobId;
+  @NotNull 
+  @Schema(name = "name", description = "The name of an output", requiredMode = Schema.RequiredMode.REQUIRED)
+  public String getName() {
+    return name;
   }
 
-  public void setJobId(Long jobId) {
-    this.jobId = jobId;
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public OutputModel value(Object value) {
+    this.value = value;
+    return this;
+  }
+
+  /**
+   * The value of an output
+   * @return value
+  */
+  @NotNull 
+  @Schema(name = "value", description = "The value of an output", requiredMode = Schema.RequiredMode.REQUIRED)
+  public Object getValue() {
+    return value;
+  }
+
+  public void setValue(Object value) {
+    this.value = value;
   }
 
   @Override
@@ -53,20 +75,22 @@ public class CreateJob200ResponseModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CreateJob200ResponseModel createJob200Response = (CreateJob200ResponseModel) o;
-    return Objects.equals(this.jobId, createJob200Response.jobId);
+    OutputModel output = (OutputModel) o;
+    return Objects.equals(this.name, output.name) &&
+        Objects.equals(this.value, output.value);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(jobId);
+    return Objects.hash(name, value);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CreateJob200ResponseModel {\n");
-    sb.append("    jobId: ").append(toIndentedString(jobId)).append("\n");
+    sb.append("class OutputModel {\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    value: ").append(toIndentedString(value)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -1,4 +1,4 @@
-package com.bytechef.atlas.web.rest.model;
+package com.bytechef.helios.project.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Webhook_retry")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-30T15:38:20.908568+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-30T15:38:18.423931+02:00[Europe/Zagreb]")
 public class WebhookRetryModel {
 
   @JsonProperty("initialInterval")

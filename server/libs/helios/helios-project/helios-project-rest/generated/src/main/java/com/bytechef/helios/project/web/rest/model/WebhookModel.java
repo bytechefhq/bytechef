@@ -1,8 +1,8 @@
-package com.bytechef.atlas.web.rest.model;
+package com.bytechef.helios.project.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.atlas.web.rest.model.WebhookRetryModel;
+import com.bytechef.helios.project.web.rest.model.WebhookRetryModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Webhook", description = "Used to register to receive notifications for certain events.")
 @JsonTypeName("Webhook")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-30T15:38:20.908568+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-30T15:38:18.423931+02:00[Europe/Zagreb]")
 public class WebhookModel {
 
   @JsonProperty("type")

@@ -2,6 +2,8 @@ package com.bytechef.atlas.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.atlas.web.rest.model.InputModel;
+import com.bytechef.atlas.web.rest.model.OutputModel;
 import com.bytechef.atlas.web.rest.model.WorkflowFormatModel;
 import com.bytechef.atlas.web.rest.model.WorkflowTaskModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -29,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-30T10:41:01.469662+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-30T15:38:20.908568+02:00[Europe/Zagreb]")
 public class WorkflowModel {
 
   @JsonProperty("createdBy")
@@ -53,7 +54,7 @@ public class WorkflowModel {
 
   @JsonProperty("inputs")
   @Valid
-  private List<Map<String, Object>> inputs = null;
+  private List<InputModel> inputs = null;
 
   @JsonProperty("label")
   private String label;
@@ -67,7 +68,7 @@ public class WorkflowModel {
 
   @JsonProperty("outputs")
   @Valid
-  private List<Map<String, Object>> outputs = null;
+  private List<OutputModel> outputs = null;
 
   /**
    * The type of the source which stores the workflow definition.
@@ -235,12 +236,12 @@ public class WorkflowModel {
     this.id = id;
   }
 
-  public WorkflowModel inputs(List<Map<String, Object>> inputs) {
+  public WorkflowModel inputs(List<InputModel> inputs) {
     this.inputs = inputs;
     return this;
   }
 
-  public WorkflowModel addInputsItem(Map<String, Object> inputsItem) {
+  public WorkflowModel addInputsItem(InputModel inputsItem) {
     if (this.inputs == null) {
       this.inputs = new ArrayList<>();
     }
@@ -254,11 +255,11 @@ public class WorkflowModel {
   */
   @Valid 
   @Schema(name = "inputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's expected list of inputs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<Map<String, Object>> getInputs() {
+  public List<InputModel> getInputs() {
     return inputs;
   }
 
-  public void setInputs(List<Map<String, Object>> inputs) {
+  public void setInputs(List<InputModel> inputs) {
     this.inputs = inputs;
   }
 
@@ -319,12 +320,12 @@ public class WorkflowModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public WorkflowModel outputs(List<Map<String, Object>> outputs) {
+  public WorkflowModel outputs(List<OutputModel> outputs) {
     this.outputs = outputs;
     return this;
   }
 
-  public WorkflowModel addOutputsItem(Map<String, Object> outputsItem) {
+  public WorkflowModel addOutputsItem(OutputModel outputsItem) {
     if (this.outputs == null) {
       this.outputs = new ArrayList<>();
     }
@@ -338,11 +339,11 @@ public class WorkflowModel {
   */
   @Valid 
   @Schema(name = "outputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's list of expected outputs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<Map<String, Object>> getOutputs() {
+  public List<OutputModel> getOutputs() {
     return outputs;
   }
 
-  public void setOutputs(List<Map<String, Object>> outputs) {
+  public void setOutputs(List<OutputModel> outputs) {
     this.outputs = outputs;
   }
 
