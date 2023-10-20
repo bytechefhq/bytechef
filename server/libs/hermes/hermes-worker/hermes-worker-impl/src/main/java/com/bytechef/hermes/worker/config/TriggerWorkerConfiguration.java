@@ -34,7 +34,6 @@ import java.util.concurrent.Executors;
  * @author Ivica Cardic
  */
 @Configuration
-
 public class TriggerWorkerConfiguration {
 
     @Bean
