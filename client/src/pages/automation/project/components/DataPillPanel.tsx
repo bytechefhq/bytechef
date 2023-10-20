@@ -1,3 +1,9 @@
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import {ChevronDownIcon} from '@heroicons/react/24/outline';
 import {
     Accordion,
@@ -6,7 +12,7 @@ import {
     AccordionTrigger,
 } from '@radix-ui/react-accordion';
 import * as Dialog from '@radix-ui/react-dialog';
-import {Cross1Icon} from '@radix-ui/react-icons';
+import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
 import {useGetActionDefinitionsQuery} from 'queries/actionDefinitions.queries';
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
@@ -179,7 +185,7 @@ const DataPillPanel = () => {
         >
             <Dialog.Portal>
                 <Dialog.Content
-                    className="fixed inset-y-2 right-[492px] top-16 z-10 w-screen max-w-[320px] overflow-hidden rounded-xl border-l bg-white shadow-lg"
+                    className="fixed inset-y-2 right-[472px] top-16 z-10 w-screen max-w-[400px] overflow-hidden rounded-xl border-l bg-white shadow-lg"
                     onInteractOutside={(event) => event.preventDefault()}
                 >
                     <div
@@ -190,9 +196,23 @@ const DataPillPanel = () => {
                             <Dialog.Title className="flex content-center items-center text-lg font-medium text-gray-900">
                                 <span>Data Pill Panel</span>
 
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <InfoCircledIcon className="ml-1 h-4 w-4" />
+                                        </TooltipTrigger>
+
+                                        <TooltipContent>
+                                            To use data from the previous step
+                                            drag its datapill into a field, or
+                                            click on the datapill.
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+
                                 <Button
                                     aria-label="Close the data pill panel"
-                                    className="ml-auto"
+                                    className="ml-auto pr-0"
                                     displayType="icon"
                                     icon={
                                         <Cross1Icon
@@ -203,11 +223,6 @@ const DataPillPanel = () => {
                                     onClick={() => setDataPillPanelOpen(false)}
                                 />
                             </Dialog.Title>
-
-                            <Dialog.Description className="text-sm">
-                                To use data from the previous step drag the
-                                datapill into a field, or click on the datapill.
-                            </Dialog.Description>
                         </header>
 
                         <main className="flex h-full flex-col">

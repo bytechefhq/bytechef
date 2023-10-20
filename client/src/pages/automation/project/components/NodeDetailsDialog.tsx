@@ -159,7 +159,7 @@ const NodeDetailsDialog = () => {
         >
             <Dialog.Portal>
                 <Dialog.Content
-                    className="fixed inset-y-0 bottom-2 right-2 top-16 z-10 w-screen max-w-[480px] overflow-hidden rounded-xl border-l bg-white shadow-lg"
+                    className="fixed inset-y-0 bottom-2 right-2 top-16 z-10 w-screen max-w-[460px] overflow-hidden rounded-xl border-l bg-white shadow-lg"
                     onInteractOutside={(event) => event.preventDefault()}
                 >
                     {currentComponent ? (
@@ -187,7 +187,7 @@ const NodeDetailsDialog = () => {
 
                                 <Button
                                     aria-label="Close the node details dialog"
-                                    className="ml-auto"
+                                    className="ml-auto pr-0"
                                     displayType="icon"
                                     icon={
                                         <Cross1Icon
