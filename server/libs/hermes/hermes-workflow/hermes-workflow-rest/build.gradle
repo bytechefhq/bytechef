@@ -61,7 +61,7 @@ dependencies {
     implementation "org.springframework:spring-webflux"
     implementation project(":server:libs:core:autoconfigure-annotations")
     implementation project(":server:libs:core:commons:commons-util")
-    implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-test")
+    implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-api")
 
     testImplementation "org.springframework.boot:spring-boot-starter-webflux"
 }

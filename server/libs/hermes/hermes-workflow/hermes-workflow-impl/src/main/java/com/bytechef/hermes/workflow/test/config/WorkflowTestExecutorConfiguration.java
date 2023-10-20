@@ -47,6 +47,7 @@ import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.hermes.workflow.test.executor.WorkflowTestExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.hermes.workflow.test.executor.WorkflowTestExecutorImpl;
 import com.bytechef.task.dispatcher.each.EachTaskDispatcher;
 import com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler;
 import com.bytechef.task.dispatcher.forkjoin.ForkJoinTaskDispatcher;
@@ -101,7 +102,7 @@ public class WorkflowTestExecutorConfiguration {
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
-        return new WorkflowTestExecutor(
+        return new WorkflowTestExecutorImpl(
             JobSyncExecutor.builder()
                 .contextService(contextService)
                 .eventPublisher(getEventPublisher(jobService, syncMessageBroker, taskExecutionService))

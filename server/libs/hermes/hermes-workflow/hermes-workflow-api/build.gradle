@@ -1,0 +1,3 @@
+dependencies {
+    implementation project(":server:libs:atlas:atlas-worker:atlas-worker-api")
+}

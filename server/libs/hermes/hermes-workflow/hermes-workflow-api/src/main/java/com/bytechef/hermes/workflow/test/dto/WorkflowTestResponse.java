@@ -19,13 +19,11 @@ package com.bytechef.hermes.workflow.test.dto;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
 public record WorkflowTestResponse(Job job, List<TaskExecution> taskExecutions) {
 }
