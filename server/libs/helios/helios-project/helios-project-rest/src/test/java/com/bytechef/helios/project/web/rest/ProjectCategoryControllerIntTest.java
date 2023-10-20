@@ -21,6 +21,7 @@ import com.bytechef.category.domain.Category;
 import com.bytechef.category.web.rest.model.CategoryModel;
 import com.bytechef.helios.project.facade.ProjectFacade;
 import com.bytechef.helios.project.facade.ProjectInstanceFacade;
+import com.bytechef.helios.project.facade.WorkflowExecutionFacade;
 import com.bytechef.helios.project.web.rest.config.ProjectRestTestConfiguration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ import static org.mockito.Mockito.when;
  * @author Ivica Cardic
  */
 @ContextConfiguration(classes = ProjectRestTestConfiguration.class)
-@WebFluxTest(value = ProjectController.class)
+@WebFluxTest(value = ProjectCategoryController.class)
 public class ProjectCategoryControllerIntTest {
 
     @MockBean
@@ -50,6 +51,9 @@ public class ProjectCategoryControllerIntTest {
 
     @Autowired
     private WebTestClient webTestClient;
+
+    @MockBean
+    private WorkflowExecutionFacade workflowExecutionFacade;
 
     @Test
     public void testGetProjectCategories() {

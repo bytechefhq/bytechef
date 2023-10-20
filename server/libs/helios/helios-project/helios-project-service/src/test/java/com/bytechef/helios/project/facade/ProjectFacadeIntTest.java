@@ -19,9 +19,6 @@ package com.bytechef.helios.project.facade;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.WorkflowCrudRepository;
-import com.bytechef.atlas.service.ContextService;
-import com.bytechef.atlas.service.JobService;
-import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.commons.util.CollectionUtils;
@@ -34,7 +31,6 @@ import com.bytechef.helios.project.dto.ProjectDTO;
 import com.bytechef.helios.project.repository.ProjectRepository;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectService;
-import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.workflow.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
@@ -99,7 +95,7 @@ public class ProjectFacadeIntTest {
 
         project = projectRepository.save(project);
 
-        WorkflowDTO workflowDTO = projectFacade.addWorkflow(project.getId(), "Workflow 1", "Description", null);
+        WorkflowDTO workflowDTO = projectFacade.addProjectWorkflow(project.getId(), "Workflow 1", "Description", null);
 
         assertThat(workflowDTO.description()).isEqualTo("Description");
         assertThat(workflowDTO.label()).isEqualTo("Workflow 1");
@@ -318,7 +314,7 @@ public class ProjectFacadeIntTest {
             .workflowIds(projectDTO.workflowIds())
             .build();
 
-        projectDTO = projectFacade.update(projectDTO);
+        projectDTO = projectFacade.updateProject(projectDTO);
 
         assertThat(projectDTO.tags()).hasSize(1);
     }
@@ -328,14 +324,14 @@ public class ProjectFacadeIntTest {
 
         @Bean
         ProjectFacade projectFacade(
-            CategoryService categoryService, ComponentDefinitionService componentDefinitionService,
-            ContextService contextService, JobService jobService, ProjectInstanceService projectInstanceService,
-            ProjectService projectService, TaskExecutionService taskExecutionService, TagService tagService,
+            CategoryService categoryService,
+            ProjectInstanceService projectInstanceService,
+            ProjectService projectService, TagService tagService,
             WorkflowService workflowService) {
 
             return new ProjectFacadeImpl(
-                categoryService, contextService, componentDefinitionService, jobService, projectInstanceService,
-                projectService, taskExecutionService, tagService, workflowService);
+                categoryService, projectInstanceService,
+                projectService, tagService, workflowService);
         }
     }
 }

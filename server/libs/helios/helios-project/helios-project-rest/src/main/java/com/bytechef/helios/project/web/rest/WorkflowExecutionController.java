@@ -17,7 +17,7 @@
 
 package com.bytechef.helios.project.web.rest;
 
-import com.bytechef.helios.project.facade.ProjectFacade;
+import com.bytechef.helios.project.facade.WorkflowExecutionFacade;
 import com.bytechef.helios.project.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.helios.project.web.rest.model.WorkflowExecutionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -40,18 +40,20 @@ import java.time.LocalDateTime;
 public class WorkflowExecutionController implements WorkflowExecutionsApi {
 
     private final ConversionService conversionService;
-    private final ProjectFacade projectFacade;
+    private final WorkflowExecutionFacade workflowExecutionFacade;
 
     @SuppressFBWarnings("EI")
-    public WorkflowExecutionController(ConversionService conversionService, ProjectFacade projectFacade) {
+    public WorkflowExecutionController(
+        ConversionService conversionService, WorkflowExecutionFacade workflowExecutionFacade) {
+
         this.conversionService = conversionService;
-        this.projectFacade = projectFacade;
+        this.workflowExecutionFacade = workflowExecutionFacade;
     }
 
     @Override
     @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<WorkflowExecutionModel>> getWorkflowExecution(Long id, ServerWebExchange exchange) {
-        return Mono.just(projectFacade.getWorkflowExecution(id))
+        return Mono.just(workflowExecutionFacade.getWorkflowExecution(id))
             .map(worflowExecutionDTO -> conversionService.convert(worflowExecutionDTO, WorkflowExecutionModel.class))
             .map(ResponseEntity::ok);
     }
@@ -62,7 +64,7 @@ public class WorkflowExecutionController implements WorkflowExecutionsApi {
         String workflowId, Integer pageNumber, ServerWebExchange exchange) {
 
         return Mono.just(
-            projectFacade
+            workflowExecutionFacade
                 .searchWorkflowExecutions(
                     jobStatus, jobStartDate, jobEndDate, projectId, projectInstanceId, workflowId, pageNumber)
                 .map(workflowExecutionDTO -> conversionService.convert(

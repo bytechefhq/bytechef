@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -39,7 +38,6 @@ import org.springframework.util.Assert;
  * @author Arik Cohen
  */
 @Table
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public final class Context implements Persistable<Long> {
 
     public enum Classname {
