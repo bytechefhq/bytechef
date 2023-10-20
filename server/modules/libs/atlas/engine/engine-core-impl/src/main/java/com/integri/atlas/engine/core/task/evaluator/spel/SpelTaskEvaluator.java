@@ -23,6 +23,7 @@ import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
+import com.integri.atlas.engine.core.xml.XMLHelper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -86,6 +87,8 @@ public class SpelTaskEvaluator implements TaskEvaluator {
         map.put("dateFormat", new DateFormat());
         map.put("config", new Config(aBuilder.environment));
         map.put("parseJSON", new ParseJSON(aBuilder.jsonHelper));
+        map.put("readXML", new ReadXML(aBuilder.xmlHelper));
+        map.put("writeXML", new WriteXML(aBuilder.xmlHelper));
         map.putAll(aBuilder.methodExecutors);
         methodExecutors = Collections.unmodifiableMap(map);
     }
@@ -179,10 +182,10 @@ public class SpelTaskEvaluator implements TaskEvaluator {
         private final Map<String, MethodExecutor> methodExecutors = new HashMap<>();
         private Environment environment = new EmptyEnvironment();
         private JSONHelper jsonHelper;
+        private XMLHelper xmlHelper;
 
-        public Builder jsonHelper(JSONHelper jsonHelper) {
-            this.jsonHelper = jsonHelper;
-
+        public Builder environment(Environment aEnvironment) {
+            environment = aEnvironment;
             return this;
         }
 
@@ -191,8 +194,15 @@ public class SpelTaskEvaluator implements TaskEvaluator {
             return this;
         }
 
-        public Builder environment(Environment aEnvironment) {
-            environment = aEnvironment;
+        public Builder jsonHelper(JSONHelper jsonHelper) {
+            this.jsonHelper = jsonHelper;
+
+            return this;
+        }
+
+        public Builder xmlHelper(XMLHelper xmlHelper) {
+            this.xmlHelper = xmlHelper;
+
             return this;
         }
 
