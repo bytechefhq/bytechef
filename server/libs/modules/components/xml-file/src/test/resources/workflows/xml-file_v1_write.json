@@ -16,7 +16,7 @@
     {
       "name": "writeXMLFile",
       "label": "Write to the XML file",
-      "type": "xmlFile/1.0/write",
+      "type": "xmlFile/v1/write",
       "source": "${source}"
     }
   ]

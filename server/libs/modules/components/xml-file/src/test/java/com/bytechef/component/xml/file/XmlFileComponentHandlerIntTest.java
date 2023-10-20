@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.xmlfile.v1_0;
+package com.bytechef.component.xml.file;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.atlas.Accessor;
+import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
-import com.bytechef.atlas.job.domain.Job;
-import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.task.commons.file.storage.FileStorageHelper;
-import com.bytechef.task.commons.xml.XmlHelper;
-import com.bytechef.test.task.BaseTaskIntTest;
+import com.bytechef.atlas.test.workflow.WorkflowExecutor;
+import com.bytechef.commons.xml.XmlUtils;
+import com.bytechef.hermes.component.FileEntry;
+import com.bytechef.hermes.component.test.MockFileEntry;
+import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -40,59 +40,64 @@ import org.springframework.core.io.ClassPathResource;
  * @author Ivica Cardic
  */
 @SpringBootTest
-public class XmlFileTaskHandlerIntTest extends BaseTaskIntTest {
-
-    private static final XmlHelper xmlHelper = new XmlHelper();
+public class XmlFileComponentHandlerIntTest {
 
     @Autowired
-    private FileStorageHelper fileStorageHelper;
+    private FileStorageService fileStorageService;
+
+    @Autowired
+    private WorkflowExecutor workflowExecutor;
 
     @Test
     public void testRead() throws IOException {
         File sampleFile = getFile("sample.xml");
 
-        Job job = startJob(
-                "samples/v1_0/xmlFile_READ.json",
+        Job job = workflowExecutor.execute(
+                "xml-file_v1_read",
                 Map.of(
                         "fileEntry",
-                        fileStorageHelper.storeFileContent(
-                                sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, Charset.defaultCharset()))));
+                        fileStorageService
+                                .storeFileContent(
+                                        sampleFile.getAbsolutePath(),
+                                        Files.contentOf(sampleFile, Charset.defaultCharset()))
+                                .toMap()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
-        Accessor outputs = job.getOutputs();
+        Map<String, Object> outputs = job.getOutputs();
 
         assertThat((List<?>) outputs.get("readXMLFile"))
-                .isEqualTo(
-                        xmlHelper.read(Files.contentOf(getFile("sample.xml"), Charset.defaultCharset()), List.class));
+                .isEqualTo(XmlUtils.read(Files.contentOf(getFile("sample.xml"), Charset.defaultCharset()), List.class));
     }
 
     @Test
     public void testWrite() throws IOException {
-        Job job = startJob(
-                "samples/v1_0/xmlFile_WRITE.json",
+        Job job = workflowExecutor.execute(
+                "xml-file_v1_write",
                 Map.of(
                         "source",
-                        xmlHelper.read(Files.contentOf(getFile("sample.xml"), Charset.defaultCharset()), List.class)));
+                        XmlUtils.read(Files.contentOf(getFile("sample.xml"), Charset.defaultCharset()), List.class)));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
-        Accessor outputs = job.getOutputs();
+        Map<String, Object> outputs = job.getOutputs();
 
-        FileEntry fileEntry = outputs.get("writeXMLFile", FileEntry.class);
+        FileEntry fileEntry = new MockFileEntry(outputs, "writeXMLFile");
         File sampleFile = getFile("sample.xml");
 
-        job = startJob(
-                "samples/v1_0/xmlFile_READ.json",
+        job = workflowExecutor.execute(
+                "xml-file_v1_read",
                 Map.of(
                         "fileEntry",
-                        fileStorageHelper.storeFileContent(
-                                sampleFile.getName(), Files.contentOf(sampleFile, Charset.defaultCharset()))));
+                        fileStorageService
+                                .storeFileContent(
+                                        sampleFile.getName(), Files.contentOf(sampleFile, Charset.defaultCharset()))
+                                .toMap()));
 
         outputs = job.getOutputs();
 
         assertThat((List<?>) outputs.get("readXMLFile"))
-                .isEqualTo(xmlHelper.read(Files.contentOf(sampleFile, Charset.defaultCharset()), List.class));
+                .isEqualTo(XmlUtils.read(Files.contentOf(sampleFile, Charset.defaultCharset()), List.class));
 
         assertThat(fileEntry.getName()).isEqualTo("file.xml");
     }

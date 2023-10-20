@@ -1,0 +1,174 @@
+{
+  "display": {
+    "description": "Reads and writes data from a XML file.",
+    "label": "XML File"
+  },
+  "name": "xmlFile",
+  "actions": [
+    {
+      "display": {
+        "description": "Reads data from a XML file.",
+        "label": "Read from file"
+      },
+      "name": "read",
+      "inputs": [
+        {
+          "description": "The object property which contains a reference to the XML file to read from.",
+          "label": "File",
+          "name": "fileEntry",
+          "type": "OBJECT",
+          "required": true,
+          "properties": [
+            {
+              "name": "extension",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "mimeType",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "name",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "url",
+              "type": "STRING",
+              "required": true
+            }
+          ]
+        },
+        {
+          "description": "The object input is array?",
+          "label": "Is Array",
+          "name": "isArray",
+          "type": "BOOLEAN",
+          "defaultValue": true
+        },
+        {
+          "label": "Options",
+          "placeholder": "Add Option",
+          "type": "OPTION",
+          "options": [
+            {
+              "description": "The path where the array is e.g 'data'. Leave blank to use the top level object.",
+              "displayOption": {
+                "showWhen": {
+                  "isArray": {
+                    "values": [
+                      true
+                    ]
+                  }
+                }
+              },
+              "label": "Path",
+              "name": "path",
+              "type": "STRING"
+            },
+            {
+              "description": "The amount of child elements to return in a page.",
+              "displayOption": {
+                "showWhen": {
+                  "isArray": {
+                    "values": [
+                      true
+                    ]
+                  }
+                }
+              },
+              "label": "Page Size",
+              "name": "pageSize",
+              "type": "INTEGER"
+            },
+            {
+              "description": "The page number to get.",
+              "displayOption": {
+                "showWhen": {
+                  "isArray": {
+                    "values": [
+                      true
+                    ]
+                  }
+                }
+              },
+              "label": "Page Number",
+              "name": "pageNumber",
+              "type": "INTEGER"
+            }
+          ]
+        }
+      ],
+      "outputSchema": [
+        {
+          "type": "ARRAY"
+        },
+        {
+          "type": "OBJECT"
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Writes the data to a XML file.",
+        "label": "Write to file"
+      },
+      "name": "write",
+      "inputs": [
+        {
+          "description": "The data to write to the file.",
+          "label": "Source",
+          "name": "source",
+          "type": "ANY",
+          "required": true,
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "OBJECT"
+            }
+          ]
+        },
+        {
+          "description": "Filename to set for binary data. By default, \"file.xml\" will be used.",
+          "label": "Filename",
+          "name": "filename",
+          "type": "STRING",
+          "required": true,
+          "defaultValue": "file.xml"
+        }
+      ],
+      "outputSchema": [
+        {
+          "type": "OBJECT",
+          "properties": [
+            {
+              "name": "extension",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "mimeType",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "name",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "url",
+              "type": "STRING",
+              "required": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "version": 1
+}

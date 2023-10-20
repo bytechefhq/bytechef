@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.xmlfile;
+package com.bytechef.component.xml.file.constants;
 
 /**
  * @author Ivica Cardic
  */
-public class XmlFileTaskConstants {
+public class XmlFileConstants {
 
     public static final String IS_ARRAY = "isArray";
     public static final String PATH = "path";
@@ -27,7 +27,6 @@ public class XmlFileTaskConstants {
     public static final String PAGE_NUMBER = "pageNumber";
     public static final String SOURCE = "source";
     public static final String XML_FILE = "xmlFile";
-    public static final float VERSION_1_0 = 1.0f;
     public static final String READ = "read";
     public static final String WRITE = "write";
 }
