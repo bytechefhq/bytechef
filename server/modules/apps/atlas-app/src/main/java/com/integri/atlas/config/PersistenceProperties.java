@@ -16,29 +16,20 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.config;
+package com.integri.atlas.config;
 
 /**
  * @author Arik Cohen
  */
-public class CoordinatorProperties {
+public class PersistenceProperties {
 
-    private boolean enabled = false;
-    private CoordinatorSubscriptions subscriptions = new CoordinatorSubscriptions();
+    private String provider;
 
-    public boolean isEnabled() {
-        return enabled;
+    public String getProvider() {
+        return provider;
     }
 
-    public void setEnabled(boolean aEnabled) {
-        enabled = aEnabled;
-    }
-
-    public CoordinatorSubscriptions getSubscriptions() {
-        return subscriptions;
-    }
-
-    public void setSubscriptions(CoordinatorSubscriptions aSubscriptions) {
-        subscriptions = aSubscriptions;
+    public void setProvider(String aProvider) {
+        provider = aProvider;
     }
 }

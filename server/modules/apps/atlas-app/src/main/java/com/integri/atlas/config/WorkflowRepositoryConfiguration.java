@@ -18,15 +18,14 @@
 
 package com.integri.atlas.config;
 
-import com.integri.atlas.engine.config.AtlasProperties;
 import com.integri.atlas.engine.coordinator.workflow.WorkflowRepositoryChain;
 import com.integri.atlas.engine.coordinator.workflow.repository.JSONWorkflowMapper;
-import com.integri.atlas.engine.coordinator.workflow.repository.ResourceBasedWorkflowRepository;
+import com.integri.atlas.workflow.repository.resource.ResourceBasedWorkflowRepository;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapper;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapperChain;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
 import com.integri.atlas.engine.coordinator.workflow.repository.YAMLWorkflowMapper;
-import com.integri.atlas.repository.workflow.git.GitWorkflowRepository;
+import com.integri.atlas.workflow.repository.git.GitWorkflowRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -65,8 +64,17 @@ public class WorkflowRepositoryConfiguration {
     @Bean
     @Order(3)
     @ConditionalOnProperty(name = "atlas.workflow-repository.git.enabled", havingValue = "true")
-    GitWorkflowRepository gitWorkflowRepository(AtlasProperties aProperties) {
-        return new GitWorkflowRepository(aProperties.getWorkflowRepository().getGit(), workflowMapper());
+    GitWorkflowRepository gitWorkflowRepository(AtlasProperties atlasProperties) {
+        WorkflowRepositoryProperties.GitProperties gitProperties = atlasProperties.getWorkflowRepository().getGit();
+
+        return new GitWorkflowRepository(
+            gitProperties.getUrl(),
+            gitProperties.getBranch(),
+            gitProperties.getSearchPaths(),
+            gitProperties.getUsername(),
+            gitProperties.getPassword(),
+            workflowMapper()
+        );
     }
 
     @Bean

@@ -16,32 +16,20 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.config;
-
-import java.util.HashMap;
-import java.util.Map;
+package com.integri.atlas.config;
 
 /**
  * @author Arik Cohen
  */
-public class WorkerProperties {
+public class SerializationProperties {
 
-    private boolean enabled = false;
-    private Map<String, Object> subscriptions = new HashMap<>();
+    private String dateFormat;
 
-    public boolean isEnabled() {
-        return enabled;
+    public String getDateFormat() {
+        return dateFormat;
     }
 
-    public void setEnabled(boolean aEnabled) {
-        enabled = aEnabled;
-    }
-
-    public Map<String, Object> getSubscriptions() {
-        return subscriptions;
-    }
-
-    public void setSubscriptions(Map<String, Object> aSubscriptions) {
-        subscriptions = aSubscriptions;
+    public void setDateFormat(String aDateFormat) {
+        dateFormat = aDateFormat;
     }
 }

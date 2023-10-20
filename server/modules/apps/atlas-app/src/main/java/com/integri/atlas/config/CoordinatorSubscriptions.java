@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.config;
+package com.integri.atlas.config;
 
 /**
  * @author Arik Cohen
