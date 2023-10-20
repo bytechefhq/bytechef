@@ -19,8 +19,8 @@ const ContextualDialog = ({
     saveButtonLabel = 'Save',
     title,
 }: ContextualDialogProps) => (
-    <div className="absolute z-50 w-full rounded-md border bg-gray-100 shadow-md">
-        <header className="flex items-center justify-between border-b-2 px-4 py-2">
+    <div className="absolute z-50 w-full rounded-md border bg-white shadow-md">
+        <header className="flex items-center justify-between px-4 py-2">
             <span className="font-medium">{title}</span>
 
             <Button
@@ -33,7 +33,7 @@ const ContextualDialog = ({
 
         <main className="p-4">{children}</main>
 
-        <footer className="flex items-center justify-end space-x-2 border-t-2 px-4 py-2">
+        <footer className="flex items-center justify-end space-x-2 px-4 py-2">
             <Button
                 displayType="secondary"
                 label={cancelButtonLabel}
