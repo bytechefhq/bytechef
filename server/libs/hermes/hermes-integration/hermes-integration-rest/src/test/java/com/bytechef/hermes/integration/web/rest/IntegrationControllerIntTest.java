@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.integration.web.rest;
+package com.bytechef.hermes.integration.web.rest;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.hermes.integration.domain.Integration;
+import com.bytechef.hermes.integration.facade.IntegrationFacade;
+import com.bytechef.hermes.integration.service.IntegrationService;
+import com.bytechef.hermes.integration.web.rest.config.IntegrationRestTestConfiguration;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
-import com.bytechef.integration.domain.Integration;
-import com.bytechef.integration.facade.IntegrationFacade;
-import com.bytechef.integration.service.IntegrationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -34,13 +35,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
  * @author Ivica Cardic
  */
+@ContextConfiguration(classes = IntegrationRestTestConfiguration.class)
 @WebFluxTest(value = IntegrationController.class)
-public class IntegrationControllerTest {
+public class IntegrationControllerIntTest {
 
     @MockBean
     private IntegrationFacade integrationFacade;

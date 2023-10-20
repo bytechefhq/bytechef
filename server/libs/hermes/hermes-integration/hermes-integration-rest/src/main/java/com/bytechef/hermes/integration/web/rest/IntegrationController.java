@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.integration.web.rest;
+package com.bytechef.hermes.integration.web.rest;
 
-import com.bytechef.hermes.integration.web.rest.IntegrationControllerApi;
+import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
+import com.bytechef.hermes.integration.domain.Integration;
+import com.bytechef.hermes.integration.facade.IntegrationFacade;
+import com.bytechef.hermes.integration.service.IntegrationService;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
-import com.bytechef.integration.domain.Integration;
-import com.bytechef.integration.facade.IntegrationFacade;
-import com.bytechef.integration.service.IntegrationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
@@ -34,7 +35,9 @@ import reactor.core.publisher.Mono;
  * @author Ivica Cardic
  */
 @RestController
-public class IntegrationController implements IntegrationControllerApi {
+@ConditionalOnApi
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+public class IntegrationController implements IntegrationsApi {
 
     private final ConversionService conversionService;
     private final IntegrationFacade integrationFacade;

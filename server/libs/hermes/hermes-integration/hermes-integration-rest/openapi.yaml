@@ -7,12 +7,13 @@ servers:
 paths:
   /integrations:
     get:
+      description: TODO
       tags:
-        - IntegrationController
+        - integrations
       operationId: getIntegrations
       responses:
         "200":
-          description: OK
+          description: TODO OK
           content:
             application/json:
               schema:
@@ -20,8 +21,9 @@ paths:
                 items:
                   $ref: '#/components/schemas/Integration'
     post:
+      description: TODO
       tags:
-        - IntegrationController
+        - integrations
       operationId: postIntegration
       requestBody:
         content:
@@ -31,48 +33,54 @@ paths:
         required: true
       responses:
         "200":
-          description: OK
+          description: TODO OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Integration'
   /integrations/{id}:
     delete:
+      description: TODO
       tags:
-        - IntegrationController
+        - integrations
       operationId: deleteIntegration
       parameters:
         - name: id
+          description: TODO
           in: path
           required: true
           schema:
             type: string
       responses:
         "200":
-          description: OK
+          description: TODO
     get:
+      description: TODO
       tags:
-        - IntegrationController
+        - integrations
       operationId: getIntegration
       parameters:
         - name: id
+          description: TODO
           in: path
           required: true
           schema:
             type: string
       responses:
         "200":
-          description: OK
+          description: TODO
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Integration'
     put:
+      description: TODO
       tags:
-        - IntegrationController
+        - integrations
       operationId: putIntegration
       parameters:
         - name: id
+          description: TODO
           in: path
           required: true
           schema:
@@ -85,7 +93,7 @@ paths:
         required: true
       responses:
         "200":
-          description: OK
+          description: TODO
           content:
             '*/*':
               schema:
@@ -93,30 +101,39 @@ paths:
 components:
   schemas:
     Integration:
+      description: TODO
       type: object
       properties:
         createdBy:
+          description: TODO
           type: string
           readOnly: true
         createdDate:
+          description: TODO
           type: string
           format: date-time
           readOnly: true
         id:
+          description: TODO
           type: string
           readOnly: true
         name:
+          description: TODO
           type: string
         description:
+          description: TODO
           type: string
         lastModifiedBy:
+          description: TODO
           type: string
           readOnly: true
         lastModifiedDate:
+          description: TODO
           type: string
           format: date-time
           readOnly: true
         workflowIds:
+          description: TODO
           type: array
           items:
             type: string
