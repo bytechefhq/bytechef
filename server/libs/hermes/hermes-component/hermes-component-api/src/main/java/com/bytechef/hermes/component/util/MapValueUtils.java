@@ -24,10 +24,21 @@ import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 public class MapValueUtils {
 
     static MapValueReader mapValueReader;
+
+    static {
+        ServiceLoader<MapValueReader> loader = ServiceLoader.load(MapValueReader.class);
+
+        mapValueReader = loader.findFirst()
+            .orElseThrow(() -> new IllegalStateException("MapValueReader instance is not available"));
+    }
+
+    private MapValueUtils() {
+    }
 
     /**
      * Determined if the given task contains the given key.

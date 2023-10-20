@@ -37,7 +37,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.net.ssl.SSLContext;
@@ -67,16 +66,7 @@ import java.util.stream.Collectors;
 /**
  * @author Ivica Cardic
  */
-@Component
 public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
-
-    private final JsonMapper jsonMapper;
-    private final XmlMapper xmlMapper;
-
-    public HttpClientExecutor(JsonMapper jsonMapper, XmlMapper xmlMapper) {
-        this.jsonMapper = jsonMapper;
-        this.xmlMapper = xmlMapper;
-    }
 
     @Override
     public Response execute(
@@ -226,11 +216,11 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
             if (!isEmpty(httpResponseBody) && responseFormat == HttpClientUtils.ResponseFormat.BINARY) {
                 body = storeBinaryResponseBody(context, configuration, headers, (InputStream) httpResponseBody);
             } else if (responseFormat == HttpClientUtils.ResponseFormat.JSON) {
-                body = isEmpty(httpResponseBody) ? null : jsonMapper.read(httpResponseBody.toString());
+                body = isEmpty(httpResponseBody) ? null : JsonUtils.read(httpResponseBody.toString());
             } else if (responseFormat == HttpClientUtils.ResponseFormat.TEXT) {
                 body = isEmpty(httpResponseBody) ? null : httpResponseBody.toString();
             } else {
-                body = isEmpty(httpResponseBody) ? null : xmlMapper.read(httpResponseBody.toString());
+                body = isEmpty(httpResponseBody) ? null : XmlUtils.read(httpResponseBody.toString());
             }
 
             response = new Response(headers, body, httpResponse.statusCode());
@@ -395,13 +385,13 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
 
     private BodyPublisher getJsonBodyPublisher(Body body) {
         return MoreBodyPublishers.ofMediaType(
-            HttpRequest.BodyPublishers.ofString(jsonMapper.write(body.getContent())),
+            HttpRequest.BodyPublishers.ofString(JsonUtils.write(body.getContent())),
             MediaType.APPLICATION_JSON);
     }
 
     private BodyPublisher getXmlBodyPublisher(Body body) {
         return MoreBodyPublishers.ofMediaType(
-            HttpRequest.BodyPublishers.ofString(xmlMapper.write(body.getContent())),
+            HttpRequest.BodyPublishers.ofString(XmlUtils.write(body.getContent())),
             MediaType.APPLICATION_XML);
     }
 

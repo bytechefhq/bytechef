@@ -20,6 +20,7 @@ package com.bytechef.hermes.component.util;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.stream.Stream;
 
 /**
@@ -28,6 +29,16 @@ import java.util.stream.Stream;
 public final class XmlUtils {
 
     static XmlMapper xmlMapper;
+
+    static {
+        ServiceLoader<XmlMapper> loader = ServiceLoader.load(XmlMapper.class);
+
+        xmlMapper = loader.findFirst()
+            .orElseThrow(() -> new IllegalStateException("XmlMapper instance is not available"));
+    }
+
+    private XmlUtils() {
+    }
 
     /**
      *

@@ -155,20 +155,30 @@ public class OpenApiClient {
 
         for (Property<?> property : properties) {
             if (Objects.equals(MapValueUtils.get(property.getMetadata(), TYPE, PropertyType.class), propertyType)) {
-                String value = MapValueUtils.getString(parameters, property.getName());
+                List<String> values;
 
-                valuesMap.compute(property.getName(), (key, values) -> {
-                    if (StringUtils.hasText(value)) {
-                        if (values == null) {
-                            values = new ArrayList<>();
-                        }
+                if (property.getType() == Type.ARRAY) {
+                    values = MapValueUtils.getList(parameters, property.getName(), String.class, List.of());
+                } else {
+                    String value = MapValueUtils.getString(parameters, property.getName());
 
-                        if (!values.contains(value)) {
-                            values.add(value);
+                    values = value == null ? List.of() : List.of(value);
+                }
+
+                valuesMap.compute(property.getName(), (key, curValues) -> {
+                    for (String value : values) {
+                        if (StringUtils.hasText(value)) {
+                            if (curValues == null) {
+                                curValues = new ArrayList<>();
+                            }
+
+                            if (!curValues.contains(value)) {
+                                curValues.add(value);
+                            }
                         }
                     }
 
-                    return values;
+                    return curValues;
                 });
             }
         }

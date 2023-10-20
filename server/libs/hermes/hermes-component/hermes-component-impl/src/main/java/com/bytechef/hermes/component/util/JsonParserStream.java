@@ -55,12 +55,11 @@ final class JsonParserStream implements Stream<Map<String, ?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(JsonParserStream.class);
 
-    private final JsonFactory jsonFactory = new JsonFactory();
     private final JsonParser jsonParser;
     private final Stream<Map<String, ?>> stream;
 
     public JsonParserStream(InputStream inputStream, ObjectMapper objectMapper) throws IOException {
-        this.jsonParser = jsonFactory.createParser(inputStream);
+        this.jsonParser = new JsonFactory().createParser(inputStream);
         this.stream = StreamSupport.stream(
             Spliterators.spliteratorUnknownSize(new JsonIterator(jsonParser, objectMapper), Spliterator.ORDERED),
             false);

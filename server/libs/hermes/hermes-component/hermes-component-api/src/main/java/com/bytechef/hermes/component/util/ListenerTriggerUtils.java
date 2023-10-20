@@ -19,12 +19,24 @@ package com.bytechef.hermes.component.util;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.util.ServiceLoader;
+
 /**
  * @author Ivica Cardic
  */
 public final class ListenerTriggerUtils {
 
     static ListenerEmitter listenerEmitter;
+
+    static {
+        ServiceLoader<ListenerEmitter> loader = ServiceLoader.load(ListenerEmitter.class);
+
+        listenerEmitter = loader.findFirst()
+            .orElseThrow(() -> new IllegalStateException("ListenerEmitter instance is not available"));
+    }
+
+    private ListenerTriggerUtils() {
+    }
 
     /**
      * @param workflowExecutionId
