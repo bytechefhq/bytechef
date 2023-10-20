@@ -25,6 +25,7 @@ import static com.bytechef.hermes.descriptor.domain.DSL.OBJECT_PROPERTY;
 import static com.bytechef.hermes.descriptor.domain.DSL.OPERATION;
 import static com.bytechef.hermes.descriptor.domain.DSL.STRING_PROPERTY;
 import static com.bytechef.hermes.descriptor.domain.DSL.createTaskDescriptor;
+import static com.bytechef.hermes.descriptor.domain.DSL.hideWhen;
 import static com.bytechef.hermes.descriptor.domain.DSL.option;
 import static com.bytechef.hermes.descriptor.domain.DSL.showWhen;
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.*;
@@ -47,8 +48,8 @@ import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.IGNOR
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.KEY;
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.MIME_TYPE;
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.PARAMETER;
-import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.PROPERTY_QUERY_PARAMETERS;
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.PROXY;
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.QUERY_PARAMETERS;
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.RESPONSE_FILE_NAME;
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.RESPONSE_FORMAT;
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.ResponseFormat;
@@ -126,7 +127,7 @@ public class HTTPClientTaskDescriptorHandler implements TaskDescriptorHandler {
         // Query parameters properties
         //
 
-        ARRAY_PROPERTY(PROPERTY_QUERY_PARAMETERS)
+        ARRAY_PROPERTY(QUERY_PARAMETERS)
                 .displayName("Query Parameters")
                 .description("Query parameters to send.")
                 .defaultValue("")
@@ -145,14 +146,22 @@ public class HTTPClientTaskDescriptorHandler implements TaskDescriptorHandler {
     };
 
     private static final TaskProperty[] BODY_CONTENT_PROPERTIES = {
+        BOOLEAN_PROPERTY(SEND_FILE)
+                .displayName("Send File")
+                .description("Send file instead of body parameters.")
+                .displayOption(showWhen(BODY_CONTENT_TYPE)
+                        .in(BodyContentType.JSON.name(), BodyContentType.RAW.name(), BodyContentType.XML.name()))
+                .defaultValue(false),
+        OBJECT_PROPERTY(BODY_PARAMETERS)
+                .displayName("Body Parameters")
+                .description("Body parameters to send.")
+                .displayOption(showWhen(BODY_CONTENT_TYPE).eq(BodyContentType.JSON.name()))
+                .additionalProperties(true)
+                .placeholder("Add Parameter"),
         ARRAY_PROPERTY(BODY_PARAMETERS)
                 .displayName("Body Parameters")
                 .description("Body parameters to send.")
-                .displayOption(showWhen(BODY_CONTENT_TYPE)
-                        .in(
-                                BodyContentType.JSON.name(),
-                                BodyContentType.FORM_DATA.name(),
-                                BodyContentType.FORM_URLENCODED.name()))
+                .displayOption(showWhen(BODY_CONTENT_TYPE).eq(BodyContentType.FORM_DATA.name()))
                 .defaultValue("")
                 .placeholder("Add Parameter")
                 .items(OBJECT_PROPERTY(PARAMETER)
@@ -166,6 +175,23 @@ public class HTTPClientTaskDescriptorHandler implements TaskDescriptorHandler {
                                         .displayName("Value")
                                         .description("The value of the parameter.")
                                         .defaultValue(""))),
+        ARRAY_PROPERTY(BODY_PARAMETERS)
+                .displayName("Body Parameters")
+                .description("Body parameters to send.")
+                .displayOption(showWhen(BODY_CONTENT_TYPE).eq(BodyContentType.FORM_URLENCODED.name()))
+                .defaultValue("")
+                .placeholder("Add Parameter")
+                .items(OBJECT_PROPERTY(PARAMETER)
+                        .displayName("Parameter")
+                        .properties(
+                                STRING_PROPERTY(KEY)
+                                        .displayName("Key")
+                                        .description("The key of the parameter.")
+                                        .defaultValue(""),
+                                ANY_PROPERTY(VALUE)
+                                        .displayName("Value")
+                                        .description("The value of the parameter.")
+                                        .types(STRING_PROPERTY(), FILE_ENTRY_PROPERTY()))),
         STRING_PROPERTY(BODY_PARAMETERS)
                 .displayName("Raw")
                 .description("The raw text to send.")
@@ -173,7 +199,14 @@ public class HTTPClientTaskDescriptorHandler implements TaskDescriptorHandler {
         FILE_ENTRY_PROPERTY(FILE_ENTRY)
                 .displayName("File")
                 .description("The object property which contains a reference to the file with data to upload.")
-                .displayOption(showWhen(BODY_CONTENT_TYPE).eq(BodyContentType.BINARY.name())),
+                .displayOption(
+                        hideWhen(SEND_FILE).eq(false),
+                        showWhen(BODY_CONTENT_TYPE)
+                                .in(
+                                        BodyContentType.BINARY.name(),
+                                        BodyContentType.JSON.name(),
+                                        BodyContentType.RAW.name(),
+                                        BodyContentType.XML.name())),
     };
 
     private static final TaskProperty[] OUTPUTS_PROPERTIES = {
@@ -338,7 +371,8 @@ public class HTTPClientTaskDescriptorHandler implements TaskDescriptorHandler {
                                                 option("Raw", BodyContentType.RAW.name()),
                                                 option("Form-Data", BodyContentType.FORM_DATA.name()),
                                                 option("Form-Urlencoded", BodyContentType.FORM_URLENCODED.name()),
-                                                option("Binary", BodyContentType.BINARY.name()))
+                                                option("Binary", BodyContentType.BINARY.name()),
+                                                option("XML", BodyContentType.XML.name()))
                                         .defaultValue("JSON")
                                 : null,
                         includeBodyContentProperties

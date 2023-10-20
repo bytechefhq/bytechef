@@ -20,24 +20,29 @@ import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.*;
 
 import com.bytechef.atlas.Accessor;
 import com.bytechef.hermes.auth.domain.Authentication;
-import com.bytechef.task.handler.httpclient.v1_0.header.HTTPHeader;
-import com.bytechef.task.handler.httpclient.v1_0.param.HTTPQueryParam;
+import com.github.mizosoft.methanol.Methanol;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ivica Cardic
  */
-public class ApiKeyAuth implements Auth {
+public class ApiKeyAuthResolver implements AuthResolver {
 
     @Override
-    public void apply(List<HTTPHeader> headers, List<HTTPQueryParam> queryParameters, Authentication taskAuth) {
-        Accessor properties = taskAuth.getProperties();
+    public void apply(
+            Methanol.Builder builder,
+            Map<String, List<String>> headers,
+            Map<String, List<String>> queryParams,
+            Authentication authentication) {
+        Accessor properties = authentication.getProperties();
 
-        if (ApiTokenLocation.valueOf(StringUtils.upperCase(properties.getString(ADD_TO))) == ApiTokenLocation.HEADER) {
-            headers.add(new HTTPHeader(properties.getString(KEY), properties.getString(VALUE)));
+        if (ApiTokenLocation.valueOf(StringUtils.upperCase(properties.getString(ADD_TO, "HEADER")))
+                == ApiTokenLocation.HEADER) {
+            headers.put(properties.getString(KEY, "api_token"), List.of(properties.getString(VALUE, "")));
         } else {
-            queryParameters.add(new HTTPQueryParam(properties.getString(KEY), properties.getString(VALUE)));
+            queryParams.put(properties.getString(KEY, "api_token"), List.of(properties.getString(VALUE, "")));
         }
     }
 }

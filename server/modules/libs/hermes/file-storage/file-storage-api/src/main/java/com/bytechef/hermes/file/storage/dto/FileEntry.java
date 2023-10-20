@@ -17,6 +17,7 @@
 package com.bytechef.hermes.file.storage.dto;
 
 import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.Tika;
 
@@ -31,6 +32,17 @@ public class FileEntry {
     private String url;
 
     private FileEntry() {}
+
+    public static boolean isFileEntry(Map<String, String> map) {
+        if (!map.containsKey("extension")
+                || !map.containsKey("mimeType")
+                || !map.containsKey("name")
+                || !map.containsKey("url")) {
+            return false;
+        }
+
+        return true;
+    }
 
     public static FileEntry of(Map<String, String> map) {
         FileEntry fileEntry = new FileEntry();
@@ -96,5 +108,41 @@ public class FileEntry {
         fileEntry.setUrl(url);
 
         return fileEntry;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FileEntry fileEntry = (FileEntry) o;
+
+        return Objects.equals(extension, fileEntry.extension)
+                && Objects.equals(mimeType, fileEntry.mimeType)
+                && Objects.equals(name, fileEntry.name)
+                && Objects.equals(url, fileEntry.url);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(extension, mimeType, name, url);
+    }
+
+    public Map<String, String> toMap() {
+        return Map.of(
+                "extension", getExtension(),
+                "mimeType", getMimeType(),
+                "name", getName(),
+                "url", getUrl());
+    }
+
+    @Override
+    public String toString() {
+        return "FileEntry{" + "extension='"
+                + extension + '\'' + ", mimeType='"
+                + mimeType + '\'' + ", name='"
+                + name + '\'' + ", url='"
+                + url + '\'' + '}';
     }
 }

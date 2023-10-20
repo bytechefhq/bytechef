@@ -19,28 +19,41 @@ package com.bytechef.task.handler.httpclient.v1_0.http;
 import static com.bytechef.hermes.auth.AuthenticationConstants.AUTHENTICATION_ID;
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.ALLOW_UNAUTHORIZED_CERTS;
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.AuthType;
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.BODY_CONTENT_TYPE;
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.BODY_PARAMETERS;
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.FILE_ENTRY;
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.FOLLOW_ALL_REDIRECTS;
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.FOLLOW_REDIRECT;
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.FULL_RESPONSE;
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.HEADER_PARAMETERS;
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.KEY;
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.MIME_TYPE;
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.PROXY;
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.QUERY_PARAMETERS;
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.RESPONSE_FILE_NAME;
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.RESPONSE_FORMAT;
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.ResponseFormat;
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.TIMEOUT;
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.URI;
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.VALUE;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.hermes.auth.domain.Authentication;
 import com.bytechef.hermes.auth.service.AuthenticationService;
-import com.bytechef.task.handler.httpclient.HTTPClientTaskConstants;
+import com.bytechef.hermes.file.storage.dto.FileEntry;
+import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.json.JSONHelper;
+import com.bytechef.task.commons.xml.XMLHelper;
 import com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.BodyContentType;
 import com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.RequestMethod;
-import com.bytechef.task.handler.httpclient.v1_0.auth.Auth;
-import com.bytechef.task.handler.httpclient.v1_0.auth.AuthRegistry;
-import com.bytechef.task.handler.httpclient.v1_0.body.HTTPBodyFactory;
-import com.bytechef.task.handler.httpclient.v1_0.header.HTTPHeader;
-import com.bytechef.task.handler.httpclient.v1_0.header.HTTPHeaderFactory;
-import com.bytechef.task.handler.httpclient.v1_0.param.HTTPQueryParam;
-import com.bytechef.task.handler.httpclient.v1_0.param.HTTPQueryParamFactory;
-import com.bytechef.task.handler.httpclient.v1_0.response.HTTPResponseHandler;
+import com.bytechef.task.handler.httpclient.v1_0.auth.AuthResolver;
+import com.bytechef.task.handler.httpclient.v1_0.auth.AuthResolverRegistry;
+import com.github.mizosoft.methanol.FormBodyPublisher;
+import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.Methanol;
-import java.io.IOException;
+import com.github.mizosoft.methanol.MoreBodyPublishers;
+import com.github.mizosoft.methanol.MultipartBodyPublisher;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.ProxySelector;
 import java.net.Socket;
@@ -51,109 +64,184 @@ import java.net.http.HttpResponse;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tika.mime.MimeType;
+import org.apache.tika.mime.MimeTypes;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Matija Petanjek
+ * @author Ivica Cardic
  */
 @Component
 public class HTTPClientHelper {
-
     private final AuthenticationService authenticationService;
-    private final HTTPBodyFactory httpBodyFactory;
-    private final HTTPHeaderFactory httpHeaderFactory;
-    private final HTTPQueryParamFactory queryParamFactory;
-    private final HTTPResponseHandler httpResponseHandler;
+    private final FileStorageService fileStorageService;
+    private final JSONHelper jsonHelper;
+    private final XMLHelper xmlHelper;
 
     public HTTPClientHelper(
             AuthenticationService authenticationService,
-            HTTPBodyFactory httpBodyFactory,
-            HTTPHeaderFactory httpHeaderFactory,
-            HTTPQueryParamFactory queryParamFactory,
-            HTTPResponseHandler httpResponseHandler) {
+            FileStorageService fileStorageService,
+            JSONHelper jsonHelper,
+            XMLHelper xmlHelper) {
         this.authenticationService = authenticationService;
-        this.httpBodyFactory = httpBodyFactory;
-        this.httpHeaderFactory = httpHeaderFactory;
-        this.queryParamFactory = queryParamFactory;
-        this.httpResponseHandler = httpResponseHandler;
+        this.fileStorageService = fileStorageService;
+        this.jsonHelper = jsonHelper;
+        this.xmlHelper = xmlHelper;
     }
 
     public Object send(TaskExecution taskExecution, RequestMethod requestMethod) throws Exception {
-        HttpClient httpClient = buildHTTPClient(taskExecution);
+        Map<String, List<String>> headers = getNameValuesMap(taskExecution, HEADER_PARAMETERS);
 
-        List<HTTPHeader> httpHeaders = httpHeaderFactory.getHTTPHeaders(taskExecution);
+        Map<String, List<String>> queryParams = getNameValuesMap(taskExecution, QUERY_PARAMETERS);
 
-        List<HTTPQueryParam> queryParameters = queryParamFactory.getQueryParams(taskExecution);
+        HttpClient httpClient = createHTTPClient(taskExecution, headers, queryParams);
 
-        Authentication authentication =
-                authenticationService.fetchAuthentication(taskExecution.getString(AUTHENTICATION_ID));
+        HttpRequest httpRequest = createHTTPRequest(taskExecution, requestMethod, headers, queryParams);
 
-        if (authentication != null) {
-            Auth auth = AuthRegistry.get(AuthType.valueOf(StringUtils.upperCase(authentication.getType())));
+        HttpResponse<?> httpResponse = httpClient.send(httpRequest, createBodyHandler(taskExecution));
 
-            auth.apply(httpHeaders, queryParameters, authentication);
-        }
-
-        HttpRequest httpRequest = getHTTPRequest(taskExecution, requestMethod, httpHeaders, queryParameters);
-
-        HttpResponse<?> httpResponse = httpClient.send(httpRequest, getBodyHandler(taskExecution));
-
-        return httpResponseHandler.handle(taskExecution, httpResponse);
+        return handleResponse(taskExecution, httpResponse);
     }
 
-    protected HttpClient buildHTTPClient(TaskExecution taskExecution) {
+    protected HttpResponse.BodyHandler<?> createBodyHandler(TaskExecution taskExecution) {
+        HttpResponse.BodyHandler<?> bodyHandler;
+
+        if (taskExecution.containsKey(RESPONSE_FORMAT)) {
+            ResponseFormat responseFormat = ResponseFormat.valueOf(taskExecution.getString(RESPONSE_FORMAT));
+
+            if (responseFormat == ResponseFormat.FILE) {
+                bodyHandler = HttpResponse.BodyHandlers.ofInputStream();
+            } else {
+                bodyHandler = HttpResponse.BodyHandlers.ofString();
+            }
+        } else {
+            bodyHandler = HttpResponse.BodyHandlers.discarding();
+        }
+
+        return bodyHandler;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected HttpRequest.BodyPublisher createBodyPublisher(TaskExecution taskExecution) {
+        HttpRequest.BodyPublisher bodyPublisher;
+
+        BodyContentType bodyContentType =
+                BodyContentType.valueOf(StringUtils.upperCase(taskExecution.getString(BODY_CONTENT_TYPE, "JSON")));
+
+        if (taskExecution.containsKey(BODY_PARAMETERS)) {
+            if (bodyContentType == BodyContentType.FORM_DATA) {
+                List<Map<String, ?>> bodyParameters = taskExecution.get(BODY_PARAMETERS, List.class);
+
+                MultipartBodyPublisher.Builder builder = MultipartBodyPublisher.newBuilder();
+
+                for (Map<String, ?> parameter : bodyParameters) {
+                    if (parameter.get(VALUE) instanceof Map
+                            && FileEntry.isFileEntry((Map<String, String>) parameter.get(VALUE))) {
+                        FileEntry fileEntry = FileEntry.of((Map<String, String>) parameter.get(VALUE));
+
+                        builder.formPart(
+                                (String) parameter.get(KEY),
+                                fileEntry.getName(),
+                                MoreBodyPublishers.ofMediaType(
+                                        HttpRequest.BodyPublishers.ofInputStream(
+                                                () -> fileStorageService.getFileContentStream(fileEntry.getUrl())),
+                                        MediaType.parse(fileEntry.getMimeType())));
+                    } else {
+                        builder.textPart((String) parameter.get(KEY), parameter.get(VALUE));
+                    }
+                }
+
+                bodyPublisher = builder.build();
+            } else if (bodyContentType == BodyContentType.FORM_URLENCODED) {
+                List<Map<String, String>> bodyParameters = taskExecution.get(BODY_PARAMETERS, List.class);
+
+                FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
+
+                for (Map<String, String> parameter : bodyParameters) {
+                    builder.query(parameter.get(KEY), parameter.get(VALUE));
+                }
+
+                bodyPublisher = builder.build();
+            } else if (bodyContentType == BodyContentType.JSON) {
+                bodyPublisher = MoreBodyPublishers.ofMediaType(
+                        HttpRequest.BodyPublishers.ofString(jsonHelper.write(taskExecution.get(BODY_PARAMETERS))),
+                        MediaType.APPLICATION_JSON);
+            } else if (bodyContentType == BodyContentType.XML) {
+                bodyPublisher = MoreBodyPublishers.ofMediaType(
+                        HttpRequest.BodyPublishers.ofString(xmlHelper.write(taskExecution.get(BODY_PARAMETERS))),
+                        MediaType.APPLICATION_XML);
+            } else {
+                MediaType mediaType;
+
+                if (taskExecution.containsKey(MIME_TYPE)) {
+                    mediaType = MediaType.parse(taskExecution.get(MIME_TYPE));
+                } else {
+                    mediaType = MediaType.TEXT_PLAIN;
+                }
+
+                bodyPublisher = MoreBodyPublishers.ofMediaType(
+                        HttpRequest.BodyPublishers.ofString(taskExecution.get(BODY_PARAMETERS)), mediaType);
+            }
+        } else if (taskExecution.containsKey(FILE_ENTRY)) {
+            FileEntry fileEntry = taskExecution.get(FILE_ENTRY, FileEntry.class);
+            MediaType mediaType;
+
+            if (bodyContentType == BodyContentType.BINARY) {
+                mediaType = MediaType.APPLICATION_OCTET_STREAM;
+            } else if (bodyContentType == BodyContentType.JSON) {
+                mediaType = MediaType.APPLICATION_JSON;
+            } else if (bodyContentType == BodyContentType.XML) {
+                mediaType = MediaType.APPLICATION_XML;
+            } else {
+                mediaType = MediaType.TEXT_PLAIN;
+            }
+
+            bodyPublisher = MoreBodyPublishers.ofMediaType(
+                    HttpRequest.BodyPublishers.ofInputStream(
+                            () -> fileStorageService.getFileContentStream(fileEntry.getUrl())),
+                    mediaType);
+        } else {
+            bodyPublisher = HttpRequest.BodyPublishers.noBody();
+        }
+
+        return bodyPublisher;
+    }
+
+    protected HttpClient createHTTPClient(
+            TaskExecution taskExecution, Map<String, List<String>> headers, Map<String, List<String>> queryParams) {
         Methanol.Builder builder = Methanol.newBuilder().version(HttpClient.Version.HTTP_1_1);
 
         if (taskExecution.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false)) {
             try {
                 SSLContext sslContext = SSLContext.getInstance("TLS");
 
-                sslContext.init(
-                        null,
-                        new TrustManager[] {
-                            new X509ExtendedTrustManager() {
-                                public X509Certificate[] getAcceptedIssuers() {
-                                    return null;
-                                }
-
-                                public void checkClientTrusted(
-                                        final X509Certificate[] a_certificates, final String a_auth_type) {}
-
-                                public void checkServerTrusted(
-                                        final X509Certificate[] a_certificates, final String a_auth_type) {}
-
-                                public void checkClientTrusted(
-                                        final X509Certificate[] a_certificates,
-                                        final String a_auth_type,
-                                        final Socket a_socket) {}
-
-                                public void checkServerTrusted(
-                                        final X509Certificate[] a_certificates,
-                                        final String a_auth_type,
-                                        final Socket a_socket) {}
-
-                                public void checkClientTrusted(
-                                        final X509Certificate[] a_certificates,
-                                        final String a_auth_type,
-                                        final SSLEngine a_engine) {}
-
-                                public void checkServerTrusted(
-                                        final X509Certificate[] a_certificates,
-                                        final String a_auth_type,
-                                        final SSLEngine a_engine) {}
-                            }
-                        },
-                        null);
+                sslContext.init(null, new TrustManager[] {new UnauthorizedCertsX509ExtendedTrustManager()}, null);
 
                 builder.sslContext(sslContext);
             } catch (Exception e) {
                 throw new RuntimeException(e);
+            }
+        }
+
+        if (taskExecution.containsKey(AUTHENTICATION_ID)) {
+            Authentication authentication =
+                    authenticationService.fetchAuthentication(taskExecution.getString(AUTHENTICATION_ID));
+
+            if (authentication != null) {
+                AuthResolver authResolver =
+                        AuthResolverRegistry.get(AuthType.valueOf(StringUtils.upperCase(authentication.getType())));
+
+                authResolver.apply(builder, headers, queryParams, authentication);
             }
         }
 
@@ -178,60 +266,129 @@ public class HTTPClientHelper {
         return builder.build();
     }
 
-    private HttpResponse.BodyHandler<?> getBodyHandler(TaskExecution taskExecution) {
-        if (!taskExecution.containsKey(RESPONSE_FORMAT)) {
-            return HttpResponse.BodyHandlers.discarding();
-        }
-
-        BodyContentType bodyContentType = BodyContentType.valueOf(taskExecution.getString(RESPONSE_FORMAT));
-
-        if (bodyContentType == BodyContentType.BINARY) {
-            return HttpResponse.BodyHandlers.ofInputStream();
-        }
-
-        return HttpResponse.BodyHandlers.ofString();
-    }
-
-    private HttpRequest getHTTPRequest(
+    protected HttpRequest createHTTPRequest(
             TaskExecution taskExecution,
             RequestMethod requestMethod,
-            List<HTTPHeader> httpHeaders,
-            List<HTTPQueryParam> queryParameters)
-            throws IOException {
-        HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
-                .method(requestMethod.name(), httpBodyFactory.getBodyPublisher(taskExecution, httpHeaders));
+            Map<String, List<String>> headers,
+            Map<String, List<String>> queryParams) {
 
-        for (HTTPHeader httpHeader : httpHeaders) {
-            httpRequestBuilder.header(httpHeader.getName(), httpHeader.getValue());
+        HttpRequest.Builder httpRequestBuilder =
+                HttpRequest.newBuilder().method(requestMethod.name(), createBodyPublisher(taskExecution));
+
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            for (String value : entry.getValue()) {
+                httpRequestBuilder.header(entry.getKey(), value);
+            }
         }
 
-        httpRequestBuilder.uri(
-                resolveURI(taskExecution.getRequiredString(HTTPClientTaskConstants.URI), queryParameters));
+        httpRequestBuilder.uri(createURI(taskExecution.getRequiredString(URI), queryParams));
 
         return httpRequestBuilder.build();
     }
 
-    private String fromQueryParameters(List<HTTPQueryParam> queryParameters) {
-        List<String> queryParameterList = new ArrayList<>();
+    protected Object handleResponse(TaskExecution taskExecution, HttpResponse<?> httpResponse) throws Exception {
+        Object body = null;
 
-        StringBuilder sb = new StringBuilder();
+        if (taskExecution.getString(RESPONSE_FORMAT) != null) {
+            ResponseFormat responseFormat = ResponseFormat.valueOf(taskExecution.getString(RESPONSE_FORMAT));
 
-        for (HTTPQueryParam queryParam : queryParameters) {
-            sb.append(queryParam.getName());
-            sb.append("=");
-            sb.append(queryParam.getValue());
+            if (responseFormat == ResponseFormat.FILE) {
+                String filename = taskExecution.getString(RESPONSE_FILE_NAME);
 
-            queryParameterList.add(sb.toString());
+                if (StringUtils.isEmpty(filename)) {
+                    Map<String, List<String>> headersMap =
+                            httpResponse.headers().map();
+
+                    if (headersMap.containsKey("Content-Type")) {
+                        MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
+
+                        List<String> values = headersMap.get("Content-Type");
+
+                        MimeType mimeType = mimeTypes.forName(values.get(0));
+
+                        filename = "file" + mimeType.getExtension();
+                    } else {
+                        filename = "file.txt";
+                    }
+                }
+
+                body = fileStorageService.storeFileContent(filename, (InputStream) httpResponse.body());
+            } else if (responseFormat == ResponseFormat.JSON) {
+                body = jsonHelper.read(httpResponse.body().toString());
+            } else if (responseFormat == ResponseFormat.TEXT) {
+                body = httpResponse.body().toString();
+            } else {
+                body = xmlHelper.read(httpResponse.body().toString());
+            }
+
+            if (taskExecution.getBoolean(FULL_RESPONSE, false)) {
+                body = new HTTPResponseEntry(body, httpResponse.headers().map(), httpResponse.statusCode());
+            }
         }
 
-        return StringUtils.join(queryParameterList, "&");
+        return body;
     }
 
-    private URI resolveURI(String uri, List<HTTPQueryParam> queryParameters) {
-        if (queryParameters.isEmpty()) {
-            return URI.create(uri);
+    private URI createURI(String uriString, Map<String, List<String>> queryParams) {
+        URI uri;
+
+        if (queryParams.isEmpty()) {
+            uri = java.net.URI.create(uriString);
+        } else {
+            String queryParamsString = queryParams.entrySet().stream()
+                    .flatMap(entry -> entry.getValue().stream().map(value -> entry.getKey() + "=" + value))
+                    .collect(Collectors.joining("&"));
+
+            uri = java.net.URI.create(uriString + '?' + queryParamsString);
         }
 
-        return URI.create(uri + '?' + fromQueryParameters(queryParameters));
+        return uri;
     }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, List<String>> getNameValuesMap(TaskExecution taskExecution, String propertyKey) {
+        Map<String, List<String>> nameValuesMap = new HashMap<>();
+
+        if (taskExecution.containsKey(propertyKey)) {
+            List<Map<String, String>> properties = taskExecution.get(propertyKey, List.class);
+
+            for (Map<String, String> property : properties) {
+                nameValuesMap.compute(property.get(KEY), (key, values) -> {
+                    if (values == null) {
+                        values = new ArrayList<>();
+                    }
+
+                    values.add(property.get(VALUE));
+
+                    return values;
+                });
+            }
+        }
+
+        return nameValuesMap;
+    }
+
+    private static class UnauthorizedCertsX509ExtendedTrustManager extends X509ExtendedTrustManager {
+        public X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+
+        public void checkClientTrusted(final X509Certificate[] a_certificates, final String a_auth_type) {}
+
+        public void checkServerTrusted(final X509Certificate[] a_certificates, final String a_auth_type) {}
+
+        public void checkClientTrusted(
+                final X509Certificate[] a_certificates, final String a_auth_type, final Socket a_socket) {}
+
+        public void checkServerTrusted(
+                final X509Certificate[] a_certificates, final String a_auth_type, final Socket a_socket) {}
+
+        public void checkClientTrusted(
+                final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine) {}
+
+        public void checkServerTrusted(
+                final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine) {}
+    }
+
+    public record HTTPResponseEntry(Object body, Map<String, List<String>> headers, int statusCode) {}
 }

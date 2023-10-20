@@ -488,14 +488,14 @@ public class TaskDescriptorTest {
                 .displayName("displayName")
                 .description("description")
                 .subtitle("subtitle")
-                .auth()
+                .authEnricher()
                 .icon("icon")
                 .version(1);
 
         jsonAssertEquals(
                 """
             {
-                "auth":{options:[]},
+                "authEnricher":{options:[]},
                 "description":"description",
                 "displayName":"displayName",
                 "name":"name",
