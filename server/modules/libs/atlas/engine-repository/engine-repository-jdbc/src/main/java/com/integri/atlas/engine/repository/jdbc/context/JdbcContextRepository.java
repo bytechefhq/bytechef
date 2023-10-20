@@ -35,7 +35,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class JdbcContextRepository implements ContextRepository {
 
     private JdbcTemplate jdbc;
-    private JSONHelper jsonMapper;
+    private JSONHelper jsonHelper;
 
     @Override
     public void push(String aStackId, Context context) {
@@ -43,7 +43,7 @@ public class JdbcContextRepository implements ContextRepository {
             "insert into context (id,stack_id,serialized_context,create_time) values (?,?,?,?)",
             UUIDGenerator.generate(),
             aStackId,
-            jsonMapper.serialize(context),
+            jsonHelper.serialize(context),
             new Date()
         );
     }
@@ -62,14 +62,14 @@ public class JdbcContextRepository implements ContextRepository {
     @SuppressWarnings("unchecked")
     private Context contextRowMapper(ResultSet aResultSet, int aIndex) throws SQLException {
         String serialized = aResultSet.getString(2);
-        return new MapContext(jsonMapper.deserialize(serialized, Map.class));
+        return new MapContext(jsonHelper.deserialize(serialized, Map.class));
     }
 
     public void setJdbcTemplate(JdbcTemplate aJdbcTemplate) {
         jdbc = aJdbcTemplate;
     }
 
-    public void setJsonMapper(JSONHelper jsonMapper) {
-        this.jsonMapper = jsonMapper;
+    public void setJsonHelper(JSONHelper jsonHelper) {
+        this.jsonHelper = jsonHelper;
     }
 }
