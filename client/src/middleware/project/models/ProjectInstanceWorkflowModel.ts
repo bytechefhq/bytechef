@@ -13,18 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { ConnectionModel } from './ConnectionModel';
-import {
-    ConnectionModelFromJSON,
-    ConnectionModelFromJSONTyped,
-    ConnectionModelToJSON,
-} from './ConnectionModel';
 import type { ProjectInstanceBasicModel } from './ProjectInstanceBasicModel';
 import {
     ProjectInstanceBasicModelFromJSON,
     ProjectInstanceBasicModelFromJSONTyped,
     ProjectInstanceBasicModelToJSON,
 } from './ProjectInstanceBasicModel';
+import type { ProjectInstanceWorkflowConnectionModel } from './ProjectInstanceWorkflowConnectionModel';
+import {
+    ProjectInstanceWorkflowConnectionModelFromJSON,
+    ProjectInstanceWorkflowConnectionModelFromJSONTyped,
+    ProjectInstanceWorkflowConnectionModelToJSON,
+} from './ProjectInstanceWorkflowConnectionModel';
 
 /**
  * Contains configuration and connections required for the execution of a particular project workflow.
@@ -39,17 +39,11 @@ export interface ProjectInstanceWorkflowModel {
      */
     inputs?: { [key: string]: object; };
     /**
-     * The ids of connections used by a project instance.
-     * @type {Array<number>}
-     * @memberof ProjectInstanceWorkflowModel
-     */
-    connectionIds?: Array<number>;
-    /**
      * The connections used by a project instance.
-     * @type {Array<ConnectionModel>}
+     * @type {Array<ProjectInstanceWorkflowConnectionModel>}
      * @memberof ProjectInstanceWorkflowModel
      */
-    readonly connections?: Array<ConnectionModel>;
+    connections?: Array<ProjectInstanceWorkflowConnectionModel>;
     /**
      * The created by.
      * @type {string}
@@ -138,8 +132,7 @@ export function ProjectInstanceWorkflowModelFromJSONTyped(json: any, ignoreDiscr
     return {
         
         'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
-        'connectionIds': !exists(json, 'connectionIds') ? undefined : json['connectionIds'],
-        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(ConnectionModelFromJSON)),
+        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(ProjectInstanceWorkflowConnectionModelFromJSON)),
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'enabled': !exists(json, 'enabled') ? undefined : json['enabled'],
@@ -164,7 +157,7 @@ export function ProjectInstanceWorkflowModelToJSON(value?: ProjectInstanceWorkfl
     return {
         
         'inputs': value.inputs,
-        'connectionIds': value.connectionIds,
+        'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(ProjectInstanceWorkflowConnectionModelToJSON)),
         'enabled': value.enabled,
         'lastExecutionDate': value.lastExecutionDate === undefined ? undefined : (value.lastExecutionDate.toISOString()),
         'projectInstance': ProjectInstanceBasicModelToJSON(value.projectInstance),

@@ -7,7 +7,6 @@ apis/ProjectsApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts
-models/ConnectionModel.ts
 models/CreateProjectInstanceJob200ResponseModel.ts
 models/CreateProjectInstanceJobRequestModel.ts
 models/CreateProjectWorkflowRequestModel.ts
@@ -22,6 +21,7 @@ models/ProjectExecutionBasicModel.ts
 models/ProjectExecutionModel.ts
 models/ProjectInstanceBasicModel.ts
 models/ProjectInstanceModel.ts
+models/ProjectInstanceWorkflowConnectionModel.ts
 models/ProjectInstanceWorkflowModel.ts
 models/ProjectModel.ts
 models/TagModel.ts

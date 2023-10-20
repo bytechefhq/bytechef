@@ -1,7 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './CategoryModel';
-export * from './ConnectionModel';
 export * from './CreateProjectInstanceJob200ResponseModel';
 export * from './CreateProjectInstanceJobRequestModel';
 export * from './CreateProjectWorkflowRequestModel';
@@ -16,6 +15,7 @@ export * from './ProjectExecutionBasicModel';
 export * from './ProjectExecutionModel';
 export * from './ProjectInstanceBasicModel';
 export * from './ProjectInstanceModel';
+export * from './ProjectInstanceWorkflowConnectionModel';
 export * from './ProjectInstanceWorkflowModel';
 export * from './ProjectModel';
 export * from './TagModel';
