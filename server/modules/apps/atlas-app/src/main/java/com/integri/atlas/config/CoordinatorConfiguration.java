@@ -41,6 +41,8 @@ import com.integri.atlas.engine.coordinator.task.dispatcher.ControlTaskDispatche
 import com.integri.atlas.engine.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.dispatcher.EachTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.dispatcher.ForkTaskDispatcher;
+import com.integri.atlas.engine.coordinator.task.dispatcher.IfTaskDescriptor;
+import com.integri.atlas.engine.coordinator.task.dispatcher.IfTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.dispatcher.ParallelTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.dispatcher.SubflowTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.dispatcher.SwitchTaskDispatcher;
@@ -265,6 +267,24 @@ public class CoordinatorConfiguration {
             counterRepository,
             SpelTaskEvaluator.builder().environment(environment).build()
         );
+    }
+
+    @Bean
+    IfTaskDispatcher ifTaskDispatcher(TaskDispatcher taskDispatcher) {
+        IfTaskDispatcher dispatcher = new IfTaskDispatcher();
+
+        dispatcher.setContextRepository(contextRepository);
+        dispatcher.setCounterRepository(counterRepository);
+        dispatcher.setMessageBroker(messageBroker);
+        dispatcher.setTaskDispatcher(taskDispatcher);
+        dispatcher.setTaskExecutionRepository(taskExecutionRepo);
+
+        return dispatcher;
+    }
+
+    @Bean
+    IfTaskDescriptor ifTaskDescriptor() {
+        return new IfTaskDescriptor();
     }
 
     @Bean
