@@ -38,7 +38,6 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ivica Cardic
@@ -48,9 +47,9 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
     enum AuthorizationType {
         API_KEY((AuthorizationContext authorizationContext, Connection connection) -> {
-            if (ApiTokenLocation.valueOf(
-                StringUtils.upperCase(
-                    connection.getParameter(ADD_TO, ApiTokenLocation.HEADER.name()))) == ApiTokenLocation.HEADER) {
+            String addTo = connection.getParameter(ADD_TO, ApiTokenLocation.HEADER.name());
+
+            if (ApiTokenLocation.valueOf(addTo.toUpperCase()) == ApiTokenLocation.HEADER) {
                 authorizationContext.setHeaders(
                     Map.of(connection.getParameter(KEY, API_TOKEN), List.of(connection.getParameter(VALUE, ""))));
             } else {

@@ -75,7 +75,6 @@ import javax.lang.model.element.Modifier;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -162,6 +161,35 @@ public class RestComponentGenerator {
         writeComponentHandlerServiceFile();
     }
 
+    private String capitalize(final String str) {
+        final int strLen = str == null ? 0 : str.length();
+
+        if (strLen == 0) {
+            return str;
+        }
+
+        final int firstCodepoint = str.codePointAt(0);
+        final int newCodePoint = Character.toTitleCase(firstCodepoint);
+
+        if (firstCodepoint == newCodePoint) {
+            // already capitalized
+            return str;
+        }
+
+        final int[] newCodePoints = new int[strLen];
+        int outOffset = 0;
+        newCodePoints[outOffset++] = newCodePoint;
+
+        for (int inOffset = Character.charCount(firstCodepoint); inOffset < strLen;) {
+            final int codepoint = str.codePointAt(inOffset);
+
+            newCodePoints[outOffset++] = codepoint;
+            inOffset += Character.charCount(codepoint);
+        }
+
+        return new String(newCodePoints, 0, outOffset);
+    }
+
     @SuppressWarnings("rawtypes")
     private void checkComponentSchemaSources(Set<String> schemas) {
         Components components = openAPI.getComponents();
@@ -226,6 +254,32 @@ public class RestComponentGenerator {
         javaCompiler.run(null, null, null, javacOpts.toArray(new String[0]));
 
         return tempDirPath;
+    }
+
+    private String deleteWhitespace(final String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+
+        final int sz = str.length();
+        final char[] chs = new char[sz];
+
+        int count = 0;
+        for (int i = 0; i < sz; i++) {
+            if (!Character.isWhitespace(str.charAt(i))) {
+                chs[count++] = str.charAt(i);
+            }
+        }
+
+        if (count == sz) {
+            return str;
+        }
+
+        if (count == 0) {
+            return "";
+        }
+
+        return new String(chs, 0, count);
     }
 
     private Map<String, List<OperationItem>> filterOperationItemsMap(Map<String, List<OperationItem>> operationsMap) {
@@ -341,7 +395,7 @@ public class RestComponentGenerator {
                 String key = operationItemsEntry.getKey();
 
                 String prefix = Arrays.stream(key.split(" "))
-                    .map(StringUtils::capitalize)
+                    .map(this::capitalize)
                     .collect(Collectors.joining());
 
                 ClassName className = ClassName.get(getPackageName() + ".action", prefix + "Actions");
@@ -680,7 +734,7 @@ public class RestComponentGenerator {
                     .actions($L)
                 """,
             componentName,
-            StringUtils.capitalize(componentName),
+            capitalize(componentName),
             openAPI.getInfo()
                 .getDescription(),
             getActionsCodeBlock(componentHandlerDirPath, openAPI));
@@ -695,7 +749,7 @@ public class RestComponentGenerator {
     }
 
     private String getComponentHandlerClassName(String componentName) {
-        return StringUtils.capitalize(componentName) + "ComponentHandler";
+        return capitalize(componentName) + "ComponentHandler";
     }
 
     private CodeBlock getConnectionCodeBlock(OpenAPI openAPI) {
@@ -877,8 +931,8 @@ public class RestComponentGenerator {
     }
 
     private String getPackageName() {
-        return StringUtils.deleteWhitespace(basePackageName == null ? "" : basePackageName + ".")
-            + StringUtils.replaceChars(componentName, "-_", ".");
+        return deleteWhitespace(basePackageName == null ? "" : basePackageName + ".") +
+            replaceChars(componentName, "-_", ".");
     }
 
     private CodeBlock getParametersPropertiesCodeBlock(Operation operation, OpenAPI openAPI) {
@@ -1194,7 +1248,7 @@ public class RestComponentGenerator {
             }
 
             if (propertyName != null) {
-                builder.add(".label($S)", StringUtils.capitalize(propertyName));
+                builder.add(".label($S)", capitalize(propertyName));
             }
 
             if (propertyDescription != null) {
@@ -1210,9 +1264,9 @@ public class RestComponentGenerator {
 
                 for (Object item : enums) {
                     if (item instanceof String) {
-                        codeBlocks.add(CodeBlock.of("option($S, $S)", StringUtils.capitalize(item.toString()), item));
+                        codeBlocks.add(CodeBlock.of("option($S, $S)", capitalize(item.toString()), item));
                     } else {
-                        codeBlocks.add(CodeBlock.of("option($S, $L)", StringUtils.capitalize(item.toString()), item));
+                        codeBlocks.add(CodeBlock.of("option($S, $L)", capitalize(item.toString()), item));
                     }
                 }
 
@@ -1262,6 +1316,43 @@ public class RestComponentGenerator {
         }
 
         return openAPI;
+    }
+
+    private String replaceChars(final String str, final String searchChars, String replaceChars) {
+        if (str == null || str.isEmpty() || searchChars == null || searchChars.isEmpty()) {
+            return str;
+        }
+
+        if (replaceChars == null) {
+            replaceChars = "";
+        }
+
+        boolean modified = false;
+        final int replaceCharsLength = replaceChars.length();
+        final int strLength = str.length();
+
+        final StringBuilder buf = new StringBuilder(strLength);
+
+        for (int i = 0; i < strLength; i++) {
+            final char ch = str.charAt(i);
+            final int index = searchChars.indexOf(ch);
+
+            if (index >= 0) {
+                modified = true;
+
+                if (index < replaceCharsLength) {
+                    buf.append(replaceChars.charAt(index));
+                }
+            } else {
+                buf.append(ch);
+            }
+        }
+
+        if (modified) {
+            return buf.toString();
+        }
+
+        return str;
     }
 
     private RestComponentHandler runComponentHandlerClass(Path classPath, String className) throws Exception {

@@ -30,16 +30,19 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
+
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.PrintStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.PumpStreamHandler;
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+
+import org.zeroturnaround.exec.ProcessExecutor;
 
 /**
  * The Bash component executes arbitrary Bash scripts.
@@ -47,8 +50,6 @@ import org.slf4j.LoggerFactory;
  * @author Ivica Cardic
  */
 public class BashComponentHandler implements ComponentHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(BashComponentHandler.class);
 
     private ComponentDefinition componentDefinition = component(BASH)
         .display(display("Bash").description("Allows you to run arbitrary Bash scripts."))
@@ -69,41 +70,61 @@ public class BashComponentHandler implements ComponentHandler {
     protected String performExecute(Context context, ExecutionParameters executionParameters) {
         try {
             File scriptFile = File.createTempFile("_script", ".sh");
-            File logFile = File.createTempFile("log", null);
 
-            FileUtils.writeStringToFile(
-                scriptFile, executionParameters.getRequiredString(SCRIPT), StandardCharsets.UTF_8);
+            writeStringToFile(scriptFile, executionParameters.getRequiredString(SCRIPT));
 
-            try (PrintStream stream = new PrintStream(logFile, StandardCharsets.UTF_8)) {
+            try {
                 Runtime runtime = Runtime.getRuntime();
+
                 Process chmodProcess = runtime.exec(String.format("chmod u+x %s", scriptFile.getAbsolutePath()));
+
                 int chmodRetCode = chmodProcess.waitFor();
 
                 if (chmodRetCode != 0) {
-                    throw new ExecuteException("Failed to chmod", chmodRetCode);
+                    throw new ActionExecutionException("Failed to chmod %s".formatted(chmodRetCode));
                 }
 
-                CommandLine commandLine = new CommandLine(scriptFile.getAbsolutePath());
-
-                logger.debug("{}", commandLine);
-
-                DefaultExecutor executor = new DefaultExecutor();
-
-                executor.setStreamHandler(new PumpStreamHandler(stream));
-                executor.execute(commandLine);
-
-                return FileUtils.readFileToString(logFile, StandardCharsets.UTF_8);
-            } catch (ExecuteException e) {
-                throw new ExecuteException(
-                    e.getMessage(),
-                    e.getExitValue(),
-                    new RuntimeException(FileUtils.readFileToString(logFile, StandardCharsets.UTF_8)));
+                return new ProcessExecutor().command(scriptFile.getAbsolutePath())
+                    .readOutput(true)
+                    .execute()
+                    .outputUTF8();
             } finally {
-                FileUtils.deleteQuietly(logFile);
-                FileUtils.deleteQuietly(scriptFile);
+                deleteRecursively(scriptFile.toPath());
             }
         } catch (Exception exception) {
             throw new ActionExecutionException("Unable to handle task " + executionParameters, exception);
+        }
+    }
+
+    private boolean deleteRecursively(Path root) throws IOException {
+        if (root == null || !Files.exists(root)) {
+            return false;
+        }
+
+        Files.walkFileTree(root, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+        return true;
+    }
+
+    private void writeStringToFile(File file, String str) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
+            writer.write(str);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

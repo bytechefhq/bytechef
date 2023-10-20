@@ -2,7 +2,6 @@ dependencies {
     api project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api")
     api project(":server:libs:atlas:atlas-event:atlas-event-api")
 
-    implementation "org.apache.commons:commons-lang3"
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-beans"
     implementation "org.springframework:spring-core"

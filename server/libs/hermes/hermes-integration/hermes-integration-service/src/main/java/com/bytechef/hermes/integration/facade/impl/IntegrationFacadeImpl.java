@@ -25,7 +25,6 @@ import com.bytechef.hermes.integration.service.IntegrationService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,7 +57,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     public Integration create(
         String name, String description, String category, List<String> workflowIds, List<String> tagNames) {
 
-        if (CollectionUtils.isEmpty(workflowIds)) {
+        if (workflowIds == null || workflowIds.isEmpty()) {
             Workflow workflow = workflowService.create(null, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
             workflowIds = List.of(workflow.getId());
@@ -66,7 +65,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
         Set<Tag> tags = null;
 
-        if (!CollectionUtils.isEmpty(tagNames)) {
+        if (tagNames != null && !tagNames.isEmpty()) {
             tags = tagService.create(new HashSet<>(tagNames));
         }
 
@@ -104,7 +103,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     public Integration update(
         Long id, String name, String description, String category, List<String> workflowIds, List<String> tagNames) {
 
-        Set<Tag> tags = CollectionUtils.isEmpty(tagNames) ? null : tagService.create(new HashSet<>(tagNames));
+        Set<Tag> tags = tagNames == null || tagNames.isEmpty() ? null : tagService.create(new HashSet<>(tagNames));
 
         return integrationService.update(
             id, name, description, category, workflowIds == null ? null : new HashSet<>(workflowIds), tags);

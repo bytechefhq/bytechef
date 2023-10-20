@@ -21,7 +21,6 @@ import java.io.File;
 import java.util.concurrent.Callable;
 
 import com.bytechef.cli.command.component.ComponentCommand;
-import org.apache.commons.lang3.StringUtils;
 import picocli.CommandLine;
 
 /**
@@ -85,7 +84,7 @@ public class InitSubcommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        if (StringUtils.isNotEmpty(openApiPath)) {
+        if (openApiPath != null && !openApiPath.isEmpty()) {
             generateOpenAPIComponent();
         }
 

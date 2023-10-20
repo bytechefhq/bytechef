@@ -20,19 +20,21 @@ package com.bytechef.atlas.repository.workflow.mapper;
 import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.error.ExecutionError;
+import com.bytechef.commons.utils.ExceptionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import org.springframework.util.FileCopyUtils;
 
 /**
  * @author Matija Petanjek
@@ -61,7 +63,7 @@ public abstract class AbstractWorkflowMapper implements WorkflowMapper {
 
     private Map<String, Object> parse(Resource resource, ObjectMapper objectMapper) {
         try (InputStream in = resource.getInputStream()) {
-            String workflow = IOUtils.toString(in, StandardCharsets.UTF_8);
+            String workflow = FileCopyUtils.copyToString(new InputStreamReader(in, StandardCharsets.UTF_8));
             @SuppressWarnings("unchecked")
             Map<String, Object> workflowMap = objectMapper.readValue(workflow, Map.class);
 

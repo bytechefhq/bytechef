@@ -32,9 +32,9 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.FileSystemUtils;
 
 public class WorkerTest {
 
@@ -148,7 +148,8 @@ public class WorkerTest {
                 } else if ("mkdir".equals(type)) {
                     return t2 -> (new File(MapUtils.getString(t2.getParameters(), "path")).mkdirs());
                 } else if ("rm".equals(type)) {
-                    return t2 -> FileUtils.deleteQuietly((new File(MapUtils.getString(t2.getParameters(), "path"))));
+                    return t2 -> FileSystemUtils
+                        .deleteRecursively((new File(MapUtils.getString(t2.getParameters(), "path"))));
                 } else if ("pass".equals(type)) {
                     Assertions.assertTrue(new File(tempDir).exists());
                     return t2 -> null;
@@ -193,7 +194,8 @@ public class WorkerTest {
                 } else if ("mkdir".equals(type)) {
                     return t2 -> (new File(MapUtils.getString(t2.getParameters(), "path")).mkdirs());
                 } else if ("rm".equals(type)) {
-                    return t2 -> FileUtils.deleteQuietly((new File(MapUtils.getString(t2.getParameters(), "path"))));
+                    return t2 -> FileSystemUtils
+                        .deleteRecursively((new File(MapUtils.getString(t2.getParameters(), "path"))));
                 } else if ("rogue".equals(type)) {
                     Assertions.assertTrue(new File(tempDir).exists());
                     return t2 -> {

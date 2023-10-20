@@ -17,10 +17,15 @@
 
 package com.bytechef.hermes.file.storage.domain;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.io.FilenameUtils;
+import java.util.Optional;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.tika.Tika;
+import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -33,6 +38,11 @@ public class FileEntry {
     private final String url;
 
     public FileEntry(String name, String extension, String mimeType, String url) {
+        Assert.notNull(name, "'name' must not be null.");
+        Assert.notNull(extension, "'extension' must not be null.");
+        Assert.notNull(mimeType, "'mimeType' must not be null.");
+        Assert.notNull(url, "'url' must not be null.");
+
         this.extension = extension;
         this.mimeType = mimeType;
         this.name = name;
@@ -43,14 +53,25 @@ public class FileEntry {
         this(fileName, fileName);
     }
 
-    public FileEntry(String fileName, String url) {
-        this.extension = FilenameUtils.getExtension(fileName);
+    @SuppressFBWarnings("NP")
+    public FileEntry(String filename, String url) {
+        Assert.notNull(filename, "'filename' must not be null.");
+        Assert.notNull(url, "'url' must not be null.");
+
+        this.extension = Optional.of(filename)
+            .filter(f -> f.contains("."))
+            .map(f -> f.substring(filename.lastIndexOf(".") + 1))
+            .orElse("");
 
         Tika tika = new Tika();
 
-        this.mimeType = tika.detect(fileName);
+        this.mimeType = tika.detect(filename);
 
-        this.name = FilenameUtils.getName(fileName);
+        Path path = Paths.get(filename);
+
+        Path fileName = Objects.requireNonNull(path.getFileName());
+
+        this.name = fileName.toString();
         this.url = url;
     }
 

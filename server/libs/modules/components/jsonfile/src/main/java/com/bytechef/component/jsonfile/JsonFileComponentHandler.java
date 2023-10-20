@@ -61,7 +61,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ivica Cardic
@@ -233,6 +232,8 @@ public class JsonFileComponentHandler implements ComponentHandler {
     }
 
     private FileType getFileType(ExecutionParameters executionParameters) {
-        return FileType.valueOf(StringUtils.upperCase(executionParameters.getString(FILE_TYPE, FileType.JSON.name())));
+        String fileType = executionParameters.getString(FILE_TYPE, FileType.JSON.name());
+
+        return FileType.valueOf(fileType.toUpperCase());
     }
 }

@@ -1,15 +1,12 @@
 dependencies {
     api project(":server:libs:atlas:atlas-worker:atlas-worker-api")
 
-    implementation "org.apache.commons:commons-lang3"
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-context"
     implementation project(":server:libs:atlas:atlas-api")
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
+    implementation project(":server:libs:core:commons:commons-utils")
 
-    testImplementation libs.commons.io
-    testImplementation "org.apache.commons:commons-lang3"
     testImplementation "org.springframework:spring-jdbc"
     testImplementation "org.springframework.security:spring-security-core"
-    testImplementation project(":server:libs:core:commons:commons-utils")
 }

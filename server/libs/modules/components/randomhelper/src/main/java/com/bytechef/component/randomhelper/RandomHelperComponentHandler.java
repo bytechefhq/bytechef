@@ -31,12 +31,15 @@ import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import org.apache.commons.lang3.RandomUtils;
+
+import java.util.Random;
 
 /**
  * @author Ivica Cardic
  */
 public class RandomHelperComponentHandler implements ComponentHandler {
+
+    private static final Random RANDOM = new Random();
 
     private final ComponentDefinition componentDefinition = component(RANDOM_HELPER)
         .display(display("Random Helper").description("The Random Helper allows you to generate random values."))
@@ -69,7 +72,7 @@ public class RandomHelperComponentHandler implements ComponentHandler {
         int startInclusive = executionParameters.getInteger("startInclusive", 0);
         int endInclusive = executionParameters.getInteger("endInclusive", 100);
 
-        return RandomUtils.nextInt(startInclusive, endInclusive);
+        return nextInt(startInclusive, endInclusive);
     }
 
     /**
@@ -79,6 +82,38 @@ public class RandomHelperComponentHandler implements ComponentHandler {
         int startInclusive = executionParameters.getInteger("startInclusive", 0);
         int endInclusive = executionParameters.getInteger("endInclusive", 100);
 
-        return RandomUtils.nextFloat(startInclusive, endInclusive);
+        return nextFloat(startInclusive, endInclusive);
+    }
+
+    private float nextFloat(final float startInclusive, final float endExclusive) {
+        if (endExclusive < startInclusive) {
+            throw new IllegalArgumentException("Start value must be smaller or equal to end value.");
+        }
+
+        if (startInclusive < 0) {
+            throw new IllegalArgumentException("Both range values must be non-negative.");
+        }
+
+        if (startInclusive == endExclusive) {
+            return startInclusive;
+        }
+
+        return startInclusive + ((endExclusive - startInclusive) * RANDOM.nextFloat());
+    }
+
+    private int nextInt(final int startInclusive, final int endExclusive) {
+        if (endExclusive < startInclusive) {
+            throw new IllegalArgumentException("Start value must be smaller or equal to end value.");
+        }
+
+        if (startInclusive < 0) {
+            throw new IllegalArgumentException("Both range values must be non-negative.");
+        }
+
+        if (startInclusive == endExclusive) {
+            return startInclusive;
+        }
+
+        return startInclusive + RANDOM.nextInt(endExclusive - startInclusive);
     }
 }

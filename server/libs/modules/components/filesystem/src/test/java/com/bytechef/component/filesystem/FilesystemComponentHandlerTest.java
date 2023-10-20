@@ -32,8 +32,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -185,7 +185,9 @@ public class FilesystemComponentHandlerTest {
     @Test
     public void testCreateDir1() {
         ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
-        String tempDir = System.getProperty("java.io.tmpdir") + "/" + RandomStringUtils.randomAlphabetic(10);
+        String tempDir = System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID()
+            .toString()
+            .replace("-", "");
 
         Mockito.when(executionParameters.getRequiredString("path"))
             .thenReturn(tempDir);
