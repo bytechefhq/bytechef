@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.csvfile.v1_0;
+package com.bytechef.component.csv.file;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-import com.bytechef.atlas.Accessor;
+import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
-import com.bytechef.atlas.job.domain.Job;
-import com.bytechef.hermes.file.storage.dto.FileEntry;
-import com.bytechef.task.commons.file.storage.FileStorageHelper;
-import com.bytechef.test.json.JsonArrayUtils;
-import com.bytechef.test.task.BaseTaskIntTest;
+import com.bytechef.atlas.test.workflow.WorkflowExecutor;
+import com.bytechef.hermes.component.FileEntry;
+import com.bytechef.hermes.component.test.MockFileEntry;
+import com.bytechef.hermes.component.test.json.JsonArrayUtils;
+import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.util.Files;
+import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,25 +43,31 @@ import org.springframework.core.io.ClassPathResource;
  * @author Ivica Cardic
  */
 @SpringBootTest
-public class CSVFileTaskHandlerIntTest extends BaseTaskIntTest {
+public class CsvFileComponentHandlerIntTest {
 
     @Autowired
-    private FileStorageHelper fileStorageHelper;
+    private FileStorageService fileStorageService;
+
+    @Autowired
+    private WorkflowExecutor workflowExecutor;
 
     @Test
-    public void testRead() throws IOException {
+    public void testRead() throws IOException, JSONException {
         File sampleFile = getFile("sample_header.csv");
 
-        Job job = startJob(
-                "samples/v1_0/csvFile_READ.json",
+        Job job = workflowExecutor.execute(
+                "csv-file_v1_read",
                 Map.of(
                         "fileEntry",
-                        fileStorageHelper.storeFileContent(
-                                sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, Charset.defaultCharset()))));
+                        fileStorageService
+                                .storeFileContent(
+                                        sampleFile.getAbsolutePath(),
+                                        Files.contentOf(sampleFile, Charset.defaultCharset()))
+                                .toMap()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
-        Accessor outputs = job.getOutputs();
+        Map<String, Object> outputs = job.getOutputs();
 
         JSONAssert.assertEquals(
                 JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
@@ -69,26 +76,28 @@ public class CSVFileTaskHandlerIntTest extends BaseTaskIntTest {
     }
 
     @Test
-    public void testWrite() throws IOException {
-        Job job = startJob(
-                "samples/v1_0/csvFile_WRITE.json",
+    public void testWrite() throws IOException, JSONException {
+        Job job = workflowExecutor.execute(
+                "csv-file_v1_write",
                 Map.of(
                         "rows",
                         JsonArrayUtils.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
-        Accessor outputs = job.getOutputs();
+        Map<String, Object> outputs = job.getOutputs();
 
-        FileEntry fileEntry = outputs.get("writeCsvFile", FileEntry.class);
+        FileEntry fileEntry = new MockFileEntry(outputs, "writeCsvFile");
         File sampleFile = getFile("sample_header.csv");
 
-        job = startJob(
-                "samples/v1_0/csvFile_READ.json",
+        job = workflowExecutor.execute(
+                "csv-file_v1_read",
                 Map.of(
                         "fileEntry",
-                        fileStorageHelper.storeFileContent(
-                                sampleFile.getName(), Files.contentOf(sampleFile, Charset.defaultCharset()))));
+                        fileStorageService
+                                .storeFileContent(
+                                        sampleFile.getName(), Files.contentOf(sampleFile, Charset.defaultCharset()))
+                                .toMap()));
 
         outputs = job.getOutputs();
 

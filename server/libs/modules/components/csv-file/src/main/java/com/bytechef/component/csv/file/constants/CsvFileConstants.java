@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.csvfile;
+package com.bytechef.component.csv.file.constants;
 
 /**
  * @author Ivica Cardic
  */
-public class CSVFileTaskConstants {
+public class CsvFileConstants {
 
     public static final String ROWS = "rows";
     public static final String DELIMITER = "delimiter";
@@ -29,7 +29,6 @@ public class CSVFileTaskConstants {
     public static final String READ_AS_STRING = "readAsString";
     public static final String INCLUDE_EMPTY_CELLS = "includeEmptyCells";
     public static final String CSV_FILE = "csvFile";
-    public static final float VERSION = 1.0f;
     public static final String READ = "read";
     public static final String WRITE = "write";
 }
