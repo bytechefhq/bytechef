@@ -1,9 +1,0 @@
-dependencies {
-    api project(":server:libs:atlas:atlas-sync-executor")
-    api project(":server:libs:test-support")
-
-    implementation "org.springframework.boot:spring-boot-autoconfigure"
-    implementation "org.springframework.boot:spring-boot-test"
-    implementation project(":server:libs:atlas:atlas-repository:atlas-repository-impl")
-    implementation project(":server:libs:atlas:atlas-repository:atlas-repository-resource")
-}

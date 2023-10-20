@@ -1,0 +1,6 @@
+dependencies {
+    api libs.json
+
+    implementation "com.fasterxml.jackson.core:jackson-databind"
+    implementation "org.skyscreamer:jsonassert"
+}
