@@ -6,11 +6,14 @@ import {
     useReactTable,
 } from '@tanstack/react-table';
 import Badge from 'components/Badge/Badge';
-import {ExecutionModel, JobBasicModel} from 'middleware/helios/execution';
+import {
+    JobBasicModel,
+    WorkflowExecutionModel,
+} from 'middleware/helios/execution';
 import useWorkflowExecutionDetailsDialogStore from 'pages/automation/project/stores/useWorkflowExecutionDetailsDialogStore';
 
 const getDuration = (
-    info: CellContext<ExecutionModel, JobBasicModel | undefined>
+    info: CellContext<WorkflowExecutionModel, JobBasicModel | undefined>
 ) => {
     const infoValue = info.getValue();
 
@@ -22,7 +25,7 @@ const getDuration = (
     }
 };
 
-const columnHelper = createColumnHelper<ExecutionModel>();
+const columnHelper = createColumnHelper<WorkflowExecutionModel>();
 
 const columns = [
     columnHelper.accessor((row) => row.job, {
@@ -69,8 +72,8 @@ const columns = [
     }),
 ];
 
-const ExecutionsTable = ({data}: {data: ExecutionModel[]}) => {
-    const reactTable = useReactTable<ExecutionModel>({
+const ExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
+    const reactTable = useReactTable<WorkflowExecutionModel>({
         columns,
         data,
         getCoreRowModel: getCoreRowModel(),
