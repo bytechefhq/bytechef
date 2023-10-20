@@ -12,18 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */package com.integri.atlas.workflow.config;
+ *
+ * Modifications copyright (C) 2021 <your company/name>
+ */
+
+package com.integri.atlas.workflow.config;
 
 public class MessageBrokerProperties {
 
-  private String provider;
+    private String provider;
 
-  public String getProvider() {
-    return provider;
-  }
+    public String getProvider() {
+        return provider;
+    }
 
-  public void setProvider(String aProvider) {
-    provider = aProvider;
-  }
-
+    public void setProvider(String aProvider) {
+        provider = aProvider;
+    }
 }
