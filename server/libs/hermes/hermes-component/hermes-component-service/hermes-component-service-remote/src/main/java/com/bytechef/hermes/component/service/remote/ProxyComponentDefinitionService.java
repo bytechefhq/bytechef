@@ -21,11 +21,13 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.service.ComponentDefinitionService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -50,10 +52,12 @@ public class ProxyComponentDefinitionService implements ComponentDefinitionServi
         .build();
 
     private final DiscoveryClient discoveryClient;
+    private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI2")
-    public ProxyComponentDefinitionService(DiscoveryClient discoveryClient) {
+    public ProxyComponentDefinitionService(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
         this.discoveryClient = discoveryClient;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -103,7 +107,7 @@ public class ProxyComponentDefinitionService implements ComponentDefinitionServi
         for (ServiceInstance serviceInstance : serviceInstances) {
             Map<String, String> metadataMap = serviceInstance.getMetadata();
 
-            String[] componentNames = StringUtils.commaDelimitedListToStringArray(metadataMap.get("componentNames"));
+            List<String> componentNames = getComponentNames(metadataMap);
 
             for (String curComponentName : componentNames) {
                 if (curComponentName.equalsIgnoreCase(componentName)) {
@@ -113,6 +117,20 @@ public class ProxyComponentDefinitionService implements ComponentDefinitionServi
         }
 
         throw new IllegalStateException("None od worker instances contains component %s ".formatted(componentName));
+    }
+
+    private List<String> getComponentNames(Map<String, String> metadataMap) {
+        List<Map<String, Object>> components;
+
+        try {
+            components = objectMapper.readValue(metadataMap.get("components"), new TypeReference<>() {});
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        return components.stream()
+            .map(component -> (String) component.get("name"))
+            .toList();
     }
 
     private Set<ServiceInstance> filterServiceInstances(List<ServiceInstance> serviceInstances) {
@@ -133,7 +151,7 @@ public class ProxyComponentDefinitionService implements ComponentDefinitionServi
         for (ServiceInstance serviceInstance : serviceInstances) {
             Map<String, String> metadataMap = serviceInstance.getMetadata();
 
-            String[] componentNames = StringUtils.commaDelimitedListToStringArray(metadataMap.get("componentNames"));
+            List<String> componentNames = getComponentNames(metadataMap);
 
             for (String componentName : componentNames) {
                 componentNameInstanceIds.compute(componentName, (key, instanceIds) -> {
