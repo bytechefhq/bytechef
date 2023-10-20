@@ -18,8 +18,8 @@
 package com.bytechef.atlas.job.repository.jdbc.config;
 
 import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
+import com.bytechef.test.config.jdbc.JdbcRepositoriesIntTestConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Optional;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -27,10 +27,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.auditing.CurrentDateTimeProvider;
-import org.springframework.data.auditing.DateTimeProvider;
-import org.springframework.data.domain.AuditorAware;
-import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
@@ -57,19 +53,7 @@ public class WorkflowRepositoryIntTestConfiguration {
     public static class CacheConfiguration {
     }
 
-    @EnableJdbcAuditing
     @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.repository.jdbc")
-    @TestConfiguration
-    public static class JdbcRepositoriesConfiguration {
-
-        @Bean
-        AuditorAware<String> auditorProvider() {
-            return () -> Optional.of("system");
-        }
-
-        @Bean
-        public DateTimeProvider auditingDateTimeProvider() {
-            return CurrentDateTimeProvider.INSTANCE;
-        }
+    public static class WorkflowJdbcRepositoriesIntTestConfiguration extends JdbcRepositoriesIntTestConfiguration {
     }
 }
