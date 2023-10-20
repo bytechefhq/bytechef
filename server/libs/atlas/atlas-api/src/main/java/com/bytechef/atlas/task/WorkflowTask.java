@@ -38,7 +38,7 @@ import org.springframework.util.Assert;
  * @author Ivica Cardic
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class WorkflowTask {
+public class WorkflowTask implements Task {
 
     static {
         MapValueUtils.addConverter(new WorkflowTaskConverter());
