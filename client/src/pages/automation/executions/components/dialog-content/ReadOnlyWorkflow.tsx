@@ -3,15 +3,15 @@ import Button from 'components/Button/Button';
 import {WorkflowExecutionModel} from 'middleware/automation/project';
 
 const ReadOnlyWorkflow = ({
-    execution,
-    setExecutionDetailsDialogOpen,
+    workflowExecution,
+    setWorkflowExecutionDetailsDialogOpen,
 }: {
-    execution: WorkflowExecutionModel;
-    setExecutionDetailsDialogOpen: (
-        executionDetailsDialogOpen: boolean
+    workflowExecution: WorkflowExecutionModel;
+    setWorkflowExecutionDetailsDialogOpen: (
+        workflowExecutionDetailsDialogOpen: boolean
     ) => void;
 }) => {
-    const {instance, project, workflow} = execution;
+    const {instance, project, workflow} = workflowExecution;
 
     return (
         <div className="flex w-full justify-between bg-gray-100 p-4">
@@ -42,7 +42,7 @@ const ReadOnlyWorkflow = ({
                             aria-hidden="true"
                         />
                     }
-                    onClick={() => setExecutionDetailsDialogOpen(false)}
+                    onClick={() => setWorkflowExecutionDetailsDialogOpen(false)}
                 />
             </div>
         </div>

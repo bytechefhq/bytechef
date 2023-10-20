@@ -24,7 +24,7 @@ import {useState} from 'react';
 import {OnChangeValue} from 'react-select';
 import {twMerge} from 'tailwind-merge';
 
-import useExecutionDetailsDialogStore from '../project/stores/useExecutionDetailsDialogStore';
+import useWorkflowExecutionDetailsDialogStore from '../project/stores/useWorkflowExecutionDetailsDialogStore';
 import ExecutionDetailsDialog from './components/ExecutionDetailsDialog';
 import ExecutionsTable from './components/ExecutionsTable';
 
@@ -89,7 +89,8 @@ export const Executions = () => {
 
     const {data: workflows, error: workflowsError} = useGetWorkflowsQuery();
 
-    const {executionDetailsDialogOpen} = useExecutionDetailsDialogStore();
+    const {workflowExecutionDetailsDialogOpen} =
+        useWorkflowExecutionDetailsDialogStore();
 
     const emptyListMessage =
         !filterStatus &&
@@ -275,7 +276,9 @@ export const Executions = () => {
                         </div>
                     )}
 
-                {executionDetailsDialogOpen && <ExecutionDetailsDialog />}
+                {workflowExecutionDetailsDialogOpen && (
+                    <ExecutionDetailsDialog />
+                )}
             </LayoutContainer>
         </PageLoader>
     );

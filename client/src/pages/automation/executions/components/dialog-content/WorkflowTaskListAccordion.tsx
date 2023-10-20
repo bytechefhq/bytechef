@@ -24,13 +24,13 @@ const WorkflowTaskListAccordion = ({
         defaultValue={taskExecutions[0].id || ''}
     >
         {taskExecutions.map((taskExecution) => {
-            const {id, input, lastModifiedDate, output, workflowTask} =
+            const {id, input, startDate, endDate, output, workflowTask} =
                 taskExecution;
 
             return (
                 workflowTask?.label && (
                     <AccordionItem key={id} value={id || ''}>
-                        <AccordionTrigger className="mb-0.5 flex w-full items-center justify-between border-b border-gray-100 bg-gray-100 p-2">
+                        <AccordionTrigger className="flex w-full items-center justify-between border-b border-gray-100 bg-white px-2 py-3">
                             <div className="flex items-center text-sm">
                                 {taskExecution?.component?.icon && (
                                     <InlineSVG
@@ -39,17 +39,23 @@ const WorkflowTaskListAccordion = ({
                                     />
                                 )}
 
-                                {workflowTask?.name}
+                                {workflowTask?.name || workflowTask?.type}
                             </div>
 
-                            <div className="flex">
-                                <span className="ml-auto mr-2 text-sm">
-                                    {lastModifiedDate?.getDate()}s
-                                </span>
+                            <div className="flex items-center">
+                                {startDate && endDate && (
+                                    <span className="ml-auto mr-2 text-xs">
+                                        {Math.round(
+                                            endDate?.getTime() -
+                                                startDate.getTime()
+                                        )}
+                                        ms
+                                    </span>
+                                )}
 
                                 <CheckCircleIcon
                                     className={twMerge(
-                                        'mr-3 h-5 w-5',
+                                        'h-5 w-5',
                                         allTasksCompleted
                                             ? 'text-green-500'
                                             : 'text-red-500'
@@ -66,7 +72,7 @@ const WorkflowTaskListAccordion = ({
                                     </span>
 
                                     <span className="text-xs">
-                                        {lastModifiedDate?.toLocaleString()}
+                                        {startDate?.toLocaleString()}
                                     </span>
                                 </header>
 
@@ -87,7 +93,7 @@ const WorkflowTaskListAccordion = ({
                                     </span>
 
                                     <span className="text-xs">
-                                        {lastModifiedDate?.toLocaleString()}
+                                        {endDate?.toLocaleString()}
                                     </span>
                                 </header>
 

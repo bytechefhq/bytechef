@@ -10,7 +10,7 @@ import {
     JobBasicModel,
     WorkflowExecutionModel,
 } from 'middleware/automation/project';
-import useExecutionDetailsDialogStore from 'pages/automation/project/stores/useExecutionDetailsDialogStore';
+import useWorkflowExecutionDetailsDialogStore from 'pages/automation/project/stores/useWorkflowExecutionDetailsDialogStore';
 
 const getDuration = (
     info: CellContext<WorkflowExecutionModel, JobBasicModel | undefined>
@@ -21,7 +21,7 @@ const getDuration = (
     const endDate = infoValue?.endDate?.getTime();
 
     if (startDate && endDate) {
-        return `${Math.round((endDate - startDate) / 1000)}s`;
+        return `${Math.round(endDate - startDate)}ms`;
     }
 };
 
@@ -63,7 +63,7 @@ const columns = [
         header: 'Execution date',
         cell: (info) => (
             <>
-                {info.getValue()?.endDate &&
+                {info.getValue()?.startDate &&
                     `${info.getValue()?.startDate?.toLocaleDateString()} ${info
                         .getValue()
                         ?.startDate?.toLocaleTimeString()}`}
@@ -79,17 +79,17 @@ const ExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
         getCoreRowModel: getCoreRowModel(),
     });
 
-    const {setCurrentExecutionId, setExecutionDetailsDialogOpen} =
-        useExecutionDetailsDialogStore();
+    const {setWorkflowExecutionId, setWorkflowExecutionDetailsDialogOpen} =
+        useWorkflowExecutionDetailsDialogStore();
 
     const headerGroups = reactTable.getHeaderGroups();
     const rows = reactTable.getRowModel().rows;
 
     const handleRowClick = (index: number) => {
         if (data[index].id) {
-            setCurrentExecutionId(data[index].id!);
+            setWorkflowExecutionId(data[index].id!);
 
-            setExecutionDetailsDialogOpen(true);
+            setWorkflowExecutionDetailsDialogOpen(true);
         }
     };
 
