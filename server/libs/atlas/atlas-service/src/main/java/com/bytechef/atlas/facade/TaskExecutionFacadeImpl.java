@@ -19,7 +19,6 @@ package com.bytechef.atlas.facade;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.dto.TaskExecutionDTO;
-import com.bytechef.atlas.facade.TaskExecutionFacade;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

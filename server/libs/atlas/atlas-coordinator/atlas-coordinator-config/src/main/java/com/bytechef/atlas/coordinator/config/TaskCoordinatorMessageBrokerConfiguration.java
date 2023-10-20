@@ -21,7 +21,6 @@ import com.bytechef.atlas.coordinator.TaskCoordinator;
 import com.bytechef.atlas.coordinator.config.TaskCoordinatorProperties.TaskCoordinatorSubscriptions;
 import com.bytechef.atlas.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
-import com.bytechef.autoconfigure.annotation.ConditionalOnCoordinator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +30,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnCoordinator
+
 public class TaskCoordinatorMessageBrokerConfiguration {
 
     private final ApplicationContext applicationContext;

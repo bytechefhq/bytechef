@@ -29,7 +29,6 @@ import com.bytechef.hermes.workflow.web.rest.model.CreateJob200ResponseModel;
 import com.bytechef.hermes.workflow.web.rest.model.JobModel;
 import com.bytechef.hermes.workflow.web.rest.model.JobParametersModel;
 import com.bytechef.hermes.workflow.web.rest.model.TaskExecutionModel;
-import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
@@ -46,7 +45,7 @@ import reactor.core.publisher.Mono;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnApi
+
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 public class JobController implements JobsApi {
 

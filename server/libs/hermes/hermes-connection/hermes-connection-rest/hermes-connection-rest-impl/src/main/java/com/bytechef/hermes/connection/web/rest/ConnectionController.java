@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.connection.web.rest;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.facade.ConnectionFacade;
@@ -42,7 +41,7 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnApi
+
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 public class ConnectionController implements ConnectionsApi {
 

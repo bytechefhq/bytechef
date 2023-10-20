@@ -17,7 +17,6 @@
 
 package com.bytechef.helios.project.web.rest;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.helios.project.dto.ProjectInstanceDTO;
 import com.bytechef.helios.project.facade.ProjectInstanceFacade;
 import com.bytechef.helios.project.web.rest.model.CreateProjectInstanceJob200ResponseModel;
@@ -41,7 +40,7 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnApi
+
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 public class ProjectInstanceController implements ProjectInstancesApi {
 

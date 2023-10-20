@@ -44,7 +44,6 @@ import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.autoconfigure.annotation.ConditionalOnCoordinator;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -59,7 +58,7 @@ import org.springframework.context.annotation.Primary;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnCoordinator
+
 @EnableConfigurationProperties(TaskCoordinatorProperties.class)
 public class TaskCoordinatorConfiguration {
 

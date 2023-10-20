@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.webhook.web.rest;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,7 +28,7 @@ import reactor.core.publisher.Mono;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnApi
+
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 public class WebhookController {
 

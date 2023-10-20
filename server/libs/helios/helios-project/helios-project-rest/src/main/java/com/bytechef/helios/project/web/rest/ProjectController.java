@@ -18,7 +18,6 @@
 package com.bytechef.helios.project.web.rest;
 
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
-import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.helios.project.web.rest.model.CreateProjectWorkflowRequestModel;
 import com.bytechef.helios.project.web.rest.model.ProjectModel;
 import com.bytechef.helios.project.web.rest.model.UpdateTagsRequestModel;
@@ -41,7 +40,7 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnApi
+
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 public class ProjectController implements ProjectsApi {
 

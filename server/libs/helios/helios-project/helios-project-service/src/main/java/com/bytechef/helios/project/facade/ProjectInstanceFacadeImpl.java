@@ -22,7 +22,6 @@ import com.bytechef.helios.project.domain.Project;
 import com.bytechef.helios.project.domain.ProjectInstance;
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.project.dto.ProjectInstanceDTO;
-import com.bytechef.helios.project.facade.ProjectInstanceFacade;
 import com.bytechef.helios.project.job.ProjectInstanceJobFactory;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;

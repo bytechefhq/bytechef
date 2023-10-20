@@ -29,7 +29,6 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerAccessor;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
-import com.bytechef.autoconfigure.annotation.ConditionalOnWorker;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +44,7 @@ import org.springframework.context.annotation.Primary;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnWorker
+
 @EnableConfigurationProperties(TaskWorkerProperties.class)
 public class TaskWorkerConfiguration {
 

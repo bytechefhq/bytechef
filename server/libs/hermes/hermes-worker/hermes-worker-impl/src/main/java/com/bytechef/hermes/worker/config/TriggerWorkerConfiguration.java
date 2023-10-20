@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.worker.config;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnWorker;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.worker.TriggerWorker;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
@@ -34,7 +33,7 @@ import java.util.concurrent.Executors;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnWorker
+
 public class TriggerWorkerConfiguration {
 
     @Bean

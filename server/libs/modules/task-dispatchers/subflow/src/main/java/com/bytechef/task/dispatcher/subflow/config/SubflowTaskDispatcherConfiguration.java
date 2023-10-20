@@ -22,7 +22,6 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.autoconfigure.annotation.ConditionalOnCoordinator;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.SubflowJobStatusEventListener;
 import org.springframework.context.annotation.Bean;
@@ -40,7 +39,7 @@ public class SubflowTaskDispatcherConfiguration {
     }
 
     @Configuration
-    @ConditionalOnCoordinator
+
     public static class SubflowJobStatusEventListenerConfiguration {
 
         @Bean

@@ -17,7 +17,6 @@
 
 package com.bytechef.category.web.rest;
 
-import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.category.web.rest.model.CategoryModel;
@@ -34,7 +33,7 @@ import reactor.core.publisher.Mono;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnApi
+
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 public class CategoryController implements CategoriesApi {
 

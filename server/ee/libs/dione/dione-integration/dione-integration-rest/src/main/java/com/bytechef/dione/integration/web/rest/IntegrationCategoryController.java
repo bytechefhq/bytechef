@@ -33,7 +33,7 @@ import reactor.core.publisher.Mono;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnApi
+
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 public class IntegrationCategoryController implements IntegrationCategoriesApi {
 

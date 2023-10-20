@@ -20,7 +20,6 @@ package com.bytechef.hermes.worker.config;
 import com.bytechef.hermes.worker.TriggerWorker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
-import com.bytechef.autoconfigure.annotation.ConditionalOnWorker;
 import com.bytechef.hermes.message.broker.TriggerMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.ApplicationContext;
@@ -31,7 +30,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnWorker
+
 public class TriggerWorkerMessageBrokerConfiguration {
 
     private final ApplicationContext applicationContext;
