@@ -6,6 +6,7 @@ src/main/java/com/bytechef/hermes/definition/registry/web/rest/ConnectionDefinit
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/TaskDispatcherDefinitionsApi.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ActionDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ActionDefinitionModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/AnyPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ArrayPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ArrayPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/AuthorizationModel.java
@@ -32,8 +33,6 @@ src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/NumberPrope
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OAuth2AuthorizationParametersModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ObjectPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ObjectPropertyModel.java
-src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OneOfPropertyAllOfModel.java
-src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OneOfPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OptionModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/OptionsDataSourceModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/PropertiesDataSourceModel.java

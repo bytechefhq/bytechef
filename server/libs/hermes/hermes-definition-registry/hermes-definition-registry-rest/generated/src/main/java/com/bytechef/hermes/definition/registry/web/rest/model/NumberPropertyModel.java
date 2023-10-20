@@ -2,11 +2,10 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.ControlTypeModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.OptionModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.OptionsDataSourceModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyTypeModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ValuePropertyModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -32,8 +31,8 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "NumberProperty", description = "A number property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-16T21:36:57.501651+02:00[Europe/Zagreb]")
-public class NumberPropertyModel extends ValuePropertyModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-23T16:33:56.395888+02:00[Europe/Zagreb]")
+public class NumberPropertyModel extends PropertyModel {
 
   private Integer maxValue;
 
@@ -152,21 +151,6 @@ public class NumberPropertyModel extends ValuePropertyModel {
 
   public void setOptionsDataSource(OptionsDataSourceModel optionsDataSource) {
     this.optionsDataSource = optionsDataSource;
-  }
-
-  public NumberPropertyModel controlType(ControlTypeModel controlType) {
-    super.setControlType(controlType);
-    return this;
-  }
-
-  public NumberPropertyModel defaultValue(Object defaultValue) {
-    super.setDefaultValue(defaultValue);
-    return this;
-  }
-
-  public NumberPropertyModel exampleValue(Object exampleValue) {
-    super.setExampleValue(exampleValue);
-    return this;
   }
 
   public NumberPropertyModel advancedOption(Boolean advancedOption) {
