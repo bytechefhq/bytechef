@@ -62,18 +62,14 @@ public interface TriggerDefinition {
     }
 
     /**
+     * TODO
      *
      * @return
      */
     Optional<Boolean> getBatch();
 
     /**
-     *
-     * @return
-     */
-    String getComponentName();
-
-    /**
+     * TODO
      *
      * @return
      */
@@ -86,6 +82,7 @@ public interface TriggerDefinition {
     String getDescription();
 
     /**
+     * TODO
      *
      * @return
      */
@@ -202,12 +199,14 @@ public interface TriggerDefinition {
     Optional<WebhookValidateFunction> getWebhookValidate();
 
     /**
+     * TODO
      *
      * @return
      */
     Optional<Boolean> getWebhookBodyRaw();
 
     /**
+     * TODO
      *
      * @return
      */

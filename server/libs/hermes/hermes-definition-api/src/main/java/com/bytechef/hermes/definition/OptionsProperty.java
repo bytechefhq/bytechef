@@ -25,7 +25,15 @@ import java.util.Optional;
  */
 public interface OptionsProperty {
 
+    /**
+     *
+     * @return
+     */
     Optional<List<Option<?>>> getOptions();
 
+    /**
+     *
+     * @return
+     */
     Optional<OptionsDataSource> getOptionsDataSource();
 }

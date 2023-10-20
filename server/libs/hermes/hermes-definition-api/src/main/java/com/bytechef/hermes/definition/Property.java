@@ -69,6 +69,9 @@ public sealed interface Property<P extends Property<P>>
     permits ModifiableProperty, Property.DynamicPropertiesProperty, Property.NullProperty, Property.OneOfProperty,
     Property.ValueProperty {
 
+    /**
+     *
+     */
     enum ControlType {
         CHECKBOX,
         CODE_EDITOR,
@@ -89,6 +92,9 @@ public sealed interface Property<P extends Property<P>>
         TIME,
     }
 
+    /**
+     *
+     */
     enum Type {
         ARRAY,
         BOOLEAN,
@@ -105,26 +111,59 @@ public sealed interface Property<P extends Property<P>>
 
     Object accept(PropertyVisitor propertyVisitor);
 
+    /**
+     *
+     */
     Optional<Boolean> getAdvancedOption();
 
+    /**
+     *
+     */
     Optional<String> getDescription();
 
+    /**
+     *
+     */
     Optional<String> getDisplayCondition();
 
+    /**
+     *
+     */
     Optional<Boolean> getExpressionDisabled();
 
+    /**
+     *
+     */
     Optional<Boolean> getHidden();
 
+    /**
+     *
+     */
     Optional<String> getLabel();
 
+    /**
+     *
+     */
     Map<String, Object> getMetadata();
 
+    /**
+     *
+     */
     String getName();
 
+    /**
+     *
+     */
     Optional<String> getPlaceholder();
 
+    /**
+     *
+     */
     Optional<Boolean> getRequired();
 
+    /**
+     *
+     */
     Type getType();
 
     interface PropertyVisitor {
@@ -153,141 +192,284 @@ public sealed interface Property<P extends Property<P>>
         Object visit(TimeProperty timeProperty);
     }
 
+    /**
+     *
+     */
     @JsonDeserialize(as = ModifiableDynamicPropertiesProperty.class)
     sealed interface DynamicPropertiesProperty
         extends Property<DynamicPropertiesProperty> permits ModifiableDynamicPropertiesProperty {
 
-        PropertiesDataSource getPropertiesDataSource();
+        /**
+         *
+         */
+        DynamicPropertiesDataSource getDynamicPropertiesDataSource();
     }
 
+    /**
+     *
+     */
     @JsonDeserialize(as = DefinitionDSL.ModifiableProperty.ModifiableOneOfProperty.class)
     sealed interface OneOfProperty
         extends Property<OneOfProperty> permits ModifiableOneOfProperty {
 
+        /**
+         *
+         */
         List<? extends Property<?>> getTypes();
     }
 
+    /**
+     *
+     */
     @JsonDeserialize(as = ModifiableValueProperty.class)
     sealed interface ValueProperty<V, P extends ValueProperty<V, P>> extends
         Property<P> permits ArrayProperty, BooleanProperty, DateProperty, DateTimeProperty, IntegerProperty,
         NumberProperty, ObjectProperty, StringProperty, TimeProperty, ModifiableValueProperty {
 
+        /**
+         *
+         */
         ControlType getControlType();
 
+        /**
+         *
+         */
         Optional<V> getDefaultValue();
 
+        /**
+         *
+         */
         Optional<V> getExampleValue();
     }
 
+    /**
+     *
+     */
     @JsonDeserialize(as = ModifiableArrayProperty.class)
     sealed interface ArrayProperty
         extends ValueProperty<Object[], ArrayProperty>, OptionsProperty permits ModifiableArrayProperty {
 
+        /**
+         *
+         */
         List<Property<?>> getItems();
 
+        /**
+         *
+         */
         Optional<Boolean> getMultipleValues();
 
+        /**
+         *
+         */
         Optional<List<Option<?>>> getOptions();
 
+        /**
+         *
+         */
         Optional<OptionsDataSource> getOptionsDataSource();
     }
 
+    /**
+     *
+     */
     @JsonDeserialize(as = ModifiableBooleanProperty.class)
     sealed interface BooleanProperty extends
         ValueProperty<Boolean, BooleanProperty> permits ModifiableBooleanProperty {
     }
 
+    /**
+     *
+     */
     @JsonDeserialize(as = ModifiableDateProperty.class)
     sealed interface DateProperty
         extends ValueProperty<LocalDate, DateProperty> permits ModifiableDateProperty {
 
+        /**
+         *
+         */
         Optional<List<Option<?>>> getOptions();
 
+        /**
+         *
+         */
         OptionsDataSource getOptionsDataSource();
     }
 
+    /**
+     *
+     */
     @JsonDeserialize(as = ModifiableDateTimeProperty.class)
     sealed interface DateTimeProperty extends
         ValueProperty<LocalDateTime, DateTimeProperty> permits ModifiableDateTimeProperty {
 
+        /**
+         *
+         */
         Optional<List<Option<?>>> getOptions();
 
+        /**
+         *
+         */
         OptionsDataSource getOptionsDataSource();
     }
 
+    /**
+     *
+     */
     @JsonDeserialize(as = ModifiableIntegerProperty.class)
     sealed interface IntegerProperty extends
         ValueProperty<Integer, IntegerProperty>, OptionsProperty permits ModifiableIntegerProperty {
 
+        /**
+         *
+         */
         Optional<Integer> getMaxValue();
 
+        /**
+         *
+         */
         Optional<Integer> getMinValue();
 
+        /**
+         *
+         */
         Optional<List<Option<?>>> getOptions();
 
+        /**
+         *
+         */
         Optional<OptionsDataSource> getOptionsDataSource();
     }
 
+    /**
+     *
+     */
     @JsonDeserialize(as = ModifiableNullProperty.class)
     sealed interface NullProperty extends Property<NullProperty> permits ModifiableNullProperty {
-
     }
 
+    /**
+     *
+     */
     @JsonDeserialize(as = ModifiableNumberProperty.class)
     sealed interface NumberProperty
         extends ValueProperty<Double, NumberProperty>, OptionsProperty permits ModifiableNumberProperty {
 
+        /**
+         *
+         */
         Optional<Integer> getMaxValue();
 
+        /**
+         *
+         */
         Optional<Integer> getMinValue();
 
+        /**
+         *
+         */
         Optional<Integer> getNumberPrecision();
 
+        /**
+         *
+         */
         Optional<List<Option<?>>> getOptions();
 
+        /**
+         *
+         */
         Optional<OptionsDataSource> getOptionsDataSource();
     }
 
+    /**
+     *
+     */
     @JsonDeserialize(as = ModifiableObjectProperty.class)
     sealed interface ObjectProperty
         extends ValueProperty<Object, ObjectProperty>, OptionsProperty permits ModifiableObjectProperty {
 
+        /**
+         *
+         */
         Optional<List<? extends Property<?>>> getAdditionalProperties();
 
+        /**
+         *
+         */
         Optional<Boolean> getMultipleValues();
 
+        /**
+         *
+         */
         Optional<String> getObjectType();
 
+        /**
+         *
+         */
         Optional<List<Option<?>>> getOptions();
 
+        /**
+         *
+         */
         Optional<OptionsDataSource> getOptionsDataSource();
 
+        /**
+         *
+         */
         Optional<List<? extends Property<?>>> getProperties();
     }
 
+    /**
+     *
+     */
     @JsonDeserialize(as = ModifiableStringProperty.class)
     sealed interface StringProperty
         extends ValueProperty<String, StringProperty>, OptionsProperty permits ModifiableStringProperty {
 
+        /**
+         *
+         */
         enum SampleDataType {
             CSV, JSON, XML
         }
 
+        /**
+         *
+         */
         Optional<List<Option<?>>> getOptions();
 
+        /**
+         *
+         */
         Optional<OptionsDataSource> getOptionsDataSource();
 
+        /**
+         * TODO
+         */
         Optional<SampleDataType> getSampleDataType();
     }
 
+    /**
+     *
+     */
     @JsonDeserialize(as = ModifiableTimeProperty.class)
     sealed interface TimeProperty extends
         ValueProperty<LocalTime, TimeProperty> permits ModifiableTimeProperty {
 
+        /**
+         *
+         */
         int getHour();
 
+        /**
+         *
+         */
         int getMinute();
 
+        /**
+         *
+         */
         int getSecond();
     }
 }

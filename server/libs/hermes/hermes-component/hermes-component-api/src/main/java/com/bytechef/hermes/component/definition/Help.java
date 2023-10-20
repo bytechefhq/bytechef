@@ -20,6 +20,8 @@ package com.bytechef.hermes.component.definition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
+ * @author Ivica Cardic
+ *
  * @param body
  * @param learnMoreUrl
  */

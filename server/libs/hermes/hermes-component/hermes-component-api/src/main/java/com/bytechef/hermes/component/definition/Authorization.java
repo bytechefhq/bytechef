@@ -55,6 +55,9 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
     String USERNAME = "username";
     String VALUE = "value";
 
+    /**
+     *
+     */
     enum AuthorizationType {
         API_KEY((
             InputParameters connectionInputParameters, AuthorizationContext authorizationContext, String url,
@@ -146,49 +149,129 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
         }
     }
 
+    /**
+     *
+     */
     enum ApiTokenLocation {
         HEADER,
         QUERY_PARAMETERS,
     }
 
+    /**
+     *
+     */
     enum HttpVerb {
         DELETE, GET, PATCH, POST, PUT
     }
 
+    /**
+     * TODO
+     *
+     * @return
+     */
     Optional<AcquireFunction> getAcquire();
 
+    /**
+     *
+     * @return
+     */
     ApplyConsumer getApply();
 
+    /**
+     *
+     * @return
+     */
     AuthorizationCallbackFunction getAuthorizationCallback();
 
+    /**
+     *
+     * @return
+     */
     AuthorizationUrlFunction getAuthorizationUrl();
 
+    /**
+     *
+     * @return
+     */
     ClientIdFunction getClientId();
 
+    /**
+     *
+     * @return
+     */
     ClientSecretFunction getClientSecret();
 
+    /**
+     * TODO
+     *
+     * @return
+     */
     Optional<List<Object>> getDetectOn();
 
+    /**
+     *
+     * @return
+     */
     Optional<String> getDescription();
 
     String getName();
 
+    /**
+     * TODO
+     *
+     * @return
+     */
     PkceFunction getPkce();
 
+    /**
+     *
+     * @return
+     */
     List<? extends Property<?>> getProperties();
 
+    /**
+     * TODO
+     *
+     * @return
+     */
     Optional<RefreshFunction> getRefresh();
 
+    /**
+     * TODO
+     *
+     * @return
+     */
     Optional<List<Object>> getRefreshOn();
 
+    /**
+     * TODO
+     *
+     * @return
+     */
     RefreshUrlFunction getRefreshUrl();
 
+    /**
+     *
+     * @return
+     */
     ScopesFunction getScopes();
 
+    /**
+     *
+     * @return
+     */
     String getTitle();
 
+    /**
+     *
+     * @return
+     */
     TokenUrlFunction getTokenUrl();
 
+    /**
+     *
+     * @return
+     */
     AuthorizationType getType();
 
     /**

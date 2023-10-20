@@ -19,7 +19,7 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
-import com.bytechef.hermes.definition.PropertiesDataSource;
+import com.bytechef.hermes.definition.DynamicPropertiesDataSource;
 import com.bytechef.hermes.definition.Property;
 
 import java.util.List;
@@ -27,21 +27,21 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-public sealed interface ComponentPropertiesDataSource
-    extends PropertiesDataSource permits ComponentDSL.ModifiableComponentPropertiesDataSource {
+public sealed interface ComponentDynamicPropertiesDataSource
+    extends DynamicPropertiesDataSource permits ComponentDSL.ModifiableComponentDynamicPropertiesDataSource {
 
     /**
      * The function that returns a list of properties.
      *
      * @return The function implementation
      */
-    PropertiesFunction getProperties();
+    DynamicPropertiesFunction getDynamicProperties();
 
     /**
      *
      */
     @FunctionalInterface
-    interface PropertiesFunction {
+    interface DynamicPropertiesFunction {
 
         /**
          *

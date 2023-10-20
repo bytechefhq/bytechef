@@ -171,9 +171,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public List<ActionDefinitionDTO> getComponentActionDefinitions(
-        String componentName, int componentVersion) {
-
+    public List<ActionDefinitionDTO> getComponentActionDefinitions(String componentName, int componentVersion) {
         List<ActionDefinitionDTO> actionDefinitionDTOs =
             componentDefinitionRegistry.getActionDefinitions(componentName, componentVersion)
                 .stream()
@@ -195,14 +193,6 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     private ActionDefinitionDTO toActionDefinitionDTO(ActionDefinition actionDefinition) {
         List<? extends Property<?>> outputSchema = Collections.emptyList();
-
-        if (OptionalUtils.orElse(actionDefinition.getOutputSchemaProperty(), null) == null) {
-            outputSchema = OptionalUtils.orElse(actionDefinition.getOutputSchema(), Collections.emptyList());
-        } else {
-            // TODO
-            // Parse outputSchemaProperty and build new output schema definition.
-            // Use SampleDataType to parse sample. Default is JSON.
-        }
 
         return new ActionDefinitionDTO(
             OptionalUtils.orElse(actionDefinition.getBatch(), false), actionDefinition.getDescription(),
