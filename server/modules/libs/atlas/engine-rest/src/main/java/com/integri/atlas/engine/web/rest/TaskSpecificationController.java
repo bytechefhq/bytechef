@@ -31,15 +31,15 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ConditionalOnCoordinator
-public class TaskController {
+public class TaskSpecificationController {
 
     private final List<TaskDeclaration> taskDeclarations;
 
-    public TaskController(List<TaskDeclaration> taskDeclarations) {
+    public TaskSpecificationController(List<TaskDeclaration> taskDeclarations) {
         this.taskDeclarations = taskDeclarations;
     }
 
-    @GetMapping(value = "/tasks/{name}")
+    @GetMapping(value = "/task-specifications/{name}")
     public TaskSpecification getTaskSpecification(@PathVariable("name") String name) {
         return taskDeclarations
             .stream()
@@ -49,7 +49,7 @@ public class TaskController {
             .orElseThrow();
     }
 
-    @GetMapping(value = "/tasks")
+    @GetMapping(value = "/task-specifications")
     public List<TaskSpecification> getTaskSpecifications() {
         return taskDeclarations.stream().map(TaskDeclaration::getSpecification).collect(Collectors.toList());
     }
