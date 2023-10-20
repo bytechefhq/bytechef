@@ -20,9 +20,9 @@ models/ControlTypeModel.ts
 models/DatePropertyAllOfModel.ts
 models/DatePropertyModel.ts
 models/DateTimePropertyModel.ts
-models/DisplayModel.ts
 models/DynamicPropertiesPropertyAllOfModel.ts
 models/DynamicPropertiesPropertyModel.ts
+models/HelpModel.ts
 models/IntegerPropertyAllOfModel.ts
 models/IntegerPropertyModel.ts
 models/NullPropertyModel.ts

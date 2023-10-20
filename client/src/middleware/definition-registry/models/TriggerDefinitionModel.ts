@@ -13,24 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { DisplayModel } from './DisplayModel';
+import type { HelpModel } from './HelpModel';
 import {
-    DisplayModelFromJSON,
-    DisplayModelFromJSONTyped,
-    DisplayModelToJSON,
-} from './DisplayModel';
+    HelpModelFromJSON,
+    HelpModelFromJSONTyped,
+    HelpModelToJSON,
+} from './HelpModel';
 import type { PropertyModel } from './PropertyModel';
 import {
     PropertyModelFromJSON,
     PropertyModelFromJSONTyped,
     PropertyModelToJSON,
 } from './PropertyModel';
-import type { ResourcesModel } from './ResourcesModel';
-import {
-    ResourcesModelFromJSON,
-    ResourcesModelFromJSONTyped,
-    ResourcesModelToJSON,
-} from './ResourcesModel';
 import type { TriggerTypeModel } from './TriggerTypeModel';
 import {
     TriggerTypeModelFromJSON,
@@ -45,17 +39,23 @@ import {
  */
 export interface TriggerDefinitionModel {
     /**
-     * 
-     * @type {DisplayModel}
+     * The description.
+     * @type {string}
      * @memberof TriggerDefinitionModel
      */
-    display: DisplayModel;
+    description?: string;
     /**
      * The example value of the action's output.
      * @type {object}
      * @memberof TriggerDefinitionModel
      */
     exampleOutput?: object;
+    /**
+     * 
+     * @type {HelpModel}
+     * @memberof TriggerDefinitionModel
+     */
+    help?: HelpModel;
     /**
      * The action name.
      * @type {string}
@@ -75,11 +75,11 @@ export interface TriggerDefinitionModel {
      */
     properties?: Array<PropertyModel>;
     /**
-     * 
-     * @type {ResourcesModel}
+     * The title
+     * @type {string}
      * @memberof TriggerDefinitionModel
      */
-    resources?: ResourcesModel;
+    title?: string;
     /**
      * 
      * @type {TriggerTypeModel}
@@ -93,7 +93,6 @@ export interface TriggerDefinitionModel {
  */
 export function instanceOfTriggerDefinitionModel(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "display" in value;
     isInstance = isInstance && "name" in value;
     isInstance = isInstance && "type" in value;
 
@@ -110,12 +109,13 @@ export function TriggerDefinitionModelFromJSONTyped(json: any, ignoreDiscriminat
     }
     return {
         
-        'display': DisplayModelFromJSON(json['display']),
+        'description': !exists(json, 'description') ? undefined : json['description'],
         'exampleOutput': !exists(json, 'exampleOutput') ? undefined : json['exampleOutput'],
+        'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
         'outputSchema': !exists(json, 'outputSchema') ? undefined : ((json['outputSchema'] as Array<any>).map(PropertyModelFromJSON)),
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
-        'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
+        'title': !exists(json, 'title') ? undefined : json['title'],
         'type': TriggerTypeModelFromJSON(json['type']),
     };
 }
@@ -129,12 +129,13 @@ export function TriggerDefinitionModelToJSON(value?: TriggerDefinitionModel | nu
     }
     return {
         
-        'display': DisplayModelToJSON(value.display),
+        'description': value.description,
         'exampleOutput': value.exampleOutput,
+        'help': HelpModelToJSON(value.help),
         'name': value.name,
         'outputSchema': value.outputSchema === undefined ? undefined : ((value.outputSchema as Array<any>).map(PropertyModelToJSON)),
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
-        'resources': ResourcesModelToJSON(value.resources),
+        'title': value.title,
         'type': TriggerTypeModelToJSON(value.type),
     };
 }

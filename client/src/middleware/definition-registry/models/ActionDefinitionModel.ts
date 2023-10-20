@@ -13,24 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { DisplayModel } from './DisplayModel';
+import type { HelpModel } from './HelpModel';
 import {
-    DisplayModelFromJSON,
-    DisplayModelFromJSONTyped,
-    DisplayModelToJSON,
-} from './DisplayModel';
+    HelpModelFromJSON,
+    HelpModelFromJSONTyped,
+    HelpModelToJSON,
+} from './HelpModel';
 import type { PropertyModel } from './PropertyModel';
 import {
     PropertyModelFromJSON,
     PropertyModelFromJSONTyped,
     PropertyModelToJSON,
 } from './PropertyModel';
-import type { ResourcesModel } from './ResourcesModel';
-import {
-    ResourcesModelFromJSON,
-    ResourcesModelFromJSONTyped,
-    ResourcesModelToJSON,
-} from './ResourcesModel';
 
 /**
  * An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.
@@ -39,17 +33,23 @@ import {
  */
 export interface ActionDefinitionModel {
     /**
-     * 
-     * @type {DisplayModel}
+     * The description.
+     * @type {string}
      * @memberof ActionDefinitionModel
      */
-    display: DisplayModel;
+    description?: string;
     /**
      * The example value of the action's output.
      * @type {object}
      * @memberof ActionDefinitionModel
      */
     exampleOutput?: object;
+    /**
+     * 
+     * @type {HelpModel}
+     * @memberof ActionDefinitionModel
+     */
+    help?: HelpModel;
     /**
      * The action name.
      * @type {string}
@@ -69,11 +69,11 @@ export interface ActionDefinitionModel {
      */
     properties?: Array<PropertyModel>;
     /**
-     * 
-     * @type {ResourcesModel}
+     * The title
+     * @type {string}
      * @memberof ActionDefinitionModel
      */
-    resources?: ResourcesModel;
+    title?: string;
 }
 
 /**
@@ -81,7 +81,6 @@ export interface ActionDefinitionModel {
  */
 export function instanceOfActionDefinitionModel(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "display" in value;
     isInstance = isInstance && "name" in value;
 
     return isInstance;
@@ -97,12 +96,13 @@ export function ActionDefinitionModelFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
-        'display': DisplayModelFromJSON(json['display']),
+        'description': !exists(json, 'description') ? undefined : json['description'],
         'exampleOutput': !exists(json, 'exampleOutput') ? undefined : json['exampleOutput'],
+        'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
         'outputSchema': !exists(json, 'outputSchema') ? undefined : ((json['outputSchema'] as Array<any>).map(PropertyModelFromJSON)),
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
-        'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
+        'title': !exists(json, 'title') ? undefined : json['title'],
     };
 }
 
@@ -115,12 +115,13 @@ export function ActionDefinitionModelToJSON(value?: ActionDefinitionModel | null
     }
     return {
         
-        'display': DisplayModelToJSON(value.display),
+        'description': value.description,
         'exampleOutput': value.exampleOutput,
+        'help': HelpModelToJSON(value.help),
         'name': value.name,
         'outputSchema': value.outputSchema === undefined ? undefined : ((value.outputSchema as Array<any>).map(PropertyModelToJSON)),
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
-        'resources': ResourcesModelToJSON(value.resources),
+        'title': value.title,
     };
 }
 

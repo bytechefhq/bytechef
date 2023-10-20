@@ -13,12 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { DisplayModel } from './DisplayModel';
-import {
-    DisplayModelFromJSON,
-    DisplayModelFromJSONTyped,
-    DisplayModelToJSON,
-} from './DisplayModel';
 import type { ResourcesModel } from './ResourcesModel';
 import {
     ResourcesModelFromJSON,
@@ -33,11 +27,23 @@ import {
  */
 export interface ComponentDefinitionBasicModel {
     /**
-     * 
-     * @type {DisplayModel}
+     * The category.
+     * @type {string}
      * @memberof ComponentDefinitionBasicModel
      */
-    display: DisplayModel;
+    category?: string;
+    /**
+     * The description.
+     * @type {string}
+     * @memberof ComponentDefinitionBasicModel
+     */
+    description?: string;
+    /**
+     * The icon.
+     * @type {string}
+     * @memberof ComponentDefinitionBasicModel
+     */
+    icon?: string;
     /**
      * The name of a component.
      * @type {string}
@@ -50,6 +56,18 @@ export interface ComponentDefinitionBasicModel {
      * @memberof ComponentDefinitionBasicModel
      */
     resources?: ResourcesModel;
+    /**
+     * Tags for categorization.
+     * @type {Array<string>}
+     * @memberof ComponentDefinitionBasicModel
+     */
+    tags?: Array<string>;
+    /**
+     * The title
+     * @type {string}
+     * @memberof ComponentDefinitionBasicModel
+     */
+    title?: string;
 }
 
 /**
@@ -57,7 +75,6 @@ export interface ComponentDefinitionBasicModel {
  */
 export function instanceOfComponentDefinitionBasicModel(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "display" in value;
     isInstance = isInstance && "name" in value;
 
     return isInstance;
@@ -73,9 +90,13 @@ export function ComponentDefinitionBasicModelFromJSONTyped(json: any, ignoreDisc
     }
     return {
         
-        'display': DisplayModelFromJSON(json['display']),
+        'category': !exists(json, 'category') ? undefined : json['category'],
+        'description': !exists(json, 'description') ? undefined : json['description'],
+        'icon': !exists(json, 'icon') ? undefined : json['icon'],
         'name': json['name'],
         'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
+        'tags': !exists(json, 'tags') ? undefined : json['tags'],
+        'title': !exists(json, 'title') ? undefined : json['title'],
     };
 }
 
@@ -88,9 +109,13 @@ export function ComponentDefinitionBasicModelToJSON(value?: ComponentDefinitionB
     }
     return {
         
-        'display': DisplayModelToJSON(value.display),
+        'category': value.category,
+        'description': value.description,
+        'icon': value.icon,
         'name': value.name,
         'resources': ResourcesModelToJSON(value.resources),
+        'tags': value.tags,
+        'title': value.title,
     };
 }
 

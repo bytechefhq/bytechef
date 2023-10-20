@@ -13,12 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { DisplayModel } from './DisplayModel';
-import {
-    DisplayModelFromJSON,
-    DisplayModelFromJSONTyped,
-    DisplayModelToJSON,
-} from './DisplayModel';
 import type { ResourcesModel } from './ResourcesModel';
 import {
     ResourcesModelFromJSON,
@@ -33,11 +27,17 @@ import {
  */
 export interface TaskDispatcherDefinitionBasicModel {
     /**
-     * 
-     * @type {DisplayModel}
+     * The description.
+     * @type {string}
      * @memberof TaskDispatcherDefinitionBasicModel
      */
-    display: DisplayModel;
+    description?: string;
+    /**
+     * The icon.
+     * @type {string}
+     * @memberof TaskDispatcherDefinitionBasicModel
+     */
+    icon?: string;
     /**
      * The task dispatcher name..
      * @type {string}
@@ -50,6 +50,12 @@ export interface TaskDispatcherDefinitionBasicModel {
      * @memberof TaskDispatcherDefinitionBasicModel
      */
     resources?: ResourcesModel;
+    /**
+     * The title
+     * @type {string}
+     * @memberof TaskDispatcherDefinitionBasicModel
+     */
+    title?: string;
 }
 
 /**
@@ -57,7 +63,6 @@ export interface TaskDispatcherDefinitionBasicModel {
  */
 export function instanceOfTaskDispatcherDefinitionBasicModel(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "display" in value;
     isInstance = isInstance && "name" in value;
 
     return isInstance;
@@ -73,9 +78,11 @@ export function TaskDispatcherDefinitionBasicModelFromJSONTyped(json: any, ignor
     }
     return {
         
-        'display': DisplayModelFromJSON(json['display']),
+        'description': !exists(json, 'description') ? undefined : json['description'],
+        'icon': !exists(json, 'icon') ? undefined : json['icon'],
         'name': json['name'],
         'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
+        'title': !exists(json, 'title') ? undefined : json['title'],
     };
 }
 
@@ -88,9 +95,11 @@ export function TaskDispatcherDefinitionBasicModelToJSON(value?: TaskDispatcherD
     }
     return {
         
-        'display': DisplayModelToJSON(value.display),
+        'description': value.description,
+        'icon': value.icon,
         'name': value.name,
         'resources': ResourcesModelToJSON(value.resources),
+        'title': value.title,
     };
 }
 

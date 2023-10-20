@@ -19,12 +19,6 @@ import {
     AuthorizationTypeModelFromJSONTyped,
     AuthorizationTypeModelToJSON,
 } from './AuthorizationTypeModel';
-import type { DisplayModel } from './DisplayModel';
-import {
-    DisplayModelFromJSON,
-    DisplayModelFromJSONTyped,
-    DisplayModelToJSON,
-} from './DisplayModel';
 import type { PropertyModel } from './PropertyModel';
 import {
     PropertyModelFromJSON,
@@ -39,11 +33,11 @@ import {
  */
 export interface AuthorizationModel {
     /**
-     * 
-     * @type {DisplayModel}
+     * The description.
+     * @type {string}
      * @memberof AuthorizationModel
      */
-    display?: DisplayModel;
+    description?: string;
     /**
      * The authorization name.
      * @type {string}
@@ -56,6 +50,12 @@ export interface AuthorizationModel {
      * @memberof AuthorizationModel
      */
     properties?: Array<PropertyModel>;
+    /**
+     * The title
+     * @type {string}
+     * @memberof AuthorizationModel
+     */
+    title?: string;
     /**
      * 
      * @type {AuthorizationTypeModel}
@@ -83,9 +83,10 @@ export function AuthorizationModelFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'display': !exists(json, 'display') ? undefined : DisplayModelFromJSON(json['display']),
+        'description': !exists(json, 'description') ? undefined : json['description'],
         'name': !exists(json, 'name') ? undefined : json['name'],
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
+        'title': !exists(json, 'title') ? undefined : json['title'],
         'type': !exists(json, 'type') ? undefined : AuthorizationTypeModelFromJSON(json['type']),
     };
 }
@@ -99,9 +100,10 @@ export function AuthorizationModelToJSON(value?: AuthorizationModel | null): any
     }
     return {
         
-        'display': DisplayModelToJSON(value.display),
+        'description': value.description,
         'name': value.name,
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
+        'title': value.title,
         'type': AuthorizationTypeModelToJSON(value.type),
     };
 }
