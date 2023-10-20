@@ -56,7 +56,7 @@ import java.util.List;
  * @generated
  */
 public abstract class AbstractPipedriveComponentHandler implements RestComponentHandler {
-    private final ComponentDefinition componentDefinition = component("pipedrive")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("pipedrive")
         .display(
             display("Pipedrive")
                 .description(null))
@@ -109,6 +109,6 @@ public abstract class AbstractPipedriveComponentHandler implements RestComponent
 
     @Override
     public ComponentDefinition getDefinition() {
-        return componentDefinition;
+        return COMPONENT_DEFINITION;
     }
 }

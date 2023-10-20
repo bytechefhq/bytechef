@@ -30,7 +30,7 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
  * @generated
  */
 public abstract class AbstractShopifyComponentHandler implements RestComponentHandler {
-    private final ComponentDefinition componentDefinition = component("shopify")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("shopify")
         .display(
             display("Shopify")
                 .description("The REST Admin API lets you build apps and other integrations for the Shopify admin."))
@@ -38,6 +38,6 @@ public abstract class AbstractShopifyComponentHandler implements RestComponentHa
 
     @Override
     public ComponentDefinition getDefinition() {
-        return componentDefinition;
+        return COMPONENT_DEFINITION;
     }
 }
