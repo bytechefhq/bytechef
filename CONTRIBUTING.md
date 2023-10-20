@@ -60,7 +60,7 @@ This section explains how you can setup a development environment for ByteChef c
 
 ### Prerequisites
 
-- Node v16+
+- [Node v16+](https://nodejs.org/en/download/)
 - [Docker](https://docs.docker.com/get-docker/)
 
 ### Steps for setup
@@ -185,8 +185,8 @@ This section doesn't provide instructions to install Java and Gradle because the
 ### Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/)
-- Java - OpenJDK 17.
-- Gradle - V7.6+.
+- [Java - GraalVM V22.3+](https://www.graalvm.org/downloads/) 
+- Gradle - V7.6+. - Comes as part of the project as [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html)
 - A PostgreSQL database - Refer to the [Setting up local development infrastructure](#setting-up-local-development-infrastructure-using-docker).
 - A Redis instance - Refer to the [Setting up local development infrastructure](#setting-up-local-development-infrastructure-using-docker).
 
