@@ -16,7 +16,7 @@ const PageHeader: React.FC<{
             {right && <div>{right}</div>}
 
             {buttonLabel && buttonOnClick && (
-                <Button label={buttonLabel} onClick={buttonOnClick}></Button>
+                <Button label={buttonLabel} onClick={buttonOnClick} />
             )}
         </div>
     </div>
