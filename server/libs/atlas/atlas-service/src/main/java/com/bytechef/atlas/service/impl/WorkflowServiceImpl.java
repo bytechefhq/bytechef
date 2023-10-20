@@ -33,7 +33,6 @@ import java.util.stream.StreamSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.lang.NonNull;
@@ -57,8 +56,8 @@ public class WorkflowServiceImpl implements WorkflowService {
     private final List<WorkflowRepository> workflowRepositories;
 
     @SuppressFBWarnings("EI2")
-    public WorkflowServiceImpl(@Qualifier("workflowRepositoryCacheManager") CacheManager cacheManager,
-        List<WorkflowCrudRepository> workflowCrudRepositories,
+    public WorkflowServiceImpl(
+        CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
         List<WorkflowRepository> workflowRepositories) {
 
         this.cacheManager = cacheManager;
