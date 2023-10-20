@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ods.file;
+package com.bytechef.component.odsfile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
+import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
-import com.bytechef.atlas.test.workflow.WorkflowExecutor;
-import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.test.MockFileEntry;
+import com.bytechef.atlas.sync.executor.WorkflowExecutor;
+import com.bytechef.commons.collection.MapUtils;
+import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.component.test.json.JsonArrayUtils;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
@@ -37,13 +38,12 @@ import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@ComponentIntTest
 public class OdsFileComponentHandlerIntTest {
 
     @Autowired
@@ -57,7 +57,7 @@ public class OdsFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_header.ods");
 
         Job job = workflowExecutor.execute(
-                "ods-file_v1_read",
+                "odsfile_v1_read",
                 Map.of(
                         "fileEntry",
                         fileStorageService
@@ -77,7 +77,7 @@ public class OdsFileComponentHandlerIntTest {
     @Test
     public void testWrite() throws IOException, JSONException {
         Job job = workflowExecutor.execute(
-                "ods-file_v1_write",
+                "odsfile_v1_write",
                 Map.of(
                         "rows",
                         JsonArrayUtils.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))));
@@ -86,11 +86,13 @@ public class OdsFileComponentHandlerIntTest {
 
         Map<String, Object> outputs = job.getOutputs();
 
-        FileEntry fileEntry = new MockFileEntry(outputs, "writeOdsFile");
+        assertThat(MapUtils.getMapKey(outputs, "writeOdsFile", WorkflowConstants.NAME))
+                .isEqualTo("file.ods");
+
         File sampleFile = getFile("sample_header.ods");
 
         job = workflowExecutor.execute(
-                "ods-file_v1_read",
+                "odsfile_v1_read",
                 Map.of(
                         "fileEntry",
                         fileStorageService
@@ -103,8 +105,6 @@ public class OdsFileComponentHandlerIntTest {
                 JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
                 JsonArrayUtils.of((List<?>) outputs.get("readOdsFile")),
                 true);
-
-        assertThat(fileEntry.getName()).isEqualTo("file.ods");
     }
 
     private File getFile(String fileName) throws IOException {

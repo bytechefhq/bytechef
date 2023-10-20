@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ods.file;
+package com.bytechef.component.odsfile;
 
-import static com.bytechef.component.ods.file.constants.OdsFileConstants.HEADER_ROW;
-import static com.bytechef.component.ods.file.constants.OdsFileConstants.INCLUDE_EMPTY_CELLS;
-import static com.bytechef.component.ods.file.constants.OdsFileConstants.ODS_FILE;
-import static com.bytechef.component.ods.file.constants.OdsFileConstants.PAGE_NUMBER;
-import static com.bytechef.component.ods.file.constants.OdsFileConstants.PAGE_SIZE;
-import static com.bytechef.component.ods.file.constants.OdsFileConstants.READ;
-import static com.bytechef.component.ods.file.constants.OdsFileConstants.READ_AS_STRING;
-import static com.bytechef.component.ods.file.constants.OdsFileConstants.ROWS;
-import static com.bytechef.component.ods.file.constants.OdsFileConstants.SHEET_NAME;
-import static com.bytechef.component.ods.file.constants.OdsFileConstants.WRITE;
+import static com.bytechef.component.odsfile.constants.OdsFileConstants.HEADER_ROW;
+import static com.bytechef.component.odsfile.constants.OdsFileConstants.INCLUDE_EMPTY_CELLS;
+import static com.bytechef.component.odsfile.constants.OdsFileConstants.ODS_FILE;
+import static com.bytechef.component.odsfile.constants.OdsFileConstants.PAGE_NUMBER;
+import static com.bytechef.component.odsfile.constants.OdsFileConstants.PAGE_SIZE;
+import static com.bytechef.component.odsfile.constants.OdsFileConstants.READ;
+import static com.bytechef.component.odsfile.constants.OdsFileConstants.READ_AS_STRING;
+import static com.bytechef.component.odsfile.constants.OdsFileConstants.ROWS;
+import static com.bytechef.component.odsfile.constants.OdsFileConstants.SHEET_NAME;
+import static com.bytechef.component.odsfile.constants.OdsFileConstants.WRITE;
 import static com.bytechef.hermes.component.ComponentDSL.action;
 import static com.bytechef.hermes.component.ComponentDSL.array;
 import static com.bytechef.hermes.component.ComponentDSL.bool;
@@ -36,7 +36,6 @@ import static com.bytechef.hermes.component.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.ComponentDSL.integer;
 import static com.bytechef.hermes.component.ComponentDSL.number;
 import static com.bytechef.hermes.component.ComponentDSL.object;
-import static com.bytechef.hermes.component.ComponentDSL.options;
 import static com.bytechef.hermes.component.ComponentDSL.string;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
@@ -75,70 +74,57 @@ public class OdsFileComponentHandler implements ComponentHandler {
             .actions(
                     action(READ)
                             .display(display("Read from file").description("Reads data from a ODS file."))
-                            .inputs(
+                            .properties(
                                     fileEntry(FILE_ENTRY)
                                             .label("File")
                                             .description(
                                                     "The object property which contains a reference to the ODS file to read from.")
                                             .required(true),
-                                    options()
-                                            .label("Options")
-                                            .placeholder("Add Option")
-                                            .options(
-                                                    bool(HEADER_ROW)
-                                                            .label("Header Row")
-                                                            .description(
-                                                                    "The first row of the file contains the header names.")
-                                                            .defaultValue(true),
-                                                    bool(INCLUDE_EMPTY_CELLS)
-                                                            .label("Include Empty Cells")
-                                                            .description(
-                                                                    "When reading from file the empty cells will be filled with an empty string.")
-                                                            .defaultValue(false),
-                                                    integer(PAGE_SIZE)
-                                                            .label("Page Size")
-                                                            .description(
-                                                                    "The amount of child elements to return in a page."),
-                                                    integer(PAGE_NUMBER)
-                                                            .label("Page Number")
-                                                            .description("The page number to get."),
-                                                    bool(READ_AS_STRING)
-                                                            .label("Read As String")
-                                                            .description(
-                                                                    "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
-                                                            .defaultValue(false),
-                                                    string(SHEET_NAME)
-                                                            .label("Sheet Name")
-                                                            .description(
-                                                                    "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
-                                                            .defaultValue("Sheet")))
-                            .outputSchema(array())
+                                    bool(HEADER_ROW)
+                                            .label("Header Row")
+                                            .description("The first row of the file contains the header names.")
+                                            .defaultValue(true),
+                                    bool(INCLUDE_EMPTY_CELLS)
+                                            .label("Include Empty Cells")
+                                            .description(
+                                                    "When reading from file the empty cells will be filled with an empty string.")
+                                            .defaultValue(false),
+                                    integer(PAGE_SIZE)
+                                            .label("Page Size")
+                                            .description("The amount of child elements to return in a page."),
+                                    integer(PAGE_NUMBER).label("Page Number").description("The page number to get."),
+                                    bool(READ_AS_STRING)
+                                            .label("Read As String")
+                                            .description(
+                                                    "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
+                                            .defaultValue(false),
+                                    string(SHEET_NAME)
+                                            .label("Sheet Name")
+                                            .description(
+                                                    "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
+                                            .defaultValue("Sheet"))
+                            .output(array())
                             .performFunction(this::performRead),
                     action(WRITE)
                             .display(display("Write to file").description("Writes the data to a ODS file."))
-                            .inputs(
+                            .properties(
                                     array(ROWS)
                                             .label("Rows")
                                             .description("The array of objects to write to the file.")
                                             .required(true)
                                             .items(object().additionalProperties(true)
                                                     .properties(bool(), dateTime(), number(), string())),
-                                    options()
-                                            .label("Options")
-                                            .placeholder("Add Option")
-                                            .options(
-                                                    string(FILENAME)
-                                                            .label("Filename")
-                                                            .description(
-                                                                    "Filename to set for binary data. By default, \"file.ods\" will be used.")
-                                                            .required(true)
-                                                            .defaultValue("file.ods"),
-                                                    string(SHEET_NAME)
-                                                            .label("Sheet Name")
-                                                            .description(
-                                                                    "The name of the sheet to create in the spreadsheet.")
-                                                            .defaultValue("Sheet")))
-                            .outputSchema(fileEntry())
+                                    string(FILENAME)
+                                            .label("Filename")
+                                            .description(
+                                                    "Filename to set for binary data. By default, \"file.ods\" will be used.")
+                                            .required(true)
+                                            .defaultValue("file.ods"),
+                                    string(SHEET_NAME)
+                                            .label("Sheet Name")
+                                            .description("The name of the sheet to create in the spreadsheet.")
+                                            .defaultValue("Sheet"))
+                            .output(fileEntry())
                             .performFunction(this::performWrite));
 
     @Override
