@@ -3,6 +3,7 @@ import Footer from './Footer';
 import Header from './Header';
 
 export const IntegrationItem: React.FC<{
+    id: string;
     name: string;
     status: string;
     dropdownTrigger: string;
@@ -10,10 +11,11 @@ export const IntegrationItem: React.FC<{
     tag: string;
     button: string;
     date: string;
-}> = ({name, status, dropdownTrigger, category, tag, button, date}) => {
+}> = ({id, name, status, dropdownTrigger, category, tag, button, date}) => {
     return (
         <div>
             <Header
+                id={id}
                 name={name}
                 status={status}
                 dropdownTrigger={dropdownTrigger}
