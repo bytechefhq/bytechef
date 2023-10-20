@@ -17,6 +17,7 @@
 package com.integri.atlas;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.integri.atlas.engine.coordinator.event.ContextService;
 import com.integri.atlas.engine.coordinator.event.EventListener;
 import com.integri.atlas.engine.coordinator.event.EventListenerChain;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
@@ -53,6 +54,14 @@ public class IntTestConfiguration {
     @PostConstruct
     void afterPropertiesSet() {
         MapObject.addConverter(new FileEntryConverter());
+    }
+
+    @Bean
+    ContextService contextService(
+        ContextRepository contextRepository,
+        TaskExecutionRepository taskExecutionRepository
+    ) {
+        return new ContextService(contextRepository, taskExecutionRepository);
     }
 
     @Bean
