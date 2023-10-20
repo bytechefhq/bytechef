@@ -11,6 +11,9 @@ plugins {
     id("org.springframework.boot")
 }
 
+//https://melix.github.io/blog/2021/03/version-catalogs-faq.html#_can_i_use_the_version_catalog_in_buildsrc
+val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs")
+
 if (project.hasProperty("prod")) {
     var profiles = "prod"
 
@@ -55,7 +58,7 @@ if (project.hasProperty("prod")) {
     }
 } else {
     dependencies {
-        "developmentOnly"("org.springframework.boot:spring-boot-devtools:3.1.4")
+        "developmentOnly"("org.springframework.boot:spring-boot-devtools:${libs.findVersion("spring-boot").get()}")
     }
 
     val profiles = "dev"
