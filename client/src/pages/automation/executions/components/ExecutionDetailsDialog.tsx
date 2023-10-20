@@ -1,6 +1,6 @@
 import {CheckCircleIcon} from '@heroicons/react/24/outline';
 import * as Dialog from '@radix-ui/react-dialog';
-import {useGetProjectExecutionQuery} from 'queries/projects.queries';
+import {useGetWorkflowExecutionQuery} from 'queries/projects.queries';
 import {twMerge} from 'tailwind-merge';
 
 import useExecutionDetailsDialogStore from '../../project/stores/useExecutionDetailsDialogStore';
@@ -15,7 +15,7 @@ const ExecutionDetailsDialog = () => {
     } = useExecutionDetailsDialogStore();
 
     const {data: currentExecution, isLoading: currentExecutionLoading} =
-        useGetProjectExecutionQuery(
+        useGetWorkflowExecutionQuery(
             {
                 id: currentExecutionId,
             },
