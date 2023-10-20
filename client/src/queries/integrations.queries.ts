@@ -1,6 +1,7 @@
 import {useQuery} from '@tanstack/react-query';
 import {
     CategoryModel,
+    GetIntegrationsRequest,
     IntegrationModel,
     IntegrationsApi,
     TagModel,
@@ -15,16 +16,28 @@ export enum ServerStateKeysEnum {
 export const useGetIntegrationCategoriesQuery = () =>
     useQuery<CategoryModel[], Error>(
         [ServerStateKeysEnum.IntegrationCategories],
-        () => new IntegrationsApi().getIntegrationCategories()
+        () => new IntegrationsApi().getIntegrationCategories(),
+        {
+            staleTime: 1 * 60 * 1000,
+        }
     );
 
 export const useGetIntegrationTagsQuery = () =>
-    useQuery<TagModel[], Error>([ServerStateKeysEnum.IntegrationTags], () =>
-        new IntegrationsApi().getIntegrationTags()
+    useQuery<TagModel[], Error>(
+        [ServerStateKeysEnum.IntegrationTags],
+        () => new IntegrationsApi().getIntegrationTags(),
+        {
+            staleTime: 1 * 60 * 1000,
+        }
     );
 
-export const useGetIntegrationsQuery = () =>
+export const useGetIntegrationsQuery = (
+    requestParameters?: GetIntegrationsRequest
+) =>
     useQuery<IntegrationModel[], Error>(
-        [ServerStateKeysEnum.Integrations],
-        () => new IntegrationsApi().getIntegrations()
+        [ServerStateKeysEnum.Integrations, requestParameters],
+        () => new IntegrationsApi().getIntegrations(requestParameters),
+        {
+            staleTime: 1 * 60 * 1000,
+        }
     );
