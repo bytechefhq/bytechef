@@ -101,6 +101,10 @@ const DataPillPanel = () => {
             (action!.outputSchema as PropertyType)?.properties
     );
 
+    if (!dataPillComponentData?.length) {
+        return <></>;
+    }
+
     return (
         <Dialog.Root
             open={
@@ -164,15 +168,13 @@ const DataPillPanel = () => {
                                 value={dataPillFilterQuery}
                             />
 
-                            {dataPillComponentData?.length && (
-                                <DataPillPanelBody
-                                    componentData={
-                                        dataPillComponentData as Array<ComponentActionData>
-                                    }
-                                    containerHeight={panelContainerHeight}
-                                    dataPillFilterQuery={dataPillFilterQuery}
-                                />
-                            )}
+                            <DataPillPanelBody
+                                componentData={
+                                    dataPillComponentData as Array<ComponentActionData>
+                                }
+                                containerHeight={panelContainerHeight}
+                                dataPillFilterQuery={dataPillFilterQuery}
+                            />
                         </main>
                     </div>
                 </Dialog.Content>
