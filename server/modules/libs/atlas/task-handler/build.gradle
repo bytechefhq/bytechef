@@ -14,9 +14,9 @@ subprojects {
         testImplementation "org.apache.commons:commons-lang3"
         testImplementation "org.springframework.boot:spring-boot-starter-jdbc"
         testImplementation project(":modules:libs:atlas:engine-repository:engine-repository-jdbc")
-        testImplementation project(":modules:libs:atlas:task-handler:task-handler-io")
-        testImplementation project(":modules:libs:atlas:task-handler:task-handler-random")
-        testImplementation project(":modules:libs:atlas:task-handler:task-handler-time")
+        testImplementation project(":modules:libs:atlas:task-handler:io")
+        testImplementation project(":modules:libs:atlas:task-handler:random")
+        testImplementation project(":modules:libs:atlas:task-handler:time")
         testImplementation project(":modules:libs:atlas:engine:engine-core-impl")
         testImplementation project(":modules:libs:atlas:engine:engine-coordinator-impl")
         testImplementation project(":modules:libs:atlas:engine:engine-worker-impl")
