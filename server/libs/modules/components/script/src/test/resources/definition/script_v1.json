@@ -26,9 +26,6 @@
               "type": "INTEGER"
             },
             {
-              "type": "NULL"
-            },
-            {
               "type": "NUMBER"
             },
             {
@@ -64,9 +61,6 @@
                 },
                 {
                   "type": "INTEGER"
-                },
-                {
-                  "type": "NULL"
                 },
                 {
                   "type": "NUMBER"
@@ -116,9 +110,6 @@
               "type": "INTEGER"
             },
             {
-              "type": "NULL"
-            },
-            {
               "type": "NUMBER"
             },
             {
@@ -154,9 +145,6 @@
                 },
                 {
                   "type": "INTEGER"
-                },
-                {
-                  "type": "NULL"
                 },
                 {
                   "type": "NUMBER"
@@ -206,9 +194,6 @@
               "type": "INTEGER"
             },
             {
-              "type": "NULL"
-            },
-            {
               "type": "NUMBER"
             },
             {
@@ -244,9 +229,6 @@
                 },
                 {
                   "type": "INTEGER"
-                },
-                {
-                  "type": "NULL"
                 },
                 {
                   "type": "NUMBER"
@@ -296,9 +278,6 @@
               "type": "INTEGER"
             },
             {
-              "type": "NULL"
-            },
-            {
               "type": "NUMBER"
             },
             {
@@ -334,9 +313,6 @@
                 },
                 {
                   "type": "INTEGER"
-                },
-                {
-                  "type": "NULL"
                 },
                 {
                   "type": "NUMBER"
@@ -386,9 +362,6 @@
               "type": "INTEGER"
             },
             {
-              "type": "NULL"
-            },
-            {
               "type": "NUMBER"
             },
             {
@@ -424,9 +397,6 @@
                 },
                 {
                   "type": "INTEGER"
-                },
-                {
-                  "type": "NULL"
                 },
                 {
                   "type": "NUMBER"

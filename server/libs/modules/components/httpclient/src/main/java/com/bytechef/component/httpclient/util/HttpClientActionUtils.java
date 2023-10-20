@@ -20,11 +20,10 @@ package com.bytechef.component.httpclient.util;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.utils.HttpClientUtils.BodyContentType;
-import com.bytechef.hermes.component.utils.HttpClientUtils.Configuration;
-import com.bytechef.hermes.component.utils.HttpClientUtils.Payload;
-import com.bytechef.hermes.component.utils.HttpClientUtils.RequestMethod;
-import com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
+import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
+import com.bytechef.hermes.component.util.HttpClientUtils.Payload;
+import com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
+import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import com.bytechef.hermes.definition.Property;
 
 import java.time.Duration;
@@ -47,7 +46,8 @@ import static com.bytechef.component.httpclient.constant.HttpClientConstants.RES
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.TIMEOUT;
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.URI;
-import static com.bytechef.hermes.component.utils.HttpClientUtils.executor;
+import static com.bytechef.hermes.component.util.HttpClientUtils.exchange;
+import static com.bytechef.hermes.component.util.HttpClientUtils.allowUnauthorizedCerts;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
@@ -57,7 +57,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 /**
  * @author Ivica Cardic
  */
-public class HttpClientUtils {
+public class HttpClientActionUtils {
 
     public static List<Property<?>> options(boolean includeBodyContentProperties) {
         List<Property<?>> properties = new ArrayList<>();
@@ -132,22 +132,21 @@ public class HttpClientUtils {
     public static Object execute(
         Context context, ExecutionParameters executionParameters, RequestMethod requestMethod) {
 
-        return executor()
-            .configuration(Configuration.builder()
-                .allowUnauthorizedCerts(executionParameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
-                .filename(executionParameters.getString(RESPONSE_FILENAME))
-                .followAllRedirects(executionParameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
-                .followRedirect(executionParameters.getBoolean(FOLLOW_REDIRECT, false))
-                .fullResponse(executionParameters.getBoolean(FULL_RESPONSE, false))
-                .proxy(executionParameters.getString(PROXY))
-                .responseFormat(getResponseFormat(executionParameters))
-                .timeout(Duration.ofMillis(executionParameters.getInteger(TIMEOUT, 10000)))
-                .build())
-            .exchange(executionParameters.getRequiredString(URI), requestMethod)
-            .headers(executionParameters.getMap(HEADER_PARAMETERS))
-            .queryParameters(executionParameters.getMap(QUERY_PARAMETERS))
-            .payload(getPayload(executionParameters, getBodyContentType(executionParameters)))
-            .execute(context);
+        return exchange(
+            executionParameters.getRequiredString(URI), requestMethod)
+                .configuration(
+                    allowUnauthorizedCerts(executionParameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
+                        .filename(executionParameters.getString(RESPONSE_FILENAME))
+                        .followAllRedirects(executionParameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
+                        .followRedirect(executionParameters.getBoolean(FOLLOW_REDIRECT, false))
+                        .fullResponse(executionParameters.getBoolean(FULL_RESPONSE, false))
+                        .proxy(executionParameters.getString(PROXY))
+                        .responseFormat(getResponseFormat(executionParameters))
+                        .timeout(Duration.ofMillis(executionParameters.getInteger(TIMEOUT, 10000))))
+                .headers(executionParameters.getMap(HEADER_PARAMETERS))
+                .queryParameters(executionParameters.getMap(QUERY_PARAMETERS))
+                .payload(getPayload(executionParameters, getBodyContentType(executionParameters)))
+                .execute();
     }
 
     public static Property<?>[] toArray(List<Property<?>>... propertiesArray) {

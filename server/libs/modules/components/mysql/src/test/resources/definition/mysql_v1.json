@@ -123,9 +123,6 @@
                       "type": "INTEGER"
                     },
                     {
-                      "type": "NULL"
-                    },
-                    {
                       "type": "NUMBER"
                     },
                     {
@@ -220,9 +217,6 @@
                       "type": "INTEGER"
                     },
                     {
-                      "type": "NULL"
-                    },
-                    {
                       "type": "NUMBER"
                     },
                     {
@@ -306,9 +300,6 @@
                       "type": "INTEGER"
                     },
                     {
-                      "type": "NULL"
-                    },
-                    {
                       "type": "NUMBER"
                     },
                     {
@@ -378,9 +369,6 @@
                       "type": "INTEGER"
                     },
                     {
-                      "type": "NULL"
-                    },
-                    {
                       "type": "NUMBER"
                     },
                     {
@@ -420,8 +408,6 @@
   ],
   "connection": {
     "componentName": "mysql",
-    "version": 1,
-    "authorizations": [],
     "display": {
       "description": "Query, insert nd update data from MySQL.",
       "label": "MySQL"
@@ -458,7 +444,9 @@
         "type": "STRING",
         "controlType": "PASSWORD"
       }
-    ]
+    ],
+    "version": 1,
+    "authorizationRequired": true
   },
   "display": {
     "description": "Query, insert nd update data from MySQL.",

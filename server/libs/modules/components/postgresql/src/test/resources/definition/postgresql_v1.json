@@ -123,9 +123,6 @@
                       "type": "INTEGER"
                     },
                     {
-                      "type": "NULL"
-                    },
-                    {
                       "type": "NUMBER"
                     },
                     {
@@ -220,9 +217,6 @@
                       "type": "INTEGER"
                     },
                     {
-                      "type": "NULL"
-                    },
-                    {
                       "type": "NUMBER"
                     },
                     {
@@ -306,9 +300,6 @@
                       "type": "INTEGER"
                     },
                     {
-                      "type": "NULL"
-                    },
-                    {
                       "type": "NUMBER"
                     },
                     {
@@ -378,9 +369,6 @@
                       "type": "INTEGER"
                     },
                     {
-                      "type": "NULL"
-                    },
-                    {
                       "type": "NUMBER"
                     },
                     {
@@ -421,7 +409,7 @@
   "connection": {
     "componentName": "postgresql",
     "version": 1,
-    "authorizations": [],
+    "authorizationRequired": true,
     "display": {
       "description": "Query, insert nd update data from PostgreSQL.",
       "label": "PostgreSQL"

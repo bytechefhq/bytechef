@@ -18,13 +18,14 @@
 package com.bytechef.component.httpclient.action;
 
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
-import com.bytechef.component.httpclient.util.HttpClientUtils;
+import com.bytechef.component.httpclient.util.HttpClientActionUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.PUT;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
 import static com.bytechef.hermes.definition.DefinitionDSL.display;
 
 /**
@@ -35,7 +36,7 @@ public class HttpClientPutAction {
     public static final ActionDefinition ACTION_DEFINITION = action(PUT)
         .display(display("PUT").description("The request method to use."))
         .properties(
-            HttpClientUtils.toArray(
+            HttpClientActionUtils.toArray(
                 //
                 // Common properties
                 //
@@ -50,12 +51,11 @@ public class HttpClientPutAction {
                 // Options
                 //
 
-                HttpClientUtils.options(true)))
-        .output(HttpClientUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
+                HttpClientActionUtils.options(true)))
+        .output(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
         .perform(HttpClientPutAction::performPut);
 
     public static Object performPut(Context context, ExecutionParameters executionParameters) {
-        return HttpClientUtils.execute(
-            context, executionParameters, com.bytechef.hermes.component.utils.HttpClientUtils.RequestMethod.PUT);
+        return HttpClientActionUtils.execute(context, executionParameters, RequestMethod.PUT);
     }
 }

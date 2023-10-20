@@ -29,9 +29,6 @@
               "type": "INTEGER"
             },
             {
-              "type": "NULL"
-            },
-            {
               "type": "NUMBER"
             },
             {

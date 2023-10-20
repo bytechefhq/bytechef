@@ -24,7 +24,7 @@ import com.bytechef.component.xmlhelper.action.XmlHelperParseAction;
 import com.bytechef.component.xmlhelper.action.XmlHelperStringifyAction;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
-import com.bytechef.hermes.component.utils.XmlUtils;
+import com.bytechef.hermes.component.util.XmlUtils;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.util.List;
 import java.util.Map;

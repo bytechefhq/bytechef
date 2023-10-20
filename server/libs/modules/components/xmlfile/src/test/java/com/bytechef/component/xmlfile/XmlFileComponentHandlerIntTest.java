@@ -23,7 +23,7 @@ import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
-import com.bytechef.hermes.component.utils.XmlUtils;
+import com.bytechef.hermes.component.util.XmlUtils;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
 import java.nio.charset.StandardCharsets;

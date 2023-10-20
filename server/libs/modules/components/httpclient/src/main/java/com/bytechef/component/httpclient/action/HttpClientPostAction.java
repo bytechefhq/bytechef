@@ -18,7 +18,7 @@
 package com.bytechef.component.httpclient.action;
 
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
-import com.bytechef.component.httpclient.util.HttpClientUtils;
+import com.bytechef.component.httpclient.util.HttpClientActionUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
@@ -29,6 +29,8 @@ import static com.bytechef.component.httpclient.constant.HttpClientConstants.POS
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.RESPONSE_FORMAT;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
+import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.display;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
@@ -44,7 +46,7 @@ public class HttpClientPostAction {
     public static final ActionDefinition ACTION_DEFINITION = action(POST)
         .display(display("POST").description("The request method to use."))
         .properties(
-            HttpClientUtils.toArray(
+            HttpClientActionUtils.toArray(
                 //
                 // Common properties
                 //
@@ -59,24 +61,19 @@ public class HttpClientPostAction {
                 // Options
                 //
 
-                HttpClientUtils.options(true)))
+                HttpClientActionUtils.options(true)))
         .output(
             oneOf().types(array(), object())
                 .displayOption(show(
                     RESPONSE_FORMAT,
                     List.of(
-                        com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat.JSON.name(),
-                        com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat.XML.name()))),
-            string().displayOption(
-                show(
-                    RESPONSE_FORMAT, com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat.TEXT.name())),
-            fileEntry().displayOption(
-                show(RESPONSE_FORMAT,
-                    com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat.BINARY.name())))
+                        ResponseFormat.JSON.name(),
+                        ResponseFormat.XML.name()))),
+            string().displayOption(show(RESPONSE_FORMAT, ResponseFormat.TEXT.name())),
+            fileEntry().displayOption(show(RESPONSE_FORMAT, ResponseFormat.BINARY.name())))
         .perform(HttpClientPostAction::performPost);
 
     public static Object performPost(Context context, ExecutionParameters executionParameters) {
-        return HttpClientUtils.execute(
-            context, executionParameters, com.bytechef.hermes.component.utils.HttpClientUtils.RequestMethod.POST);
+        return HttpClientActionUtils.execute(context, executionParameters, RequestMethod.POST);
     }
 }
