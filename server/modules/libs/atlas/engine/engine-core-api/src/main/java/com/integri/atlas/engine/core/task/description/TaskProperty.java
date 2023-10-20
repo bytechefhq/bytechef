@@ -35,9 +35,9 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
         TaskProperty.CollectionTaskProperty,
         TaskProperty.GroupTaskProperty,
         TaskProperty.JSONTaskProperty,
-        TaskProperty.MultiSelectTaskProperty,
+        TaskProperty.MultiOptionTaskProperty,
         TaskProperty.NumberTaskProperty,
-        TaskProperty.SelectTaskProperty,
+        TaskProperty.OptionTaskProperty,
         TaskProperty.StringTaskProperty {
 
     protected TaskParameter defaultValue;
@@ -75,16 +75,16 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
         return new JSONTaskProperty(name);
     }
 
-    public static MultiSelectTaskProperty MULTI_SELECT_PROPERTY(String name) {
-        return new MultiSelectTaskProperty(name);
+    public static MultiOptionTaskProperty MULTI_OPTION_PROPERTY(String name) {
+        return new MultiOptionTaskProperty(name);
     }
 
     public static NumberTaskProperty NUMBER_PROPERTY(String name) {
         return new NumberTaskProperty(name);
     }
 
-    public static SelectTaskProperty SELECT_PROPERTY(String name) {
-        return new SelectTaskProperty(name);
+    public static OptionTaskProperty OPTION_PROPERTY(String name) {
+        return new OptionTaskProperty(name);
     }
 
     public static StringTaskProperty STRING_PROPERTY(String name) {
@@ -759,28 +759,28 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
         }
     }
 
-    public static final class MultiSelectTaskProperty extends TaskProperty<MultiSelectTaskProperty> {
+    public static final class MultiOptionTaskProperty extends TaskProperty<MultiOptionTaskProperty> {
 
         private List<TaskPropertyOption> options;
 
-        public MultiSelectTaskProperty(String name) {
+        public MultiOptionTaskProperty(String name) {
             this.name = name;
             this.type = TaskPropertyType.MULTI_SELECT;
         }
 
-        public MultiSelectTaskProperty defaultValue(Integer... value) {
+        public MultiOptionTaskProperty defaultValue(Integer... value) {
             this.defaultValue = parameter(value);
 
             return this;
         }
 
-        public MultiSelectTaskProperty defaultValue(String... value) {
+        public MultiOptionTaskProperty defaultValue(String... value) {
             this.defaultValue = parameter(value);
 
             return this;
         }
 
-        public MultiSelectTaskProperty options(TaskPropertyOption... options) {
+        public MultiOptionTaskProperty options(TaskPropertyOption... options) {
             this.options = List.of(options);
 
             return this;
@@ -835,35 +835,35 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
         }
     }
 
-    public static final class SelectTaskProperty extends TaskProperty<SelectTaskProperty> {
+    public static final class OptionTaskProperty extends TaskProperty<OptionTaskProperty> {
 
         private List<TaskPropertyOption> options;
         private String placeholder;
 
-        public SelectTaskProperty(String name) {
+        public OptionTaskProperty(String name) {
             this.name = name;
             this.type = TaskPropertyType.SELECT;
         }
 
-        public SelectTaskProperty defaultValue(int defaultValue) {
+        public OptionTaskProperty defaultValue(int defaultValue) {
             this.defaultValue = parameter(defaultValue);
 
             return this;
         }
 
-        public SelectTaskProperty defaultValue(String defaultValue) {
+        public OptionTaskProperty defaultValue(String defaultValue) {
             this.defaultValue = parameter(defaultValue);
 
             return this;
         }
 
-        public SelectTaskProperty options(TaskPropertyOption... options) {
+        public OptionTaskProperty options(TaskPropertyOption... options) {
             this.options = List.of(options);
 
             return this;
         }
 
-        public SelectTaskProperty placeholder(String placeholder) {
+        public OptionTaskProperty placeholder(String placeholder) {
             this.placeholder = placeholder;
 
             return this;

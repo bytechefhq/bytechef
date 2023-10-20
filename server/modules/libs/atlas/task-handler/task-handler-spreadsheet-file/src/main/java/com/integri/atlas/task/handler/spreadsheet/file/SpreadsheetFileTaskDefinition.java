@@ -22,7 +22,7 @@ import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLEC
 import static com.integri.atlas.engine.core.task.description.TaskProperty.GROUP_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.JSON_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.NUMBER_PROPERTY;
-import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT_PROPERTY;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.OPTION_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
@@ -42,7 +42,7 @@ public class SpreadsheetFileTaskDefinition implements TaskDefinition {
         .displayName("Spreadsheet File")
         .description("Reads and writes data from a spreadsheet file")
         .properties(
-            SELECT_PROPERTY("operation")
+            OPTION_PROPERTY("operation")
                 .displayName("Operation")
                 .description("The operation to perform.")
                 .options(
@@ -61,7 +61,7 @@ public class SpreadsheetFileTaskDefinition implements TaskDefinition {
                 .description("The object property which contains reference to the file with JSON data.")
                 .displayOption(show("operation", parameterValues("WRITE"), "inputType", parameterValues("FILE")))
                 .required(true),
-            SELECT_PROPERTY("fileFormat")
+            OPTION_PROPERTY("fileFormat")
                 .displayName("FileFormat")
                 .description("The format of the file to save the data.")
                 .displayOption(show("operation", "WRITE"))
@@ -102,7 +102,7 @@ public class SpreadsheetFileTaskDefinition implements TaskDefinition {
                         .description("When reading from file the empty cells will be filled with an empty string.")
                         .displayOption(show("operation", "READ"))
                         .defaultValue(false),
-                    SELECT_PROPERTY("inputType")
+                    OPTION_PROPERTY("inputType")
                         .displayName("Input Content Type")
                         .description("Input type to use when writing data.")
                         .displayOption(show("operation", "WRITE"))
