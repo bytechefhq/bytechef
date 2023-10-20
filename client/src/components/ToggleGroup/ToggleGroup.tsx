@@ -1,5 +1,5 @@
-import React from 'react';
 import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';
+import React from 'react';
 
 export interface IToggleItem {
     label: string;

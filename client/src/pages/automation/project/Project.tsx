@@ -1,32 +1,33 @@
-import React, {useEffect, useState} from 'react';
-import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
-import Button from 'components/Button/Button';
-import LeftSidebar from './components/LeftSidebar';
-import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
-import ToggleGroup, {
-    IToggleItem,
-} from '../../../components/ToggleGroup/ToggleGroup';
-import Select from '../../../components/Select/Select';
-import {WorkflowModel} from '../../../middleware/workflow';
 import {
     ArrowLeftOnRectangleIcon,
     ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/solid';
-import WorkflowEditor from './WorkflowEditor';
+import {useQueryClient} from '@tanstack/react-query';
+import Button from 'components/Button/Button';
 import Input from 'components/Input/Input';
+import React, {useEffect, useState} from 'react';
+import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
+import getCreatedWorkflow from 'utils/getCreatedWorkflow';
+
+import Select from '../../../components/Select/Select';
+import ToggleGroup, {
+    IToggleItem,
+} from '../../../components/ToggleGroup/ToggleGroup';
+import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
+import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
 import {ProjectModel} from '../../../middleware/project';
-import useLeftSidebarStore from './stores/useLeftSidebarStore';
+import {WorkflowModel} from '../../../middleware/workflow';
+import {useCreateProjectWorkflowRequestMutation} from '../../../mutations/projects.mutations';
 import {useGetComponentDefinitionsQuery} from '../../../queries/componentDefinitions.queries';
-import {useGetTaskDispatcherDefinitionsQuery} from '../../../queries/taskDispatcherDefinitions.queries';
 import {
     ProjectKeys,
     useGetProjectQuery,
     useGetProjectWorkflowsQuery,
 } from '../../../queries/projects.queries';
-import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
-import {useCreateProjectWorkflowRequestMutation} from '../../../mutations/projects.mutations';
-import {useQueryClient} from '@tanstack/react-query';
-import getCreatedWorkflow from 'utils/getCreatedWorkflow';
+import {useGetTaskDispatcherDefinitionsQuery} from '../../../queries/taskDispatcherDefinitions.queries';
+import WorkflowEditor from './WorkflowEditor';
+import LeftSidebar from './components/LeftSidebar';
+import useLeftSidebarStore from './stores/useLeftSidebarStore';
 
 const headerToggleItems: IToggleItem[] = [
     {

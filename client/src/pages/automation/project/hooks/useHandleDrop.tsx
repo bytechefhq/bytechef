@@ -4,6 +4,7 @@ import {
     TaskDispatcherDefinitionModel,
 } from 'middleware/definition-registry';
 import {Edge, Node, useReactFlow} from 'reactflow';
+
 import getFormattedName from '../utils/getFormattedName';
 import getRandomId from '../utils/getRandomId';
 

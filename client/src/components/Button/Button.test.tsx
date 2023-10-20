@@ -1,8 +1,9 @@
 import '@testing-library/jest-dom';
+import {MixIcon} from '@radix-ui/react-icons';
+import {vi} from 'vitest';
+
 import {render, screen} from '../../utils/test-utils';
 import Button from './Button';
-import {vi} from 'vitest';
-import {MixIcon} from '@radix-ui/react-icons';
 
 describe('Button', async () => {
     it('should render the button', () => {

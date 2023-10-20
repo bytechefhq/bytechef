@@ -1,6 +1,7 @@
-import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
-import PageHeader from '../../../components/PageHeader/PageHeader';
 import React from 'react';
+
+import PageHeader from '../../../components/PageHeader/PageHeader';
+import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
 
 export const Instances = () => {
     return (

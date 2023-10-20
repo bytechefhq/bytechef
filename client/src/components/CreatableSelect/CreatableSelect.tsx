@@ -1,11 +1,13 @@
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
-import {twMerge} from 'tailwind-merge';
 import React from 'react';
 import ReactSelectCreatable, {CreatableProps} from 'react-select/creatable';
+import {twMerge} from 'tailwind-merge';
+
 import './CreatableSelect.css';
+
+import {FieldPath, FieldValues} from 'react-hook-form/dist/types';
 import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
 import {GroupBase} from 'react-select';
-import {FieldPath, FieldValues} from 'react-hook-form/dist/types';
 
 export interface ISelectOption {
     value: string;

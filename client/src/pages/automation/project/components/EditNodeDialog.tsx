@@ -1,8 +1,8 @@
-import {useState} from 'react';
-import Dialog from 'components/Dialog/Dialog';
-import Input from 'components/Input/Input';
 import {Close} from '@radix-ui/react-dialog';
 import Button from 'components/Button/Button';
+import Dialog from 'components/Dialog/Dialog';
+import Input from 'components/Input/Input';
+import {useState} from 'react';
 
 type EditNodeDialogProps = {
     visible?: boolean;

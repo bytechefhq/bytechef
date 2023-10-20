@@ -1,9 +1,10 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
+
 import Select from '../../../../components/Select/Select';
-import useRightSlideOverStore from '../stores/useRightSlideOverStore';
 import {Tooltip} from '../../../../components/Tooltip/Tooltip';
+import useRightSlideOverStore from '../stores/useRightSlideOverStore';
 
 const RightSlideOver = () => {
     const {currentNode, rightSlideOverOpen, setRightSlideOverOpen} =
@@ -58,7 +59,9 @@ const RightSlideOver = () => {
                                     defaultValue="Canada"
                                 >
                                     <option>United States</option>
+
                                     <option>Canada</option>
+
                                     <option>Mexico</option>
                                 </select>
                             </div>

@@ -1,47 +1,47 @@
-import React, {useEffect, useMemo, useState} from 'react';
-
-import Input from 'components/Input/Input';
-import Dialog from 'components/Dialog/Dialog';
-import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
-import {Controller, useForm} from 'react-hook-form';
-import Button from 'components/Button/Button';
+import {ClipboardIcon} from '@heroicons/react/24/outline';
+import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {
-    ComponentDefinitionKeys,
-    useGetComponentDefinitionsQuery,
-} from '../../../queries/componentDefinitions.queries';
+import Button from 'components/Button/Button';
+import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
+import Dialog from 'components/Dialog/Dialog';
+import Input from 'components/Input/Input';
+import {timeout} from 'd3-timer';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Controller, useForm} from 'react-hook-form';
+import {OnChangeValue} from 'react-select';
+
+import Alert from '../../../components/Alert/Alert';
+import Checkbox from '../../../components/Checkbox/Checkbox';
+import FilterableSelect, {
+    ISelectOption,
+} from '../../../components/FilterableSelect/FilterableSelect';
+import Label from '../../../components/Label/Label';
+import NativeSelect from '../../../components/NativeSelect/NativeSelect';
+import Properties from '../../../components/Properties/Properties';
+import {Tooltip} from '../../../components/Tooltip/Tooltip';
+import useCopyToClipboard from '../../../hooks/useCopyToClipboard';
+import {ConnectionModel, TagModel} from '../../../middleware/connection';
 import {
     AuthorizationModel,
     ComponentDefinitionBasicModel,
 } from '../../../middleware/definition-registry';
-import {ConnectionModel, TagModel} from '../../../middleware/connection';
-import FilterableSelect, {
-    ISelectOption,
-} from '../../../components/FilterableSelect/FilterableSelect';
+import {
+    useCreateConnectionMutation,
+    useUpdateConnectionMutation,
+} from '../../../mutations/connections.mutations';
+import {
+    ComponentDefinitionKeys,
+    useGetComponentDefinitionsQuery,
+} from '../../../queries/componentDefinitions.queries';
+import {useGetConnectionDefinitionQuery} from '../../../queries/connectionDefinitions.queries';
 import {
     ConnectionKeys,
     useGetConnectionOAuth2AuthorizationParametersQuery,
     useGetConnectionTagsQuery,
 } from '../../../queries/connections.queries';
-import {
-    useCreateConnectionMutation,
-    useUpdateConnectionMutation,
-} from '../../../mutations/connections.mutations';
-import {OnChangeValue} from 'react-select';
-import {useGetConnectionDefinitionQuery} from '../../../queries/connectionDefinitions.queries';
-import NativeSelect from '../../../components/NativeSelect/NativeSelect';
-import Properties from '../../../components/Properties/Properties';
+import {useGetOAuth2PropertiesQuery} from '../../../queries/oauth2Properties.queries';
 import OAuth2Button from './components/OAuth2Button';
 import {AuthTokenPayload} from './oauth2/useOAuth2';
-import {useGetOAuth2PropertiesQuery} from '../../../queries/oauth2Properties.queries';
-import useCopyToClipboard from '../../../hooks/useCopyToClipboard';
-import {ClipboardIcon} from '@heroicons/react/24/outline';
-import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
-import Alert from '../../../components/Alert/Alert';
-import Checkbox from '../../../components/Checkbox/Checkbox';
-import Label from '../../../components/Label/Label';
-import {Tooltip} from '../../../components/Tooltip/Tooltip';
-import {timeout} from 'd3-timer';
 
 type Tag = TagModel | {label: string; value: string};
 
@@ -541,6 +541,7 @@ const ConnectionDialog = ({
                                                 credentials
                                             </span>
                                         )}
+
                                         {!usePredefinedOAuthApp && (
                                             <span>
                                                 I want to use predefined app

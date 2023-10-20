@@ -1,6 +1,6 @@
-import {useEffect} from 'react';
-import {useReactFlow, useStore, Node, Edge, ReactFlowState} from 'reactflow';
 import {stratify, tree} from 'd3-hierarchy';
+import {useEffect} from 'react';
+import {Edge, Node, ReactFlowState, useReactFlow, useStore} from 'reactflow';
 
 // initialize the tree layout (see https://observablehq.com/@d3/tree for examples)
 const layout = tree<Node>()

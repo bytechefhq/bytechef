@@ -1,17 +1,18 @@
+import {PencilIcon, TrashIcon} from '@heroicons/react/24/outline';
+import Button from 'components/Button/Button';
 import {memo, useState} from 'react';
 import {
     Handle,
-    Position,
     NodeProps,
-    useReactFlow,
+    Position,
     getConnectedEdges,
+    useReactFlow,
 } from 'reactflow';
-import styles from './NodeTypes.module.css';
-import useNodeClickHandler from '../hooks/useNodeClick';
-import Button from 'components/Button/Button';
-import EditNodeDialog from '../components/EditNodeDialog';
-import {PencilIcon, TrashIcon} from '@heroicons/react/24/outline';
 import {twMerge} from 'tailwind-merge';
+
+import EditNodeDialog from '../components/EditNodeDialog';
+import useNodeClickHandler from '../hooks/useNodeClick';
+import styles from './NodeTypes.module.css';
 
 const WorkflowNode = ({id, data}: NodeProps) => {
     const [showEditNodeDialog, setShowEditNodeDialog] = useState(false);

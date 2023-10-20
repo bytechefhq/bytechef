@@ -1,27 +1,29 @@
-import {DragEventHandler, useEffect, useMemo, useState} from 'react';
-import ReactFlow, {
-    ReactFlowProvider,
-    Controls,
-    MiniMap,
-    Edge,
-    Node,
-    useReactFlow,
-    useStore,
-} from 'reactflow';
-import PlaceholderEdge from './edges/PlaceholderEdge';
-import WorkflowEdge from './edges/WorkflowEdge';
-import PlaceholderNode from './nodes/PlaceholderNode';
-import WorkflowNode from './nodes/WorkflowNode';
-import useHandleDrop from './hooks/useHandleDrop';
-import useLayout from './hooks/useLayout';
 import {PlayIcon} from '@heroicons/react/24/outline';
-import RightSlideOver from './components/NodeDetailsDialog';
 import {
     ComponentDefinitionModel,
     TaskDispatcherDefinitionModel,
 } from 'middleware/definition-registry';
+import {DragEventHandler, useEffect, useMemo, useState} from 'react';
+import ReactFlow, {
+    Controls,
+    Edge,
+    MiniMap,
+    Node,
+    ReactFlowProvider,
+    useReactFlow,
+    useStore,
+} from 'reactflow';
+
+import RightSlideOver from './components/NodeDetailsDialog';
+import PlaceholderEdge from './edges/PlaceholderEdge';
+import WorkflowEdge from './edges/WorkflowEdge';
+import useHandleDrop from './hooks/useHandleDrop';
+import useLayout from './hooks/useLayout';
+import PlaceholderNode from './nodes/PlaceholderNode';
+import WorkflowNode from './nodes/WorkflowNode';
 
 import 'reactflow/dist/base.css';
+
 import './WorkflowEditor.css';
 
 type WorkflowProps = {

@@ -1,13 +1,14 @@
-import {
-    useGetProjectsQuery,
-    useGetProjectTagsQuery,
-} from '../../../queries/projects.queries';
+import {FolderPlusIcon} from '@heroicons/react/24/outline';
 import ProjectListItem from 'pages/automation/projects/ProjectListItem';
 import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
+
 import EmptyList from '../../../components/EmptyList/EmptyList';
+import {
+    useGetProjectTagsQuery,
+    useGetProjectsQuery,
+} from '../../../queries/projects.queries';
 import ProjectDialog from './ProjectDialog';
-import {FolderPlusIcon} from '@heroicons/react/24/outline';
 
 const ProjectList = () => {
     const [searchParams] = useSearchParams();

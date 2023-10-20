@@ -1,6 +1,7 @@
-import useOAuth2, {AuthTokenPayload} from '../oauth2/useOAuth2';
-import Button from '../../../../components/Button/Button';
 import React from 'react';
+
+import Button from '../../../../components/Button/Button';
+import useOAuth2, {AuthTokenPayload} from '../oauth2/useOAuth2';
 
 const LoadingIcon = (): JSX.Element => (
     <svg
@@ -17,6 +18,7 @@ const LoadingIcon = (): JSX.Element => (
             stroke="currentColor"
             strokeWidth="4"
         />
+
         <path
             className="opacity-75"
             fill="currentColor"

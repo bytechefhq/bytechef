@@ -1,7 +1,8 @@
-import React from 'react';
-import {ComponentStory, ComponentMeta} from '@storybook/react';
-import Button from './Button';
 import {MixIcon} from '@radix-ui/react-icons';
+import {ComponentMeta, ComponentStory} from '@storybook/react';
+import React from 'react';
+
+import Button from './Button';
 
 export default {
     title: 'Button',

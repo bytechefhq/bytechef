@@ -1,4 +1,5 @@
 import {useCallback, useRef, useState} from 'react';
+
 import {OAUTH_RESPONSE, OAUTH_STATE_KEY} from './constants';
 import {objectToQuery} from './tools';
 

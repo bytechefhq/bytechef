@@ -1,17 +1,18 @@
+import {QueryClient} from '@tanstack/react-query';
 import {createBrowserRouter} from 'react-router-dom';
+
 import App from './App';
 import ErrorPage from './ErrorPage';
-import Project from './pages/automation/project/Project';
-import Integrations from './pages/embedded/integrations/Integrations';
-import Connections from './pages/automation/connections/Connections';
-import Settings from './pages/settings/Settings';
-import Instances from './pages/automation/instances/Instances';
-import Executions from './pages/automation/executions/Executions';
-import {QueryClient} from '@tanstack/react-query';
 import {ProjectsApi} from './middleware/project';
-import {ProjectKeys} from './queries/projects.queries';
+import Connections from './pages/automation/connections/Connections';
 import OAuthPopup from './pages/automation/connections/oauth2/OAuthPopup';
+import Executions from './pages/automation/executions/Executions';
+import Instances from './pages/automation/instances/Instances';
+import Project from './pages/automation/project/Project';
 import Projects from './pages/automation/projects/Projects';
+import Integrations from './pages/embedded/integrations/Integrations';
+import Settings from './pages/settings/Settings';
+import {ProjectKeys} from './queries/projects.queries';
 
 const queryClient = new QueryClient();
 

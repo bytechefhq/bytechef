@@ -1,20 +1,21 @@
+import {CalendarIcon} from '@heroicons/react/24/outline';
+import {Component1Icon} from '@radix-ui/react-icons';
+import {useQueryClient} from '@tanstack/react-query';
 import React, {useState} from 'react';
+
+import AlertDialog from '../../../components/AlertDialog/AlertDialog';
+import Badge from '../../../components/Badge/Badge';
 import DropdownMenu, {
     IDropdownMenuItem,
 } from '../../../components/DropdownMenu/DropdownMenu';
+import TagList from '../../../components/TagList/TagList';
 import {ConnectionModel, TagModel} from '../../../middleware/connection';
-import {useQueryClient} from '@tanstack/react-query';
-import {Component1Icon} from '@radix-ui/react-icons';
-import {ConnectionKeys} from '../../../queries/connections.queries';
 import {
     useDeleteConnectionMutation,
     useUpdateConnectionTagsMutation,
 } from '../../../mutations/connections.mutations';
 import {ComponentDefinitionKeys} from '../../../queries/componentDefinitions.queries';
-import TagList from '../../../components/TagList/TagList';
-import Badge from '../../../components/Badge/Badge';
-import {CalendarIcon} from '@heroicons/react/24/outline';
-import AlertDialog from '../../../components/AlertDialog/AlertDialog';
+import {ConnectionKeys} from '../../../queries/connections.queries';
 import ConnectionDialog from './ConnectionDialog';
 
 interface ConnectionListItemProps {
@@ -87,6 +88,7 @@ const ConnectionListItem = ({
                             />
                         </div>
                     </div>
+
                     <div className="mt-2 sm:flex sm:items-center sm:justify-between">
                         <div
                             className="flex h-[38px] items-center"

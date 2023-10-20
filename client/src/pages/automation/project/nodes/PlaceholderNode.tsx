@@ -1,9 +1,9 @@
 import {memo, useState} from 'react';
-import {Handle, Position, NodeProps} from 'reactflow';
-
-import styles from './NodeTypes.module.css';
-import PopoverMenu from '../components/PopoverMenu';
+import {Handle, NodeProps, Position} from 'reactflow';
 import {twMerge} from 'tailwind-merge';
+
+import PopoverMenu from '../components/PopoverMenu';
+import styles from './NodeTypes.module.css';
 
 const PlaceholderNode = ({id, data}: NodeProps) => {
     const [isDropzoneActive, setDropzoneActive] = useState<boolean>(false);

@@ -1,14 +1,15 @@
-import {useState} from 'react';
 import {
     FolderPlusIcon,
     LightBulbIcon,
     LinkIcon,
     QueueListIcon,
 } from '@heroicons/react/24/outline';
-import {DesktopSidebar} from './components/Sidebar/DesktopSidebar';
-import {MobileTopNavigation} from './components/Sidebar/MobileTopNavigation';
-import {MobileSidebar} from './components/Sidebar/MobileSidebar';
+import {useState} from 'react';
 import {Outlet} from 'react-router-dom';
+
+import {DesktopSidebar} from './components/Sidebar/DesktopSidebar';
+import {MobileSidebar} from './components/Sidebar/MobileSidebar';
+import {MobileTopNavigation} from './components/Sidebar/MobileTopNavigation';
 
 const user = {
     name: 'Emily Selman',

@@ -1,7 +1,7 @@
-import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
-import React, {Dispatch, Fragment, SetStateAction} from 'react';
-import Button from '../Button/Button';
+import {Transition} from '@headlessui/react';
 import {
+    Action,
+    Cancel,
     Content,
     Description,
     Overlay,
@@ -9,7 +9,9 @@ import {
     Root,
     Title,
 } from '@radix-ui/react-alert-dialog';
-import {Transition} from '@headlessui/react';
+import React, {Dispatch, Fragment, SetStateAction} from 'react';
+
+import Button from '../Button/Button';
 
 interface AlertDialogProps {
     danger: boolean;
@@ -69,15 +71,15 @@ const AlertDialog = ({
                             </Description>
 
                             <div className="mt-4 flex justify-end space-x-2">
-                                <AlertDialogPrimitive.Cancel asChild>
+                                <Cancel asChild>
                                     <Button
                                         displayType="lightBorder"
                                         label="Cancel"
                                         type="button"
                                     />
-                                </AlertDialogPrimitive.Cancel>
+                                </Cancel>
 
-                                <AlertDialogPrimitive.Action asChild>
+                                <Action asChild>
                                     <Button
                                         displayType={
                                             danger ? 'danger' : 'primary'
@@ -86,7 +88,7 @@ const AlertDialog = ({
                                         type="submit"
                                         onClick={onConfirmClick}
                                     />
-                                </AlertDialogPrimitive.Action>
+                                </Action>
                             </div>
                         </Content>
                     </Transition.Child>

@@ -1,5 +1,6 @@
 import {useQuery} from '@tanstack/react-query';
-import {Oauth2Api, OAuth2PropertiesModel} from '../middleware/connection';
+
+import {OAuth2PropertiesModel, Oauth2Api} from '../middleware/connection';
 
 export const OAuth2PropertiesKeys = {
     oAuth2Properties: ['oAuth2Properties'] as const,

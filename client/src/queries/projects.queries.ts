@@ -6,10 +6,11 @@ import {
     ProjectCategoriesApi,
     ProjectExecutionsApi,
     ProjectModel,
-    ProjectsApi,
     ProjectTagsApi,
+    ProjectsApi,
     TagModel,
 } from 'middleware/project';
+
 import {WorkflowModel} from '../middleware/workflow';
 
 export const ProjectKeys = {
