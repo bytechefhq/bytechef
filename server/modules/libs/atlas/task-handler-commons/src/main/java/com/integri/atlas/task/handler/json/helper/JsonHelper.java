@@ -76,44 +76,6 @@ public class JsonHelper {
         );
     }
 
-    public Object check(Object object) {
-        return check(object, null);
-    }
-
-    public Object check(Object object, Class<?> clazz) {
-        Object result = null;
-
-        if (object != null) {
-            if (object instanceof List list) {
-                result = list;
-            } else if (object instanceof Collection<?> collection) {
-                result = new ArrayList<>(collection);
-            } else if (object instanceof Map map) {
-                result = map;
-            } else if (object instanceof String string && (string.startsWith("{") || string.startsWith("["))) {
-                if (string.startsWith("{")) {
-                    result = read(string, Map.class);
-                } else {
-                    result = read(string, List.class);
-                }
-            } else {
-                throw new IllegalArgumentException(
-                    String.format("%s cannot be converted to JSON compatible format", object)
-                );
-            }
-
-            List<Class<?>> classes = getClasses(result);
-
-            if (clazz != null && !classes.contains(clazz)) {
-                throw new IllegalArgumentException(
-                    String.format("%s cannot be converted to JSON compatible format", object)
-                );
-            }
-        }
-
-        return result;
-    }
-
     public <T> List<T> checkArray(Object object, Class<T> itemClass) {
         return checkArray(object, typeFactory.constructType(itemClass));
     }

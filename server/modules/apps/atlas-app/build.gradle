@@ -59,7 +59,7 @@ dependencies {
     implementation project(":modules:libs:atlas:task-handler:task-handler-xlsx-file")
     implementation project(":modules:libs:atlas:task-handler:task-handler-xml-helpers")
     implementation project(":modules:libs:atlas:task-handler:task-handler-xml-file")
-    implementation project(":modules:libs:atlas:task-handler-common")
+    implementation project(":modules:libs:atlas:task-handler-commons")
     implementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-git")
     implementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-jdbc")
     implementation project(":modules:libs:atlas:engine:engine-workflow:engine-workflow-repository:engine-workflow-repository-resource")
