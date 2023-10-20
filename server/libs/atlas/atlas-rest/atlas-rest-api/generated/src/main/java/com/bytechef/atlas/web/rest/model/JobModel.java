@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-20T23:05:08.874398+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T09:06:53.695754+01:00[Europe/Zagreb]")
 public class JobModel {
 
   @JsonProperty("createdBy")
@@ -141,7 +141,7 @@ public class JobModel {
    * @return createdBy
   */
   
-  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", required = false)
+  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getCreatedBy() {
     return createdBy;
   }
@@ -160,7 +160,7 @@ public class JobModel {
    * @return createdDate
   */
   @Valid 
-  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", required = false)
+  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -179,7 +179,7 @@ public class JobModel {
    * @return currentTask
   */
   
-  @Schema(name = "currentTask", accessMode = Schema.AccessMode.READ_ONLY, description = "The index of the step on the job's workflow on which the job is working on right now.", required = false)
+  @Schema(name = "currentTask", accessMode = Schema.AccessMode.READ_ONLY, description = "The index of the step on the job's workflow on which the job is working on right now.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getCurrentTask() {
     return currentTask;
   }
@@ -198,7 +198,7 @@ public class JobModel {
    * @return endTime
   */
   @Valid 
-  @Schema(name = "endTime", description = "The time execution entered end status COMPLETED, STOPPED, FAILED", required = false)
+  @Schema(name = "endTime", description = "The time execution entered end status COMPLETED, STOPPED, FAILED", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getEndTime() {
     return endTime;
   }
@@ -217,7 +217,7 @@ public class JobModel {
    * @return error
   */
   @Valid 
-  @Schema(name = "error", required = false)
+  @Schema(name = "error", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public ExecutionErrorModel getError() {
     return error;
   }
@@ -236,7 +236,7 @@ public class JobModel {
    * @return id
   */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "Id of the job.", required = false)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "Id of the job.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getId() {
     return id;
   }
@@ -263,7 +263,7 @@ public class JobModel {
    * @return inputs
   */
   
-  @Schema(name = "inputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The key-value map of the inputs passed to the job when it was created.", required = false)
+  @Schema(name = "inputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The key-value map of the inputs passed to the job when it was created.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Map<String, Object> getInputs() {
     return inputs;
   }
@@ -282,7 +282,7 @@ public class JobModel {
    * @return label
   */
   
-  @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The job's human-readable name.", required = false)
+  @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The job's human-readable name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLabel() {
     return label;
   }
@@ -301,7 +301,7 @@ public class JobModel {
    * @return lastModifiedBy
   */
   
-  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", required = false)
+  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -320,7 +320,7 @@ public class JobModel {
    * @return lastModifiedDate
   */
   @Valid 
-  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", required = false)
+  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -347,7 +347,7 @@ public class JobModel {
    * @return outputs
   */
   
-  @Schema(name = "outputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The key-value map of the outputs returned.", required = false)
+  @Schema(name = "outputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The key-value map of the outputs returned.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Map<String, Object> getOutputs() {
     return outputs;
   }
@@ -366,7 +366,7 @@ public class JobModel {
    * @return parentTaskExecutionId
   */
   
-  @Schema(name = "parentTaskExecutionId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the parent task that created this job. Required for sub-flows.", required = false)
+  @Schema(name = "parentTaskExecutionId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the parent task that created this job. Required for sub-flows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Long getParentTaskExecutionId() {
     return parentTaskExecutionId;
   }
@@ -385,7 +385,7 @@ public class JobModel {
    * @return priority
   */
   
-  @Schema(name = "priority", accessMode = Schema.AccessMode.READ_ONLY, description = "The priority value.", required = true)
+  @Schema(name = "priority", accessMode = Schema.AccessMode.READ_ONLY, description = "The priority value.", requiredMode = Schema.RequiredMode.REQUIRED)
   public Integer getPriority() {
     return priority;
   }
@@ -404,7 +404,7 @@ public class JobModel {
    * @return startTime
   */
   @Valid 
-  @Schema(name = "startTime", accessMode = Schema.AccessMode.READ_ONLY, description = "The time of when the job began.", required = true)
+  @Schema(name = "startTime", accessMode = Schema.AccessMode.READ_ONLY, description = "The time of when the job began.", requiredMode = Schema.RequiredMode.REQUIRED)
   public LocalDateTime getStartTime() {
     return startTime;
   }
@@ -423,7 +423,7 @@ public class JobModel {
    * @return status
   */
   
-  @Schema(name = "status", accessMode = Schema.AccessMode.READ_ONLY, description = "The job's status.", required = true)
+  @Schema(name = "status", accessMode = Schema.AccessMode.READ_ONLY, description = "The job's status.", requiredMode = Schema.RequiredMode.REQUIRED)
   public StatusEnum getStatus() {
     return status;
   }
@@ -450,7 +450,7 @@ public class JobModel {
    * @return webhooks
   */
   @Valid 
-  @Schema(name = "webhooks", accessMode = Schema.AccessMode.READ_ONLY, description = "The list of the webhooks configured.", required = false)
+  @Schema(name = "webhooks", accessMode = Schema.AccessMode.READ_ONLY, description = "The list of the webhooks configured.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<Map<String, Object>> getWebhooks() {
     return webhooks;
   }
@@ -469,7 +469,7 @@ public class JobModel {
    * @return workflowId
   */
   
-  @Schema(name = "workflowId", accessMode = Schema.AccessMode.READ_ONLY, required = false)
+  @Schema(name = "workflowId", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getWorkflowId() {
     return workflowId;
   }

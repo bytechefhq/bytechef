@@ -2,7 +2,6 @@ package com.bytechef.hermes.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.connection.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -24,19 +23,19 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "putConnectionTags_request", description = "The request object that contains the array of tags.")
 @JsonTypeName("putConnectionTags_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-26T23:43:53.466934+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T11:45:15.933556+01:00[Europe/Zagreb]")
 public class PutConnectionTagsRequestModel {
 
   @JsonProperty("tags")
   @Valid
-  private List<TagModel> tags = null;
+  private List<com.bytechef.tag.web.rest.model.TagModel> tags = null;
 
-  public PutConnectionTagsRequestModel tags(List<TagModel> tags) {
+  public PutConnectionTagsRequestModel tags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
     this.tags = tags;
     return this;
   }
 
-  public PutConnectionTagsRequestModel addTagsItem(TagModel tagsItem) {
+  public PutConnectionTagsRequestModel addTagsItem(com.bytechef.tag.web.rest.model.TagModel tagsItem) {
     if (this.tags == null) {
       this.tags = new ArrayList<>();
     }
@@ -50,11 +49,11 @@ public class PutConnectionTagsRequestModel {
   */
   @Valid 
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<TagModel> getTags() {
+  public List<com.bytechef.tag.web.rest.model.TagModel> getTags() {
     return tags;
   }
 
-  public void setTags(List<TagModel> tags) {
+  public void setTags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
     this.tags = tags;
   }
 

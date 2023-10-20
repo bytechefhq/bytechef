@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-20T23:05:08.874398+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T09:06:53.695754+01:00[Europe/Zagreb]")
 public class WorkflowModel {
 
   @JsonProperty("createdBy")
@@ -128,7 +128,7 @@ public class WorkflowModel {
    * @return createdBy
   */
   
-  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", required = false)
+  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getCreatedBy() {
     return createdBy;
   }
@@ -147,7 +147,7 @@ public class WorkflowModel {
    * @return createdDate
   */
   @Valid 
-  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", required = false)
+  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -166,7 +166,7 @@ public class WorkflowModel {
    * @return definition
   */
   
-  @Schema(name = "definition", required = false)
+  @Schema(name = "definition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getDefinition() {
     return definition;
   }
@@ -185,7 +185,7 @@ public class WorkflowModel {
    * @return format
   */
   @Valid 
-  @Schema(name = "format", required = false)
+  @Schema(name = "format", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public WorkflowFormatModel getFormat() {
     return format;
   }
@@ -204,7 +204,7 @@ public class WorkflowModel {
    * @return id
   */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the workflow.", required = false)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getId() {
     return id;
   }
@@ -231,7 +231,7 @@ public class WorkflowModel {
    * @return inputs
   */
   @Valid 
-  @Schema(name = "inputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's expected list of inputs.", required = false)
+  @Schema(name = "inputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's expected list of inputs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<Map<String, Object>> getInputs() {
     return inputs;
   }
@@ -250,7 +250,7 @@ public class WorkflowModel {
    * @return label
   */
   
-  @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The descriptive name for the workflow", required = false)
+  @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The descriptive name for the workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLabel() {
     return label;
   }
@@ -269,7 +269,7 @@ public class WorkflowModel {
    * @return lastModifiedBy
   */
   
-  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", required = false)
+  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -288,7 +288,7 @@ public class WorkflowModel {
    * @return lastModifiedDate
   */
   @Valid 
-  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", required = false)
+  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -315,7 +315,7 @@ public class WorkflowModel {
    * @return outputs
   */
   @Valid 
-  @Schema(name = "outputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's list of expected outputs.", required = false)
+  @Schema(name = "outputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's list of expected outputs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<Map<String, Object>> getOutputs() {
     return outputs;
   }
@@ -334,7 +334,7 @@ public class WorkflowModel {
    * @return sourceType
   */
   
-  @Schema(name = "sourceType", description = "The type of the source which stores the workflow definition.", required = false)
+  @Schema(name = "sourceType", description = "The type of the source which stores the workflow definition.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public SourceTypeEnum getSourceType() {
     return sourceType;
   }
@@ -353,7 +353,7 @@ public class WorkflowModel {
    * @return retry
   */
   
-  @Schema(name = "retry", accessMode = Schema.AccessMode.READ_ONLY, description = "The maximum number of times a task may retry.", required = false)
+  @Schema(name = "retry", accessMode = Schema.AccessMode.READ_ONLY, description = "The maximum number of times a task may retry.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getRetry() {
     return retry;
   }
@@ -380,7 +380,7 @@ public class WorkflowModel {
    * @return tasks
   */
   @Valid 
-  @Schema(name = "tasks", accessMode = Schema.AccessMode.READ_ONLY, description = "The steps that make up the workflow.", required = false)
+  @Schema(name = "tasks", accessMode = Schema.AccessMode.READ_ONLY, description = "The steps that make up the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<WorkflowTaskModel> getTasks() {
     return tasks;
   }
@@ -399,7 +399,7 @@ public class WorkflowModel {
    * @return version
   */
   
-  @Schema(name = "version", required = false)
+  @Schema(name = "version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getVersion() {
     return version;
   }

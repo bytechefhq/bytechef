@@ -1,31 +1,35 @@
 package com.bytechef.hermes.project.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A group of workflows that make one logical integration.
+ * A group of workflows that make one logical project.
  */
 
-@Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
-@JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-28T11:24:35.597268+01:00[Europe/Zagreb]")
+@Schema(name = "Project", description = "A group of workflows that make one logical project.")
+@JsonTypeName("Project")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T11:35:39.488347+01:00[Europe/Zagreb]")
 public class ProjectModel {
 
   @JsonProperty("category")
-  private CategoryModel category;
+  private com.bytechef.category.web.rest.model.CategoryModel category;
 
   @JsonProperty("createdBy")
   private String createdBy;
@@ -52,7 +56,7 @@ public class ProjectModel {
 
   @JsonProperty("tags")
   @Valid
-  private List<TagModel> tags = null;
+  private List<com.bytechef.tag.web.rest.model.TagModel> tags = null;
 
   @JsonProperty("version")
   private Integer version;
@@ -61,7 +65,7 @@ public class ProjectModel {
   @Valid
   private List<String> workflowIds = null;
 
-  public ProjectModel category(CategoryModel category) {
+  public ProjectModel category(com.bytechef.category.web.rest.model.CategoryModel category) {
     this.category = category;
     return this;
   }
@@ -70,13 +74,13 @@ public class ProjectModel {
    * Get category
    * @return category
   */
-  @Valid
+  @Valid 
   @Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public CategoryModel getCategory() {
+  public com.bytechef.category.web.rest.model.CategoryModel getCategory() {
     return category;
   }
 
-  public void setCategory(CategoryModel category) {
+  public void setCategory(com.bytechef.category.web.rest.model.CategoryModel category) {
     this.category = category;
   }
 
@@ -89,7 +93,7 @@ public class ProjectModel {
    * The created by.
    * @return createdBy
   */
-
+  
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getCreatedBy() {
     return createdBy;
@@ -108,7 +112,7 @@ public class ProjectModel {
    * The created date.
    * @return createdDate
   */
-  @Valid
+  @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getCreatedDate() {
     return createdDate;
@@ -124,11 +128,11 @@ public class ProjectModel {
   }
 
   /**
-   * The id of an integration.
+   * The id of an project.
    * @return id
   */
-
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Long getId() {
     return id;
   }
@@ -143,11 +147,11 @@ public class ProjectModel {
   }
 
   /**
-   * The name of the integration.
+   * The name of the project.
    * @return name
   */
-  @NotNull
-  @Schema(name = "name", description = "The name of the integration.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @NotNull 
+  @Schema(name = "name", description = "The name of the project.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getName() {
     return name;
   }
@@ -162,11 +166,11 @@ public class ProjectModel {
   }
 
   /**
-   * The description of the integration.
+   * The description of the project.
    * @return description
   */
-
-  @Schema(name = "description", description = "The description of the integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  
+  @Schema(name = "description", description = "The description of the project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getDescription() {
     return description;
   }
@@ -184,7 +188,7 @@ public class ProjectModel {
    * The last modified by.
    * @return lastModifiedBy
   */
-
+  
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLastModifiedBy() {
     return lastModifiedBy;
@@ -203,7 +207,7 @@ public class ProjectModel {
    * The last modified date.
    * @return lastModifiedDate
   */
-  @Valid
+  @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
@@ -213,12 +217,12 @@ public class ProjectModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public ProjectModel tags(List<TagModel> tags) {
+  public ProjectModel tags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
     this.tags = tags;
     return this;
   }
 
-  public ProjectModel addTagsItem(TagModel tagsItem) {
+  public ProjectModel addTagsItem(com.bytechef.tag.web.rest.model.TagModel tagsItem) {
     if (this.tags == null) {
       this.tags = new ArrayList<>();
     }
@@ -230,13 +234,13 @@ public class ProjectModel {
    * Get tags
    * @return tags
   */
-  @Valid
+  @Valid 
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<TagModel> getTags() {
+  public List<com.bytechef.tag.web.rest.model.TagModel> getTags() {
     return tags;
   }
 
-  public void setTags(List<TagModel> tags) {
+  public void setTags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
     this.tags = tags;
   }
 
@@ -249,7 +253,7 @@ public class ProjectModel {
    * Get version
    * @return version
   */
-
+  
   @Schema(name = "version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getVersion() {
     return version;
@@ -273,11 +277,11 @@ public class ProjectModel {
   }
 
   /**
-   * The workflow ids belonging to this integration.
+   * The workflow ids belonging to this project.
    * @return workflowIds
   */
-
-  @Schema(name = "workflowIds", description = "The workflow ids belonging to this integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  
+  @Schema(name = "workflowIds", description = "The workflow ids belonging to this project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<String> getWorkflowIds() {
     return workflowIds;
   }
@@ -294,18 +298,18 @@ public class ProjectModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ProjectModel integration = (ProjectModel) o;
-    return Objects.equals(this.category, integration.category) &&
-        Objects.equals(this.createdBy, integration.createdBy) &&
-        Objects.equals(this.createdDate, integration.createdDate) &&
-        Objects.equals(this.id, integration.id) &&
-        Objects.equals(this.name, integration.name) &&
-        Objects.equals(this.description, integration.description) &&
-        Objects.equals(this.lastModifiedBy, integration.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, integration.lastModifiedDate) &&
-        Objects.equals(this.tags, integration.tags) &&
-        Objects.equals(this.version, integration.version) &&
-        Objects.equals(this.workflowIds, integration.workflowIds);
+    ProjectModel project = (ProjectModel) o;
+    return Objects.equals(this.category, project.category) &&
+        Objects.equals(this.createdBy, project.createdBy) &&
+        Objects.equals(this.createdDate, project.createdDate) &&
+        Objects.equals(this.id, project.id) &&
+        Objects.equals(this.name, project.name) &&
+        Objects.equals(this.description, project.description) &&
+        Objects.equals(this.lastModifiedBy, project.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, project.lastModifiedDate) &&
+        Objects.equals(this.tags, project.tags) &&
+        Objects.equals(this.version, project.version) &&
+        Objects.equals(this.workflowIds, project.workflowIds);
   }
 
   @Override
@@ -316,7 +320,7 @@ public class ProjectModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class IntegrationModel {\n");
+    sb.append("class ProjectModel {\n");
     sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
