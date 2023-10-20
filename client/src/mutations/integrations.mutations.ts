@@ -7,6 +7,8 @@ import {
     UpdateIntegrationTagsRequest,
 } from 'middleware/integration';
 
+import {WorkflowModel} from '../middleware/workflow';
+
 type CreateIntegrationMutationProps = {
     onSuccess?: (result: IntegrationModel, variables: IntegrationModel) => void;
     onError?: (error: object, variables: IntegrationModel) => void;
@@ -78,7 +80,7 @@ export const useDeleteIntegrationMutation = (
 
 type CreateIntegrationWorkflowRequestMutationProps = {
     onSuccess?: (
-        result: IntegrationModel,
+        result: WorkflowModel,
         variables: CreateIntegrationWorkflowRequest
     ) => void;
     onError?: (
