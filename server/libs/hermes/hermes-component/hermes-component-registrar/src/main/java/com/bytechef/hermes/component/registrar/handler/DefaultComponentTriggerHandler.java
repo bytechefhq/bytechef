@@ -42,6 +42,7 @@ import com.bytechef.hermes.component.definition.WebhookBodyImpl;
 import com.bytechef.hermes.component.definition.WebhookHeadersImpl;
 import com.bytechef.hermes.component.definition.WebhookParametersImpl;
 import com.bytechef.hermes.component.util.ComponentContextSupplier;
+import com.bytechef.hermes.connection.WorkflowConnection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.data.storage.domain.DataStorage.Scope;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
@@ -104,7 +105,10 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
     public Object handle(TriggerExecution triggerExecution) throws TriggerExecutionException {
         TriggerContext context = new ContextImpl(
             connectionDefinitionService, connectionService, eventPublisher, fileStorageService,
-            triggerExecution.getParameters(), null);
+            null,
+            WorkflowConnection.of(triggerExecution.getWorkflowTrigger())
+                .map(workflowConnection -> Map.of(workflowConnection.getName(), workflowConnection))
+                .orElse(Map.of()));
 
         return ComponentContextSupplier.get(
             context, componentDefinitionFactory.getDefinition(), () -> doHandle(triggerExecution, context));

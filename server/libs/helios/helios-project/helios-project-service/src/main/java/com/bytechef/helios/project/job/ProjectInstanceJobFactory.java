@@ -19,6 +19,7 @@ package com.bytechef.helios.project.job;
 
 import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.job.JobFactory;
+import com.bytechef.helios.project.constant.ProjectConstants;
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.job.InstanceJobFactory;
@@ -27,6 +28,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
+/**
+ * @author Ivica Cardic
+ */
 @Component
 public class ProjectInstanceJobFactory implements InstanceJobFactory {
 
@@ -56,6 +60,6 @@ public class ProjectInstanceJobFactory implements InstanceJobFactory {
 
     @Override
     public String getType() {
-        return "PROJECT";
+        return ProjectConstants.PROJECT;
     }
 }

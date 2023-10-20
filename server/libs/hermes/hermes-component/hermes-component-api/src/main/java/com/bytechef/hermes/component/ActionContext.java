@@ -17,10 +17,16 @@
 
 package com.bytechef.hermes.component;
 
+import java.util.Optional;
+
 /**
  * @author Ivica Cardic
  */
 public interface ActionContext extends Context {
+
+    Optional<Connection> fetchConnection(String name);
+
+    Connection getConnection(String name);
 
     /**
      *

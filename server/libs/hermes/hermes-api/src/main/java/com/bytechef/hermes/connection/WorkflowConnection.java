@@ -18,23 +18,87 @@
 package com.bytechef.hermes.connection;
 
 import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.task.WorkflowTask;
+import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.hermes.trigger.WorkflowTrigger;
+import org.springframework.core.ParameterizedTypeReference;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
  */
-public record WorkflowConnection(String componentName, int connectionVersion) {
+public class WorkflowConnection {
+
+    private static final String CONNECTIONS = "connections";
+
+    private final String componentName;
+    private final int connectionVersion;
+    private final String name;
+    private final String title;
+
+    private WorkflowConnection(String componentName, int connectionVersion, String name, String title) {
+        this.componentName = componentName;
+        this.connectionVersion = connectionVersion;
+        this.name = name;
+        this.title = title;
+    }
+
+    public static Map<String, WorkflowConnection> of(WorkflowTask workflowTask) {
+        return toMap(workflowTask.getExtension(CONNECTIONS, new ParameterizedTypeReference<>() {}));
+    }
+
+    public static Optional<WorkflowConnection> of(WorkflowTrigger workflowTrigger) {
+        return toMap(workflowTrigger.getExtension(CONNECTIONS, new ParameterizedTypeReference<>() {}))
+            .values()
+            .stream()
+            .findFirst();
+    }
 
     public static List<WorkflowConnection> of(Workflow workflow) {
-        // TODO trigger
+        List<WorkflowConnection> workflowConnections = new ArrayList<>();
 
-        return workflow.getTasks()
+        WorkflowTrigger.of(workflow)
             .stream()
-            .map(workflowTask -> workflowTask.fetchExtension(WorkflowConnection.class))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .toList();
+            .map(WorkflowConnection::of)
+            .forEach(optional -> optional.ifPresent(workflowConnections::add));
+
+        workflow.getTasks()
+            .stream()
+            .map(WorkflowConnection::of)
+            .forEach(workflowConnectionMap -> workflowConnections.addAll(workflowConnectionMap.values()));
+
+        return workflowConnections;
+    }
+
+    public String getComponentName() {
+        return componentName;
+    }
+
+    public int getConnectionVersion() {
+        return connectionVersion;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    private static Map<String, WorkflowConnection> toMap(Map<String, Map<String, Object>> source) {
+        return source.entrySet()
+            .stream()
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> new WorkflowConnection(
+                    MapValueUtils.getRequiredString(entry.getValue(), "componentName"),
+                    MapValueUtils.getRequiredInteger(entry.getValue(), "connectionVersion"),
+                    entry.getKey(), MapValueUtils.getString(entry.getValue(), "title"))));
     }
 }

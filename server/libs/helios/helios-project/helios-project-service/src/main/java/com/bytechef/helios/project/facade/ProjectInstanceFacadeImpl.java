@@ -20,6 +20,7 @@ package com.bytechef.helios.project.facade;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.helios.project.constant.ProjectConstants;
 import com.bytechef.helios.project.domain.Project;
 import com.bytechef.helios.project.domain.ProjectInstance;
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflow;
@@ -29,7 +30,6 @@ import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.project.service.ProjectService;
 import com.bytechef.hermes.connection.WorkflowConnection;
-import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.trigger.WorkflowTrigger;
 import com.bytechef.hermes.trigger.executor.TriggerLifecycleExecutor;
@@ -98,20 +98,20 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
             Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
 
-            workflow.fetchExtension(WorkflowTrigger.class)
-                .ifPresent(workflowTrigger -> {
-                    Connection connection = workflowTrigger.fetchExtension(WorkflowConnection.class)
-                        .map(workflowConnection -> connectionService.getConnection(
-                            workflowConnection.componentName(), workflowConnection.connectionVersion()))
-                        .orElse(null);
+            List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
-                    triggerLifecycleExecutor.executeTriggerEnable(
-                        workflowTrigger,
-                        WorkflowExecutionId.of(
-                            workflow.getId(), projectInstanceDTO.id(), "PROJECT", workflowTrigger.getTriggerName()),
-                        connection,
-                        projectInstanceWorkflow.getInputs());
-                });
+            for (WorkflowTrigger workflowTrigger : workflowTriggers) {
+                triggerLifecycleExecutor.executeTriggerEnable(
+                    workflowTrigger,
+                    WorkflowExecutionId.of(
+                        workflow.getId(), projectInstanceDTO.id(), ProjectConstants.PROJECT,
+                        workflowTrigger.getTriggerName()),
+                    WorkflowConnection.of(workflowTrigger)
+                        .map(workflowConnection -> connectionService.getConnection(
+                            workflowConnection.getComponentName(), workflowConnection.getConnectionVersion()))
+                        .orElse(null),
+                    projectInstanceWorkflow.getInputs());
+            }
         }
 
         return new ProjectInstanceDTO(
@@ -139,19 +139,19 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
             Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
 
-            workflow.fetchExtension(WorkflowTrigger.class)
-                .ifPresent(workflowTrigger -> {
-                    Connection connection = workflowTrigger.fetchExtension(WorkflowConnection.class)
-                        .map(workflowConnection -> connectionService.getConnection(
-                            workflowConnection.componentName(), workflowConnection.connectionVersion()))
-                        .orElse(null);
+            List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
-                    triggerLifecycleExecutor.executeTriggerDisable(
-                        workflowTrigger,
-                        WorkflowExecutionId.of(
-                            workflow.getId(), projectInstanceId, "PROJECT", workflowTrigger.getTriggerName()),
-                        connection);
-                });
+            for (WorkflowTrigger workflowTrigger : workflowTriggers) {
+                triggerLifecycleExecutor.executeTriggerDisable(
+                    workflowTrigger,
+                    WorkflowExecutionId.of(
+                        workflow.getId(), projectInstanceId, ProjectConstants.PROJECT,
+                        workflowTrigger.getTriggerName()),
+                    WorkflowConnection.of(workflowTrigger)
+                        .map(workflowConnection -> connectionService.getConnection(
+                            workflowConnection.getComponentName(), workflowConnection.getConnectionVersion()))
+                        .orElse(null));
+            }
         }
 
 // TODO find a way to delete ll tags not referenced anymore
@@ -214,8 +214,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             projectInstanceService.update(
                 projectInstanceDTO.id(), projectInstanceDTO.description(), projectInstanceDTO.name(),
                 projectInstanceDTO.status(), CollectionUtils.map(tags, Tag::getId), projectInstanceDTO.version()),
-            projectInstanceWorkflows, projectService.getProject(projectInstanceDTO.projectId()),
-            tags);
+            projectInstanceWorkflows, projectService.getProject(projectInstanceDTO.projectId()), tags);
     }
 
     @Override
