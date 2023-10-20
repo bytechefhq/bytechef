@@ -39,6 +39,7 @@ import org.springframework.core.io.Resource;
 public class WorkflowResource implements Resource {
 
     private final String id;
+    private final long lastModified;
     private final Map<String, Object> metadata;
     private final transient Resource resource;
     private final Workflow.Format workflowFormat;
@@ -46,7 +47,14 @@ public class WorkflowResource implements Resource {
     public WorkflowResource(
         String id, Map<String, Object> metadata, Resource resource, Workflow.Format workflowFormat) {
 
+        this(id, 0, metadata, resource, workflowFormat);
+    }
+
+    public WorkflowResource(
+        String id, long lastModified, Map<String, Object> metadata, Resource resource,Workflow.Format workflowFormat) {
+
         this.id = id;
+        this.lastModified = lastModified;
         this.metadata = new HashMap<>(metadata);
         this.resource = resource;
         this.workflowFormat = workflowFormat;
@@ -102,7 +110,11 @@ public class WorkflowResource implements Resource {
 
     @Override
     public long lastModified() throws IOException {
-        return resource.lastModified();
+        if (lastModified == 0 ) {
+            return resource.lastModified();
+        }
+
+        return lastModified;
     }
 
     @Override

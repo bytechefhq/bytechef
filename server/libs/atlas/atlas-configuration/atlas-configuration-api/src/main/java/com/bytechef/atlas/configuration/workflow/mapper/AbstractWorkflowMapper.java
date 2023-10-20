@@ -106,9 +106,13 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
     }
 
     protected Map<String, Object> readWorkflowMap(WorkflowResource workflowResource, ObjectMapper objectMapper) {
-        String definition = readDefinition(workflowResource);
+        try {
+            String definition = readDefinition(workflowResource);
 
-        return parse(definition, objectMapper);
+            return parse(definition, objectMapper);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Map<String, Object> parse(String workflow, ObjectMapper objectMapper) {
@@ -138,11 +142,9 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
         return workflowMap;
     }
 
-    private String readDefinition(Resource resource) {
+    private String readDefinition(Resource resource) throws IOException {
         try (InputStream in = resource.getInputStream()) {
             return FileCopyUtils.copyToString(new InputStreamReader(in, StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 

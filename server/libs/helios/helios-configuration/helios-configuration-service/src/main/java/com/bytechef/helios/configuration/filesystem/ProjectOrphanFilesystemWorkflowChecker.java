@@ -68,7 +68,8 @@ public class ProjectOrphanFilesystemWorkflowChecker {
     @Transactional
     public void onApplicationReadyEvent() {
         List<Project> projects = projectService.getProjects();
-        List<Workflow> workflows = workflowService.getFilesystemWorkflows(ProjectConstants.PROJECT_TYPE);
+        List<Workflow> workflows = workflowService.getWorkflows(
+            ProjectConstants.PROJECT_TYPE, List.of(Workflow.SourceType.FILESYSTEM, Workflow.SourceType.GIT));
 
         List<Workflow> orphanWorkflows = new ArrayList<>();
         List<String> projectWorkflowIds = CollectionUtils.flatMap(projects, Project::getWorkflowIds);
