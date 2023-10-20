@@ -58,12 +58,12 @@ public class TriggerLifecycleFacadeController {
         triggerLifecycleFacade.executeTriggerEnable(
             triggerRequest.workflowId, triggerRequest.instanceId, triggerRequest.instanceType,
             triggerRequest.workflowTriggerName, triggerRequest.workflowTriggerType, triggerRequest.triggerParameters,
-            triggerRequest.connectionId);
+            triggerRequest.connectionId, triggerRequest.webhookUrl);
     }
 
     @SuppressFBWarnings("EI")
-    private record TriggerRequest(
+    public record TriggerRequest(
         String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
-        Map<String, ?> triggerParameters, long connectionId) {
+        Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
     }
 }

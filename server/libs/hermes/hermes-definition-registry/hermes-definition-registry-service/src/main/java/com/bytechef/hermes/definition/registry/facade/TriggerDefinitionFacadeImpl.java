@@ -35,15 +35,13 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     private final ConnectionService connectionService;
     private final TriggerDefinitionService triggerDefinitionService;
-    private final String webhookUrl;
 
     @SuppressFBWarnings("EI")
     public TriggerDefinitionFacadeImpl(
-        ConnectionService connectionService, TriggerDefinitionService triggerDefinitionService, String webhookUrl) {
+        ConnectionService connectionService, TriggerDefinitionService triggerDefinitionService) {
 
         this.connectionService = connectionService;
         this.triggerDefinitionService = triggerDefinitionService;
-        this.webhookUrl = webhookUrl;
     }
 
     @Override
@@ -75,15 +73,15 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        String workflowExecutionId, Long connectionId) {
+        String workflowExecutionId, Long connectionId, String webhookUrl) {
 
         Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
         return triggerDefinitionService.executeDynamicWebhookEnable(
             componentName, componentVersion, triggerName, triggerParameters,
             connection == null ? null : connection.getParameters(),
-            connection == null ? null : connection.getAuthorizationName(), createWebhookUrl(workflowExecutionId),
-            workflowExecutionId);
+            connection == null ? null : connection.getAuthorizationName(),
+            createWebhookUrl(workflowExecutionId, webhookUrl), workflowExecutionId);
     }
 
     @Override
@@ -166,7 +164,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
     }
 
-    private String createWebhookUrl(String workflowExecutionId) {
+    private String createWebhookUrl(String workflowExecutionId, String webhookUrl) {
         return webhookUrl + "/api/webhooks/" + workflowExecutionId;
     }
 }

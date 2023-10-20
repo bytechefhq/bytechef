@@ -46,19 +46,19 @@ public class TriggerLifecycleFacadeClient implements TriggerLifecycleFacade {
             "/api/internal/trigger-lifecycle-facade/execute-trigger-enable",
             new TriggerRequest(
                 workflowId, instanceId, instanceType, workflowTriggerName, workflowTriggerType, triggerParameters,
-                connectionId));
+                connectionId, null));
     }
 
     @Override
     public void executeTriggerEnable(
         String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
-        Map<String, ?> triggerParameters, long connectionId) {
+        Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
 
         post(
             "/api/internal/trigger-lifecycle-facade/execute-trigger-disable",
             new TriggerRequest(
                 workflowId, instanceId, instanceType, workflowTriggerName, workflowTriggerType, triggerParameters,
-                connectionId));
+                connectionId, webhookUrl));
     }
 
     private void post(String path, TriggerRequest workflowExecutionId) {
@@ -73,6 +73,6 @@ public class TriggerLifecycleFacadeClient implements TriggerLifecycleFacade {
     @SuppressFBWarnings("EI")
     private record TriggerRequest(
         String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
-        Map<String, ?> triggerParameters, long connectionId) {
+        Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
     }
 }

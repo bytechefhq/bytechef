@@ -30,5 +30,5 @@ public interface TriggerLifecycleFacade {
 
     void executeTriggerEnable(
         String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
-        Map<String, ?> triggerParameters, long connectionId);
+        Map<String, ?> triggerParameters, long connectionId, String webhookUrl);
 }

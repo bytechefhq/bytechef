@@ -94,7 +94,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
     @Override
     public void executeTriggerEnable(
         String workflowId, long instanceId, String instanceType, String workflowTriggerName, String workflowTriggerType,
-        Map<String, ?> triggerParameters, long connectionId) {
+        Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
 
         ComponentOperation componentOperation = ComponentUtils.getComponentOperation(workflowTriggerType);
 
@@ -114,7 +114,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
                     triggerDefinitionFacade.executeDynamicWebhookEnable(
                         workflowExecutionId.getComponentName(), workflowExecutionId.getComponentVersion(),
                         workflowExecutionId.getComponentTriggerName(), triggerParameters,
-                        workflowExecutionId.toString(), connectionId);
+                        workflowExecutionId.toString(), connectionId, webhookUrl);
 
                 if (output != null) {
                     triggerStateService.save(workflowExecutionId, output);

@@ -82,7 +82,8 @@ public class TriggerDefinitionFacadeController {
         return ResponseEntity.ok(triggerDefinitionFacade.executeDynamicWebhookEnable(
             dynamicWebhookEnableRequest.componentName, dynamicWebhookEnableRequest.componentVersion,
             dynamicWebhookEnableRequest.triggerName, dynamicWebhookEnableRequest.triggerParameters,
-            dynamicWebhookEnableRequest.workflowExecutionId, dynamicWebhookEnableRequest.connectionId));
+            dynamicWebhookEnableRequest.workflowExecutionId, dynamicWebhookEnableRequest.connectionId,
+            dynamicWebhookEnableRequest.webhookUrl));
     }
 
     @RequestMapping(
@@ -209,7 +210,8 @@ public class TriggerDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record DynamicWebhookEnableRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        Map<String, Object> triggerParameters, @NotNull String workflowExecutionId, Long connectionId) {
+        Map<String, Object> triggerParameters, @NotNull String workflowExecutionId, Long connectionId,
+        String webhookUrl) {
     }
 
     @SuppressFBWarnings("EI")
