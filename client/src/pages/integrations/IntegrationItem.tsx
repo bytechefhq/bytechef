@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import DropdownMenu, {
-    DropdownMenuItem,
+    DropdownMenuItemProps,
 } from '../../components/DropdownMenu/DropdownMenu';
 import {
     IntegrationModel,
@@ -35,7 +35,7 @@ const IntegrationItem = ({
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-    const dropdownItems: DropdownMenuItem[] = [
+    const dropdownItems: DropdownMenuItemProps[] = [
         {
             label: 'Edit',
             onClick: () => {
