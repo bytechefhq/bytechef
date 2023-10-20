@@ -3,7 +3,7 @@ import {ChevronDownIcon, PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import Button from 'components/Button/Button';
 import {TagModel} from 'middleware/integration';
-import {useIntegrationTagsMutation} from 'mutations/integrations.mutations';
+import {useUpdateIntegrationTagsMutation} from 'mutations/integrations.mutations';
 import {IntegrationKeys} from 'queries/integrations';
 import {useState} from 'react';
 import {OnChangeValue} from 'react-select';
@@ -28,43 +28,43 @@ const Tag = ({tag, onDeleteTag}: TagProps) => (
 );
 
 interface TagListProps {
-    integrationItemId: number;
-    tags: TagModel[];
+    integrationId: number;
     remainingTags?: TagModel[];
+    tags: TagModel[];
 }
 
-const TagList = ({integrationItemId, tags, remainingTags}: TagListProps) => {
+const TagList = ({integrationId, tags, remainingTags}: TagListProps) => {
     const [showAllTags, setShowAllTags] = useState(false);
     const [isNewTagWindowVisible, setIsNewTagWindowVisible] = useState(false);
 
     const queryClient = useQueryClient();
 
-    const handleOnAddTag = (newTag: TagModel) => {
-        const newTags = (tags && [...tags]) || [];
-
-        newTags.push(newTag);
-
-        tagsMutation.mutate({
-            id: integrationItemId || 0,
-            putIntegrationTagsRequestModel: {
-                tags: newTags || [],
-            },
-        });
-    };
-
-    const tagsMutation = useIntegrationTagsMutation({
+    const updateIntegrationTagsMutation = useUpdateIntegrationTagsMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(IntegrationKeys.integrations);
             queryClient.invalidateQueries(IntegrationKeys.integrationTags);
         },
     });
 
+    const handleOnAddTag = (newTag: TagModel) => {
+        const newTags = (tags && [...tags]) || [];
+
+        newTags.push(newTag);
+
+        updateIntegrationTagsMutation.mutate({
+            id: integrationId!,
+            updateIntegrationTagsRequestModel: {
+                tags: newTags || [],
+            },
+        });
+    };
+
     const handleOnDeleteTag = (deletedTag: TagModel) => {
         const newTags = tags?.filter((tag) => tag.id !== deletedTag.id) || [];
 
-        tagsMutation.mutate({
-            id: integrationItemId || 0,
-            putIntegrationTagsRequestModel: {
+        updateIntegrationTagsMutation.mutate({
+            id: integrationId || 0,
+            updateIntegrationTagsRequestModel: {
                 tags: newTags || [],
             },
         });
