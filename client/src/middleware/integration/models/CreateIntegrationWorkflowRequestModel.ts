@@ -20,11 +20,11 @@ import { exists, mapValues } from '../runtime';
  */
 export interface CreateIntegrationWorkflowRequestModel {
     /**
-     * The workflow name.
+     * The descriptive name for a workflow.
      * @type {string}
      * @memberof CreateIntegrationWorkflowRequestModel
      */
-    name: string;
+    label: string;
     /**
      * The workflow description.
      * @type {string}
@@ -44,7 +44,7 @@ export interface CreateIntegrationWorkflowRequestModel {
  */
 export function instanceOfCreateIntegrationWorkflowRequestModel(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "label" in value;
 
     return isInstance;
 }
@@ -59,7 +59,7 @@ export function CreateIntegrationWorkflowRequestModelFromJSONTyped(json: any, ig
     }
     return {
         
-        'name': json['name'],
+        'label': json['label'],
         'description': !exists(json, 'description') ? undefined : json['description'],
         'definition': !exists(json, 'definition') ? undefined : json['definition'],
     };
@@ -74,7 +74,7 @@ export function CreateIntegrationWorkflowRequestModelToJSON(value?: CreateIntegr
     }
     return {
         
-        'name': value.name,
+        'label': value.label,
         'description': value.description,
         'definition': value.definition,
     };

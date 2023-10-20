@@ -16,21 +16,144 @@
 import * as runtime from '../runtime';
 import type {
   ProjectInstanceModel,
+  UpdateTagsRequestModel,
 } from '../models';
 import {
     ProjectInstanceModelFromJSON,
     ProjectInstanceModelToJSON,
+    UpdateTagsRequestModelFromJSON,
+    UpdateTagsRequestModelToJSON,
 } from '../models';
+
+export interface CreateProjectInstanceRequest {
+    projectInstanceModel: ProjectInstanceModel;
+}
+
+export interface DeleteProjectInstanceRequest {
+    id: number;
+}
+
+export interface GetProjectInstanceRequest {
+    id: number;
+}
 
 export interface GetProjectInstancesRequest {
     projectIds?: Array<number>;
     tagIds?: Array<number>;
 }
 
+export interface UpdateProjectInstanceRequest {
+    id: number;
+    projectInstanceModel: ProjectInstanceModel;
+}
+
+export interface UpdateProjectInstanceTagsRequest {
+    id: number;
+    updateTagsRequestModel: UpdateTagsRequestModel;
+}
+
 /**
  * 
  */
 export class ProjectInstancesApi extends runtime.BaseAPI {
+
+    /**
+     * Create a new project instance.
+     * Create a new project instance.
+     */
+    async createProjectInstanceRaw(requestParameters: CreateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstanceModel>> {
+        if (requestParameters.projectInstanceModel === null || requestParameters.projectInstanceModel === undefined) {
+            throw new runtime.RequiredError('projectInstanceModel','Required parameter requestParameters.projectInstanceModel was null or undefined when calling createProjectInstance.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/project-instances`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ProjectInstanceModelToJSON(requestParameters.projectInstanceModel),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectInstanceModelFromJSON(jsonValue));
+    }
+
+    /**
+     * Create a new project instance.
+     * Create a new project instance.
+     */
+    async createProjectInstance(requestParameters: CreateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstanceModel> {
+        const response = await this.createProjectInstanceRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Delete a project instance.
+     * Delete a project instance.
+     */
+    async deleteProjectInstanceRaw(requestParameters: DeleteProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deleteProjectInstance.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/project-instances/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Delete a project instance.
+     * Delete a project instance.
+     */
+    async deleteProjectInstance(requestParameters: DeleteProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteProjectInstanceRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Get a project instance by id.
+     * Get a project instance by id.
+     */
+    async getProjectInstanceRaw(requestParameters: GetProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstanceModel>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getProjectInstance.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/project-instances/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectInstanceModelFromJSON(jsonValue));
+    }
+
+    /**
+     * Get a project instance by id.
+     * Get a project instance by id.
+     */
+    async getProjectInstance(requestParameters: GetProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstanceModel> {
+        const response = await this.getProjectInstanceRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Get project instances.
@@ -66,6 +189,83 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
     async getProjectInstances(requestParameters: GetProjectInstancesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectInstanceModel>> {
         const response = await this.getProjectInstancesRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Update an existing project instance.
+     * Update an existing project instance.
+     */
+    async updateProjectInstanceRaw(requestParameters: UpdateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstanceModel>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateProjectInstance.');
+        }
+
+        if (requestParameters.projectInstanceModel === null || requestParameters.projectInstanceModel === undefined) {
+            throw new runtime.RequiredError('projectInstanceModel','Required parameter requestParameters.projectInstanceModel was null or undefined when calling updateProjectInstance.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/project-instances/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ProjectInstanceModelToJSON(requestParameters.projectInstanceModel),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectInstanceModelFromJSON(jsonValue));
+    }
+
+    /**
+     * Update an existing project instance.
+     * Update an existing project instance.
+     */
+    async updateProjectInstance(requestParameters: UpdateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstanceModel> {
+        const response = await this.updateProjectInstanceRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Updates tags of an existing project instance.
+     * Updates tags of an existing project instance.
+     */
+    async updateProjectInstanceTagsRaw(requestParameters: UpdateProjectInstanceTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateProjectInstanceTags.');
+        }
+
+        if (requestParameters.updateTagsRequestModel === null || requestParameters.updateTagsRequestModel === undefined) {
+            throw new runtime.RequiredError('updateTagsRequestModel','Required parameter requestParameters.updateTagsRequestModel was null or undefined when calling updateProjectInstanceTags.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/project-instances/{id}/tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateTagsRequestModelToJSON(requestParameters.updateTagsRequestModel),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Updates tags of an existing project instance.
+     * Updates tags of an existing project instance.
+     */
+    async updateProjectInstanceTags(requestParameters: UpdateProjectInstanceTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateProjectInstanceTagsRaw(requestParameters, initOverrides);
     }
 
 }

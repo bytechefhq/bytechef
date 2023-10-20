@@ -7,7 +7,7 @@ models/CategoryModel.ts
 models/CreateIntegrationWorkflowRequestModel.ts
 models/IntegrationModel.ts
 models/TagModel.ts
-models/UpdateIntegrationTagsRequestModel.ts
+models/UpdateTagsRequestModel.ts
 models/WorkflowFormatModel.ts
 models/WorkflowModel.ts
 models/WorkflowTaskModel.ts

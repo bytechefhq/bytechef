@@ -45,11 +45,17 @@ export interface WorkflowModel {
      */
     readonly createdDate?: Date;
     /**
-     * 
+     * The definition of a workflow.
      * @type {string}
      * @memberof WorkflowModel
      */
     definition?: string;
+    /**
+     * The description of a workflow.
+     * @type {string}
+     * @memberof WorkflowModel
+     */
+    description?: string;
     /**
      * 
      * @type {WorkflowFormatModel}
@@ -153,6 +159,7 @@ export function WorkflowModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'definition': !exists(json, 'definition') ? undefined : json['definition'],
+        'description': !exists(json, 'description') ? undefined : json['description'],
         'format': !exists(json, 'format') ? undefined : WorkflowFormatModelFromJSON(json['format']),
         'id': !exists(json, 'id') ? undefined : json['id'],
         'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
@@ -177,6 +184,7 @@ export function WorkflowModelToJSON(value?: WorkflowModel | null): any {
     return {
         
         'definition': value.definition,
+        'description': value.description,
         'format': WorkflowFormatModelToJSON(value.format),
         'sourceType': value.sourceType,
         '__version': value.version,

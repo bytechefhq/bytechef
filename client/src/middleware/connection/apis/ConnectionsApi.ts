@@ -17,18 +17,15 @@ import * as runtime from '../runtime';
 import type {
   ConnectionModel,
   OAuth2AuthorizationParametersModel,
-  TagModel,
-  UpdateConnectionTagsRequestModel,
+  UpdateTagsRequestModel,
 } from '../models';
 import {
     ConnectionModelFromJSON,
     ConnectionModelToJSON,
     OAuth2AuthorizationParametersModelFromJSON,
     OAuth2AuthorizationParametersModelToJSON,
-    TagModelFromJSON,
-    TagModelToJSON,
-    UpdateConnectionTagsRequestModelFromJSON,
-    UpdateConnectionTagsRequestModelToJSON,
+    UpdateTagsRequestModelFromJSON,
+    UpdateTagsRequestModelToJSON,
 } from '../models';
 
 export interface CreateConnectionRequest {
@@ -59,7 +56,7 @@ export interface UpdateConnectionRequest {
 
 export interface UpdateConnectionTagsRequest {
     id: number;
-    updateConnectionTagsRequestModel: UpdateConnectionTagsRequestModel;
+    updateTagsRequestModel: UpdateTagsRequestModel;
 }
 
 /**
@@ -201,34 +198,6 @@ export class ConnectionsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get connection tags.
-     * Get connection tags.
-     */
-    async getConnectionTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagModel>>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/connections/tags`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagModelFromJSON));
-    }
-
-    /**
-     * Get connection tags.
-     * Get connection tags.
-     */
-    async getConnectionTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagModel>> {
-        const response = await this.getConnectionTagsRaw(initOverrides);
-        return await response.value();
-    }
-
-    /**
      * Get connections.
      * Get connections.
      */
@@ -312,8 +281,8 @@ export class ConnectionsApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateConnectionTags.');
         }
 
-        if (requestParameters.updateConnectionTagsRequestModel === null || requestParameters.updateConnectionTagsRequestModel === undefined) {
-            throw new runtime.RequiredError('updateConnectionTagsRequestModel','Required parameter requestParameters.updateConnectionTagsRequestModel was null or undefined when calling updateConnectionTags.');
+        if (requestParameters.updateTagsRequestModel === null || requestParameters.updateTagsRequestModel === undefined) {
+            throw new runtime.RequiredError('updateTagsRequestModel','Required parameter requestParameters.updateTagsRequestModel was null or undefined when calling updateConnectionTags.');
         }
 
         const queryParameters: any = {};
@@ -327,7 +296,7 @@ export class ConnectionsApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: UpdateConnectionTagsRequestModelToJSON(requestParameters.updateConnectionTagsRequestModel),
+            body: UpdateTagsRequestModelToJSON(requestParameters.updateTagsRequestModel),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);

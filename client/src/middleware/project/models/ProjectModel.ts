@@ -51,23 +51,17 @@ export interface ProjectModel {
      */
     readonly createdDate?: Date;
     /**
-     * The id of a project.
-     * @type {number}
-     * @memberof ProjectModel
-     */
-    readonly id?: number;
-    /**
-     * The name of a project.
-     * @type {string}
-     * @memberof ProjectModel
-     */
-    name: string;
-    /**
      * The description of a project.
      * @type {string}
      * @memberof ProjectModel
      */
     description?: string;
+    /**
+     * The id of a project.
+     * @type {number}
+     * @memberof ProjectModel
+     */
+    readonly id?: number;
     /**
      * The last modified by.
      * @type {string}
@@ -81,6 +75,12 @@ export interface ProjectModel {
      */
     readonly lastModifiedDate?: Date;
     /**
+     * The name of a project.
+     * @type {string}
+     * @memberof ProjectModel
+     */
+    name: string;
+    /**
      * The published date.
      * @type {Date}
      * @memberof ProjectModel
@@ -93,7 +93,7 @@ export interface ProjectModel {
      */
     projectVersion?: number;
     /**
-     * A status of a project.
+     * The status of a project.
      * @type {string}
      * @memberof ProjectModel
      */
@@ -152,11 +152,11 @@ export function ProjectModelFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'category': !exists(json, 'category') ? undefined : CategoryModelFromJSON(json['category']),
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'name': json['name'],
         'description': !exists(json, 'description') ? undefined : json['description'],
+        'id': !exists(json, 'id') ? undefined : json['id'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
+        'name': json['name'],
         'publishedDate': !exists(json, 'publishedDate') ? undefined : (new Date(json['publishedDate'])),
         'projectVersion': !exists(json, 'projectVersion') ? undefined : json['projectVersion'],
         'status': !exists(json, 'status') ? undefined : json['status'],
@@ -176,8 +176,8 @@ export function ProjectModelToJSON(value?: ProjectModel | null): any {
     return {
         
         'category': CategoryModelToJSON(value.category),
-        'name': value.name,
         'description': value.description,
+        'name': value.name,
         'publishedDate': value.publishedDate === undefined ? undefined : (value.publishedDate.toISOString()),
         'projectVersion': value.projectVersion,
         'status': value.status,

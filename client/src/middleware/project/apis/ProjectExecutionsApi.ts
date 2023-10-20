@@ -24,8 +24,8 @@ import {
 
 export interface GetProjectExecutionsRequest {
     jobStatus?: GetProjectExecutionsJobStatusEnum;
-    jobStartTime?: Date;
-    jobEndTime?: Date;
+    jobStartDate?: Date;
+    jobEndDate?: Date;
     projectId?: number;
     projectInstanceId?: number;
     workflowId?: string;
@@ -48,12 +48,12 @@ export class ProjectExecutionsApi extends runtime.BaseAPI {
             queryParameters['jobStatus'] = requestParameters.jobStatus;
         }
 
-        if (requestParameters.jobStartTime !== undefined) {
-            queryParameters['jobStartTime'] = (requestParameters.jobStartTime as any).toISOString();
+        if (requestParameters.jobStartDate !== undefined) {
+            queryParameters['jobStartDate'] = (requestParameters.jobStartDate as any).toISOString();
         }
 
-        if (requestParameters.jobEndTime !== undefined) {
-            queryParameters['jobEndTime'] = (requestParameters.jobEndTime as any).toISOString();
+        if (requestParameters.jobEndDate !== undefined) {
+            queryParameters['jobEndDate'] = (requestParameters.jobEndDate as any).toISOString();
         }
 
         if (requestParameters.projectId !== undefined) {

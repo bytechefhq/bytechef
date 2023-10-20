@@ -49,7 +49,7 @@ export interface JobModel {
      * @type {Date}
      * @memberof JobModel
      */
-    endTime?: Date;
+    endDate?: Date;
     /**
      * 
      * @type {ExecutionErrorModel}
@@ -109,7 +109,7 @@ export interface JobModel {
      * @type {Date}
      * @memberof JobModel
      */
-    readonly startTime: Date;
+    readonly startDate: Date;
     /**
      * The job's status.
      * @type {string}
@@ -117,7 +117,7 @@ export interface JobModel {
      */
     readonly status: JobModelStatusEnum;
     /**
-     * A list of the webhooks configured.
+     * The list of the webhooks configured.
      * @type {Array<{ [key: string]: object; }>}
      * @memberof JobModel
      */
@@ -150,7 +150,7 @@ export type JobModelStatusEnum = typeof JobModelStatusEnum[keyof typeof JobModel
 export function instanceOfJobModel(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "priority" in value;
-    isInstance = isInstance && "startTime" in value;
+    isInstance = isInstance && "startDate" in value;
     isInstance = isInstance && "status" in value;
 
     return isInstance;
@@ -169,7 +169,7 @@ export function JobModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'currentTask': !exists(json, 'currentTask') ? undefined : json['currentTask'],
-        'endTime': !exists(json, 'endTime') ? undefined : (new Date(json['endTime'])),
+        'endDate': !exists(json, 'endDate') ? undefined : (new Date(json['endDate'])),
         'error': !exists(json, 'error') ? undefined : ExecutionErrorModelFromJSON(json['error']),
         'id': !exists(json, 'id') ? undefined : json['id'],
         'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
@@ -179,7 +179,7 @@ export function JobModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'outputs': !exists(json, 'outputs') ? undefined : json['outputs'],
         'parentTaskExecutionId': !exists(json, 'parentTaskExecutionId') ? undefined : json['parentTaskExecutionId'],
         'priority': json['priority'],
-        'startTime': (new Date(json['startTime'])),
+        'startDate': (new Date(json['startDate'])),
         'status': json['status'],
         'webhooks': !exists(json, 'webhooks') ? undefined : json['webhooks'],
         'workflowId': !exists(json, 'workflowId') ? undefined : json['workflowId'],
@@ -195,7 +195,7 @@ export function JobModelToJSON(value?: JobModel | null): any {
     }
     return {
         
-        'endTime': value.endTime === undefined ? undefined : (value.endTime.toISOString()),
+        'endDate': value.endDate === undefined ? undefined : (value.endDate.toISOString()),
         'error': ExecutionErrorModelToJSON(value.error),
     };
 }

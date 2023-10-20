@@ -26,7 +26,7 @@ export interface OAuth2PropertiesModel {
      */
     readonly redirectUri?: string;
     /**
-     * A list of predefined OAuth2 apps.
+     * The list of predefined OAuth2 apps.
      * @type {Array<string>}
      * @memberof OAuth2PropertiesModel
      */

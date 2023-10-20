@@ -51,7 +51,7 @@ export interface NumberPropertyAllOfModel {
      */
     numberPrecision?: number;
     /**
-     * A list of valid property options.
+     * The list of valid property options.
      * @type {Array<OptionModel>}
      * @memberof NumberPropertyAllOfModel
      */
