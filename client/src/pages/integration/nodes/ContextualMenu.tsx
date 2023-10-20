@@ -1,11 +1,12 @@
 import {Component1Icon} from '@radix-ui/react-icons';
 import Input from 'components/Input/Input';
-import React, {HTMLAttributes, memo, useEffect, useState} from 'react';
+import {memo, useEffect, useState} from 'react';
 import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
 } from '../../../middleware/definition-registry';
+import WorkflowNodesList from '../components/WorkflowNodesList';
 
 const uuid = (): string =>
     new Date().getTime().toString(36) + Math.random().toString(36).slice(2);
@@ -16,41 +17,17 @@ interface ContextualMenuProps {
     id: string;
 }
 
-interface ContextualMenuItemProps extends HTMLAttributes<HTMLLIElement> {
-    item: ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel;
-    onClick: () => void;
-}
-
-const ContextualMenuItem = ({item, onClick}: ContextualMenuItemProps) => (
-    <li
-        className="flex cursor-pointer items-center py-2 px-3 hover:bg-gray-50"
-        onClick={onClick}
-    >
-        <Component1Icon className="mr-3 h-6 w-6 flex-none" />
-
-        <div>
-            <span className="flex items-center  text-sm">
-                {item.display?.label}
-            </span>
-
-            {item.display?.description && (
-                // eslint-disable-next-line tailwindcss/no-custom-classname
-                <p className="text-left text-xs text-gray-500 line-clamp-2">
-                    {item.display.description}
-                </p>
-            )}
-        </div>
-    </li>
-);
-
 const ContextualMenu = ({
     components,
     flowControls,
     id,
 }: ContextualMenuProps): JSX.Element => {
     const [filter, setFilter] = useState('');
-    const [filteredNodes, setFilteredNodes] = useState<
-        Array<ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel>
+    const [filteredComponents, setFilteredComponents] = useState<
+        Array<ComponentDefinitionBasicModel>
+    >([]);
+    const [filteredFlowControls, setFilteredFlowControls] = useState<
+        Array<TaskDispatcherDefinitionModel>
     >([]);
 
     const {getNode, setEdges, setNodes} = useReactFlow();
@@ -138,19 +115,31 @@ const ContextualMenu = ({
 
     useEffect(() => {
         if (components && flowControls) {
-            setFilteredNodes(
-                [...components, ...flowControls].filter(
-                    (item) =>
-                        item.name
+            setFilteredComponents(
+                components.filter(
+                    (component) =>
+                        component.name
                             ?.toLowerCase()
                             .includes(filter.toLowerCase()) ||
-                        item.display?.label
+                        component.display?.label
+                            ?.toLowerCase()
+                            .includes(filter.toLowerCase())
+                )
+            );
+
+            setFilteredFlowControls(
+                flowControls.filter(
+                    (flowControl) =>
+                        flowControl.name
+                            ?.toLowerCase()
+                            .includes(filter.toLowerCase()) ||
+                        flowControl.display?.label
                             ?.toLowerCase()
                             .includes(filter.toLowerCase())
                 )
             );
         }
-    }, [components, flowControls, filter]);
+    }, [components, filter, flowControls]);
 
     return (
         // eslint-disable-next-line tailwindcss/no-custom-classname
@@ -162,39 +151,21 @@ const ContextualMenu = ({
                     </div>
                 ))}
 
-            <header className="border-b border-gray-200 px-3 pt-2 text-center font-bold text-gray-600">
+            <header className="border-b border-gray-200 px-3 pt-2 text-center text-gray-600">
                 <Input
                     name="contextualMenuFilter"
-                    placeholder="Filter nodes"
+                    placeholder="Filter workflow nodes"
                     value={filter}
                     onChange={(event) => setFilter(event.target.value)}
                 />
             </header>
 
-            <main className="max-h-64 overflow-auto">
-                <ul>
-                    {filteredNodes.length ? (
-                        filteredNodes.map(
-                            (
-                                filteredItem:
-                                    | ComponentDefinitionBasicModel
-                                    | TaskDispatcherDefinitionModel
-                            ) => (
-                                <ContextualMenuItem
-                                    item={filteredItem}
-                                    key={filteredItem.name}
-                                    onClick={() =>
-                                        handleItemClick(filteredItem)
-                                    }
-                                />
-                            )
-                        )
-                    ) : (
-                        <span className="block py-2 px-3 text-xs text-gray-500">
-                            No items found.
-                        </span>
-                    )}
-                </ul>
+            <main className="max-h-64 overflow-auto bg-gray-100">
+                <WorkflowNodesList
+                    components={filteredComponents}
+                    flowControls={filteredFlowControls}
+                    onItemClick={handleItemClick}
+                />
             </main>
         </div>
     );
