@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ivica Cardic
  */
-@Component
+@Component(MAP + "_v1_ComponentDefinitionFactory")
 public class MapComponentDefinitionFactory implements ComponentDefinitionFactory {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(MAP)

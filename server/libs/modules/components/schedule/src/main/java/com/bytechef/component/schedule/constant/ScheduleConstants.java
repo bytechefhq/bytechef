@@ -29,6 +29,7 @@ public class ScheduleConstants {
     public static final String HOUR = "hour";
     public static final String INTERVAL = "interval";
     public static final String MINUTE = "minute";
+    public static final String SCHEDULE = "schedule";
     public static final String TIME_UNIT = "timeUnit";
     public static final String TIMEZONE = "timezone";
 }
