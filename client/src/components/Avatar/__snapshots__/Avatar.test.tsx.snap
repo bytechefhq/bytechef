@@ -20,7 +20,7 @@ exports[`<Avatar /> > should render the empty Avatar 1`] = `
 exports[`<Avatar /> > should render the large Avatar 1`] = `
 <img
   alt="Avatar"
-  class="mx-auto block h-10 w-10 rounded-full w-14 h-14"
+  class="mx-auto block rounded-full w-14 h-14"
   src="https://gravatar.com/4405735f6f3129e0286d9d43e7b460d0"
 />
 `;
@@ -28,7 +28,7 @@ exports[`<Avatar /> > should render the large Avatar 1`] = `
 exports[`<Avatar /> > should render the medium Avatar as default 1`] = `
 <img
   alt="Avatar"
-  class="mx-auto block h-10 w-10 rounded-full w-12 h-12"
+  class="mx-auto block rounded-full w-12 h-12"
   src="https://gravatar.com/4405735f6f3129e0286d9d43e7b460d0"
 />
 `;
@@ -36,7 +36,7 @@ exports[`<Avatar /> > should render the medium Avatar as default 1`] = `
 exports[`<Avatar /> > should render the small Avatar 1`] = `
 <img
   alt="Avatar"
-  class="mx-auto block h-10 w-10 rounded-full w-10 h-10"
+  class="mx-auto block rounded-full w-10 h-10"
   src="https://gravatar.com/4405735f6f3129e0286d9d43e7b460d0"
 />
 `;

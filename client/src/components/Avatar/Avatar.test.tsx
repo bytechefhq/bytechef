@@ -14,7 +14,7 @@ describe('<Avatar />', () => {
         expect(screen.getByRole('img', {name: /Avatar/i})).toBeInTheDocument();
 
         expect(container.firstChild).toHaveClass(
-            'mx-auto block h-10 w-10 rounded-full w-12 h-12'
+            'mx-auto block rounded-full w-12 h-12'
         );
 
         expect(container.firstChild).toMatchSnapshot();
@@ -26,7 +26,7 @@ describe('<Avatar />', () => {
         expect(screen.getByRole('img', {name: /Avatar/i})).toBeInTheDocument();
 
         expect(container.firstChild).toHaveClass(
-            'mx-auto block h-10 w-10 rounded-full w-10 h-10'
+            'mx-auto block rounded-full w-10 h-10'
         );
 
         expect(container.firstChild).toMatchSnapshot();
@@ -38,7 +38,7 @@ describe('<Avatar />', () => {
         expect(screen.getByRole('img', {name: /Avatar/i})).toBeInTheDocument();
 
         expect(container.firstChild).toHaveClass(
-            'mx-auto block h-10 w-10 rounded-full w-12 h-12'
+            'mx-auto block rounded-full w-12 h-12'
         );
     });
 
@@ -48,7 +48,7 @@ describe('<Avatar />', () => {
         expect(screen.getByRole('img', {name: /Avatar/i})).toBeInTheDocument();
 
         expect(container.firstChild).toHaveClass(
-            'mx-auto block h-10 w-10 rounded-full w-14 h-14'
+            'mx-auto block rounded-full w-14 h-14'
         );
 
         expect(container.firstChild).toMatchSnapshot();
