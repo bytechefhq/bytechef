@@ -25,6 +25,7 @@ import com.bytechef.hermes.integration.service.CategoryService;
 import com.bytechef.hermes.integration.web.rest.model.CategoryModel;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
 import com.bytechef.hermes.integration.web.rest.model.PostIntegrationWorkflowRequestModel;
+import com.bytechef.hermes.integration.web.rest.model.PutIntegrationTagsRequestModel;
 import com.bytechef.hermes.integration.web.rest.model.TagModel;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -36,6 +37,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -155,18 +158,19 @@ public class IntegrationController implements IntegrationsApi {
 
     @Override
     public Mono<ResponseEntity<Void>> putIntegrationTags(
-        Long id, Flux<TagModel> tagModelFlux, ServerWebExchange exchange) {
+        Long id, Mono<PutIntegrationTagsRequestModel> tagsRequestModelMono, ServerWebExchange exchange) {
 
-        return tagModelFlux.collectList()
-            .map(tagModels -> {
-                integrationFacade.update(
-                    id,
-                    tagModels.stream()
-                        .map(tagModel -> conversionService.convert(tagModel, Tag.class))
-                        .toList());
+        return tagsRequestModelMono.map(tagsRequestModel -> {
+            List<TagModel> tagModels = tagsRequestModel.getTags();
 
-                return ResponseEntity.noContent()
-                    .build();
-            });
+            integrationFacade.update(
+                id,
+                tagModels.stream()
+                    .map(tagModel -> conversionService.convert(tagModel, Tag.class))
+                    .toList());
+
+            return ResponseEntity.noContent()
+                .build();
+        });
     }
 }
