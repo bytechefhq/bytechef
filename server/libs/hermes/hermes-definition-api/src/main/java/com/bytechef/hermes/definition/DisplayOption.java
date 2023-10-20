@@ -36,14 +36,14 @@ public sealed class DisplayOption permits DefinitionDSL.ModifiableDisplayOption 
     }
 
     @Schema(
-        name = "hideWhen",
+        name = "hide",
         description = "The map of property names and list of values to check against if the property should be hidden.")
     public Map<String, List<Object>> getHide() {
         return hide;
     }
 
     @Schema(
-        name = "showWhen",
+        name = "show",
         description = "The map of property names and list of values to check against if the property should be shown.")
     public Map<String, List<Object>> getShow() {
         return show;
