@@ -57,10 +57,10 @@ export interface Connection {
     name: string;
     /**
      * TODO
-     * @type {string}
+     * @type {number}
      * @memberof Connection
      */
-    readonly id?: string;
+    readonly id?: number;
     /**
      * TODO
      * @type {string}

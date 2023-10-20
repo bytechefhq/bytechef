@@ -26,11 +26,11 @@ import {
 } from '../models';
 
 export interface DeleteConnectionRequest {
-    id: string;
+    id: number;
 }
 
 export interface GetConnectionRequest {
-    id: string;
+    id: number;
 }
 
 export interface PostConnectionRequest {
@@ -38,7 +38,7 @@ export interface PostConnectionRequest {
 }
 
 export interface PutConnectionOperationRequest {
-    id: string;
+    id: number;
     putConnectionRequest: PutConnectionRequest;
 }
 
