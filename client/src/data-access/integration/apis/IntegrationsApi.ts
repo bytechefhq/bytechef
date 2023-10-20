@@ -16,18 +16,21 @@
 import * as runtime from '../runtime';
 import type {
   Integration,
+  PutIntegrationTagsRequest,
 } from '../models';
 import {
     IntegrationFromJSON,
     IntegrationToJSON,
+    PutIntegrationTagsRequestFromJSON,
+    PutIntegrationTagsRequestToJSON,
 } from '../models';
 
 export interface DeleteIntegrationRequest {
-    id: string;
+    id: number;
 }
 
 export interface GetIntegrationRequest {
-    id: string;
+    id: number;
 }
 
 export interface PostIntegrationRequest {
@@ -35,8 +38,13 @@ export interface PostIntegrationRequest {
 }
 
 export interface PutIntegrationRequest {
-    id: string;
+    id: number;
     integration: Integration;
+}
+
+export interface PutIntegrationTagsOperationRequest {
+    id: number;
+    putIntegrationTagsRequest: PutIntegrationTagsRequest;
 }
 
 /**
@@ -104,6 +112,34 @@ export class IntegrationsApi extends runtime.BaseAPI {
      */
     async getIntegration(requestParameters: GetIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Integration> {
         const response = await this.getIntegrationRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get integration tags.
+     * Get integration tags.
+     */
+    async getIntegrationTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/integration-tags`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * Get integration tags.
+     * Get integration tags.
+     */
+    async getIntegrationTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
+        const response = await this.getIntegrationTagsRaw(initOverrides);
         return await response.value();
     }
 
@@ -207,6 +243,44 @@ export class IntegrationsApi extends runtime.BaseAPI {
     async putIntegration(requestParameters: PutIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Integration> {
         const response = await this.putIntegrationRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Updates tags of an existing integration.
+     * Updates tags of an existing integration.
+     */
+    async putIntegrationTagsRaw(requestParameters: PutIntegrationTagsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling putIntegrationTags.');
+        }
+
+        if (requestParameters.putIntegrationTagsRequest === null || requestParameters.putIntegrationTagsRequest === undefined) {
+            throw new runtime.RequiredError('putIntegrationTagsRequest','Required parameter requestParameters.putIntegrationTagsRequest was null or undefined when calling putIntegrationTags.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/integrations/{id}/integration-tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: PutIntegrationTagsRequestToJSON(requestParameters.putIntegrationTagsRequest),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Updates tags of an existing integration.
+     * Updates tags of an existing integration.
+     */
+    async putIntegrationTags(requestParameters: PutIntegrationTagsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.putIntegrationTagsRaw(requestParameters, initOverrides);
     }
 
 }
