@@ -40,6 +40,10 @@ const NodeDetailsDialog = () => {
         componentVersion: currentNode.version,
     });
 
+    const singleActionComponent = currentComponent?.actions.length === 1;
+
+    const firstAction = currentComponent?.actions[0];
+
     return (
         <Dialog.Root
             open={nodeDetailsOpen}
@@ -85,21 +89,51 @@ const NodeDetailsDialog = () => {
                                 />
                             </Dialog.Title>
 
-                            <div className="space-y-4 p-4">
-                                <Select
-                                    label="Actions"
-                                    options={currentComponent?.actions.map(
-                                        (action) => ({
-                                            label: action.name!,
-                                            value: action.display.label!,
-                                            description:
-                                                action.display.description,
-                                        })
-                                    )}
-                                    triggerClassName="w-full bg-gray-100"
-                                />
+                            <div className="flex flex-col">
+                                <div className="p-4">
+                                    {singleActionComponent && !!firstAction ? (
+                                        <>
+                                            <span className="block px-2 text-sm font-medium leading-6">
+                                                Action
+                                            </span>
 
-                                <div className="flex justify-center space-x-1">
+                                            <div className="overflow-hidden rounded-md bg-gray-100 py-2">
+                                                <span className="inline-flex px-4 text-sm font-medium">
+                                                    {firstAction.display.label}
+                                                </span>
+
+                                                {/* eslint-disable-next-line tailwindcss/no-custom-classname */}
+
+                                                <p className="mt-1 w-full overflow-hidden px-4 text-xs text-gray-500 line-clamp-2">
+                                                    {
+                                                        firstAction.display
+                                                            .description
+                                                    }
+                                                </p>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <Select
+                                            contentClassName="max-w-select-trigger-width max-h-select-content-available-height-1/2"
+                                            label="Actions"
+                                            options={currentComponent?.actions.map(
+                                                (action) => ({
+                                                    label: action.display
+                                                        .label!,
+                                                    value: action.name,
+                                                    description:
+                                                        action.display
+                                                            .description,
+                                                })
+                                            )}
+                                            triggerClassName="w-full bg-gray-100"
+                                        />
+                                    )}
+                                </div>
+
+                                <div className="border-t border-gray-100" />
+
+                                <div className="flex justify-center space-x-1 p-4">
                                     {tabs.map((tab) => (
                                         <TabButton
                                             activeTab={activeTab}
@@ -113,33 +147,35 @@ const NodeDetailsDialog = () => {
                                     ))}
                                 </div>
 
-                                {activeTab === 'description' && (
-                                    <TextArea
-                                        label="Node Description"
-                                        labelClassName="Node Description"
-                                        name="nodeDescription"
-                                        placeholder="Write some notes for yourself..."
-                                    />
-                                )}
+                                <div className="px-4 py-2">
+                                    {activeTab === 'description' && (
+                                        <TextArea
+                                            label="Description"
+                                            labelClassName="px-2"
+                                            name="nodeDescription"
+                                            placeholder="Write some notes for yourself..."
+                                        />
+                                    )}
 
-                                {activeTab === 'properties' && (
-                                    <h1>Properties</h1>
-                                )}
+                                    {activeTab === 'properties' && (
+                                        <h1>Properties</h1>
+                                    )}
 
-                                {activeTab === 'connection' && (
-                                    <h1>Connection</h1>
-                                )}
+                                    {activeTab === 'connection' && (
+                                        <h1>Connection</h1>
+                                    )}
 
-                                {activeTab === 'output' && <h1>Output</h1>}
+                                    {activeTab === 'output' && <h1>Output</h1>}
+                                </div>
                             </div>
 
                             <div className="mt-auto flex p-4">
                                 <Select
                                     defaultValue={currentComponent?.version.toString()}
                                     options={[
-                                        {label: 'v 1', value: '1'},
-                                        {label: 'v 2', value: '2'},
-                                        {label: 'v 3', value: '3'},
+                                        {label: 'v1', value: '1'},
+                                        {label: 'v2', value: '2'},
+                                        {label: 'v3', value: '3'},
                                     ]}
                                 />
                             </div>
