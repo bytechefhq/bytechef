@@ -17,7 +17,7 @@ const PropertyField = ({data, label}: {data: PropertyType; label: string}) => (
 
 const SchemaProperties = ({properties}: {properties: PropertyType[]}) => (
     <ul className="ml-2 h-full">
-        {properties.map((property: PropertyType, index: number) => (
+        {properties.map((property, index) => (
             <li className="flex flex-col" key={`${property.name}_${index}`}>
                 <PropertyField data={property} label={property.name!} />
 
@@ -39,32 +39,26 @@ const OutputTab = ({outputSchema}: {outputSchema: PropertyType}) => {
 
     return (
         <div className="max-h-full flex-[1_1_1px] p-4">
-            <div>
-                <div className="mb-1 flex items-center">
-                    <span title={outputSchema.type}>
-                        {
-                            TYPE_ICONS[
-                                outputSchema.type as keyof typeof TYPE_ICONS
-                            ]
-                        }
-                    </span>
+            <div className="mb-1 flex items-center">
+                <span title={outputSchema.type}>
+                    {TYPE_ICONS[outputSchema.type as keyof typeof TYPE_ICONS]}
+                </span>
 
-                    <span className="ml-2 text-sm text-gray-800">
-                        {currentNode.name}
-                    </span>
-                </div>
-
-                {outputSchema.properties && (
-                    <SchemaProperties properties={outputSchema.properties} />
-                )}
-
-                {!outputSchema.properties && !!outputSchema.controlType && (
-                    <PropertyField
-                        data={outputSchema}
-                        label={outputSchema.controlType!}
-                    />
-                )}
+                <span className="ml-2 text-sm text-gray-800">
+                    {currentNode.name}
+                </span>
             </div>
+
+            {outputSchema.properties && (
+                <SchemaProperties properties={outputSchema.properties} />
+            )}
+
+            {!outputSchema.properties && !!outputSchema.controlType && (
+                <PropertyField
+                    data={outputSchema}
+                    label={outputSchema.controlType!}
+                />
+            )}
         </div>
     );
 };
