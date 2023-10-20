@@ -17,18 +17,19 @@
 
 package com.bytechef.component.aws.s3.action;
 
-import com.bytechef.component.aws.s3.util.AmazonS3Uri;
+import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
-import static com.bytechef.component.aws.s3.constant.AwsS3Constant.FILENAME;
-import static com.bytechef.component.aws.s3.constant.AwsS3Constant.GET_OBJECT;
-import static com.bytechef.component.aws.s3.constant.AwsS3Constant.URI;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.FILENAME;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.GET_OBJECT;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.KEY;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 
@@ -43,33 +44,28 @@ public class AwsS3GetObjectAction {
         .title("Get Object")
         .description("Get the AWS S3 object.")
         .properties(
-            string(URI)
-                .label("URI")
-                .description("The AWS S3 uri.")
-                .required(true),
             string(FILENAME)
                 .label("Filename")
                 .description("Filename to set for binary data.")
                 .required(true)
-                .defaultValue("file.xml"))
+                .defaultValue("file.txt"),
+            string(KEY)
+                .label("Key")
+                .description("The object key.")
+                .required(true))
         .outputSchema(fileEntry())
         .execute(AwsS3GetObjectAction::executeGetObject);
 
     protected static Context.FileEntry executeGetObject(Context context, InputParameters inputParameters) {
-        AmazonS3Uri amazonS3Uri = new AmazonS3Uri(inputParameters.getRequiredString(URI));
+        Connection connection = context.getConnection();
 
-        String bucketName = amazonS3Uri.getBucket();
-        String key = amazonS3Uri.getKey();
-
-        S3ClientBuilder builder = S3Client.builder();
-
-        try (S3Client s3Client = builder.build()) {
+        try (S3Client s3Client = AwsS3Utils.buildS3Client(connection)) {
             return context.storeFileContent(
                 inputParameters.getRequiredString(FILENAME),
                 s3Client.getObject(
                     GetObjectRequest.builder()
-                        .bucket(bucketName)
-                        .key(key)
+                        .bucket(connection.getRequiredString(BUCKET_NAME))
+                        .key(inputParameters.getRequiredString(KEY))
                         .build(),
                     ResponseTransformer.toInputStream()));
         }

@@ -17,13 +17,14 @@
 
 package com.bytechef.component.aws.s3.action;
 
-import com.bytechef.component.aws.s3.util.AmazonS3Uri;
+import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.Connection;
+import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
@@ -31,13 +32,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.bytechef.component.aws.s3.constant.AwsS3Constant.ACL;
-import static com.bytechef.component.aws.s3.constant.AwsS3Constant.FILE_ENTRY;
-import static com.bytechef.component.aws.s3.constant.AwsS3Constant.PUT_OBJECT;
-import static com.bytechef.component.aws.s3.constant.AwsS3Constant.URI;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.ACL;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.FILE_ENTRY;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.KEY;
+import static com.bytechef.component.aws.s3.constant.AwsS3Constants.PUT_OBJECT;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 
+import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -49,42 +52,45 @@ public class AwsS3PutObjectAction {
         .title("Put Object")
         .description("Store an object to AWS S3.")
         .properties(
-            string(URI)
-                .label("URI")
-                .description("The AWS S3 uri.")
-                .required(true),
             fileEntry(FILE_ENTRY)
                 .label("File")
                 .description(
                     "The object property which contains a reference to the file that needs to be written to AWS S3.")
                 .required(true),
-            string(ACL).label("ACL")
-                .description("The canned ACL to apply to the object."))
+            string(KEY)
+                .label("Key")
+                .description("The object key.")
+                .required(true),
+            string(ACL)
+                .label("ACL")
+                .description("The canned ACL to apply to the object.")
+                .options(
+                    option("authenticated-read", "authenticated-read"),
+                    option("aws-exec-read", "aws-exec-read"),
+                    option("bucket-owner-read", "bucket-owner-read"),
+                    option("bucket-owner-full-control", "bucket-owner-full-control"),
+                    option("private", "private"),
+                    option("public-read", "public-read"),
+                    option("public-read-write", "public-read-write")))
         .outputSchema(string())
         .execute(AwsS3PutObjectAction::executePutObject);
 
     protected static Object executePutObject(Context context, InputParameters inputParameters) {
-        AmazonS3Uri amazonS3Uri = new AmazonS3Uri(inputParameters.getRequiredString(URI));
+        Connection connection = context.getConnection();
+        FileEntry fileEntry = inputParameters.get(FILE_ENTRY, FileEntry.class);
 
-        String bucketName = amazonS3Uri.getBucket();
-        String key = amazonS3Uri.getKey();
-
-        S3ClientBuilder builder = S3Client.builder();
-        Context.FileEntry fileEntry = inputParameters.get(FILE_ENTRY, Context.FileEntry.class);
-
-        try (S3Client s3Client = builder.build()) {
+        try (S3Client s3Client = AwsS3Utils.buildS3Client(connection)) {
             Path tempFilePath = Files.createTempFile("", ".tmp");
 
             Files.copy(context.getFileStream(fileEntry), tempFilePath);
 
             s3Client.putObject(
                 PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(key)
-                    .acl(
-                        inputParameters.getString(ACL) != null
-                            ? ObjectCannedACL.fromValue(inputParameters.getString(ACL))
-                            : null)
+                    .bucket(connection.getRequiredString(BUCKET_NAME))
+                    .key(inputParameters.getRequiredString(KEY))
+                    .acl(inputParameters.getString(ACL) != null
+                        ? ObjectCannedACL.fromValue(inputParameters.getString(ACL))
+                        : null)
                     .build(),
                 tempFilePath);
 
