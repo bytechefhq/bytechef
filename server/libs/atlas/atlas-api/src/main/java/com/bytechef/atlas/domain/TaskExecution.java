@@ -141,7 +141,8 @@ public final class TaskExecution
     @SuppressFBWarnings("UuF")
     private int version;
 
-    @Column("workflow_task")
+//    @Column("workflow_task")
+    @Transient
     private WorkflowTask workflowTask = WorkflowTask.EMPTY_WORKFLOW_TASK;
 
     public TaskExecution() {

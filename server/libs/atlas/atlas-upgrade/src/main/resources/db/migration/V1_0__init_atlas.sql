@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS task_execution (
     end_time                 TIMESTAMP        NULL,
     execution_time           INT          NOT NULL,
     error                    TEXT             NULL,
-    workflow_task            TEXT         NOT NULL,
+--     workflow_task            TEXT         NOT NULL,
     task_number              INT          NOT NULL,
     created_date             TIMESTAMP    NOT NULL,
     created_by               VARCHAR(256) NOT NULL,
