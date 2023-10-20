@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.service.impl;
+package com.bytechef.atlas.service;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.repository.TaskExecutionRepository;
-import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -54,7 +53,7 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     @Transactional(readOnly = true)
     public TaskExecution getTaskExecution(long id) {
         return taskExecutionRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(IllegalArgumentException::new);
     }
 
     @Override
@@ -80,7 +79,7 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
         Assert.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
 
         TaskExecution currentTaskExecution = taskExecutionRepository.findByIdForUpdate(taskExecution.getId())
-            .orElseThrow();
+            .orElseThrow(IllegalArgumentException::new);
 
         TaskStatus currentTaskStatus = currentTaskExecution.getStatus();
         TaskStatus taskStatus = taskExecution.getStatus();

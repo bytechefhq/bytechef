@@ -15,10 +15,8 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.coordinator.impl;
+package com.bytechef.atlas.coordinator;
 
-import com.bytechef.atlas.coordinator.Coordinator;
-import com.bytechef.atlas.coordinator.CoordinatorManager;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.error.Errorable;

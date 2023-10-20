@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.service.impl;
+package com.bytechef.hermes.connection.service;
 
 import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
-import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.annotation.EmbeddedSql;
@@ -126,7 +125,7 @@ public class ConnectionServiceIntTest {
         Connection connection = new Connection();
 
         connection.setComponentName("componentName");
-        connection.setConnectionVersion(1);
+        connection.setKey("key");
         connection.setName("name");
         connection.setParameters(Map.of("key1", "value1"));
         connection.setVersion(1);

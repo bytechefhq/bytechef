@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.category.service.impl;
+package com.bytechef.category.service;
 
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.repository.CategoryRepository;
-import com.bytechef.category.service.CategoryService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -75,7 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category getCategory(long id) {
         return categoryRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(IllegalArgumentException::new);
     }
 
     @Override
@@ -105,7 +104,7 @@ public class CategoryServiceImpl implements CategoryService {
             }
         } else {
             Category curCategory = categoryRepository.findById(category.getId())
-                .orElseThrow();
+                .orElseThrow(IllegalArgumentException::new);
 
             curCategory.setName(category.getName());
             curCategory.setVersion(category.getVersion());

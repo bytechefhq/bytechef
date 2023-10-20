@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.impl;
+package com.bytechef.hermes.component;
 
 import com.bytechef.commons.util.MapValueUtils;
-import com.bytechef.hermes.component.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.LocalDate;

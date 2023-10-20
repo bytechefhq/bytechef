@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.service.impl;
+package com.bytechef.atlas.service;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
-import com.bytechef.atlas.service.WorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;
@@ -83,7 +82,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             .filter(workflowCrudRepository -> Objects.equals(workflowCrudRepository.getSourceType(), sourceType))
             .findFirst()
             .map(workflowCrudRepository -> save(workflow, workflowCrudRepository))
-            .orElseThrow();
+            .orElseThrow(IllegalArgumentException::new);
     }
 
     @Override
@@ -212,7 +211,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                 .isPresent())
             .findFirst()
             .map(workflowCrudRepository -> save(workflow, workflowCrudRepository))
-            .orElseThrow();
+            .orElseThrow(IllegalArgumentException::new);
     }
 
     @SuppressFBWarnings("NP")
@@ -221,7 +220,7 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflow = workflowCrudRepository.save(workflow);
         } else {
             Workflow curWorkflow = workflowCrudRepository.findById(workflow.getId())
-                .orElseThrow();
+                .orElseThrow(IllegalArgumentException::new);
 
             curWorkflow.setDefinition(workflow.getDefinition());
             curWorkflow.setVersion(workflow.getVersion());

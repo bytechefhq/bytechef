@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.repository.jdbc.impl;
+package com.bytechef.atlas.repository.jdbc;
 
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.repository.jdbc.CustomJobRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
