@@ -132,6 +132,11 @@ Desktop.ini
 *application.pid
 
 ######################
+# Gradle Wrapper
+######################
+!gradle/wrapper/gradle-wrapper.jar
+
+######################
 # ESLint
 ######################
 .eslintcache
