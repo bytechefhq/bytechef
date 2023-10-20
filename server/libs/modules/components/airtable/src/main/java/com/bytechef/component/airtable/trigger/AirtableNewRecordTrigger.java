@@ -33,7 +33,7 @@ import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
-public class NewRecordTrigger {
+public class AirtableNewRecordTrigger {
 
     private static final String BASE_ID = "baseId";
     private static final String TABLE_ID = "tableId";
@@ -59,7 +59,7 @@ public class NewRecordTrigger {
                 .description(
                     "It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one.")
                 .required(true))
-        .poll(NewRecordTrigger::poll);
+        .poll(AirtableNewRecordTrigger::poll);
 
     protected static TriggerDefinition.PollOutput poll(TriggerDefinition.PollContext context) {
         Map<String, ?> inputParameters = context.inputParameters();

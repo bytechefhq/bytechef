@@ -17,7 +17,7 @@
 
 package com.bytechef.component.airtable;
 
-import com.bytechef.component.airtable.trigger.NewRecordTrigger;
+import com.bytechef.component.airtable.trigger.AirtableNewRecordTrigger;
 import com.bytechef.component.airtable.util.AirtableUtils;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;
@@ -42,7 +42,7 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
 
     @Override
     public List<ModifiableTriggerDefinition> getTriggers() {
-        return List.of(NewRecordTrigger.TRIGGER_DEFINITION);
+        return List.of(AirtableNewRecordTrigger.TRIGGER_DEFINITION);
     }
 
     @Override
