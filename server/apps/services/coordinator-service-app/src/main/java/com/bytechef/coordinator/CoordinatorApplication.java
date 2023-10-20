@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.ApplicationPidFileWriter;
@@ -38,7 +39,10 @@ public class CoordinatorApplication {
 
     private static final Logger log = LoggerFactory.getLogger(CoordinatorApplication.class);
 
-    public CoordinatorApplication() {
+    private static String gitCommitId;
+
+    public CoordinatorApplication(@Value("${git.commit.id}") String gitCommitId) {
+        this.gitCommitId = gitCommitId;
     }
 
     /**
@@ -83,6 +87,7 @@ public class CoordinatorApplication {
                 \tExternal: \t{}://{}:{}{}
                 \tSwaggerUI: \t{}
                 \tProfile(s): \t{}
+                \tGit Commit Id: \t{}
                 ----------------------------------------------------------""",
             environment.getProperty("spring.application.name"),
             protocol,
@@ -96,6 +101,7 @@ public class CoordinatorApplication {
                 .contains("api-docs")
                     ? "%s://localhost:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
                     : "",
-            environment.getActiveProfiles());
+            environment.getActiveProfiles(),
+            gitCommitId);
     }
 }
