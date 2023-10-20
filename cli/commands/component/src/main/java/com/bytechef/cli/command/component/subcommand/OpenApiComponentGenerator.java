@@ -94,6 +94,8 @@ public class OpenApiComponentGenerator {
 
     private static final ClassName AUTHORIZATION_CLASS_NAME = ClassName.get(
         "com.bytechef.hermes.component.definition", "Authorization");
+    private static final ClassName AUTHORIZATION_CONSTANTS_CLASS_NAME = ClassName.get(
+        "com.bytechef.hermes.component.definition.constant", "AuthorizationConstants");
     public static final String COM_BYTECHEF_HERMES_COMPONENT_PACKAGE = "com.bytechef.hermes.component";
     public static final ClassName COMPONENT_DEFINITION_CLASS_NAME = ClassName
         .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ComponentDefinition");
@@ -178,19 +180,19 @@ public class OpenApiComponentGenerator {
     }
 
     private JavaFile.Builder addStaticImport(JavaFile.Builder builder) {
-        return builder.addStaticImport(AUTHORIZATION_CLASS_NAME, "ADD_TO")
-            .addStaticImport(AUTHORIZATION_CLASS_NAME, "AUTHORIZATION_URL")
-            .addStaticImport(AUTHORIZATION_CLASS_NAME, "CLIENT_ID")
-            .addStaticImport(AUTHORIZATION_CLASS_NAME, "CLIENT_SECRET")
-            .addStaticImport(AUTHORIZATION_CLASS_NAME, "HEADER_PREFIX")
-            .addStaticImport(AUTHORIZATION_CLASS_NAME, "KEY")
-            .addStaticImport(AUTHORIZATION_CLASS_NAME, "PASSWORD")
-            .addStaticImport(AUTHORIZATION_CLASS_NAME, "REFRESH_URL")
-            .addStaticImport(AUTHORIZATION_CLASS_NAME, "SCOPES")
-            .addStaticImport(AUTHORIZATION_CLASS_NAME, "TOKEN")
-            .addStaticImport(AUTHORIZATION_CLASS_NAME, "TOKEN_URL")
-            .addStaticImport(AUTHORIZATION_CLASS_NAME, "USERNAME")
-            .addStaticImport(AUTHORIZATION_CLASS_NAME, "VALUE")
+        return builder.addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "ADD_TO")
+            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "AUTHORIZATION_URL")
+            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "CLIENT_ID")
+            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "CLIENT_SECRET")
+            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "HEADER_PREFIX")
+            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "KEY")
+            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "PASSWORD")
+            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "REFRESH_URL")
+            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "SCOPES")
+            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "TOKEN")
+            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "TOKEN_URL")
+            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "USERNAME")
+            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "VALUE")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "any")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
