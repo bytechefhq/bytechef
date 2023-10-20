@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.configuration.connection;
+package com.bytechef.helios.configuration.connection;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.task.WorkflowTask;

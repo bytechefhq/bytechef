@@ -35,7 +35,6 @@ import com.bytechef.dione.configuration.web.rest.model.CreateIntegrationWorkflow
 import com.bytechef.dione.configuration.web.rest.model.IntegrationModel;
 import com.bytechef.dione.configuration.web.rest.model.TagModel;
 import com.bytechef.dione.configuration.web.rest.model.UpdateTagsRequestModel;
-import com.bytechef.hermes.configuration.dto.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -53,7 +52,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -179,7 +177,7 @@ public class IntegrationControllerIntTest {
             Workflow workflow = new Workflow("{}", Workflow.Format.JSON, "workflow1", Map.of(), Map.of());
 
             when(integrationFacade.getIntegrationWorkflows(1L)).thenReturn(
-                List.of(new WorkflowDTO(Collections.emptyList(), workflow)));
+                List.of(workflow));
 
             this.webTestClient
                 .get()
@@ -304,7 +302,7 @@ public class IntegrationControllerIntTest {
             Workflow.Format.JSON.getId());
 
         when(integrationFacade.addWorkflow(anyLong(), any(), any(), any()))
-            .thenReturn(new WorkflowDTO(Collections.emptyList(), workflow));
+            .thenReturn(workflow);
 
         try {
             this.webTestClient

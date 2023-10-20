@@ -15,37 +15,24 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.configuration.facade;
+package com.bytechef.helios.configuration.facade;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import com.bytechef.atlas.configuration.domain.Workflow.Format;
+import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
+import com.bytechef.helios.configuration.dto.WorkflowDTO;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public class WorkflowFacadeTest {
+public interface WorkflowFacade {
 
-    @Disabled
-    @Test
-    public void testCreate() {
-        // TODO
-    }
+    WorkflowDTO create(String definition, Format format, SourceType sourceType);
 
-    @Disabled
-    @Test
-    public void testGetWorkflow() {
-        // TODO
-    }
+    WorkflowDTO getWorkflow(String id);
 
-    @Disabled
-    @Test
-    public void testGetWorkflows() {
-        // TODO
-    }
+    List<WorkflowDTO> getWorkflows();
 
-    @Disabled
-    @Test
-    public void testUpdate() {
-        // TODO
-    }
+    WorkflowDTO update(String id, String definition);
 }

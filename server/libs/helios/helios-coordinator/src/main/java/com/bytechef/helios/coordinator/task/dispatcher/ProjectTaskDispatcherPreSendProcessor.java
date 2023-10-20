@@ -26,7 +26,7 @@ import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.coordinator.AbstractDispatcherPreSendProcessor;
-import com.bytechef.hermes.configuration.connection.WorkflowConnection;
+import com.bytechef.helios.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;

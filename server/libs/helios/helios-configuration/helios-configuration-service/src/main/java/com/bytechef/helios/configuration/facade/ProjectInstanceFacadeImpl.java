@@ -31,7 +31,7 @@ import com.bytechef.helios.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectService;
-import com.bytechef.hermes.configuration.connection.WorkflowConnection;
+import com.bytechef.helios.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
