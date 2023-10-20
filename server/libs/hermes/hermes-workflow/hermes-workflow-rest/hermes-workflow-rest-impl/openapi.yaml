@@ -1,8 +1,8 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "OpenAPI definition"
-  version: "v1"
+  title: "Workflow API"
+  version: "1"
 servers:
 - url: "http://localhost:5173/api"
 paths:
@@ -304,7 +304,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/WorkflowTestResponse"
+                $ref: "#/components/schemas/WorkflowResponse"
 components:
   schemas:
     ExecutionError:
@@ -780,7 +780,7 @@ components:
         type:
           description: "Type of the task."
           type: "string"
-    WorkflowTestResponse:
+    WorkflowResponse:
       type: "object"
       properties:
         job:

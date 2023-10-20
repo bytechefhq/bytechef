@@ -1,8 +1,8 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "OpenAPI definition"
-  version: "v1"
+  title: "Connection API"
+  version: "1"
 servers:
 - url: "http://localhost:5173/api"
 paths:
