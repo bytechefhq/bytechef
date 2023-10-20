@@ -40,6 +40,7 @@ import java.util.List;
  */
 public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
+    public static final String TASKS = "tasks";
     private final ContextService contextService;
     private final MessageBroker messageBroker;
     private final TaskDispatcher taskDispatcher;
@@ -68,7 +69,7 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
         taskExecutionService.update(sequenceTaskExecution);
 
-        List<WorkflowTask> subWorkflowTasks = sequenceTaskExecution.getWorkflowTasks("tasks");
+        List<WorkflowTask> subWorkflowTasks = sequenceTaskExecution.getWorkflowTasks(TASKS);
 
         if (subWorkflowTasks.size() > 0) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);

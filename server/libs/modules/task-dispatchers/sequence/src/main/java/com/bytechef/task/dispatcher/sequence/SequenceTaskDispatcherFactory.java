@@ -16,23 +16,28 @@
 
 package com.bytechef.task.dispatcher.sequence;
 
+import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.array;
 import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.create;
 import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.display;
+import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.task;
+import static com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher.TASKS;
+import static com.bytechef.task.dispatcher.sequence.constants.SequenceTaskDispatcherConstants.SEQUENCE;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
-import com.bytechef.task.dispatcher.sequence.constants.SequenceTaskDispatcherConstants;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class SequenceTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
+public class SequenceTaskDispatcherFactory implements TaskDispatcherFactory {
 
-    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = create(
-                    SequenceTaskDispatcherConstants.SEQUENCE)
-            .display(display("Sequence").description("Executes list of tasks in a sequence."));
+    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = create(SEQUENCE)
+            .display(display("Sequence").description("Executes list of tasks in a sequence."))
+            .taskProperties(array(TASKS)
+                    .description("The task to use in each iteration.")
+                    .items(task()));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
