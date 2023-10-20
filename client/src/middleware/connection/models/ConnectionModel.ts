@@ -21,67 +21,67 @@ import {
 } from './TagModel';
 
 /**
- * TODO
+ * Contains all required information to open a connection to a service defined by componentName parameter.
  * @export
  * @interface ConnectionModel
  */
 export interface ConnectionModel {
     /**
-     * TODO
+     * The name of an authorization used by this connection. Used for HTTP based services.
      * @type {string}
      * @memberof ConnectionModel
      */
     authorizationName?: string;
     /**
-     * TODO
+     * The name of a component that uses this connection.
      * @type {string}
      * @memberof ConnectionModel
      */
     componentName: string;
     /**
-     * TODO
+     * The version of a connection.
      * @type {number}
      * @memberof ConnectionModel
      */
     connectionVersion: number;
     /**
-     * TODO
+     * The created by.
      * @type {string}
      * @memberof ConnectionModel
      */
     readonly createdBy?: string;
     /**
-     * TODO
+     * The created date.
      * @type {Date}
      * @memberof ConnectionModel
      */
     readonly createdDate?: Date;
     /**
-     * TODO
+     * The name of a connection.
      * @type {string}
      * @memberof ConnectionModel
      */
     name: string;
     /**
-     * TODO
+     * The id of a connection.
      * @type {number}
      * @memberof ConnectionModel
      */
     readonly id?: number;
     /**
-     * TODO
+     * The last modified by.
      * @type {string}
      * @memberof ConnectionModel
      */
     readonly lastModifiedBy?: string;
     /**
-     * TODO
+     * The last modified date.
      * @type {Date}
      * @memberof ConnectionModel
      */
     readonly lastModifiedDate?: Date;
     /**
-     * TODO
+     * The parameters of a connection.
      * @type {{ [key: string]: object; }}
      * @memberof ConnectionModel
      */

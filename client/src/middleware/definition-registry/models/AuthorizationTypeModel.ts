@@ -24,6 +24,7 @@ export const AuthorizationTypeModel = {
     Custom: 'CUSTOM',
     DigestAuth: 'DIGEST_AUTH',
     Oauth2AuthorizationCode: 'OAUTH2_AUTHORIZATION_CODE',
+    Oauth2AuthorizationCodePkce: 'OAUTH2_AUTHORIZATION_CODE_PKCE',
     Oauth2ClientCredentials: 'OAUTH2_CLIENT_CREDENTIALS',
     Oauth2ImplicitCode: 'OAUTH2_IMPLICIT_CODE',
     Oauth2ResourceOwnerPassword: 'OAUTH2_RESOURCE_OWNER_PASSWORD'

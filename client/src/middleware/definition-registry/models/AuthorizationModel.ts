@@ -25,12 +25,12 @@ import {
     DisplayModelFromJSONTyped,
     DisplayModelToJSON,
 } from './DisplayModel';
-import type { ValuePropertyModel } from './ValuePropertyModel';
+import type { PropertyModel } from './PropertyModel';
 import {
-    ValuePropertyModelFromJSON,
-    ValuePropertyModelFromJSONTyped,
-    ValuePropertyModelToJSON,
-} from './ValuePropertyModel';
+    PropertyModelFromJSON,
+    PropertyModelFromJSONTyped,
+    PropertyModelToJSON,
+} from './PropertyModel';
 
 /**
  * Contains information required for a connection's authorization.
@@ -52,10 +52,10 @@ export interface AuthorizationModel {
     name?: string;
     /**
      * Properties of the connection.
-     * @type {Array<ValuePropertyModel>}
+     * @type {Array<PropertyModel>}
      * @memberof AuthorizationModel
      */
-    properties?: Array<ValuePropertyModel>;
+    properties?: Array<PropertyModel>;
     /**
      * 
      * @type {AuthorizationTypeModel}
@@ -85,7 +85,7 @@ export function AuthorizationModelFromJSONTyped(json: any, ignoreDiscriminator: 
         
         'display': !exists(json, 'display') ? undefined : DisplayModelFromJSON(json['display']),
         'name': !exists(json, 'name') ? undefined : json['name'],
-        'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(ValuePropertyModelFromJSON)),
+        'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'type': !exists(json, 'type') ? undefined : AuthorizationTypeModelFromJSON(json['type']),
     };
 }
@@ -101,7 +101,7 @@ export function AuthorizationModelToJSON(value?: AuthorizationModel | null): any
         
         'display': DisplayModelToJSON(value.display),
         'name': value.name,
-        'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(ValuePropertyModelToJSON)),
+        'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
         'type': AuthorizationTypeModelToJSON(value.type),
     };
 }

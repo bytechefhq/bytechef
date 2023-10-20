@@ -75,7 +75,7 @@ export interface ComponentDefinitionWithBasicActionsModel {
      */
     resources: ResourcesModel;
     /**
-     * The component version.
+     * The version of a component.
      * @type {number}
      * @memberof ComponentDefinitionWithBasicActionsModel
      */
