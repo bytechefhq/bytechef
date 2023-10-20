@@ -19,10 +19,21 @@ package com.bytechef.hermes.integration.facade;
 
 import com.bytechef.hermes.integration.domain.Integration;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * @author Ivica Cardic
  */
 public interface IntegrationFacade {
 
-    Integration initialize(Integration integration);
+    Integration create(
+        String name, String description, String category, List<String> workflowIds, List<String> tagNames);
+
+    void delete(Long id);
+
+    Set<String> getIntegrationTags();
+
+    Integration update(
+        Long id, String name, String description, String category, List<String> workflowIds, List<String> tagNames);
 }

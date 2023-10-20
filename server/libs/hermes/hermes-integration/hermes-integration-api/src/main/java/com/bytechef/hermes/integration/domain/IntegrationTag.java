@@ -17,29 +17,37 @@
 
 package com.bytechef.hermes.integration.domain;
 
-import java.util.Objects;
+import com.bytechef.tag.domain.Tag;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.Objects;
+
 /**
  * @author Ivica Cardic
  */
-@Table("integration_workflow")
-public final class IntegrationWorkflow implements Persistable<Long> {
+@Table("integration_tag")
+public final class IntegrationTag implements Persistable<Long> {
 
     @Id
     private Long id;
 
-    @Column("workflow_id")
-    private String workflowId;
+    @Column("tag_id")
+    private Long tagId;
 
-    public IntegrationWorkflow() {
+    public IntegrationTag() {
     }
 
-    public IntegrationWorkflow(String workflowId) {
-        this.workflowId = workflowId;
+    public IntegrationTag(Long tagId) {
+        this.tagId = tagId;
+    }
+
+    @SuppressFBWarnings("EI2")
+    public IntegrationTag(Tag tag) {
+        this.tagId = tag.getId();
     }
 
     @Override
@@ -52,9 +60,9 @@ public final class IntegrationWorkflow implements Persistable<Long> {
             return false;
         }
 
-        IntegrationWorkflow integrationWorkflow = (IntegrationWorkflow) o;
+        IntegrationTag integrationTag = (IntegrationTag) o;
 
-        return Objects.equals(id, integrationWorkflow.id) && Objects.equals(workflowId, integrationWorkflow.workflowId);
+        return Objects.equals(id, integrationTag.id) && Objects.equals(tagId, integrationTag.tagId);
     }
 
     @Override
@@ -67,8 +75,8 @@ public final class IntegrationWorkflow implements Persistable<Long> {
         return id;
     }
 
-    public String getWorkflowId() {
-        return workflowId;
+    public Long getTagId() {
+        return tagId;
     }
 
     @Override
@@ -80,14 +88,10 @@ public final class IntegrationWorkflow implements Persistable<Long> {
         this.id = id;
     }
 
-    public void setWorkflowId(String workflowId) {
-        this.workflowId = workflowId;
-    }
-
     @Override
     public String toString() {
-        return "IntegrationWorkflow{" + ", id='"
-            + id + '\'' + ", workflowId='"
-            + workflowId + '\'' + '}';
+        return "IntegrationTag{" + ", id='"
+            + id + '\'' + ", tagId='"
+            + tagId + '\'' + '}';
     }
 }

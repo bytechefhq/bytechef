@@ -18,20 +18,24 @@
 package com.bytechef.hermes.integration.service;
 
 import com.bytechef.hermes.integration.domain.Integration;
+import com.bytechef.tag.domain.Tag;
+
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Ivica Cardic
  */
 public interface IntegrationService {
 
-    Integration create(Integration integration);
+    Integration create(String name, String description, String category, Set<String> workflowIds, Set<Tag> tags);
 
-    void delete(String id);
+    void delete(Long id);
 
-    Integration getIntegration(String id);
+    Integration getIntegration(Long id);
 
     List<Integration> getIntegrations();
 
-    Integration update(Integration integration);
+    Integration update(
+        Long id, String name, String description, String category, Set<String> workflowIds, Set<Tag> tags);
 }
