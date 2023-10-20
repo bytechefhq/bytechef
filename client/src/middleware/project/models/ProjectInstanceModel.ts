@@ -63,6 +63,12 @@ export interface ProjectInstanceModel {
      */
     readonly id?: number;
     /**
+     * The last execution date.
+     * @type {Date}
+     * @memberof ProjectInstanceModel
+     */
+    readonly lastExecutionDate?: Date;
+    /**
      * The last modified by.
      * @type {string}
      * @memberof ProjectInstanceModel
@@ -153,6 +159,7 @@ export function ProjectInstanceModelFromJSONTyped(json: any, ignoreDiscriminator
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'id': !exists(json, 'id') ? undefined : json['id'],
+        'lastExecutionDate': !exists(json, 'lastExecutionDate') ? undefined : (new Date(json['lastExecutionDate'])),
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],

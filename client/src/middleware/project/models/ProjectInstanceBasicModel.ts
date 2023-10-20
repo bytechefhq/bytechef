@@ -44,6 +44,12 @@ export interface ProjectInstanceBasicModel {
      */
     readonly id?: number;
     /**
+     * The last execution date.
+     * @type {string}
+     * @memberof ProjectInstanceBasicModel
+     */
+    readonly lastExecutionDate?: string;
+    /**
      * The last modified by.
      * @type {string}
      * @memberof ProjectInstanceBasicModel
@@ -110,6 +116,7 @@ export function ProjectInstanceBasicModelFromJSONTyped(json: any, ignoreDiscrimi
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'id': !exists(json, 'id') ? undefined : json['id'],
+        'lastExecutionDate': !exists(json, 'lastExecutionDate') ? undefined : json['lastExecutionDate'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
