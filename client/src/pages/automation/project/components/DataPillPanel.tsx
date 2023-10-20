@@ -123,7 +123,7 @@ const DataPillPanelBody = ({containerHeight}: {containerHeight: number}) => {
                                         <span className="text-sm">{title}</span>
                                     </div>
 
-                                    <ChevronDownIcon className="h-5 w-5 text-gray-400 transition-transform duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-180" />
+                                    <ChevronDownIcon className="ease-[cubic-bezier(0.87,_0,_0.13,_1)] h-5 w-5 text-gray-400 transition-transform duration-300 group-data-[state=open]:rotate-180" />
                                 </AccordionTrigger>
 
                                 <AccordionContent
