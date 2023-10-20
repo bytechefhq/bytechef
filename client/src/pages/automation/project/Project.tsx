@@ -7,7 +7,6 @@ import Button from 'components/Button/Button';
 import Input from 'components/Input/Input';
 import React, {useEffect, useState} from 'react';
 import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
-import getCreatedWorkflow from 'utils/getCreatedWorkflow';
 
 import PageLoader from '../../../components/PageLoader/PageLoader';
 import Select from '../../../components/Select/Select';
@@ -78,21 +77,12 @@ const Project: React.FC = () => {
     } = useGetProjectWorkflowsQuery(project?.id as number);
 
     const createWorkflowMutation = useCreateProjectWorkflowRequestMutation({
-        onSuccess: (project) => {
+        onSuccess: (workflow) => {
             queryClient.invalidateQueries(
                 ProjectKeys.projectWorkflows(parseInt(projectId!))
             );
 
-            if (projectWorkflows) {
-                const createdWorkflow = getCreatedWorkflow(
-                    projectWorkflows,
-                    project
-                );
-
-                if (createdWorkflow) {
-                    setCurrentWorkflow(createdWorkflow);
-                }
-            }
+            setCurrentWorkflow(workflow);
         },
     });
 

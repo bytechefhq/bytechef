@@ -1,7 +1,6 @@
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
-import getCreatedWorkflow from 'utils/getCreatedWorkflow';
 
 import AlertDialog from '../../../components/AlertDialog/AlertDialog';
 import Badge from '../../../components/Badge/Badge';
@@ -48,15 +47,10 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
     const createProjectWorkflowRequestMutation =
         useCreateProjectWorkflowRequestMutation({
-            onSuccess: (projectWithWorkflows) => {
+            onSuccess: (workflow) => {
                 if (projectWorkflows) {
-                    const createdWorkflow = getCreatedWorkflow(
-                        projectWorkflows,
-                        projectWithWorkflows
-                    );
-
                     navigate(
-                        `/automation/projects/${project.id}/workflow/${createdWorkflow?.id}`
+                        `/automation/projects/${project.id}/workflow/${workflow?.id}`
                     );
                 }
 
