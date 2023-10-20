@@ -78,9 +78,9 @@ public class HttpClientTaskHandlerIntTest extends BaseTaskIntTest {
             "httpClient",
             new HttpClientTaskHandler(
                 new HttpAuthenticationFactory(),
-                new HttpHeadersFactory(),
+                new HttpHeadersFactory(jsonHelper),
                 new HttpResponseHandler(fileStorageService, jsonHelper),
-                new QueryParamsFactory(),
+                new QueryParamsFactory(jsonHelper),
                 jsonHelper
             )
         );
