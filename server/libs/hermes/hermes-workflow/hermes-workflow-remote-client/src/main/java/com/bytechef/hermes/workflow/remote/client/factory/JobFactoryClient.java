@@ -19,7 +19,9 @@ package com.bytechef.hermes.workflow.remote.client.factory;
 
 import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.factory.JobFactory;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * @author Ivica Cardic
@@ -27,8 +29,26 @@ import org.springframework.stereotype.Component;
 @Component
 public class JobFactoryClient implements JobFactory {
 
+    private final WebClient.Builder loadBalancedWebClientBuilder;
+
+    @SuppressFBWarnings("EI")
+    public JobFactoryClient(WebClient.Builder loadBalancedWebClientBuilder) {
+        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    }
+
     @Override
+    @SuppressFBWarnings("NP")
     public long create(JobParameters jobParameters) {
-        return 0;
+        return loadBalancedWebClientBuilder
+            .build()
+            .post()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/job-factory/create")
+                .build())
+            .bodyValue(jobParameters)
+            .retrieve()
+            .bodyToMono(Long.class)
+            .block();
     }
 }

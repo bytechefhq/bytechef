@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.remote.web.rest.service;
+package com.bytechef.hermes.workflow.remote.web.rest.service;
 
-import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.workflow.service.TriggerLifecycleService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,39 +26,43 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 /**
  * @author Ivica Cardic
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
-public class ConnectionServiceController {
+public class TriggerLifecycleServiceController {
 
-    private final ConnectionService connectionService;
+    private final TriggerLifecycleService triggerLifecycleService;
 
     @SuppressFBWarnings("EI")
-    public ConnectionServiceController(ConnectionService connectionService) {
-        this.connectionService = connectionService;
+    public TriggerLifecycleServiceController(TriggerLifecycleService triggerLifecycleService) {
+        this.triggerLifecycleService = triggerLifecycleService;
     }
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connection-service/get-connection/{id}",
-        produces = {
+        value = "/trigger-lifecycle-service/fetch-value/{workflowExecutionId}",
+        consumes = {
             "application/json"
         })
-    public ResponseEntity<Connection> getConnection(@PathVariable long id) {
-        return ResponseEntity.ok(connectionService.getConnection(id));
+    public ResponseEntity<Object> fetchValue(@PathVariable String workflowExecutionId) {
+        return triggerLifecycleService.fetchValue(workflowExecutionId)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.noContent()
+                .build());
     }
 
     @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/connection-service/get-connections",
-        produces = {
+        method = RequestMethod.POST,
+        value = "/trigger-lifecycle-service/save/{workflowExecutionId}",
+        consumes = {
             "application/json"
         })
-    public ResponseEntity<List<Connection>> getConnections() {
-        return ResponseEntity.ok(connectionService.getConnections());
+    public ResponseEntity<Void> save(@PathVariable String workflowExecutionId, DynamicWebhookEnableOutput value) {
+        triggerLifecycleService.save(workflowExecutionId, value);
+
+        return ResponseEntity.noContent()
+            .build();
     }
 }

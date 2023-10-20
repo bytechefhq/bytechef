@@ -17,8 +17,12 @@
 
 package com.bytechef.hermes.workflow.remote.client.service;
 
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.workflow.service.TriggerLifecycleService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Optional;
 
@@ -28,13 +32,40 @@ import java.util.Optional;
 @Component
 public class TriggerLifecycleServiceClient implements TriggerLifecycleService {
 
-    @Override
-    public <T> Optional<T> fetchValue(long instanceId, String workflowExecutionId) {
-        return Optional.empty();
+    private final WebClient.Builder loadBalancedWebClientBuilder;
+
+    @SuppressFBWarnings("EI")
+    public TriggerLifecycleServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
+        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
     }
 
     @Override
-    public void save(long instanceId, String workflowExecutionId, Object value) {
+    public <T> Optional<T> fetchValue(String workflowExecutionId) {
+        return Optional.ofNullable(
+            loadBalancedWebClientBuilder
+                .build()
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                    .host("platform-service-app")
+                    .path("/api/internal/trigger-lifecycle-service/fetch-value/{workflowExecutionId}")
+                    .build(workflowExecutionId))
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<T>() {})
+                .block());
+    }
 
+    @Override
+    public void save(String workflowExecutionId, DynamicWebhookEnableOutput value) {
+        loadBalancedWebClientBuilder
+            .build()
+            .post()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/trigger-lifecycle-service/save/{workflowExecutionId}")
+                .build(workflowExecutionId))
+            .bodyValue(value)
+            .retrieve()
+            .toBodilessEntity()
+            .block();
     }
 }

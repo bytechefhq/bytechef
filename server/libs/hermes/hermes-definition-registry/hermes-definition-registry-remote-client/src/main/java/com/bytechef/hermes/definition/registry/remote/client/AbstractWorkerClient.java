@@ -19,6 +19,7 @@ package com.bytechef.hermes.definition.registry.remote.client;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.util.CollectionUtils;
@@ -37,6 +38,7 @@ public abstract class AbstractWorkerClient {
     protected final DiscoveryClient discoveryClient;
     protected final ObjectMapper objectMapper;
 
+    @SuppressFBWarnings("EI")
     public AbstractWorkerClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
         this.discoveryClient = discoveryClient;
         this.objectMapper = objectMapper;

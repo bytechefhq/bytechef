@@ -19,7 +19,9 @@ package com.bytechef.hermes.connection.remote.client.service;
 
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 
@@ -29,48 +31,72 @@ import java.util.List;
 @Component
 public class ConnectionServiceClient implements ConnectionService {
 
+    private final WebClient.Builder loadBalancedWebClientBuilder;
+
+    public ConnectionServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
+        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    }
+
     @Override
     public Connection create(Connection connection) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void delete(long id) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Connection getConnection(long id) {
-        return null;
+        return loadBalancedWebClientBuilder
+            .build()
+            .get()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/connection-service/get-connection/{id}")
+                .build(id))
+            .retrieve()
+            .bodyToMono(Connection.class)
+            .block();
     }
 
     @Override
     public List<Connection> getConnections() {
-        return null;
+        return loadBalancedWebClientBuilder
+            .build()
+            .get()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/connection-service/get-connections")
+                .build())
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<Connection>>() {})
+            .block();
     }
 
     @Override
     public List<Connection> getConnections(List<Long> ids) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Connection> getConnections(String componentName, int version) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Connection> getConnections(List<String> componentNames, List<Long> tagIds) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Connection update(long id, List<Long> tagIds) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public Connection update(long id, String name, List<Long> tagIds, int version) {
-        return null;
+    public Connection update(Connection connection) {
+        throw new UnsupportedOperationException();
     }
 }

@@ -20,8 +20,10 @@ package com.bytechef.hermes.workflow.remote.client.service;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.service.JobService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,39 +35,64 @@ import java.util.Optional;
 @Component
 public class JobServiceClient implements JobService {
 
+    private final WebClient.Builder loadBalancedWebClientBuilder;
+
+    @SuppressFBWarnings("EI")
+    public JobServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
+        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    }
+
     @Override
     public Job create(JobParameters jobParameters) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Optional<Job> fetchLatestJob() {
-        return Optional.empty();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Job> getJobs() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Page<Job> getJobs(int pageNumber) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Job getJob(long id) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Job getTaskExecutionJob(long taskExecutionId) {
-        return null;
+        return loadBalancedWebClientBuilder
+            .build()
+            .get()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/job-service/get-task-execution-job/{taskExecutionId}")
+                .build(taskExecutionId))
+            .retrieve()
+            .bodyToMono(Job.class)
+            .block();
     }
 
     @Override
     public Job resumeToStatusStarted(long id) {
-        return null;
+        return loadBalancedWebClientBuilder
+            .build()
+            .put()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/job-service/resume-to-status-started/{id}")
+                .build(id))
+            .retrieve()
+            .bodyToMono(Job.class)
+            .block();
     }
 
     @Override
@@ -73,21 +100,49 @@ public class JobServiceClient implements JobService {
         String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
         Integer pageNumber) {
 
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Job setStatusToStarted(long id) {
-        return null;
+        return loadBalancedWebClientBuilder
+            .build()
+            .put()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/job-service/set-status-to-started/{id}")
+                .build(id))
+            .retrieve()
+            .bodyToMono(Job.class)
+            .block();
     }
 
     @Override
     public Job setStatusToStopped(long id) {
-        return null;
+        return loadBalancedWebClientBuilder
+            .build()
+            .put()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/job-service/set-status-to-stopped/{id}")
+                .build(id))
+            .retrieve()
+            .bodyToMono(Job.class)
+            .block();
     }
 
     @Override
     public Job update(Job job) {
-        return null;
+        return loadBalancedWebClientBuilder
+            .build()
+            .put()
+            .uri(uriBuilder -> uriBuilder
+                .host("platform-service-app")
+                .path("/api/internal/job-service/update")
+                .build())
+            .bodyValue(job)
+            .retrieve()
+            .bodyToMono(Job.class)
+            .block();
     }
 }
