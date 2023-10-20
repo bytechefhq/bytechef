@@ -28,12 +28,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class PolyglotEngine {
 
-    public Value execute(String languageId, TaskExecution taskExecution) {
+    public Object execute(String languageId, TaskExecution taskExecution) {
         try (Context polyglotContext = Context.newBuilder().allowAllAccess(true).build()) {
 
             injectValues(polyglotContext.getBindings(languageId), taskExecution.get("context", Map.class));
 
-            return polyglotContext.eval(languageId, taskExecution.get("source", String.class));
+            Value value = polyglotContext.eval(languageId, taskExecution.get("source", String.class));
+
+            return value.as(Object.class);
         }
     }
 
