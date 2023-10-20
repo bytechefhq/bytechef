@@ -272,6 +272,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
+  /workflows/{id}/test:
+    post:
+      description: "Create a request for testing a workflow."
+      summary: "Create a request for testing a workflow."
+      tags:
+      - "workflows"
+      operationId: "testWorkflow"
+      parameters:
+      - name: "id"
+        description: "The id of the workflow to test."
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      requestBody:
+        description: "Parameters required to run a workflow, for example '{\"workflowId\"\
+          :\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkflowParameters"
+        required: true
+      responses:
+        "200":
+          description: "The output of the executed workflow, if any."
+          content:
+            application/json:
+              schema:
+                type: "object"
 components:
   schemas:
     ExecutionError:
@@ -397,11 +426,6 @@ components:
         label:
           description: "The job's human-readable name"
           type: "string"
-        outputs:
-          description: "The outputs expected by the workflow."
-          type: "object"
-          additionalProperties:
-            type: "object"
         parentTaskExecutionId:
           description: "The id of the parent task that created this job. Used for\
             \ sub-flows."
@@ -649,6 +673,20 @@ components:
       enum:
       - "JSON"
       - "YAML"
+    WorkflowParameters:
+      description: "Defines parameters used to execute a workflow."
+      type: "object"
+      properties:
+        inputs:
+          description: "The inputs expected by the workflow"
+          type: "object"
+          additionalProperties:
+            type: "object"
+        outputs:
+          description: "The outputs expected by the workflow."
+          type: "object"
+          additionalProperties:
+            type: "object"
     WorkflowTask:
       description: "Represents a definition of the task."
       type: "object"
