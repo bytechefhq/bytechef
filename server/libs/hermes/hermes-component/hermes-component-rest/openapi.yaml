@@ -1,0 +1,86 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v1
+servers:
+  - url: http://localhost:5173/api
+paths:
+  /definitions/components:
+    get:
+      tags:
+        - ComponentDefinitionController
+      operationId: getComponentDefinitions
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ComponentDefinition'
+  /definitions/connections:
+    get:
+      tags:
+        - ConnectionDefinitionController
+      operationId: getConnectionDefinitions
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Connections'
+components:
+  schemas:
+    AnyProperty:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/AnyProperty'
+    ArrayProperty:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/ArrayProperty'
+    BooleanProperty:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/BooleanProperty'
+    ComponentDefinition:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/ComponentDefinition'
+    ComponentDisplay:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/ComponentDisplay'
+    ComponentAction:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/ComponentAction'
+    ConnectionDefinition:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/ConnectionDefinition'
+    Connections:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/Connections'
+    DateTimeProperty:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/DateTimeProperty'
+    Display:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/Display'
+    DisplayOption:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/DisplayOption'
+    DisplayOptionEntryValue:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/DisplayOptionEntryValue'
+    EditorType:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/EditorType'
+    IntegerProperty:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/IntegerProperty'
+    NumberProperty:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/NumberProperty'
+    ObjectProperty:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/ObjectProperty'
+    OptionProperty:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/OptionProperty'
+    PrimitiveValueProperty:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/PrimitiveValueProperty'
+    Property:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/Property'
+    PropertyOption:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/PropertyOption'
+    PropertyType:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/PropertyType'
+    StringProperty:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/StringProperty'
+    TypeProperty:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/TypeProperty'
+    ValueProperty:
+      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/ValueProperty'
+
