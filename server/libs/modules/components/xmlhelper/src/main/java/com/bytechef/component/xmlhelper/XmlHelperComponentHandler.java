@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.xml.helper;
+package com.bytechef.component.xmlhelper;
 
-import static com.bytechef.component.xml.helper.constants.XmlHelperConstants.SOURCE;
-import static com.bytechef.component.xml.helper.constants.XmlHelperConstants.XML_HELPER;
-import static com.bytechef.component.xml.helper.constants.XmlHelperConstants.XML_PARSE;
-import static com.bytechef.component.xml.helper.constants.XmlHelperConstants.XML_STRINGIFY;
+import static com.bytechef.component.xmlhelper.constants.XmlHelperConstants.SOURCE;
+import static com.bytechef.component.xmlhelper.constants.XmlHelperConstants.XML_HELPER;
+import static com.bytechef.component.xmlhelper.constants.XmlHelperConstants.XML_PARSE;
+import static com.bytechef.component.xmlhelper.constants.XmlHelperConstants.XML_STRINGIFY;
 import static com.bytechef.hermes.component.ComponentDSL.action;
 import static com.bytechef.hermes.component.ComponentDSL.any;
 import static com.bytechef.hermes.component.ComponentDSL.array;
@@ -46,21 +46,21 @@ public class XmlHelperComponentHandler implements ComponentHandler {
                     action(XML_PARSE)
                             .display(display("Convert from XML string")
                                     .description("Converts the XML string to object/array."))
-                            .inputs(string(SOURCE)
+                            .properties(string(SOURCE)
                                     .label("Source")
                                     .description("The XML string to convert to the data.")
                                     .required(true))
-                            .outputSchema(object())
+                            .output(object())
                             .performFunction(this::performParse),
                     action(XML_STRINGIFY)
                             .display(display("Convert to XML string")
                                     .description("Writes the object/array to a XML string."))
-                            .inputs(any(SOURCE)
+                            .properties(any(SOURCE)
                                     .label("Source")
                                     .description("The data to convert to XML string.")
                                     .required(true)
                                     .types(array(), object()))
-                            .outputSchema(string())
+                            .output(string())
                             .performFunction(this::performStringify));
 
     @Override

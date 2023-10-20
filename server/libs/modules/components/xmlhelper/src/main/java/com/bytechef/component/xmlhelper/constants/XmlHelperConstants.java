@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.xml.helper.constants;
+package com.bytechef.component.xmlhelper.constants;
 
 /**
  * @author Ivica Cardic

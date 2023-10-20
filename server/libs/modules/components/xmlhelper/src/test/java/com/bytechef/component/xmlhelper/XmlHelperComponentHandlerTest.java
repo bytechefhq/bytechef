@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.xml.helper;
+package com.bytechef.component.xmlhelper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.commons.xml.XmlUtils;
-import com.bytechef.hermes.component.test.MockContext;
-import com.bytechef.hermes.component.test.MockExecutionParameters;
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.hermes.component.test.mock.MockContext;
+import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -30,14 +30,14 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class XmlUtilsComponentHandlerTest {
+public class XmlHelperComponentHandlerTest {
 
     private static final MockContext context = new MockContext();
     private static final XmlHelperComponentHandler xmlHelperComponentHandler = new XmlHelperComponentHandler();
 
     @Test
     public void testGetComponentDefinition() throws IOException {
-        DefinitionAssert.assertEquals("definition/xml-helper_v1.json", new XmlHelperComponentHandler().getDefinition());
+        AssertUtils.assertEquals("definition/xmlhelper_v1.json", new XmlHelperComponentHandler().getDefinition());
     }
 
     @Test
