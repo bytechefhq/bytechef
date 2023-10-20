@@ -14,9 +14,26 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.json.item;
+package com.atlas.json.serializer;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import java.io.IOException;
+import org.json.JSONArray;
 
 /**
  * @author Ivica Cardic
  */
-public class JSONItemHelper {}
+public class JSONArrayStdSerializer extends StdSerializer<JSONArray> {
+
+    public JSONArrayStdSerializer() {
+        super(JSONArray.class);
+    }
+
+    @Override
+    public void serialize(JSONArray jsonArray, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
+        throws IOException {
+        jsonGenerator.writeObject(jsonArray.toList());
+    }
+}

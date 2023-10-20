@@ -14,9 +14,20 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.json.item;
+package com.atlas.json.converter;
+
+import com.atlas.json.JSONObjectUtil;
+import java.util.Map;
+import org.json.JSONObject;
+import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-public class JSONItemHelperTest {}
+public class JSONObjectConverter implements Converter<Map<?, ?>, JSONObject> {
+
+    @Override
+    public JSONObject convert(Map<?, ?> source) {
+        return JSONObjectUtil.of(source);
+    }
+}
