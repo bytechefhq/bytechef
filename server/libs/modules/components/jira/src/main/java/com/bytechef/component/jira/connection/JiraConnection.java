@@ -17,10 +17,10 @@
 
 package com.bytechef.component.jira.connection;
 
-import static com.bytechef.hermes.component.constant.ComponentConstants.CLIENT_ID;
-import static com.bytechef.hermes.component.constant.ComponentConstants.CLIENT_SECRET;
-import static com.bytechef.hermes.component.constant.ComponentConstants.PASSWORD;
-import static com.bytechef.hermes.component.constant.ComponentConstants.USERNAME;
+import static com.bytechef.hermes.component.definition.Authorization.CLIENT_ID;
+import static com.bytechef.hermes.component.definition.Authorization.CLIENT_SECRET;
+import static com.bytechef.hermes.component.definition.Authorization.PASSWORD;
+import static com.bytechef.hermes.component.definition.Authorization.USERNAME;
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
@@ -42,29 +42,29 @@ public class JiraConnection {
             Authorization.AuthorizationType.BASIC_AUTH.name()
                 .toLowerCase(),
             Authorization.AuthorizationType.BASIC_AUTH)
-                .display(
-                    display("Basic Auth"))
-                .properties(
-                    string(USERNAME)
-                        .label("Username")
-                        .required(true),
-                    string(PASSWORD)
-                        .label("Password")
-                        .required(true)),
+            .display(
+                display("Basic Auth"))
+            .properties(
+                string(USERNAME)
+                    .label("Username")
+                    .required(true),
+                string(PASSWORD)
+                    .label("Password")
+                    .required(true)),
             authorization(
                 Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE.name()
                     .toLowerCase(),
                 Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                    .display(
-                        display("OAuth2 Authorization Code"))
-                    .properties(
-                        string(CLIENT_ID)
-                            .label("Client Id")
-                            .required(true),
-                        string(CLIENT_SECRET)
-                            .label("Client Secret")
-                            .required(true))
-                    .authorizationUrl(connection -> "https://auth.atlassian.com/authorize")
-                    .scopes(connection -> List.of("read:jira-work", "write:jira-work"))
-                    .tokenUrl(connection -> "https://auth.atlassian.com/oauth/token"));
+                .display(
+                    display("OAuth2 Authorization Code"))
+                .properties(
+                    string(CLIENT_ID)
+                        .label("Client Id")
+                        .required(true),
+                    string(CLIENT_SECRET)
+                        .label("Client Secret")
+                        .required(true))
+                .authorizationUrl(connection -> "https://auth.atlassian.com/authorize")
+                .scopes(connection -> List.of("read:jira-work", "write:jira-work"))
+                .tokenUrl(connection -> "https://auth.atlassian.com/oauth/token"));
 }
