@@ -135,6 +135,7 @@ Desktop.ini
 *.*~
 *~
 .merge_file*
+*application.pid
 
 ######################
 # Maven Wrapper
