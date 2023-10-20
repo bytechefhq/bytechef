@@ -35,8 +35,9 @@ schemas:
             type: array
             items:
               $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Property'
-          type:
-            type: string
+          multipleValues:
+            description: If the array can contain multiple items.
+            type: boolean
   BooleanProperty:
     description: A boolean property type.
     type: object
@@ -185,6 +186,9 @@ schemas:
             type: array
             items:
               $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Property'
+          multipleValues:
+            description: If the object can contain multiple additional properties.
+            type: boolean
           objectType:
             description: The object type.
             type: string
