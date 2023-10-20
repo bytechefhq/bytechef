@@ -38,12 +38,6 @@ export interface DisplayModel {
      */
     icon?: string;
     /**
-     * The label.
-     * @type {string}
-     * @memberof DisplayModel
-     */
-    label?: string;
-    /**
      * The additional explanation.
      * @type {string}
      * @memberof DisplayModel
@@ -55,6 +49,12 @@ export interface DisplayModel {
      * @memberof DisplayModel
      */
     tags?: Array<string>;
+    /**
+     * The title.
+     * @type {string}
+     * @memberof DisplayModel
+     */
+    title?: string;
 }
 
 /**
@@ -79,9 +79,9 @@ export function DisplayModelFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'category': !exists(json, 'category') ? undefined : json['category'],
         'description': !exists(json, 'description') ? undefined : json['description'],
         'icon': !exists(json, 'icon') ? undefined : json['icon'],
-        'label': !exists(json, 'label') ? undefined : json['label'],
         'subtitle': !exists(json, 'subtitle') ? undefined : json['subtitle'],
         'tags': !exists(json, 'tags') ? undefined : json['tags'],
+        'title': !exists(json, 'title') ? undefined : json['title'],
     };
 }
 
@@ -97,9 +97,9 @@ export function DisplayModelToJSON(value?: DisplayModel | null): any {
         'category': value.category,
         'description': value.description,
         'icon': value.icon,
-        'label': value.label,
         'subtitle': value.subtitle,
         'tags': value.tags,
+        'title': value.title,
     };
 }
 

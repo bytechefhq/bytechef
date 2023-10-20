@@ -5,7 +5,9 @@ apis/index.ts
 index.ts
 models/CategoryModel.ts
 models/CreateIntegrationWorkflowRequestModel.ts
+models/InputModel.ts
 models/IntegrationModel.ts
+models/OutputModel.ts
 models/TagModel.ts
 models/UpdateTagsRequestModel.ts
 models/WorkflowFormatModel.ts

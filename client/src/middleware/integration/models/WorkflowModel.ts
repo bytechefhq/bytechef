@@ -13,6 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { InputModel } from './InputModel';
+import {
+    InputModelFromJSON,
+    InputModelFromJSONTyped,
+    InputModelToJSON,
+} from './InputModel';
+import type { OutputModel } from './OutputModel';
+import {
+    OutputModelFromJSON,
+    OutputModelFromJSONTyped,
+    OutputModelToJSON,
+} from './OutputModel';
 import type { WorkflowFormatModel } from './WorkflowFormatModel';
 import {
     WorkflowFormatModelFromJSON,
@@ -70,10 +82,10 @@ export interface WorkflowModel {
     readonly id?: string;
     /**
      * The workflow's expected list of inputs.
-     * @type {Array<{ [key: string]: object; }>}
+     * @type {Array<InputModel>}
      * @memberof WorkflowModel
      */
-    readonly inputs?: Array<{ [key: string]: object; }>;
+    readonly inputs?: Array<InputModel>;
     /**
      * The descriptive name for the workflow
      * @type {string}
@@ -94,10 +106,10 @@ export interface WorkflowModel {
     readonly lastModifiedDate?: Date;
     /**
      * The workflow's list of expected outputs.
-     * @type {Array<{ [key: string]: object; }>}
+     * @type {Array<OutputModel>}
      * @memberof WorkflowModel
      */
-    readonly outputs?: Array<{ [key: string]: object; }>;
+    readonly outputs?: Array<OutputModel>;
     /**
      * The type of the source which stores the workflow definition.
      * @type {string}
@@ -162,11 +174,11 @@ export function WorkflowModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         'description': !exists(json, 'description') ? undefined : json['description'],
         'format': !exists(json, 'format') ? undefined : WorkflowFormatModelFromJSON(json['format']),
         'id': !exists(json, 'id') ? undefined : json['id'],
-        'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
+        'inputs': !exists(json, 'inputs') ? undefined : ((json['inputs'] as Array<any>).map(InputModelFromJSON)),
         'label': !exists(json, 'label') ? undefined : json['label'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'outputs': !exists(json, 'outputs') ? undefined : json['outputs'],
+        'outputs': !exists(json, 'outputs') ? undefined : ((json['outputs'] as Array<any>).map(OutputModelFromJSON)),
         'sourceType': !exists(json, 'sourceType') ? undefined : json['sourceType'],
         'retry': !exists(json, 'retry') ? undefined : json['retry'],
         'tasks': !exists(json, 'tasks') ? undefined : ((json['tasks'] as Array<any>).map(WorkflowTaskModelFromJSON)),
