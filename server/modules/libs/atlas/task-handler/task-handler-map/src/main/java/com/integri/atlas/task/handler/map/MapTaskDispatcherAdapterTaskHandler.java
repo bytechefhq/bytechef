@@ -49,12 +49,12 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
     private final Worker.Builder builder;
 
     public MapTaskDispatcherAdapterTaskHandler(
-        TaskHandlerResolver aResolver,
-        TaskEvaluator aTaskEvaluator,
+        TaskHandlerResolver taskHandlerResolver,
+        TaskEvaluator taskEvaluator,
         Worker.Builder builder
     ) {
-        taskHandlerResolver = Objects.requireNonNull(aResolver);
-        taskEvaluator = Objects.requireNonNull(aTaskEvaluator);
+        this.taskHandlerResolver = Objects.requireNonNull(taskHandlerResolver);
+        this.taskEvaluator = Objects.requireNonNull(taskEvaluator);
         this.builder = builder;
     }
 
@@ -68,6 +68,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
             Queues.COMPLETIONS,
             message -> {
                 TaskExecution completion = (TaskExecution) message;
+
                 result.add(completion.getOutput());
             }
         );
@@ -78,7 +79,9 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
             Queues.ERRORS,
             message -> {
                 TaskExecution erringTask = (TaskExecution) message;
+
                 Error err = erringTask.getError();
+
                 errors.add(err);
             }
         );
@@ -109,19 +112,23 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
         if (errors.size() > 0) {
             StringBuilder errorMessage = new StringBuilder();
+
             for (Error e : errors) {
                 if (errorMessage.length() > 3000) {
                     errorMessage.append("\n").append("...");
                     break;
                 }
+
                 if (errorMessage.length() > 0) {
                     errorMessage.append("\n");
                 }
+
                 errorMessage
                     .append(e.getMessage())
                     .append("\n")
                     .append(String.join("\n", Arrays.asList(e.getStackTrace())));
             }
+
             throw new RuntimeException(errorMessage.toString());
         }
 

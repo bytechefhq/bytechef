@@ -40,10 +40,9 @@ import org.springframework.web.client.RestTemplate;
  */
 public class JobStatusWebhookEventListener implements EventListener {
 
+    private static final Logger logger = LoggerFactory.getLogger(JobStatusWebhookEventListener.class);
+
     private final JobRepository jobRepository;
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     private final RestTemplate rest = new RestTemplate();
 
     public JobStatusWebhookEventListener(JobRepository aJobRepository) {
