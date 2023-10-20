@@ -51,6 +51,12 @@ export interface ObjectProperty extends ValueProperty {
      */
     additionalProperties?: Array<Property>;
     /**
+     * If the object can contain multiple additional properties.
+     * @type {boolean}
+     * @memberof ObjectProperty
+     */
+    multipleValues?: boolean;
+    /**
      * The object type.
      * @type {string}
      * @memberof ObjectProperty
@@ -91,6 +97,7 @@ export function ObjectPropertyFromJSONTyped(json: any, ignoreDiscriminator: bool
     return {
         ...ValuePropertyFromJSONTyped(json, ignoreDiscriminator),
         'additionalProperties': !exists(json, 'additionalProperties') ? undefined : ((json['additionalProperties'] as Array<any>).map(PropertyFromJSON)),
+        'multipleValues': !exists(json, 'multipleValues') ? undefined : json['multipleValues'],
         'objectType': !exists(json, 'objectType') ? undefined : json['objectType'],
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
         'type': json['type'],
@@ -107,6 +114,7 @@ export function ObjectPropertyToJSON(value?: ObjectProperty | null): any {
     return {
         ...ValuePropertyToJSON(value),
         'additionalProperties': value.additionalProperties === undefined ? undefined : ((value.additionalProperties as Array<any>).map(PropertyToJSON)),
+        'multipleValues': value.multipleValues,
         'objectType': value.objectType,
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyToJSON)),
         'type': value.type,

@@ -51,11 +51,11 @@ export interface ArrayProperty extends ValueProperty {
      */
     items?: Array<Property>;
     /**
-     * 
-     * @type {string}
+     * If the array can contain multiple items.
+     * @type {boolean}
      * @memberof ArrayProperty
      */
-    type: string;
+    multipleValues?: boolean;
 }
 
 /**
@@ -63,7 +63,6 @@ export interface ArrayProperty extends ValueProperty {
  */
 export function instanceOfArrayProperty(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "type" in value;
 
     return isInstance;
 }
@@ -79,7 +78,7 @@ export function ArrayPropertyFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         ...ValuePropertyFromJSONTyped(json, ignoreDiscriminator),
         'items': !exists(json, 'items') ? undefined : ((json['items'] as Array<any>).map(PropertyFromJSON)),
-        'type': json['type'],
+        'multipleValues': !exists(json, 'multipleValues') ? undefined : json['multipleValues'],
     };
 }
 
@@ -93,7 +92,7 @@ export function ArrayPropertyToJSON(value?: ArrayProperty | null): any {
     return {
         ...ValuePropertyToJSON(value),
         'items': value.items === undefined ? undefined : ((value.items as Array<any>).map(PropertyToJSON)),
-        'type': value.type,
+        'multipleValues': value.multipleValues,
     };
 }
 
