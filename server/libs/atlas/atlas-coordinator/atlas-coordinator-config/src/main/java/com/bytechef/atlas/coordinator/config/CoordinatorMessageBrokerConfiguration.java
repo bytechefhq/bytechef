@@ -55,46 +55,43 @@ public class CoordinatorMessageBrokerConfiguration implements ApplicationContext
                 T listenerEndpointRegistrar, MessageBrokerListenerRegistrar<T> messageBrokerListenerRegistrar) {
                 Coordinator coordinator = applicationContext.getBean(Coordinator.class);
 
+                CoordinatorProperties.CoordinatorSubscriptions coordinatorSubscriptions = coordinatorProperties
+                    .getSubscriptions();
+
                 messageBrokerListenerRegistrar.registerListenerEndpoint(
                     listenerEndpointRegistrar,
                     Queues.COMPLETIONS,
-                    coordinatorProperties.getSubscriptions()
-                        .getCompletions(),
+                    coordinatorSubscriptions.getCompletions(),
                     coordinator,
                     "complete");
                 messageBrokerListenerRegistrar.registerListenerEndpoint(
                     listenerEndpointRegistrar,
                     Queues.ERRORS,
-                    coordinatorProperties.getSubscriptions()
-                        .getErrors(),
+                    coordinatorSubscriptions.getErrors(),
                     coordinator,
                     "handleError");
                 messageBrokerListenerRegistrar.registerListenerEndpoint(
                     listenerEndpointRegistrar,
                     Queues.EVENTS,
-                    coordinatorProperties.getSubscriptions()
-                        .getEvents(),
+                    coordinatorSubscriptions.getEvents(),
                     applicationContext.getBean(EventListener.class),
                     "onApplicationEvent");
                 messageBrokerListenerRegistrar.registerListenerEndpoint(
                     listenerEndpointRegistrar,
                     Queues.JOBS,
-                    coordinatorProperties.getSubscriptions()
-                        .getJobs(),
+                    coordinatorSubscriptions.getJobs(),
                     coordinator,
                     "start");
                 messageBrokerListenerRegistrar.registerListenerEndpoint(
                     listenerEndpointRegistrar,
                     Queues.RESTARTS,
-                    coordinatorProperties.getSubscriptions()
-                        .getRequests(),
+                    coordinatorSubscriptions.getRequests(),
                     coordinator,
                     "resume");
                 messageBrokerListenerRegistrar.registerListenerEndpoint(
                     listenerEndpointRegistrar,
                     Queues.STOPS,
-                    coordinatorProperties.getSubscriptions()
-                        .getRequests(),
+                    coordinatorSubscriptions.getRequests(),
                     coordinator,
                     "stop");
             }
