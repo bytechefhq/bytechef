@@ -13,5 +13,5 @@ dependencies {
     testImplementation project(":server:libs:atlas:atlas-service")
     testImplementation project(":server:libs:atlas:atlas-upgrade")
     testImplementation project(":server:libs:hermes:hermes-integration:hermes-integration-upgrade")
-    testImplementation project(":server:libs:test-support")
+    testImplementation project(":server:libs:test:test-int-support")
 }

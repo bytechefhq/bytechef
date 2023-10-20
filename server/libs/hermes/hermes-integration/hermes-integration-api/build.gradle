@@ -1,4 +1,3 @@
 dependencies {
     api "org.springframework.data:spring-data-jdbc"
-    api project(":server:libs:core:commons:commons-data")
 }
