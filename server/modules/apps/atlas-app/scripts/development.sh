@@ -8,7 +8,7 @@ java -jar \
      -Datlas.worker.subscriptions.tasks=5 \
      -Datlas.workflow-repository.git.enabled=true \
      -Datlas.workflow-repository.git.url=https://github.com/creactiviti/atlas-workflows.git \
-     -Datlas.workflow-repository.git.search-paths=demo/,video/ \
+     -Datlas.workflow-repository.git.search-paths=samples/,video/ \
      -Datlas.workflow-repository.filesystem.enabled=true \
      -Datlas.workflow-repository.filesystem.location-pattern=$HOME/atlas/**/*.yaml \
      -Dspring.datasource.initialization-mode=always \
