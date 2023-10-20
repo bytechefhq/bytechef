@@ -11,6 +11,13 @@ outputs:
     value: ${randomNumber}
 
 tasks:
+  - name: map
+    type: var/v1/set
+    value: "${T(java.util.Map).of('name', 'My name')}"
+  - name: mapInfo
+    label: Print map
+    type: logger/v1/info
+    text: "Map: ${map}"
   - name: tempDirOperation
     label: Do something with temp dir
     type: logger/v1/info
