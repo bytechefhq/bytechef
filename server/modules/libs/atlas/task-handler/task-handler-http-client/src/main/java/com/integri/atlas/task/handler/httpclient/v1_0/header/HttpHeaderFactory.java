@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.httpclient.header;
+package com.integri.atlas.task.handler.httpclient.v1_0.header;
 
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.BODY_CONTENT_TYPE;
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.BodyContentType;
@@ -24,7 +24,7 @@ import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.MIME_TYPE;
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.RESPONSE_FORMAT;
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.VALUE;
-import static com.integri.atlas.task.handler.httpclient.header.HttpHeader.BOUNDARY_TMPL;
+import static com.integri.atlas.task.handler.httpclient.v1_0.header.HttpHeader.BOUNDARY_TMPL;
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import java.util.ArrayList;

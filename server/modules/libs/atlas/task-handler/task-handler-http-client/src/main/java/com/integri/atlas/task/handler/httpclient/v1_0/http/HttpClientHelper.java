@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.httpclient.http;
+package com.integri.atlas.task.handler.httpclient.v1_0.http;
 
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.AuthType;
 
 import com.integri.atlas.task.auth.TaskAuth;
 import com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.RequestMethod;
-import com.integri.atlas.task.handler.httpclient.auth.HttpAuth;
-import com.integri.atlas.task.handler.httpclient.auth.HttpAuthRegistry;
-import com.integri.atlas.task.handler.httpclient.header.HttpHeader;
-import com.integri.atlas.task.handler.httpclient.params.HttpQueryParam;
+import com.integri.atlas.task.handler.httpclient.v1_0.auth.HttpAuth;
+import com.integri.atlas.task.handler.httpclient.v1_0.auth.HttpAuthRegistry;
+import com.integri.atlas.task.handler.httpclient.v1_0.header.HttpHeader;
+import com.integri.atlas.task.handler.httpclient.v1_0.params.HttpQueryParam;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -31,6 +31,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 
 /**

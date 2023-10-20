@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.httpclient.auth;
+package com.integri.atlas.task.handler.httpclient.v1_0.auth;
 
 import com.integri.atlas.task.auth.TaskAuth;
-import com.integri.atlas.task.handler.httpclient.header.HttpHeader;
-import com.integri.atlas.task.handler.httpclient.params.HttpQueryParam;
+import com.integri.atlas.task.handler.httpclient.v1_0.header.HttpHeader;
+import com.integri.atlas.task.handler.httpclient.v1_0.params.HttpQueryParam;
+
 import java.util.List;
 
 /**
+ * @author Matija Petanjek
  * @author Ivica Cardic
  */
-public class OAuth2HttpAuth implements HttpAuth {
-
-    @Override
-    public void apply(List<HttpHeader> headers, List<HttpQueryParam> queryParameters, TaskAuth taskAuth) {
-        throw new UnsupportedOperationException();
-    }
+public interface HttpAuth {
+    void apply(List<HttpHeader> headers, List<HttpQueryParam> queryParameters, TaskAuth taskAuth);
 }

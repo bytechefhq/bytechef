@@ -14,22 +14,32 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.httpclient.auth;
+package com.integri.atlas.task.handler.httpclient.v1_0.params;
 
-import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.TOKEN;
-
-import com.integri.atlas.task.auth.TaskAuth;
-import com.integri.atlas.task.handler.httpclient.header.HttpHeader;
-import com.integri.atlas.task.handler.httpclient.params.HttpQueryParam;
-import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ivica Cardic
  */
-public class BearerHttpAuth implements HttpAuth {
+public class HttpQueryParam {
 
-    @Override
-    public void apply(List<HttpHeader> headers, List<HttpQueryParam> queryParameters, TaskAuth taskAuth) {
-        headers.add(new HttpHeader("Authorization", "Bearer " + taskAuth.getProperty(TOKEN)));
+    private final String name;
+    private String value;
+
+    public HttpQueryParam(String name, String... values) {
+        this.name = name;
+        this.value = StringUtils.join(values, ',');
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.httpclient.body;
+package com.integri.atlas.task.handler.httpclient.v1_0.body;
 
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.BODY_CONTENT_TYPE;
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.BODY_PARAMETERS;
@@ -27,14 +27,15 @@ import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.file.storage.service.FileStorageService;
 import com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.*;
-import com.integri.atlas.task.handler.httpclient.body.multipart.MultiPartHttpBodyPublisher;
-import com.integri.atlas.task.handler.httpclient.header.HttpHeader;
+import com.integri.atlas.task.handler.httpclient.v1_0.body.multipart.MultiPartHttpBodyPublisher;
+import com.integri.atlas.task.handler.httpclient.v1_0.header.HttpHeader;
 import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 

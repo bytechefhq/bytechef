@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.httpclient.response;
+package com.integri.atlas.task.handler.httpclient.v1_0.response;
 
 import java.net.http.HttpResponse;
 import java.util.List;

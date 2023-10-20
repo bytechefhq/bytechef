@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.httpclient.params;
+package com.integri.atlas.task.handler.httpclient.v1_0.params;
 
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.KEY;
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.PROPERTY_QUERY_PARAMETERS;

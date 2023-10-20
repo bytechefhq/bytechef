@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.httpclient.body.multipart;
+package com.integri.atlas.task.handler.httpclient.v1_0.body.multipart;
 
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.BODY_PARAMETERS;
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.file.storage.service.FileStorageService;
-import com.integri.atlas.task.handler.httpclient.header.HttpHeader;
+import com.integri.atlas.task.handler.httpclient.v1_0.header.HttpHeader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
