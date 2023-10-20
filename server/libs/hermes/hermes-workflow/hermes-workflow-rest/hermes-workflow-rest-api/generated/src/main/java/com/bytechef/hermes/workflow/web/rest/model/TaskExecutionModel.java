@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to the task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:43.010591+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-05T17:08:20.252283+02:00[Europe/Zagreb]")
 public class TaskExecutionModel {
 
   private String createdBy;
@@ -63,7 +63,7 @@ public class TaskExecutionModel {
 
   private Integer progress;
 
-  private Integer retry;
+  private Integer maxRetries;
 
   private Integer retryAttempts;
 
@@ -432,24 +432,24 @@ public class TaskExecutionModel {
     this.progress = progress;
   }
 
-  public TaskExecutionModel retry(Integer retry) {
-    this.retry = retry;
+  public TaskExecutionModel maxRetries(Integer maxRetries) {
+    this.maxRetries = maxRetries;
     return this;
   }
 
   /**
    * The maximum number of times that a task may retry.
-   * @return retry
+   * @return maxRetries
   */
   
-  @Schema(name = "retry", accessMode = Schema.AccessMode.READ_ONLY, description = "The maximum number of times that a task may retry.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("retry")
-  public Integer getRetry() {
-    return retry;
+  @Schema(name = "maxRetries", accessMode = Schema.AccessMode.READ_ONLY, description = "The maximum number of times that a task may retry.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("maxRetries")
+  public Integer getMaxRetries() {
+    return maxRetries;
   }
 
-  public void setRetry(Integer retry) {
-    this.retry = retry;
+  public void setMaxRetries(Integer maxRetries) {
+    this.maxRetries = maxRetries;
   }
 
   public TaskExecutionModel retryAttempts(Integer retryAttempts) {
@@ -655,7 +655,7 @@ public class TaskExecutionModel {
         Objects.equals(this.parentId, taskExecution.parentId) &&
         Objects.equals(this.priority, taskExecution.priority) &&
         Objects.equals(this.progress, taskExecution.progress) &&
-        Objects.equals(this.retry, taskExecution.retry) &&
+        Objects.equals(this.maxRetries, taskExecution.maxRetries) &&
         Objects.equals(this.retryAttempts, taskExecution.retryAttempts) &&
         Objects.equals(this.retryDelay, taskExecution.retryDelay) &&
         Objects.equals(this.retryDelayFactor, taskExecution.retryDelayFactor) &&
@@ -669,7 +669,7 @@ public class TaskExecutionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, endDate, error, executionTime, id, input, jobId, lastModifiedBy, lastModifiedDate, output, parentId, priority, progress, retry, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, retryDelayMillis, workflowTask, type);
+    return Objects.hash(createdBy, createdDate, endDate, error, executionTime, id, input, jobId, lastModifiedBy, lastModifiedDate, output, parentId, priority, progress, maxRetries, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, retryDelayMillis, workflowTask, type);
   }
 
   @Override
@@ -690,7 +690,7 @@ public class TaskExecutionModel {
     sb.append("    parentId: ").append(toIndentedString(parentId)).append("\n");
     sb.append("    priority: ").append(toIndentedString(priority)).append("\n");
     sb.append("    progress: ").append(toIndentedString(progress)).append("\n");
-    sb.append("    retry: ").append(toIndentedString(retry)).append("\n");
+    sb.append("    maxRetries: ").append(toIndentedString(maxRetries)).append("\n");
     sb.append("    retryAttempts: ").append(toIndentedString(retryAttempts)).append("\n");
     sb.append("    retryDelay: ").append(toIndentedString(retryDelay)).append("\n");
     sb.append("    retryDelayFactor: ").append(toIndentedString(retryDelayFactor)).append("\n");

@@ -3,6 +3,7 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -22,12 +23,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinitionBasic", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-05T18:35:34.469553+02:00[Europe/Zagreb]")
 public class ActionDefinitionBasicModel {
 
   private String name;
 
   private DisplayModel display;
+
+  private ResourcesModel resources;
 
   /**
    * Default constructor
@@ -86,6 +89,26 @@ public class ActionDefinitionBasicModel {
     this.display = display;
   }
 
+  public ActionDefinitionBasicModel resources(ResourcesModel resources) {
+    this.resources = resources;
+    return this;
+  }
+
+  /**
+   * Get resources
+   * @return resources
+  */
+  @Valid 
+  @Schema(name = "resources", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("resources")
+  public ResourcesModel getResources() {
+    return resources;
+  }
+
+  public void setResources(ResourcesModel resources) {
+    this.resources = resources;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -96,12 +119,13 @@ public class ActionDefinitionBasicModel {
     }
     ActionDefinitionBasicModel actionDefinitionBasic = (ActionDefinitionBasicModel) o;
     return Objects.equals(this.name, actionDefinitionBasic.name) &&
-        Objects.equals(this.display, actionDefinitionBasic.display);
+        Objects.equals(this.display, actionDefinitionBasic.display) &&
+        Objects.equals(this.resources, actionDefinitionBasic.resources);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, display);
+    return Objects.hash(name, display, resources);
   }
 
   @Override
@@ -110,6 +134,7 @@ public class ActionDefinitionBasicModel {
     sb.append("class ActionDefinitionBasicModel {\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    display: ").append(toIndentedString(display)).append("\n");
+    sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
     sb.append("}");
     return sb.toString();
   }
