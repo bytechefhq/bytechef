@@ -24,7 +24,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * @author Ivica Cardic
  */
-public interface WorkflowTestExecutor {
+public interface JobTestExecutor {
 
     @SuppressFBWarnings("NP")
     JobDTO execute(JobParameters jobParameters);
