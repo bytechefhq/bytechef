@@ -51,7 +51,7 @@ public class AwaitWorkflowAndRespondTrigger {
         .display(display("Await workflow and respond").description(
             "You have the flexibility to set up your preferred response. After a webhook request is received, the webhook trigger enters a waiting state for the workflow's response."))
         .type(TriggerType.STATIC_WEBHOOK)
-        .executeWorkflowSynchronously(true)
+        .workflowSyncExecution(true)
         .properties(
             string(CSRF_TOKEN)
                 .label("CSRF Token")

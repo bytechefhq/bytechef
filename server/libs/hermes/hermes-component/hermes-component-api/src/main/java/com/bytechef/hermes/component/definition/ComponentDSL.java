@@ -1196,7 +1196,6 @@ public final class ComponentDSL extends DefinitionDSL {
         private DynamicWebhookRequestFunction dynamicWebhookRequest;
         private Object exampleOutput;
         private ExampleOutputDataSource exampleOutputDataSource;
-        private boolean executeWorkflowSynchronously;
         private HelpFunction help;
         private ListenerEnableConsumer listenerEnable;
         private ListenerDisableConsumer listenerDisable;
@@ -1210,6 +1209,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private TriggerType type;
         private boolean webhookBodyRaw;
         private WebhookValidateFunction webhookValidate;
+        private boolean workflowSyncExecution;
 
         private ModifiableTriggerDefinition() {
         }
@@ -1244,12 +1244,6 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableTriggerDefinition exampleOutputDataSource(ExampleOutputDataSource exampleOutputDataSource) {
             this.exampleOutputDataSource = exampleOutputDataSource;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition executeWorkflowSynchronously(boolean executeWorkflowSynchronously) {
-            this.executeWorkflowSynchronously = executeWorkflowSynchronously;
 
             return this;
         }
@@ -1358,6 +1352,12 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
+        public ModifiableTriggerDefinition workflowSyncExecution(boolean workflowSyncExecution) {
+            this.workflowSyncExecution = workflowSyncExecution;
+
+            return this;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -1384,8 +1384,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public boolean isExecuteWorkflowSynchronously() {
-            return executeWorkflowSynchronously;
+        public boolean isWorkflowSyncExecution() {
+            return workflowSyncExecution;
         }
 
         @Override

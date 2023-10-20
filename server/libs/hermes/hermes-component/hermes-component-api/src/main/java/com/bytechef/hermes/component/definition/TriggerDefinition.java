@@ -196,7 +196,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    boolean isExecuteWorkflowSynchronously();
+    boolean isWorkflowSyncExecution();
 
     /**
      *
