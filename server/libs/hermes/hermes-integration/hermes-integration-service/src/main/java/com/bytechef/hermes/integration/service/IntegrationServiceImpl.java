@@ -29,6 +29,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Ivica Cardic
@@ -45,7 +46,7 @@ public class IntegrationServiceImpl implements IntegrationService {
     @Override
     public Integration create(
         @NonNull String name, String description, String category, @NonNull Set<String> workflowIds, Set<Tag> tags) {
-        Assert.notNull(name, "'name' must not be null.");
+        Assert.isTrue(StringUtils.hasText(name), "'name' must not be empty.");
         Assert.notEmpty(workflowIds, "'workflowIds' must not be empty.");
 
         Integration integration = new Integration();
