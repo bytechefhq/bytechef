@@ -8,7 +8,9 @@ import {useNodeDetailsDialogStore} from '../../stores/useNodeDetailsDialogStore'
 
 const PropertyField = ({data, label}: {data: PropertyType; label: string}) => (
     <div className="inline-flex items-center rounded-md p-1.5 text-sm hover:bg-gray-100">
-        <span>{TYPE_ICONS[data.type as keyof typeof TYPE_ICONS]}</span>
+        <span title={data.type}>
+            {TYPE_ICONS[data.type as keyof typeof TYPE_ICONS]}
+        </span>
 
         <span className="pl-2">{label}</span>
     </div>
@@ -42,28 +44,32 @@ const OutputTab = ({outputSchema}: {outputSchema: PropertyModel[]}) => {
 
     return (
         <div className="max-h-full flex-[1_1_1px] overflow-auto p-4">
-            <div className="mb-2 flex items-center">
-                <span>{TYPE_ICONS.OBJECT}</span>
+            {outputSchema.map((schema: PropertyType, index) => (
+                <>
+                    <div className="mb-2 flex items-center">
+                        <span title={schema.type}>
+                            {TYPE_ICONS[schema.type as keyof typeof TYPE_ICONS]}
+                        </span>
 
-                <span className="ml-2 text-sm text-gray-800">
-                    {currentNode.name}
-                </span>
-            </div>
+                        <span className="ml-2 text-sm text-gray-800">
+                            {currentNode.name}
+                        </span>
+                    </div>
 
-            {outputSchema.map((schema: PropertyType, index) =>
-                schema.properties ? (
-                    <SchemaProperties
-                        key={`${schema.name}_${index}`}
-                        properties={schema.properties}
-                    />
-                ) : (
-                    <PropertyField
-                        data={schema}
-                        key={`${schema.name}_${index}`}
-                        label={schema.controlType!}
-                    />
-                )
-            )}
+                    {schema.properties ? (
+                        <SchemaProperties
+                            key={`${schema.name}_${index}`}
+                            properties={schema.properties}
+                        />
+                    ) : (
+                        <PropertyField
+                            data={schema}
+                            key={`${schema.name}_${index}`}
+                            label={schema.controlType!}
+                        />
+                    )}
+                </>
+            ))}
         </div>
     );
 };
