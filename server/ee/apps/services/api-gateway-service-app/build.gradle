@@ -12,7 +12,6 @@ dependencies {
     implementation libs.org.springframework.cloud.spring.cloud.starter.loadbalancer
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
     implementation project(":server:ee:libs:core:discovery:discovery-redis")
-    implementation project(":server:libs:core:config-post-processor")
 
     testImplementation project(":server:libs:test:test-int-support")
 }

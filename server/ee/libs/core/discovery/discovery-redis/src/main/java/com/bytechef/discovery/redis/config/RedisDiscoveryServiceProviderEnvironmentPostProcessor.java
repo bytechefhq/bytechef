@@ -15,56 +15,37 @@
  * limitations under the License.
  */
 
-package com.bytechef.discovery.config;
+package com.bytechef.discovery.redis.config;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 /**
  * @author Ivica Cardic
  */
-public class DiscoveryServiceProviderEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class RedisDiscoveryServiceProviderEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        processDiscoveryServiceProvider(
-            environment.getProperty("bytechef.discovery-service.provider", String.class), source);
-        processWorkflowMessageBrokerProvider(
-            environment.getProperty("bytechef.message-broker.provider", String.class), source);
+        if (Objects.equals(environment.getProperty("bytechef.discovery-service.provider", String.class), "redis")) {
+            source.put("spring.cloud.redis.enabled", true);
+        } else {
+            source.put("spring.cloud.redis.enabled", false);
+        }
 
         MapPropertySource mapPropertySource = new MapPropertySource("Custom Spring Cloud Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 
         mutablePropertySources.addFirst(mapPropertySource);
-    }
-
-    private static void processDiscoveryServiceProvider(String discoveryServiceProvider, Map<String, Object> source) {
-        source.put("spring.cloud.consul.enabled", false);
-        source.put("spring.cloud.redis.enabled", false);
-
-        if (Objects.equals(discoveryServiceProvider, "consul")) {
-            source.put("spring.cloud.consul.enabled", true);
-        } else {
-            source.put("spring.cloud.redis.enabled", true);
-        }
-    }
-
-    private static void processWorkflowMessageBrokerProvider(
-        String workflowMessageBrokerProvider, Map<String, Object> source) {
-
-        source.put("management.health.rabbit.enabled", false);
-
-        if (!Objects.equals(workflowMessageBrokerProvider, "redis")) {
-            source.put("management.health.rabbit.enabled", true);
-        }
     }
 }
