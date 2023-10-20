@@ -36,13 +36,42 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ComponentDefinitionBasic"
+  /component-definitions/{componentName}/{componentVersion}/actions:
+    get:
+      description: "Get a list of actions for a component definition."
+      summary: "Get a list of actions for a component definition."
+      tags:
+      - "component-definitions"
+      operationId: "getComponentActionDefinitions"
+      parameters:
+      - name: "componentName"
+        description: "The name of the component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of the component to get."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ActionDefinitionBasic"
   /component-definitions/{componentName}/{componentVersion}/actions/{actionName}:
     get:
       description: "Get an action of a component definition."
       summary: "Get an action of a component definition."
       tags:
       - "component-definitions"
-      operationId: "getActionDefinition"
+      operationId: "getComponentActionDefinition"
       parameters:
       - name: "componentName"
         description: "The name of the component."
@@ -267,7 +296,13 @@ components:
         \ version]/[action name]. Action properties are used to set properties of\
         \ the task inside the workflow."
       type: "object"
+      required:
+      - "component"
+      - "display"
+      - "name"
       properties:
+        component:
+          $ref: "#/components/schemas/ComponentDefinitionBasic"
         display:
           $ref: "#/components/schemas/Display"
         exampleOutput:
@@ -286,6 +321,8 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
+        resources:
+          $ref: "#/components/schemas/Resources"
     ActionDefinitionBasic:
       description: "An action is a portion of reusable code that accomplish a specific\
         \ task. When building a workflow, each action is represented as a task inside\
@@ -294,14 +331,19 @@ components:
         \ the task inside the workflow."
       type: "object"
       required:
-      - "name"
+      - "component"
       - "display"
+      - "name"
       properties:
+        component:
+          $ref: "#/components/schemas/ComponentDefinitionBasic"
         name:
           description: "The action name."
           type: "string"
         display:
           $ref: "#/components/schemas/Display"
+        resources:
+          $ref: "#/components/schemas/Resources"
     ArrayProperty:
       description: "An array property type."
       type: "object"
@@ -390,16 +432,14 @@ components:
       required:
       - "display"
       - "name"
-      - "version"
       properties:
         display:
           $ref: "#/components/schemas/Display"
         name:
           description: "The name of a component."
           type: "string"
-        version:
-          description: "The version of a component."
-          type: "integer"
+        resources:
+          $ref: "#/components/schemas/Resources"
     ComponentDefinitionWithBasicActions:
       description: "A component contains a set of reusable code(actions) that accomplish\
         \ specific tasks, triggers(TODO) and connections if there is a need for a\
@@ -409,7 +449,6 @@ components:
       - "actions"
       - "display"
       - "name"
-      - "resources"
       - "version"
       properties:
         actions:
@@ -432,6 +471,9 @@ components:
     ConnectionDefinition:
       description: "Definition of a connection to an outside service."
       type: "object"
+      required:
+      - "component"
+      - "version"
       properties:
         authorizationRequired:
           description: "If connection requires an authorization to be configured or\
@@ -444,11 +486,8 @@ components:
         baseUri:
           description: "Defines the base URI for all future HTTP requests."
           type: "string"
-        componentName:
-          description: "The name of a component this connection can be used for."
-          type: "string"
-        componentDisplay:
-          $ref: "#/components/schemas/Display"
+        component:
+          $ref: "#/components/schemas/ComponentDefinitionBasic"
         properties:
           description: "The properties of the connection."
           type: "array"
@@ -456,18 +495,23 @@ components:
             $ref: "#/components/schemas/Property"
         resources:
           $ref: "#/components/schemas/Resources"
+        version:
+          description: "The version of a connection."
+          type: "integer"
     ConnectionDefinitionBasic:
       description: "Definition of a connection to an outside service."
       type: "object"
       required:
-      - "componentName"
-      - "display"
+      - "component"
+      - "version"
       properties:
-        componentName:
-          description: "The name of a component this connection can be used for."
-          type: "string"
-        componentDisplay:
-          $ref: "#/components/schemas/Display"
+        component:
+          $ref: "#/components/schemas/ComponentDefinitionBasic"
+        resources:
+          $ref: "#/components/schemas/Resources"
+        version:
+          description: "The version of a component."
+          type: "integer"
     ControlType:
       description: "A type of the control to show in UI."
       type: "string"
