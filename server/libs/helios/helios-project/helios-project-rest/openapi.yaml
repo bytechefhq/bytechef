@@ -974,7 +974,10 @@ components:
           description: "The name of a project instance."
           type: "string"
         project:
-          $ref: "#/components/schemas/ProjectBasic"
+          type: "object"
+          allOf:
+          - $ref: "#/components/schemas/ProjectBasic"
+          readOnly: true
         projectId:
           description: "Th id of a project."
           type: "integer"
@@ -1096,7 +1099,10 @@ components:
           format: "date-time"
           readOnly: true
         projectInstance:
-          $ref: "#/components/schemas/ProjectInstanceBasic"
+          type: "object"
+          allOf:
+          - $ref: "#/components/schemas/ProjectInstanceBasic"
+          readOnly: true
         projectInstanceId:
           description: "Th id of a project instance."
           type: "integer"
