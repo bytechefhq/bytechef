@@ -676,7 +676,8 @@ public class TaskDescriptionTest {
 
     @Test
     public void testTaskSpecification() throws JsonProcessingException, JSONException {
-        TaskSpecification taskSpecification = TaskSpecification.create("name")
+        TaskSpecification taskSpecification = TaskSpecification
+            .create("name")
             .displayName("displayName")
             .description("description")
             .subtitle("subtitle")

@@ -29,7 +29,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class BinaryFileTaskDefinition implements TaskDefinition {
 
-    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification.create("binaryFile")
+    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
+        .create("binaryFile")
         .displayName("Binary File")
         .description("Reads or writes a binary file from/to disk")
         .properties(

@@ -170,8 +170,7 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    IfTaskCompletionHandler ifTaskCompletionHandler(
-        TaskCompletionHandler aTaskCompletionHandler) {
+    IfTaskCompletionHandler ifTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
         return new IfTaskCompletionHandler(
             taskExecutionRepository,
             aTaskCompletionHandler,

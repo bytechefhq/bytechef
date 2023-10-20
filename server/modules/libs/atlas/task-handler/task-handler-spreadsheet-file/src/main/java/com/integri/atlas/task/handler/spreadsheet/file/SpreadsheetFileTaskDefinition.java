@@ -37,7 +37,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpreadsheetFileTaskDefinition implements TaskDefinition {
 
-    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification.create("spreadsheetFile")
+    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
+        .create("spreadsheetFile")
         .displayName("Spreadsheet File")
         .description("Reads and writes data from a spreadsheet file")
         .properties(
