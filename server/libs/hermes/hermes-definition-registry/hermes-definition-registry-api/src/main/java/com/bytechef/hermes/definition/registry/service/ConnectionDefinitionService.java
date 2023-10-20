@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;

@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.bytechef.hermes.component.util.HttpClientUtils.exchange;
 import static com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
 
 /**
@@ -50,33 +49,33 @@ public class OpenApiClient {
     public HttpClientUtils.Response execute(ActionDefinition actionDefinition, TaskExecution taskExecution) {
         Map<String, Object> metadata = actionDefinition.getMetadata();
 
-        return exchange(
-            createUri(
+        return HttpClientUtils.exchange(
+            createUrl(
                 metadata, taskExecution.getParameters(),
                 OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList())),
             MapValueUtils.get(metadata, "method", RequestMethod.class))
-                .configuration(
-                    HttpClientUtils.responseFormat(getResponseFormat(actionDefinition)))
-                .headers(
-                    getValuesMap(
-                        taskExecution.getParameters(),
-                        OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList()),
-                        PropertyType.HEADER))
-                .body(
-                    getBody(
-                        MapValueUtils.get(metadata, "bodyContentType", BodyContentType.class),
-                        MapValueUtils.getString(metadata, "mimeType"),
-                        taskExecution.getParameters(),
-                        OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList())))
-                .queryParameters(
-                    getValuesMap(
-                        taskExecution.getParameters(),
-                        OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList()),
-                        PropertyType.QUERY))
-                .execute();
+            .configuration(
+                HttpClientUtils.responseFormat(getResponseFormat(actionDefinition)))
+            .headers(
+                getValuesMap(
+                    taskExecution.getParameters(),
+                    OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList()),
+                    PropertyType.HEADER))
+            .body(
+                getBody(
+                    MapValueUtils.get(metadata, "bodyContentType", BodyContentType.class),
+                    MapValueUtils.getString(metadata, "mimeType"),
+                    taskExecution.getParameters(),
+                    OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList())))
+            .queryParameters(
+                getValuesMap(
+                    taskExecution.getParameters(),
+                    OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList()),
+                    PropertyType.QUERY))
+            .execute();
     }
 
-    private String createUri(
+    private String createUrl(
         Map<String, Object> metadata, Map<String, Object> parameters, List<? extends Property<?>> properties) {
 
         String path = (String) metadata.get("path");
