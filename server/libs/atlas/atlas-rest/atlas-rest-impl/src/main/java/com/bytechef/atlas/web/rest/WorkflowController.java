@@ -89,6 +89,7 @@ public class WorkflowController implements WorkflowsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<WorkflowModel>> createWorkflow(
         Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
 
@@ -107,6 +108,7 @@ public class WorkflowController implements WorkflowsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<WorkflowModel>> updateWorkflow(
         String id, Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
 

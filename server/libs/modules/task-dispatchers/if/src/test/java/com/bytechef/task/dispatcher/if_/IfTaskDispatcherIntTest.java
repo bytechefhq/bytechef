@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @TaskDispatcherIntTest
 public class IfTaskDispatcherIntTest {
 
+    public static final Base64.Encoder ENCODER = Base64.getEncoder();
     private TestVarTaskHandler<Object, Object> testVarTaskHandler;
 
     @Autowired
@@ -59,8 +60,7 @@ public class IfTaskDispatcherIntTest {
     @Test
     public void testDispatchBoolean() {
         workflowExecutor.execute(
-            Base64.getEncoder()
-                .encodeToString("if_v1-conditions-boolean".getBytes(StandardCharsets.UTF_8)),
+            ENCODER.encodeToString("if_v1-conditions-boolean".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "true", "value2", "false"),
             getGetTaskCompletionHandlers(),
             getGetTaskDispatcherResolvers(),
@@ -73,8 +73,7 @@ public class IfTaskDispatcherIntTest {
     @Test
     public void testDispatchDateTime() {
         workflowExecutor.execute(
-            Base64.getEncoder()
-                .encodeToString("if_v1-conditions-dateTime".getBytes(StandardCharsets.UTF_8)),
+            ENCODER.encodeToString("if_v1-conditions-dateTime".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "2022-01-01T00:00:00", "value2", "2022-01-01T00:00:01"),
             getGetTaskCompletionHandlers(),
             getGetTaskDispatcherResolvers(),
@@ -87,8 +86,7 @@ public class IfTaskDispatcherIntTest {
     @Test
     public void testDispatchExpression() {
         workflowExecutor.execute(
-            Base64.getEncoder()
-                .encodeToString("if_v1-conditions-expression".getBytes(StandardCharsets.UTF_8)),
+            ENCODER.encodeToString("if_v1-conditions-expression".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", 100, "value2", 200),
             getGetTaskCompletionHandlers(),
             getGetTaskDispatcherResolvers(),
@@ -100,8 +98,7 @@ public class IfTaskDispatcherIntTest {
     @Test
     public void testDispatchNumber() {
         workflowExecutor.execute(
-            Base64.getEncoder()
-                .encodeToString("if_v1-conditions-number".getBytes(StandardCharsets.UTF_8)),
+            ENCODER.encodeToString("if_v1-conditions-number".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", 100, "value2", 200),
             getGetTaskCompletionHandlers(),
             getGetTaskDispatcherResolvers(),
@@ -118,8 +115,7 @@ public class IfTaskDispatcherIntTest {
     @Test
     public void testDispatchString() {
         workflowExecutor.execute(
-            Base64.getEncoder()
-                .encodeToString("if_v1-conditions-string".getBytes(StandardCharsets.UTF_8)),
+            ENCODER.encodeToString("if_v1-conditions-string".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "Hello World", "value2", "Hello"),
             getGetTaskCompletionHandlers(),
             getGetTaskDispatcherResolvers(),
@@ -142,13 +138,14 @@ public class IfTaskDispatcherIntTest {
     private static WorkflowExecutor.TaskDispatcherResolversFunction getGetTaskDispatcherResolvers() {
         return (
             contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
-            taskExecutionService) -> List.of(new IfTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService));
+            taskExecutionService) -> List.of(
+                new IfTaskDispatcher(
+                    contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService));
     }
 
     private WorkflowExecutor.TaskCompletionHandlersFunction getGetTaskCompletionHandlers() {
-        return (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) -> List
-            .of(new IfTaskCompletionHandler(
+        return (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) -> List.of(
+            new IfTaskCompletionHandler(
                 contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService));
     }
 }
