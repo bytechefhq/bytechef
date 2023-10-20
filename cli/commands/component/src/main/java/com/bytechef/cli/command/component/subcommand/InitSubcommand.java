@@ -24,7 +24,7 @@ import picocli.CommandLine;
 /**
  * @author Ivica Cardic
  */
-@CommandLine.Command(name = "init", description = "Generates project for a new component)")
+@CommandLine.Command(name = "init", description = "Generates project for a new component.")
 public class InitSubcommand implements Callable<Integer> {
 
     @CommandLine.Spec
