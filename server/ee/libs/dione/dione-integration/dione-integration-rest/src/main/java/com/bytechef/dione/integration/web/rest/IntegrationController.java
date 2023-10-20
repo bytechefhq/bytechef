@@ -23,7 +23,7 @@ import com.bytechef.dione.integration.domain.Integration;
 import com.bytechef.dione.integration.facade.IntegrationFacade;
 import com.bytechef.dione.integration.web.rest.model.CreateIntegrationWorkflowRequestModel;
 import com.bytechef.dione.integration.web.rest.model.IntegrationModel;
-import com.bytechef.dione.integration.web.rest.model.UpdateIntegrationTagsRequestModel;
+import com.bytechef.dione.integration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -130,7 +130,7 @@ public class IntegrationController implements IntegrationsApi {
 
     @Override
     public Mono<ResponseEntity<Void>> updateIntegrationTags(
-        Long id, Mono<UpdateIntegrationTagsRequestModel> updateIntegrationTagsRequestModelMono,
+        Long id, Mono<UpdateTagsRequestModel> updateIntegrationTagsRequestModelMono,
         ServerWebExchange exchange) {
 
         return updateIntegrationTagsRequestModelMono.map(putIntegrationTagsRequestModel -> {
