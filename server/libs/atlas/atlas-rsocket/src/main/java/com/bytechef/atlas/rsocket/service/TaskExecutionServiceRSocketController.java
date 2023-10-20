@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.rsocket;
+package com.bytechef.atlas.rsocket.service;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
@@ -29,12 +30,12 @@ import reactor.core.publisher.Mono;
  * @author Ivica Cardic
  */
 @Controller
-public class TaskExecutionRSocketController {
+public class TaskExecutionServiceRSocketController {
 
     private TaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI2")
-    public TaskExecutionRSocketController(TaskExecutionService taskExecutionService) {
+    public TaskExecutionServiceRSocketController(TaskExecutionService taskExecutionService) {
         this.taskExecutionService = taskExecutionService;
     }
 
@@ -44,12 +45,12 @@ public class TaskExecutionRSocketController {
     }
 
     @MessageMapping("getTaskExecution")
-    public Mono<TaskExecution> getTaskExecution(String id) {
+    public Mono<TaskExecution> getTaskExecution(Long id) {
         return Mono.create(sink -> sink.success(taskExecutionService.getTaskExecution(id)));
     }
 
     @MessageMapping("getParentTaskExecutions")
-    public Mono<List<TaskExecution>> getParentTaskExecutions(String parentId) {
+    public Mono<List<TaskExecution>> getParentTaskExecutions(Long parentId) {
         return Mono.create(sink -> sink.success(taskExecutionService.getParentTaskExecutions(parentId)));
     }
 
@@ -59,6 +60,7 @@ public class TaskExecutionRSocketController {
     }
 
     @MessageMapping("updateTaskExecutionStatus")
+    @SuppressFBWarnings("NP")
     public Mono<Void> updateTaskExecutionStatus(TaskExecution taskExecution) {
         taskExecutionService.updateStatus(taskExecution.getId(),
             taskExecution.getStatus(), taskExecution.getStartTime(), taskExecution.getEndTime());

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.rsocket;
+package com.bytechef.atlas.rsocket.service;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
@@ -29,12 +29,12 @@ import reactor.core.publisher.Mono;
  * @author Ivica Cardic
  */
 @Controller
-public class WorkflowRSocketController {
+public class WorkflowServiceRSocketController {
 
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
-    public WorkflowRSocketController(WorkflowService workflowService) {
+    public WorkflowServiceRSocketController(WorkflowService workflowService) {
         this.workflowService = workflowService;
     }
 

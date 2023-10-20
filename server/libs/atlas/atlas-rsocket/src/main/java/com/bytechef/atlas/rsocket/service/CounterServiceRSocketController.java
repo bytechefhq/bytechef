@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.rsocket;
+package com.bytechef.atlas.rsocket.service;
 
-import com.bytechef.atlas.domain.Context;
-import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.CounterService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
+
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
@@ -28,24 +29,31 @@ import reactor.core.publisher.Mono;
  * @author Ivica Cardic
  */
 @Controller
-public class ContextRSocketController {
+public class CounterServiceRSocketController {
 
-    private final ContextService contextService;
+    private final CounterService counterService;
 
     @SuppressFBWarnings("EI2")
-    public ContextRSocketController(ContextService contextService) {
-        this.contextService = contextService;
+    public CounterServiceRSocketController(CounterService counterService) {
+        this.counterService = counterService;
     }
 
-    @MessageMapping("pushStack")
-    public Mono<Void> pushStack(Context context) {
-        contextService.push(context.getStackId(), context);
+    @MessageMapping("deleteCounter")
+    public Mono<Void> deleteCounter(Long id) {
+        counterService.delete(id);
 
         return Mono.empty();
     }
 
-    @MessageMapping("peekStack")
-    public Mono<Context> peekStack(String stackId) {
-        return Mono.create(sink -> sink.success(contextService.peek(stackId)));
+    @MessageMapping("decrementCounter")
+    public Mono<Long> decrementCounter(Long id) {
+        return Mono.create(sink -> sink.success(counterService.decrement(id)));
+    }
+
+    @MessageMapping("setCounter")
+    public Mono<Void> setCounter(Map<String, Object> map) {
+        counterService.set((Long) map.get("id"), (Long) map.get("value"));
+
+        return Mono.empty();
     }
 }
