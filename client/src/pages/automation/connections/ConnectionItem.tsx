@@ -5,12 +5,12 @@ import DropdownMenu, {
 import {ConnectionModel, TagModel} from '../../../middleware/connection';
 import {useQueryClient} from '@tanstack/react-query';
 import {Component1Icon} from '@radix-ui/react-icons';
-import {ConnectionKeys} from '../../../queries/connections';
+import {ConnectionKeys} from '../../../queries/connections.queries';
 import {
     useDeleteConnectionMutation,
     useUpdateConnectionTagsMutation,
 } from '../../../mutations/connections.mutations';
-import {ComponentDefinitionKeys} from '../../../queries/componentDefinitions';
+import {ComponentDefinitionKeys} from '../../../queries/componentDefinitions.queries';
 import TagList from '../../../components/TagList/TagList';
 
 interface ConnectionItemProps {

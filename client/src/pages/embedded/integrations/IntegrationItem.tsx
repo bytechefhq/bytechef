@@ -12,7 +12,7 @@ import {
     useCreateIntegrationMutation,
     useUpdateIntegrationTagsMutation,
 } from '../../../mutations/integrations.mutations';
-import {IntegrationKeys} from '../../../queries/integrations';
+import {IntegrationKeys} from '../../../queries/integrations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
 import {Link} from 'react-router-dom';

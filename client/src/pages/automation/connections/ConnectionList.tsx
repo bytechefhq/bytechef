@@ -3,7 +3,7 @@ import ConnectionItem from './ConnectionItem';
 import {
     useGetConnectionsQuery,
     useGetConnectionTagsQuery,
-} from '../../../queries/connections';
+} from '../../../queries/connections.queries';
 import EmptyList from '../../../components/EmptyList/EmptyList';
 import {LinkIcon} from '@heroicons/react/24/outline';
 import ConnectionDialog from './ConnectionDialog';

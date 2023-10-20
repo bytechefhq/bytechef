@@ -9,7 +9,7 @@ import Instances from './pages/automation/instances/Instances';
 import Executions from './pages/automation/executions/Executions';
 import {QueryClient} from '@tanstack/react-query';
 import {ProjectsApi} from './middleware/project';
-import {ProjectKeys} from './queries/projects';
+import {ProjectKeys} from './queries/projects.queries';
 import OAuthPopup from './pages/automation/connections/oauth2/OAuthPopup';
 import Projects from './pages/automation/projects/Projects';
 

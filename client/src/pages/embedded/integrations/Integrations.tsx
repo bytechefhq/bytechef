@@ -10,7 +10,7 @@ import {useSearchParams} from 'react-router-dom';
 import {
     useGetIntegrationCategoriesQuery,
     useGetIntegrationTagsQuery,
-} from '../../../queries/integrations';
+} from '../../../queries/integrations.queries';
 
 export enum Type {
     Category,

@@ -10,7 +10,7 @@ import {useSearchParams} from 'react-router-dom';
 import {
     useGetProjectCategoriesQuery,
     useGetProjectTagsQuery,
-} from '../../../queries/projects';
+} from '../../../queries/projects.queries';
 
 export enum Type {
     Category,

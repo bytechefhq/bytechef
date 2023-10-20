@@ -7,7 +7,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useCreateProjectWorkflowRequestMutation} from '../../../mutations/projects.mutations';
 import {WorkflowModel} from 'middleware/project';
 import TextArea from 'components/TextArea/TextArea';
-import {ProjectKeys} from '../../../queries/projects';
+import {ProjectKeys} from '../../../queries/projects.queries';
 
 interface WorkflowDialogProps {
     id?: number;

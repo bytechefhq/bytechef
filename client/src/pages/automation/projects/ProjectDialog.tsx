@@ -10,7 +10,7 @@ import {
     ProjectKeys,
     useGetProjectCategoriesQuery,
     useGetProjectTagsQuery,
-} from '../../../queries/projects';
+} from '../../../queries/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {CategoryModel, TagModel} from '../../../middleware/project';
 import {

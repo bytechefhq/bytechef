@@ -9,7 +9,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {
     ComponentDefinitionKeys,
     useGetComponentDefinitionsQuery,
-} from '../../../queries/componentDefinitions';
+} from '../../../queries/componentDefinitions.queries';
 import {
     AuthorizationModel,
     ComponentDefinitionBasicModel,
@@ -21,10 +21,10 @@ import FilterableSelect, {
 import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
-} from '../../../queries/connections';
+} from '../../../queries/connections.queries';
 import {useCreateConnectionMutation} from '../../../mutations/connections.mutations';
 import {OnChangeValue} from 'react-select';
-import {useGetConnectionDefinitionQuery} from '../../../queries/connectionDefinitions';
+import {useGetConnectionDefinitionQuery} from '../../../queries/connectionDefinitions.queries';
 import NativeSelect from '../../../components/NativeSelect/NativeSelect';
 import Properties from '../../../components/Properties/Properties';
 import {timeout} from 'd3-timer';

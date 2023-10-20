@@ -25,12 +25,12 @@ import Input from 'components/Input/Input';
 import {ProjectModel} from '../../../middleware/project';
 import useRightSlideOverStore from './stores/useRightSlideOverStore';
 import useLeftSidebarStore from './stores/useLeftSidebarStore';
-import {useGetComponentDefinitionsQuery} from '../../../queries/componentDefinitions';
-import {useGetTaskDispatcherDefinitionsQuery} from '../../../queries/taskDispatcherDefinitions';
+import {useGetComponentDefinitionsQuery} from '../../../queries/componentDefinitions.queries';
+import {useGetTaskDispatcherDefinitionsQuery} from '../../../queries/taskDispatcherDefinitions.queries';
 import {
     useGetProjectQuery,
     useGetProjectWorkflowsQuery,
-} from '../../../queries/projects';
+} from '../../../queries/projects.queries';
 import WorkflowDialog from 'pages/automation/projects/WorkflowDialog';
 
 const headerToggleItems: ToggleItem[] = [

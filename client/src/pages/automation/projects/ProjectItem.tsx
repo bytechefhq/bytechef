@@ -8,7 +8,7 @@ import {
     useCreateProjectMutation,
     useUpdateProjectTagsMutation,
 } from '../../../mutations/projects.mutations';
-import {ProjectKeys} from '../../../queries/projects';
+import {ProjectKeys} from '../../../queries/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
 import {Link} from 'react-router-dom';
