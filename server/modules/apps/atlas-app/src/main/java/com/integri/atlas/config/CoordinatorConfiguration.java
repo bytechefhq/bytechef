@@ -50,6 +50,8 @@ import com.integri.atlas.task.dispatcher.fork.ForkTaskDispatcher;
 import com.integri.atlas.task.dispatcher.fork.completion.ForkTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.if_.IfTaskDescriptor;
 import com.integri.atlas.task.dispatcher.if_.IfTaskDispatcher;
+import com.integri.atlas.task.dispatcher.if_.IfTaskHelper;
+import com.integri.atlas.task.dispatcher.if_.completion.IfTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.map.MapTaskDispatcher;
 import com.integri.atlas.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.parallel.ParallelTaskDispatcher;
@@ -137,6 +139,7 @@ public class CoordinatorConfiguration {
                 parallelTaskCompletionHandler(taskCompletionHandlerChain),
                 forkTaskCompletionHandler(taskCompletionHandlerChain),
                 switchTaskCompletionHandler(taskCompletionHandlerChain),
+                ifTaskCompletionHandler(taskCompletionHandlerChain, ifTaskHelper()),
                 defaultTaskCompletionHandler()
             )
         );
@@ -165,6 +168,44 @@ public class CoordinatorConfiguration {
             contextRepository,
             SpelTaskEvaluator.builder().environment(environment).build()
         );
+    }
+
+    @Bean
+    IfTaskHelper ifTaskHelper() {
+        return new IfTaskHelper();
+    }
+
+    @Bean
+    IfTaskCompletionHandler ifTaskCompletionHandler(
+        TaskCompletionHandler aTaskCompletionHandler,
+        IfTaskHelper ifTaskHelper
+    ) {
+        return new IfTaskCompletionHandler(
+            taskExecutionRepo,
+            aTaskCompletionHandler,
+            taskDispatcher(),
+            contextRepository,
+            SpelTaskEvaluator.builder().environment(environment).build(),
+            ifTaskHelper
+        );
+    }
+
+    @Bean
+    IfTaskDispatcher ifTaskDispatcher(TaskDispatcher taskDispatcher, IfTaskHelper ifTaskHelper) {
+        return new IfTaskDispatcher(
+            contextRepository,
+            counterRepository,
+            messageBroker,
+            taskDispatcher,
+            taskExecutionRepo,
+            SpelTaskEvaluator.builder().environment(environment).build(),
+            ifTaskHelper
+        );
+    }
+
+    @Bean
+    IfTaskDescriptor ifTaskDescriptor() {
+        return new IfTaskDescriptor();
     }
 
     @Bean
@@ -240,6 +281,7 @@ public class CoordinatorConfiguration {
         TaskDispatcherChain taskDispatcher = new TaskDispatcherChain();
         List<TaskDispatcherResolver> resolvers = Arrays.asList(
             eachTaskDispatcher(taskDispatcher),
+            ifTaskDispatcher(taskDispatcher, ifTaskHelper()),
             mapTaskDispatcher(taskDispatcher),
             parallelTaskDispatcher(taskDispatcher),
             forkTaskDispatcher(taskDispatcher),
@@ -267,24 +309,6 @@ public class CoordinatorConfiguration {
             counterRepository,
             SpelTaskEvaluator.builder().environment(environment).build()
         );
-    }
-
-    @Bean
-    IfTaskDispatcher ifTaskDispatcher(TaskDispatcher taskDispatcher) {
-        IfTaskDispatcher dispatcher = new IfTaskDispatcher();
-
-        dispatcher.setContextRepository(contextRepository);
-        dispatcher.setCounterRepository(counterRepository);
-        dispatcher.setMessageBroker(messageBroker);
-        dispatcher.setTaskDispatcher(taskDispatcher);
-        dispatcher.setTaskExecutionRepository(taskExecutionRepo);
-
-        return dispatcher;
-    }
-
-    @Bean
-    IfTaskDescriptor ifTaskDescriptor() {
-        return new IfTaskDescriptor();
     }
 
     @Bean
