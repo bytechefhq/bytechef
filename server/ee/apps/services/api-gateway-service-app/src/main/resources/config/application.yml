@@ -80,7 +80,7 @@ spring:
         - id: execution-service
           uri: lb://execution-service-app
           predicates:
-            - Path=/api/automation/jobs/**,/api/automation/project-workflow-executions/**
+            - Path=/api/automation/jobs/**,/api/automation/executions/**
 #        - id: openapi
 #          uri: http://localhost:${server.port}
 #          predicates:

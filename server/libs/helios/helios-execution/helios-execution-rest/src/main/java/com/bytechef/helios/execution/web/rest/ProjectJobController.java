@@ -23,11 +23,10 @@ import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.facade.JobFactoryFacade;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.helios.configuration.web.rest.JobsApi;
-import com.bytechef.helios.configuration.web.rest.model.CreateJob200ResponseModel;
-import com.bytechef.helios.configuration.web.rest.model.JobBasicModel;
-import com.bytechef.helios.configuration.web.rest.model.JobModel;
-import com.bytechef.helios.configuration.web.rest.model.JobParametersModel;
+import com.bytechef.helios.execution.web.rest.model.CreateJob200ResponseModel;
+import com.bytechef.helios.execution.web.rest.model.JobBasicModel;
+import com.bytechef.helios.execution.web.rest.model.JobModel;
+import com.bytechef.helios.execution.web.rest.model.JobParametersModel;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.JobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,9 +41,8 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
-
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
-public class JobController implements JobsApi {
+public class ProjectJobController implements JobsApi {
 
     private final ConversionService conversionService;
     private final JobFactoryFacade jobFactoryFacade;
@@ -52,7 +50,7 @@ public class JobController implements JobsApi {
     private final MessageBroker messageBroker;
 
     @SuppressFBWarnings("EI2")
-    public JobController(
+    public ProjectJobController(
         ConversionService conversionService, JobFactoryFacade jobFactoryFacade, JobService jobService,
         MessageBroker messageBroker) {
 

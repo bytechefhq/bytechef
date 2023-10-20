@@ -25,8 +25,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
  * @author Ivica Cardic
  */
 @Disabled
-@WebMvcTest(JobController.class)
-public class JobControllerIntTest {
+@WebMvcTest(ProjectJobController.class)
+public class ProjectJobControllerIntTest {
 
     @Test
     public void testGetJob() {

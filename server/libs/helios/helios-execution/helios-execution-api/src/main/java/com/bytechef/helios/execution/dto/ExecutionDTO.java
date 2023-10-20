@@ -15,20 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.test.web.rest.mapper;
+package com.bytechef.helios.execution.dto;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.hermes.execution.dto.JobDTO;
-import com.bytechef.hermes.test.web.rest.mapper.config.WorkflowTestMapperSpringConfig;
-import com.bytechef.hermes.test.web.rest.model.JobModel;
-import org.mapstruct.Mapper;
-import org.springframework.core.convert.converter.Converter;
+import com.bytechef.helios.configuration.domain.Project;
+import com.bytechef.helios.configuration.domain.ProjectInstance;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = WorkflowTestMapperSpringConfig.class)
-public interface TestJobMapper extends Converter<JobDTO, JobModel> {
-
-    @Override
-    JobModel convert(JobDTO jobDTO);
+@SuppressFBWarnings("EI")
+public record ExecutionDTO(
+    long id, ProjectInstance instance, JobDTO job, Project project, Workflow workflow) {
 }

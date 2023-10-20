@@ -21,8 +21,8 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectService;
-import com.bytechef.helios.execution.facade.ProjectWorkflowExecutionFacade;
-import com.bytechef.helios.execution.facade.ProjectWorkflowExecutionFacadeImpl;
+import com.bytechef.helios.execution.facade.ExecutionFacade;
+import com.bytechef.helios.execution.facade.ExecutionFacadeImpl;
 import com.bytechef.hermes.execution.facade.JobFacade;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,11 +34,11 @@ import org.springframework.context.annotation.Configuration;
 public class ProjectConfiguration {
 
     @Bean
-    ProjectWorkflowExecutionFacade projectWorkflowExecutionFacade(
+    ExecutionFacade projectWorkflowExecutionFacade(
         JobFacade jobFacade, JobService jobService, ProjectInstanceService projectInstanceService,
         ProjectService projectService, WorkflowService workflowService) {
 
-        return new ProjectWorkflowExecutionFacadeImpl(
+        return new ExecutionFacadeImpl(
             jobFacade, jobService, projectInstanceService, projectService, workflowService);
     }
 }

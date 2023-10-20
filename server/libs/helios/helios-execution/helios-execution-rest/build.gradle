@@ -3,17 +3,16 @@ plugins {
 }
 
 task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
-    apiPackage = "com.bytechef.helios.configuration.web.rest"
+    apiPackage = "com.bytechef.helios.execution.web.rest"
     configOptions = [
         "dateLibrary": "java8-localdatetime",
         "interfaceOnly": "true",
         "useSpringBoot3": "true",
-        "useTags": "true"
     ]
     generatorName = "spring"
     inputSpec = "$projectDir/openapi.yaml".toString()
     modelNameSuffix = "Model"
-    modelPackage = "com.bytechef.helios.configuration.web.rest.model"
+    modelPackage = "com.bytechef.helios.execution.web.rest.model"
     outputDir = "$projectDir/generated".toString()
     schemaMappings = [
         Page: "org.springframework.data.domain.Page",
@@ -62,6 +61,7 @@ dependencies {
     implementation project(":server:libs:core:commons:commons-util")
     implementation project(":server:libs:helios:helios-configuration:helios-configuration-rest:helios-configuration-rest-api")
     implementation project(":server:libs:helios:helios-execution:helios-execution-api")
+    implementation project(":server:libs:hermes:hermes-test:hermes-test-api")
 
     testImplementation "org.springframework:spring-webflux"
     testImplementation "org.springframework.boot:spring-boot-starter-web"

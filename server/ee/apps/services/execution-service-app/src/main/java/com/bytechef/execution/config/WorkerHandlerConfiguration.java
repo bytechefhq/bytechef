@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.configuration.config;
+package com.bytechef.execution.config;
 
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;

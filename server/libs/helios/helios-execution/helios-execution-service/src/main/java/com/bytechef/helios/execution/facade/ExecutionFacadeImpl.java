@@ -26,7 +26,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectService;
-import com.bytechef.helios.execution.dto.ProjectWorkflowExecutionDTO;
+import com.bytechef.helios.execution.dto.ExecutionDTO;
 import com.bytechef.hermes.execution.dto.JobDTO;
 import com.bytechef.hermes.execution.facade.JobFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -41,7 +41,7 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecutionFacade {
+public class ExecutionFacadeImpl implements ExecutionFacade {
 
     private final JobFacade jobFacade;
     private final JobService jobService;
@@ -50,7 +50,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public ProjectWorkflowExecutionFacadeImpl(
+    public ExecutionFacadeImpl(
         JobFacade jobFacade, JobService jobService, ProjectInstanceService projectInstanceService,
         ProjectService projectService, WorkflowService workflowService) {
 
@@ -64,10 +64,10 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     @Override
     @Transactional(readOnly = true)
     @SuppressFBWarnings("NP")
-    public ProjectWorkflowExecutionDTO getProjectWorkflowExecution(long id) {
+    public ExecutionDTO getExecution(long id) {
         JobDTO jobDTO = jobFacade.getJob(id);
 
-        return new ProjectWorkflowExecutionDTO(
+        return new ExecutionDTO(
             Objects.requireNonNull(jobDTO.id()),
             OptionalUtils.orElse(projectInstanceService.fetchJobProjectInstance(jobDTO.id()), null),
             jobDTO,
@@ -78,7 +78,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     @Override
     @Transactional(readOnly = true)
     @SuppressFBWarnings("NP")
-    public Page<ProjectWorkflowExecutionDTO> getProjectWorkflowExecutions(
+    public Page<ExecutionDTO> getExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber) {
 
@@ -104,7 +104,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         List<Workflow> workflows = workflowService.getWorkflows(
             CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
 
-        return jobsPage.map(job -> new ProjectWorkflowExecutionDTO(
+        return jobsPage.map(job -> new ExecutionDTO(
             Objects.requireNonNull(job.getId()),
             OptionalUtils.orElse(projectInstanceService.fetchJobProjectInstance(job.getId()), null),
             new JobDTO(job, List.of()),

@@ -17,7 +17,7 @@
 
 package com.bytechef.helios.execution.web.rest.mapper;
 
-import com.bytechef.helios.configuration.web.rest.model.TaskExecutionModel;
+import com.bytechef.helios.execution.web.rest.model.TaskExecutionModel;
 import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
 import com.bytechef.hermes.execution.dto.TaskExecutionDTO;
 import org.mapstruct.Mapper;
