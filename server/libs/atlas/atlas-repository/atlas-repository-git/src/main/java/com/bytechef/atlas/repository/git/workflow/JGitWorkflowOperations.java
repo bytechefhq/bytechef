@@ -19,8 +19,9 @@
 
 package com.bytechef.atlas.repository.git.workflow;
 
+import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowResource;
-import com.bytechef.atlas.workflow.WorkflowFormat;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -160,7 +161,7 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
                 .getBytes();
             AbbreviatedObjectId abbreviated = reader.abbreviate(objectId);
             return new WorkflowResource(
-                aPath + ":" + abbreviated.name(), new ByteArrayResource(data), WorkflowFormat.parse(aPath));
+                aPath + ":" + abbreviated.name(), new ByteArrayResource(data), Workflow.Format.parse(aPath));
         }
     }
 
