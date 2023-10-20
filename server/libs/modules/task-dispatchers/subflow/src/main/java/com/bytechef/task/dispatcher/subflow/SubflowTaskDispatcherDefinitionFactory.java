@@ -35,13 +35,13 @@ public class SubflowTaskDispatcherDefinitionFactory implements TaskDispatcherDef
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(
         SubflowTaskDispatcherConstants.SUBFLOW)
-            .display(
-                display("Subflow")
-                    .description(
-                        "Starts a new job as a sub-flow of the current job. Output of the sub-flow job is the output of the task."))
-            .properties(string(WorkflowConstants.WORKFLOW_ID)
-                .label("Workflow Id")
-                .description("The id of sub-workflow to execute."));
+        .display(
+            display("Subflow")
+                .description(
+                    "Starts a new job as a sub-flow of the current job. Output of the sub-flow job is the output of the task."))
+        .properties(string(WorkflowConstants.WORKFLOW_ID)
+            .label("Workflow Id")
+            .description("The id of sub-workflow to execute."));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
