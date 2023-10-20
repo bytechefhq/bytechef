@@ -256,7 +256,7 @@ Registering webhooks is done when creating the job. E.g.:
 
 ```
 {
-  "workflowId": "samples/hello",
+  "workflowId": "samples/hello.json",
   "inputs": {
     ...
   },
@@ -696,7 +696,7 @@ Start a demo job:
 curl -s \
      -X POST \
      -H Content-Type:application/json \
-     -d '{"workflowId":"samples/hello","inputs":{"yourName":"Joe Jones"}}' \
+     -d '{"workflowId":"samples/hello.json","inputs":{"yourName":"Joe Jones"}}' \
      http://localhost:8080/jobs
 ```
 
@@ -712,7 +712,7 @@ Which should give you something like this as a response:
   "id": "8221553af238431ab006cc178eb59129",
   "label": "Hello Demo",
   "priority": 0,
-  "workflowId": "samples/hello",
+  "workflowId": "samples/hello.json",
   "status": "CREATED",
   "tags": []
 }
@@ -721,7 +721,7 @@ Which should give you something like this as a response:
 
 If you'll refresh your browser page now you should see the executing job. 
 
-In case you are wondering, the `samples/hello` workflow is located at <a href="https://github.com/integri/atlas/blob/master/server/modules/apps/atlas-app/src/main/resources/workflow/samples/hello.yaml" target="_blank">here</a>
+In case you are wondering, the `samples/hello.json` workflow is located at <a href="https://github.com/integri/atlas/blob/master/server/modules/apps/atlas-app/src/main/resources/workflow/samples/hello.yaml" target="_blank">here</a>
 
 
 ## Writing your first workflow
@@ -785,7 +785,7 @@ Execute the sample workflow:
 curl -s \
      -X POST \
      -H Content-Type:application/json \
-     -d '{"workflowId":"samples/hello","inputs":{"yourName":"Joe Jones"}}' \
+     -d '{"workflowId":"samples/hello.json","inputs":{"yourName":"Joe Jones"}}' \
      http://localhost:8080/jobs
 ```
 
