@@ -19,9 +19,9 @@ dependencies {
     implementation project(":server:libs:core:message-broker:message-broker-kafka")
     implementation project(":server:libs:core:message-broker:message-broker-redis")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-remote-client")
+    implementation project(":server:libs:hermes:hermes-execution:hermes-execution-remote-client")
     implementation project(":server:libs:hermes:hermes-scheduler:hermes-scheduler-impl")
     implementation project(":server:libs:hermes:hermes-scheduler:hermes-scheduler-remote-rest")
-    implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-remote-client")
 
     testImplementation project(":server:libs:test:test-int-support")
 }

@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.worker.handler.remote.web.rest;
 
-import com.bytechef.hermes.workflow.domain.TriggerExecution;
+import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.excepton.TriggerExecutionException;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerRegistry;

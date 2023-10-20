@@ -17,15 +17,15 @@
 
 package com.bytechef.helios.connection.facade;
 
-import com.bytechef.atlas.service.WorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.connection.config.ConnectionIntTestConfiguration;
-import com.bytechef.helios.project.repository.ProjectInstanceWorkflowConnectionRepository;
-import com.bytechef.helios.project.repository.ProjectInstanceWorkflowJobRepository;
-import com.bytechef.helios.project.repository.ProjectInstanceWorkflowRepository;
-import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
-import com.bytechef.helios.project.service.ProjectInstanceWorkflowServiceImpl;
+import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowConnectionRepository;
+import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowJobRepository;
+import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowRepository;
+import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
+import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowServiceImpl;
 import com.bytechef.hermes.connection.service.ConnectionServiceImpl;
 import com.bytechef.oauth2.config.OAuth2Properties;
 import com.bytechef.hermes.connection.domain.Connection;
@@ -163,7 +163,7 @@ public class ConnectionFacadeIntTest {
 
         connection = connectionRepository.save(connection);
 
-        List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections((List<String>) null, null);
+        List<ConnectionDTO> connectionDTOs = connectionFacade.search((List<String>) null, null);
 
         Assertions.assertThat(
             CollectionUtils.map(connectionDTOs, ConnectionDTO::toConnection))

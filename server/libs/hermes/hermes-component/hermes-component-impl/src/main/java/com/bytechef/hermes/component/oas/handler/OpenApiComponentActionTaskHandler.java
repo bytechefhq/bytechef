@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.oas.handler;
 
-import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
@@ -26,7 +26,7 @@ import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.oas.OpenApiClient;
 import com.bytechef.hermes.component.util.ComponentContextSupplier;
-import com.bytechef.hermes.workflow.constant.MetadataConstants;
+import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 

@@ -18,7 +18,7 @@
 package com.bytechef.hermes.definition.registry.component;
 
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.event.TaskProgressedWorkflowEvent;
+import com.bytechef.atlas.execution.event.TaskProgressedWorkflowEvent;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;

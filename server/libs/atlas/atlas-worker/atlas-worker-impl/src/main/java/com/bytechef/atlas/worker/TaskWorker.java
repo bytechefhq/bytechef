@@ -19,17 +19,17 @@
 
 package com.bytechef.atlas.worker;
 
-import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.domain.TaskExecution.Status;
-import com.bytechef.atlas.message.broker.TaskMessageRoute;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.domain.TaskExecution.Status;
+import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.event.TaskStartedWorkflowEvent;
+import com.bytechef.atlas.execution.event.TaskStartedWorkflowEvent;
 import com.bytechef.message.Controllable;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
-import com.bytechef.atlas.task.CancelControlTask;
-import com.bytechef.atlas.task.WorkflowTask;
+import com.bytechef.atlas.configuration.task.CancelControlTask;
+import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.commons.util.ExceptionUtils;

@@ -19,7 +19,7 @@ package com.bytechef.hermes.file.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.bytechef.atlas.constant.WorkflowConstants;
+import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.file.storage.domain.FileEntry;

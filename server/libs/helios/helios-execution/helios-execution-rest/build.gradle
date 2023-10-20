@@ -1,0 +1,85 @@
+plugins {
+    alias(libs.plugins.org.openapi.generator)
+}
+
+task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    apiPackage = "com.bytechef.helios.configuration.web.rest"
+    configOptions = [
+        "dateLibrary": "java8-localdatetime",
+        "interfaceOnly": "true",
+        "useSpringBoot3": "true",
+        "useTags": "true"
+    ]
+    generatorName = "spring"
+    importMappings = [
+        "TagModel": "com.bytechef.tag.web.rest.model.TagModel",
+        "TaskExecutionModel": "com.bytechef.hermes.execution.web.rest.model.TaskExecutionModel"
+    ]
+    inputSpec = "$projectDir/openapi.yaml".toString()
+    modelNameSuffix = "Model"
+    modelPackage = "com.bytechef.helios.configuration.web.rest.model"
+    outputDir = "$projectDir/generated".toString()
+    schemaMappings = [
+        Category: "com.bytechef.category.web.rest.model.CategoryModel",
+        ComponentDefinition: "com.bytechef.helios.configuration.web.rest.model.ComponentDefinitionModel",
+        ExecutionError: "com.bytechef.hermes.execution.web.rest.model.ExecutionErrorModel",
+        Job: "com.bytechef.hermes.execution.web.rest.model.JobModel",
+        JobBasic: "com.bytechef.hermes.execution.web.rest.model.JobBasicModel",
+        Page: "org.springframework.data.domain.Page",
+        ProjectBasic: "com.bytechef.helios.configuration.web.rest.model.ProjectBasicModel",
+        ProjectInstanceBasic: "com.bytechef.helios.configuration.web.rest.model.ProjectInstanceBasicModel",
+        ProjectInstance: "com.bytechef.helios.configuration.web.rest.model.ProjectInstanceModel",
+        ProjectInstance_project: "com.bytechef.helios.configuration.web.rest.model.ProjectInstanceProjectModel",
+        ProjectInstanceWorkflowConnection: "com.bytechef.helios.configuration.web.rest.model.ProjectInstanceWorkflowConnectionModel",
+        ProjectInstanceWorkflow: "com.bytechef.helios.configuration.web.rest.model.ProjectInstanceWorkflowModel",
+        Project: "com.bytechef.helios.configuration.web.rest.model.ProjectModel",
+        Tag: "TagModel",
+        TaskExecution: "TaskExecutionModel",
+        Webhook: "com.bytechef.hermes.execution.web.rest.model.WebhookModel",
+        Webhook_retry: "com.bytechef.hermes.execution.web.rest.model.WebhookRetryModel",
+        WorkflowFormat: "com.bytechef.hermes.configuration.web.rest.model.WorkflowFormatModel",
+        WorkflowTask: "com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel"
+    ]
+}
+
+sourceSets.main.java.srcDir "${projectDir}/generated/src/main/java"
+
+task generateOpenAPITypeScriptFetch(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName = "typescript-fetch"
+    inputSpec = "$projectDir/openapi.yaml".toString()
+    modelNameSuffix = "Model"
+    outputDir = "$rootDir/client/src/middleware/automation/execution".toString()
+    typeMappings = [
+        DateTime: "Date"
+    ]
+}
+
+tasks.register("generateOpenAPI") {
+    dependsOn tasks.generateOpenAPISpring, tasks.generateOpenAPITypeScriptFetch
+}
+
+dependencies {
+    annotationProcessor libs.org.mapstruct.mapstruct.processor
+    annotationProcessor libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions
+
+    api project(":server:libs:core:category:category-rest:category-rest-api")
+    api project(":server:libs:core:tag:tag-rest:tag-rest-api")
+    api project(":server:libs:helios:helios-configuration:helios-configuration-rest:helios-configuration-rest-api")
+    api project(":server:libs:helios:helios-execution:helios-execution-api")
+    api project(":server:libs:hermes:hermes-execution:hermes-execution-rest:hermes-execution-rest-api")
+
+    compileOnly "jakarta.servlet:jakarta.servlet-api:6.0.0"
+
+    implementation libs.io.swagger.core.v3.swagger.annotations
+    implementation libs.org.openapitools.jackson.databind.nullable
+    implementation "jakarta.annotation:jakarta.annotation-api"
+    implementation "jakarta.validation:jakarta.validation-api"
+    implementation libs.org.mapstruct
+    implementation libs.org.mapstruct.extensions.spring.mapstruct.spring.annotations
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework:spring-web"
+
+    testImplementation "org.springframework:spring-webflux"
+    testImplementation "org.springframework.boot:spring-boot-starter-web"
+}

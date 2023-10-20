@@ -18,7 +18,7 @@
 package com.bytechef.hermes.scheduler.remote.web.rest.trigger;
 
 import com.bytechef.hermes.scheduler.TriggerScheduler;
-import com.bytechef.hermes.workflow.WorkflowExecutionId;
+import com.bytechef.hermes.configuration.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;

@@ -17,25 +17,23 @@
 
 package com.bytechef.server.config;
 
-import com.bytechef.atlas.repository.jdbc.converter.ExecutionErrorToStringConverter;
-import com.bytechef.atlas.repository.jdbc.converter.StringToExecutionErrorConverter;
-import com.bytechef.atlas.repository.jdbc.converter.StringToWebhooksConverter;
-import com.bytechef.atlas.repository.jdbc.converter.StringToWorkflowTaskConverter;
-import com.bytechef.atlas.repository.jdbc.converter.WebhooksToStringConverter;
-import com.bytechef.atlas.repository.jdbc.converter.WorkflowTaskToStringConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.ExecutionErrorToStringConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.StringToExecutionErrorConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksConverter;
+import com.bytechef.atlas.configuration.repository.jdbc.converter.StringToWorkflowTaskConverter;
+import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
+import com.bytechef.atlas.configuration.repository.jdbc.converter.WorkflowTaskToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
-import com.bytechef.commons.data.jdbc.converter.MapListWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
-import com.bytechef.commons.data.jdbc.converter.StringToMapListWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.encryption.Encryption;
-import com.bytechef.hermes.workflow.converter.StringToTriggerLifecycleValueConverter;
-import com.bytechef.hermes.workflow.converter.StringToWorkflowExecutionIdConverter;
-import com.bytechef.hermes.workflow.converter.StringToWorkflowTriggerConverter;
-import com.bytechef.hermes.workflow.converter.TriggerLifecycleValueToStringConverter;
-import com.bytechef.hermes.workflow.converter.WorkflowExecutionIdToStringConverter;
-import com.bytechef.hermes.workflow.converter.WorkflowTriggerToStringConverter;
+import com.bytechef.hermes.configuration.converter.StringToTriggerLifecycleValueConverter;
+import com.bytechef.hermes.configuration.converter.StringToWorkflowExecutionIdConverter;
+import com.bytechef.hermes.configuration.converter.StringToWorkflowTriggerConverter;
+import com.bytechef.hermes.configuration.converter.TriggerLifecycleValueToStringConverter;
+import com.bytechef.hermes.configuration.converter.WorkflowExecutionIdToStringConverter;
+import com.bytechef.hermes.configuration.converter.WorkflowTriggerToStringConverter;
 import com.bytechef.hermes.data.storage.db.converter.DataStorageValueToStringConverter;
 import com.bytechef.hermes.data.storage.db.converter.StringToDataStorageValueConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -88,11 +86,9 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
             new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
             new ExecutionErrorToStringConverter(objectMapper),
             new MapWrapperToStringConverter(objectMapper),
-            new MapListWrapperToStringConverter(objectMapper),
             new StringToDataStorageValueConverter(objectMapper),
             new StringToExecutionErrorConverter(objectMapper),
             new StringToMapWrapperConverter(objectMapper),
-            new StringToMapListWrapperConverter(objectMapper),
             new StringToWebhooksConverter(objectMapper),
             new StringToWorkflowExecutionIdConverter(),
             new StringToWorkflowTaskConverter(objectMapper),

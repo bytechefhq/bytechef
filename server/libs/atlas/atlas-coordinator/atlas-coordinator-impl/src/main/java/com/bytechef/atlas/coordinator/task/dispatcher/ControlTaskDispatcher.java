@@ -19,10 +19,10 @@
 
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
-import com.bytechef.atlas.task.ControlTask;
+import com.bytechef.atlas.configuration.task.ControlTask;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.task.Task;
+import com.bytechef.atlas.configuration.task.Task;
 
 import java.util.Objects;
 

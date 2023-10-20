@@ -20,10 +20,10 @@ package com.bytechef.hermes.scheduler.trigger.executor;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
-import com.bytechef.hermes.workflow.domain.TriggerExecution;
-import com.bytechef.hermes.workflow.message.broker.TriggerMessageRoute;
-import com.bytechef.hermes.workflow.service.TriggerLifecycleService;
-import com.bytechef.hermes.workflow.WorkflowExecutionId;
+import com.bytechef.hermes.execution.domain.TriggerExecution;
+import com.bytechef.hermes.execution.message.broker.TriggerMessageRoute;
+import com.bytechef.hermes.configuration.service.TriggerLifecycleService;
+import com.bytechef.hermes.configuration.WorkflowExecutionId;
 import com.bytechef.message.broker.MessageBroker;
 import org.springframework.stereotype.Component;
 

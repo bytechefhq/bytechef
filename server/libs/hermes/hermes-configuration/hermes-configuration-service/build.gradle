@@ -1,0 +1,11 @@
+dependencies {
+    api project(":server:libs:hermes:hermes-scheduler:hermes-scheduler-api")
+    api project(":server:libs:hermes:hermes-configuration:hermes-configuration-api")
+
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework.data:spring-data-relational"
+    implementation project(":server:libs:core:commons:commons-util")
+
+    testImplementation project(":server:libs:db-migration")
+    testImplementation project(":server:libs:test:test-int-support")
+}

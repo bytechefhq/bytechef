@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.task.dispatcher.test.task.handler;
 
-import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import java.util.HashMap;
 import java.util.Map;

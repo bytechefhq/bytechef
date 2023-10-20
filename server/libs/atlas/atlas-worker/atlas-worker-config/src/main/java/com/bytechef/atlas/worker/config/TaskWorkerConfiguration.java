@@ -52,7 +52,7 @@ public class TaskWorkerConfiguration {
     private List<TaskDispatcherAdapterFactory> taskDispatcherAdapterTaskHandlerFactories = Collections.emptyList();
 
     @Bean
-    TaskHandlerRegistry taskHandlerAccessor(Map<String, TaskHandler<?>> taskHandlerMap) {
+    TaskHandlerRegistry taskHandlerRegistry(Map<String, TaskHandler<?>> taskHandlerMap) {
         return taskHandlerMap::get;
     }
 
@@ -75,7 +75,7 @@ public class TaskWorkerConfiguration {
         taskHandlerResolverChain.setTaskHandlerResolvers(
             List.of(
                 taskDispatcherAdapterTaskHandlerResolver(taskHandlerResolverChain),
-                defaultTaskHandlerResolver(taskHandlerAccessor(taskHandlerMap == null ? Map.of() : taskHandlerMap))));
+                defaultTaskHandlerResolver(taskHandlerRegistry(taskHandlerMap == null ? Map.of() : taskHandlerMap))));
 
         return taskHandlerResolverChain;
     }

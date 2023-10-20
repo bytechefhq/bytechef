@@ -19,12 +19,12 @@
 
 package com.bytechef.atlas.coordinator.event;
 
-import com.bytechef.atlas.constant.WorkflowConstants;
-import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.event.JobStatusWorkflowEvent;
+import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.event.JobStatusWorkflowEvent;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.event.WorkflowEvent;
-import com.bytechef.atlas.service.JobService;
+import com.bytechef.atlas.execution.service.JobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;

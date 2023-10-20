@@ -22,9 +22,9 @@ package com.bytechef.task.dispatcher.parallel.completion;
 import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants.PARALLEL;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
-import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.service.CounterService;
-import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
