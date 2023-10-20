@@ -34,6 +34,10 @@ import {
     PropertyModelToJSON,
 } from '../models';
 
+export interface GetActionDefinitionsRequest {
+    types: Array<string>;
+}
+
 export interface GetComponentActionDefinitionRequest {
     componentName: string;
     componentVersion: number;
@@ -87,6 +91,38 @@ export interface GetComponentActionSampleOutputRequest {
  * 
  */
 export class ActionDefinitionsApi extends runtime.BaseAPI {
+
+    /**
+     * Get all component definitions.
+     * Get all component definitions
+     */
+    async getActionDefinitionsRaw(requestParameters: GetActionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ActionDefinitionModel>>> {
+        if (requestParameters.types === null || requestParameters.types === undefined) {
+            throw new runtime.RequiredError('types','Required parameter requestParameters.types was null or undefined when calling getActionDefinitions.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/action-definitions`.replace(`{${"types"}}`, encodeURIComponent(String(requestParameters.types))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ActionDefinitionModelFromJSON));
+    }
+
+    /**
+     * Get all component definitions.
+     * Get all component definitions
+     */
+    async getActionDefinitions(requestParameters: GetActionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ActionDefinitionModel>> {
+        const response = await this.getActionDefinitionsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Get an action definition of a component.
