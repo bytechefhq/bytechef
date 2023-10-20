@@ -19,18 +19,14 @@ package com.bytechef.hermes.connection.config;
 
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
+import com.bytechef.test.config.jdbc.JdbcRepositoriesIntTestConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Optional;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.auditing.CurrentDateTimeProvider;
-import org.springframework.data.auditing.DateTimeProvider;
-import org.springframework.data.domain.AuditorAware;
-import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
@@ -68,19 +64,7 @@ public class ConnectionIntTestConfiguration {
         }
     }
 
-    @EnableJdbcAuditing
     @EnableJdbcRepositories(basePackages = "com.bytechef.hermes.connection.repository")
-    @TestConfiguration
-    public static class JdbcRepositoriesConfiguration {
-
-        @Bean
-        AuditorAware<String> auditorProvider() {
-            return () -> Optional.of("system");
-        }
-
-        @Bean
-        public DateTimeProvider auditingDateTimeProvider() {
-            return CurrentDateTimeProvider.INSTANCE;
-        }
+    public static class ConnectionJdbcRepositoriesIntTestConfiguration extends JdbcRepositoriesIntTestConfiguration {
     }
 }

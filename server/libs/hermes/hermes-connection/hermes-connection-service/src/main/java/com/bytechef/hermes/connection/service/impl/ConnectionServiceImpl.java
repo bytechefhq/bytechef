@@ -22,7 +22,6 @@ import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.StreamSupport;
 
 import org.springframework.lang.NonNull;
@@ -43,21 +42,8 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
-    public Connection create(
-        @NonNull String name, @NonNull String componentName, int componentVersion, String authorizationName,
-        @NonNull Map<String, Object> parameters) {
-
-        Assert.notNull(name, "'name' must not be null.");
-        Assert.notNull(componentName, "'componentName' must not be null.");
-        Assert.notNull(parameters, "'parameters' must not be null.");
-
-        Connection connection = new Connection();
-
-        connection.setAuthorizationName(authorizationName);
-        connection.setComponentName(componentName);
-        connection.setComponentVersion(componentVersion);
-        connection.setName(name);
-        connection.setParameters(parameters);
+    public Connection create(@NonNull Connection connection) {
+        Assert.notNull(connection, "'connection' must not be null.");
 
         return connectionRepository.save(connection);
     }
@@ -83,15 +69,17 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
-    public Connection update(long id, @NonNull String name) {
-        Assert.notNull(name, "'name' must not be null.");
+    @SuppressFBWarnings("NP")
+    public Connection update(@NonNull Connection connection) {
+        Assert.notNull(connection, "'connection' must not be null.");
 
         return connectionRepository
-            .findById(id)
-            .map(connection -> {
-                connection.setName(name);
+            .findById(connection.getId())
+            .map(curConnection -> {
+                curConnection.setName(connection.getName());
+                curConnection.setVersion(connection.getVersion());
 
-                return connectionRepository.save(connection);
+                return connectionRepository.save(curConnection);
             })
             .orElseThrow();
     }
