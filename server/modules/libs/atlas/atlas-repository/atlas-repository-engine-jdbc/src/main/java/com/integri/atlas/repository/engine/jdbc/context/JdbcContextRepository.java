@@ -35,7 +35,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @author Arik Cohe
  * @author Ivica Cardic
  */
-public abstract class AbstractJdbcContextRepository implements ContextRepository {
+public class JdbcContextRepository implements ContextRepository {
 
     private JdbcTemplate jdbc;
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -43,7 +43,7 @@ public abstract class AbstractJdbcContextRepository implements ContextRepository
     @Override
     public void push(String aStackId, Context aContext) {
         jdbc.update(
-            getPushSql(),
+            "insert into context (id,stack_id,serialized_context,create_time) values (?,?,?,?)",
             UUIDGenerator.generate(),
             aStackId,
             Json.serialize(objectMapper, aContext),
@@ -75,6 +75,4 @@ public abstract class AbstractJdbcContextRepository implements ContextRepository
     public void setObjectMapper(ObjectMapper aObjectMapper) {
         objectMapper = aObjectMapper;
     }
-
-    protected abstract String getPushSql();
 }

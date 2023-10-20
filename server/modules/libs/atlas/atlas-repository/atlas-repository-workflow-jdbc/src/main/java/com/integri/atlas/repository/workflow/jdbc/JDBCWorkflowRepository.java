@@ -36,7 +36,7 @@ import org.springframework.util.Assert;
 /**
  * @author Matija Petanjek
  */
-public class MySqlJDBCWorkflowRepository implements WorkflowRepository {
+public class JDBCWorkflowRepository implements WorkflowRepository {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
     private WorkflowMapper workflowMapper;

@@ -44,7 +44,7 @@ import org.springframework.util.Assert;
  * @author Arik Cohe
  * @author Ivica Cardic
  */
-public abstract class AbstractJdbcJobRepository implements JobRepository {
+public class JdbcJobRepository implements JobRepository {
 
     protected NamedParameterJdbcOperations jdbc;
     protected final ObjectMapper json = new ObjectMapper();
@@ -79,7 +79,10 @@ public abstract class AbstractJdbcJobRepository implements JobRepository {
     public void create(Job aJob) {
         MapSqlParameterSource sqlParameterSource = createSqlParameterSource(aJob);
 
-        jdbc.update(getCreateSQL(), sqlParameterSource);
+        jdbc.update(
+            "insert into job (id,create_time,start_time,status,current_task,workflow_id,label,priority,inputs,webhooks,outputs,parent_task_execution_id) values (:id,:createTime,:startTime,:status,:currentTask,:workflowId,:label,:priority,:inputs,:webhooks,:outputs,:parentTaskExecutionId)",
+            sqlParameterSource
+        );
     }
 
     @Override
@@ -135,7 +138,10 @@ public abstract class AbstractJdbcJobRepository implements JobRepository {
     public Job merge(Job aJob) {
         MapSqlParameterSource sqlParameterSource = createSqlParameterSource(aJob);
 
-        jdbc.update(getMergeSql(), sqlParameterSource);
+        jdbc.update(
+            "update job set status=:status,start_time=:startTime,end_time=:endTime,current_task=:currentTask,workflow_id=:workflowId,label=:label,outputs=:outputs where id = :id ",
+            sqlParameterSource
+        );
 
         return aJob;
     }
@@ -207,10 +213,6 @@ public abstract class AbstractJdbcJobRepository implements JobRepository {
         map.put(DSL.PARENT_TASK_EXECUTION_ID, aRs.getString("parent_task_execution_id"));
         return new JobSummary(new SimpleJob(map));
     }
-
-    protected abstract String getCreateSQL();
-
-    protected abstract String getMergeSql();
 
     private List<TaskExecution> getExecution(String aJobId) {
         return jobTaskRepository.getExecution(aJobId);
