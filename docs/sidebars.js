@@ -65,7 +65,8 @@ const sidebars = {
         id: 'how-to/index',
       },
       items: [
-        'how-to/git-as-a-workflow-repository',
+        'how-to/simple-hello-world-workflow',
+        'how-to/git-as-a-workflow-repository'
       ],
     },
     'platform/contributing-guide'
