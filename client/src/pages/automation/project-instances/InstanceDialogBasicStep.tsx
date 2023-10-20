@@ -80,10 +80,9 @@ const InstanceDialogBasicStep = ({
                                     if (selectedOption) {
                                         setValue(
                                             'projectId',
-                                            parseInt(
-                                                selectedOption.value.toString()
-                                            )
+                                            parseInt(selectedOption.value)
                                         );
+
                                         setValue('project', selectedOption);
                                     }
                                 }}
@@ -94,14 +93,6 @@ const InstanceDialogBasicStep = ({
                                 }))}
                                 placeholder="Select..."
                                 required
-                                value={
-                                    (projectInstance?.project && {
-                                        label: projectInstance.project.name,
-                                        name: projectInstance.project.name,
-                                        value: projectInstance.project.id!.toString(),
-                                    }) ||
-                                    undefined
-                                }
                             />
                         )}
                         shouldUnregister={false}
@@ -115,9 +106,6 @@ const InstanceDialogBasicStep = ({
                         {...register('name', {
                             required: true,
                         })}
-                        onChange={(e) => {
-                            setValue('name', e.target.value);
-                        }}
                     />
 
                     <TextArea

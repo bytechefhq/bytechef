@@ -34,7 +34,7 @@ const ProjectInstanceDialog = ({
 
     const {
         control,
-        formState: {errors, touchedFields},
+        formState: {errors, isValid, touchedFields},
         getValues,
         handleSubmit,
         register,
@@ -52,6 +52,7 @@ const ProjectInstanceDialog = ({
                     label: tag.name,
                 })) || [],
         } as ProjectInstanceModel,
+        mode: 'onChange',
     });
 
     const queryClient = useQueryClient();
@@ -142,7 +143,7 @@ const ProjectInstanceDialog = ({
                     ? `${projectInstance?.id ? 'Edit' : 'Create'} Instance`
                     : undefined
             }
-            large={true}
+            large
             wizard
         >
             <div className="flex h-full w-full rounded-l-lg">
@@ -232,13 +233,11 @@ const ProjectInstanceDialog = ({
                                 </Close>
 
                                 <Button
-                                    disabled={
-                                        !getValues('project') ||
-                                        !getValues('name')
-                                    }
+                                    disabled={!isValid}
                                     label="Next"
                                     onClick={() => {
                                         handleSubmit(saveProjectInstance);
+
                                         setActiveStepIndex(activeStepIndex + 1);
                                     }}
                                 />
@@ -250,9 +249,9 @@ const ProjectInstanceDialog = ({
                                 <Button
                                     displayType="lightBorder"
                                     label="Previous"
-                                    onClick={() => {
-                                        setActiveStepIndex(activeStepIndex - 1);
-                                    }}
+                                    onClick={() =>
+                                        setActiveStepIndex(activeStepIndex - 1)
+                                    }
                                 />
 
                                 <Button
