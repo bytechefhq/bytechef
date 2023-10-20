@@ -24,7 +24,7 @@ interface TagProps {
 }
 
 const Tag = ({tag, onDeleteTag}: TagProps) => (
-    <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700 hover:bg-gray-200">
+    <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700">
         {tag.name}
 
         <XMarkIcon
