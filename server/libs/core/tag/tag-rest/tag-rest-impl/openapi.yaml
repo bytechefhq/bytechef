@@ -5,6 +5,9 @@ info:
   version: "1"
 servers:
 - url: "http://localhost:5173/api/core"
+tags:
+- name: "tags"
+  description: "The Core Tags API"
 paths:
   /tags:
     get:

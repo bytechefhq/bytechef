@@ -36,7 +36,7 @@ import java.time.LocalDateTime;
  */
 @RestController
 
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
 public class ProjectExecutionController implements ProjectExecutionsApi {
 
     private final ConversionService conversionService;

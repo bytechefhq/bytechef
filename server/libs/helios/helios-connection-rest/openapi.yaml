@@ -5,262 +5,274 @@ info:
   version: "1"
 servers:
 - url: "http://localhost:5173/api/automation"
+tags:
+- name: "automation"
+  description: "The Automation API"
+- name: "connections"
+  description: "The Automation Connections API"
 paths:
   /connection-tags:
     get:
-        description: "Get connection tags."
-        summary: "Get connection tags."
-        tags:
-            - "connection-tags"
-        operationId: "getConnectionTags"
-        responses:
-            "200":
-                description: "A list of connection tags."
-                content:
-                    application/json:
-                        schema:
-                            description: "The response object that contains the array of tags."
-                            type: "array"
-                            items:
-                                $ref: "../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
+      description: "Get connection tags."
+      summary: "Get connection tags."
+      tags:
+      - "connection-tags"
+      operationId: "getConnectionTags"
+      responses:
+        "200":
+          description: "A list of connection tags."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of tags."
+                type: "array"
+                items:
+                  $ref: "../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
   /connections:
     get:
-        description: "Get connections."
-        summary: "Get connections."
-        tags:
-            - "connections"
-        operationId: "getConnections"
-        parameters:
-            - name: "componentNames"
-              description: "The list of component names used for filtering connections."
-              in: "query"
-              required: false
+      description: "Get connections."
+      summary: "Get connections."
+      tags:
+      - "connections"
+      - "automation"
+      operationId: "getConnections"
+      parameters:
+      - name: "componentNames"
+        description: "The list of component names used for filtering connections."
+        in: "query"
+        required: false
+        schema:
+          type: "array"
+          items:
+            type: "string"
+      - name: "tagIds"
+        description: "The list of tag ids of used for filtering connections."
+        in: "query"
+        required: false
+        schema:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "A list of connections."
+          content:
+            application/json:
               schema:
-                  type: "array"
-                  items:
-                      type: "string"
-            - name: "tagIds"
-              description: "The list of tag ids of used for filtering connections."
-              in: "query"
-              required: false
-              schema:
-                  type: "array"
-                  items:
-                      type: "integer"
-                      format: "int64"
-        responses:
-            "200":
-                description: "A list of connections."
-                content:
-                    application/json:
-                        schema:
-                            type: "array"
-                            items:
-                                $ref: "#/components/schemas/Connection"
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Connection"
     post:
-        description: "Create a new connection."
-        summary: "Create a new connection."
-        tags:
-            - "connections"
-        operationId: "createConnection"
-        requestBody:
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/Connection"
-            required: true
-        responses:
-            "200":
-                description: "The connection object."
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/Connection"
+      description: "Create a new connection."
+      summary: "Create a new connection."
+      tags:
+      - "connections"
+      - "automation"
+      operationId: "createConnection"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Connection"
+        required: true
+      responses:
+        "200":
+          description: "The connection object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Connection"
   /connections/oauth2:
     post:
-        description: "Retrieves oauth2 authorization parameters."
-        summary: "Retrieves oauth2 authorization parameters."
-        tags:
-            - "connections"
-        operationId: "getConnectionOAuth2AuthorizationParameters"
-        requestBody:
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/Connection"
-            required: true
-        responses:
-            "200":
-                description: "The object with oauth2 authorization parameters."
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/OAuth2AuthorizationParameters"
+      description: "Retrieves oauth2 authorization parameters."
+      summary: "Retrieves oauth2 authorization parameters."
+      tags:
+      - "connections"
+      - "automation"
+      operationId: "getConnectionOAuth2AuthorizationParameters"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Connection"
+        required: true
+      responses:
+        "200":
+          description: "The object with oauth2 authorization parameters."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuth2AuthorizationParameters"
   /connections/{id}:
     delete:
-        description: "Delete a connection."
-        summary: "Delete a connection."
-        tags:
-            - "connections"
-        operationId: "deleteConnection"
-        parameters:
-            - name: "id"
-              description: "The id of a connection."
-              in: "path"
-              required: true
-              schema:
-                  type: "integer"
-                  format: "int64"
-        responses:
-            "200":
-                description: "Successful operation."
+      description: "Delete a connection."
+      summary: "Delete a connection."
+      tags:
+      - "connections"
+      - "automation"
+      operationId: "deleteConnection"
+      parameters:
+      - name: "id"
+        description: "The id of a connection."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "Successful operation."
     get:
-        description: "Get a connection by id."
-        summary: "Get a connection by id."
-        tags:
-            - "connections"
-        operationId: "getConnection"
-        parameters:
-            - name: "id"
-              description: "The id of a connection."
-              in: "path"
-              required: true
+      description: "Get a connection by id."
+      summary: "Get a connection by id."
+      tags:
+      - "connections"
+      - "automation"
+      operationId: "getConnection"
+      parameters:
+      - name: "id"
+        description: "The id of a connection."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "The connection object."
+          content:
+            application/json:
               schema:
-                  type: "integer"
-                  format: "int64"
-        responses:
-            "200":
-                description: "The connection object."
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/Connection"
+                $ref: "#/components/schemas/Connection"
     put:
-        description: "Update an existing connection."
-        summary: "Update an existing connection."
-        tags:
-            - "connections"
-        operationId: "updateConnection"
-        parameters:
-            - name: "id"
-              description: "The id of a connection."
-              in: "path"
-              required: true
+      description: "Update an existing connection."
+      summary: "Update an existing connection."
+      tags:
+      - "connections"
+      - "automation"
+      operationId: "updateConnection"
+      parameters:
+      - name: "id"
+        description: "The id of a connection."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Connection"
+        required: true
+      responses:
+        "200":
+          description: "The updated connection object."
+          content:
+            application/json:
               schema:
-                  type: "integer"
-                  format: "int64"
-        requestBody:
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/Connection"
-            required: true
-        responses:
-            "200":
-                description: "The updated connection object."
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/Connection"
+                $ref: "#/components/schemas/Connection"
   /connections/{id}/tags:
     put:
-        description: "Updates tags of an existing connection."
-        summary: "Updates tags of an existing connection."
-        tags:
-            - "connections"
-        operationId: "updateConnectionTags"
-        parameters:
-            - name: "id"
-              description: "The id of the connection."
-              in: "path"
-              required: true
-              schema:
-                  type: "integer"
-                  format: "int64"
-        requestBody:
-            content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/UpdateTagsRequest"
-            required: true
-        responses:
-            "200":
-                description: "Successful operation."
+      description: "Updates tags of an existing connection."
+      summary: "Updates tags of an existing connection."
+      tags:
+      - "connections"
+      - "automation"
+      operationId: "updateConnectionTags"
+      parameters:
+      - name: "id"
+        description: "The id of the connection."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTagsRequest"
+        required: true
+      responses:
+        "200":
+          description: "Successful operation."
 components:
   schemas:
     Connection:
       description: "Contains all required information to open a connection to a service\
-    \ defined by componentName parameter."
+        \ defined by componentName parameter."
       type: "object"
       required:
-          - "name"
-          - "componentName"
-          - "componentVersion"
-          - "parameters"
+      - "name"
+      - "componentName"
+      - "componentVersion"
+      - "parameters"
       properties:
-          active:
-              description: "If a connection is used in any of active workflows."
-              type: "boolean"
-              readOnly: true
-          authorizationName:
-              description: "The name of an authorization used by this connection. Used\
-        \ for HTTP based services."
-              type: "string"
-          componentName:
-              description: "The name of a component that uses this connection."
-              type: "string"
-          connectionVersion:
-              description: "The version of a component that uses this connection."
-              type: "integer"
-          createdBy:
-              description: "The created by."
-              type: "string"
-              readOnly: true
-          createdDate:
-              description: "The created date."
-              type: "string"
-              format: "date-time"
-              readOnly: true
-          name:
-              description: "The name of a connection."
-              type: "string"
-          id:
-              description: "The id of a connection."
-              type: "integer"
-              format: "int64"
-              readOnly: true
-          lastModifiedBy:
-              description: "The last modified by."
-              type: "string"
-              readOnly: true
-          lastModifiedDate:
-              description: "The last modified date."
-              type: "string"
-              format: "date-time"
-              readOnly: true
-          parameters:
-              description: "The parameters of a connection."
-              type: "object"
-              additionalProperties:
-                  type: "object"
-              writeOnly: true
-          tags:
-              type: "array"
-              items:
-                  $ref: "../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
-          __version:
-              type: "integer"
-              format: "int32"
+        active:
+          description: "If a connection is used in any of active workflows."
+          type: "boolean"
+          readOnly: true
+        authorizationName:
+          description: "The name of an authorization used by this connection. Used\
+            \ for HTTP based services."
+          type: "string"
+        componentName:
+          description: "The name of a component that uses this connection."
+          type: "string"
+        connectionVersion:
+          description: "The version of a component that uses this connection."
+          type: "integer"
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        name:
+          description: "The name of a connection."
+          type: "string"
+        id:
+          description: "The id of a connection."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        parameters:
+          description: "The parameters of a connection."
+          type: "object"
+          additionalProperties:
+            type: "object"
+          writeOnly: true
+        tags:
+          type: "array"
+          items:
+            $ref: "../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
+        __version:
+          type: "integer"
+          format: "int32"
     OAuth2AuthorizationParameters:
-        properties:
-            authorizationUrl:
-                type: "string"
-            clientId:
-                type: "string"
-            scopes:
-                type: "array"
-                items:
-                    type: "string"
+      properties:
+        authorizationUrl:
+          type: "string"
+        clientId:
+          type: "string"
+        scopes:
+          type: "array"
+          items:
+            type: "string"
     UpdateTagsRequest:
       description: "The request object that contains the array of tags."
       type: "object"

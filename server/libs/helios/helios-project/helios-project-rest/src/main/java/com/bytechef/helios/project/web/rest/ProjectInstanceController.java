@@ -41,7 +41,7 @@ import java.util.List;
  */
 @RestController
 
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
 public class ProjectInstanceController implements ProjectInstancesApi {
 
     private final ConversionService conversionService;

@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.connection.web.rest.mapper;
 
-import com.bytechef.hermes.oauth2.web.rest.adapter.OAuth2ConversionServiceAdapter;
+import com.bytechef.hermes.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
 import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.web.rest.model.OAuth2PropertiesModel;
 import org.mapstruct.Mapper;
@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = OAuth2ConversionServiceAdapter.class)
+@Mapper(config = ConnectionMapperSpringConfig.class)
 public interface OAuth2PropertiesModelMapper extends Converter<OAuth2Properties, OAuth2PropertiesModel> {
 
     @Override

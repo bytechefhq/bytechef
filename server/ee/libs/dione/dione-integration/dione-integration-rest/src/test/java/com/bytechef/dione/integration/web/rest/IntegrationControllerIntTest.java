@@ -77,7 +77,7 @@ public class IntegrationControllerIntTest {
         try {
             this.webTestClient
                 .delete()
-                .uri("/integrations/1")
+                .uri("/embedded/integrations/1")
                 .exchange()
                 .expectStatus()
                 .isOk();
@@ -102,7 +102,7 @@ public class IntegrationControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/integrations/1")
+                .uri("/embedded/integrations/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -124,7 +124,7 @@ public class IntegrationControllerIntTest {
 
             this.webTestClient
                 .get()
-                .uri("/integrations/1/workflows")
+                .uri("/embedded/integrations/1/workflows")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
@@ -145,7 +145,7 @@ public class IntegrationControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/integrations")
+            .uri("/embedded/integrations")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -158,7 +158,7 @@ public class IntegrationControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/integrations?categoryIds=1")
+            .uri("/embedded/integrations?categoryIds=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -170,7 +170,7 @@ public class IntegrationControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/integrations?tagIds=1")
+            .uri("/embedded/integrations?tagIds=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -182,7 +182,7 @@ public class IntegrationControllerIntTest {
 
         this.webTestClient
             .get()
-            .uri("/integrations?categoryIds=1&tagIds=1")
+            .uri("/embedded/integrations?categoryIds=1&tagIds=1")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus()
@@ -203,7 +203,7 @@ public class IntegrationControllerIntTest {
             assert integrationDTO.id() != null;
             this.webTestClient
                 .post()
-                .uri("/integrations")
+                .uri("/embedded/integrations")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(integrationModel)
@@ -250,7 +250,7 @@ public class IntegrationControllerIntTest {
         try {
             this.webTestClient
                 .post()
-                .uri("/integrations/1/workflows")
+                .uri("/embedded/integrations/1/workflows")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(createIntegrationWorkflowRequestModel)
@@ -298,7 +298,7 @@ public class IntegrationControllerIntTest {
         try {
             this.webTestClient
                 .put()
-                .uri("/integrations/1")
+                .uri("/embedded/integrations/1")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(integrationModel)
@@ -326,7 +326,7 @@ public class IntegrationControllerIntTest {
         try {
             this.webTestClient
                 .put()
-                .uri("/integrations/1/tags")
+                .uri("/embedded/integrations/1/tags")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UpdateTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))

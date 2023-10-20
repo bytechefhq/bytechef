@@ -5,6 +5,9 @@ info:
   version: "1"
 servers:
 - url: "http://localhost:5173/api/core"
+tags:
+- name: "categories"
+  description: "The Core Categories API"
 paths:
   /categories:
     get:

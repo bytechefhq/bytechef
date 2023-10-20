@@ -33,7 +33,7 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/embedded")
 public class IntegrationCategoryController implements IntegrationCategoriesApi {
 
     private final ConversionService conversionService;

@@ -15,19 +15,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.connection.web.rest;
+package com.bytechef.hermes.connection.web.rest.mapper.config;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import com.bytechef.hermes.connection.web.rest.adapter.ConversionServiceAdapter;
+import org.mapstruct.MapperConfig;
+import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
  * @author Ivica Cardic
  */
-public class ConnectionTagControllerTest {
-
-    @Disabled
-    @Test
-    public void testGetConnectionTags() {
-        // TODO
-    }
+@MapperConfig(componentModel = "spring", uses = {
+    ConversionServiceAdapter.class
+})
+@SpringMapperConfig(
+    conversionServiceAdapterPackage = "com.bytechef.hermes.connection.web.rest.adapter",
+    conversionServiceAdapterClassName = "ConversionServiceAdapter")
+public interface ConnectionMapperSpringConfig {
 }

@@ -77,7 +77,7 @@ public class ComponentDefinitionControllerIntTest {
         try {
             webTestClient
                 .get()
-                .uri("/component-definitions")
+                .uri("/core/component-definitions")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()

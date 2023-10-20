@@ -5,6 +5,13 @@ info:
   version: "1"
 servers:
 - url: "http://localhost:5173/api/embedded"
+tags:
+- name: "integration-categories"
+  description: "The Embedded Integrations Categories API"
+- name: "integration-tags"
+  description: "The Embedded Integration Tags API"
+- name: "integrations"
+  description: "The Embedded Integrations API"
 paths:
   /integration-categories:
     get:

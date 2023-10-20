@@ -33,7 +33,7 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
 public class ProjectInstanceTagController implements ProjectInstanceTagsApi {
 
     private final ConversionService conversionService;

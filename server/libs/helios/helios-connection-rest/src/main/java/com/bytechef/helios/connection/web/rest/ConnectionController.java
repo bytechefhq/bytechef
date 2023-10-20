@@ -42,7 +42,7 @@ import java.util.List;
  */
 @RestController
 
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
 public class ConnectionController implements ConnectionsApi {
 
     private final ConnectionDefinitionService connectionDefinitionService;
@@ -50,6 +50,7 @@ public class ConnectionController implements ConnectionsApi {
     private final ConversionService conversionService;
     private final OAuth2Properties oAuth2Properties;
 
+    @SuppressFBWarnings("EI")
     public ConnectionController(
         ConnectionDefinitionService connectionDefinitionService, ConnectionFacade connectionFacade,
         ConversionService conversionService, OAuth2Properties oAuth2Properties) {
