@@ -22,6 +22,7 @@ sourceSets.main.java.srcDir "${projectDir}/generated/src/main/java"
 task generateOpenAPITypeScriptFetch(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
     generatorName = "typescript-fetch"
     inputSpec = "$projectDir/openapi.yaml".toString()
+    modelNameSuffix = "Model"
     outputDir = "$rootDir/client/src/data-access/integration".toString()
     typeMappings = [
         DateTime: "Date"
