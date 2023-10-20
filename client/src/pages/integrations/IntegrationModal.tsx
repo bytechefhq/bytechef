@@ -4,29 +4,25 @@ import Input from 'components/Input/Input';
 import Modal from 'components/Modal/Modal';
 import MultiSelect from 'components/MultiSelect/MultiSelect';
 import TextArea from 'components/TextArea/TextArea';
+import {Controller, useForm} from 'react-hook-form';
+import Button from 'components/Button/Button';
 
 interface Tag {
     readonly label: string;
     readonly value: string;
 }
 
-interface IntegrationData {
-    category: string;
-    description: string;
-    name: string;
-    tags: Array<Tag>;
-    workflowIds: Array<string>;
-}
-
 const IntegrationModal: React.FC = () => {
+    const [isOpen, setIsOpen] = useState(false);
     const [availableTags, setAvailableTags] = useState([]);
-    const [tagsInputValue, setTagsInputValue] = useState<Array<Tag>>([]);
-    const [integrationData, setIntegrationData] = useState<IntegrationData>({
-        category: '',
-        description: '',
-        name: '',
-        tags: [],
-        workflowIds: [],
+
+    const {control, getValues, handleSubmit, reset} = useForm({
+        defaultValues: {
+            name: '',
+            description: '',
+            category: '',
+            tags: [],
+        },
     });
 
     useEffect(() => {
@@ -38,33 +34,20 @@ const IntegrationModal: React.FC = () => {
             .then((response) => setAvailableTags(response.tags));
     }, []);
 
-    function createIntegration(integrationData: IntegrationData) {
-        const {category, description, name, tags, workflowIds} =
-            integrationData;
+    function createIntegration() {
+        const formData = getValues();
 
-        const tagValues = tags.map((tag) => tag.value);
+        const tagValues = formData.tags.map((tag: Tag) => tag.value);
 
         fetch('http://localhost:5173/api/integrations', {
-            body: JSON.stringify({
-                category,
-                description,
-                name,
-                tags: tagValues,
-                workflowIds,
-            }),
+            body: JSON.stringify({...formData, tags: tagValues}),
             credentials: 'same-origin',
             headers: {'Content-Type': 'application/json'},
             method: 'POST',
         }).then(() => {
-            setIntegrationData({
-                category: '',
-                description: '',
-                name: '',
-                tags: [],
-                workflowIds: [],
-            });
+            setIsOpen(false);
 
-            setTagsInputValue([]);
+            reset();
         });
     }
 
@@ -72,80 +55,75 @@ const IntegrationModal: React.FC = () => {
         <Modal
             confirmButtonLabel="Create"
             description="Use this to create your integration which will contain related workflows"
-            handleConfirmButtonClick={() => createIntegration(integrationData)}
+            handleConfirmButtonClick={handleSubmit(createIntegration)}
             triggerLabel="Create Integration"
             title="Create Integration"
+            form={true}
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
         >
-            <Input
-                label="Name"
+            <Controller
                 name="name"
-                onChange={(event) =>
-                    setIntegrationData({
-                        ...integrationData,
-                        name: event.target.value,
-                    })
-                }
-                placeholder="My CRM Integration"
-                required
-                value={integrationData.name}
+                control={control}
+                rules={{required: true}}
+                render={({field, fieldState: {error, isTouched}}) => (
+                    <Input
+                        error={isTouched && !!error}
+                        label="Name"
+                        placeholder="My CRM Integration"
+                        {...field}
+                    />
+                )}
             />
 
-            <TextArea
-                label="Description"
+            <Controller
+                control={control}
                 name="description"
-                onChange={(event) =>
-                    setIntegrationData({
-                        ...integrationData,
-                        description: event.target.value,
-                    })
-                }
-                placeholder="Cute description of your integration"
-                value={integrationData.description}
+                render={({field}) => (
+                    <TextArea
+                        label="Description"
+                        placeholder="Cute description of your integration"
+                        {...field}
+                    />
+                )}
             />
 
-            <Input
-                label="Category"
+            <Controller
+                control={control}
                 name="category"
-                onChange={(event) =>
-                    setIntegrationData({
-                        ...integrationData,
-                        category: event.target.value,
-                    })
-                }
-                placeholder="Marketing, Sales, Social Media..."
-                value={integrationData.category}
+                render={({field}) => (
+                    <Input
+                        label="Category"
+                        placeholder="Marketing, Sales, Social Media..."
+                        {...field}
+                    />
+                )}
             />
 
-            <MultiSelect
-                label="Tags"
+            <Controller
+                control={control}
                 name="tags"
-                onChange={(inputValues: Tag[]) => {
-                    setIntegrationData({
-                        ...integrationData,
-                        tags: inputValues as Tag[],
-                    });
-
-                    setTagsInputValue(inputValues as Tag[]);
-                }}
-                onCreateOption={(inputValue: string) => {
-                    const newOption = {
-                        label: inputValue,
-                        value: inputValue.toLowerCase().replace(/\W/g, ''),
-                    };
-
-                    setTagsInputValue([...tagsInputValue, newOption]);
-
-                    setIntegrationData({
-                        ...integrationData,
-                        tags: [...integrationData.tags, newOption],
-                    });
-                }}
-                options={availableTags.map((tag: string) => ({
-                    label: `${tag.charAt(0).toUpperCase()}${tag.slice(1)}`,
-                    value: tag.toLowerCase().replace(/\W/g, ''),
-                }))}
-                value={tagsInputValue}
+                render={({field}) => (
+                    <MultiSelect
+                        label="Tags"
+                        options={availableTags.map((tag: string) => ({
+                            label: `${tag.charAt(0).toUpperCase()}${tag.slice(
+                                1
+                            )}`,
+                            value: tag.toLowerCase().replace(/\W/g, ''),
+                        }))}
+                        {...field}
+                    />
+                )}
             />
+
+            <div className="mt-4 flex justify-end">
+                <Button
+                    label="Create"
+                    onClick={handleSubmit(createIntegration)}
+                    type="submit"
+                />
+            </div>
         </Modal>
     );
 };
