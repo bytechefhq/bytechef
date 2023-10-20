@@ -14,7 +14,6 @@ dependencies {
 
     testImplementation "commons-io:commons-io"
     testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
-    testImplementation "org.testcontainers:postgresql"
     testImplementation project(":modules:libs:atlas:engine-repository:engine-repository-jdbc")
     testImplementation project(":modules:libs:atlas:task-handler:task-handler-io")
     testImplementation project(":modules:libs:atlas:task-handler:task-handler-random")
@@ -26,4 +25,5 @@ dependencies {
     testImplementation project(":modules:libs:atlas:workflow-repository:workflow-repository-resource")
 
     testRuntimeOnly "org.postgresql:postgresql"
+    testRuntimeOnly "org.testcontainers:postgresql"
 }
