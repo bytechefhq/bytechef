@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import Input from 'components/Input/Input';
 import Modal from 'components/Modal/Modal';
@@ -17,10 +17,27 @@ import {
     IntegrationModel,
     TagModel,
 } from '../../middleware/integration';
-import {useIntegrationMutation} from '../../mutations/integrations.mutations';
+import {
+    useIntegrationMutation,
+    useIntegrationPutMutation,
+} from '../../mutations/integrations.mutations';
 
-const IntegrationModal = () => {
-    const [isOpen, setIsOpen] = useState(false);
+interface IntegrationModalProps {
+    id?: number;
+    integrationItem: IntegrationModel | undefined;
+    visible?: boolean;
+}
+
+const IntegrationModal = ({
+    id,
+    integrationItem,
+    visible = false,
+}: IntegrationModalProps) => {
+    const [isOpen, setIsOpen] = useState(visible);
+
+    useEffect(() => {
+        setIsOpen(visible);
+    }, [visible]);
 
     const {
         control,
@@ -32,10 +49,18 @@ const IntegrationModal = () => {
         setValue,
     } = useForm({
         defaultValues: {
-            name: '',
-            description: '',
-            category: undefined,
-            tags: [],
+            name: integrationItem?.name || '',
+            description: integrationItem?.description || '',
+            category:
+                {
+                    label: integrationItem?.category?.name,
+                    ...integrationItem?.category,
+                } || undefined,
+            tags:
+                integrationItem?.tags?.map((tag) => ({
+                    ...tag,
+                    label: tag.name,
+                })) || [],
         },
     });
 
@@ -53,6 +78,10 @@ const IntegrationModal = () => {
 
     const queryClient = useQueryClient();
 
+    const tagNames = integrationItem?.tags?.map((tag) => tag.name);
+
+    const remainingTags = tags?.filter((tag) => !tagNames?.includes(tag.name));
+
     const mutation = useIntegrationMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(
@@ -67,27 +96,58 @@ const IntegrationModal = () => {
         },
     });
 
+    const putMutation = useIntegrationPutMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries(
+                IntegrationKeys.integrationCategories
+            );
+
+            queryClient.invalidateQueries(IntegrationKeys.integrations);
+
+            queryClient.invalidateQueries(IntegrationKeys.integrationTags);
+
+            setIsOpen(false);
+
+            reset();
+        },
+    });
+
     function createIntegration() {
         const formData = getValues();
 
-        mutation.mutate({...formData} as IntegrationModel);
+        const tagValues = formData.tags?.map((tag: TagModel) => {
+            return {id: tag.id, name: tag.name, version: tag.version};
+        });
+
+        if (!id) {
+            putMutation.mutate({
+                ...integrationItem,
+                ...formData,
+                createdDate: integrationItem?.createdDate,
+            } as IntegrationModel);
+        } else {
+            mutation.mutate({...formData, tags: tagValues} as IntegrationModel);
+        }
     }
 
     return (
         <Modal
-            confirmButtonLabel="Create"
-            description="Create your integration which will contain related workflows"
+            confirmButtonLabel={id ? 'Edit' : 'Create'}
+            description={`Use this to ${
+                id ? 'edit' : 'create'
+            } your integration which will contain related workflows`}
             form
             isOpen={isOpen}
-            setIsOpen={setIsOpen}
-            title="Create Integration"
-            triggerLabel="Create Integration"
             onCloseClick={reset}
             onConfirmButtonClick={handleSubmit(createIntegration)}
+            setIsOpen={setIsOpen}
+            title={`${id ? 'Edit' : 'Create'} Integration`}
+            triggerLabel={`${id ? 'Edit' : 'Create'} Integration`}
         >
             {categoriesError &&
                 !categoriesIsLoading &&
                 `An error has occurred: ${categoriesError.message}`}
+
             {tagsError &&
                 !tagsIsLoading &&
                 `An error has occurred: ${tagsError.message}`}
@@ -137,12 +197,15 @@ const IntegrationModal = () => {
                                     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
                                 } as any);
                             }}
+                            value={field.value}
+                            onBlur={field.onBlur}
+                            onChange={field.onChange}
                         />
                     )}
                 />
             )}
 
-            {!tagsIsLoading && (
+            {remainingTags && (
                 <Controller
                     control={control}
                     name="tags"
@@ -151,16 +214,17 @@ const IntegrationModal = () => {
                             field={field}
                             isMulti
                             label="Tags"
-                            name="tags"
-                            options={tags!.map((tag: TagModel) => ({
-                                label: `${tag.name
-                                    .charAt(0)
-                                    .toUpperCase()}${tag.name.slice(1)}`,
-                                value: tag.name
-                                    .toLowerCase()
-                                    .replace(/\W/g, ''),
-                                ...tag,
-                            }))}
+                            options={remainingTags!.map((tag: TagModel) => {
+                                return {
+                                    label: `${tag.name
+                                        .charAt(0)
+                                        .toUpperCase()}${tag.name.slice(1)}`,
+                                    value: tag.name
+                                        .toLowerCase()
+                                        .replace(/\W/g, ''),
+                                    ...tag,
+                                };
+                            })}
                             onCreateOption={(inputValue: string) => {
                                 setValue('tags', [
                                     ...getValues().tags!,
@@ -171,6 +235,10 @@ const IntegrationModal = () => {
                                     },
                                 ] as never[]);
                             }}
+                            name={field.name}
+                            value={field.value}
+                            onBlur={field.onBlur}
+                            onChange={field.onChange}
                         />
                     )}
                 />
@@ -189,7 +257,7 @@ const IntegrationModal = () => {
                 />
 
                 <Button
-                    label="Create"
+                    label={(id && 'Edit') || 'Create'}
                     onClick={handleSubmit(createIntegration)}
                     type="submit"
                 />

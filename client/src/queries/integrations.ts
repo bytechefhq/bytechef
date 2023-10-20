@@ -30,7 +30,7 @@ export const useGetIntegrationTagsQuery = () =>
 
 export const useGetIntegrationQuery = (
     id: number,
-    initialData: IntegrationModel
+    initialData?: IntegrationModel
 ) =>
     useQuery<IntegrationModel, Error>(
         IntegrationKeys.integration(id),

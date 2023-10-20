@@ -1,7 +1,15 @@
 import {useState} from 'react';
 import {Dropdown, DropDownMenuItem} from '../../components/DropDown/Dropdown';
-import {CategoryModel, TagModel} from '../../middleware/integration';
-import {useIntegrationTagsMutation} from '../../mutations/integrations.mutations';
+import {
+    CategoryModel,
+    IntegrationModel,
+    TagModel,
+} from '../../middleware/integration';
+import {
+    useIntegrationDeleteMutation,
+    useIntegrationMutation,
+    useIntegrationTagsMutation,
+} from '../../mutations/integrations.mutations';
 import {IntegrationKeys} from '../../queries/integrations';
 import {useQueryClient} from '@tanstack/react-query';
 import {Content, Root, Trigger} from '@radix-ui/react-hover-card';
@@ -12,47 +20,9 @@ import CreatableSelect, {
 import Button from 'components/Button/Button';
 import {PlusIcon, XMarkIcon} from '@heroicons/react/24/outline';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
+import IntegrationModal from './IntegrationModal';
+import {useGetIntegrationQuery} from 'queries/integrations';
 import {OnChangeValue} from 'react-select';
-
-const menuItems: DropDownMenuItem[] = [
-    {
-        label: 'Edit',
-    },
-    {
-        label: 'Duplicate',
-    },
-    {
-        label: 'New Workflow',
-    },
-    {
-        separator: true,
-    },
-    {
-        label: 'Delete',
-    },
-];
-
-interface CategoryProps {
-    category: CategoryModel;
-}
-
-interface IntegrationItemProps {
-    category?: CategoryModel;
-    description?: string;
-    id?: number;
-    lastDatePublished?: Date;
-    name: string;
-    published: boolean;
-    remainingTags?: TagModel[];
-    tags?: TagModel[];
-    componentVersion?: number;
-    workflowIds?: string[];
-}
-
-interface DateProps {
-    lastPublishDate?: Date;
-    published?: boolean;
-}
 
 interface FooterProps {
     tags?: TagModel[];
@@ -90,27 +60,6 @@ interface TagListProps {
     remainingTags?: TagModel[];
 }
 
-interface WorkflowsProps {
-    workflowIds?: string[];
-}
-
-const Category = ({category}: CategoryProps) => {
-    return (
-        <span className="text-xs uppercase text-gray-700">{category.name}</span>
-    );
-};
-
-const Date = ({published, lastPublishDate}: DateProps) => {
-    return (
-        <span className="mr-4 w-[76px] text-center text-sm text-gray-500">
-            {lastPublishDate &&
-                published &&
-                lastPublishDate.toLocaleDateString()}
-            {!published && '-'}
-        </span>
-    );
-};
-
 const Footer = ({
     tags,
     workflowIds,
@@ -123,7 +72,11 @@ const Footer = ({
             className="flex h-[38px] items-center"
             onClick={(event) => event.preventDefault()}
         >
-            <Workflows workflowIds={workflowIds} />
+            <div className="mr-4 text-xs font-semibold text-gray-700">
+                {workflowIds?.length === 1
+                    ? `${workflowIds?.length} workflow`
+                    : `${workflowIds?.length} workflows`}
+            </div>
 
             {tags && (
                 <TagList
@@ -146,10 +99,28 @@ const Header = ({
         <div className="relative mb-2 flex items-center">
             <Name description={description} name={name} />
 
-            {category && <Category category={category} />}
+            {category && (
+                <span className="text-xs uppercase text-gray-700">
+                    {category.name}
+                </span>
+            )}
         </div>
     );
 };
+
+interface IntegrationItemProps {
+    integrationNames: string[];
+    name: string;
+    published: boolean;
+    category?: CategoryModel;
+    description?: string;
+    id?: number;
+    lastDatePublished?: Date;
+    remainingTags?: TagModel[];
+    tags?: TagModel[];
+    componentVersion?: number;
+    workflowIds?: string[];
+}
 
 const IntegrationItem = ({
     category,
@@ -162,10 +133,108 @@ const IntegrationItem = ({
     componentVersion,
     workflowIds,
     remainingTags,
+    integrationNames,
 }: IntegrationItemProps) => {
+    const [showEditModal, setShowEditModal] = useState<boolean>(false);
+
+    const dropdownItems: DropDownMenuItem[] = [
+        {
+            label: 'Edit',
+            onClick: (id: number, event: React.MouseEvent) => {
+                event.preventDefault();
+
+                setShowEditModal(true);
+            },
+        },
+        {
+            label: 'Duplicate',
+            onClick: (id: number, event: React.MouseEvent) => {
+                event.preventDefault();
+
+                duplicateIntegrationItem();
+            },
+        },
+        {
+            label: 'New Workflow',
+        },
+        {
+            separator: true,
+        },
+        {
+            label: 'Delete',
+            onClick: (id: number, event: React.MouseEvent) => {
+                event.preventDefault();
+
+                if (
+                    confirm('Are you sure you want to delete this integration?')
+                ) {
+                    handleOnConfirmDelete();
+                }
+            },
+        },
+    ];
+
     const queryClient = useQueryClient();
 
-    const mutation = useIntegrationTagsMutation({
+    const {data: currentIntegration} = useGetIntegrationQuery(id!);
+
+    const duplication = useIntegrationMutation({
+        onSuccess: (data) => {
+            queryClient.invalidateQueries(IntegrationKeys.integrations);
+
+            queryClient.invalidateQueries(
+                IntegrationKeys.integrationCategories
+            );
+
+            queryClient.invalidateQueries(IntegrationKeys.integrationTags);
+
+            const integrationsData = queryClient.getQueryData<
+                IntegrationModel[]
+            >(IntegrationKeys.integrations);
+
+            if (integrationsData) {
+                queryClient.setQueryData<IntegrationModel[]>(
+                    IntegrationKeys.integrations,
+                    [...integrationsData, data]
+                );
+            }
+        },
+    });
+
+    const duplicateIntegrationItem = () => {
+        let copyNumber = 1;
+
+        while (
+            integrationNames.includes(
+                `${currentIntegration?.name} (${copyNumber})`
+            )
+        ) {
+            copyNumber++;
+        }
+
+        duplication.mutate({
+            ...currentIntegration,
+            id: undefined,
+            name: `${currentIntegration?.name} (${copyNumber})`,
+            version: undefined,
+        } as IntegrationModel);
+    };
+
+    const deletion = useIntegrationDeleteMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries(IntegrationKeys.integrations);
+        },
+    });
+
+    const handleOnConfirmDelete = () => {
+        if (id) {
+            deletion.mutate({
+                id,
+            });
+        }
+    };
+
+    const tagsMutation = useIntegrationTagsMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(IntegrationKeys.integrations);
             queryClient.invalidateQueries(IntegrationKeys.integrationTags);
@@ -177,7 +246,7 @@ const IntegrationItem = ({
 
         newTags.push(newTag);
 
-        mutation.mutate({
+        tagsMutation.mutate({
             id: id || 0,
             putIntegrationTagsRequestModel: {
                 tags: newTags || [],
@@ -188,7 +257,7 @@ const IntegrationItem = ({
     const handleOnDeleteTag = (deletedTag: TagModel) => {
         const newTags = tags?.filter((tag) => tag.id !== deletedTag.id) || [];
 
-        mutation.mutate({
+        tagsMutation.mutate({
             id: id || 0,
             putIntegrationTagsRequestModel: {
                 tags: newTags || [],
@@ -197,8 +266,8 @@ const IntegrationItem = ({
     };
 
     return (
-        <div className="flex items-center justify-between">
-            <div className="flex flex-1 items-center justify-between">
+        <>
+            <div className="flex items-center justify-between">
                 <div>
                     <Header
                         category={category}
@@ -214,47 +283,54 @@ const IntegrationItem = ({
                         onDeleteTag={handleOnDeleteTag}
                     />
                 </div>
+
                 <div className="flex items-center">
                     <Status published={published} version={componentVersion} />
 
-                    <Date
-                        lastPublishDate={lastDatePublished}
-                        published={published}
-                    />
+                    <span className="mr-4 w-[76px] text-center text-sm text-gray-500">
+                        {lastDatePublished && published
+                            ? lastDatePublished.toLocaleDateString()
+                            : '-'}
+                    </span>
+
+                    <Dropdown id={id} menuItems={dropdownItems} />
                 </div>
             </div>
-            <div>
-                <Dropdown id={id} menuItems={menuItems} />
-            </div>
-        </div>
-    );
-};
 
-const Name = ({name, description}: NameProps) => {
-    return (
-        <Root>
-            <Trigger asChild>
-                <span className="mr-2 text-base font-semibold text-gray-900">
-                    {name}
-                </span>
-            </Trigger>
-
-            {description && (
-                <Content
-                    align="center"
-                    className="max-w-md rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800 md:w-full"
-                    sideOffset={4}
-                >
-                    <div className="flex h-full w-full space-x-4">
-                        <p className="mt-1 text-sm font-normal text-gray-700 dark:text-gray-400">
-                            {description}
-                        </p>
-                    </div>
-                </Content>
+            {showEditModal && (
+                <IntegrationModal
+                    id={id}
+                    integrationItem={currentIntegration}
+                    visible
+                />
             )}
-        </Root>
+        </>
     );
 };
+
+const Name = ({name, description}: NameProps) => (
+    <Root>
+        <Trigger asChild>
+            <span className="mr-2 text-base font-semibold text-gray-900">
+                {name}
+            </span>
+        </Trigger>
+
+        {description && (
+            <Content
+                align="center"
+                className="max-w-md rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800 md:w-full"
+                sideOffset={4}
+            >
+                <div className="flex h-full w-full space-x-4">
+                    <p className="mt-1 text-sm font-normal text-gray-700 dark:text-gray-400">
+                        {description}
+                    </p>
+                </div>
+            </Content>
+        )}
+    </Root>
+);
 
 const Status = ({published, version}: StatusProps) => {
     const label = published ? 'Published' : 'Not Published';
@@ -274,18 +350,16 @@ const Status = ({published, version}: StatusProps) => {
     );
 };
 
-const Tag = ({tag, onDeleteTag}: TagProps) => {
-    return (
-        <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700">
-            {tag.name}
+const Tag = ({tag, onDeleteTag}: TagProps) => (
+    <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700 hover:bg-gray-200">
+        {tag.name}
 
-            <XMarkIcon
-                className="ml-1.5 h-3 w-3 rounded-full hover:bg-gray-300"
-                onClick={() => onDeleteTag(tag)}
-            />
-        </span>
-    );
-};
+        <XMarkIcon
+            className="ml-1.5 h-3 w-3 rounded-full hover:bg-gray-300"
+            onClick={() => onDeleteTag(tag)}
+        />
+    </span>
+);
 
 const TagList = ({
     tags,
@@ -361,21 +435,13 @@ const TagList = ({
                     className="flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-gray-100 hover:bg-gray-200"
                     onClick={(event) => {
                         event.preventDefault();
+
                         setIsNewTagWindowVisible(true);
                     }}
                 >
                     <PlusIcon className="h-3 w-3 rounded-full hover:bg-gray-300" />
                 </div>
             )}
-        </div>
-    );
-};
-
-const Workflows = ({workflowIds}: WorkflowsProps) => {
-    return (
-        <div className="mr-4 text-xs font-semibold text-gray-700">
-            {workflowIds && workflowIds.length}{' '}
-            {workflowIds && workflowIds.length === 1 ? 'workflow' : 'workflows'}
         </div>
     );
 };
