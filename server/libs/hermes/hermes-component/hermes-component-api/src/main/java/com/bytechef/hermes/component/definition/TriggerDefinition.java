@@ -19,7 +19,8 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Property.InputProperty;
+import com.bytechef.hermes.definition.Property.OutputProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
@@ -143,7 +144,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<List<? extends Property<?>>> getOutputSchema();
+    Optional<List<? extends OutputProperty<?>>> getOutputSchema();
 
     /**
      *
@@ -161,7 +162,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<List<? extends Property<?>>> getProperties();
+    Optional<List<? extends InputProperty>> getProperties();
 
     /**
      *
@@ -307,14 +308,13 @@ public interface TriggerDefinition {
      * @param headers
      * @param parameters
      * @param body
-     * @param path
      * @param method
      * @param dynamicWebhookEnableOutput
      */
     @SuppressFBWarnings("EI")
     record DynamicWebhookRequestContext(
         TriggerContext triggerContext, Map<String, ?> inputParameters, WebhookHeaders headers,
-        WebhookParameters parameters, WebhookBody body, String path, WebhookMethod method,
+        WebhookParameters parameters, WebhookBody body, WebhookMethod method,
         DynamicWebhookEnableOutput dynamicWebhookEnableOutput) {
     }
 
@@ -411,13 +411,12 @@ public interface TriggerDefinition {
      * @param headers
      * @param parameters
      * @param body
-     * @param path
      * @param method
      */
     @SuppressFBWarnings("EI")
     record StaticWebhookRequestContext(
         TriggerContext triggerContext, Map<String, ?> inputParameters, WebhookHeaders headers,
-        WebhookParameters parameters, WebhookBody body, String path, WebhookMethod method) {
+        WebhookParameters parameters, WebhookBody body, WebhookMethod method) {
     }
 
     /**
@@ -611,13 +610,12 @@ public interface TriggerDefinition {
      * @param headers
      * @param parameters
      * @param body
-     * @param path
      * @param method
      */
     @SuppressFBWarnings("EI")
     record WebhookValidateContext(
         TriggerContext triggerContext, Map<String, ?> inputParameters, WebhookHeaders headers,
-        WebhookParameters parameters, WebhookBody body, String path, WebhookMethod method) {
+        WebhookParameters parameters, WebhookBody body, WebhookMethod method) {
     }
 
     /**

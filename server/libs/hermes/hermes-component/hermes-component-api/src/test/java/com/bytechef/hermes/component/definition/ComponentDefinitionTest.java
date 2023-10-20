@@ -60,7 +60,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testArrayProperty() throws JSONException, JsonProcessingException {
-        Property<Property.ArrayProperty> property = ComponentDSL.array("name")
+        Property property = ComponentDSL.array("name")
             .defaultValue(1, 2)
             .description("description")
             .label("label")
@@ -77,7 +77,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testBooleanProperty() throws JSONException, JsonProcessingException {
-        Property<Property.BooleanProperty> property = ComponentDSL.bool("name")
+        Property property = ComponentDSL.bool("name")
             .defaultValue(true)
             .description("description")
             .label("label")
@@ -108,7 +108,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testDateProperty() throws JSONException, JsonProcessingException {
-        Property<Property.DateProperty> property = ComponentDSL.date("name")
+        Property property = ComponentDSL.date("name")
             .defaultValue(LocalDate.MIN)
             .description("description")
             .label("label")
@@ -124,7 +124,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testDateTimeProperty() throws JSONException, JsonProcessingException {
-        Property<Property.DateTimeProperty> property = ComponentDSL.dateTime("name")
+        Property property = ComponentDSL.dateTime("name")
             .defaultValue(LocalDateTime.MIN)
             .description("description")
             .label("label")
@@ -140,7 +140,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testIntegerProperty() throws JSONException, JsonProcessingException {
-        Property<Property.IntegerProperty> property = ComponentDSL.integer("name")
+        Property property = ComponentDSL.integer("name")
             .defaultValue(2)
             .description("description")
             .label("label")
@@ -156,7 +156,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testNumberProperty() throws JSONException, JsonProcessingException {
-        Property<Property.NumberProperty> property = ComponentDSL.number("name")
+        Property property = ComponentDSL.number("name")
             .defaultValue(2)
             .description("description")
             .label("label")
@@ -173,7 +173,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testObjectProperty() throws JSONException, JsonProcessingException {
-        Property<Property.ObjectProperty> property = ComponentDSL.object("name")
+        Property property = ComponentDSL.object("name")
             .defaultValue(Map.of("key", Map.of("key1", "value1")))
             .description("description")
             .label("label")
@@ -188,24 +188,8 @@ public class ComponentDefinitionTest {
     }
 
     @Test
-    public void testOneOfProperty() throws JSONException, JsonProcessingException {
-        Property<Property.OneOfProperty> property = ComponentDSL.oneOf("name")
-            .description("description")
-            .label("label")
-            .placeholder("placeholder")
-            .required(true)
-            .types(ComponentDSL.string());
-
-        jsonAssertEquals(
-            """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"ONE_OF","types":[{"advancedOption":null,"description":null,"displayCondition":null,"expressionEnabled":null,"hidden":null,"label":null,"metadata":{},"placeholder":null,"required":null,"name":null,"type":"STRING","defaultValue":null,"exampleValue":null,"controlType":"INPUT_TEXT","options":null,"sampleDataType":null,"optionsDataSource":null}]}
-                """,
-            property);
-    }
-
-    @Test
     public void testStringProperty() throws JSONException, JsonProcessingException {
-        Property<Property.StringProperty> property = ComponentDSL.string("name")
+        Property property = ComponentDSL.string("name")
             .defaultValue("defaultValue")
             .description("description")
             .label("label")
