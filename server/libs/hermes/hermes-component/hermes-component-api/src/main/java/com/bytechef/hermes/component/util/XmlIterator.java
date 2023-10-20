@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.util;
 
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.util.Iterator;
@@ -48,7 +48,7 @@ final class XmlIterator implements Iterator<Map<String, ?>> {
                 throw new IllegalArgumentException("Provided stream is not a valid XML");
             }
         } catch (XMLStreamException xmlStreamException) {
-            throw new ActionExecutionException("Unable to parse xml", xmlStreamException);
+            throw new ComponentExecutionException("Unable to parse xml", xmlStreamException);
         }
     }
 
@@ -71,7 +71,7 @@ final class XmlIterator implements Iterator<Map<String, ?>> {
 
             value = xmlMapper.readValue(xmlStreamReader, new TypeReference<>() {});
         } catch (Exception exception) {
-            throw new ActionExecutionException("Unable to read value", exception);
+            throw new ComponentExecutionException("Unable to read value", exception);
         }
 
         return value != null;

@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.util;
 
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.io.InputStream;
@@ -56,7 +56,7 @@ public final class XmlUtils {
         try {
             return XML_MAPPER.convertValue(XML_MAPPER.readTree(xml), new TypeReference<>() {});
         } catch (Exception exception) {
-            throw new ActionExecutionException("Unable to convert xml value", exception);
+            throw new ComponentExecutionException("Unable to convert xml value", exception);
         }
     }
 
@@ -64,7 +64,7 @@ public final class XmlUtils {
         try {
             return XML_MAPPER.readValue(inputStream, clazz);
         } catch (Exception exception) {
-            throw new ActionExecutionException("Unable to read xml value", exception);
+            throw new ComponentExecutionException("Unable to read xml value", exception);
         }
     }
 
@@ -72,7 +72,7 @@ public final class XmlUtils {
         try {
             return XML_MAPPER.readValue(xml, clazz);
         } catch (Exception exception) {
-            throw new ActionExecutionException("Unable to read xml value", exception);
+            throw new ComponentExecutionException("Unable to read xml value", exception);
         }
     }
 
@@ -80,7 +80,7 @@ public final class XmlUtils {
         try {
             return XML_MAPPER.readValue(inputStream, typeReference);
         } catch (Exception exception) {
-            throw new ActionExecutionException("Unable to read xml", exception);
+            throw new ComponentExecutionException("Unable to read xml", exception);
         }
     }
 
@@ -88,7 +88,7 @@ public final class XmlUtils {
         try {
             return XML_MAPPER.readValue(xml, typeReference);
         } catch (Exception exception) {
-            throw new ActionExecutionException("Unable to read xml", exception);
+            throw new ComponentExecutionException("Unable to read xml", exception);
         }
     }
 
@@ -114,7 +114,7 @@ public final class XmlUtils {
         try {
             return new XmlStreamReaderStream(inputStream, XML_MAPPER);
         } catch (Exception exception) {
-            throw new ActionExecutionException("Unable to stream xml", exception);
+            throw new ComponentExecutionException("Unable to stream xml", exception);
         }
     }
 
@@ -128,7 +128,7 @@ public final class XmlUtils {
                 .withRootName(rootName)
                 .writeValueAsString(object);
         } catch (Exception exception) {
-            throw new ActionExecutionException("Unable to write xml", exception);
+            throw new ComponentExecutionException("Unable to write xml", exception);
         }
     }
 
@@ -136,7 +136,7 @@ public final class XmlUtils {
         try {
             return documentBuilder.parse(inputStream);
         } catch (Exception exception) {
-            throw new ActionExecutionException("Unable to parse xml", exception);
+            throw new ComponentExecutionException("Unable to parse xml", exception);
         }
     }
 
@@ -144,7 +144,7 @@ public final class XmlUtils {
         try {
             return documentBuilder.parse(new InputSource(new StringReader(xml)));
         } catch (Exception exception) {
-            throw new ActionExecutionException("Unable to parse xml", exception);
+            throw new ComponentExecutionException("Unable to parse xml", exception);
         }
     }
 
@@ -167,7 +167,7 @@ public final class XmlUtils {
 
             sb.append("</root>");
         } catch (Exception exception) {
-            throw new ActionExecutionException("Unable to parse xml", exception);
+            throw new ComponentExecutionException("Unable to parse xml", exception);
         }
 
         return sb.toString();
@@ -183,7 +183,7 @@ public final class XmlUtils {
 
             return stringWriter.toString();
         } catch (Exception exception) {
-            throw new ActionExecutionException("Unable to transform xml node", exception);
+            throw new ComponentExecutionException("Unable to transform xml node", exception);
         }
     }
 }

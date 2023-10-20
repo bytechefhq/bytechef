@@ -17,14 +17,6 @@
 
 package com.bytechef.hermes.component.definition;
 
-import static com.bytechef.hermes.component.constant.ComponentConstants.ADD_TO;
-import static com.bytechef.hermes.component.constant.ComponentConstants.HEADER_PREFIX;
-import static com.bytechef.hermes.component.constant.ComponentConstants.KEY;
-import static com.bytechef.hermes.component.constant.ComponentConstants.PASSWORD;
-import static com.bytechef.hermes.component.constant.ComponentConstants.TOKEN;
-import static com.bytechef.hermes.component.constant.ComponentConstants.USERNAME;
-import static com.bytechef.hermes.component.constant.ComponentConstants.VALUE;
-
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
@@ -47,10 +39,23 @@ import java.util.function.Function;
 @JsonDeserialize(as = ComponentDSL.ModifiableAuthorization.class)
 public sealed interface Authorization permits ComponentDSL.ModifiableAuthorization {
 
+    String ADD_TO = "addTo";
     String API_TOKEN = "api_token";
     String ACCESS_TOKEN = "access_token";
+    String AUTHORIZATION_URL = "authorizationUrl";
+    String CLIENT_ID = "clientId";
+    String CLIENT_SECRET = "clientSecret";
+    String CODE = "code";
+    String HEADER_PREFIX = "headerPrefix";
+    String KEY = "key";
+    String PASSWORD = "password";
     String REFRESH_TOKEN = "refresh_token";
-    Base64.Encoder ENCODER = Base64.getEncoder();
+    String REFRESH_URL = "refreshUrl";
+    String SCOPES = "scopes";
+    String TOKEN = "token";
+    String TOKEN_URL = "tokenUrl";
+    String USERNAME = "username";
+    String VALUE = "value";
 
     enum AuthorizationType {
         API_KEY((AuthorizationContext authorizationContext, Context.Connection connection) -> {
@@ -90,6 +95,8 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
         OAUTH2_RESOURCE_OWNER_PASSWORD(
             (AuthorizationContext authorizationContext, Context.Connection connection) -> authorizationContext
                 .setHeaders(getOAuth2Headers(connection)));
+
+        private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
         private final BiConsumer<AuthorizationContext, Context.Connection> defaultApplyConsumer;
 
@@ -132,7 +139,7 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
     BiConsumer<AuthorizationContext, Context.Connection> getApplyConsumer();
 
-    FourFunction<Context.Connection, String, String, String, AuthorizationCallbackResponse> getAuthorizationCallbackFunction();
+    QuadFunction<Context.Connection, String, String, String, AuthorizationCallbackResponse> getAuthorizationCallbackFunction();
 
     Function<Context.Connection, String> getAuthorizationUrlFunction();
 
@@ -189,7 +196,7 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
     }
 
     @FunctionalInterface
-    interface FourFunction<T, U, V, Z, R> {
+    interface QuadFunction<T, U, V, Z, R> {
 
         R apply(T t, U u, V v, Z z);
     }

@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.util;
 
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -48,7 +48,7 @@ final class JsonIterator implements Iterator<Map<String, ?>> {
                 throw new IllegalArgumentException("Provided stream is not a JSON array");
             }
         } catch (IOException ioException) {
-            throw new ActionExecutionException("Unable to read json stream", ioException);
+            throw new ComponentExecutionException("Unable to read json stream", ioException);
         }
     }
 
@@ -65,7 +65,7 @@ final class JsonIterator implements Iterator<Map<String, ?>> {
 
             return false;
         } catch (Exception exception) {
-            throw new ActionExecutionException("Unable to read json stream", exception);
+            throw new ComponentExecutionException("Unable to read json stream", exception);
         }
     }
 
