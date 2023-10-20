@@ -1,6 +1,5 @@
 subprojects {
     dependencies {
-        compileOnly "com.google.guava:guava"
         compileOnly "commons-io:commons-io"
         compileOnly "com.fasterxml.jackson.core:jackson-databind"
         compileOnly "org.apache.commons:commons-lang3"
@@ -11,7 +10,6 @@ subprojects {
         compileOnly project(":modules:libs:atlas:file-storage:file-storage-api")
         compileOnly project(":modules:libs:atlas:task-specification")
 
-        testImplementation "com.google.guava:guava"
         testImplementation "commons-io:commons-io"
         testImplementation "org.apache.commons:commons-lang3"
         testImplementation "org.postgresql:postgresql"

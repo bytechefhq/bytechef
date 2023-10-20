@@ -18,11 +18,12 @@
 
 package com.integri.atlas.workflow.repository.git;
 
-import com.google.common.base.Throwables;
-import com.google.common.io.Files;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowFormat;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowResource;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -108,7 +109,7 @@ public class JGitTemplate implements GitOperations {
             }
             return resources;
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -125,7 +126,7 @@ public class JGitTemplate implements GitOperations {
             Git git = cmd.call();
             return (git.getRepository());
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -142,7 +143,7 @@ public class JGitTemplate implements GitOperations {
                 return readBlob(repository, aFileId, LATEST);
             }
         } catch (Exception e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -169,6 +170,14 @@ public class JGitTemplate implements GitOperations {
         if (repositoryDir != null) {
             FileUtils.deleteQuietly(repositoryDir);
         }
-        repositoryDir = Files.createTempDir();
+
+        Path path = null;
+        try {
+            path = Files.createTempDirectory("jgit_");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        repositoryDir = path.toFile();
     }
 }

@@ -5,7 +5,6 @@ subprojects {
         compileOnly project(":modules:libs:atlas:engine:engine-coordinator-api")
         compileOnly project(":modules:libs:atlas:task-specification")
 
-        testImplementation "com.google.guava:guava"
         testImplementation project(":modules:libs:atlas:engine:engine-core-impl")
         testImplementation project(":modules:libs:atlas:task-specification")
     }

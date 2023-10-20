@@ -2,7 +2,6 @@ dependencies {
     api project(":modules:libs:atlas:engine:engine-core-api")
 
     implementation "commons-io:commons-io"
-    implementation "com.google.guava:guava"
     implementation "org.apache.commons:commons-lang3"
     implementation "org.springframework.boot:spring-boot-autoconfigure"
 }

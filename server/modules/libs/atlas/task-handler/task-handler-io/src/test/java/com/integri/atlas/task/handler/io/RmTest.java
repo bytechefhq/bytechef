@@ -16,10 +16,11 @@
 
 package com.integri.atlas.task.handler.io;
 
-import com.google.common.io.Files;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,10 +30,16 @@ public class RmTest {
     public void test1() throws IOException {
         Rm rm = new Rm();
         SimpleTaskExecution task = new SimpleTaskExecution();
-        File tempDir = Files.createTempDir();
+        File tempDir = getTempDir();
         Assertions.assertTrue(tempDir.exists());
         task.set("path", tempDir);
         rm.handle(task);
         Assertions.assertFalse(tempDir.exists());
+    }
+
+    private File getTempDir() throws IOException {
+        Path path = Files.createTempDirectory("rm_");
+
+        return path.toFile();
     }
 }
