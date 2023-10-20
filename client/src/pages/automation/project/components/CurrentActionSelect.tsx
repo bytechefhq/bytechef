@@ -1,6 +1,11 @@
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import Select from 'components/Select/Select';
-import Tooltip from 'components/Tooltip/Tooltip';
 import {ActionDefinitionBasicModel} from 'middleware/core/workflow/configuration';
 
 const CurrentActionSelect = ({
@@ -23,9 +28,15 @@ const CurrentActionSelect = ({
                     </span>
 
                     {description && (
-                        <Tooltip text={description}>
-                            <QuestionMarkCircledIcon />
-                        </Tooltip>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <QuestionMarkCircledIcon />
+                                </TooltipTrigger>
+
+                                <TooltipContent>{description}</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     )}
                 </div>
 

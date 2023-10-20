@@ -1,5 +1,10 @@
 import Avatar from '@/components/Avatar/Avatar';
-import Tooltip from '@/components/Tooltip/Tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import {Link} from 'react-router-dom';
 
 import reactLogo from '../assets/logo.svg';
@@ -40,12 +45,20 @@ export function DesktopSidebar({
                                     to={item.href}
                                     className="flex items-center rounded-lg p-4 hover:text-blue-600"
                                 >
-                                    <Tooltip side="right" text={item.name}>
-                                        <item.icon
-                                            className="h-7 w-7"
-                                            aria-hidden="true"
-                                        />
-                                    </Tooltip>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <item.icon
+                                                    className="h-7 w-7"
+                                                    aria-hidden="true"
+                                                />
+                                            </TooltipTrigger>
+
+                                            <TooltipContent side="right">
+                                                {item.name}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
 
                                     <span className="sr-only">{item.name}</span>
                                 </Link>
