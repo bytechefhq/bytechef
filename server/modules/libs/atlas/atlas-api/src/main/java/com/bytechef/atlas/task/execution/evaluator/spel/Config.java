@@ -32,7 +32,7 @@ import org.springframework.expression.spel.SpelMessage;
  */
 class Config implements MethodExecutor {
 
-    private final Environment environment;
+    private final transient Environment environment;
 
     public Config(Environment aEnvironment) {
         environment = aEnvironment;

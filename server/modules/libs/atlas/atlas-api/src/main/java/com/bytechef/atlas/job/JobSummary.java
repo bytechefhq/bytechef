@@ -31,7 +31,7 @@ import java.util.Objects;
  */
 public class JobSummary {
 
-    private final Job job;
+    private final transient Job job;
 
     public JobSummary(Job aJob) {
         job = Objects.requireNonNull(aJob);

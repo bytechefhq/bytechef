@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class ResultPage<T> extends MapObject implements Page<T> {
 
-    private final Class<T> elementType;
+    private final transient Class<T> elementType;
 
     public ResultPage(Class<T> aElementType) {
         super(Collections.EMPTY_MAP);

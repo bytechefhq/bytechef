@@ -49,43 +49,43 @@ public class ComponentCommand implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ComponentCommand.class);
 
     @Spec
-    private CommandSpec commandSpec;
+    private transient CommandSpec commandSpec;
 
     @Option(
             names = {"--base-package-name"},
             paramLabel = "base package name",
             description = "package for generated classes",
             defaultValue = "com.bytechef.task.handler")
-    private String basePackageName;
+    private transient String basePackageName;
 
     @Option(
             names = {"--component-version"},
             paramLabel = "component version",
             description = "component version",
             defaultValue = "1.0")
-    private float componentVersion;
+    private transient float componentVersion;
 
     @Option(
             names = {"--open-api-path"},
             description = "path to the OpenAPI specification")
-    private String openAPIPath;
+    private transient String openAPIPath;
 
     @Option(
             names = {"-o", "--output"},
             paramLabel = "output directory",
             description = "where to write the generated files (current dir by default)",
             defaultValue = ".")
-    private String output;
+    private transient String output;
 
     @Option(
             names = {"--standard-component"},
             paramLabel = "standard component",
             description = "if a component is the standard one(ships with the platform) or the custom one",
             defaultValue = "true")
-    private boolean standardComponent;
+    private transient boolean standardComponent;
 
     @Parameters(paramLabel = "COMPONENT", description = "component name")
-    private String componentName;
+    private transient String componentName;
 
     @Override
     public Integer call() throws Exception {
@@ -130,7 +130,7 @@ public class ComponentCommand implements Callable<Integer> {
                         "task_description_handler.mustache", "src/main/java", "TaskDescriptorHandler.java"),
                 new TemplateDefinition("task_handler.mustache", "src/main/java", "TaskHandler.java"));
 
-        private Generator generator;
+        private transient Generator generator;
 
         private OpenAPIComponentGenerator() {
             if (!openAPIPath.matches("^http(s)?://.*") && !new File(openAPIPath).exists()) {

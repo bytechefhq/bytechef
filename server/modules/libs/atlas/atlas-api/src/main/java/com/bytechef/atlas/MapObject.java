@@ -89,7 +89,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
     public <T> List<T> getList(Object aKey, Class<T> aElementType) {
         List<?> list = get(aKey, List.class);
         if (list == null) {
-            return null;
+            return Collections.emptyList();
         }
         List<T> typedList = new ArrayList<>();
         for (Object item : list) {
@@ -270,7 +270,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
 
     @Override
     public Map<String, Object> asMap() {
-        return Collections.unmodifiableMap(new HashMap<>(map));
+        return Map.copyOf(map);
     }
 
     @Override
@@ -280,11 +280,8 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
             return (T[]) value;
         }
         List<T> list = getList(aKey, aElementType);
-        T[] toR = (T[]) Array.newInstance(aElementType, list.size());
-        for (int i = 0; i < list.size(); i++) {
-            toR[i] = list.get(i);
-        }
-        return toR;
+
+        return list.toArray((T[]) Array.newInstance(aElementType, 0));
     }
 
     @Override
@@ -305,8 +302,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
         if (counter == null) {
             counter = 0L;
         }
-        counter++;
-        set(aKey, counter);
+        set(aKey, ++counter);
         return counter;
     }
 
@@ -318,6 +314,11 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
     @Override
     public boolean equals(Object aObj) {
         return map.equals(aObj);
+    }
+
+    @Override
+    public int hashCode() {
+        return map.hashCode();
     }
 
     public static MapObject empty() {
