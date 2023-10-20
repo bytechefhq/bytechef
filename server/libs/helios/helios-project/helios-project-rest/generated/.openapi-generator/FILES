@@ -6,7 +6,12 @@ src/main/java/com/bytechef/helios/project/web/rest/ProjectInstancesApi.java
 src/main/java/com/bytechef/helios/project/web/rest/ProjectTagsApi.java
 src/main/java/com/bytechef/helios/project/web/rest/ProjectsApi.java
 src/main/java/com/bytechef/helios/project/web/rest/model/CreateProjectWorkflowRequestModel.java
+src/main/java/com/bytechef/helios/project/web/rest/model/JobBasicModel.java
+src/main/java/com/bytechef/helios/project/web/rest/model/ProjectBasicModel.java
+src/main/java/com/bytechef/helios/project/web/rest/model/ProjectExecutionBasicModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectExecutionModel.java
+src/main/java/com/bytechef/helios/project/web/rest/model/ProjectInstanceBasicModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectInstanceModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/ProjectModel.java
 src/main/java/com/bytechef/helios/project/web/rest/model/UpdateTagsRequestModel.java
+src/main/java/com/bytechef/helios/project/web/rest/model/WorkflowBasicModel.java
