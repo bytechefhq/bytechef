@@ -22,14 +22,6 @@ import {
     CategoryModelToJSON,
 } from '../models';
 
-export interface CreateCategoryRequest {
-    categoryModel: CategoryModel;
-}
-
-export interface DeleteCategoryRequest {
-    id: number;
-}
-
 export interface GetCategoryRequest {
     id: number;
 }
@@ -43,100 +35,6 @@ export interface UpdateCategoryRequest {
  * 
  */
 export class CategoriesApi extends runtime.BaseAPI {
-
-    /**
-     * Create a new category.
-     * Create a new category.
-     */
-    async createCategoryRaw(requestParameters: CreateCategoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CategoryModel>> {
-        if (requestParameters.categoryModel === null || requestParameters.categoryModel === undefined) {
-            throw new runtime.RequiredError('categoryModel','Required parameter requestParameters.categoryModel was null or undefined when calling createCategory.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/categories`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: CategoryModelToJSON(requestParameters.categoryModel),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => CategoryModelFromJSON(jsonValue));
-    }
-
-    /**
-     * Create a new category.
-     * Create a new category.
-     */
-    async createCategory(requestParameters: CreateCategoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CategoryModel> {
-        const response = await this.createCategoryRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Delete a category.
-     * Delete a category.
-     */
-    async deleteCategoryRaw(requestParameters: DeleteCategoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deleteCategory.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/categories/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
-            method: 'DELETE',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     * Delete a category.
-     * Delete a category.
-     */
-    async deleteCategory(requestParameters: DeleteCategoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.deleteCategoryRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     * Get all categories.
-     * Get all categories.
-     */
-    async getCategoriesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<CategoryModel>>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/categories`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(CategoryModelFromJSON));
-    }
-
-    /**
-     * Get all categories.
-     * Get all categories.
-     */
-    async getCategories(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<CategoryModel>> {
-        const response = await this.getCategoriesRaw(initOverrides);
-        return await response.value();
-    }
 
     /**
      * Get a category by id.

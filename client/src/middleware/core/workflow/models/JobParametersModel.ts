@@ -13,6 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { JobWorkflowConnectionModel } from './JobWorkflowConnectionModel';
+import {
+    JobWorkflowConnectionModelFromJSON,
+    JobWorkflowConnectionModelFromJSONTyped,
+    JobWorkflowConnectionModelToJSON,
+} from './JobWorkflowConnectionModel';
 import type { WebhookModel } from './WebhookModel';
 import {
     WebhookModelFromJSON,
@@ -26,6 +32,12 @@ import {
  * @interface JobParametersModel
  */
 export interface JobParametersModel {
+    /**
+     * 
+     * @type {Array<JobWorkflowConnectionModel>}
+     * @memberof JobParametersModel
+     */
+    connections?: Array<JobWorkflowConnectionModel>;
     /**
      * The inputs expected by the workflow
      * @type {{ [key: string]: object; }}
@@ -84,6 +96,7 @@ export function JobParametersModelFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
+        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(JobWorkflowConnectionModelFromJSON)),
         'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
         'label': !exists(json, 'label') ? undefined : json['label'],
         'parentTaskExecutionId': !exists(json, 'parentTaskExecutionId') ? undefined : json['parentTaskExecutionId'],
@@ -102,6 +115,7 @@ export function JobParametersModelToJSON(value?: JobParametersModel | null): any
     }
     return {
         
+        'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(JobWorkflowConnectionModelToJSON)),
         'inputs': value.inputs,
         'label': value.label,
         'parentTaskExecutionId': value.parentTaskExecutionId,

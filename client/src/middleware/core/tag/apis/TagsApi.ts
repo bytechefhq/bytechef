@@ -22,14 +22,6 @@ import {
     TagModelToJSON,
 } from '../models';
 
-export interface CreateTagRequest {
-    tagModel: TagModel;
-}
-
-export interface DeleteTagRequest {
-    id: number;
-}
-
 export interface GetTagRequest {
     id: number;
 }
@@ -43,72 +35,6 @@ export interface UpdateTagRequest {
  * 
  */
 export class TagsApi extends runtime.BaseAPI {
-
-    /**
-     * Create a new tag.
-     * Create a new tag.
-     */
-    async createTagRaw(requestParameters: CreateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TagModel>> {
-        if (requestParameters.tagModel === null || requestParameters.tagModel === undefined) {
-            throw new runtime.RequiredError('tagModel','Required parameter requestParameters.tagModel was null or undefined when calling createTag.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/tags`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: TagModelToJSON(requestParameters.tagModel),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => TagModelFromJSON(jsonValue));
-    }
-
-    /**
-     * Create a new tag.
-     * Create a new tag.
-     */
-    async createTag(requestParameters: CreateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TagModel> {
-        const response = await this.createTagRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Delete a tag.
-     * Delete a tag.
-     */
-    async deleteTagRaw(requestParameters: DeleteTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling deleteTag.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/tags/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
-            method: 'DELETE',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     * Delete a tag.
-     * Delete a tag.
-     */
-    async deleteTag(requestParameters: DeleteTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.deleteTagRaw(requestParameters, initOverrides);
-    }
 
     /**
      * Get a tag by id.
@@ -139,34 +65,6 @@ export class TagsApi extends runtime.BaseAPI {
      */
     async getTag(requestParameters: GetTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TagModel> {
         const response = await this.getTagRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get all tags.
-     * Get all tags.
-     */
-    async getTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagModel>>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/tags`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagModelFromJSON));
-    }
-
-    /**
-     * Get all tags.
-     * Get all tags.
-     */
-    async getTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagModel>> {
-        const response = await this.getTagsRaw(initOverrides);
         return await response.value();
     }
 

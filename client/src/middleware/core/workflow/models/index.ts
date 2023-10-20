@@ -6,6 +6,7 @@ export * from './ExecutionErrorModel';
 export * from './InputModel';
 export * from './JobModel';
 export * from './JobParametersModel';
+export * from './JobWorkflowConnectionModel';
 export * from './OutputModel';
 export * from './PageModel';
 export * from './TaskExecutionModel';
