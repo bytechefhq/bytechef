@@ -17,8 +17,9 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
-import com.bytechef.commons.rsocket.util.RSocketUtils;
+import com.bytechef.commons.reactor.util.MonoUtils;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
+import com.bytechef.hermes.definition.registry.rsocket.AbstractRSocketClient;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
@@ -27,40 +28,28 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 /**
  * @author Ivica Cardic
  */
-public class TriggerDefinitionServiceRSocketClient implements TriggerDefinitionService {
-
-    private static final String WORKER_SERVICE_APP = "worker-service-app";
-
-    private final DiscoveryClient discoveryClient;
-    private final RSocketRequester.Builder rSocketRequesterBuilder;
+public class TriggerDefinitionServiceRSocketClient extends AbstractRSocketClient
+    implements TriggerDefinitionService {
 
     public TriggerDefinitionServiceRSocketClient(
         DiscoveryClient discoveryClient, RSocketRequester.Builder rSocketRequesterBuilder) {
 
-        this.discoveryClient = discoveryClient;
-        this.rSocketRequesterBuilder = rSocketRequesterBuilder;
+        super(discoveryClient, rSocketRequesterBuilder);
     }
 
     @Override
     public TriggerDefinitionDTO getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
-        try {
-            return getRSocketRequester(componentName)
-                .route("TriggerDefinitionService.getTriggerDefinition")
-                .data(
-                    Map.of(
-                        "componentName", componentName, "componentVersion", componentVersion,
-                        "triggerName", triggerName))
-                .retrieveMono(TriggerDefinitionDTO.class)
-                .toFuture()
-                .get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        return MonoUtils.get(getRSocketRequester(componentName)
+            .route("TriggerDefinitionService.getTriggerDefinition")
+            .data(
+                Map.of(
+                    "componentName", componentName, "componentVersion", componentVersion,
+                    "triggerName", triggerName))
+            .retrieveMono(TriggerDefinitionDTO.class));
     }
 
     @Override
@@ -85,10 +74,5 @@ public class TriggerDefinitionServiceRSocketClient implements TriggerDefinitionS
             .data(
                 Map.of("componentName", componentName, "componentVersion", componentVersion))
             .retrieveMono(new ParameterizedTypeReference<>() {});
-    }
-
-    private RSocketRequester getRSocketRequester(String componentName) {
-        return RSocketUtils.getRSocketRequester(
-            discoveryClient.getInstances(WORKER_SERVICE_APP), componentName, rSocketRequesterBuilder);
     }
 }
