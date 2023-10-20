@@ -14,6 +14,12 @@ paths:
       - "component-definitions"
       operationId: "getComponentDefinitions"
       parameters:
+      - name: "actionDefinitions"
+        description: "Use for filtering components which define action definitions."
+        in: "query"
+        required: false
+        schema:
+          type: "boolean"
       - name: "connectionDefinitions"
         description: "Use for filtering components which define connection definitions."
         in: "query"
@@ -27,6 +33,12 @@ paths:
         required: false
         schema:
           type: "boolean"
+      - name: "triggerDefinitions"
+        description: "Use for filtering components which define trigger definitions."
+        in: "query"
+        required: false
+        schema:
+          type: "boolean"
       responses:
         "200":
           description: "Successful operation."
@@ -36,12 +48,12 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ComponentDefinitionBasic"
-  /component-definitions/{componentName}/{componentVersion}/actions:
+  /component-definitions/{componentName}/{componentVersion}/action-definitions:
     get:
-      description: "Get a list of actions for a component definition."
-      summary: "Get a list of actions for a component definition."
+      description: "Get a list of action definitions for a component."
+      summary: "Get a list of action definitions for a component."
       tags:
-      - "component-definitions"
+      - "action-definitions"
       operationId: "getComponentActionDefinitions"
       parameters:
       - name: "componentName"
@@ -65,12 +77,12 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ActionDefinitionBasic"
-  /component-definitions/{componentName}/{componentVersion}/actions/{actionName}:
+  /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}:
     get:
-      description: "Get an action of a component definition."
-      summary: "Get an action of a component definition."
+      description: "Get an action definition of a component."
+      summary: "Get an action definition of a component."
       tags:
-      - "component-definitions"
+      - "action-definitions"
       operationId: "getComponentActionDefinition"
       parameters:
       - name: "componentName"
@@ -103,7 +115,7 @@ paths:
       description: "Get connection definition for a component."
       summary: "Get connection definition for a component."
       tags:
-      - "component-definitions"
+      - "connection-definitions"
       operationId: "getComponentConnectionDefinition"
       parameters:
       - name: "componentName"
@@ -130,7 +142,7 @@ paths:
       description: "Get all compatible connection definitions for a component."
       summary: "Get all compatible connection definitions for a component."
       tags:
-      - "component-definitions"
+      - "connection-definitions"
       operationId: "getComponentConnectionDefinitions"
       parameters:
       - name: "componentName"
@@ -156,8 +168,36 @@ paths:
                   $ref: "#/components/schemas/ConnectionDefinitionBasic"
   /component-definitions/{componentName}:
     get:
-      description: "Get all component definition versions of a component definition."
-      summary: "Get all component definition versions of a component definition."
+      description: "Get a component definition."
+      summary: "Get a component definition."
+      tags:
+      - "component-definitions"
+      operationId: "getComponentDefinition"
+      parameters:
+      - name: "componentName"
+        description: "The name of a component to get."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component to get. If not set, teh latest version\
+          \ is returned."
+        required: false
+        in: "query"
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComponentDefinition"
+  /component-definitions/{componentName}/versions:
+    get:
+      description: "Get all component definition versions of a component."
+      summary: "Get all component definition versions of a component."
       tags:
       - "component-definitions"
       operationId: "getComponentDefinitionVersions"
@@ -177,22 +217,22 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ComponentDefinitionBasic"
-  /component-definitions/{componentName}/{componentVersion}:
+  /component-definitions/{componentName}/{componentVersion}/trigger-definitions:
     get:
-      description: "Get a component definition."
-      summary: "Get a component definition."
+      description: "Get a list of trigger definitionss for a component."
+      summary: "Get a list of trigger definitionss for a component."
       tags:
-      - "component-definitions"
-      operationId: "getComponentDefinition"
+      - "trigger-definitions"
+      operationId: "getComponentTriggerDefinitions"
       parameters:
       - name: "componentName"
-        description: "The name of a component to get."
+        description: "The name of the component."
         required: true
         in: "path"
         schema:
           type: "string"
       - name: "componentVersion"
-        description: "The version of a component to get."
+        description: "The version of the component to get."
         required: true
         in: "path"
         schema:
@@ -203,23 +243,42 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ComponentDefinitionWithBasicActions"
-  /connection-definitions:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/TriggerDefinitionBasic"
+  /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}:
     get:
-      description: "Get all connection definitions."
-      summary: "Get all connection definitions."
+      description: "Get a trigger definition of a component."
+      summary: "Get a trigger definition of a component."
       tags:
-      - "connection-definitions"
-      operationId: "getConnectionDefinitions"
+      - "trigger-definitions"
+      operationId: "getComponentTriggerDefinition"
+      parameters:
+      - name: "componentName"
+        description: "The name of the component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of the component to get."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      - name: "triggerName"
+        description: "The name of the action to get."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
       responses:
         "200":
           description: "Successful operation."
           content:
             application/json:
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/ConnectionDefinitionBasic"
+                $ref: "#/components/schemas/TriggerDefinition"
   /task-dispatcher-definitions:
     get:
       description: "Get all task dispatcher definitions."
@@ -236,11 +295,10 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/TaskDispatcherDefinition"
-  /task-dispatcher-definitions/{taskDispatcherName}:
+  /task-dispatcher-definitions/{taskDispatcherName}/versions:
     get:
-      description: "Get all task dispatcher definition versions of a task dispatcher\
-        \ definition."
-      summary: "Get all task dispatcher definition versions of a component definition."
+      description: "Get all task dispatcher definition versions of a task dispatcher."
+      summary: "Get all task dispatcher definition versions of a task dispatcher."
       tags:
       - "task-dispatcher-definitions"
       operationId: "getTaskDispatcherDefinitionVersions"
@@ -259,7 +317,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/TaskDispatcherDefinition"
+                  $ref: "#/components/schemas/TaskDispatcherDefinitionBasic"
   /task-dispatcher-definitions/{taskDispatcherName}/{taskDispatcherVersion}:
     get:
       description: "Get a task dispatcher definition."
@@ -297,12 +355,9 @@ components:
         \ the task inside the workflow."
       type: "object"
       required:
-      - "component"
       - "display"
       - "name"
       properties:
-        component:
-          $ref: "#/components/schemas/ComponentDefinitionBasic"
         display:
           $ref: "#/components/schemas/Display"
         exampleOutput:
@@ -331,12 +386,9 @@ components:
         \ the task inside the workflow."
       type: "object"
       required:
-      - "component"
       - "display"
       - "name"
       properties:
-        component:
-          $ref: "#/components/schemas/ComponentDefinitionBasic"
         name:
           description: "The action name."
           type: "string"
@@ -406,14 +458,18 @@ components:
         \ specific tasks, triggers and connections if there is a need for a connection\
         \ to an outside service."
       type: "object"
+      required:
+      - "display"
+      - "name"
+      - "version"
       properties:
         actions:
           description: "The list of all available actions the component can perform."
           type: "array"
           items:
-            $ref: "#/components/schemas/ActionDefinition"
+            $ref: "#/components/schemas/ActionDefinitionBasic"
         connection:
-          $ref: "#/components/schemas/ConnectionDefinition"
+          $ref: "#/components/schemas/ConnectionDefinitionBasic"
         display:
           $ref: "#/components/schemas/Display"
         name:
@@ -421,6 +477,11 @@ components:
           type: "string"
         resources:
           $ref: "#/components/schemas/Resources"
+        triggers:
+          description: "The list of all available triggers the component can perform."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TriggerDefinitionBasic"
         version:
           description: "The version of a component."
           type: "integer"
@@ -432,6 +493,7 @@ components:
       required:
       - "display"
       - "name"
+      - "v"
       properties:
         display:
           $ref: "#/components/schemas/Display"
@@ -440,39 +502,12 @@ components:
           type: "string"
         resources:
           $ref: "#/components/schemas/Resources"
-    ComponentDefinitionWithBasicActions:
-      description: "A component contains a set of reusable code(actions) that accomplish\
-        \ specific tasks, triggers(TODO) and connections if there is a need for a\
-        \ connection to an outside service."
-      type: "object"
-      required:
-      - "actions"
-      - "display"
-      - "name"
-      - "version"
-      properties:
-        actions:
-          description: "The list of all available actions the component can perform."
-          type: "array"
-          items:
-            $ref: "#/components/schemas/ActionDefinitionBasic"
-        connection:
-          $ref: "#/components/schemas/ConnectionDefinition"
-        display:
-          $ref: "#/components/schemas/Display"
-        name:
-          description: "The component name."
-          type: "string"
-        resources:
-          $ref: "#/components/schemas/Resources"
-        version:
-          description: "The version of a component."
-          type: "integer"
     ConnectionDefinition:
       description: "Definition of a connection to an outside service."
       type: "object"
       required:
-      - "component"
+      - "display"
+      - "name"
       - "version"
       properties:
         authorizationRequired:
@@ -486,8 +521,11 @@ components:
         baseUri:
           description: "Defines the base URI for all future HTTP requests."
           type: "string"
-        component:
-          $ref: "#/components/schemas/ComponentDefinitionBasic"
+        display:
+          $ref: "#/components/schemas/Display"
+        name:
+          description: "The connection name."
+          type: "string"
         properties:
           description: "The properties of the connection."
           type: "array"
@@ -502,15 +540,19 @@ components:
       description: "Definition of a connection to an outside service."
       type: "object"
       required:
-      - "component"
+      - "display"
+      - "name"
       - "version"
       properties:
-        component:
-          $ref: "#/components/schemas/ComponentDefinitionBasic"
+        display:
+          $ref: "#/components/schemas/Display"
+        name:
+          description: "The connection name."
+          type: "string"
         resources:
           $ref: "#/components/schemas/Resources"
         version:
-          description: "The version of a component."
+          description: "The version of a connection."
           type: "integer"
     ControlType:
       description: "A type of the control to show in UI."
@@ -815,6 +857,10 @@ components:
       description: "A task dispatcher defines a strategy for dispatching tasks to\
         \ be executed."
       type: "object"
+      required:
+      - "display"
+      - "name"
+      - "version"
       properties:
         display:
           $ref: "#/components/schemas/Display"
@@ -841,6 +887,76 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
+    TaskDispatcherDefinitionBasic:
+      description: "A task dispatcher defines a strategy for dispatching tasks to\
+        \ be executed."
+      type: "object"
+      required:
+      - "display"
+      - "name"
+      properties:
+        display:
+          $ref: "#/components/schemas/Display"
+        name:
+          description: "The task dispatcher name.."
+          type: "string"
+        resources:
+          $ref: "#/components/schemas/Resources"
+    TriggerDefinition:
+      description: "A trigger definition defines ways to trigger workflows from the\
+        \ outside services."
+      type: "object"
+      required:
+      - "display"
+      - "name"
+      - "type"
+      properties:
+        display:
+          $ref: "#/components/schemas/Display"
+        exampleOutput:
+          description: "The example value of the action's output."
+          type: "object"
+        name:
+          description: "The action name."
+          type: "string"
+        outputSchema:
+          description: "The output schema of an execution result."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
+        properties:
+          description: "The list of action properties."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
+        resources:
+          $ref: "#/components/schemas/Resources"
+        type:
+          $ref: "#/components/schemas/TriggerType"
+    TriggerDefinitionBasic:
+      description: "A trigger definition defines ways to trigger workflows from the\
+        \ outside services."
+      type: "object"
+      required:
+      - "display"
+      - "name"
+      - "type"
+      properties:
+        display:
+          $ref: "#/components/schemas/Display"
+        name:
+          description: "The action name."
+          type: "string"
+        type:
+          $ref: "#/components/schemas/TriggerType"
+    TriggerType:
+      type: "string"
+      enum:
+      - "DYNAMIC_WEBHOOK"
+      - "HYBRID"
+      - "MANUAL"
+      - "POLLING"
+      - "STATIC_WEBHOOK"
     ValueProperty:
       description: "A base property for all value based properties."
       type: "object"
