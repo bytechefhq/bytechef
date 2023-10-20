@@ -26,58 +26,67 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "atlas")
 public class AtlasProperties {
 
-    private SerializationProperties serialization;
-    private PersistenceProperties persistence;
-    private WorkflowRepositoryProperties workflowRepository;
-    private MessageBrokerProperties messageBroker;
     private CoordinatorProperties coordinator = new CoordinatorProperties();
+    private MessageBrokerProperties messageBroker;
+    private PersistenceProperties persistence;
+    private SerializationProperties serialization;
+    private StorageProperties storage;
+    private WorkflowRepositoryProperties workflowRepository;
     private WorkerProperties worker = new WorkerProperties();
 
-    public SerializationProperties getSerialization() {
-        return serialization;
+    public CoordinatorProperties getCoordinator() {
+        return coordinator;
     }
 
-    public void setSerialization(SerializationProperties aSerialization) {
-        serialization = aSerialization;
-    }
-
-    public PersistenceProperties getPersistence() {
-        return persistence;
-    }
-
-    public void setPersistence(PersistenceProperties aPersistence) {
-        persistence = aPersistence;
-    }
-
-    public WorkflowRepositoryProperties getWorkflowRepository() {
-        return workflowRepository;
-    }
-
-    public void setWorkflowRepository(WorkflowRepositoryProperties aWorkflowRepository) {
-        workflowRepository = aWorkflowRepository;
+    public void setCoordinator(CoordinatorProperties coordinator) {
+        this.coordinator = coordinator;
     }
 
     public MessageBrokerProperties getMessageBroker() {
         return messageBroker;
     }
 
-    public void setMessageBroker(MessageBrokerProperties aMessageBroker) {
-        messageBroker = aMessageBroker;
+    public void setMessageBroker(MessageBrokerProperties messageBroker) {
+        this.messageBroker = messageBroker;
     }
 
-    public CoordinatorProperties getCoordinator() {
-        return coordinator;
+    public PersistenceProperties getPersistence() {
+        return persistence;
     }
 
-    public void setCoordinator(CoordinatorProperties aCoordinator) {
-        coordinator = aCoordinator;
+    public void setPersistence(PersistenceProperties persistence) {
+        this.persistence = persistence;
+    }
+
+    public SerializationProperties getSerialization() {
+        return serialization;
+    }
+
+    public void setSerialization(SerializationProperties serialization) {
+        this.serialization = serialization;
+    }
+
+    public StorageProperties getStorage() {
+        return storage;
+    }
+
+    public void setStorage(StorageProperties storage) {
+        this.storage = storage;
+    }
+
+    public WorkflowRepositoryProperties getWorkflowRepository() {
+        return workflowRepository;
+    }
+
+    public void setWorkflowRepository(WorkflowRepositoryProperties workflowRepository) {
+        this.workflowRepository = workflowRepository;
     }
 
     public WorkerProperties getWorker() {
         return worker;
     }
 
-    public void setWorker(WorkerProperties aWorker) {
-        worker = aWorker;
+    public void setWorker(WorkerProperties worker) {
+        this.worker = worker;
     }
 }

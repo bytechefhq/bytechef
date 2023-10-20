@@ -45,7 +45,9 @@ public class FileStorageConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "atlas.storage.provider", havingValue = "file")
-    FileStorageService fileSystemFileStorageService(StorageProperties storageProperties) {
+    FileStorageService fileSystemFileStorageService(AtlasProperties atlasProperties) {
+        StorageProperties storageProperties = atlasProperties.getStorage();
+
         return new FileSystemFileStorageService(storageProperties.getFileStorageDir());
     }
 }
