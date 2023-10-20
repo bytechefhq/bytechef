@@ -311,10 +311,7 @@ public class SpelTaskEvaluatorTest {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.builder().methodExecutor("tempDir", new TempDir()).build();
         TaskExecution jt = SimpleTaskExecution.of("tempDir", "${tempDir()}");
         TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
-        Assertions.assertEquals(
-            FilenameUtils.getFullPathNoEndSeparator(System.getProperty("java.io.tmpdir")),
-            evaluated.get("tempDir")
-        );
+        Assertions.assertEquals(System.getProperty("java.io.tmpdir"), evaluated.get("tempDir"));
     }
 
     @Test
