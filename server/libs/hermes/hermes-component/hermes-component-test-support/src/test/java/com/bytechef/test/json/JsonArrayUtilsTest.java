@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.test.support.json;
+package com.bytechef.test.json;
 
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-import com.bytechef.test.json.JsonArrayUtils;
-import com.bytechef.test.json.JsonObjectUtils;
+import com.bytechef.hermes.component.test.json.JsonArrayUtils;
+import com.bytechef.hermes.component.test.json.JsonObjectUtils;
 import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
