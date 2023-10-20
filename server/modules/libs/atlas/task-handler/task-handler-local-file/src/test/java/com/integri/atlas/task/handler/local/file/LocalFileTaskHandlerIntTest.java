@@ -21,8 +21,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.core.Accessor;
+import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.FileEntry;
-import com.integri.atlas.task.handler.BaseTaskHandlerIntTest;
+import com.integri.atlas.task.handler.BaseTaskIntTest;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -36,17 +37,13 @@ import org.springframework.core.io.ClassPathResource;
  * @author Ivica Cardic
  */
 @SpringBootTest
-public class LocalFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
+public class LocalFileTaskHandlerIntTest extends BaseTaskIntTest {
 
     @Test
     public void testRead() throws IOException {
         File sampleFile = getFile();
 
-        Job job = startJob(
-            "samples/localFile_READ.json",
-            Map.of("localFile", new LocalFileTaskHandler(fileStorageService)),
-            Map.of("fileName", sampleFile.getAbsolutePath())
-        );
+        Job job = startJob("samples/localFile_READ.json", Map.of("fileName", sampleFile.getAbsolutePath()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
@@ -71,7 +68,6 @@ public class LocalFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
 
         Job job = startJob(
             "samples/localFile_WRITE.json",
-            Map.of("localFile", new LocalFileTaskHandler(fileStorageService)),
             Map.of(
                 "fileEntry",
                 fileStorageService.storeFile(
@@ -88,6 +84,11 @@ public class LocalFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
         Accessor outputs = job.getOutputs();
 
         assertThat((Map<?, ?>) outputs.get("writeToFile")).hasFieldOrPropertyWithValue("bytes", 5);
+    }
+
+    @Override
+    protected Map<String, TaskHandler<?>> getTaskHandlerResolverMap() {
+        return Map.of("localFile", new LocalFileTaskHandler(fileStorageService));
     }
 
     private File getFile() throws IOException {
