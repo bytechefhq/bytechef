@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.connection.web.rest;
+package com.bytechef.hermes.connection.web.rest;
 
-import com.bytechef.helios.connection.web.rest.model.OAuth2PropertiesModel;
 import com.bytechef.hermes.connection.config.OAuth2Properties;
+import com.bytechef.hermes.connection.web.rest.model.OAuth2PropertiesModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,19 +31,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
 public class ConnectionOAuth2PropertiesController implements ConnectionOauth2PropertiesApi {
 
-    private final ConversionService conversionService;
     private final OAuth2Properties oAuth2Properties;
 
     @SuppressFBWarnings("EI")
-    public ConnectionOAuth2PropertiesController(ConversionService conversionService,
-        OAuth2Properties oAuth2Properties) {
-        this.conversionService = conversionService;
+    public ConnectionOAuth2PropertiesController(OAuth2Properties oAuth2Properties) {
         this.oAuth2Properties = oAuth2Properties;
     }
 
     @Override
     @SuppressFBWarnings("NP")
     public ResponseEntity<OAuth2PropertiesModel> getOAuth2Properties() {
-        return ResponseEntity.ok(conversionService.convert(oAuth2Properties, OAuth2PropertiesModel.class));
+        return ResponseEntity.ok(
+            new OAuth2PropertiesModel()
+                .predefinedApps(
+                    oAuth2Properties.getPredefinedApps()
+                        .keySet()
+                        .stream()
+                        .toList())
+                .redirectUri(oAuth2Properties.getRedirectUri()));
     }
 }
