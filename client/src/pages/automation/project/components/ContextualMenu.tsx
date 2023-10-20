@@ -35,7 +35,7 @@ const ContextualMenu = ({
         Array<TaskDispatcherDefinitionModel>
     >([]);
 
-    const {componentNames, setComponents} = useWorkflowDefinitionStore();
+    const {componentNames, setComponentNames} = useWorkflowDefinitionStore();
 
     const {getEdge, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 
@@ -146,7 +146,10 @@ const ContextualMenu = ({
                             nodes
                         );
 
-                        setComponents([...componentNames, formattedNodeName]);
+                        setComponentNames([
+                            ...componentNames,
+                            formattedNodeName,
+                        ]);
 
                         return {
                             ...node,

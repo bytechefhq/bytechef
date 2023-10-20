@@ -19,7 +19,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
     const [showEditNodeDialog, setShowEditNodeDialog] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
 
-    const {currentNode, nodeDetailsOpen} = useNodeDetailsDialogStore();
+    const {currentNode, nodeDetailsDialogOpen} = useNodeDetailsDialogStore();
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
@@ -110,7 +110,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                 className={twMerge(
                     'rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:border-blue-200 hover:bg-blue-200 hover:shadow-none',
                     isSelected &&
-                        nodeDetailsOpen &&
+                        nodeDetailsDialogOpen &&
                         'border-blue-300 bg-blue-100 shadow-none'
                 )}
                 displayType="icon"
