@@ -1,5 +1,6 @@
-import {PlusIcon, XMarkIcon} from '@heroicons/react/24/outline';
+import {LinkIcon, PlusIcon, XMarkIcon} from '@heroicons/react/24/outline';
 import Button from 'components/Button/Button';
+import EmptyList from 'components/EmptyList/EmptyList';
 import Select from 'components/Select/Select';
 import {ComponentDefinitionModel} from 'middleware/definition-registry';
 import ConnectionDialog from 'pages/automation/connections/components/ConnectionDialog';
@@ -12,16 +13,19 @@ const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
     const [showEditConnectionDialog, setShowEditConnectionDialog] =
         useState(false);
 
-    const {data: connections} = useGetConnectionsQuery({
-        componentNames: [component.connection!.name!],
-    });
+    const {data: connections} = useGetConnectionsQuery(
+        {
+            componentNames: [component.connection!.name!],
+        },
+        !!component.connection?.name
+    );
 
     const {showConnectionNote, setShowConnectionNote} =
         useConnectionNoteStore();
 
     return (
         <>
-            {!!connections?.length && (
+            {connections?.length ? (
                 <div className="flex space-x-2">
                     <Select
                         contentClassName="max-w-select-trigger-width max-h-select-content-available-height-1/2"
@@ -38,6 +42,23 @@ const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
                         icon={<PlusIcon className="h-5 w-5" />}
                         onClick={() => setShowEditConnectionDialog(true)}
                         title="Create a new connection"
+                    />
+                </div>
+            ) : (
+                <div className="p-4">
+                    <EmptyList
+                        button={
+                            <Button
+                                label="Create a connection"
+                                onClick={() =>
+                                    setShowEditConnectionDialog(true)
+                                }
+                                title="Create a new connection"
+                            />
+                        }
+                        icon={<LinkIcon className="h-6 w-6 text-gray-400" />}
+                        title="No Connections"
+                        message="You have not created any connections for this component yet."
                     />
                 </div>
             )}

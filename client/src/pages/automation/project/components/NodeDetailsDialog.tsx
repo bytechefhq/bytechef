@@ -2,7 +2,10 @@ import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
 import {useGetActionDefinitionQuery} from 'queries/actionDefinitions.queries';
-import {useGetComponentDefinitionQuery} from 'queries/componentDefinitions.queries';
+import {
+    useGetComponentDefinitionQuery,
+    useGetComponentDefinitionsQuery,
+} from 'queries/componentDefinitions.queries';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -40,9 +43,17 @@ const NodeDetailsDialog = () => {
     const {currentNode, nodeDetailsOpen, setNodeDetailsOpen} =
         useNodeDetailsDialogStore();
 
+    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
+        connectionDefinitions: true,
+    });
+
     const {data: currentComponent} = useGetComponentDefinitionQuery({
         componentName: currentNode.name,
     });
+
+    const componentDefinitionNames = componentDefinitions?.map(
+        (component) => component.name
+    );
 
     const singleActionComponent =
         currentComponent?.actions && currentComponent?.actions.length === 1;
@@ -155,7 +166,9 @@ const NodeDetailsDialog = () => {
                                     {tabs.map((tab) => {
                                         if (
                                             tab.name === 'connection' &&
-                                            !currentComponent.connection
+                                            !componentDefinitionNames?.includes(
+                                                currentComponent?.name
+                                            )
                                         ) {
                                             return;
                                         } else {
