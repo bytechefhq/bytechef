@@ -26,7 +26,6 @@ import com.integri.atlas.engine.coordinator.workflow.repository.JSONWorkflowMapp
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.error.Error;
-import com.integri.atlas.engine.core.file.storage.FileStorageService;
 import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.message.broker.Queues;
 import com.integri.atlas.engine.core.task.TaskExecution;
@@ -35,6 +34,7 @@ import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.worker.Worker;
 import com.integri.atlas.engine.worker.task.handler.DefaultTaskHandlerResolver;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
+import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.message.broker.sync.SyncMessageBroker;
 import com.integri.atlas.workflow.repository.resource.ResourceBasedWorkflowRepository;
 import java.util.Map;

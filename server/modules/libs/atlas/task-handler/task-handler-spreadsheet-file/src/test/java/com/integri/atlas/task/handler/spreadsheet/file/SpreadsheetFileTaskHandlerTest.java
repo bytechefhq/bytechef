@@ -22,11 +22,11 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import com.atlas.json.JSONArrayUtil;
 import com.atlas.json.JSONObjectUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.core.file.storage.FileEntry;
-import com.integri.atlas.engine.core.file.storage.FileStorageService;
 import com.integri.atlas.engine.core.json.DefaultJSONHelper;
 import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
+import com.integri.atlas.file.storage.FileEntry;
+import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.file.storage.base64.Base64FileStorageService;
 import java.io.File;
 import java.io.FileInputStream;
@@ -287,7 +287,7 @@ public class SpreadsheetFileTaskHandlerTest {
             includeEmptyCells,
             range,
             readAsString,
-            file == null ? null : fileStorageService.addFile(file.getName(), new FileInputStream(file))
+            file == null ? null : fileStorageService.storeFile(file.getName(), new FileInputStream(file))
         );
     }
 
@@ -310,21 +310,11 @@ public class SpreadsheetFileTaskHandlerTest {
         return taskExecution;
     }
 
-    private SimpleTaskExecution getWriteSimpleTaskExecution(
-        String fileFormat,
-        FileEntry fileEntry,
-        List<Object> items
-    ) {
+    private SimpleTaskExecution getWriteSimpleTaskExecution(String fileFormat, List<Object> items) {
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
         taskExecution.put("fileFormat", fileFormat);
-
-        if (fileEntry == null) {
-            taskExecution.put("items", items);
-        } else {
-            taskExecution.put("fileEntry", fileEntry);
-        }
-
+        taskExecution.put("items", items);
         taskExecution.put("operation", "WRITE");
 
         return taskExecution;
@@ -450,34 +440,9 @@ public class SpreadsheetFileTaskHandlerTest {
         FileEntry fileEntry = (FileEntry) spreadsheetFileTaskHandler.handle(
             getWriteSimpleTaskExecution(
                 fileFormat,
-                null,
                 JSONArrayUtil.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))
             )
         );
-
-        assertEquals(
-            JSONArrayUtil.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-            JSONArrayUtil.of(
-                (List<?>) spreadsheetFileTaskHandler.handle(
-                    getReadSimpleTaskExecution(true, true, null, false, fileEntry)
-                )
-            ),
-            true
-        );
-
-        assertThat(fileEntry.getName()).isEqualTo("spreadsheet." + fileFormat);
-
-        fileEntry =
-            (FileEntry) spreadsheetFileTaskHandler.handle(
-                getWriteSimpleTaskExecution(
-                    fileFormat,
-                    fileStorageService.addFile(
-                        "sample.json",
-                        Files.contentOf(getFile("sample.json"), Charset.defaultCharset())
-                    ),
-                    null
-                )
-            );
 
         assertEquals(
             JSONArrayUtil.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),

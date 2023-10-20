@@ -16,10 +16,10 @@
 
 package com.integri.atlas.file.storage.filesystem;
 
-import com.integri.atlas.engine.core.file.storage.FileEntry;
-import com.integri.atlas.engine.core.file.storage.FileStorageService;
-import com.integri.atlas.engine.core.file.storage.exception.FileStorageException;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
+import com.integri.atlas.file.storage.FileEntry;
+import com.integri.atlas.file.storage.FileStorageService;
+import com.integri.atlas.file.storage.exception.FileStorageException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -42,12 +42,12 @@ public class FileSystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public FileEntry addFile(String fileName, String data) throws FileStorageException {
-        return addFile(fileName, new ByteArrayInputStream(data.getBytes()));
+    public FileEntry storeFile(String fileName, String data) throws FileStorageException {
+        return storeFile(fileName, new ByteArrayInputStream(data.getBytes()));
     }
 
     @Override
-    public FileEntry addFile(String fileName, InputStream inputStream) throws FileStorageException {
+    public FileEntry storeFile(String fileName, InputStream inputStream) throws FileStorageException {
         Path path = resolveDirectory();
 
         path = path.resolve(UUIDGenerator.generate());
@@ -68,7 +68,7 @@ public class FileSystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public String getContent(String url) throws FileStorageException {
+    public String readFileContent(String url) throws FileStorageException {
         Path path = resolveDirectory();
         String filePath = getFilePath(url);
 
@@ -80,7 +80,7 @@ public class FileSystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public InputStream getContentStream(String url) {
+    public InputStream getFileContentStream(String url) {
         Path path = resolveDirectory();
 
         try {

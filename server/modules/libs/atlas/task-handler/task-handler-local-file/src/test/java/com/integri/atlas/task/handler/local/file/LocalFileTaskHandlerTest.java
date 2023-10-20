@@ -18,9 +18,9 @@ package com.integri.atlas.task.handler.local.file;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.integri.atlas.engine.core.file.storage.FileEntry;
-import com.integri.atlas.engine.core.file.storage.FileStorageService;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
+import com.integri.atlas.file.storage.FileEntry;
+import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.file.storage.base64.Base64FileStorageService;
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,7 +45,7 @@ public class LocalFileTaskHandlerTest {
 
         SimpleTaskExecution taskExecution = getSimpleTaskExecution(file.getAbsolutePath(), "READ", null);
 
-        FileEntry fileEntry = fileStorageService.addFile(
+        FileEntry fileEntry = fileStorageService.storeFile(
             file.getName(),
             Files.contentOf(file, Charset.defaultCharset())
         );
@@ -64,7 +64,7 @@ public class LocalFileTaskHandlerTest {
         SimpleTaskExecution taskExecution = getSimpleTaskExecution(
             file.getAbsolutePath(),
             "WRITE",
-            fileStorageService.addFile(file.getName(), new FileInputStream(file))
+            fileStorageService.storeFile(file.getName(), new FileInputStream(file))
         );
 
         assertThat(localFileTaskHandler.handle(taskExecution)).hasFieldOrPropertyWithValue("bytes", 5L);

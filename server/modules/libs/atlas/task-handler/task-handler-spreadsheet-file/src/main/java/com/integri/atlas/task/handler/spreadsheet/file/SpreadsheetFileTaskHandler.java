@@ -16,11 +16,11 @@
 
 package com.integri.atlas.task.handler.spreadsheet.file;
 
-import com.integri.atlas.engine.core.file.storage.FileEntry;
-import com.integri.atlas.engine.core.file.storage.FileStorageService;
 import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
+import com.integri.atlas.file.storage.FileEntry;
+import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.task.handler.spreadsheet.file.processor.CSVSpreadsheetProcessor;
 import com.integri.atlas.task.handler.spreadsheet.file.processor.ODSSpreadsheetProcessor;
 import com.integri.atlas.task.handler.spreadsheet.file.processor.SpreadsheetProcessor;
@@ -95,7 +95,7 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
 
             SpreadsheetProcessor spreadsheetProcessor = getSpreadsheetProcessor(fileFormat);
 
-            try (InputStream inputStream = fileStorageService.getContentStream(fileEntry.getUrl())) {
+            try (InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl())) {
                 result =
                     spreadsheetProcessor.read(
                         inputStream,
@@ -117,21 +117,13 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
                 String.class,
                 "spreadsheet." + StringUtils.lowerCase(fileFormat.name())
             );
-            List<Map<String, ?>> items;
-
-            if (taskExecution.containsKey("fileEntry")) {
-                FileEntry fileEntry = taskExecution.get("fileEntry", FileEntry.class);
-
-                items = jsonHelper.read(fileStorageService.getContent(fileEntry.getUrl()));
-            } else {
-                items = taskExecution.get("items");
-            }
+            List<Map<String, ?>> items = taskExecution.get("items");
 
             String sheetName = taskExecution.get("sheetName", String.class, "Sheet");
 
             SpreadsheetProcessor spreadsheetProcessor = getSpreadsheetProcessor(fileFormat);
 
-            return fileStorageService.addFile(
+            return fileStorageService.storeFile(
                 fileName,
                 new ByteArrayInputStream(
                     spreadsheetProcessor.write(items, new SpreadsheetProcessor.WriteConfiguration(fileName, sheetName))

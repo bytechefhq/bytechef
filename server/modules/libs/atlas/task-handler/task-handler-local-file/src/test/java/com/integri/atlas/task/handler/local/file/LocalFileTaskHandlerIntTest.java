@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.core.Accessor;
-import com.integri.atlas.engine.core.file.storage.FileEntry;
+import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.task.handler.BaseTaskHandlerIntTest;
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +52,7 @@ public class LocalFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
 
         Accessor outputs = job.getOutputs();
 
-        FileEntry fileEntry = fileStorageService.addFile(
+        FileEntry fileEntry = fileStorageService.storeFile(
             "sample.txt",
             Files.contentOf(getFile(), Charset.defaultCharset())
         );
@@ -74,7 +74,7 @@ public class LocalFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
             Map.of("localFile", new LocalFileTaskHandler(fileStorageService)),
             Map.of(
                 "fileEntry",
-                fileStorageService.addFile(
+                fileStorageService.storeFile(
                     sampleFile.getAbsolutePath(),
                     Files.contentOf(getFile(), Charset.defaultCharset())
                 ),
