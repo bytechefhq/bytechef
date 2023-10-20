@@ -88,17 +88,7 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
             try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
-                printWriter.println("[");
-
-                for (int i = 0; i < items.size(); i++) {
-                    printWriter.println(jsonHelper.serialize(items.get(i)));
-
-                    if (i < items.size() - 1) {
-                        printWriter.print(",");
-                    }
-                }
-
-                printWriter.println("]");
+                printWriter.println(jsonHelper.serialize(items));
             }
 
             try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
