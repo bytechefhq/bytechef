@@ -5,6 +5,7 @@
  */
 package com.bytechef.hermes.integration.web.rest;
 
+import com.bytechef.hermes.integration.web.rest.model.GetIntegrationTags200ResponseModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -31,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-27T13:16:13.209880+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-04T10:26:43.691521+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "integration-tags", description = "the integration-tags API")
 public interface IntegrationTagsApi {
@@ -48,7 +49,7 @@ public interface IntegrationTagsApi {
         tags = { "integrations" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of integration tags.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = GetIntegrationTags200ResponseModel.class))
             })
         }
     )
@@ -57,14 +58,14 @@ public interface IntegrationTagsApi {
         value = "/integration-tags",
         produces = { "application/json" }
     )
-    default Mono<ResponseEntity<Flux<String>>> getIntegrationTags(
+    default Mono<ResponseEntity<GetIntegrationTags200ResponseModel>> getIntegrationTags(
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "\"\"";
+                String exampleString = "{ \"tags\" : [ \"tags\", \"tags\" ] }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
