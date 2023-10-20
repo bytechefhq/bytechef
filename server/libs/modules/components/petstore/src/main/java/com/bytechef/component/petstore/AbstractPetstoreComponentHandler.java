@@ -80,7 +80,7 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
             .output(object(null).properties(PetSchema.COMPONENT_SCHEMA)
                 .metadata(
                     Map.of(
-                        "responseType", "JSON"))),
+                        "responseFormat", "JSON"))),
             action("updatePet")
                 .display(
                     display("Update an existing pet")
@@ -99,7 +99,7 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                 .output(object(null).properties(PetSchema.COMPONENT_SCHEMA)
                     .metadata(
                         Map.of(
-                            "responseType", "JSON"))),
+                            "responseFormat", "JSON"))),
             action("findPetsByStatus")
                 .display(
                     display("Finds Pets by status")
@@ -120,7 +120,7 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                 .output(array(null).items(object(null).properties(PetSchema.COMPONENT_SCHEMA))
                     .metadata(
                         Map.of(
-                            "responseType", "JSON"))),
+                            "responseFormat", "JSON"))),
             action("findPetsByTags")
                 .display(
                     display("Finds Pets by tags")
@@ -143,7 +143,7 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                 .output(array(null).items(object(null).properties(PetSchema.COMPONENT_SCHEMA))
                     .metadata(
                         Map.of(
-                            "responseType", "JSON"))),
+                            "responseFormat", "JSON"))),
             action("deletePet")
                 .display(
                     display("Deletes a pet")
@@ -185,7 +185,7 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                 .output(object(null).properties(PetSchema.COMPONENT_SCHEMA)
                     .metadata(
                         Map.of(
-                            "responseType", "JSON"))),
+                            "responseFormat", "JSON"))),
             action("updatePetWithForm")
                 .display(
                     display("Updates a pet in the store with form data")
@@ -242,7 +242,7 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                 .output(object(null).properties(ApiResponseSchema.COMPONENT_SCHEMA)
                     .metadata(
                         Map.of(
-                            "responseType", "JSON"))),
+                            "responseFormat", "JSON"))),
             action("getInventory")
                 .display(
                     display("Returns pet inventories by status")
@@ -257,7 +257,7 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                 .output(object(null).additionalProperties(integer())
                     .metadata(
                         Map.of(
-                            "responseType", "JSON"))),
+                            "responseFormat", "JSON"))),
             action("placeOrder")
                 .display(
                     display("Place an order for a pet")
@@ -275,7 +275,7 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                 .output(object(null).properties(OrderSchema.COMPONENT_SCHEMA)
                     .metadata(
                         Map.of(
-                            "responseType", "JSON"))),
+                            "responseFormat", "JSON"))),
             action("deleteOrder")
                 .display(
                     display("Delete purchase order by ID")
@@ -313,7 +313,7 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                 .output(object(null).properties(OrderSchema.COMPONENT_SCHEMA)
                     .metadata(
                         Map.of(
-                            "responseType", "JSON"))),
+                            "responseFormat", "JSON"))),
             action("createUser")
                 .display(
                     display("Create user")
@@ -346,7 +346,7 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                 .output(object(null).properties(UserSchema.COMPONENT_SCHEMA)
                     .metadata(
                         Map.of(
-                            "responseType", "JSON"))),
+                            "responseFormat", "JSON"))),
             action("loginUser")
                 .display(
                     display("Logs user into the system")
@@ -371,7 +371,7 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                                 "type", "QUERY")))
                 .output(string(null).metadata(
                     Map.of(
-                        "responseType", "XML"))),
+                        "responseFormat", "XML"))),
             action("logoutUser")
                 .display(
                     display("Logs out current logged in user session")
@@ -418,7 +418,7 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                 .output(object(null).properties(UserSchema.COMPONENT_SCHEMA)
                     .metadata(
                         Map.of(
-                            "responseType", "JSON"))),
+                            "responseFormat", "JSON"))),
             action("updateUser")
                 .display(
                     display("Update user")

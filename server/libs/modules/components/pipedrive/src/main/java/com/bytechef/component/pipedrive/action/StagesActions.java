@@ -103,7 +103,7 @@ public class StagesActions {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", "JSON")))
+                    "responseFormat", "JSON")))
         .exampleOutput(
             "{\"success\":true,\"data\":[{\"id\":1,\"order_nr\":1,\"name\":\"Stage Name\",\"active_flag\":true,\"deal_probability\":100,\"pipeline_id\":1,\"rotten_flag\":false,\"rotten_days\":1,\"add_time\":\"2017-08-03 12:51:18\",\"update_time\":\"2020-03-23 13:15:25\",\"pipeline_name\":\"Pipeline\",\"pipeline_deal_probability\":false}]}"),
         action("getStage")
@@ -224,7 +224,7 @@ public class StagesActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseType", "JSON")))
+                        "responseFormat", "JSON")))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"id\":1,\"order_nr\":1,\"name\":\"Stage Name\",\"active_flag\":true,\"deal_probability\":100,\"pipeline_id\":1,\"rotten_flag\":false,\"rotten_days\":1,\"add_time\":\"2017-08-03 12:51:18\",\"update_time\":\"2020-03-23 13:15:25\",\"deals_summary\":{\"per_stages\":{\"1\":{\"EUR\":{\"count\":1,\"value\":10,\"value_formatted\":\"10 €\",\"weighted_value\":10,\"weighted_value_formatted\":\"10€\"}}},\"per_currency\":{\"EUR\":1},\"total_count\":1,\"per_currency_full\":{\"EUR\":{\"count\":1,\"value\":10}}}}}"));
 }

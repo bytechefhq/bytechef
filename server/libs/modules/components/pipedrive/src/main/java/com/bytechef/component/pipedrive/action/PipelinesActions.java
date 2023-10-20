@@ -84,7 +84,7 @@ public class PipelinesActions {
                     .required(false))
             .metadata(
                 Map.of(
-                    "responseType", "JSON")))
+                    "responseFormat", "JSON")))
         .exampleOutput(
             "{\"success\":true,\"data\":[{\"id\":1,\"name\":\"Pipeline Name\",\"url_title\":\"Pipeline-Name\",\"order_nr\":1,\"active\":true,\"deal_probability\":true,\"add_time\":\"2017-08-03 12:51:18\",\"update_time\":\"2020-03-23 13:15:25\",\"selected\":true}]}"),
         action("getPipeline")
@@ -200,7 +200,7 @@ public class PipelinesActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseType", "JSON")))
+                        "responseFormat", "JSON")))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"id\":1,\"name\":\"Pipeline\",\"url_title\":\"Pipeline\",\"order_nr\":1,\"active\":true,\"deal_probability\":true,\"add_time\":\"2017-08-03 12:51:18\",\"update_time\":\"2020-03-23 13:15:25\",\"selected\":true,\"deals_summary\":{\"per_stages\":{\"1\":{\"EUR\":{\"count\":1,\"value\":10,\"value_formatted\":\"10 €\",\"weighted_value\":10,\"weighted_value_formatted\":\"10€\"}}},\"per_currency\":{\"EUR\":1},\"total_count\":1,\"per_currency_full\":{\"EUR\":{\"count\":1,\"value\":10}}}}}"));
 }

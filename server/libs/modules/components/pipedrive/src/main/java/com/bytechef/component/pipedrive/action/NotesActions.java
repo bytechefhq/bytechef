@@ -178,7 +178,7 @@ public class NotesActions {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", "JSON")))
+                    "responseFormat", "JSON")))
         .exampleOutput(
             "{\"success\":true,\"data\":{\"id\":1,\"active_flag\":true,\"add_time\":\"2019-12-09 13:59:21\",\"content\":\"abc\",\"deal\":{\"title\":\"Deal title\"},\"lead_id\":\"adf21080-0e10-11eb-879b-05d71fb426ec\",\"deal_id\":1,\"last_update_user_id\":1,\"org_id\":1,\"organization\":{\"name\":\"Organization name\"},\"person\":{\"name\":\"Person name\"},\"person_id\":1,\"pinned_to_lead_flag\":false,\"pinned_to_deal_flag\":true,\"pinned_to_organization_flag\":false,\"pinned_to_person_flag\":false,\"update_time\":\"2019-12-09 14:26:11\",\"user\":{\"email\":\"user@email.com\",\"icon_url\":\"https://iconurl.net/profile_120x120_123.jpg\",\"is_you\":true,\"name\":\"User Name\"},\"user_id\":1}}"));
 }
