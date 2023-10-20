@@ -27,13 +27,15 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ConfigurationMapperSpringConfig.class)
+@Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
+    OptionalMapper.class
+})
 public interface OptionMapper extends Converter<OptionDTO, OptionModel> {
 
     @Override
     OptionModel convert(OptionDTO optionDTO);
 
-    default JsonNullable<Object> map(Object value) {
+    default JsonNullable<Object> mapToJsonNullable(Object value) {
         return value == null ? JsonNullable.undefined() : JsonNullable.of(value);
     }
 }

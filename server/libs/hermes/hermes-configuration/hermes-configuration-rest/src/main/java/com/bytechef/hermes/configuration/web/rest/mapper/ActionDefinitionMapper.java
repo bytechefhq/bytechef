@@ -27,14 +27,14 @@ import com.bytechef.hermes.configuration.web.rest.model.HelpModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
-import java.util.Optional;
-
 /**
  * @author Ivica Cardic
  */
 public class ActionDefinitionMapper {
 
-    @Mapper(config = ConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
+        OptionalMapper.class
+    })
     public interface ActionDefinitionToActionDefinitionModelMapper
         extends Converter<ActionDefinitionDTO, ActionDefinitionModel> {
 
@@ -42,18 +42,11 @@ public class ActionDefinitionMapper {
         ActionDefinitionModel convert(ActionDefinitionDTO actionDefinitionDTO);
 
         HelpModel map(HelpDTO helpDTO);
-
-        default HelpModel mapToHelp(Optional<HelpDTO> optional) {
-            return optional.map(this::map)
-                .orElse(null);
-        }
-
-        default String mapToString(Optional<String> value) {
-            return value.orElse(null);
-        }
     }
 
-    @Mapper(config = ConfigurationMapperSpringConfig.class)
+    @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
+        OptionalMapper.class
+    })
     public interface ActionDefinitionToActionDefinitionBasicModelMapper
         extends Converter<ActionDefinitionDTO, ActionDefinitionBasicModel> {
 
@@ -61,14 +54,5 @@ public class ActionDefinitionMapper {
         ActionDefinitionBasicModel convert(ActionDefinitionDTO actionDefinitionDTO);
 
         HelpModel map(HelpDTO helpDTO);
-
-        default HelpModel mapToHelp(Optional<HelpDTO> optional) {
-            return optional.map(this::map)
-                .orElse(null);
-        }
-
-        default String mapToString(Optional<String> value) {
-            return value.orElse(null);
-        }
     }
 }
