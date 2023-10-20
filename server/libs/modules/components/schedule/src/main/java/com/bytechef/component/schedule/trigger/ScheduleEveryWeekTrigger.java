@@ -18,6 +18,7 @@
 package com.bytechef.component.schedule.trigger;
 
 import com.bytechef.component.schedule.data.WorkflowScheduleAndData;
+import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
@@ -82,12 +83,7 @@ public class ScheduleEveryWeekTrigger {
             string(TIMEZONE)
                 .label("Timezone")
                 .description("The timezone at which the cron expression will be scheduled.")
-//                .options(
-//                    ZoneId.getAvailableZoneIds()
-//                        .stream()
-//                        .map(zoneId -> option(zoneId, zoneId))
-//                        .toList())
-        )
+                .options(ScheduleUtils.getTimeZoneOptions()))
         .outputSchema(
             object()
                 .properties(

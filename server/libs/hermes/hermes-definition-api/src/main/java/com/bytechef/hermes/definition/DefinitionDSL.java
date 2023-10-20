@@ -1220,7 +1220,7 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableStringProperty options(List<ModifiableOption<String>> options) {
+            public ModifiableStringProperty options(List<? extends Option<String>> options) {
                 this.options = new ArrayList<>(options);
 
                 return this;
