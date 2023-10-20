@@ -116,7 +116,11 @@ const ExecutionsTable = ({data}: {data: ProjectExecutionModel[]}) => {
 
             <tbody className="divide-y divide-gray-200 bg-white">
                 {rows.map((row) => (
-                    <tr key={row.id} onClick={() => handleRowClick(row.index)}>
+                    <tr
+                        className="cursor-pointer"
+                        key={row.id}
+                        onClick={() => handleRowClick(row.index)}
+                    >
                         {row.getVisibleCells().map((cell) => (
                             <td
                                 key={cell.id}

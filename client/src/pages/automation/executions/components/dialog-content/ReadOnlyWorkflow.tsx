@@ -1,18 +1,50 @@
+import {Cross1Icon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
 import {ProjectExecutionModel} from 'middleware/automation/project';
 
-const ReadOnlyWorkflow = ({execution}: {execution: ProjectExecutionModel}) => {
+const ReadOnlyWorkflow = ({
+    execution,
+    setExecutionDetailsDialogOpen,
+}: {
+    execution: ProjectExecutionModel;
+    setExecutionDetailsDialogOpen: (
+        executionDetailsDialogOpen: boolean
+    ) => void;
+}) => {
     const {instance, project, workflow} = execution;
 
     return (
-        <div className="w-96 bg-white p-4">
+        <div className="flex w-full justify-between bg-gray-100 p-4">
             <h3>
                 {workflow?.label
-                    ? `${project?.name} / ${instance?.name} / ${workflow?.label}`
+                    ? `${project?.name ? project.name + ' / ' : ''}${
+                          instance?.name ? instance.name + ' / ' : ''
+                      }${workflow?.label}`
                     : 'No data to show'}
             </h3>
 
-            <Button label="Edit" className="ml-4" />
+            <div>
+                <Button
+                    label="Edit"
+                    className="ml-4"
+                    size={'small'}
+                    displayType="secondary"
+                />
+
+                <Button
+                    aria-label="Close panel"
+                    className="ml-auto"
+                    displayType="icon"
+                    size={'small'}
+                    icon={
+                        <Cross1Icon
+                            className="h-3 w-3 cursor-pointer text-gray-900"
+                            aria-hidden="true"
+                        />
+                    }
+                    onClick={() => setExecutionDetailsDialogOpen(false)}
+                />
+            </div>
         </div>
     );
 };
