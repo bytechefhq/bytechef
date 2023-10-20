@@ -1,0 +1,480 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v1
+servers:
+  - url: http://localhost:5173/api
+paths:
+  /caches/clear:
+    get:
+      tags:
+        - CacheController
+      operationId: clearCache
+      responses:
+        "200":
+          description: OK
+  /jobs:
+    get:
+      tags:
+        - JobController
+      operationId: getJobs
+      parameters:
+        - name: pageNumber
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+    post:
+      tags:
+        - JobController
+      operationId: postJob
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: object
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobId:
+                    type: string
+  /jobs/latest:
+    get:
+      tags:
+        - JobController
+      operationId: getLatestJob
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+  /jobs/{id}:
+    get:
+      tags:
+        - JobController
+      operationId: getJob
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+  /jobs/{id}/restart:
+    put:
+      tags:
+        - JobController
+      operationId: restartJob
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /jobs/{id}/stop:
+    put:
+      tags:
+        - JobController
+      operationId: stopJob
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+  /jobs/{id}/task-executions/:
+    get:
+      tags:
+        - TaskExecutionController
+      operationId: getJobTaskExecutions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskExecution'
+  /task-executions/{id}:
+    get:
+      tags:
+        - TaskExecutionController
+      operationId: getTaskExecution
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskExecution'
+  /workflows:
+    get:
+      tags:
+        - WorkflowController
+      operationId: getWorkflows
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Workflow'
+    post:
+      tags:
+        - WorkflowController
+      operationId: postWorkflow
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Workflow'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+  /workflows/{id}:
+    delete:
+      tags:
+        - WorkflowController
+      operationId: deleteWorkflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+    get:
+      tags:
+        - WorkflowController
+      operationId: getWorkflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+    put:
+      tags:
+        - WorkflowController
+      operationId: putWorkflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Workflow'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+components:
+  schemas:
+    ExecutionError:
+      type: object
+      properties:
+        message:
+          type: string
+        stackTrace:
+          type: array
+          items:
+            type: string
+    Workflow:
+      type: object
+      properties:
+        content:
+          type: string
+        createdBy:
+          type: string
+          readOnly: true
+        createdDate:
+          type: string
+          format: date-time
+          readOnly: true
+        error:
+          $ref: '#/components/schemas/ExecutionError'
+        format:
+          type: string
+          enum:
+            - JSON
+            - YML
+            - YAML
+        id:
+          type: string
+          readOnly: true
+        inputs:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: object
+        label:
+          type: string
+        lastModifiedBy:
+          type: string
+          readOnly: true
+        lastModifiedDate:
+          type: string
+          format: date-time
+          readOnly: true
+        outputs:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: object
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowTask'
+        retry:
+          type: integer
+          format: int32
+    WorkflowTask:
+      type: object
+      properties:
+        finalize:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowTask'
+        label:
+          type: string
+        name:
+          type: string
+        node:
+          type: string
+        parameters:
+          type: object
+          additionalProperties:
+            type: object
+        post:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowTask'
+        pre:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowTask'
+        timeout:
+          type: string
+        type:
+          type: string
+    Job:
+      type: object
+      properties:
+        createdBy:
+          type: string
+          readOnly: true
+        createdDate:
+          type: string
+          format: date-time
+          readOnly: true
+        currentTask:
+          type: integer
+          format: int32
+        endTime:
+          type: string
+          format: date-time
+        error:
+          $ref: '#/components/schemas/ExecutionError'
+        id:
+          type: string
+          readOnly: true
+        inputs:
+          type: object
+          additionalProperties:
+            type: object
+        label:
+          type: string
+        lastModifiedBy:
+          type: string
+          readOnly: true
+        lastModifiedDate:
+          type: string
+          format: date-time
+          readOnly: true
+        outputs:
+          type: object
+          additionalProperties:
+            type: object
+        parentTaskExecutionId:
+          type: string
+        priority:
+          type: integer
+          format: int32
+        startTime:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+            - CREATED
+            - STARTED
+            - STOPPED
+            - FAILED
+            - COMPLETED
+        webhooks:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: object
+        workflowId:
+          type: string
+    Page:
+      description: minimal Page response without content property
+      properties:
+        number:
+          type: integer
+        size:
+          type: integer
+        numberOfElements:
+          type: integer
+        totalPages:
+          type: integer
+        totalElements:
+          type: integer
+        content:
+          type: array
+          items:
+            type: object
+    TaskExecution:
+      type: object
+      properties:
+        createdBy:
+          type: string
+          readOnly: true
+        createdDate:
+          type: string
+          format: date-time
+          readOnly: true
+        endTime:
+          type: string
+          format: date-time
+        error:
+          $ref: '#/components/schemas/ExecutionError'
+        executionTime:
+          type: integer
+          format: int64
+        id:
+          type: string
+          readOnly: true
+        jobId:
+          type: string
+        lastModifiedBy:
+          type: string
+          readOnly: true
+        lastModifiedDate:
+          type: string
+          format: date-time
+          readOnly: true
+        output:
+          type: object
+        parentId:
+          type: string
+        priority:
+          type: integer
+          format: int32
+        progress:
+          type: integer
+          format: int32
+        retry:
+          type: integer
+          format: int32
+        retryAttempts:
+          type: integer
+          format: int32
+        retryDelay:
+          type: string
+        retryDelayFactor:
+          type: integer
+          format: int32
+        startTime:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+            - CREATED
+            - STARTED
+            - FAILED
+            - CANCELLED
+            - COMPLETED
+        taskNumber:
+          type: integer
+          format: int32
+        workflowTask:
+          $ref: '#/components/schemas/WorkflowTask'
+        retryDelayMillis:
+          type: integer
+          format: int64
+        type:
+          type: string
