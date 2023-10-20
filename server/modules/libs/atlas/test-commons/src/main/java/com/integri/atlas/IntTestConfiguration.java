@@ -40,6 +40,9 @@ import com.integri.atlas.file.storage.converter.FileEntryConverter;
 import com.integri.atlas.file.storage.service.FileStorageService;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import org.jobrunr.jobs.mappers.JobMapper;
+import org.jobrunr.storage.InMemoryStorageProvider;
+import org.jobrunr.storage.StorageProvider;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -113,6 +116,15 @@ public class IntTestConfiguration {
         jdbcContextRepository.setObjectMapper(objectMapper);
 
         return jdbcContextRepository;
+    }
+
+    @Bean
+    public StorageProvider storageProvider(JobMapper jobMapper) {
+        InMemoryStorageProvider storageProvider = new InMemoryStorageProvider();
+
+        storageProvider.setJobMapper(jobMapper);
+
+        return storageProvider;
     }
 
     @Bean
