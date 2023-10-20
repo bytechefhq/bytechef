@@ -140,7 +140,7 @@ export const Executions = () => {
                         {!isLoadingWorkflows && !errorInWorkflows && (
                             <FilterableSelect
                                 name="workflows"
-                                label="Worflows"
+                                label="Workflows"
                                 options={
                                     workflows?.map((workflow) => ({
                                         label:
