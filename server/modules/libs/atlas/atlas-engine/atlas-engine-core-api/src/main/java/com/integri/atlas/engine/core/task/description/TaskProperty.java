@@ -31,6 +31,7 @@ import java.util.stream.Stream;
  */
 public abstract sealed class TaskProperty<T extends TaskProperty<?>>
     permits
+        TaskProperty.BinaryTaskProperty,
         TaskProperty.BooleanTaskProperty,
         TaskProperty.ColorTaskProperty,
         TaskProperty.DateTimeTaskProperty,
@@ -52,6 +53,10 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
     protected TaskPropertyTypeOption typeOption;
 
     private TaskProperty() {}
+
+    public static BinaryTaskProperty BINARY_PROPERTY(String name) {
+        return new BinaryTaskProperty(name);
+    }
 
     public static BooleanTaskProperty BOOLEAN_PROPERTY(String name) {
         return new BooleanTaskProperty(name);
@@ -576,6 +581,20 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
         return type;
     }
 
+    public static final class BinaryTaskProperty extends TaskProperty<BinaryTaskProperty> {
+
+        public BinaryTaskProperty(String name) {
+            this.name = name;
+            this.type = TaskPropertyType.BINARY;
+        }
+
+        public BinaryTaskProperty defaultValue(JsonNode defaultValue) {
+            this.defaultValue = parameter(defaultValue);
+
+            return this;
+        }
+    }
+
     public static final class BooleanTaskProperty extends TaskProperty<BooleanTaskProperty> {
 
         public BooleanTaskProperty(String name) {
@@ -889,7 +908,7 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
             this.type = TaskPropertyType.STRING;
         }
 
-        public StringTaskProperty defaultValue(String... value) {
+        public StringTaskProperty defaultValue(String value) {
             this.defaultValue = parameter(value);
 
             return this;
