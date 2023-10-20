@@ -89,7 +89,7 @@ export function TagModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
-        'version': !exists(json, 'version') ? undefined : json['version'],
+        'version': !exists(json, '__version') ? undefined : json['__version'],
     };
 }
 
@@ -104,7 +104,7 @@ export function TagModelToJSON(value?: TagModel | null): any {
         
         'id': value.id,
         'name': value.name,
-        'version': value.version,
+        '__version': value.version,
     };
 }
 

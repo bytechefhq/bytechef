@@ -22,6 +22,10 @@ import {
     TagModelToJSON,
 } from '../models';
 
+export interface CreateTagRequest {
+    tagModel: TagModel;
+}
+
 export interface DeleteTagRequest {
     id: number;
 }
@@ -30,11 +34,7 @@ export interface GetTagRequest {
     id: number;
 }
 
-export interface PostTagRequest {
-    tagModel: TagModel;
-}
-
-export interface PutTagRequest {
+export interface UpdateTagRequest {
     id: number;
     tagModel: TagModel;
 }
@@ -43,6 +43,41 @@ export interface PutTagRequest {
  * 
  */
 export class TagsApi extends runtime.BaseAPI {
+
+    /**
+     * Create a new tag.
+     * Create a new tag.
+     */
+    async createTagRaw(requestParameters: CreateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TagModel>> {
+        if (requestParameters.tagModel === null || requestParameters.tagModel === undefined) {
+            throw new runtime.RequiredError('tagModel','Required parameter requestParameters.tagModel was null or undefined when calling createTag.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/tags`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: TagModelToJSON(requestParameters.tagModel),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TagModelFromJSON(jsonValue));
+    }
+
+    /**
+     * Create a new tag.
+     * Create a new tag.
+     */
+    async createTag(requestParameters: CreateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TagModel> {
+        const response = await this.createTagRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Delete a tag.
@@ -136,51 +171,16 @@ export class TagsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Create a new tag.
-     * Create a new tag.
-     */
-    async postTagRaw(requestParameters: PostTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TagModel>> {
-        if (requestParameters.tagModel === null || requestParameters.tagModel === undefined) {
-            throw new runtime.RequiredError('tagModel','Required parameter requestParameters.tagModel was null or undefined when calling postTag.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/tags`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: TagModelToJSON(requestParameters.tagModel),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => TagModelFromJSON(jsonValue));
-    }
-
-    /**
-     * Create a new tag.
-     * Create a new tag.
-     */
-    async postTag(requestParameters: PostTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TagModel> {
-        const response = await this.postTagRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
      * Update an existing tag.
      * Update an existing tag.
      */
-    async putTagRaw(requestParameters: PutTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TagModel>> {
+    async updateTagRaw(requestParameters: UpdateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TagModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling putTag.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateTag.');
         }
 
         if (requestParameters.tagModel === null || requestParameters.tagModel === undefined) {
-            throw new runtime.RequiredError('tagModel','Required parameter requestParameters.tagModel was null or undefined when calling putTag.');
+            throw new runtime.RequiredError('tagModel','Required parameter requestParameters.tagModel was null or undefined when calling updateTag.');
         }
 
         const queryParameters: any = {};
@@ -204,8 +204,8 @@ export class TagsApi extends runtime.BaseAPI {
      * Update an existing tag.
      * Update an existing tag.
      */
-    async putTag(requestParameters: PutTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TagModel> {
-        const response = await this.putTagRaw(requestParameters, initOverrides);
+    async updateTag(requestParameters: UpdateTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TagModel> {
+        const response = await this.updateTagRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

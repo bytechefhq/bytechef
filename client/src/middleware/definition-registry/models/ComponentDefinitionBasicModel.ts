@@ -33,13 +33,13 @@ export interface ComponentDefinitionBasicModel {
      */
     display: DisplayModel;
     /**
-     * The component name.
+     * The name of a component.
      * @type {string}
      * @memberof ComponentDefinitionBasicModel
      */
     name: string;
     /**
-     * The component version.
+     * The version of a component.
      * @type {number}
      * @memberof ComponentDefinitionBasicModel
      */

@@ -2,10 +2,11 @@ apis/ProjectsApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts
-models/PostProjectWorkflowRequestModel.ts
+models/CreateProjectWorkflowRequestModel.ts
 models/ProjectModel.ts
-models/PutProjectTagsRequestModel.ts
+models/StatusModel.ts
 models/TagModel.ts
+models/UpdateProjectTagsRequestModel.ts
 models/WorkflowFormatModel.ts
 models/WorkflowModel.ts
 models/WorkflowTaskModel.ts

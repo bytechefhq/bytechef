@@ -16,44 +16,44 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface PostProjectWorkflowRequestModel
+ * @interface CreateProjectWorkflowRequestModel
  */
-export interface PostProjectWorkflowRequestModel {
+export interface CreateProjectWorkflowRequestModel {
     /**
      * The workflow name.
      * @type {string}
-     * @memberof PostProjectWorkflowRequestModel
+     * @memberof CreateProjectWorkflowRequestModel
      */
     name: string;
     /**
      * The workflow description.
      * @type {string}
-     * @memberof PostProjectWorkflowRequestModel
+     * @memberof CreateProjectWorkflowRequestModel
      */
     description?: string;
     /**
      * The workflow definition.
      * @type {string}
-     * @memberof PostProjectWorkflowRequestModel
+     * @memberof CreateProjectWorkflowRequestModel
      */
     definition?: string;
 }
 
 /**
- * Check if a given object implements the PostProjectWorkflowRequestModel interface.
+ * Check if a given object implements the CreateProjectWorkflowRequestModel interface.
  */
-export function instanceOfPostProjectWorkflowRequestModel(value: object): boolean {
+export function instanceOfCreateProjectWorkflowRequestModel(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "name" in value;
 
     return isInstance;
 }
 
-export function PostProjectWorkflowRequestModelFromJSON(json: any): PostProjectWorkflowRequestModel {
-    return PostProjectWorkflowRequestModelFromJSONTyped(json, false);
+export function CreateProjectWorkflowRequestModelFromJSON(json: any): CreateProjectWorkflowRequestModel {
+    return CreateProjectWorkflowRequestModelFromJSONTyped(json, false);
 }
 
-export function PostProjectWorkflowRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): PostProjectWorkflowRequestModel {
+export function CreateProjectWorkflowRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): CreateProjectWorkflowRequestModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -65,7 +65,7 @@ export function PostProjectWorkflowRequestModelFromJSONTyped(json: any, ignoreDi
     };
 }
 
-export function PostProjectWorkflowRequestModelToJSON(value?: PostProjectWorkflowRequestModel | null): any {
+export function CreateProjectWorkflowRequestModelToJSON(value?: CreateProjectWorkflowRequestModel | null): any {
     if (value === undefined) {
         return undefined;
     }

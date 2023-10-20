@@ -16,44 +16,44 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface PostIntegrationWorkflowRequestModel
+ * @interface CreateIntegrationWorkflowRequestModel
  */
-export interface PostIntegrationWorkflowRequestModel {
+export interface CreateIntegrationWorkflowRequestModel {
     /**
      * The workflow name.
      * @type {string}
-     * @memberof PostIntegrationWorkflowRequestModel
+     * @memberof CreateIntegrationWorkflowRequestModel
      */
     name: string;
     /**
      * The workflow description.
      * @type {string}
-     * @memberof PostIntegrationWorkflowRequestModel
+     * @memberof CreateIntegrationWorkflowRequestModel
      */
     description?: string;
     /**
      * The workflow definition.
      * @type {string}
-     * @memberof PostIntegrationWorkflowRequestModel
+     * @memberof CreateIntegrationWorkflowRequestModel
      */
     definition?: string;
 }
 
 /**
- * Check if a given object implements the PostIntegrationWorkflowRequestModel interface.
+ * Check if a given object implements the CreateIntegrationWorkflowRequestModel interface.
  */
-export function instanceOfPostIntegrationWorkflowRequestModel(value: object): boolean {
+export function instanceOfCreateIntegrationWorkflowRequestModel(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "name" in value;
 
     return isInstance;
 }
 
-export function PostIntegrationWorkflowRequestModelFromJSON(json: any): PostIntegrationWorkflowRequestModel {
-    return PostIntegrationWorkflowRequestModelFromJSONTyped(json, false);
+export function CreateIntegrationWorkflowRequestModelFromJSON(json: any): CreateIntegrationWorkflowRequestModel {
+    return CreateIntegrationWorkflowRequestModelFromJSONTyped(json, false);
 }
 
-export function PostIntegrationWorkflowRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): PostIntegrationWorkflowRequestModel {
+export function CreateIntegrationWorkflowRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): CreateIntegrationWorkflowRequestModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -65,7 +65,7 @@ export function PostIntegrationWorkflowRequestModelFromJSONTyped(json: any, igno
     };
 }
 
-export function PostIntegrationWorkflowRequestModelToJSON(value?: PostIntegrationWorkflowRequestModel | null): any {
+export function CreateIntegrationWorkflowRequestModelToJSON(value?: CreateIntegrationWorkflowRequestModel | null): any {
     if (value === undefined) {
         return undefined;
     }
