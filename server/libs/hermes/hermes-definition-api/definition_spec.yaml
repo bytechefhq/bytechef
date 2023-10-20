@@ -222,8 +222,6 @@ schemas:
         type: object
         additionalProperties:
           type: object
-          items:
-            type: object
       name:
         description: The property name.
         type: string
