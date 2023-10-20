@@ -22,7 +22,7 @@ import com.bytechef.hermes.coordinator.instance.registry.InstanceWorkflowManager
 import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
-import com.bytechef.hermes.configuration.WorkflowExecutionId;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
 import org.springframework.stereotype.Component;
 
 /**

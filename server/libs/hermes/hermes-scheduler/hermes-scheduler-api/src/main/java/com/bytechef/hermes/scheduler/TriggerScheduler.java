@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.scheduler;
 
-import com.bytechef.hermes.configuration.WorkflowExecutionId;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
 
 import java.time.LocalDateTime;
 import java.util.Map;

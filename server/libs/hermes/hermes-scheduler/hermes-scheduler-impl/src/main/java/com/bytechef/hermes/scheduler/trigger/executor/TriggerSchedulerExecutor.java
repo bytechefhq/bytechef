@@ -22,8 +22,8 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhook
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.message.broker.TriggerMessageRoute;
-import com.bytechef.hermes.configuration.service.TriggerLifecycleService;
-import com.bytechef.hermes.configuration.WorkflowExecutionId;
+import com.bytechef.hermes.execution.service.TriggerLifecycleService;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.message.broker.MessageBroker;
 import org.springframework.stereotype.Component;
 

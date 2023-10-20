@@ -17,7 +17,7 @@
 
 package com.bytechef.task.dispatcher.subflow.config;
 
-import com.bytechef.atlas.execution.factory.JobFactory;
+import com.bytechef.atlas.execution.job.JobFactory;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;

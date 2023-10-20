@@ -21,7 +21,7 @@ import com.bytechef.commons.util.InstantUtils;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 import com.bytechef.hermes.scheduler.trigger.data.PollingTriggerScheduleAndData;
 import com.bytechef.hermes.scheduler.trigger.data.ScheduleTriggerScheduleAndData;
-import com.bytechef.hermes.configuration.WorkflowExecutionId;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
 import com.github.kagkarlsson.scheduler.task.schedule.CronSchedule;
