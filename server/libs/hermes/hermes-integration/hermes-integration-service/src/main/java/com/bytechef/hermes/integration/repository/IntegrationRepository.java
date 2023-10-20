@@ -17,9 +17,14 @@
 
 package com.bytechef.hermes.integration.repository;
 
+import com.bytechef.hermes.integration.domain.Category;
 import com.bytechef.hermes.integration.domain.Integration;
+import com.bytechef.tag.domain.Tag;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -28,4 +33,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface IntegrationRepository
     extends PagingAndSortingRepository<Integration, Long>, CrudRepository<Integration, Long> {
+
+    @Query("""
+            SELECT integration.* FROM integration
+            JOIN integration_tag ON integration.id = integration_tag.integration_id
+            WHERE integration_tag.tag_id = :#{#tagRef.id}
+        """)
+    Iterable<Integration> findByTagRef(@Param("tagRef") AggregateReference<Tag, Long> tagRef);
+
+    Iterable<Integration> findByCategoryRef(AggregateReference<Category, Long> categoryRef);
 }

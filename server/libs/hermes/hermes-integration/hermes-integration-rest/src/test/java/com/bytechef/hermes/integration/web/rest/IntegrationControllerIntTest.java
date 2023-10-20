@@ -131,7 +131,7 @@ public class IntegrationControllerIntTest {
         try {
             Integration integration = getIntegration();
 
-            when(integrationService.getIntegrations()).thenReturn(List.of(integration));
+            when(integrationService.getIntegrations(null, null)).thenReturn(List.of(integration));
 
             this.webTestClient
                 .get()

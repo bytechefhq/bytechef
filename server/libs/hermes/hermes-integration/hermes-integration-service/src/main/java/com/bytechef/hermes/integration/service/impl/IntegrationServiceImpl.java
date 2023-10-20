@@ -25,6 +25,7 @@ import java.util.stream.StreamSupport;
 
 import com.bytechef.hermes.integration.service.IntegrationService;
 import com.bytechef.tag.domain.Tag;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -68,9 +69,20 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public List<Integration> getIntegrations() {
-        return StreamSupport.stream(integrationRepository.findAll()
-            .spliterator(), false)
+    public List<Integration> getIntegrations(Long categoryId, Long tagId) {
+        Iterable<Integration> integrationIterable;
+
+        if (categoryId == null && tagId == null) {
+            integrationIterable = integrationRepository.findAll();
+        } else if (categoryId != null && tagId == null) {
+            integrationIterable = integrationRepository.findByCategoryRef(AggregateReference.to(categoryId));
+        } else if (categoryId == null) {
+            integrationIterable = integrationRepository.findByTagRef(AggregateReference.to(tagId));
+        } else {
+            throw new IllegalArgumentException("categoryId and tagId are null.");
+        }
+
+        return StreamSupport.stream(integrationIterable.spliterator(), false)
             .toList();
     }
 

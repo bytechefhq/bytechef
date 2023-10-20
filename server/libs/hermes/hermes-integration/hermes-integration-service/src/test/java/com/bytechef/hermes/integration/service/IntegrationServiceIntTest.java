@@ -126,7 +126,7 @@ public class IntegrationServiceIntTest {
     public void testGetIntegrations() {
         integrationRepository.save(getIntegration());
 
-        assertThat(integrationService.getIntegrations()).hasSize(1);
+        assertThat(integrationService.getIntegrations(null, null)).hasSize(1);
     }
 
     @Test

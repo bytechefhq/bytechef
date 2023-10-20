@@ -105,7 +105,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     @Override
     @Transactional(readOnly = true)
     public List<Tag> getIntegrationTags() {
-        List<Integration> integrations = integrationService.getIntegrations();
+        List<Integration> integrations = integrationService.getIntegrations(null, null);
 
         List<Long> tagIds = integrations.stream()
             .map(Integration::getTagIds)
