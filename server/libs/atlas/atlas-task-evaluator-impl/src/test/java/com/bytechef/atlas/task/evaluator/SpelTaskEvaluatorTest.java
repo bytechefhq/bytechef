@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
 import com.bytechef.atlas.task.evaluator.spel.TempDir;
 import java.io.File;
@@ -52,7 +53,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test2() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("hello", "world");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("hello", "world"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals(evaluated.getWorkflowTask(), jt.getWorkflowTask());
     }
@@ -60,7 +61,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test3() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("hello", "${name}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("hello", "${name}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.singletonMap("name", "arik")));
         Assertions.assertEquals("arik", evaluated.getString("hello"));
     }
@@ -68,7 +69,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test4() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("hello", "${firstName} ${lastName}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("hello", "${firstName} ${lastName}"));
         Context ctx = new Context();
         ctx.put("firstName", "Arik");
         ctx.put("lastName", "Cohen");
@@ -79,7 +80,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test5() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("hello", "${T(java.lang.Integer).valueOf(number)}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("hello", "${T(java.lang.Integer).valueOf(number)}"));
         Context ctx = new Context();
         ctx.put("number", "5");
         TaskExecution evaluated = evaluator.evaluate(jt, ctx);
@@ -89,7 +90,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test6() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("list", Arrays.asList("${firstName}", "${lastName}"));
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("list", Arrays.asList("${firstName}", "${lastName}")));
         Context ctx = new Context();
         ctx.put("firstName", "Arik");
         ctx.put("lastName", "Cohen");
@@ -100,7 +101,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test7() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("map", Collections.singletonMap("hello", "${firstName}"));
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("map", Collections.singletonMap("hello", "${firstName}")));
         Context ctx = new Context();
         ctx.put("firstName", "Arik");
         TaskExecution evaluated = evaluator.evaluate(jt, ctx);
@@ -110,7 +111,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test8() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("mult", "${n1*n2}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("mult", "${n1*n2}"));
         Context ctx = new Context();
         ctx.put("n1", 5);
         ctx.put("n2", 3);
@@ -121,7 +122,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test9() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("message", "${name}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("message", "${name}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals("${name}", evaluated.getString("message"));
     }
@@ -129,7 +130,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test10() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("message", "yo ${name}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("message", "yo ${name}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals("yo ${name}", evaluated.getString("message"));
     }
@@ -137,7 +138,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test11() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("thing", "${number}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("thing", "${number}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.singletonMap("number", 1)));
         Assertions.assertEquals(Integer.valueOf(1), evaluated.get("thing"));
     }
@@ -145,7 +146,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test12() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("thing", "${number*3}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("thing", "${number*3}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.singletonMap("number", 1)));
         Assertions.assertEquals(Integer.valueOf(3), evaluated.get("thing"));
     }
@@ -153,7 +154,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test13() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("thing", "${number*3}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("thing", "${number*3}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals("${number*3}", evaluated.get("thing"));
     }
@@ -161,7 +162,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test14() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("list", "${range(1,3)}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("list", "${range(1,3)}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals(Arrays.asList(1, 2, 3), evaluated.get("list"));
     }
@@ -169,7 +170,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test15() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("sub", Collections.singletonMap("list", "${range(1,3)}"));
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("sub", Collections.singletonMap("list", "${range(1,3)}")));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals(Arrays.asList(1, 2, 3), evaluated.getMap("sub").get("list"));
     }
@@ -177,7 +178,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test16() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("message", "${item1}-${item2}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("message", "${item1}-${item2}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Map.of("item1", "hello", "item2", "world")));
         Assertions.assertEquals("hello-world", evaluated.get("message"));
     }
@@ -185,7 +186,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test17() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("someBoolean", "${boolean('1')}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("someBoolean", "${boolean('1')}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals(Boolean.valueOf(true), evaluated.get("someBoolean"));
     }
@@ -193,7 +194,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test18() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("someByte", "${byte('127')}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("someByte", "${byte('127')}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals(Byte.valueOf(Byte.MAX_VALUE), evaluated.get("someByte"));
     }
@@ -201,7 +202,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test19() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("someChar", "${char('c')}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("someChar", "${char('c')}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals(Character.valueOf('c'), evaluated.get("someChar"));
     }
@@ -209,7 +210,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test20() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("someShort", "${short('32767')}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("someShort", "${short('32767')}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals(Short.valueOf(Short.MAX_VALUE), evaluated.get("someShort"));
     }
@@ -217,7 +218,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test21() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("someInt", "${int('1')}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("someInt", "${int('1')}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals(Integer.valueOf(1), evaluated.get("someInt"));
     }
@@ -225,7 +226,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test22() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("someLong", "${long('1')}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("someLong", "${long('1')}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals(Long.valueOf(1L), evaluated.get("someLong"));
     }
@@ -233,7 +234,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test23() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("someFloat", "${float('1.337')}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("someFloat", "${float('1.337')}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals(Float.valueOf(1.337f), evaluated.get("someFloat"));
     }
@@ -241,7 +242,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test24() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("someDouble", "${double('1.337')}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("someDouble", "${double('1.337')}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals(Double.valueOf(1.337d), evaluated.get("someDouble"));
     }
@@ -249,7 +250,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test25() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("joined", "${join(',',range(1,3))}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("joined", "${join(',',range(1,3))}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals("1,2,3", evaluated.get("joined"));
     }
@@ -257,7 +258,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test26() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("joined", "${join(',',range(1,1))}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("joined", "${join(',',range(1,1))}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals("1", evaluated.get("joined"));
     }
@@ -265,7 +266,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test27() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("joined", "${join(' and ',{'a','b','c'})}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("joined", "${join(' and ',{'a','b','c'})}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals("a and b and c", evaluated.get("joined"));
     }
@@ -273,7 +274,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test28() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("concatenated", "${concat({'a','b','c'}, {'d','e','f'})}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("concatenated", "${concat({'a','b','c'}, {'d','e','f'})}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals(Arrays.asList("a", "b", "c", "d", "e", "f"), evaluated.get("concatenated"));
     }
@@ -281,7 +282,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test29() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("concatenated", "${concat({'a','b','c'}, range(1,3))}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("concatenated", "${concat({'a','b','c'}, range(1,3))}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals(Arrays.asList("a", "b", "c", 1, 2, 3), evaluated.get("concatenated"));
     }
@@ -289,7 +290,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test30() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("flattened", "${flatten({{'a','b','c'},{'d','e','f'}})}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("flattened", "${flatten({{'a','b','c'},{'d','e','f'}})}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals(Arrays.asList("a", "b", "c", "d", "e", "f"), evaluated.get("flattened"));
     }
@@ -297,7 +298,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test31() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("flattened", "${flatten({{'a','b','c'},range(1,3)})}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("flattened", "${flatten({{'a','b','c'},range(1,3)})}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertEquals(Arrays.asList("a", "b", "c", 1, 2, 3), evaluated.get("flattened"));
     }
@@ -307,7 +308,7 @@ public class SpelTaskEvaluatorTest {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.builder()
                 .methodExecutor("tempDir", new TempDir())
                 .build();
-        TaskExecution jt = TaskExecution.of("tempDir", "${tempDir()}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("tempDir", "${tempDir()}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         String tmpDir = System.getProperty("java.io.tmpdir");
         if (tmpDir.endsWith(File.separator)) {
@@ -319,7 +320,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test33() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("uuid", "${uuid()}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("uuid", "${uuid()}"));
         TaskExecution evaluated = evaluator.evaluate(jt, new Context(Collections.emptyMap()));
         Assertions.assertNotNull(evaluated.get("uuid"));
     }
@@ -327,7 +328,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test34() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("fullName", "${firstName} ${lastName}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("fullName", "${firstName} ${lastName}"));
         Context ctx = new Context();
         ctx.put("firstName", "Arik");
         TaskExecution evaluated = evaluator.evaluate(jt, ctx);
@@ -337,7 +338,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test35() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("result", "${num/den}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("result", "${num/den}"));
         Context ctx = new Context();
         ctx.put("num", 5.0);
         ctx.put("den", 10.0);
@@ -348,7 +349,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test36() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("number", "${stringf('%03d',5)}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("number", "${stringf('%03d',5)}"));
         Context ctx = new Context();
         TaskExecution evaluated = evaluator.evaluate(jt, ctx);
         Assertions.assertEquals("005", evaluated.getString("number"));
@@ -357,7 +358,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test37() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("number", "${stringf('%s %s','hello','world')}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("number", "${stringf('%s %s','hello','world')}"));
         Context ctx = new Context();
         TaskExecution evaluated = evaluator.evaluate(jt, ctx);
         Assertions.assertEquals("hello world", evaluated.getString("number"));
@@ -366,7 +367,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test38() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("sorted", "${sort({3,1,2})}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("sorted", "${sort({3,1,2})}"));
         Context ctx = new Context();
         TaskExecution evaluated = evaluator.evaluate(jt, ctx);
         Assertions.assertEquals(Arrays.asList(1, 2, 3), evaluated.getList("sorted", Integer.class));
@@ -375,7 +376,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test39() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("sorted", "${sort({'C','A','B'})}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("sorted", "${sort({'C','A','B'})}"));
         Context ctx = new Context();
         TaskExecution evaluated = evaluator.evaluate(jt, ctx);
         Assertions.assertEquals(Arrays.asList("A", "B", "C"), evaluated.getList("sorted", String.class));
@@ -384,7 +385,7 @@ public class SpelTaskEvaluatorTest {
     @Test
     public void test40() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution jt = TaskExecution.of("date", "${dateFormat(now(),'yyyyMMdd')}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("date", "${dateFormat(now(),'yyyyMMdd')}"));
         Context ctx = new Context();
         TaskExecution evaluated = evaluator.evaluate(jt, ctx);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -397,7 +398,7 @@ public class SpelTaskEvaluatorTest {
         when(env.getProperty("my.property")).thenReturn("something");
         SpelTaskEvaluator evaluator =
                 SpelTaskEvaluator.builder().environment(env).build();
-        TaskExecution jt = TaskExecution.of("myValue", "${config('my.property')}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("myValue", "${config('my.property')}"));
         Context ctx = new Context();
         TaskExecution evaluated = evaluator.evaluate(jt, ctx);
         Assertions.assertEquals("something", evaluated.getString("myValue"));
@@ -408,7 +409,7 @@ public class SpelTaskEvaluatorTest {
         Environment env = mock(Environment.class);
         SpelTaskEvaluator evaluator =
                 SpelTaskEvaluator.builder().environment(env).build();
-        TaskExecution jt = TaskExecution.of("myValue", "${config('no.such.property')}");
+        TaskExecution jt = TaskExecution.of(WorkflowTask.of("myValue", "${config('no.such.property')}"));
         Context ctx = new Context();
         TaskExecution evaluated = evaluator.evaluate(jt, ctx);
         Assertions.assertEquals("${config('no.such.property')}", evaluated.getString("myValue"));
