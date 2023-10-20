@@ -110,7 +110,8 @@ public class TriggerDefinitionServiceController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<Void> executeListenerDisable(@Valid @RequestBody ListenerDisableRequest listenerDisableRequest) {
+    public ResponseEntity<Void>
+        executeListenerDisable(@Valid @RequestBody ListenerDisableRequest listenerDisableRequest) {
         triggerDefinitionService.executeListenerDisable(
             listenerDisableRequest.componentName, listenerDisableRequest.componentVersion,
             listenerDisableRequest.triggerName, listenerDisableRequest.connectionParameters,
