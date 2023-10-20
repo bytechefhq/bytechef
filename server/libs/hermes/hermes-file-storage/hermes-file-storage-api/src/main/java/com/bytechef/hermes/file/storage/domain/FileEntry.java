@@ -38,10 +38,10 @@ public class FileEntry {
     private final String url;
 
     public FileEntry(String name, String extension, String mimeType, String url) {
-        Assert.notNull(name, "'name' must not be null.");
-        Assert.notNull(extension, "'extension' must not be null.");
-        Assert.notNull(mimeType, "'mimeType' must not be null.");
-        Assert.notNull(url, "'url' must not be null.");
+        Assert.notNull(name, "'name' must not be null");
+        Assert.notNull(extension, "'extension' must not be null");
+        Assert.notNull(mimeType, "'mimeType' must not be null");
+        Assert.notNull(url, "'url' must not be null");
 
         this.extension = extension;
         this.mimeType = mimeType;
@@ -55,8 +55,8 @@ public class FileEntry {
 
     @SuppressFBWarnings("NP")
     public FileEntry(String filename, String url) {
-        Assert.notNull(filename, "'filename' must not be null.");
-        Assert.notNull(url, "'url' must not be null.");
+        Assert.notNull(filename, "'filename' must not be null");
+        Assert.notNull(url, "'url' must not be null");
 
         this.extension = Optional.of(filename)
             .filter(f -> f.contains("."))

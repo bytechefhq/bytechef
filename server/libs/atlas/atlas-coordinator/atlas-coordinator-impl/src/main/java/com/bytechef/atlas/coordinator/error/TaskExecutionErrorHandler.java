@@ -67,7 +67,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
     public void handle(TaskExecution taskExecution) {
         ExecutionError error = taskExecution.getError();
 
-        Assert.notNull(error, "'error' must not be null.");
+        Assert.notNull(error, "'error' must not be null");
 
         logger.error("Task {}: {}\n{}", taskExecution.getId(), error.getMessage(), error.getStackTrace());
 

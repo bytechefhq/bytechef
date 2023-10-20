@@ -68,8 +68,8 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public Workflow create(
         String definition, @NonNull Workflow.Format format, @NonNull Workflow.SourceType sourceType) {
-        Assert.notNull(format, "'format' must not be null.");
-        Assert.notNull(sourceType, "'sourceType' must not be null.");
+        Assert.notNull(format, "'format' must not be null");
+        Assert.notNull(sourceType, "'sourceType' must not be null");
 
         if (ObjectUtils.isEmpty(definition)) {
             definition = "{\"label\": \"New Workflow\", \"tasks\": []}";
@@ -88,7 +88,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     public void delete(@NonNull String id) {
-        Assert.notNull(id, "'id' must not be null.");
+        Assert.notNull(id, "'id' must not be null");
 
         workflowCrudRepositories.stream()
             .filter(workflowCrudRepository -> workflowCrudRepository.findById(id)
@@ -101,7 +101,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     @SuppressFBWarnings("NP")
     @Transactional(readOnly = true)
     public Workflow getWorkflow(@NonNull String id) {
-        Assert.notNull(id, "'id' must not be null.");
+        Assert.notNull(id, "'id' must not be null");
 
         Cache cacheOne = Objects.requireNonNull(cacheManager.getCache(CACHE_ONE));
 
@@ -200,8 +200,8 @@ public class WorkflowServiceImpl implements WorkflowService {
 
     @Override
     public Workflow update(@NonNull String id, @NonNull String definition) {
-        Assert.notNull(id, "'id' must not be null.");
-        Assert.notNull(definition, "'definition' must not be null.");
+        Assert.notNull(id, "'id' must not be null");
+        Assert.notNull(definition, "'definition' must not be null");
 
         Workflow workflow = getWorkflow(id);
 

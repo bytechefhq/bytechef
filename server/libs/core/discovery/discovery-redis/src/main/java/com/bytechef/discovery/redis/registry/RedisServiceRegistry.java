@@ -77,7 +77,7 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
             // ignore
         }
 
-        logger.info("Redis Service Registry is closed.");
+        logger.info("Redis Service Registry is closed");
     }
 
     @Override

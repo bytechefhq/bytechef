@@ -55,7 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> getCategories(List<Long> ids) {
-        Assert.notNull(ids, "'ids' must not be null.");
+        Assert.notNull(ids, "'ids' must not be null");
 
         if (ids.isEmpty()) {
             return Collections.emptyList();

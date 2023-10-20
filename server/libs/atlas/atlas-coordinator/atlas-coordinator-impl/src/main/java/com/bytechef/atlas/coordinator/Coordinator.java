@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Coordinator {
 
-    private static final Logger log = LoggerFactory.getLogger(Coordinator.class);
+    private static final Logger logger = LoggerFactory.getLogger(Coordinator.class);
 
     private final ErrorHandler<? super Errorable> errorHandler;
     private final EventPublisher eventPublisher;
@@ -94,9 +94,9 @@ public class Coordinator {
 
         jobExecutor.execute(job);
 
-        log.debug("Job {}: '{}' started.", job.getId(), job.getLabel());
-
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
+
+        logger.debug("Job id={}, label='{}' started", job.getId(), job.getLabel());
     }
 
     /**
@@ -124,6 +124,8 @@ public class Coordinator {
                 new CancelControlTask(currentTaskExecution.getJobId(), currentTaskExecution.getId()));
         }
 
+        logger.debug("Job id={} stopped", job.getId());
+
         return job;
     }
 
@@ -137,6 +139,8 @@ public class Coordinator {
         Job job = jobService.resume(jobId);
 
         jobExecutor.execute(job);
+
+        logger.debug("Job id={} resumed", job.getId());
 
         return job;
     }

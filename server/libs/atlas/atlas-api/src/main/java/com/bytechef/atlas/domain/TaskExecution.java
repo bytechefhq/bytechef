@@ -154,7 +154,7 @@ public final class TaskExecution
     }
 
     public TaskExecution(@NonNull WorkflowTask workflowTask) {
-        Assert.notNull(workflowTask, "'workflowTask' must not be null.");
+        Assert.notNull(workflowTask, "'workflowTask' must not be null");
 
         this.workflowTask = workflowTask;
     }
@@ -173,14 +173,14 @@ public final class TaskExecution
     }
 
     public static TaskExecution of(long jobId, int priority, WorkflowTask workflowTask) {
-        Assert.notNull(workflowTask, "'workflowTask' must not be null.");
+        Assert.notNull(workflowTask, "'workflowTask' must not be null");
 
         return new TaskExecution(jobId, null, priority, DEFAULT_TASK_NUMBER, workflowTask);
     }
 
     public static TaskExecution of(
         long jobId, long parentId, int priority, @NonNull WorkflowTask workflowTask) {
-        Assert.notNull(workflowTask, "'workflowTask' must not be null.");
+        Assert.notNull(workflowTask, "'workflowTask' must not be null");
 
         return new TaskExecution(jobId, parentId, priority, DEFAULT_TASK_NUMBER, workflowTask);
     }
@@ -188,13 +188,13 @@ public final class TaskExecution
     public static TaskExecution of(
         long jobId, long parentId, int priority, int taskNumber, @NonNull WorkflowTask workflowTask) {
 
-        Assert.notNull(workflowTask, "'workflowTask' must not be null.");
+        Assert.notNull(workflowTask, "'workflowTask' must not be null");
 
         return new TaskExecution(jobId, parentId, priority, taskNumber, workflowTask);
     }
 
     public static TaskExecution of(long jobId, @NonNull WorkflowTask workflowTask) {
-        Assert.notNull(workflowTask, "'workflowTask' must not be null.");
+        Assert.notNull(workflowTask, "'workflowTask' must not be null");
 
         return new TaskExecution(jobId, null, 0, DEFAULT_TASK_NUMBER, workflowTask);
     }

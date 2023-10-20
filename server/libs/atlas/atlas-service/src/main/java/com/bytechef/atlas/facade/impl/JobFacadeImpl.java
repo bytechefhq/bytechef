@@ -28,8 +28,13 @@ import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 public class JobFacadeImpl implements JobFacade {
+
+    private static final Logger logger = LoggerFactory.getLogger(JobFacadeImpl.class);
 
     private final ContextService contextService;
     private final EventPublisher eventPublisher;
@@ -51,11 +56,15 @@ public class JobFacadeImpl implements JobFacade {
     public long create(JobParameters jobParameters) {
         Job job = jobService.create(jobParameters);
 
+        Assert.notNull(job.getId(), "'job.id' must not be null");
+
         contextService.push(job.getId(), Context.Classname.JOB, job.getInputs());
 
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
 
         messageBroker.send(Queues.JOBS, job.getId());
+
+        logger.debug("Job id={}, label='{}' created", job.getId(), job.getLabel());
 
         return job.getId();
     }

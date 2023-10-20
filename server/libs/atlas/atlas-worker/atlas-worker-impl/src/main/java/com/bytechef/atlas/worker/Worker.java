@@ -143,7 +143,7 @@ public class Worker {
      * an ongoing task or to adjust something on a worker outside the context of a job.
      */
     public void handle(ControlTask controlTask) {
-        logger.debug("received control task: {}", controlTask);
+        logger.debug("Received control task: {}", controlTask);
 
         if (CancelControlTask.TYPE_CANCEL.equals(controlTask.getType())) {
             Long jobId = ((CancelControlTask) controlTask).getJobId();

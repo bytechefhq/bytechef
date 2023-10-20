@@ -47,13 +47,13 @@ public class MapUtils {
     private static final DefaultConversionService conversionService = new DefaultConversionService();
 
     public static boolean containsKey(Map<String, Object> map, String key) {
-        Assert.notNull(map, "'map' must not be null.");
+        Assert.notNull(map, "'map' must not be null");
 
         return map.containsKey(key);
     }
 
     public static Object get(Map<String, ?> map, String key) {
-        Assert.notNull(map, "'map' must not be null.");
+        Assert.notNull(map, "'map' must not be null");
 
         return map.get(key);
     }

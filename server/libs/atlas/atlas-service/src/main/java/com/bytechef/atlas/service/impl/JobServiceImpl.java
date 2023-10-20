@@ -88,7 +88,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job create(@NonNull JobParameters jobParameters) {
-        Assert.notNull(jobParameters, "'jobParameters' must not be null.");
+        Assert.notNull(jobParameters, "'jobParameters' must not be null");
 
         String workflowId = jobParameters.getWorkflowId();
 
@@ -123,8 +123,6 @@ public class JobServiceImpl implements JobService {
 
         job = jobRepository.save(job);
 
-        log.debug("Job {}: '{}' created.", job.getId(), job.getLabel());
-
         return job;
     }
 
@@ -136,8 +134,6 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job resume(long id) {
-        log.debug("Resuming job {}", id);
-
         Job job = jobRepository.findById(id)
             .orElseThrow();
 
@@ -173,7 +169,7 @@ public class JobServiceImpl implements JobService {
 
         Assert.isTrue(
             job.getStatus() == Job.Status.STARTED,
-            "Job " + id + " can not be stopped as it is " + job.getStatus());
+            "Job id=" + id + " can not be stopped as it is " + job.getStatus());
 
         job.setStatus(Job.Status.STOPPED);
 
@@ -184,7 +180,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job update(@NonNull Job job) {
-        Assert.notNull(job, "'job' must not be null.");
+        Assert.notNull(job, "'job' must not be null");
 
         return jobRepository.save(job);
     }
