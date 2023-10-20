@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 <your company/name>.
+ * Copyright 2016-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,17 +12,49 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
 
 package com.integri.atlas.engine.core.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
+ * @author Arik Cohen
  * @author Ivica Cardic
  */
-public interface JSONHelper {
-    <T> T deserialize(String value, Class<T> clazz);
+public class JSONHelper {
 
-    String serialize(Object value);
+    private final ObjectMapper objectMapper;
 
-    <T> T read(String json);
+    public JSONHelper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    public <T> T deserialize(String value, Class<T> clazz) {
+        try {
+            return objectMapper.readValue(value, clazz);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public <T> T deserialize(String json) {
+        try {
+            return objectMapper.readValue(json, new TypeReference<>() {});
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String serialize(Object value) {
+        try {
+            return objectMapper.writeValueAsString(value);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

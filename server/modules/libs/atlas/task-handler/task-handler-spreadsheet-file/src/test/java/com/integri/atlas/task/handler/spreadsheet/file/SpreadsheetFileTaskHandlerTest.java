@@ -22,7 +22,6 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import com.atlas.json.JSONArrayUtil;
 import com.atlas.json.JSONObjectUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.core.json.DefaultJSONHelper;
 import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.file.storage.FileEntry;
@@ -47,7 +46,7 @@ import org.springframework.core.io.ClassPathResource;
 public class SpreadsheetFileTaskHandlerTest {
 
     private static final FileStorageService fileStorageService = new Base64FileStorageService();
-    private static final JSONHelper jsonHelper = new DefaultJSONHelper(new ObjectMapper());
+    private static final JSONHelper jsonHelper = new JSONHelper(new ObjectMapper());
     private static final SpreadsheetFileTaskHandler spreadsheetFileTaskHandler = new SpreadsheetFileTaskHandler(
         fileStorageService,
         jsonHelper
