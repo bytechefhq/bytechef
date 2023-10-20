@@ -140,12 +140,11 @@ public final class TaskExecution
     @Column("task_number")
     private int taskNumber = DEFAULT_TASK_NUMBER;
 
-    // TODO Add version
     @Version
     @SuppressFBWarnings("UuF")
     private int version;
 
-    @Transient
+    @Column("workflow_task")
     private WorkflowTask workflowTask = WorkflowTask.EMPTY_WORKFLOW_TASK;
 
     public TaskExecution() {
