@@ -2,13 +2,13 @@ import DatePicker from '@/components/DatePicker/DatePicker';
 import EmptyList from '@/components/EmptyList/EmptyList';
 import FilterableSelect, {
     ISelectOption,
-import PageFooter from 'components/PageFooter/PageFooter';
-import PageHeader from 'components/PageHeader/PageHeader';
-import PageLoader from 'components/PageLoader/PageLoader';
-import LayoutContainer from 'layouts/LayoutContainer/LayoutContainer';
 } from '@/components/FilterableSelect/FilterableSelect';
 import PageLoader from '@/components/PageLoader/PageLoader';
 import Pagination from '@/components/Pagination/Pagination';
+import LayoutContainer from '@/layouts/LayoutContainer';
+import PageFooter from '@/layouts/PageFooter';
+import PageHeader from '@/layouts/PageHeader';
+import {QueueListIcon} from '@heroicons/react/24/outline';
 import {
     GetProjectWorkflowExecutionsJobStatusEnum,
     ProjectWorkflowExecutionModel,
@@ -136,7 +136,7 @@ export const WorkflowExecutions = () => {
                 leftSidebarHeader={
                     <>
                         <PageHeader
-                            leftSidebar
+                            position="sidebar"
                             title="Workflow Executions History"
                         />
 
