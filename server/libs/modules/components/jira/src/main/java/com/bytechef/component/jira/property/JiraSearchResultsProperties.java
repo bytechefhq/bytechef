@@ -31,38 +31,39 @@ import java.util.List;
  * @generated
  */
 public class JiraSearchResultsProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        string("expand").label("Expand")
-            .description("Expand options that include additional search result details in the response.")
-            .required(false),
-        integer("startAt").label("Start At")
-            .description("The index of the first item returned on the page.")
-            .required(false),
-        integer("maxResults").label("Max Results")
-            .description("The maximum number of results that could be on the page.")
-            .required(false),
-        integer("total").label("Total")
-            .description("The number of results on the page.")
-            .required(false),
-        array("issues").items(object().properties(JiraIssueBeanProperties.PROPERTIES)
-            .description("Details about an issue."))
-            .placeholder("Add to Issues")
-            .label("Issues")
-            .description("The list of issues found by the search.")
-            .required(false),
-        array("warningMessages").items(string().description("Any warnings related to the JQL query."))
-            .placeholder("Add to Warning Messages")
-            .label("Warning Messages")
-            .description("Any warnings related to the JQL query.")
-            .required(false),
-        object("names").additionalProperties(string())
-            .placeholder("Add to Names")
-            .label("Names")
-            .description("The ID and name of each field in the search results.")
-            .required(false),
-        object("schema").additionalProperties(object().properties(JiraJsonTypeBeanProperties.PROPERTIES))
-            .placeholder("Add to Schema")
-            .label("Schema")
-            .description("The schema describing the field types in the search results.")
-            .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
+        List.of(
+            string("expand").label("Expand")
+                .description("Expand options that include additional search result details in the response.")
+                .required(false),
+            integer("startAt").label("Start At")
+                .description("The index of the first item returned on the page.")
+                .required(false),
+            integer("maxResults").label("Max Results")
+                .description("The maximum number of results that could be on the page.")
+                .required(false),
+            integer("total").label("Total")
+                .description("The number of results on the page.")
+                .required(false),
+            array("issues").items(object().properties(JiraIssueBeanProperties.PROPERTIES)
+                .description("Details about an issue."))
+                .placeholder("Add to Issues")
+                .label("Issues")
+                .description("The list of issues found by the search.")
+                .required(false),
+            array("warningMessages").items(string().description("Any warnings related to the JQL query."))
+                .placeholder("Add to Warning Messages")
+                .label("Warning Messages")
+                .description("Any warnings related to the JQL query.")
+                .required(false),
+            object("names").additionalProperties(string())
+                .placeholder("Add to Names")
+                .label("Names")
+                .description("The ID and name of each field in the search results.")
+                .required(false),
+            object("schema").additionalProperties(object().properties(JiraJsonTypeBeanProperties.PROPERTIES))
+                .placeholder("Add to Schema")
+                .label("Schema")
+                .description("The schema describing the field types in the search results.")
+                .required(false));
 }

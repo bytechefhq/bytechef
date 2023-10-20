@@ -28,23 +28,24 @@ import java.util.List;
  * @generated
  */
 public class JiraHistoryMetadataParticipantProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        string("id").label("Id")
-            .description("The ID of the user or system associated with a history record.")
-            .required(false),
-        string("displayName").label("Display Name")
-            .description("The display name of the user or system associated with a history record.")
-            .required(false),
-        string("displayNameKey").label("Display Name Key")
-            .description("The key of the display name of the user or system associated with a history record.")
-            .required(false),
-        string("type").label("Type")
-            .description("The type of the user or system associated with a history record.")
-            .required(false),
-        string("avatarUrl").label("Avatar Url")
-            .description("The URL to an avatar for the user or system associated with a history record.")
-            .required(false),
-        string("url").label("Url")
-            .description("The URL of the user or system associated with a history record.")
-            .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
+        List.of(
+            string("id").label("Id")
+                .description("The ID of the user or system associated with a history record.")
+                .required(false),
+            string("displayName").label("Display Name")
+                .description("The display name of the user or system associated with a history record.")
+                .required(false),
+            string("displayNameKey").label("Display Name Key")
+                .description("The key of the display name of the user or system associated with a history record.")
+                .required(false),
+            string("type").label("Type")
+                .description("The type of the user or system associated with a history record.")
+                .required(false),
+            string("avatarUrl").label("Avatar Url")
+                .description("The URL to an avatar for the user or system associated with a history record.")
+                .required(false),
+            string("url").label("Url")
+                .description("The URL of the user or system associated with a history record.")
+                .required(false));
 }

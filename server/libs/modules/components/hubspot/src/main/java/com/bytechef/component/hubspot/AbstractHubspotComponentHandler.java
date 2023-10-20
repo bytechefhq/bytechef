@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.jira;
+package com.bytechef.component.hubspot;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.jira.action.JiraCreateIssueAction;
-import com.bytechef.component.jira.action.JiraGetIssueAction;
-import com.bytechef.component.jira.action.JiraSearchForIssuesUsingJqlAction;
-import com.bytechef.component.jira.connection.JiraConnection;
+import com.bytechef.component.hubspot.action.HubspotCreateContactAction;
+import com.bytechef.component.hubspot.action.HubspotUpdateContactAction;
+import com.bytechef.component.hubspot.connection.HubspotConnection;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 
@@ -31,15 +30,15 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
  *
  * @generated
  */
-public abstract class AbstractJiraComponentHandler implements OpenApiComponentHandler {
+public abstract class AbstractHubspotComponentHandler implements OpenApiComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
-        component("jira")
-            .title("Jira")
+        component("hubspot")
+            .title("Hubspot")
             .description(
-                "Jira is a proprietary issue tracking product developed by Atlassian that allows bug tracking and agile project management."))
-                    .actions(modifyActions(JiraCreateIssueAction.ACTION_DEFINITION,
-                        JiraGetIssueAction.ACTION_DEFINITION, JiraSearchForIssuesUsingJqlAction.ACTION_DEFINITION))
-                    .connection(modifyConnection(JiraConnection.CONNECTION_DEFINITION))
+                "HubSpot is a CRM platform with all the software, integrations, and resources you need to connect marketing, sales, content management, and customer service."))
+                    .actions(modifyActions(HubspotCreateContactAction.ACTION_DEFINITION,
+                        HubspotUpdateContactAction.ACTION_DEFINITION))
+                    .connection(modifyConnection(HubspotConnection.CONNECTION_DEFINITION))
                     .triggers(getTriggers());
 
     @Override

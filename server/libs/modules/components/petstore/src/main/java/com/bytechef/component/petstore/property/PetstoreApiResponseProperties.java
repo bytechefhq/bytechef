@@ -29,11 +29,12 @@ import java.util.List;
  * @generated
  */
 public class PetstoreApiResponseProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        integer("code").label("Code")
-            .required(false),
-        string("type").label("Type")
-            .required(false),
-        string("message").label("Message")
-            .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
+        List.of(
+            integer("code").label("Code")
+                .required(false),
+            string("type").label("Type")
+                .required(false),
+            string("message").label("Message")
+                .required(false));
 }

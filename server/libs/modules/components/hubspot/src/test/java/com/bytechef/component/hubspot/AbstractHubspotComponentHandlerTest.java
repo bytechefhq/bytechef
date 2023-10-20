@@ -15,24 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.petstore.property;
+package com.bytechef.component.hubspot;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-
-import com.bytechef.hermes.definition.DefinitionDSL;
-import java.util.List;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
 
 /**
- * Provides schema definition.
+ * Provides the base test implementation for the REST based component.
  *
  * @generated
  */
-public class PetstoreTagProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
-        List.of(
-            integer("id").label("Id")
-                .required(false),
-            string("name").label("Name")
-                .required(false));
+public abstract class AbstractHubspotComponentHandlerTest {
+    @Test
+    public void testGetDefinition() {
+        JsonFileAssert.assertEquals("definition/hubspot_v1.json", new HubspotComponentHandler().getDefinition());
+    }
 }

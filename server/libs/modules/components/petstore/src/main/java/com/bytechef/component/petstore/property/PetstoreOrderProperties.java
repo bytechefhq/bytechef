@@ -32,23 +32,24 @@ import java.util.List;
  * @generated
  */
 public class PetstoreOrderProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        integer("id").label("Id")
-            .required(false)
-            .exampleValue(10),
-        integer("petId").label("Pet Id")
-            .required(false)
-            .exampleValue(198772),
-        integer("quantity").label("Quantity")
-            .required(false)
-            .exampleValue(7),
-        dateTime("shipDate").label("Ship Date")
-            .required(false),
-        string("status").label("Status")
-            .description("Order Status")
-            .options(option("Placed", "placed"), option("Approved", "approved"), option("Delivered", "delivered"))
-            .required(false)
-            .exampleValue("approved"),
-        bool("complete").label("Complete")
-            .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
+        List.of(
+            integer("id").label("Id")
+                .required(false)
+                .exampleValue(10),
+            integer("petId").label("Pet Id")
+                .required(false)
+                .exampleValue(198772),
+            integer("quantity").label("Quantity")
+                .required(false)
+                .exampleValue(7),
+            dateTime("shipDate").label("Ship Date")
+                .required(false),
+            string("status").label("Status")
+                .description("Order Status")
+                .options(option("Placed", "placed"), option("Approved", "approved"), option("Delivered", "delivered"))
+                .required(false)
+                .exampleValue("approved"),
+            bool("complete").label("Complete")
+                .required(false));
 }

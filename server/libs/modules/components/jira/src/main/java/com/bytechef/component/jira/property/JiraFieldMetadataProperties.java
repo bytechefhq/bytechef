@@ -31,42 +31,44 @@ import java.util.List;
  * @generated
  */
 public class JiraFieldMetadataProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        bool("required").label("Required")
-            .description("Whether the field is required.")
-            .required(true),
-        object("schema").properties(JiraJsonTypeBeanProperties.PROPERTIES)
-            .label("Schema")
-            .description("The schema of a field.")
-            .required(false),
-        string("name").label("Name")
-            .description("The name of the field.")
-            .required(true),
-        string("key").label("Key")
-            .description("The key of the field.")
-            .required(true),
-        string("autoCompleteUrl").label("Auto Complete Url")
-            .description("The URL that can be used to automatically complete the field.")
-            .required(false),
-        bool("hasDefaultValue").label("Has Default Value")
-            .description("Whether the field has a default value.")
-            .required(false),
-        array("operations").items(string().description("The list of operations that can be performed on the field."))
-            .placeholder("Add to Operations")
-            .label("Operations")
-            .description("The list of operations that can be performed on the field.")
-            .required(true),
-        array("allowedValues").items(object().description("The list of values allowed in the field."))
-            .placeholder("Add to Allowed Values")
-            .label("Allowed Values")
-            .description("The list of values allowed in the field.")
-            .required(false),
-        object("defaultValue").label("Default Value")
-            .description("The default value of the field.")
-            .required(false),
-        object("configuration").additionalProperties(object())
-            .placeholder("Add to Configuration")
-            .label("Configuration")
-            .description("The configuration properties.")
-            .required(false));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
+        List.of(
+            bool("required").label("Required")
+                .description("Whether the field is required.")
+                .required(true),
+            object("schema").properties(JiraJsonTypeBeanProperties.PROPERTIES)
+                .label("Schema")
+                .description("The schema of a field.")
+                .required(false),
+            string("name").label("Name")
+                .description("The name of the field.")
+                .required(true),
+            string("key").label("Key")
+                .description("The key of the field.")
+                .required(true),
+            string("autoCompleteUrl").label("Auto Complete Url")
+                .description("The URL that can be used to automatically complete the field.")
+                .required(false),
+            bool("hasDefaultValue").label("Has Default Value")
+                .description("Whether the field has a default value.")
+                .required(false),
+            array("operations")
+                .items(string().description("The list of operations that can be performed on the field."))
+                .placeholder("Add to Operations")
+                .label("Operations")
+                .description("The list of operations that can be performed on the field.")
+                .required(true),
+            array("allowedValues").items(object().description("The list of values allowed in the field."))
+                .placeholder("Add to Allowed Values")
+                .label("Allowed Values")
+                .description("The list of values allowed in the field.")
+                .required(false),
+            object("defaultValue").label("Default Value")
+                .description("The default value of the field.")
+                .required(false),
+            object("configuration").additionalProperties(object())
+                .placeholder("Add to Configuration")
+                .label("Configuration")
+                .description("The configuration properties.")
+                .required(false));
 }
