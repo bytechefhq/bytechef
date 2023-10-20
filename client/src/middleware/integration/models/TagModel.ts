@@ -14,11 +14,23 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * An integration tag.
+ * A tag.
  * @export
  * @interface TagModel
  */
 export interface TagModel {
+    /**
+     * The created by.
+     * @type {string}
+     * @memberof TagModel
+     */
+    readonly createdBy?: string;
+    /**
+     * The created date.
+     * @type {Date}
+     * @memberof TagModel
+     */
+    readonly createdDate?: Date;
     /**
      * The id of the tag.
      * @type {number}
@@ -71,6 +83,8 @@ export function TagModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     }
     return {
         
+        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
+        'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'id': !exists(json, 'id') ? undefined : json['id'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),

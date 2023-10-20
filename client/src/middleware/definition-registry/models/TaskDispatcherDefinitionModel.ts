@@ -55,7 +55,7 @@ export interface TaskDispatcherDefinitionModel {
      * @type {Array<PropertyModel>}
      * @memberof TaskDispatcherDefinitionModel
      */
-    output?: Array<PropertyModel>;
+    outputSchema?: Array<PropertyModel>;
     /**
      * The list of task dispatcher properties.
      * @type {Array<PropertyModel>}
@@ -103,7 +103,7 @@ export function TaskDispatcherDefinitionModelFromJSONTyped(json: any, ignoreDisc
         
         'display': !exists(json, 'display') ? undefined : DisplayModelFromJSON(json['display']),
         'name': !exists(json, 'name') ? undefined : json['name'],
-        'output': !exists(json, 'output') ? undefined : ((json['output'] as Array<any>).map(PropertyModelFromJSON)),
+        'outputSchema': !exists(json, 'outputSchema') ? undefined : ((json['outputSchema'] as Array<any>).map(PropertyModelFromJSON)),
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
         'version': !exists(json, 'version') ? undefined : json['version'],
@@ -122,7 +122,7 @@ export function TaskDispatcherDefinitionModelToJSON(value?: TaskDispatcherDefini
         
         'display': DisplayModelToJSON(value.display),
         'name': value.name,
-        'output': value.output === undefined ? undefined : ((value.output as Array<any>).map(PropertyModelToJSON)),
+        'outputSchema': value.outputSchema === undefined ? undefined : ((value.outputSchema as Array<any>).map(PropertyModelToJSON)),
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
         'resources': ResourcesModelToJSON(value.resources),
         'version': value.version,
