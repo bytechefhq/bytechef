@@ -106,6 +106,7 @@ const Workflow = (): JSX.Element => {
                 proOptions={{hideAttribution: true}}
                 zoomOnDoubleClick={false}
                 zoomOnScroll={false}
+                deleteKeyCode={null}
             >
                 <MiniMap />
 
