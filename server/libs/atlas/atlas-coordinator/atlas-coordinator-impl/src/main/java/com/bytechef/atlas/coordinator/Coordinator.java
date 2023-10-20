@@ -42,7 +42,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.bytechef.commons.utils.ExceptionUtils;
-import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +52,6 @@ import org.slf4j.LoggerFactory;
  * @author Ivica Cardic
  * @since Jun 12, 2016
  */
-@Transactional
 public class Coordinator {
 
     private static final Logger log = LoggerFactory.getLogger(Coordinator.class);

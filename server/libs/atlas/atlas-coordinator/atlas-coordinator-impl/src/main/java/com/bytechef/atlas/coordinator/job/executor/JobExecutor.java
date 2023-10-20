@@ -30,7 +30,6 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +39,6 @@ import java.util.Map;
  * @author Ivica Cardic
  * @since Apr 24, 2017
  */
-@Transactional
 public class JobExecutor {
 
     private final ContextService contextService;
