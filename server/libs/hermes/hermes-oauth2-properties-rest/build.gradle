@@ -3,7 +3,7 @@ plugins {
 }
 
 task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
-    apiPackage = "com.bytechef.hermes.connection.web.rest"
+    apiPackage = "com.bytechef.hermes.oauth2.properties.web.rest"
     configOptions = [
         "dateLibrary": "java8-localdatetime",
         "interfaceOnly": "true",
@@ -11,13 +11,10 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
         "useSpringBoot3": "true"
     ]
     generatorName = "spring"
-    importMappings = [
-        "TagModel": "com.bytechef.tag.web.rest.model.TagModel",
-    ]
     inputSpec = "$projectDir/openapi.yaml".toString()
     modelNameSuffix = "Model"
-    modelPackage = "com.bytechef.hermes.connection.web.rest.model"
-    outputDir = "$projectDir/../hermes-connection-rest-api/generated".toString()
+    modelPackage = "com.bytechef.hermes.oauth2.properties.web.rest.model"
+    outputDir = "$projectDir/generated".toString()
     schemaMappings = [
         Tag: "TagModel"
     ]
@@ -29,7 +26,7 @@ task generateOpenAPITypeScriptFetch(type: org.openapitools.generator.gradle.plug
     generatorName = "typescript-fetch"
     inputSpec = "$projectDir/openapi.yaml".toString()
     modelNameSuffix = "Model"
-    outputDir = "$rootDir/client/src/middleware/connection".toString()
+    outputDir = "$rootDir/client/src/middleware/oauth2-properties".toString()
     typeMappings = [
         DateTime: "Date"
     ]
@@ -40,8 +37,15 @@ tasks.register("generateOpenAPI") {
 }
 
 dependencies {
-    api project(":server:libs:hermes:hermes-connection:hermes-connection-rest:hermes-connection-rest-api")
+    annotationProcessor libs.org.mapstruct.mapstruct.processor
+    annotationProcessor libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions
 
+    implementation libs.io.swagger.core.v3.swagger.annotations
+    implementation "jakarta.annotation:jakarta.annotation-api"
+    implementation "jakarta.validation:jakarta.validation-api"
+    implementation libs.org.openapitools.jackson.databind.nullable
+    implementation libs.org.mapstruct
+    implementation libs.org.mapstruct.extensions.spring.mapstruct.spring.annotations
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-webflux"
 
