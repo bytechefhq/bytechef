@@ -1,22 +1,22 @@
 import {
     GetExecutionRequest,
     GetExecutionsRequest,
-    ProjectWorkflowExecutionApi,
+    WorkflowExecutionApi,
     WorkflowExecutionModel,
 } from '@/middleware/helios/execution';
 import {useQuery} from '@tanstack/react-query';
 import {
+    CategoryApi,
     CategoryModel,
     PageModel,
     ProjectApi,
-    ProjectCategoryApi,
     ProjectInstanceApi,
     ProjectInstanceModel,
     ProjectInstanceTagApi,
     ProjectModel,
     ProjectTagApi,
-    ProjectWorkflowApi,
     TagModel,
+    WorkflowApi,
     WorkflowModel,
 } from 'middleware/helios/configuration';
 
@@ -56,7 +56,7 @@ export const WorkflowKeys = {
 
 export const useGetProjectCategoriesQuery = () =>
     useQuery<CategoryModel[], Error>(ProjectKeys.projectCategories, () =>
-        new ProjectCategoryApi().getProjectCategories()
+        new CategoryApi().getProjectCategories()
     );
 
 export const useGetProjectInstancesQuery = (filters: {
@@ -98,12 +98,12 @@ export const useGetProjectsQuery = (filters?: {
 
 export const useGetProjectWorkflowsQuery = (id: number) =>
     useQuery<WorkflowModel[], Error>(ProjectKeys.projectWorkflows(id), () =>
-        new ProjectWorkflowApi().getProjectWorkflows({id})
+        new WorkflowApi().getProjectWorkflows({id})
     );
 
 export const useGetExecutionsQuery = (request: GetExecutionsRequest) =>
     useQuery<PageModel, Error>(ProjectKeys.workflowExecutions(request), () =>
-        new ProjectWorkflowExecutionApi().getExecutions(request)
+        new WorkflowExecutionApi().getExecutions(request)
     );
 
 export const useGetWorkflowExecutionQuery = (
@@ -112,7 +112,7 @@ export const useGetWorkflowExecutionQuery = (
 ) =>
     useQuery<WorkflowExecutionModel, Error>(
         ProjectKeys.workflowExecution(request),
-        () => new ProjectWorkflowExecutionApi().getExecution(request),
+        () => new WorkflowExecutionApi().getExecution(request),
         {
             enabled: isEnabled,
         }
@@ -120,5 +120,5 @@ export const useGetWorkflowExecutionQuery = (
 
 export const useGetWorkflowsQuery = () =>
     useQuery<WorkflowModel[], Error>(WorkflowKeys.workflows, () =>
-        new ProjectWorkflowApi().getWorkflows()
+        new WorkflowApi().getWorkflows()
     );
