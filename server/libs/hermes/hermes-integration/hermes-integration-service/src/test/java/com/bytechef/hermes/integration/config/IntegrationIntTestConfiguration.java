@@ -19,7 +19,7 @@ package com.bytechef.hermes.integration.config;
 
 import com.bytechef.atlas.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
-import com.bytechef.atlas.repository.config.WorkflowRepositoryConfiguration;
+import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.service.impl.WorkflowServiceImpl;
 
@@ -48,7 +48,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
     })
 @EnableAutoConfiguration
 @Import({
-    WorkflowRepositoryConfiguration.class
+    WorkflowMapperConfiguration.class
 })
 @SpringBootConfiguration
 public class IntegrationIntTestConfiguration {
