@@ -7,7 +7,7 @@ package com.bytechef.hermes.workflow.web.rest;
 
 import java.util.Map;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
-import com.bytechef.hermes.workflow.web.rest.model.WorkflowTestResponseModel;
+import com.bytechef.hermes.workflow.web.rest.model.WorkflowResponseModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-05T17:08:20.252283+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-14T13:37:25.780236+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflows", description = "the workflows API")
 public interface WorkflowsApi {
@@ -210,7 +210,7 @@ public interface WorkflowsApi {
         tags = { "workflows" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The output expected by the workflow.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowTestResponseModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowResponseModel.class))
             })
         }
     )
@@ -220,7 +220,7 @@ public interface WorkflowsApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default Mono<ResponseEntity<WorkflowTestResponseModel>> testWorkflow(
+    default Mono<ResponseEntity<WorkflowResponseModel>> testWorkflow(
         @Parameter(name = "id", description = "The id of the workflow to test.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
         @Parameter(name = "request_body", description = "Parameters required to run a workflow, for example '{\"yourName\":\"Joe Jones\"}'", required = true) @Valid @RequestBody Mono<Map<String, Object>> requestBody,
         @Parameter(hidden = true) final ServerWebExchange exchange

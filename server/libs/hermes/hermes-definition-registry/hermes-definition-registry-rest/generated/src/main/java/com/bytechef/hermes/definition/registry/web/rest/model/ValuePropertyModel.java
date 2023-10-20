@@ -41,13 +41,15 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = DateTimePropertyModel.class, name = "DATE_TIME"),
   @JsonSubTypes.Type(value = DynamicPropertiesPropertyModel.class, name = "DYNAMIC_PROPERTIES"),
   @JsonSubTypes.Type(value = IntegerPropertyModel.class, name = "INTEGER"),
+  @JsonSubTypes.Type(value = NullPropertyModel.class, name = "NULL"),
   @JsonSubTypes.Type(value = NumberPropertyModel.class, name = "NUMBER"),
   @JsonSubTypes.Type(value = ObjectPropertyModel.class, name = "OBJECT"),
   @JsonSubTypes.Type(value = OneOfPropertyModel.class, name = "ONE_OF"),
-  @JsonSubTypes.Type(value = StringPropertyModel.class, name = "STRING")
+  @JsonSubTypes.Type(value = StringPropertyModel.class, name = "STRING"),
+  @JsonSubTypes.Type(value = TimePropertyModel.class, name = "TimeProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-05T18:35:34.469553+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-15T19:47:32.550589+02:00[Europe/Zagreb]")
 public class ValuePropertyModel extends PropertyModel {
 
   private ControlTypeModel controlType;

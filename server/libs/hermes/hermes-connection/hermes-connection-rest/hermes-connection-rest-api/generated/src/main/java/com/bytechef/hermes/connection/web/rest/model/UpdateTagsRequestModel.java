@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "UpdateTagsRequest", description = "The request object that contains the array of tags.")
 @JsonTypeName("UpdateTagsRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-05T17:08:20.024572+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-14T13:37:25.470077+02:00[Europe/Zagreb]")
 public class UpdateTagsRequestModel {
 
   @Valid

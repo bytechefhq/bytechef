@@ -23,6 +23,7 @@ src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DynamicProp
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/DynamicPropertiesPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/IntegerPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/IntegerPropertyModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/NullPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/NumberPropertyAllOfModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/NumberPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ObjectPropertyAllOfModel.java
@@ -38,6 +39,8 @@ src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/ResourcesMo
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/StringPropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TaskDispatcherDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TaskDispatcherDefinitionModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TimePropertyAllOfModel.java
+src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TimePropertyModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TriggerDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TriggerDefinitionModel.java
 src/main/java/com/bytechef/hermes/definition/registry/web/rest/model/TriggerTypeModel.java

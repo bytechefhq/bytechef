@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createProjectInstanceJob_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-05T17:08:18.190488+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-16T12:25:34.168337+02:00[Europe/Zagreb]")
 public class CreateProjectInstanceJob200ResponseModel {
 
   private Long jobId;

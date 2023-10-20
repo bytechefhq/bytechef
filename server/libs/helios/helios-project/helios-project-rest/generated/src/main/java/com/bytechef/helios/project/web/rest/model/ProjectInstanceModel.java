@@ -2,8 +2,8 @@ package com.bytechef.helios.project.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.helios.project.web.rest.model.ProjectInstanceWorkflowModel;
 import com.bytechef.helios.project.web.rest.model.ProjectModel;
-import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
 import com.bytechef.tag.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -11,9 +11,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -26,22 +24,13 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * Contains specific configuration required for the execution of project workflows.
+ * Contains configurations and connections required for the execution of project workflows.
  */
 
-@Schema(name = "ProjectInstance", description = "Contains specific configuration required for the execution of project workflows.")
+@Schema(name = "ProjectInstance", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-05T17:08:18.190488+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-16T12:25:34.168337+02:00[Europe/Zagreb]")
 public class ProjectInstanceModel {
-
-  @Valid
-  private Map<String, Object> configurationParameters = new HashMap<>();
-
-  @Valid
-  private List<Long> connectionIds;
-
-  @Valid
-  private List<@Valid ConnectionModel> connections;
 
   private String description;
 
@@ -51,9 +40,6 @@ public class ProjectInstanceModel {
   private LocalDateTime createdDate;
 
   private Long id;
-
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastExecutionDate;
 
   private String lastModifiedBy;
 
@@ -65,6 +51,9 @@ public class ProjectInstanceModel {
   private ProjectModel project;
 
   private Long projectId;
+
+  @Valid
+  private List<@Valid ProjectInstanceWorkflowModel> projectInstanceWorkflows;
 
   /**
    * The status of a project instance.
@@ -122,90 +111,6 @@ public class ProjectInstanceModel {
    */
   public ProjectInstanceModel(String name) {
     this.name = name;
-  }
-
-  public ProjectInstanceModel configurationParameters(Map<String, Object> configurationParameters) {
-    this.configurationParameters = configurationParameters;
-    return this;
-  }
-
-  public ProjectInstanceModel putConfigurationParametersItem(String key, Object configurationParametersItem) {
-    if (this.configurationParameters == null) {
-      this.configurationParameters = new HashMap<>();
-    }
-    this.configurationParameters.put(key, configurationParametersItem);
-    return this;
-  }
-
-  /**
-   * The configuration parameters of an project instance used as workflow input values.
-   * @return configurationParameters
-  */
-  
-  @Schema(name = "configurationParameters", description = "The configuration parameters of an project instance used as workflow input values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("configurationParameters")
-  public Map<String, Object> getConfigurationParameters() {
-    return configurationParameters;
-  }
-
-  public void setConfigurationParameters(Map<String, Object> configurationParameters) {
-    this.configurationParameters = configurationParameters;
-  }
-
-  public ProjectInstanceModel connectionIds(List<Long> connectionIds) {
-    this.connectionIds = connectionIds;
-    return this;
-  }
-
-  public ProjectInstanceModel addConnectionIdsItem(Long connectionIdsItem) {
-    if (this.connectionIds == null) {
-      this.connectionIds = new ArrayList<>();
-    }
-    this.connectionIds.add(connectionIdsItem);
-    return this;
-  }
-
-  /**
-   * The ids of connections used by a project instance.
-   * @return connectionIds
-  */
-  
-  @Schema(name = "connectionIds", description = "The ids of connections used by a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("connectionIds")
-  public List<Long> getConnectionIds() {
-    return connectionIds;
-  }
-
-  public void setConnectionIds(List<Long> connectionIds) {
-    this.connectionIds = connectionIds;
-  }
-
-  public ProjectInstanceModel connections(List<@Valid ConnectionModel> connections) {
-    this.connections = connections;
-    return this;
-  }
-
-  public ProjectInstanceModel addConnectionsItem(ConnectionModel connectionsItem) {
-    if (this.connections == null) {
-      this.connections = new ArrayList<>();
-    }
-    this.connections.add(connectionsItem);
-    return this;
-  }
-
-  /**
-   * The connections used by a project instance.
-   * @return connections
-  */
-  @Valid 
-  @Schema(name = "connections", accessMode = Schema.AccessMode.READ_ONLY, description = "The connections used by a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("connections")
-  public List<@Valid ConnectionModel> getConnections() {
-    return connections;
-  }
-
-  public void setConnections(List<@Valid ConnectionModel> connections) {
-    this.connections = connections;
   }
 
   public ProjectInstanceModel description(String description) {
@@ -286,26 +191,6 @@ public class ProjectInstanceModel {
 
   public void setId(Long id) {
     this.id = id;
-  }
-
-  public ProjectInstanceModel lastExecutionDate(LocalDateTime lastExecutionDate) {
-    this.lastExecutionDate = lastExecutionDate;
-    return this;
-  }
-
-  /**
-   * The last execution date of a project instance.
-   * @return lastExecutionDate
-  */
-  @Valid 
-  @Schema(name = "lastExecutionDate", description = "The last execution date of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("lastExecutionDate")
-  public LocalDateTime getLastExecutionDate() {
-    return lastExecutionDate;
-  }
-
-  public void setLastExecutionDate(LocalDateTime lastExecutionDate) {
-    this.lastExecutionDate = lastExecutionDate;
   }
 
   public ProjectInstanceModel lastModifiedBy(String lastModifiedBy) {
@@ -408,6 +293,34 @@ public class ProjectInstanceModel {
     this.projectId = projectId;
   }
 
+  public ProjectInstanceModel projectInstanceWorkflows(List<@Valid ProjectInstanceWorkflowModel> projectInstanceWorkflows) {
+    this.projectInstanceWorkflows = projectInstanceWorkflows;
+    return this;
+  }
+
+  public ProjectInstanceModel addProjectInstanceWorkflowsItem(ProjectInstanceWorkflowModel projectInstanceWorkflowsItem) {
+    if (this.projectInstanceWorkflows == null) {
+      this.projectInstanceWorkflows = new ArrayList<>();
+    }
+    this.projectInstanceWorkflows.add(projectInstanceWorkflowsItem);
+    return this;
+  }
+
+  /**
+   * Get projectInstanceWorkflows
+   * @return projectInstanceWorkflows
+  */
+  @Valid 
+  @Schema(name = "projectInstanceWorkflows", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectInstanceWorkflows")
+  public List<@Valid ProjectInstanceWorkflowModel> getProjectInstanceWorkflows() {
+    return projectInstanceWorkflows;
+  }
+
+  public void setProjectInstanceWorkflows(List<@Valid ProjectInstanceWorkflowModel> projectInstanceWorkflows) {
+    this.projectInstanceWorkflows = projectInstanceWorkflows;
+  }
+
   public ProjectInstanceModel status(StatusEnum status) {
     this.status = status;
     return this;
@@ -485,19 +398,16 @@ public class ProjectInstanceModel {
       return false;
     }
     ProjectInstanceModel projectInstance = (ProjectInstanceModel) o;
-    return Objects.equals(this.configurationParameters, projectInstance.configurationParameters) &&
-        Objects.equals(this.connectionIds, projectInstance.connectionIds) &&
-        Objects.equals(this.connections, projectInstance.connections) &&
-        Objects.equals(this.description, projectInstance.description) &&
+    return Objects.equals(this.description, projectInstance.description) &&
         Objects.equals(this.createdBy, projectInstance.createdBy) &&
         Objects.equals(this.createdDate, projectInstance.createdDate) &&
         Objects.equals(this.id, projectInstance.id) &&
-        Objects.equals(this.lastExecutionDate, projectInstance.lastExecutionDate) &&
         Objects.equals(this.lastModifiedBy, projectInstance.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, projectInstance.lastModifiedDate) &&
         Objects.equals(this.name, projectInstance.name) &&
         Objects.equals(this.project, projectInstance.project) &&
         Objects.equals(this.projectId, projectInstance.projectId) &&
+        Objects.equals(this.projectInstanceWorkflows, projectInstance.projectInstanceWorkflows) &&
         Objects.equals(this.status, projectInstance.status) &&
         Objects.equals(this.tags, projectInstance.tags) &&
         Objects.equals(this.version, projectInstance.version);
@@ -505,26 +415,23 @@ public class ProjectInstanceModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(configurationParameters, connectionIds, connections, description, createdBy, createdDate, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, project, projectId, status, tags, version);
+    return Objects.hash(description, createdBy, createdDate, id, lastModifiedBy, lastModifiedDate, name, project, projectId, projectInstanceWorkflows, status, tags, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ProjectInstanceModel {\n");
-    sb.append("    configurationParameters: ").append(toIndentedString(configurationParameters)).append("\n");
-    sb.append("    connectionIds: ").append(toIndentedString(connectionIds)).append("\n");
-    sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    project: ").append(toIndentedString(project)).append("\n");
     sb.append("    projectId: ").append(toIndentedString(projectId)).append("\n");
+    sb.append("    projectInstanceWorkflows: ").append(toIndentedString(projectInstanceWorkflows)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
