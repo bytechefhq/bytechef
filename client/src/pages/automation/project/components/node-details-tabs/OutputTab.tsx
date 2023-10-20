@@ -55,10 +55,14 @@ const SchemaProperties = ({properties}: {properties: any}) => {
     );
 };
 
-const OutputTab = ({action}: {action: ActionDefinitionModel}) => {
+const OutputTab = ({
+    actionDefinition,
+}: {
+    actionDefinition: ActionDefinitionModel;
+}) => {
     return (
-            {action.outputSchema?.map((schema: any) =>
         <div className="max-h-full flex-[1_1_1px] overflow-auto">
+            {actionDefinition.outputSchema?.map((schema: any, index) =>
                 schema.properties ? (
                     <SchemaProperties
                         key={schema.name + '_' + index}
