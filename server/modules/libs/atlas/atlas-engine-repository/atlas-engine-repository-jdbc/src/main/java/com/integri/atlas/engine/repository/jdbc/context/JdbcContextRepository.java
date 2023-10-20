@@ -19,7 +19,7 @@ package com.integri.atlas.engine.repository.jdbc.context;
 import com.integri.atlas.engine.core.context.Context;
 import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
-import com.integri.atlas.engine.core.json.JsonMapper;
+import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,7 +35,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class JdbcContextRepository implements ContextRepository {
 
     private JdbcTemplate jdbc;
-    private JsonMapper jsonMapper;
+    private JSONHelper jsonMapper;
 
     @Override
     public void push(String aStackId, Context context) {
@@ -69,7 +69,7 @@ public class JdbcContextRepository implements ContextRepository {
         jdbc = aJdbcTemplate;
     }
 
-    public void setJsonMapper(JsonMapper jsonMapper) {
+    public void setJsonMapper(JSONHelper jsonMapper) {
         this.jsonMapper = jsonMapper;
     }
 }

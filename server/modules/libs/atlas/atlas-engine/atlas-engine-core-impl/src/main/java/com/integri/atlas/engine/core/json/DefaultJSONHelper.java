@@ -18,17 +18,19 @@
 
 package com.integri.atlas.engine.core.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-public class DefaultJsonMapper implements JsonMapper {
+public class DefaultJSONHelper implements JSONHelper {
 
     private final ObjectMapper objectMapper;
 
-    public DefaultJsonMapper(ObjectMapper objectMapper) {
+    public DefaultJSONHelper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
@@ -44,6 +46,15 @@ public class DefaultJsonMapper implements JsonMapper {
         try {
             return objectMapper.writeValueAsString(value);
         } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public <T> T read(String json) {
+        try {
+            return objectMapper.readValue(json, new TypeReference<>() {});
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }

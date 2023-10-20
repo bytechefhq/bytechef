@@ -16,8 +16,13 @@
 
 package com.integri.atlas.engine.core.json;
 
-public interface JsonMapper {
+/**
+ * @author Ivica Cardic
+ */
+public interface JSONHelper {
     <T> T deserialize(String value, Class<T> clazz);
 
     String serialize(Object value);
+
+    <T> T read(String json);
 }
