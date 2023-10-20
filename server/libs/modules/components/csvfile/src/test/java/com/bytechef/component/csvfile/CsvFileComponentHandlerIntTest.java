@@ -24,18 +24,16 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
-import com.bytechef.hermes.component.test.json.JsonArrayUtils;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.util.Files;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 
 /**
  * @author Ivica Cardic
@@ -50,7 +48,7 @@ public class CsvFileComponentHandlerIntTest {
     private WorkflowExecutor workflowExecutor;
 
     @Test
-    public void testRead() throws IOException, JSONException {
+    public void testRead() throws JSONException {
         File sampleFile = getFile("sample_header.csv");
 
         Job job = workflowExecutor.execute(
@@ -60,7 +58,7 @@ public class CsvFileComponentHandlerIntTest {
                         fileStorageService
                                 .storeFileContent(
                                         sampleFile.getAbsolutePath(),
-                                        Files.contentOf(sampleFile, Charset.defaultCharset()))
+                                        Files.contentOf(sampleFile, StandardCharsets.UTF_8))
                                 .toMap()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
@@ -68,18 +66,18 @@ public class CsvFileComponentHandlerIntTest {
         Map<String, Object> outputs = job.getOutputs();
 
         assertEquals(
-                JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-                JsonArrayUtils.of((List<?>) outputs.get("readCsvFile")),
+                new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
+                new JSONArray((List<?>) outputs.get("readCsvFile")),
                 true);
     }
 
     @Test
-    public void testWrite() throws IOException, JSONException {
+    public void testWrite() throws JSONException {
         Job job = workflowExecutor.execute(
                 "csvfile_v1_write",
                 Map.of(
                         "rows",
-                        JsonArrayUtils.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))));
+                        new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)).toList()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
@@ -96,20 +94,21 @@ public class CsvFileComponentHandlerIntTest {
                         "fileEntry",
                         fileStorageService
                                 .storeFileContent(
-                                        sampleFile.getName(), Files.contentOf(sampleFile, Charset.defaultCharset()))
+                                        sampleFile.getName(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
                                 .toMap()));
 
         outputs = job.getOutputs();
 
         assertEquals(
-                JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-                JsonArrayUtils.of((List<?>) outputs.get("readCsvFile")),
+                new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
+                new JSONArray((List<?>) outputs.get("readCsvFile")),
                 true);
     }
 
-    private File getFile(String fileName) throws IOException {
-        ClassPathResource classPathResource = new ClassPathResource("dependencies/" + fileName);
-
-        return classPathResource.getFile();
+    private File getFile(String fileName) {
+        return new File(CsvFileComponentHandlerIntTest.class
+                .getClassLoader()
+                .getResource("dependencies/" + fileName)
+                .getFile());
     }
 }

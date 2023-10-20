@@ -23,11 +23,11 @@ import static com.bytechef.component.script.constants.ScriptConstants.PYTHON;
 import static com.bytechef.component.script.constants.ScriptConstants.R;
 import static com.bytechef.component.script.constants.ScriptConstants.SCRIPT;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.any;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 
 import com.bytechef.component.script.constants.ScriptConstants;
 import com.bytechef.hermes.component.ComponentHandler;
@@ -55,14 +55,12 @@ public class ScriptComponentHandler implements ComponentHandler {
                                     object(INPUT)
                                             .label("Input")
                                             .description("Initialize parameter values used in the custom code.")
-                                            .additionalProperties(true)
-                                            .displayOption()
-                                            .properties(any()),
+                                            .additionalProperties(oneOf()),
                                     string(SCRIPT)
                                             .label("Java code")
                                             .description("Add your Java custom logic here.")
                                             .controlType(Property.ControlType.CODE))
-                            .output(any())
+                            .output(oneOf())
                             .perform(this::performJava),
                     action(JAVASCRIPT)
                             .display(display("JavaScript").description("Executes custom JavaScript code."))
@@ -70,13 +68,12 @@ public class ScriptComponentHandler implements ComponentHandler {
                                     object(INPUT)
                                             .label("Input")
                                             .description("Initialize parameter values used in the custom code.")
-                                            .additionalProperties(true)
-                                            .properties(any()),
+                                            .additionalProperties(oneOf()),
                                     string(SCRIPT)
                                             .label("JavaScript code")
                                             .description("Add your JavaScript custom logic here.")
                                             .controlType(Property.ControlType.CODE))
-                            .output(any())
+                            .output(oneOf())
                             .perform(this::performJavaScript),
                     action(PYTHON)
                             .display(display("Python").description("Executes custom Python code."))
@@ -84,13 +81,12 @@ public class ScriptComponentHandler implements ComponentHandler {
                                     object(INPUT)
                                             .label("Input")
                                             .description("Initialize parameter values used in the custom code.")
-                                            .additionalProperties(true)
-                                            .properties(any()),
+                                            .additionalProperties(oneOf()),
                                     string(SCRIPT)
                                             .label("Python code")
                                             .description("Add your Python custom logic here.")
                                             .controlType(Property.ControlType.CODE))
-                            .output(any())
+                            .output(oneOf())
                             .perform(this::performPython),
                     action(R)
                             .display(display("R").description("Executes custom R code."))
@@ -98,13 +94,12 @@ public class ScriptComponentHandler implements ComponentHandler {
                                     object(INPUT)
                                             .label("Input")
                                             .description("Initialize parameter values used in the custom code.")
-                                            .additionalProperties(true)
-                                            .properties(any()),
+                                            .additionalProperties(oneOf()),
                                     string(SCRIPT)
                                             .label("R code")
                                             .description("Add your R custom logic here.")
                                             .controlType(Property.ControlType.CODE))
-                            .output(any())
+                            .output(oneOf())
                             .perform(this::performR),
                     action(ScriptConstants.RUBY)
                             .display(display("Ruby").description("Executes custom Ruby code."))
@@ -112,13 +107,12 @@ public class ScriptComponentHandler implements ComponentHandler {
                                     object(INPUT)
                                             .label("Input")
                                             .description("Initialize parameter values used in the custom code.")
-                                            .additionalProperties(true)
-                                            .properties(any()),
+                                            .additionalProperties(oneOf()),
                                     string(SCRIPT)
                                             .label("Ruby code")
                                             .description("Add your Ruby custom logic here.")
                                             .controlType(Property.ControlType.CODE))
-                            .output(any())
+                            .output(oneOf())
                             .perform(this::performRuby));
 
     @Override

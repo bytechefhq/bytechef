@@ -16,14 +16,16 @@
 
 package com.bytechef.component.xmlfile;
 
+import static com.bytechef.component.xmlfile.constants.XmlFileConstants.FILENAME;
+import static com.bytechef.component.xmlfile.constants.XmlFileConstants.FILE_ENTRY;
 import static com.bytechef.component.xmlfile.constants.XmlFileConstants.IS_ARRAY;
+import static com.bytechef.component.xmlfile.constants.XmlFileConstants.PAGE_NUMBER;
+import static com.bytechef.component.xmlfile.constants.XmlFileConstants.PAGE_SIZE;
+import static com.bytechef.component.xmlfile.constants.XmlFileConstants.PATH;
 import static com.bytechef.component.xmlfile.constants.XmlFileConstants.READ;
 import static com.bytechef.component.xmlfile.constants.XmlFileConstants.SOURCE;
 import static com.bytechef.component.xmlfile.constants.XmlFileConstants.WRITE;
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.any;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
@@ -31,8 +33,9 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.showWhen;
+import static com.bytechef.hermes.component.definition.ComponentDSL.show;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 
 import com.bytechef.component.xmlfile.constants.XmlFileConstants;
 import com.bytechef.hermes.component.ComponentHandler;
@@ -73,27 +76,30 @@ public class XmlFileComponentHandler implements ComponentHandler {
                                             .label("Is Array")
                                             .description("The object input is array?")
                                             .defaultValue(true),
-                                    string(XmlFileConstants.PATH)
+                                    string(PATH)
                                             .label("Path")
                                             .description(
                                                     "The path where the array is e.g 'data'. Leave blank to use the top level object.")
-                                            .displayOption(showWhen(IS_ARRAY).eq(true)),
-                                    integer(XmlFileConstants.PAGE_SIZE)
+                                            .displayOption(show(IS_ARRAY, true))
+                                            .advancedOption(true),
+                                    integer(PAGE_SIZE)
                                             .label("Page Size")
                                             .description("The amount of child elements to return in a page.")
-                                            .displayOption(showWhen(IS_ARRAY).eq(true)),
-                                    integer(XmlFileConstants.PAGE_NUMBER)
+                                            .displayOption(show(IS_ARRAY, true))
+                                            .advancedOption(true),
+                                    integer(PAGE_NUMBER)
                                             .label("Page Number")
                                             .description("The page number to get.")
-                                            .displayOption(showWhen(IS_ARRAY).eq(true)))
+                                            .displayOption(show(IS_ARRAY, true))
+                                            .advancedOption(true))
                             .output(
-                                    array().displayOption(showWhen(IS_ARRAY).eq(true)),
-                                    object().displayOption(showWhen(IS_ARRAY).eq(false)))
+                                    array().displayOption(show(IS_ARRAY, true)),
+                                    object().displayOption(show(IS_ARRAY, false)))
                             .perform(this::performRead),
                     action(WRITE)
                             .display(display("Write to file").description("Writes the data to a XML file."))
                             .properties(
-                                    any(SOURCE)
+                                    oneOf(SOURCE)
                                             .label("Source")
                                             .description("The data to write to the file.")
                                             .required(true)
@@ -103,7 +109,8 @@ public class XmlFileComponentHandler implements ComponentHandler {
                                             .description(
                                                     "Filename to set for binary data. By default, \"file.xml\" will be used.")
                                             .required(true)
-                                            .defaultValue("file.xml"))
+                                            .defaultValue("file.xml")
+                                            .advancedOption(true))
                             .output(fileEntry())
                             .perform(this::performWrite));
 
@@ -112,14 +119,13 @@ public class XmlFileComponentHandler implements ComponentHandler {
         return componentDefinition;
     }
 
-    @SuppressWarnings("unchecked")
     protected Object performRead(Context context, ExecutionParameters executionParameters) {
-        FileEntry fileEntry = executionParameters.getFileEntry(FILE_ENTRY);
+        FileEntry fileEntry = executionParameters.get(FILE_ENTRY, FileEntry.class);
         boolean isArray = executionParameters.getBoolean(IS_ARRAY, true);
         Object result;
 
         if (isArray) {
-            String path = executionParameters.getString(XmlFileConstants.PATH);
+            String path = executionParameters.getString(PATH);
             InputStream inputStream = context.getFileStream(fileEntry);
             List<Map<String, ?>> items;
 
@@ -131,8 +137,8 @@ public class XmlFileComponentHandler implements ComponentHandler {
                 items = XmlUtils.read(inputStream, path, new TypeReference<>() {});
             }
 
-            Integer pageSize = executionParameters.getInteger(XmlFileConstants.PAGE_SIZE);
-            Integer pageNumber = executionParameters.getInteger(XmlFileConstants.PAGE_NUMBER);
+            Integer pageSize = executionParameters.getInteger(PAGE_SIZE);
+            Integer pageNumber = executionParameters.getInteger(PAGE_NUMBER);
             Integer rangeStartIndex = null;
             Integer rangeEndIndex = null;
 
@@ -156,7 +162,7 @@ public class XmlFileComponentHandler implements ComponentHandler {
     }
 
     protected FileEntry performWrite(Context context, ExecutionParameters executionParameters) {
-        Object source = executionParameters.getRequiredObject(SOURCE);
+        Object source = executionParameters.getRequired(SOURCE);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 

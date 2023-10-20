@@ -71,7 +71,7 @@ public class BashComponentHandler implements ComponentHandler {
             File logFile = File.createTempFile("log", null);
 
             FileUtils.writeStringToFile(
-                    scriptFile, executionParameters.getRequiredString("script"), StandardCharsets.UTF_8);
+                    scriptFile, executionParameters.getRequiredString(SCRIPT), StandardCharsets.UTF_8);
 
             try (PrintStream stream = new PrintStream(logFile, StandardCharsets.UTF_8)) {
                 Runtime runtime = Runtime.getRuntime();

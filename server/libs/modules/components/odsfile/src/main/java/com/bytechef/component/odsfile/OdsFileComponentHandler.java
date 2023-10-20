@@ -16,6 +16,8 @@
 
 package com.bytechef.component.odsfile;
 
+import static com.bytechef.component.odsfile.constants.OdsFileConstants.FILENAME;
+import static com.bytechef.component.odsfile.constants.OdsFileConstants.FILE_ENTRY;
 import static com.bytechef.component.odsfile.constants.OdsFileConstants.HEADER_ROW;
 import static com.bytechef.component.odsfile.constants.OdsFileConstants.INCLUDE_EMPTY_CELLS;
 import static com.bytechef.component.odsfile.constants.OdsFileConstants.ODS_FILE;
@@ -26,19 +28,16 @@ import static com.bytechef.component.odsfile.constants.OdsFileConstants.READ_AS_
 import static com.bytechef.component.odsfile.constants.OdsFileConstants.ROWS;
 import static com.bytechef.component.odsfile.constants.OdsFileConstants.SHEET_NAME;
 import static com.bytechef.component.odsfile.constants.OdsFileConstants.WRITE;
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
@@ -46,7 +45,6 @@ import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
-import com.bytechef.hermes.component.utils.MapUtils;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
 import com.github.miachm.sods.SpreadSheet;
@@ -83,26 +81,34 @@ public class OdsFileComponentHandler implements ComponentHandler {
                                     bool(HEADER_ROW)
                                             .label("Header Row")
                                             .description("The first row of the file contains the header names.")
-                                            .defaultValue(true),
+                                            .defaultValue(true)
+                                            .advancedOption(true),
                                     bool(INCLUDE_EMPTY_CELLS)
                                             .label("Include Empty Cells")
                                             .description(
                                                     "When reading from file the empty cells will be filled with an empty string.")
-                                            .defaultValue(false),
+                                            .defaultValue(false)
+                                            .advancedOption(true),
                                     integer(PAGE_SIZE)
                                             .label("Page Size")
-                                            .description("The amount of child elements to return in a page."),
-                                    integer(PAGE_NUMBER).label("Page Number").description("The page number to get."),
+                                            .description("The amount of child elements to return in a page.")
+                                            .advancedOption(true),
+                                    integer(PAGE_NUMBER)
+                                            .label("Page Number")
+                                            .description("The page number to get.")
+                                            .advancedOption(true),
                                     bool(READ_AS_STRING)
                                             .label("Read As String")
                                             .description(
                                                     "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
-                                            .defaultValue(false),
+                                            .defaultValue(false)
+                                            .advancedOption(true),
                                     string(SHEET_NAME)
                                             .label("Sheet Name")
                                             .description(
                                                     "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
-                                            .defaultValue("Sheet"))
+                                            .defaultValue("Sheet")
+                                            .advancedOption(true))
                             .output(array())
                             .perform(this::performRead),
                     action(WRITE)
@@ -112,18 +118,19 @@ public class OdsFileComponentHandler implements ComponentHandler {
                                             .label("Rows")
                                             .description("The array of objects to write to the file.")
                                             .required(true)
-                                            .items(object().additionalProperties(true)
-                                                    .properties(bool(), dateTime(), number(), string())),
+                                            .items(object().additionalProperties(oneOf())),
                                     string(FILENAME)
                                             .label("Filename")
                                             .description(
                                                     "Filename to set for binary data. By default, \"file.ods\" will be used.")
                                             .required(true)
-                                            .defaultValue("file.ods"),
+                                            .defaultValue("file.ods")
+                                            .advancedOption(true),
                                     string(SHEET_NAME)
                                             .label("Sheet Name")
                                             .description("The name of the sheet to create in the spreadsheet.")
-                                            .defaultValue("Sheet"))
+                                            .defaultValue("Sheet")
+                                            .advancedOption(true))
                             .output(fileEntry())
                             .perform(this::performWrite));
 
@@ -140,7 +147,7 @@ public class OdsFileComponentHandler implements ComponentHandler {
         boolean readAsString = executionParameters.getBoolean(READ_AS_STRING, false);
         String sheetName = executionParameters.getString(SHEET_NAME);
 
-        try (InputStream inputStream = context.getFileStream(executionParameters.getFileEntry(FILE_ENTRY))) {
+        try (InputStream inputStream = context.getFileStream(executionParameters.get(FILE_ENTRY, FileEntry.class))) {
             if (inputStream == null) {
                 throw new ActionExecutionException("Unable to get file content from task " + executionParameters);
             }
@@ -170,7 +177,8 @@ public class OdsFileComponentHandler implements ComponentHandler {
 
     protected FileEntry performWrite(Context context, ExecutionParameters executionParameters) {
         String fileName = executionParameters.getString(FILENAME, "file.ods");
-        List<Map<String, ?>> rows = executionParameters.getRequiredList(ROWS);
+        @SuppressWarnings("unchecked")
+        List<Map<String, ?>> rows = (List) executionParameters.getList(ROWS, Map.class, List.of());
 
         String sheetName = executionParameters.getString(SHEET_NAME, "Sheet");
 
@@ -198,6 +206,12 @@ public class OdsFileComponentHandler implements ComponentHandler {
         }
 
         return values;
+    }
+
+    protected List<Map<String, ?>> read(InputStream inputStream) throws IOException {
+        return read(
+                inputStream,
+                new OdsFileComponentHandler.ReadConfiguration(true, true, 0, Integer.MAX_VALUE, false, "Sheet"));
     }
 
     private List<Map<String, ?>> read(InputStream inputStream, ReadConfiguration configuration) throws IOException {
@@ -257,16 +271,20 @@ public class OdsFileComponentHandler implements ComponentHandler {
 
                     rows.add(map);
                 } else {
-                    List<Object> values = new ArrayList<>();
+                    Map<String, Object> map = new HashMap<>();
 
                     for (int j = 0; j <= range.getLastColumn(); j++) {
                         Range cell = range.getCell(i, j);
 
-                        values.add(processValue(
-                                cell.getValue(), configuration.includeEmptyCells(), configuration.readAsString()));
+                        map.put(
+                                "column_" + (j + 1),
+                                processValue(
+                                        cell.getValue(),
+                                        configuration.includeEmptyCells(),
+                                        configuration.readAsString()));
                     }
 
-                    rows.add(MapUtils.of(values));
+                    rows.add(map);
                 }
             } else {
                 if (count >= configuration.rangeEndRow()) {

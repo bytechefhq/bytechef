@@ -16,7 +16,7 @@
 
 package com.bytechef.component.var;
 
-import com.bytechef.test.jsonasssert.AssertUtils;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.io.IOException;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ public class VarComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() throws IOException {
-        AssertUtils.assertEquals("definition/var_v1.json", new VarComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/var_v1.json", new VarComponentHandler().getDefinition());
     }
 
     @Disabled

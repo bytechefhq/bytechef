@@ -1,9 +1,4 @@
 {
-  "display": {
-    "description": "Sets a value which can then be referenced in other tasks.",
-    "label": "Var"
-  },
-  "name": "var",
   "actions": [
     {
       "display": {
@@ -14,12 +9,46 @@
         {
           "description": "Value of any type to set.",
           "label": "Value",
+          "required": true,
           "name": "value",
-          "type": "ANY",
-          "required": true
+          "type": "ONE_OF",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "BOOLEAN"
+            },
+            {
+              "type": "DATE"
+            },
+            {
+              "type": "DATE_TIME"
+            },
+            {
+              "type": "INTEGER"
+            },
+            {
+              "type": "NULL"
+            },
+            {
+              "type": "NUMBER"
+            },
+            {
+              "type": "OBJECT"
+            },
+            {
+              "type": "STRING"
+            }
+          ]
         }
       ]
     }
   ],
+  "display": {
+    "description": "Sets a value which can then be referenced in other tasks.",
+    "label": "Var"
+  },
+  "name": "var",
   "version": 1
 }

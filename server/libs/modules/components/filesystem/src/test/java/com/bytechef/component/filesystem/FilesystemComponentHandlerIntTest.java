@@ -26,12 +26,11 @@ import com.bytechef.hermes.file.storage.domain.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 
 /**
  * @author Ivica Cardic
@@ -56,7 +55,7 @@ public class FilesystemComponentHandlerIntTest {
         Map<String, Object> outputs = job.getOutputs();
 
         FileEntry fileEntry =
-                fileStorageService.storeFileContent("sample.txt", Files.contentOf(getFile(), Charset.defaultCharset()));
+                fileStorageService.storeFileContent("sample.txt", Files.contentOf(getFile(), StandardCharsets.UTF_8));
 
         assertThat(outputs.get("readLocalFile"))
                 .hasFieldOrPropertyWithValue("extension", "txt")
@@ -77,7 +76,7 @@ public class FilesystemComponentHandlerIntTest {
                         fileStorageService
                                 .storeFileContent(
                                         sampleFile.getAbsolutePath(),
-                                        Files.contentOf(getFile(), Charset.defaultCharset()))
+                                        Files.contentOf(getFile(), StandardCharsets.UTF_8))
                                 .toMap(),
                         "filename",
                         tempFile.getAbsolutePath()));
@@ -90,8 +89,9 @@ public class FilesystemComponentHandlerIntTest {
     }
 
     private File getFile() throws IOException {
-        ClassPathResource classPathResource = new ClassPathResource("dependencies/sample.txt");
-
-        return classPathResource.getFile();
+        return new File(FilesystemComponentHandlerIntTest.class
+                .getClassLoader()
+                .getResource("dependencies/sample.txt")
+                .getFile());
     }
 }

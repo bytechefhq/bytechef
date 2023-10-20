@@ -29,4 +29,6 @@ public class FilesystemConstants {
     public static final String LS = "ls";
     public static final String MKDIR = "mkdir";
     public static final String RM = "rm";
+    public static final String FILE_ENTRY = "fileEntry";
+    public static final String FILENAME = "filename";
 }

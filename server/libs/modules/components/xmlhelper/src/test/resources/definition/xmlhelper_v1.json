@@ -1,9 +1,4 @@
 {
-  "display": {
-    "description": "Converts between XML string and object/array.",
-    "label": "XML Helper"
-  },
-  "name": "xmlHelper",
   "actions": [
     {
       "display": {
@@ -20,8 +15,8 @@
         {
           "description": "The XML string to convert to the data.",
           "label": "Source",
-          "name": "source",
           "required": true,
+          "name": "source",
           "type": "STRING"
         }
       ]
@@ -41,9 +36,9 @@
         {
           "description": "The data to convert to XML string.",
           "label": "Source",
-          "name": "source",
           "required": true,
-          "type": "ANY",
+          "name": "source",
+          "type": "ONE_OF",
           "types": [
             {
               "type": "ARRAY"
@@ -56,5 +51,10 @@
       ]
     }
   ],
+  "display": {
+    "description": "Converts between XML string and object/array.",
+    "label": "XML Helper"
+  },
+  "name": "xmlHelper",
   "version": 1
 }

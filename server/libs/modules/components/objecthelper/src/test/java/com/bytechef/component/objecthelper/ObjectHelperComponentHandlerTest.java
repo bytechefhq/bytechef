@@ -16,69 +16,71 @@
 
 package com.bytechef.component.objecthelper;
 
+import static com.bytechef.component.objecthelper.constants.ObjectHelperConstants.SOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.hermes.component.test.mock.MockContext;
-import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
+import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.utils.JsonUtils;
-import com.bytechef.test.jsonasssert.AssertUtils;
-import java.io.IOException;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 /**
  * @author Ivica Cardic
  */
 public class ObjectHelperComponentHandlerTest {
 
-    private static final MockContext context = new MockContext();
+    private static final Context context = Mockito.mock(Context.class);
     private static final ObjectHelperComponentHandler objectHelperComponentHandler = new ObjectHelperComponentHandler();
 
     @Test
-    public void testGetComponentDefinition() throws IOException {
-        AssertUtils.assertEquals("definition/objecthelper_v1.json", new ObjectHelperComponentHandler().getDefinition());
+    public void testGetComponentDefinition() {
+        JsonFileAssert.assertEquals(
+                "definition/objecthelper_v1.json", new ObjectHelperComponentHandler().getDefinition());
     }
 
     @Test
     public void testPerformParse() {
-        MockExecutionParameters parameters = new MockExecutionParameters();
+        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
-        String input = """
+        Mockito.when(executionParameters.getRequired(SOURCE))
+                .thenReturn("""
             {
                 "key": 3
             }
-            """;
+            """);
 
-        parameters.set("input", input);
-
-        assertThat(objectHelperComponentHandler.performParse(context, parameters))
+        assertThat(objectHelperComponentHandler.performParse(context, executionParameters))
                 .isEqualTo(Map.of("key", 3));
 
-        input =
-                """
+        executionParameters = Mockito.mock(ExecutionParameters.class);
+
+        Mockito.when(executionParameters.getRequired(SOURCE))
+                .thenReturn(
+                        """
             [
                 {
                     "key": 3
                 }
             ]
-            """;
+            """);
 
-        parameters.set("input", input);
-
-        assertThat(objectHelperComponentHandler.performParse(context, parameters))
+        assertThat(objectHelperComponentHandler.performParse(context, executionParameters))
                 .isEqualTo(List.of(Map.of("key", 3)));
     }
 
     @Test
     public void testPerformStringify() {
-        MockExecutionParameters parameters = new MockExecutionParameters();
+        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
         Map<String, Integer> input = Map.of("key", 3);
 
-        parameters.set("input", input);
+        Mockito.when(executionParameters.getRequired(SOURCE)).thenReturn(Map.of("key", 3));
 
-        assertThat(objectHelperComponentHandler.performStringify(context, parameters))
+        assertThat(objectHelperComponentHandler.performStringify(context, executionParameters))
                 .isEqualTo(JsonUtils.write(input));
     }
 }

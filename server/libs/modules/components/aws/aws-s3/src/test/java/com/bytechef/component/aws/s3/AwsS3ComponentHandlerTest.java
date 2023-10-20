@@ -16,7 +16,7 @@
 
 package com.bytechef.component.aws.s3;
 
-import com.bytechef.test.jsonasssert.AssertUtils;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,7 @@ public class AwsS3ComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        AssertUtils.assertEquals("definition/aws-s3_v1.json", new AwsS3ComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/aws-s3_v1.json", new AwsS3ComponentHandler().getDefinition());
     }
 
     @Disabled

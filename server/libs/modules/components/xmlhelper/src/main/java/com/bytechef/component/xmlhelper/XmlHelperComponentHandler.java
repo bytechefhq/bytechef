@@ -21,12 +21,12 @@ import static com.bytechef.component.xmlhelper.constants.XmlHelperConstants.XML_
 import static com.bytechef.component.xmlhelper.constants.XmlHelperConstants.XML_PARSE;
 import static com.bytechef.component.xmlhelper.constants.XmlHelperConstants.XML_STRINGIFY;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.any;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
@@ -55,7 +55,7 @@ public class XmlHelperComponentHandler implements ComponentHandler {
                     action(XML_STRINGIFY)
                             .display(display("Convert to XML string")
                                     .description("Writes the object/array to a XML string."))
-                            .properties(any(SOURCE)
+                            .properties(oneOf(SOURCE)
                                     .label("Source")
                                     .description("The data to convert to XML string.")
                                     .required(true)
@@ -69,14 +69,14 @@ public class XmlHelperComponentHandler implements ComponentHandler {
     }
 
     protected Map<String, ?> performParse(Context context, ExecutionParameters executionParameters) {
-        String input = executionParameters.getRequiredString(SOURCE);
+        String source = executionParameters.getRequiredString(SOURCE);
 
-        return XmlUtils.read(input);
+        return XmlUtils.read(source);
     }
 
     protected String performStringify(Context context, ExecutionParameters executionParameters) {
-        Object input = executionParameters.getRequiredObject(SOURCE);
+        Object source = executionParameters.getRequired(SOURCE);
 
-        return XmlUtils.write(input);
+        return XmlUtils.write(source);
     }
 }

@@ -24,20 +24,19 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
-import com.bytechef.hermes.component.test.json.JsonArrayUtils;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.util.Files;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 
 /**
  * @author Ivica Cardic
@@ -68,8 +67,8 @@ public class XlsxFileComponentHandlerIntTest {
         Map<String, Object> outputs = job.getOutputs();
 
         JSONAssert.assertEquals(
-                JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-                JsonArrayUtils.of((List<?>) outputs.get("readXlsxFile")),
+                new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
+                new JSONArray((List<?>) outputs.get("readXlsxFile")),
                 true);
     }
 
@@ -79,7 +78,7 @@ public class XlsxFileComponentHandlerIntTest {
                 "xlsxfile_v1_write",
                 Map.of(
                         "rows",
-                        JsonArrayUtils.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))));
+                        new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)).toList()));
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.COMPLETED);
 
@@ -101,14 +100,15 @@ public class XlsxFileComponentHandlerIntTest {
         outputs = job.getOutputs();
 
         assertEquals(
-                JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-                JsonArrayUtils.of((List<?>) outputs.get("readXlsxFile")),
+                new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
+                new JSONArray((List<?>) outputs.get("readXlsxFile")),
                 true);
     }
 
-    private File getFile(String fileName) throws IOException {
-        ClassPathResource classPathResource = new ClassPathResource("dependencies/" + fileName);
-
-        return classPathResource.getFile();
+    private File getFile(String filename) throws IOException {
+        return new File(XlsxFileComponentHandlerIntTest.class
+                .getClassLoader()
+                .getResource("dependencies/" + filename)
+                .getFile());
     }
 }

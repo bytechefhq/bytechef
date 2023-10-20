@@ -16,7 +16,7 @@
 
 package com.bytechef.component.map;
 
-import com.bytechef.test.jsonasssert.AssertUtils;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -26,6 +26,6 @@ public class MapComponentDefinitionFactoryTest {
 
     @Test
     public void testGetComponentDefinition() {
-        AssertUtils.assertEquals("definition/map_v1.json", new MapComponentDefinitionFactory().getDefinition());
+        JsonFileAssert.assertEquals("definition/map_v1.json", new MapComponentDefinitionFactory().getDefinition());
     }
 }

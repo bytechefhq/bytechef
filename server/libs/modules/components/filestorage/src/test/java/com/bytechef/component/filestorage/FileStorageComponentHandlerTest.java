@@ -16,82 +16,100 @@
 
 package com.bytechef.component.filestorage;
 
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
-import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
+import static com.bytechef.component.filestorage.constants.FileStorageConstants.CONTENT;
+import static com.bytechef.component.filestorage.constants.FileStorageConstants.FILENAME;
+import static com.bytechef.component.filestorage.constants.FileStorageConstants.FILE_ENTRY;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.test.mock.MockContext;
-import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
-import com.bytechef.test.jsonasssert.AssertUtils;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ClassPathResource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 /**
  * @author Ivica Cardic
  */
 public class FileStorageComponentHandlerTest {
 
-    private static final MockContext context = new MockContext();
+    private static final Context context = Mockito.mock(Context.class);
     private static final FileStorageComponentHandler fileStorageComponentHandler = new FileStorageComponentHandler();
 
     @Test
     public void testGetComponentDefinition() {
-        AssertUtils.assertEquals("definition/filestorage_v1.json", fileStorageComponentHandler.getDefinition());
+        JsonFileAssert.assertEquals("definition/filestorage_v1.json", fileStorageComponentHandler.getDefinition());
     }
 
     @Test
-    public void testPerformRead() throws Exception {
-        File file = getFile();
+    public void testPerformRead() {
+        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
-        MockExecutionParameters parameters = new MockExecutionParameters();
+        FileEntry fileEntry = Mockito.mock(FileEntry.class);
 
-        parameters.set(
-                FILE_ENTRY,
-                context.storeFileContent(file.getName(), new FileInputStream(file))
-                        .toMap());
+        Mockito.when(executionParameters.get(FILE_ENTRY, FileEntry.class)).thenReturn(fileEntry);
 
-        assertThat(fileStorageComponentHandler.performRead(context, parameters))
-                .isEqualTo(Files.contentOf(file, Charset.defaultCharset()));
+        fileStorageComponentHandler.performRead(context, executionParameters);
+
+        ArgumentCaptor<FileEntry> fileEntryArgumentCaptor = ArgumentCaptor.forClass(FileEntry.class);
+
+        Mockito.verify(context).readFileToString(fileEntryArgumentCaptor.capture());
+
+        assertThat(fileEntryArgumentCaptor.getValue()).isEqualTo(fileEntry);
     }
 
     @Disabled
     @Test
-    public void testPerformDownload() throws Exception {
+    public void testPerformDownload() {
         // TODO
     }
 
     @Test
-    public void testPerformWrite() throws Exception {
+    public void testPerformWrite() {
         File file = getFile();
 
-        MockExecutionParameters parameters = new MockExecutionParameters();
+        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
-        parameters.set("content", Files.contentOf(file, Charset.defaultCharset()));
+        Mockito.when(executionParameters.getRequired(CONTENT))
+                .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
+        Mockito.when(executionParameters.getString(FILENAME, "file.txt")).thenReturn("file.txt");
 
-        FileEntry fileEntry = (FileEntry) fileStorageComponentHandler.performWrite(context, parameters);
+        fileStorageComponentHandler.performWrite(context, executionParameters);
 
-        assertThat(context.readFileToString(fileEntry)).isEqualTo(Files.contentOf(file, Charset.defaultCharset()));
+        ArgumentCaptor<String> contentArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-        assertThat(fileEntry.getName()).isEqualTo("file.txt");
+        Mockito.verify(context).storeFileContent(filenameArgumentCaptor.capture(), contentArgumentCaptor.capture());
 
-        parameters.set(FILENAME, "test.txt");
-        parameters.set("content", Files.contentOf(file, Charset.defaultCharset()));
+        assertThat(contentArgumentCaptor.getValue()).isEqualTo(Files.contentOf(file, StandardCharsets.UTF_8));
+        assertThat(filenameArgumentCaptor.getValue()).isEqualTo("file.txt");
 
-        fileEntry = (FileEntry) fileStorageComponentHandler.performWrite(context, parameters);
+        executionParameters = Mockito.mock(ExecutionParameters.class);
 
-        assertThat(fileEntry.getName()).isEqualTo("test.txt");
+        Mockito.when(executionParameters.getRequired(CONTENT))
+                .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
+        Mockito.when(executionParameters.getString(FILENAME, "file.txt")).thenReturn("test.txt");
+
+        Mockito.reset(context);
+
+        fileStorageComponentHandler.performWrite(context, executionParameters);
+
+        filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
+
+        Mockito.verify(context).storeFileContent(filenameArgumentCaptor.capture(), Mockito.anyString());
+
+        assertThat(filenameArgumentCaptor.getValue()).isEqualTo("test.txt");
     }
 
-    private File getFile() throws IOException {
-        ClassPathResource classPathResource = new ClassPathResource("dependencies/sample.txt");
-
-        return classPathResource.getFile();
+    private File getFile() {
+        return new File(FileStorageComponentHandlerTest.class
+                .getClassLoader()
+                .getResource("dependencies/sample.txt")
+                .getFile());
     }
 }

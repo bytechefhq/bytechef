@@ -1,9 +1,4 @@
 {
-  "display": {
-    "description": "Reads and writes data from a ODS file.",
-    "label": "ODS File"
-  },
-  "name": "odsFile",
   "actions": [
     {
       "display": {
@@ -20,29 +15,29 @@
         {
           "description": "The object property which contains a reference to the ODS file to read from.",
           "label": "File",
-          "name": "fileEntry",
           "required": true,
+          "name": "fileEntry",
           "type": "OBJECT",
           "objectType": "FILE_ENTRY",
           "properties": [
             {
+              "required": true,
               "name": "extension",
-              "required": true,
               "type": "STRING"
             },
             {
+              "required": true,
               "name": "mimeType",
-              "required": true,
               "type": "STRING"
             },
             {
+              "required": true,
               "name": "name",
-              "required": true,
               "type": "STRING"
             },
             {
-              "name": "url",
               "required": true,
+              "name": "url",
               "type": "STRING"
             }
           ]
@@ -101,23 +96,23 @@
           "objectType": "FILE_ENTRY",
           "properties": [
             {
+              "required": true,
               "name": "extension",
-              "required": true,
               "type": "STRING"
             },
             {
+              "required": true,
               "name": "mimeType",
-              "required": true,
               "type": "STRING"
             },
             {
+              "required": true,
               "name": "name",
-              "required": true,
               "type": "STRING"
             },
             {
-              "name": "url",
               "required": true,
+              "name": "url",
               "type": "STRING"
             }
           ]
@@ -127,25 +122,44 @@
         {
           "description": "The array of objects to write to the file.",
           "label": "Rows",
-          "name": "rows",
           "required": true,
+          "name": "rows",
           "type": "ARRAY",
           "items": [
             {
               "type": "OBJECT",
-              "additionalProperties": true,
-              "properties": [
+              "additionalProperties": [
                 {
-                  "type": "BOOLEAN"
-                },
-                {
-                  "type": "DATE_TIME"
-                },
-                {
-                  "type": "NUMBER"
-                },
-                {
-                  "type": "STRING"
+                  "type": "ONE_OF",
+                  "types": [
+                    {
+                      "type": "ARRAY"
+                    },
+                    {
+                      "type": "BOOLEAN"
+                    },
+                    {
+                      "type": "DATE"
+                    },
+                    {
+                      "type": "DATE_TIME"
+                    },
+                    {
+                      "type": "INTEGER"
+                    },
+                    {
+                      "type": "NULL"
+                    },
+                    {
+                      "type": "NUMBER"
+                    },
+                    {
+                      "type": "OBJECT"
+                    },
+                    {
+                      "type": "STRING"
+                    }
+                  ]
                 }
               ]
             }
@@ -154,8 +168,8 @@
         {
           "description": "Filename to set for binary data. By default, \"file.ods\" will be used.",
           "label": "Filename",
-          "name": "filename",
           "required": true,
+          "name": "filename",
           "type": "STRING",
           "defaultValue": "file.ods"
         },
@@ -169,5 +183,10 @@
       ]
     }
   ],
+  "display": {
+    "description": "Reads and writes data from a ODS file.",
+    "label": "ODS File"
+  },
+  "name": "odsFile",
   "version": 1
 }

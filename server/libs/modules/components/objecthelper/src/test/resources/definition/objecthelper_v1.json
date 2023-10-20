@@ -1,9 +1,4 @@
 {
-  "display": {
-    "description": "The Object Helper allows you to do various operations on objects.",
-    "label": "Object Helper"
-  },
-  "name": "objectHelper",
   "actions": [
     {
       "display": {
@@ -13,15 +8,44 @@
       "name": "jsonParse",
       "output": [
         {
-          "type": "ANY"
+          "type": "ONE_OF",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "BOOLEAN"
+            },
+            {
+              "type": "DATE"
+            },
+            {
+              "type": "DATE_TIME"
+            },
+            {
+              "type": "INTEGER"
+            },
+            {
+              "type": "NULL"
+            },
+            {
+              "type": "NUMBER"
+            },
+            {
+              "type": "OBJECT"
+            },
+            {
+              "type": "STRING"
+            }
+          ]
         }
       ],
       "properties": [
         {
           "description": "The JSON string to convert to the data.",
           "label": "Source",
-          "name": "source",
           "required": true,
+          "name": "source",
           "type": "STRING"
         }
       ]
@@ -41,15 +65,27 @@
         {
           "description": "The data to convert to JSON string.",
           "label": "Source",
-          "name": "source",
           "required": true,
-          "type": "ANY",
+          "name": "source",
+          "type": "ONE_OF",
           "types": [
             {
               "type": "ARRAY"
             },
             {
               "type": "BOOLEAN"
+            },
+            {
+              "type": "DATE"
+            },
+            {
+              "type": "DATE_TIME"
+            },
+            {
+              "type": "INTEGER"
+            },
+            {
+              "type": "NULL"
             },
             {
               "type": "NUMBER"
@@ -65,5 +101,10 @@
       ]
     }
   ],
+  "display": {
+    "description": "The Object Helper allows you to do various operations on objects.",
+    "label": "Object Helper"
+  },
+  "name": "objectHelper",
   "version": 1
 }

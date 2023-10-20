@@ -16,40 +16,48 @@
 
 package com.bytechef.component.csvfile;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.DELIMITER;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.FILE_ENTRY;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.HEADER_ROW;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.INCLUDE_EMPTY_CELLS;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.PAGE_NUMBER;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.PAGE_SIZE;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.READ_AS_STRING;
+import static com.bytechef.component.csvfile.constants.CsvFileConstants.ROWS;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.test.json.JsonArrayUtils;
-import com.bytechef.hermes.component.test.json.JsonObjectUtils;
-import com.bytechef.hermes.component.test.mock.MockContext;
-import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
-import com.bytechef.test.jsonasssert.AssertUtils;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ClassPathResource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 /**
  * @author Ivica Cardic
  */
 public class CsvFileComponentHandlerTest {
 
-    private static final Context context = new MockContext();
+    private static final Context context = Mockito.mock(Context.class);
     private static final CsvFileComponentHandler csvFileComponentHandler = new CsvFileComponentHandler();
 
     @Test
     public void testGetDescription() {
-        AssertUtils.assertEquals("definition/csvfile_v1.json", csvFileComponentHandler.getDefinition());
+        JsonFileAssert.assertEquals("definition/csvfile_v1.json", csvFileComponentHandler.getDefinition());
     }
 
     @Test
@@ -57,90 +65,94 @@ public class CsvFileComponentHandlerTest {
         // headerRow: true, includeEmptyCells: false, readAsString: false
 
         assertEquals(
-                JsonArrayUtils.of(getJSONObjectsWithNamedColumns(false, false)),
-                JsonArrayUtils.of((List) csvFileComponentHandler.performRead(
+                new JSONArray(getJSONObjectsWithNamedColumns(false, false)),
+                new JSONArray((List) csvFileComponentHandler.performRead(
                         context, getReadParameters(true, false, null, null, false, getFile("sample_header.csv")))),
                 true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: false
 
         assertEquals(
-                JsonArrayUtils.of(getJSONObjectsWithNamedColumns(true, false)),
-                JsonArrayUtils.of((List) csvFileComponentHandler.performRead(
+                new JSONArray(getJSONObjectsWithNamedColumns(true, false)),
+                new JSONArray((List) csvFileComponentHandler.performRead(
                         context, getReadParameters(true, true, null, null, false, getFile("sample_header.csv")))),
                 true);
 
         // headerRow: true, includeEmptyCells: false, readAsString: true
 
         assertEquals(
-                JsonArrayUtils.of(getJSONObjectsWithNamedColumns(false, true)),
-                JsonArrayUtils.of((List) csvFileComponentHandler.performRead(
+                new JSONArray(getJSONObjectsWithNamedColumns(false, true)),
+                new JSONArray((List) csvFileComponentHandler.performRead(
                         context, getReadParameters(true, false, null, null, true, getFile("sample_header.csv")))),
                 true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: true
 
         assertEquals(
-                JsonArrayUtils.of(getJSONObjectsWithNamedColumns(true, true)),
-                JsonArrayUtils.of((List) csvFileComponentHandler.performRead(
+                new JSONArray(getJSONObjectsWithNamedColumns(true, true)),
+                new JSONArray((List) csvFileComponentHandler.performRead(
                         context, getReadParameters(true, true, null, null, true, getFile("sample_header.csv")))),
                 true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: false
 
         assertEquals(
-                JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(false, false)),
-                JsonArrayUtils.of((List) csvFileComponentHandler.performRead(
+                new JSONArray(getJSONArrayWithoutNamedColumns(false, false)),
+                new JSONArray((List) csvFileComponentHandler.performRead(
                         context, getReadParameters(false, false, null, null, false, getFile("sample_no_header.csv")))),
                 true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: true
 
         assertEquals(
-                JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(false, true)),
-                JsonArrayUtils.of((List) csvFileComponentHandler.performRead(
+                new JSONArray(getJSONArrayWithoutNamedColumns(false, true)),
+                new JSONArray((List) csvFileComponentHandler.performRead(
                         context, getReadParameters(false, false, null, null, true, getFile("sample_no_header.csv")))),
                 true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: false
 
         assertEquals(
-                JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(true, false)),
-                JsonArrayUtils.of((List) csvFileComponentHandler.performRead(
+                new JSONArray(getJSONArrayWithoutNamedColumns(true, false)),
+                new JSONArray((List) csvFileComponentHandler.performRead(
                         context, getReadParameters(false, true, null, null, false, getFile("sample_no_header.csv")))),
                 true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: true
 
         assertEquals(
-                JsonArrayUtils.of(getJSONArrayWithoutNamedColumns(true, true)),
-                JsonArrayUtils.of((List) csvFileComponentHandler.performRead(
+                new JSONArray(getJSONArrayWithoutNamedColumns(true, true)),
+                new JSONArray((List) csvFileComponentHandler.performRead(
                         context, getReadParameters(false, true, null, null, true, getFile("sample_no_header.csv")))),
                 true);
 
         // paging
 
         assertEquals(
-                JsonArrayUtils.of(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
-                JsonArrayUtils.of((List) csvFileComponentHandler.performRead(
+                new JSONArray(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
+                new JSONArray((List) csvFileComponentHandler.performRead(
                         context, getReadParameters(true, false, 1, 3, false, getFile("sample_header.csv")))),
                 true);
     }
 
     @Test
-    public void testPerformWriteCSV() throws Exception {
-        FileEntry fileEntry = (FileEntry) csvFileComponentHandler.performWrite(
-                context,
-                getWriteParameters(
-                        JsonArrayUtils.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset()))));
+    @SuppressWarnings({"raw", "unchecked"})
+    public void testPerformWriteCSV() throws IOException {
+        String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
+
+        csvFileComponentHandler.performWrite(context, getWriteParameters((List) new JSONArray(jsonContent).toList()));
+
+        ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor =
+                ArgumentCaptor.forClass(ByteArrayInputStream.class);
+        ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
+
+        Mockito.verify(context).storeFileContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture());
 
         assertEquals(
-                JsonArrayUtils.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
-                JsonArrayUtils.of((List) csvFileComponentHandler.performRead(
-                        context, getReadParameters(true, true, null, null, false, fileEntry))),
+                new JSONArray(jsonContent),
+                new JSONArray(csvFileComponentHandler.read(inputStreamArgumentCaptor.getValue())),
                 true);
-
-        assertThat(fileEntry.getName()).isEqualTo("file.csv");
+        Assertions.assertThat(filenameArgumentCaptor.getValue()).isEqualTo("file.csv");
     }
 
     private List<JSONObject> getJSONObjectsWithNamedColumns(boolean includeEmptyCells, boolean readAsString)
@@ -273,19 +285,13 @@ public class CsvFileComponentHandlerTest {
             String sumKey,
             Object sumValue)
             throws JSONException {
-        JSONObject jsonObject = JsonObjectUtils.of(
-                idKey,
-                idValue,
-                nameKey,
-                nameValue,
-                cityKey,
-                cityValue,
-                activeKey,
-                activeValue,
-                dateKey,
-                dateValue,
-                sumKey,
-                sumValue);
+        JSONObject jsonObject = new JSONObject()
+                .put(idKey, idValue)
+                .put(nameKey, nameValue)
+                .put(cityKey, cityValue)
+                .put(activeKey, activeValue)
+                .put(dateKey, dateValue)
+                .put(sumKey, sumValue);
 
         if (descriptionValue != null) {
             jsonObject.put(descriptionKey, descriptionValue);
@@ -294,10 +300,11 @@ public class CsvFileComponentHandlerTest {
         return jsonObject;
     }
 
-    private File getFile(String fileName) throws IOException {
-        ClassPathResource classPathResource = new ClassPathResource("dependencies/" + fileName);
-
-        return classPathResource.getFile();
+    private File getFile(String fileName) {
+        return new File(CsvFileComponentHandlerTest.class
+                .getClassLoader()
+                .getResource("dependencies/" + fileName)
+                .getFile());
     }
 
     private ExecutionParameters getReadParameters(
@@ -308,35 +315,30 @@ public class CsvFileComponentHandlerTest {
             boolean readAsString,
             File file)
             throws FileNotFoundException {
-        return getReadParameters(
-                headerRow,
-                includeEmptyCells,
-                pageNumber,
-                pageSize,
-                readAsString,
-                file == null ? null : context.storeFileContent(file.getName(), new FileInputStream(file)));
+
+        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
+
+        Mockito.when(executionParameters.getString(DELIMITER, ",")).thenReturn(",");
+        Mockito.when(executionParameters.get(FILE_ENTRY, FileEntry.class)).thenReturn(Mockito.mock(FileEntry.class));
+        Mockito.when(executionParameters.getBoolean(HEADER_ROW, true)).thenReturn(headerRow);
+        Mockito.when(executionParameters.getBoolean(INCLUDE_EMPTY_CELLS, false)).thenReturn(includeEmptyCells);
+        Mockito.when(executionParameters.getInteger(PAGE_NUMBER)).thenReturn(pageNumber);
+        Mockito.when(executionParameters.getInteger(PAGE_SIZE)).thenReturn(pageSize);
+        Mockito.when(executionParameters.getBoolean(READ_AS_STRING, false)).thenReturn(readAsString);
+
+        if (file != null) {
+            Mockito.when(context.getFileStream(Mockito.any(FileEntry.class))).thenReturn(new FileInputStream(file));
+        }
+
+        return executionParameters;
     }
 
-    private ExecutionParameters getReadParameters(
-            boolean headerRow,
-            boolean includeEmptyCells,
-            Integer pageNumber,
-            Integer pageSize,
-            boolean readAsString,
-            FileEntry fileEntry) {
-        MockExecutionParameters parameters = new MockExecutionParameters();
+    @SuppressWarnings("raw")
+    private ExecutionParameters getWriteParameters(List<Map> items) {
+        ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
-        parameters.set("fileEntry", fileEntry.toMap());
-        parameters.set("headerRow", headerRow);
-        parameters.set("includeEmptyCells", includeEmptyCells);
-        parameters.set("pageNumber", pageNumber);
-        parameters.set("pageSize", pageSize);
-        parameters.set("readAsString", readAsString);
+        Mockito.when(executionParameters.getList(ROWS, Map.class, List.of())).thenReturn(items);
 
-        return parameters;
-    }
-
-    private ExecutionParameters getWriteParameters(List<Object> items) {
-        return new MockExecutionParameters().set("rows", items);
+        return executionParameters;
     }
 }

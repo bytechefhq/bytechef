@@ -31,4 +31,6 @@ public class OdsFileConstants {
     public static final String ODS_FILE = "odsFile";
     public static final String READ = "read";
     public static final String WRITE = "write";
+    public static final String FILE_ENTRY = "fileEntry";
+    public static final String FILENAME = "filename";
 }

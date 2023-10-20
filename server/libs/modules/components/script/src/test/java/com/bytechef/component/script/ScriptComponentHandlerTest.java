@@ -16,7 +16,7 @@
 
 package com.bytechef.component.script;
 
-import com.bytechef.test.jsonasssert.AssertUtils;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -26,6 +26,6 @@ public class ScriptComponentHandlerTest {
 
     @Test
     public void testGetDefinition() {
-        AssertUtils.assertEquals("definition/script_v1.json", new ScriptComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/script_v1.json", new ScriptComponentHandler().getDefinition());
     }
 }
