@@ -62,7 +62,7 @@ export const useGetIntegrationWorkflowsQuery = (id: number) =>
     useQuery<WorkflowModel[], Error>(
         IntegrationKeys.integrationWorkflows(id),
         () =>
-            new IntegrationWorkflowsApi().getIntegrationIntegrationWorkflows({
+            new IntegrationWorkflowsApi().getIntegrationWorkflows({
                 id,
             })
     );

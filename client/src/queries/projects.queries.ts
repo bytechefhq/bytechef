@@ -98,7 +98,7 @@ export const useGetProjectsQuery = (filters?: {
 
 export const useGetProjectWorkflowsQuery = (id: number) =>
     useQuery<WorkflowModel[], Error>(ProjectKeys.projectWorkflows(id), () =>
-        new ProjectWorkflowsApi().getProjectProjectWorkflows({id})
+        new ProjectWorkflowsApi().getProjectWorkflows({id})
     );
 
 export const useGetProjectWorkflowExecutionsQuery = (
@@ -125,5 +125,5 @@ export const useGetWorkflowExecutionQuery = (
 
 export const useGetWorkflowsQuery = () =>
     useQuery<WorkflowModel[], Error>(WorkflowKeys.workflows, () =>
-        new ProjectWorkflowsApi().getProjectWorkflows()
+        new ProjectWorkflowsApi().getWorkflows()
     );
