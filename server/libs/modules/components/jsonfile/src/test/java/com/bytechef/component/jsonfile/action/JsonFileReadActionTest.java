@@ -25,7 +25,6 @@ import org.assertj.core.util.Files;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -52,11 +51,6 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 public class JsonFileReadActionTest {
 
     private static final Context context = Mockito.mock(Context.class);
-
-    @BeforeAll
-    public static void beforeAll() {
-//        ReflectionTestUtils.setField(JsonUtils.class, "jsonMapper", new JsonMapper(new ObjectMapper()));
-    }
 
     @BeforeEach
     public void beforeEach() {
@@ -106,7 +100,7 @@ public class JsonFileReadActionTest {
         inputParameters = Map.of(
             FILE_ENTRY, Mockito.mock(Context.FileEntry.class),
             FILE_TYPE, "JSON",
-            IS_ARRAY, false,
+            IS_ARRAY, true,
             PAGE_NUMBER, 1,
             PAGE_SIZE, 2);
 
@@ -138,7 +132,7 @@ public class JsonFileReadActionTest {
         inputParameters = Map.of(
             FILE_ENTRY, Mockito.mock(Context.FileEntry.class),
             FILE_TYPE, "JSONL",
-            IS_ARRAY, false,
+            IS_ARRAY, true,
             PAGE_NUMBER, 1,
             PAGE_SIZE, 2);
 

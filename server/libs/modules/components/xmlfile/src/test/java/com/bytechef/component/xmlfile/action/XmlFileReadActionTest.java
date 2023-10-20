@@ -23,7 +23,6 @@ import com.bytechef.hermes.component.util.XmlUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -51,11 +50,6 @@ public class XmlFileReadActionTest {
 
     private static final String SAMPLE_ARRAY_XML = "sample_array.xml";
     private static final String SAMPLE_XML = "sample.xml";
-
-    @BeforeAll
-    public static void beforeAll() {
-//        ReflectionTestUtils.setField(XmlUtils.class, "xmlMapper", new XmlMapper());
-    }
 
     @BeforeEach
     public void beforeEach() {
