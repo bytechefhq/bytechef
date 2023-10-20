@@ -126,4 +126,18 @@ public class ComponentDefinitionServiceRSocketClient implements ComponentDefinit
                 .toList(),
             ServiceInstanceUtils::toConnectionDefinitions);
     }
+
+    @Override
+    public Mono<List<ConnectionDefinition>> getConnectionDefinitions(String componentName) {
+        return Mono.zip(
+            ServiceInstanceUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
+                .stream()
+                .map(serviceInstance -> rSocketRequesterBuilder
+                    .websocket(ServiceInstanceUtils.toWebSocketUri(serviceInstance))
+                    .route("Service.getComponentConnectionDefinitions")
+                    .data(componentName)
+                    .retrieveMono(new ParameterizedTypeReference<List<ConnectionDefinition>>() {}))
+                .toList(),
+            ServiceInstanceUtils::toConnectionDefinitions);
+    }
 }

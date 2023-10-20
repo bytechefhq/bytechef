@@ -15,48 +15,47 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.repository.jdbc.config;
+package com.bytechef.worker.config;
 
-import com.bytechef.atlas.repository.jdbc.converter.ExecutionErrorToStringConverter;
-import com.bytechef.atlas.repository.jdbc.converter.StringToExecutionErrorConverter;
-import com.bytechef.atlas.repository.jdbc.converter.StringToWorkflowTaskConverter;
-import com.bytechef.atlas.repository.jdbc.converter.WorkflowTaskToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.MapListWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapListWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.encryption.Encryption;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Arrays;
-import java.util.List;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef.workflow", name = "persistence.provider", havingValue = "jdbc")
-public class WorkflowRepositoryJdbcConfiguration extends AbstractJdbcConfiguration {
+//@ConditionalOnProperty(prefix = "bytechef.workflow", name = "persistence.provider", havingValue = "jdbc")
+public class JdbcConfiguration extends AbstractJdbcConfiguration {
 
+    private final Encryption encryption;
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI2")
-    public WorkflowRepositoryJdbcConfiguration(ObjectMapper objectMapper) {
+    public JdbcConfiguration(Encryption encryption, ObjectMapper objectMapper) {
+        this.encryption = encryption;
         this.objectMapper = objectMapper;
     }
 
     @Override
     protected List<?> userConverters() {
         return Arrays.asList(
-            new ExecutionErrorToStringConverter(objectMapper),
+            new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
+            new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
             new MapWrapperToStringConverter(objectMapper),
             new MapListWrapperToStringConverter(objectMapper),
-            new StringToExecutionErrorConverter(objectMapper),
             new StringToMapWrapperConverter(objectMapper),
-            new StringToMapListWrapperConverter(objectMapper),
-            new StringToWorkflowTaskConverter(objectMapper),
-            new WorkflowTaskToStringConverter(objectMapper));
+            new StringToMapListWrapperConverter(objectMapper));
     }
 }

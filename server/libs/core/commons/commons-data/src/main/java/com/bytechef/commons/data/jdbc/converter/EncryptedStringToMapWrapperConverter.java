@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.converter;
+package com.bytechef.commons.data.jdbc.converter;
 
-import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.encryption.Encryption;
+import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -28,7 +28,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-public class EncryptedStringToMapWrapperConverter implements Converter<String, MapWrapper> {
+public class EncryptedStringToMapWrapperConverter implements Converter<String, EncryptedMapWrapper> {
 
     private final Encryption encryption;
     private final ObjectMapper objectMapper;
@@ -40,8 +40,8 @@ public class EncryptedStringToMapWrapperConverter implements Converter<String, M
     }
 
     @Override
-    public MapWrapper convert(String source) {
-        return source == null ? null : new MapWrapper(read(objectMapper, encryption.decrypt(source)));
+    public EncryptedMapWrapper convert(String source) {
+        return source == null ? null : new EncryptedMapWrapper(read(objectMapper, encryption.decrypt(source)));
     }
 
     private Map read(ObjectMapper objectMapper, String json) {

@@ -20,7 +20,7 @@ paths:
             type: array
             items:
               type: string
-        - name: tagId
+        - name: tagIds
           description: The list of tag ids of used for filtering connections.
           in: query
           required: false
@@ -31,7 +31,7 @@ paths:
               format: int64
       responses:
         "200":
-          description: TODO
+          description: The list of connections.
           content:
             application/json:
               schema:
@@ -51,7 +51,7 @@ paths:
         required: true
       responses:
         "200":
-          description: TODO OK
+          description: The connection object.
           content:
             application/json:
               schema:
@@ -131,7 +131,7 @@ paths:
         required: true
       responses:
         "200":
-          description: TODO
+          description: The updated connection object.
           content:
             application/json:
               schema:
@@ -180,15 +180,12 @@ components:
         authorizationName:
           description: TODO
           type: string
-          readOnly: true
         componentName:
           description: TODO
           type: string
-          readOnly: true
         connectionVersion:
           description: TODO
           type: integer
-          readOnly: true
         createdBy:
           description: TODO
           type: string
@@ -220,7 +217,6 @@ components:
           type: object
           additionalProperties:
             type: object
-          readOnly: true
         tags:
           type: array
           items:

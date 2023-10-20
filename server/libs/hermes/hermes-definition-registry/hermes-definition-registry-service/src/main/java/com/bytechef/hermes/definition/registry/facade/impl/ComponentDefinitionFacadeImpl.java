@@ -76,6 +76,7 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
                         return false;
                     }
                 })
+                .distinct()
                 .toList());
     }
 }

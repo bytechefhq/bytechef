@@ -14,13 +14,13 @@ paths:
       operationId: getComponentDefinitions
       parameters:
         - name: connectionDefinitions
-          description: Filter components which define connection definitions.
+          description: Use for filtering components which define connection definitions.
           in: query
           required: false
           schema:
             type: boolean
         - name: connectionInstances
-          description: Filter components which have connections created.
+          description: Use for filtering components which have connection instances created.
           in: query
           required: false
           schema:
@@ -124,6 +124,29 @@ paths:
       tags:
         - connection-definitions
       operationId: getConnectionDefinitions
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConnectionDefinitionBasic'
+  /connection-definitions/{componentName}:
+    get:
+      description: Get all connection definitions for a component.
+      summary: Get all connection definitions for a component.
+      tags:
+        - connection-definitions
+      operationId: getComponentConnectionDefinitions
+      parameters:
+        - name: componentName
+          description: The name of the component.
+          required: true
+          in: path
+          schema:
+            type: string
       responses:
         "200":
           description: OK

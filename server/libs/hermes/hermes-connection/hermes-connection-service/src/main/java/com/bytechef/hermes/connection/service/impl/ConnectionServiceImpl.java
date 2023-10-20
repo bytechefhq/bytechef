@@ -23,6 +23,7 @@ import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.StreamSupport;
 
 import org.springframework.lang.NonNull;
@@ -46,6 +47,8 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     public Connection create(@NonNull Connection connection) {
         Assert.notNull(connection, "'connection' must not be null");
+        Assert.hasText(connection.getComponentName(), "'componentName' must not be empty");
+        Assert.hasText(connection.getName(), "'name' must not be empty");
 
         return connectionRepository.save(connection);
     }
@@ -94,9 +97,11 @@ public class ConnectionServiceImpl implements ConnectionService {
     @SuppressFBWarnings("NP")
     public Connection update(@NonNull Connection connection) {
         Assert.notNull(connection, "'connection' must not be null");
+        Assert.hasText(connection.getComponentName(), "'componentName' must not be empty");
+        Assert.hasText(connection.getName(), "'name' must not be empty");
 
         return connectionRepository
-            .findById(connection.getId())
+            .findById(Objects.requireNonNull(connection.getId()))
             .map(curConnection -> {
                 curConnection.setName(connection.getName());
                 curConnection.setVersion(connection.getVersion());

@@ -575,8 +575,15 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @JsonIgnore
         private Consumer<Connection> testConsumer;
+        private Boolean authorizationRequired;
 
         private ModifiableConnectionDefinition() {
+        }
+
+        public ModifiableConnectionDefinition authorizationRequired(Boolean authorizationRequired) {
+            this.authorizationRequired = authorizationRequired;
+
+            return this;
         }
 
         public ModifiableConnectionDefinition authorizations(ModifiableAuthorization... authorizations) {
@@ -651,6 +658,11 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public int hashCode() {
             return Objects.hash(componentName, version);
+        }
+
+        @Override
+        public Boolean isAuthorizationRequired() {
+            return authorizationRequired;
         }
 
         @Override

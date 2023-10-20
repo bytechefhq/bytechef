@@ -6,26 +6,18 @@ schemas:
   OneOfProperty:
     description: A one of property type.
     type: object
-    required:
-      - type
     allOf:
       - $ref: '#/schemas/Property'
       - type: object
         properties:
-          required:
-            type: boolean
           types:
             description: Possible types of properties that can be used.
             type: array
             items:
               $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Property'
-          type:
-            type: string
   ArrayProperty:
     description: An array property type.
     type: object
-    required:
-      - type
     allOf:
       - $ref: '#/schemas/ValueProperty'
       - type: object
@@ -41,36 +33,18 @@ schemas:
   BooleanProperty:
     description: A boolean property type.
     type: object
-    required:
-      - type
     allOf:
       - $ref: '#/schemas/ValueProperty'
-      - type: object
-        properties:
-          type:
-            type: string
   DateProperty:
     description: A date property type.
     type: object
-    required:
-      - type
     allOf:
       - $ref: '#/schemas/ValueProperty'
-      - type: object
-        properties:
-          type:
-            type: string
   DateTimeProperty:
     description: A date-time property type.
     type: object
-    required:
-      - type
     allOf:
       - $ref: '#/schemas/ValueProperty'
-      - type: object
-        properties:
-          type:
-            type: string
   Display:
     description: A display information.
     type: object
@@ -136,24 +110,14 @@ schemas:
             description: The minimum property value.
             type: integer
             format: int32
-          type:
-            type: string
   NullProperty:
     description: A null property type.
     type: object
-    required:
-      - type
     allOf:
       - $ref: '#/schemas/Property'
-      - type: object
-        properties:
-          type:
-            type: string
   NumberProperty:
     description: A number property type.
     type: object
-    required:
-      - type
     allOf:
       - $ref: '#/schemas/ValueProperty'
       - type: object
@@ -170,13 +134,9 @@ schemas:
             description: The number value precision.
             type: integer
             format: int32
-          type:
-            type: string
   ObjectProperty:
     description: An object property type.
     type: object
-    required:
-      - type
     allOf:
       - $ref: '#/schemas/ValueProperty'
       - type: object
@@ -197,11 +157,11 @@ schemas:
             type: array
             items:
               $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Property'
-          type:
-            type: string
   Property:
     description: A base property.
     type: object
+    required:
+    - propertyType
     properties:
       advancedOption:
         description: If the property should be grouped under advanced options.
@@ -231,8 +191,12 @@ schemas:
       required:
         description: If the property is required or not.
         type: boolean
+      type:
+        $ref: '#/schemas/PropertyType'
+#      __model_type:
+#        type: string
     discriminator:
-      propertyName: type
+      propertyName: __model_type
       mapping:
         ARRAY: '#/schemas/ArrayProperty'
         BOOLEAN: '#/schemas/BooleanProperty'
@@ -271,6 +235,20 @@ schemas:
       loadOptionsFunction:
         description: The function that should dynamically load options for the property.
         type: object
+  PropertyType:
+    description: A type of property.
+    type:
+    enum:
+      - ARRAY
+      - BOOLEAN
+      - DATE
+      - DATE_TIME
+      - INTEGER
+      - "NULL"
+      - NUMBER
+      - STRING
+      - OBJECT
+      - ONE_OF
   Resources:
     description: A set of available resources.
     type: object
@@ -281,16 +259,12 @@ schemas:
   StringProperty:
     description: A string property.
     type: object
-    required:
-      - type
     allOf:
       - $ref: '#/schemas/ValueProperty'
       - type: object
         properties:
           controlType:
             $ref: '#/schemas/ControlType'
-          type:
-            type: string
   ValueProperty:
     description: A base property for all value based properties.
     type: object

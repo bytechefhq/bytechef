@@ -27,18 +27,20 @@ import com.bytechef.hermes.component.utils.XmlUtils;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Base64Utils;
 
 /**
  * @author Ivica Cardic
  */
 @ComponentIntTest
 public class XmlFileComponentHandlerIntTest {
+
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
     private FileStorageService fileStorageService;
@@ -51,7 +53,7 @@ public class XmlFileComponentHandlerIntTest {
         File sampleFile = getFile("sample.xml");
 
         Job job = workflowExecutor.execute(
-            Base64Utils.encodeToString("xmlfile_v1_read".getBytes(StandardCharsets.UTF_8)),
+            ENCODER.encodeToString("xmlfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
                 fileStorageService
@@ -71,7 +73,7 @@ public class XmlFileComponentHandlerIntTest {
     @Test
     public void testWrite() {
         Job job = workflowExecutor.execute(
-            Base64Utils.encodeToString("xmlfile_v1_write".getBytes(StandardCharsets.UTF_8)),
+            ENCODER.encodeToString("xmlfile_v1_write".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "source",
                 XmlUtils.read(Files.contentOf(getFile("sample.xml"), StandardCharsets.UTF_8), List.class)));
@@ -86,7 +88,7 @@ public class XmlFileComponentHandlerIntTest {
         File sampleFile = getFile("sample.xml");
 
         job = workflowExecutor.execute(
-            Base64Utils.encodeToString("xmlfile_v1_read".getBytes(StandardCharsets.UTF_8)),
+            ENCODER.encodeToString("xmlfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
                 fileStorageService

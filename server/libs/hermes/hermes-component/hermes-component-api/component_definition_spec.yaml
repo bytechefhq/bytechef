@@ -93,6 +93,9 @@ schemas:
     description: Definition of a connection to an outside service.
     type: object
     properties:
+      authorizationRequired:
+        description: If connection requires an authorization to be configured or not.
+        type: boolean
       authorizations:
         type: array
         items:
@@ -100,9 +103,9 @@ schemas:
       componentName:
         description: The name of a component this connection can be used for.
         type: string
-#      componentVersion:
-#        description: The version of a component this connection can be used for.
-#        type: string
+      connectionVersion:
+        description: The connection version.
+        type: string
       display:
         $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
       properties:
@@ -113,7 +116,6 @@ schemas:
       resources:
         $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Resources'
       version:
-        description: The connection version.
         type: number
         format: double
   JdbcComponentDefinition:

@@ -19,9 +19,12 @@ package com.bytechef.commons.data.jdbc.converter;
 
 import com.bytechef.commons.data.jdbc.wrapper.MapListWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -41,9 +44,9 @@ public class StringToMapListWrapperConverter implements Converter<String, MapLis
         return source == null ? null : new MapListWrapper(read(objectMapper, source));
     }
 
-    private List read(ObjectMapper objectMapper, String json) {
+    private List<Map<String, Object>> read(ObjectMapper objectMapper, String json) {
         try {
-            return objectMapper.readValue(json, List.class);
+            return objectMapper.readValue(json, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

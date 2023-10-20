@@ -98,4 +98,16 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet())));
     }
+
+    @Override
+    public Mono<List<ConnectionDefinition>> getConnectionDefinitions(String componentName) {
+        return Mono.just(
+            new ArrayList<>(
+                componentDefinitionFactories.stream()
+                    .map(ComponentDefinitionFactory::getDefinition)
+                    .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), componentName))
+                    .map(ComponentDefinition::getConnection)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet())));
+    }
 }
