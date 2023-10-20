@@ -16,7 +16,7 @@
 
 package com.integri.atlas.task.handler.objecthelpers.v1_0;
 
-import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.handler.AbstractTaskDefinitionHandler;
 import com.integri.atlas.task.definition.model.TaskDefinition;
 import com.integri.atlas.task.handler.objecthelpers.ObjectHelpersTaskConstants;
 import org.springframework.stereotype.Component;

@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.definition;
+package com.integri.atlas.task.definition.handler;
 
-import com.integri.atlas.task.definition.model.TaskAuthDefinition;
-import com.integri.atlas.task.definition.model.TaskDefinition;
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public interface TaskDefinitionHandler {
-    List<TaskAuthDefinition> getTaskAuthDefinitions();
+public interface TaskDefinitionHandlerResolver {
+    TaskDefinitionHandler resolve(String name);
 
-    TaskDefinition getTaskDefinition();
+    List<TaskDefinitionHandler> getTaskDefinitionHandlers();
 }

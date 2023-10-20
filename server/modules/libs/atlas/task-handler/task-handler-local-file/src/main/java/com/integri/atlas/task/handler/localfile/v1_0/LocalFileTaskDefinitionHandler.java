@@ -26,7 +26,7 @@ import static com.integri.atlas.task.handler.localfile.LocalFileTaskConstants.FI
 import static com.integri.atlas.task.handler.localfile.LocalFileTaskConstants.LOCAL_FILE;
 import static com.integri.atlas.task.handler.localfile.LocalFileTaskConstants.VERSION_1_0;
 
-import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.handler.AbstractTaskDefinitionHandler;
 import com.integri.atlas.task.definition.model.DSL;
 import com.integri.atlas.task.definition.model.TaskDefinition;
 import com.integri.atlas.task.handler.localfile.LocalFileTaskConstants;

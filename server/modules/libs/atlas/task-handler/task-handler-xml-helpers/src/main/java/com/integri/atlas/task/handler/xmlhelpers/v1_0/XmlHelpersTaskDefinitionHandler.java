@@ -25,7 +25,7 @@ import static com.integri.atlas.task.handler.xmlhelpers.XmlHelpersTaskConstants.
 import static com.integri.atlas.task.handler.xmlhelpers.XmlHelpersTaskConstants.VERSION_1_0;
 import static com.integri.atlas.task.handler.xmlhelpers.XmlHelpersTaskConstants.XML_HELPERS;
 
-import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.handler.AbstractTaskDefinitionHandler;
 import com.integri.atlas.task.definition.model.DSL;
 import com.integri.atlas.task.definition.model.TaskDefinition;
 import com.integri.atlas.task.handler.xmlhelpers.XmlHelpersTaskConstants;

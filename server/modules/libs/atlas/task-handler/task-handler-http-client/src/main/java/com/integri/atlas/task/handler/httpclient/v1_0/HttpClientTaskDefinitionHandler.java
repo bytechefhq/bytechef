@@ -57,7 +57,7 @@ import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.URI;
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.VALUE;
 
-import com.integri.atlas.task.definition.AbstractTaskDefinitionHandler;
+import com.integri.atlas.task.definition.handler.AbstractTaskDefinitionHandler;
 import com.integri.atlas.task.definition.model.DSL;
 import com.integri.atlas.task.definition.model.TaskAuthDefinition;
 import com.integri.atlas.task.definition.model.TaskDefinition;
