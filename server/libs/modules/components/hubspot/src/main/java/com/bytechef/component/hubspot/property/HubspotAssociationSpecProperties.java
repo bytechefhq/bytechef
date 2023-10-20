@@ -30,12 +30,11 @@ import java.util.List;
  * @generated
  */
 public class HubspotAssociationSpecProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
-        List.of(
-            string("associationCategory").label("Association Category")
-                .options(option("HUBSPOT_DEFINED", "HUBSPOT_DEFINED"), option("USER_DEFINED", "USER_DEFINED"),
-                    option("INTEGRATOR_DEFINED", "INTEGRATOR_DEFINED"))
-                .required(true),
-            integer("associationTypeId").label("Association Type Id")
-                .required(true));
+    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+        string("associationCategory").label("Association Category")
+            .options(option("HUBSPOT_DEFINED", "HUBSPOT_DEFINED"), option("USER_DEFINED", "USER_DEFINED"),
+                option("INTEGRATOR_DEFINED", "INTEGRATOR_DEFINED"))
+            .required(true),
+        integer("associationTypeId").label("Association Type Id")
+            .required(true));
 }

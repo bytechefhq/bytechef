@@ -23,6 +23,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.date;
 import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.hermes.component.definition.ComponentDSL.dynamicProperties;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.nullable;
 import static com.bytechef.hermes.component.definition.ComponentDSL.number;
@@ -62,10 +63,7 @@ public class AirtableCreateRecordAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)),
-            object("__item").properties(object("fields").additionalProperties(
-                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
-                .placeholder("Add to Fields")
-                .label("Fields")
+            object("__item").properties(dynamicProperties("fields").label("Fields")
                 .required(false))
                 .label("Item")
                 .metadata(
