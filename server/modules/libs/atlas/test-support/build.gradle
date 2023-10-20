@@ -1,0 +1,13 @@
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-jdbc"
+    implementation "org.springframework.boot:spring-boot-starter-test"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation project(":modules:libs:atlas:engine:engine-core-impl")
+    implementation project(":modules:libs:atlas:engine:engine-coordinator-impl")
+    implementation project(":modules:libs:atlas:engine:engine-worker-impl")
+    implementation project(":modules:libs:atlas:message-broker:message-broker-sync")
+    implementation project(":modules:libs:atlas:engine-repository:engine-repository-jdbc")
+    implementation project(":modules:libs:atlas:storage:storage-base64")
+    implementation project(":modules:libs:atlas:storage:storage-file")
+    implementation project(":modules:libs:atlas:workflow-repository:workflow-repository-resource")
+}

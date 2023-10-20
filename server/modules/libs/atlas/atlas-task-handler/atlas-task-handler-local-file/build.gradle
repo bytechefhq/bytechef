@@ -1,6 +1,0 @@
-dependencies {
-    compileOnly project(":modules:libs:atlas:atlas-engine:atlas-engine-worker-api")
-    compileOnly "org.slf4j:slf4j-api"
-    compileOnly "org.springframework:spring-core"
-    compileOnly "org.springframework:spring-context"
-}

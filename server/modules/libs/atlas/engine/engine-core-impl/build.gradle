@@ -1,0 +1,14 @@
+dependencies {
+    api "com.fasterxml.jackson.core:jackson-databind"
+    api project(":modules:libs:atlas:engine:engine-core-api")
+
+    implementation "com.google.guava:guava"
+    implementation "commons-io:commons-io"
+    implementation "org.apache.commons:commons-lang3"
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework:spring-expression"
+    implementation "org.springframework.boot:spring-boot"
+
+    testImplementation project(":modules:libs:atlas:storage:storage-base64")
+}
