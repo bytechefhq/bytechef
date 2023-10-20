@@ -98,7 +98,7 @@ public class DataStorage implements Persistable<Long> {
     private Long scopeId;
 
     @Column
-    private Object value;
+    private DataStorageValue value;
 
     @Version
     private int version;
@@ -110,7 +110,7 @@ public class DataStorage implements Persistable<Long> {
         this.key = key;
         this.scope = scope;
         this.scopeId = scopeId;
-        this.value = value;
+        this.value = new DataStorageValue(value, value.getClass());
     }
 
     public String getCreatedBy() {
@@ -147,7 +147,11 @@ public class DataStorage implements Persistable<Long> {
     }
 
     public Object getValue() {
-        return value;
+        if (value == null) {
+            return null;
+        }
+
+        return value.value;
     }
 
     public int getVersion() {
@@ -196,7 +200,7 @@ public class DataStorage implements Persistable<Long> {
     }
 
     public void setValue(Object value) {
-        this.value = value;
+        this.value = new DataStorageValue(value, value.getClass());
     }
 
     public void setVersion(int version) {
@@ -217,5 +221,11 @@ public class DataStorage implements Persistable<Long> {
             ", lastModifiedDate=" + lastModifiedDate +
             ", version=" + version +
             '}';
+    }
+
+    public record DataStorageValue(Object value, String classname) {
+        public DataStorageValue(Object value, Class<?> classValue) {
+            this(value, classValue.getName());
+        }
     }
 }

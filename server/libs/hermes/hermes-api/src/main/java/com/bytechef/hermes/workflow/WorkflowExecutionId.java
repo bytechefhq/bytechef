@@ -21,10 +21,12 @@ import com.bytechef.commons.util.Base64Utils;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import java.io.Serializable;
+
 /**
  * @author Ivica Cardic
  */
-public class WorkflowExecutionId {
+public class WorkflowExecutionId implements Serializable {
 
     private final long instanceId;
     private final String instanceType;
