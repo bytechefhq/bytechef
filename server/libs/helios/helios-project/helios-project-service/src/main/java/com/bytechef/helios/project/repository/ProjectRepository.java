@@ -62,4 +62,11 @@ public interface ProjectRepository
     Optional<Project> findByJobId(@Param("jobId") long jobId);
 
     Optional<Project> findByName(String name);
+
+    @Query("""
+            SELECT project.* FROM project
+            JOIN project_workflow ON project.id = project_workflow.project_id
+            WHERE project_workflow.workflow_id = :workflowId
+        """)
+    Optional<Project> findByWorkflowId(@Param("workflowId") String workflowId);
 }
