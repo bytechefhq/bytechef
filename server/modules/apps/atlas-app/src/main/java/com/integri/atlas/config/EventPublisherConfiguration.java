@@ -18,8 +18,8 @@
 
 package com.integri.atlas.config;
 
-import com.integri.atlas.engine.core.event.DistributedEventPublisher;
-import com.integri.atlas.engine.core.message.broker.MessageBroker;
+import com.integri.atlas.engine.event.DistributedEventPublisher;
+import com.integri.atlas.engine.message.broker.MessageBroker;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

@@ -84,7 +84,7 @@ public class XmlFileTaskDefinitionTest {
                                 "operation":["WRITE"]
                             }
                         },
-                        "name":"input",
+                        "name":"source",
                         "required":true,
                         "type":"JSON"
                     },

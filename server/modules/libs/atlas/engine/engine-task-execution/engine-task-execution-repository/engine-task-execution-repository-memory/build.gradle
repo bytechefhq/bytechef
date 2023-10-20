@@ -1,0 +1,5 @@
+dependencies {
+    api project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-repository:engine-task-execution-repository-api")
+
+    implementation "org.springframework:spring-core"
+}

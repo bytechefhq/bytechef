@@ -16,19 +16,19 @@
 
 package com.integri.atlas.task.dispatcher.sequence.completion;
 
+import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.MapObject;
+import com.integri.atlas.engine.context.Context;
+import com.integri.atlas.engine.context.MapContext;
+import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
-import com.integri.atlas.engine.core.DSL;
-import com.integri.atlas.engine.core.MapObject;
-import com.integri.atlas.engine.core.context.Context;
-import com.integri.atlas.engine.core.context.MapContext;
-import com.integri.atlas.engine.core.context.repository.ContextRepository;
-import com.integri.atlas.engine.core.task.SimpleTaskExecution;
-import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.TaskStatus;
-import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
-import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
-import com.integri.atlas.engine.core.uuid.UUIDGenerator;
+import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
+import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
+import com.integri.atlas.engine.task.execution.TaskExecution;
+import com.integri.atlas.engine.task.execution.TaskStatus;
+import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
+import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.uuid.UUIDGenerator;
 import java.util.Date;
 import java.util.List;
 

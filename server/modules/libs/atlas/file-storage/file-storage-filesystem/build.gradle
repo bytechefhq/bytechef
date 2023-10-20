@@ -1,6 +1,6 @@
 dependencies {
     compileOnly "commons-io:commons-io"
 
-    api project(":modules:libs:atlas:engine:engine-core-api")
+    api project(":modules:libs:atlas:engine:engine-common")
     api project(":modules:libs:atlas:file-storage:file-storage-api")
 }

@@ -18,7 +18,7 @@
 
 package com.integri.atlas.task.handler.time;
 
-import com.integri.atlas.engine.core.task.SimpleTaskExecution;
+import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

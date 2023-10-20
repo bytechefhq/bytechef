@@ -1,6 +1,0 @@
-dependencies {
-    api project(":modules:libs:atlas:engine:engine-core-api")
-
-    implementation "javax.jms:javax.jms-api"
-    implementation "org.springframework:spring-jms"
-}

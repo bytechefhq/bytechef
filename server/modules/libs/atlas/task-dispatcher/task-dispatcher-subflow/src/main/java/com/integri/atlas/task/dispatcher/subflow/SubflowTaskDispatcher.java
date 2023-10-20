@@ -18,13 +18,13 @@
 
 package com.integri.atlas.task.dispatcher.subflow;
 
-import com.integri.atlas.engine.core.DSL;
-import com.integri.atlas.engine.core.message.broker.MessageBroker;
-import com.integri.atlas.engine.core.message.broker.Queues;
-import com.integri.atlas.engine.core.task.Task;
-import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
-import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcherResolver;
+import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.message.broker.MessageBroker;
+import com.integri.atlas.engine.message.broker.Queues;
+import com.integri.atlas.engine.task.Task;
+import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
+import com.integri.atlas.engine.task.dispatcher.TaskDispatcherResolver;
+import com.integri.atlas.engine.task.execution.TaskExecution;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

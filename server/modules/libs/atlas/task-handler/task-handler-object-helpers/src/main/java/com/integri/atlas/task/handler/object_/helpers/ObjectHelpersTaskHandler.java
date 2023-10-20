@@ -19,7 +19,7 @@ package com.integri.atlas.task.handler.object_.helpers;
 import static com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskConstants.TASK_OBJECT_HELPERS;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskConstants.Operation;

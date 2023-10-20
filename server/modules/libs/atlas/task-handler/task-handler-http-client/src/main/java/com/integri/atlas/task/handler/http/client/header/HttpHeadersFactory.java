@@ -24,7 +24,7 @@ import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RESPONSE_FORMAT;
 import static com.integri.atlas.task.handler.http.client.header.HttpHeader.BOUNDARY_TMPL;
 
-import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.*;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import java.util.ArrayList;

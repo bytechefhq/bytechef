@@ -1,0 +1,9 @@
+dependencies {
+    api project(":modules:libs:atlas:engine:engine-context:engine-context-api")
+
+    implementation "org.springframework:spring-tx"
+    implementation "org.springframework:spring-context"
+    implementation project(":modules:libs:atlas:engine:engine-context:engine-context-repository:engine-context-repository-api")
+    implementation project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-repository:engine-task-execution-repository-api")
+    implementation project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-api")
+}

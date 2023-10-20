@@ -16,15 +16,15 @@
 
 package com.integri.atlas.task.dispatcher.loop;
 
-import com.integri.atlas.engine.core.DSL;
-import com.integri.atlas.engine.core.message.broker.MessageBroker;
-import com.integri.atlas.engine.core.message.broker.Queues;
-import com.integri.atlas.engine.core.task.SimpleTaskExecution;
-import com.integri.atlas.engine.core.task.Task;
-import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
-import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcherResolver;
-import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.message.broker.MessageBroker;
+import com.integri.atlas.engine.message.broker.Queues;
+import com.integri.atlas.engine.task.Task;
+import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
+import com.integri.atlas.engine.task.dispatcher.TaskDispatcherResolver;
+import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
+import com.integri.atlas.engine.task.execution.TaskExecution;
+import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
 import java.util.Date;
 import org.springframework.util.Assert;
 

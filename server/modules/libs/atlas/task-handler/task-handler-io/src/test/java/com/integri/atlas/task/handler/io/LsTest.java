@@ -16,7 +16,7 @@
 
 package com.integri.atlas.task.handler.io;
 
-import com.integri.atlas.engine.core.task.SimpleTaskExecution;
+import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.task.handler.io.Ls.FileInfo;
 import java.io.IOException;
 import java.util.List;

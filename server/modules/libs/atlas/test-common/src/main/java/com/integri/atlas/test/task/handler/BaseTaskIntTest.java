@@ -16,39 +16,37 @@
 
 package com.integri.atlas.test.task.handler;
 
+import com.integri.atlas.engine.MapObject;
+import com.integri.atlas.engine.context.repository.ContextRepository;
 import com.integri.atlas.engine.coordinator.CoordinatorImpl;
 import com.integri.atlas.engine.coordinator.error.TaskExecutionErrorHandler;
-import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.executor.DefaultJobExecutor;
-import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.coordinator.task.completion.DefaultTaskCompletionHandler;
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
 import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandlerChain;
 import com.integri.atlas.engine.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.dispatcher.TaskDispatcherChain;
-import com.integri.atlas.engine.coordinator.workflow.repository.JSONWorkflowMapper;
-import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapper;
-import com.integri.atlas.engine.coordinator.workflow.repository.YAMLWorkflowMapper;
-import com.integri.atlas.engine.core.MapObject;
-import com.integri.atlas.engine.core.context.repository.ContextRepository;
-import com.integri.atlas.engine.core.error.Error;
-import com.integri.atlas.engine.core.event.EventPublisher;
-import com.integri.atlas.engine.core.message.broker.MessageBroker;
-import com.integri.atlas.engine.core.message.broker.Queues;
-import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
-import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcherResolver;
-import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
-import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.error.Error;
+import com.integri.atlas.engine.event.EventPublisher;
+import com.integri.atlas.engine.job.Job;
+import com.integri.atlas.engine.job.repository.JobRepository;
+import com.integri.atlas.engine.job.service.JobService;
+import com.integri.atlas.engine.message.broker.MessageBroker;
+import com.integri.atlas.engine.message.broker.Queues;
+import com.integri.atlas.engine.message.broker.sync.SyncMessageBroker;
+import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
+import com.integri.atlas.engine.task.dispatcher.TaskDispatcherResolver;
+import com.integri.atlas.engine.task.execution.TaskExecution;
+import com.integri.atlas.engine.task.execution.evaluator.spel.SpelTaskEvaluator;
+import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.worker.Worker;
 import com.integri.atlas.engine.worker.WorkerImpl;
 import com.integri.atlas.engine.worker.task.handler.DefaultTaskHandlerResolver;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolverChain;
+import com.integri.atlas.engine.workflow.repository.WorkflowRepository;
 import com.integri.atlas.file.storage.service.FileStorageService;
-import com.integri.atlas.message.broker.sync.SyncMessageBroker;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
-import com.integri.atlas.workflow.repository.resource.ResourceBasedWorkflowRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -70,6 +68,9 @@ public abstract class BaseTaskIntTest {
     protected JobRepository jobRepository;
 
     @Autowired
+    protected JobService jobService;
+
+    @Autowired
     protected JSONHelper jsonHelper;
 
     @Autowired
@@ -80,6 +81,9 @@ public abstract class BaseTaskIntTest {
 
     @Autowired
     protected TaskExecutionRepository taskExecutionRepository;
+
+    @Autowired
+    protected WorkflowRepository workflowRepository;
 
     protected List<TaskCompletionHandler> getTaskCompletionHandlers(
         TaskCompletionHandler taskCompletionHandler,
@@ -97,10 +101,6 @@ public abstract class BaseTaskIntTest {
 
     protected Map<String, TaskHandler<?>> getTaskHandlerResolverMap() {
         return Map.of();
-    }
-
-    protected WorkflowMapper getWorkflowMapper(String workflowId) {
-        return workflowId.endsWith(".json") ? new JSONWorkflowMapper() : new YAMLWorkflowMapper();
     }
 
     protected Job startJob(String workflowId, Map<String, ?> inputs) {
@@ -138,9 +138,7 @@ public abstract class BaseTaskIntTest {
             .build();
 
         coordinator.setContextRepository(contextRepository);
-        coordinator.setJobRepository(jobRepository);
-        coordinator.setWorkflowRepository(new ResourceBasedWorkflowRepository(getWorkflowMapper(workflowId)));
-        coordinator.setJobTaskRepository(taskExecutionRepository);
+        coordinator.setJobService(jobService);
 
         SyncMessageBroker coordinatorMessageBroker = new SyncMessageBroker();
 
@@ -159,13 +157,12 @@ public abstract class BaseTaskIntTest {
 
         coordinator.setErrorHandler(getJobTaskErrorHandler(taskDispatcherChain));
         coordinator.setEventPublisher(eventPublisher);
-        coordinator.setTaskDispatcher(taskDispatcherChain);
 
         DefaultJobExecutor jobExecutor = new DefaultJobExecutor();
 
         jobExecutor.setContextRepository(contextRepository);
         jobExecutor.setTaskExecutionRepository(taskExecutionRepository);
-        jobExecutor.setWorkflowRepository(new ResourceBasedWorkflowRepository(getWorkflowMapper(workflowId)));
+        jobExecutor.setWorkflowRepository(workflowRepository);
         jobExecutor.setTaskDispatcher(taskDispatcherChain);
         jobExecutor.setTaskEvaluator(SpelTaskEvaluator.create());
 
@@ -177,9 +174,7 @@ public abstract class BaseTaskIntTest {
         defaultTaskCompletionHandler.setJobExecutor(jobExecutor);
         defaultTaskCompletionHandler.setJobRepository(jobRepository);
         defaultTaskCompletionHandler.setTaskExecutionRepository(taskExecutionRepository);
-        defaultTaskCompletionHandler.setWorkflowRepository(
-            new ResourceBasedWorkflowRepository(getWorkflowMapper(workflowId))
-        );
+        defaultTaskCompletionHandler.setWorkflowRepository(workflowRepository);
         defaultTaskCompletionHandler.setEventPublisher(eventPublisher);
         defaultTaskCompletionHandler.setTaskEvaluator(SpelTaskEvaluator.create());
 

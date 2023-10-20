@@ -19,7 +19,7 @@ package com.integri.atlas.task.handler.http.client.response;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_FULL_RESPONSE;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RESPONSE_FORMAT;
 
-import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.file.storage.service.FileStorageService;
 import com.integri.atlas.task.handler.http.client.HttpClientTaskConstants;

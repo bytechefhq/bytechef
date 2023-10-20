@@ -18,7 +18,7 @@
 
 package com.integri.atlas.task.handler.s3;
 
-import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import java.nio.file.Paths;
 import org.springframework.stereotype.Component;

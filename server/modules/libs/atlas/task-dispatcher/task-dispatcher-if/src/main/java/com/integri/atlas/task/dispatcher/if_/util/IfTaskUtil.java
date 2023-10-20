@@ -29,8 +29,8 @@ import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_STR
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_VALUE_1;
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_VALUE_2;
 
-import com.integri.atlas.engine.core.MapObject;
-import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.MapObject;
+import com.integri.atlas.engine.task.execution.TaskExecution;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -18,21 +18,21 @@
 
 package com.integri.atlas.task.dispatcher.parallel;
 
-import com.integri.atlas.engine.core.DSL;
-import com.integri.atlas.engine.core.MapObject;
-import com.integri.atlas.engine.core.context.MapContext;
-import com.integri.atlas.engine.core.context.repository.ContextRepository;
-import com.integri.atlas.engine.core.counter.repository.CounterRepository;
-import com.integri.atlas.engine.core.message.broker.MessageBroker;
-import com.integri.atlas.engine.core.message.broker.Queues;
-import com.integri.atlas.engine.core.task.SimpleTaskExecution;
-import com.integri.atlas.engine.core.task.Task;
-import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.TaskStatus;
-import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
-import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcherResolver;
-import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
-import com.integri.atlas.engine.core.uuid.UUIDGenerator;
+import com.integri.atlas.engine.DSL;
+import com.integri.atlas.engine.MapObject;
+import com.integri.atlas.engine.context.MapContext;
+import com.integri.atlas.engine.context.repository.ContextRepository;
+import com.integri.atlas.engine.counter.repository.CounterRepository;
+import com.integri.atlas.engine.message.broker.MessageBroker;
+import com.integri.atlas.engine.message.broker.Queues;
+import com.integri.atlas.engine.task.Task;
+import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
+import com.integri.atlas.engine.task.dispatcher.TaskDispatcherResolver;
+import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
+import com.integri.atlas.engine.task.execution.TaskExecution;
+import com.integri.atlas.engine.task.execution.TaskStatus;
+import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
+import com.integri.atlas.engine.uuid.UUIDGenerator;
 import com.integri.atlas.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
 import java.util.Date;
 import java.util.List;

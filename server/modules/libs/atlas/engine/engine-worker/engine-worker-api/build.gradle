@@ -1,0 +1,8 @@
+dependencies {
+    api project(":modules:libs:atlas:engine:engine-common")
+    api project(":modules:libs:atlas:engine:engine-event:engine-event-api")
+    api project(":modules:libs:atlas:engine:engine-message-broker:engine-message-broker-api")
+    api project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-api")
+
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+}

@@ -19,9 +19,9 @@ package com.integri.atlas.task.handler.csv.file;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-import com.integri.atlas.engine.coordinator.job.Job;
-import com.integri.atlas.engine.coordinator.job.JobStatus;
-import com.integri.atlas.engine.core.Accessor;
+import com.integri.atlas.engine.Accessor;
+import com.integri.atlas.engine.job.Job;
+import com.integri.atlas.engine.job.JobStatus;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.test.json.JSONArrayUtil;

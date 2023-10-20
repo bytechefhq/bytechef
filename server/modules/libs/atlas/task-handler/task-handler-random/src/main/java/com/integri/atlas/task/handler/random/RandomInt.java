@@ -18,7 +18,7 @@
 
 package com.integri.atlas.task.handler.random;
 
-import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.stereotype.Component;

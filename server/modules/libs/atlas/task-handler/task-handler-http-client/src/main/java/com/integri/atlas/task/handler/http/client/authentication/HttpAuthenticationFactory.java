@@ -18,7 +18,7 @@ package com.integri.atlas.task.handler.http.client.authentication;
 
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.*;
 
-import com.integri.atlas.engine.core.MapObject;
+import com.integri.atlas.engine.MapObject;
 import org.springframework.stereotype.Component;
 
 /**

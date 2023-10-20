@@ -18,19 +18,19 @@
 
 package com.integri.atlas.task.handler.map;
 
-import com.integri.atlas.engine.core.context.MapContext;
-import com.integri.atlas.engine.core.error.Error;
-import com.integri.atlas.engine.core.message.broker.Queues;
-import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.repository.memory.context.InMemoryContextRepository;
-import com.integri.atlas.engine.repository.memory.counter.InMemoryCounterRepository;
-import com.integri.atlas.engine.repository.memory.task.InMemoryTaskExecutionRepository;
+import com.integri.atlas.engine.context.MapContext;
+import com.integri.atlas.engine.context.repository.memory.InMemoryContextRepository;
+import com.integri.atlas.engine.counter.repository.memory.InMemoryCounterRepository;
+import com.integri.atlas.engine.error.Error;
+import com.integri.atlas.engine.message.broker.Queues;
+import com.integri.atlas.engine.message.broker.sync.SyncMessageBroker;
+import com.integri.atlas.engine.task.execution.TaskExecution;
+import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
+import com.integri.atlas.engine.task.execution.repository.memory.InMemoryTaskExecutionRepository;
 import com.integri.atlas.engine.worker.Worker;
 import com.integri.atlas.engine.worker.concurrency.CurrentThreadExecutorService;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolver;
-import com.integri.atlas.message.broker.sync.SyncMessageBroker;
 import com.integri.atlas.task.dispatcher.map.MapTaskDispatcher;
 import java.util.ArrayList;
 import java.util.Arrays;

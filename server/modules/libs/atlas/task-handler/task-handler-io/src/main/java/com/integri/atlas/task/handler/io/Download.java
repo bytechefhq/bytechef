@@ -20,10 +20,10 @@ package com.integri.atlas.task.handler.io;
 
 import static org.apache.commons.io.IOUtils.copy;
 
-import com.integri.atlas.engine.core.event.EventPublisher;
-import com.integri.atlas.engine.core.event.Events;
-import com.integri.atlas.engine.core.event.WorkflowEvent;
-import com.integri.atlas.engine.core.task.TaskExecution;
+import com.integri.atlas.engine.event.EventPublisher;
+import com.integri.atlas.engine.event.Events;
+import com.integri.atlas.engine.event.WorkflowEvent;
+import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import java.io.BufferedInputStream;
 import java.io.File;
