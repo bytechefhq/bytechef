@@ -23,7 +23,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -58,7 +58,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -75,7 +75,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -92,7 +92,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -109,10 +109,10 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "controlType": "INPUT_TEXT",
-      "expressionDisabled": null
+      "controlType": "EXPRESSION",
+      "expressionEnabled": null
     }, {
       "advancedOption": true,
       "description": "The first row of the file contains the header names.",
@@ -125,8 +125,19 @@
       "type": "BOOLEAN",
       "defaultValue": true,
       "exampleValue": null,
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "False",
+        "value": true
+      } ],
       "controlType": "CHECKBOX",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": true,
       "description": "When reading from file the empty cells will be filled with an empty string.",
@@ -139,8 +150,19 @@
       "type": "BOOLEAN",
       "defaultValue": false,
       "exampleValue": null,
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "False",
+        "value": true
+      } ],
       "controlType": "CHECKBOX",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": true,
       "description": "The amount of child elements to return in a page.",
@@ -158,7 +180,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -176,7 +198,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": true,
       "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
@@ -189,8 +211,19 @@
       "type": "BOOLEAN",
       "defaultValue": false,
       "exampleValue": null,
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "False",
+        "value": true
+      } ],
       "controlType": "CHECKBOX",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": true,
       "description": "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.",
@@ -207,7 +240,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -252,7 +285,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -269,7 +302,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -286,7 +319,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -303,10 +336,10 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "controlType": "INPUT_TEXT",
-      "expressionDisabled": null
+      "controlType": "EXPRESSION",
+      "expressionEnabled": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -359,7 +392,7 @@
             "options": null,
             "optionsDataSource": null,
             "controlType": "JSON_BUILDER",
-            "expressionDisabled": null
+            "expressionEnabled": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -372,8 +405,19 @@
             "type": "BOOLEAN",
             "defaultValue": null,
             "exampleValue": null,
+            "options": [ {
+              "description": null,
+              "displayCondition": null,
+              "name": "True",
+              "value": true
+            }, {
+              "description": null,
+              "displayCondition": null,
+              "name": "False",
+              "value": true
+            } ],
             "controlType": "CHECKBOX",
-            "expressionDisabled": null
+            "expressionEnabled": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -389,7 +433,7 @@
             "options": null,
             "optionsDataSource": null,
             "controlType": "DATE",
-            "expressionDisabled": null
+            "expressionEnabled": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -405,7 +449,7 @@
             "options": null,
             "optionsDataSource": null,
             "controlType": "DATE_TIME",
-            "expressionDisabled": null
+            "expressionEnabled": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -423,7 +467,7 @@
             "options": null,
             "optionsDataSource": null,
             "controlType": "INPUT_INTEGER",
-            "expressionDisabled": null
+            "expressionEnabled": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -442,7 +486,7 @@
             "options": null,
             "optionsDataSource": null,
             "controlType": "INPUT_NUMBER",
-            "expressionDisabled": null
+            "expressionEnabled": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -462,7 +506,7 @@
             "optionsDataSource": null,
             "properties": null,
             "controlType": "JSON_BUILDER",
-            "expressionDisabled": null
+            "expressionEnabled": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -479,9 +523,9 @@
             "options": null,
             "optionsDataSource": null,
             "sampleDataType": null,
-            "expressionDisabled": null
+            "expressionEnabled": null
           } ],
-          "expressionDisabled": null
+          "expressionEnabled": null
         } ],
         "multipleValues": true,
         "objectType": null,
@@ -489,13 +533,13 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.xlsx\" will be used.",
@@ -512,7 +556,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": true,
       "description": "The name of the sheet to create in the spreadsheet.",
@@ -529,7 +573,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,

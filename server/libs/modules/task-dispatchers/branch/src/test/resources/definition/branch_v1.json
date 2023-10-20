@@ -7,6 +7,7 @@
     "advancedOption": null,
     "description": "Defines expression upon which evaluation the proper branch continues execution.",
     "displayCondition": null,
+    "expressionEnabled": null,
     "hidden": null,
     "label": "Expression",
     "placeholder": null,
@@ -18,14 +19,14 @@
     "controlType": "INPUT_TEXT",
     "options": null,
     "optionsDataSource": null,
-    "sampleDataType": null,
-    "expressionDisabled": null
+    "sampleDataType": null
   } ],
   "resources": null,
   "taskProperties": [ {
     "advancedOption": null,
     "description": "The list of tasks to execute if the result of expression matches the 'key' value.",
     "displayCondition": null,
+    "expressionEnabled": null,
     "hidden": null,
     "label": null,
     "placeholder": null,
@@ -38,6 +39,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -55,6 +57,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -66,12 +69,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The list of tasks.",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -84,6 +87,7 @@
           "advancedOption": null,
           "description": "The task or task dispatcher to use.",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -98,27 +102,24 @@
           "options": null,
           "optionsDataSource": null,
           "properties": null,
-          "controlType": "INPUT_TEXT",
-          "expressionDisabled": null
+          "controlType": "EXPRESSION"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "multipleValues": true,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "JSON_BUILDER",
-    "expressionDisabled": null
+    "controlType": "JSON_BUILDER"
   }, {
     "advancedOption": null,
     "description": "The list of tasks to execute if the result of expression does not match any of 'key' values.",
     "displayCondition": null,
+    "expressionEnabled": null,
     "hidden": null,
     "label": null,
     "placeholder": null,
@@ -131,6 +132,7 @@
       "advancedOption": null,
       "description": "The task or task dispatcher to use.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -145,14 +147,12 @@
       "options": null,
       "optionsDataSource": null,
       "properties": null,
-      "controlType": "INPUT_TEXT",
-      "expressionDisabled": null
+      "controlType": "EXPRESSION"
     } ],
     "multipleValues": true,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "JSON_BUILDER",
-    "expressionDisabled": null
+    "controlType": "JSON_BUILDER"
   } ],
   "title": "Branch",
   "version": 1

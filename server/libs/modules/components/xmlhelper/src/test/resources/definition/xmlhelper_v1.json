@@ -25,7 +25,7 @@
       "optionsDataSource": null,
       "properties": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -43,7 +43,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -71,7 +71,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -100,7 +100,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -120,9 +120,9 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,

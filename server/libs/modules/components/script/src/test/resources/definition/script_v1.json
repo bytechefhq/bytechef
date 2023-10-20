@@ -33,7 +33,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -46,8 +46,19 @@
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -63,7 +74,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "DATE",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -79,7 +90,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "DATE_TIME",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -97,7 +108,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -116,7 +127,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_NUMBER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -136,7 +147,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -153,9 +164,9 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -196,7 +207,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -209,8 +220,19 @@
           "type": "BOOLEAN",
           "defaultValue": null,
           "exampleValue": null,
+          "options": [ {
+            "description": null,
+            "displayCondition": null,
+            "name": "True",
+            "value": true
+          }, {
+            "description": null,
+            "displayCondition": null,
+            "name": "False",
+            "value": true
+          } ],
           "controlType": "CHECKBOX",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -226,7 +248,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "DATE",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -242,7 +264,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "DATE_TIME",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -260,7 +282,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -279,7 +301,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "INPUT_NUMBER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -299,7 +321,7 @@
           "optionsDataSource": null,
           "properties": null,
           "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -316,9 +338,9 @@
           "options": null,
           "optionsDataSource": null,
           "sampleDataType": null,
-          "expressionDisabled": null
+          "expressionEnabled": null
         } ],
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "multipleValues": true,
       "objectType": null,
@@ -326,7 +348,7 @@
       "optionsDataSource": null,
       "properties": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "Add your Java custom logic here.",
@@ -343,7 +365,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -382,7 +404,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -395,8 +417,19 @@
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -412,7 +445,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "DATE",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -428,7 +461,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "DATE_TIME",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -446,7 +479,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -465,7 +498,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_NUMBER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -485,7 +518,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -502,9 +535,9 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -545,7 +578,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -558,8 +591,19 @@
           "type": "BOOLEAN",
           "defaultValue": null,
           "exampleValue": null,
+          "options": [ {
+            "description": null,
+            "displayCondition": null,
+            "name": "True",
+            "value": true
+          }, {
+            "description": null,
+            "displayCondition": null,
+            "name": "False",
+            "value": true
+          } ],
           "controlType": "CHECKBOX",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -575,7 +619,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "DATE",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -591,7 +635,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "DATE_TIME",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -609,7 +653,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -628,7 +672,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "INPUT_NUMBER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -648,7 +692,7 @@
           "optionsDataSource": null,
           "properties": null,
           "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -665,9 +709,9 @@
           "options": null,
           "optionsDataSource": null,
           "sampleDataType": null,
-          "expressionDisabled": null
+          "expressionEnabled": null
         } ],
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "multipleValues": true,
       "objectType": null,
@@ -675,7 +719,7 @@
       "optionsDataSource": null,
       "properties": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "Add your JavaScript custom logic here.",
@@ -692,7 +736,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -731,7 +775,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -744,8 +788,19 @@
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -761,7 +816,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "DATE",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -777,7 +832,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "DATE_TIME",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -795,7 +850,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -814,7 +869,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_NUMBER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -834,7 +889,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -851,9 +906,9 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -894,7 +949,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -907,8 +962,19 @@
           "type": "BOOLEAN",
           "defaultValue": null,
           "exampleValue": null,
+          "options": [ {
+            "description": null,
+            "displayCondition": null,
+            "name": "True",
+            "value": true
+          }, {
+            "description": null,
+            "displayCondition": null,
+            "name": "False",
+            "value": true
+          } ],
           "controlType": "CHECKBOX",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -924,7 +990,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "DATE",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -940,7 +1006,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "DATE_TIME",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -958,7 +1024,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -977,7 +1043,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "INPUT_NUMBER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -997,7 +1063,7 @@
           "optionsDataSource": null,
           "properties": null,
           "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1014,9 +1080,9 @@
           "options": null,
           "optionsDataSource": null,
           "sampleDataType": null,
-          "expressionDisabled": null
+          "expressionEnabled": null
         } ],
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "multipleValues": true,
       "objectType": null,
@@ -1024,7 +1090,7 @@
       "optionsDataSource": null,
       "properties": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "Add your Python custom logic here.",
@@ -1041,7 +1107,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -1080,7 +1146,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1093,8 +1159,19 @@
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1110,7 +1187,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "DATE",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1126,7 +1203,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "DATE_TIME",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1144,7 +1221,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1163,7 +1240,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_NUMBER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1183,7 +1260,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1200,9 +1277,9 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -1243,7 +1320,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1256,8 +1333,19 @@
           "type": "BOOLEAN",
           "defaultValue": null,
           "exampleValue": null,
+          "options": [ {
+            "description": null,
+            "displayCondition": null,
+            "name": "True",
+            "value": true
+          }, {
+            "description": null,
+            "displayCondition": null,
+            "name": "False",
+            "value": true
+          } ],
           "controlType": "CHECKBOX",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1273,7 +1361,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "DATE",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1289,7 +1377,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "DATE_TIME",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1307,7 +1395,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1326,7 +1414,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "INPUT_NUMBER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1346,7 +1434,7 @@
           "optionsDataSource": null,
           "properties": null,
           "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1363,9 +1451,9 @@
           "options": null,
           "optionsDataSource": null,
           "sampleDataType": null,
-          "expressionDisabled": null
+          "expressionEnabled": null
         } ],
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "multipleValues": true,
       "objectType": null,
@@ -1373,7 +1461,7 @@
       "optionsDataSource": null,
       "properties": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "Add your R custom logic here.",
@@ -1390,7 +1478,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -1429,7 +1517,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1442,8 +1530,19 @@
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
         "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1459,7 +1558,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "DATE",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1475,7 +1574,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "DATE_TIME",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1493,7 +1592,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1512,7 +1611,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "INPUT_NUMBER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1532,7 +1631,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1549,9 +1648,9 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -1592,7 +1691,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1605,8 +1704,19 @@
           "type": "BOOLEAN",
           "defaultValue": null,
           "exampleValue": null,
+          "options": [ {
+            "description": null,
+            "displayCondition": null,
+            "name": "True",
+            "value": true
+          }, {
+            "description": null,
+            "displayCondition": null,
+            "name": "False",
+            "value": true
+          } ],
           "controlType": "CHECKBOX",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1622,7 +1732,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "DATE",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1638,7 +1748,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "DATE_TIME",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1656,7 +1766,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1675,7 +1785,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "INPUT_NUMBER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1695,7 +1805,7 @@
           "optionsDataSource": null,
           "properties": null,
           "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -1712,9 +1822,9 @@
           "options": null,
           "optionsDataSource": null,
           "sampleDataType": null,
-          "expressionDisabled": null
+          "expressionEnabled": null
         } ],
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "multipleValues": true,
       "objectType": null,
@@ -1722,7 +1832,7 @@
       "optionsDataSource": null,
       "properties": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "Add your Ruby custom logic here.",
@@ -1739,7 +1849,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,

@@ -7,6 +7,7 @@
     "advancedOption": null,
     "description": "The id of sub-workflow to execute.",
     "displayCondition": null,
+    "expressionEnabled": null,
     "hidden": null,
     "label": "Workflow Id",
     "placeholder": null,
@@ -18,8 +19,7 @@
     "controlType": "INPUT_TEXT",
     "options": null,
     "optionsDataSource": null,
-    "sampleDataType": null,
-    "expressionDisabled": null
+    "sampleDataType": null
   } ],
   "resources": null,
   "taskProperties": null,

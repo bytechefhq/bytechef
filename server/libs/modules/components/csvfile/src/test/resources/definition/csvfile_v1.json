@@ -10,6 +10,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -22,13 +23,13 @@
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": "The object property which contains a reference to the csv file to read from.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "File",
       "placeholder": null,
@@ -46,6 +47,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -57,12 +59,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -74,12 +76,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -91,12 +93,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -108,15 +110,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       } ],
-      "controlType": "INPUT_TEXT",
-      "expressionDisabled": null
+      "controlType": "EXPRESSION"
     }, {
       "advancedOption": true,
       "description": "Delimiter to use when reading a csv file.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Delimiter",
       "placeholder": null,
@@ -128,12 +129,12 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     }, {
       "advancedOption": true,
       "description": "The first row of the file contains the header names.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Header Row",
       "placeholder": null,
@@ -142,12 +143,23 @@
       "type": "BOOLEAN",
       "defaultValue": true,
       "exampleValue": null,
-      "controlType": "CHECKBOX",
-      "expressionDisabled": null
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "False",
+        "value": true
+      } ],
+      "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
       "description": "When reading from file the empty cells will be filled with an empty string.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Include Empty Cells",
       "placeholder": null,
@@ -156,12 +168,23 @@
       "type": "BOOLEAN",
       "defaultValue": false,
       "exampleValue": null,
-      "controlType": "CHECKBOX",
-      "expressionDisabled": null
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "False",
+        "value": true
+      } ],
+      "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
       "description": "The amount of child elements to return in a page.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Page Size",
       "placeholder": null,
@@ -174,12 +197,12 @@
       "minValue": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "controlType": "INPUT_INTEGER"
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Page Number",
       "placeholder": null,
@@ -192,12 +215,12 @@
       "minValue": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "controlType": "INPUT_INTEGER"
     }, {
       "advancedOption": true,
       "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Read As String",
       "placeholder": null,
@@ -206,8 +229,18 @@
       "type": "BOOLEAN",
       "defaultValue": false,
       "exampleValue": null,
-      "controlType": "CHECKBOX",
-      "expressionDisabled": null
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "False",
+        "value": true
+      } ],
+      "controlType": "CHECKBOX"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -223,6 +256,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -240,6 +274,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -251,12 +286,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -268,12 +303,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -285,12 +320,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -302,16 +337,15 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       } ],
-      "controlType": "INPUT_TEXT",
-      "expressionDisabled": null
+      "controlType": "EXPRESSION"
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": "The array of objects to write to the file.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Rows",
       "placeholder": null,
@@ -324,6 +358,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -336,6 +371,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -346,6 +382,7 @@
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": null,
             "placeholder": null,
@@ -354,12 +391,23 @@
             "type": "BOOLEAN",
             "defaultValue": null,
             "exampleValue": null,
-            "controlType": "CHECKBOX",
-            "expressionDisabled": null
+            "options": [ {
+              "description": null,
+              "displayCondition": null,
+              "name": "True",
+              "value": true
+            }, {
+              "description": null,
+              "displayCondition": null,
+              "name": "False",
+              "value": true
+            } ],
+            "controlType": "CHECKBOX"
           }, {
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": null,
             "placeholder": null,
@@ -370,12 +418,12 @@
             "exampleValue": null,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "DATE_TIME",
-            "expressionDisabled": null
+            "controlType": "DATE_TIME"
           }, {
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": null,
             "placeholder": null,
@@ -389,12 +437,12 @@
             "numberPrecision": null,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "INPUT_NUMBER",
-            "expressionDisabled": null
+            "controlType": "INPUT_NUMBER"
           }, {
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": null,
             "placeholder": null,
@@ -406,28 +454,25 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
-          } ],
-          "expressionDisabled": null
+            "sampleDataType": null
+          } ]
         } ],
         "multipleValues": true,
         "objectType": null,
         "options": null,
         "optionsDataSource": null,
         "properties": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.csv\" will be used.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Filename",
       "placeholder": null,
@@ -439,8 +484,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,

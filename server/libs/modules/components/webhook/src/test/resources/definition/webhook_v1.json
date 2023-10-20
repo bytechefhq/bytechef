@@ -55,7 +55,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -75,7 +75,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -103,7 +103,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -123,12 +123,12 @@
           "optionsDataSource": null,
           "properties": null,
           "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         } ],
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "outputSchemaDataSource": null,
     "properties": null,
@@ -181,7 +181,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -201,7 +201,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -229,7 +229,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -249,12 +249,12 @@
           "optionsDataSource": null,
           "properties": null,
           "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         } ],
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "outputSchemaDataSource": null,
     "properties": [ {
@@ -273,7 +273,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "title": "Validate and respond",
@@ -324,7 +324,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -344,7 +344,7 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -372,7 +372,7 @@
           "options": null,
           "optionsDataSource": null,
           "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -392,12 +392,12 @@
           "optionsDataSource": null,
           "properties": null,
           "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "expressionEnabled": null
         } ],
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "outputSchemaDataSource": null,
     "properties": [ {
@@ -416,7 +416,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes.",
@@ -434,7 +434,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "title": "Await workflow and respond",

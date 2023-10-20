@@ -23,7 +23,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": null,
@@ -43,7 +43,7 @@
       "optionsDataSource": null,
       "properties": null,
       "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -71,7 +71,7 @@
       } ],
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The object property which contains a reference to the JSON file to read from.",
@@ -105,7 +105,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -122,7 +122,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -139,7 +139,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -156,10 +156,10 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "controlType": "INPUT_TEXT",
-      "expressionDisabled": null
+      "controlType": "EXPRESSION",
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The object input is array?",
@@ -172,8 +172,19 @@
       "type": "BOOLEAN",
       "defaultValue": true,
       "exampleValue": null,
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "False",
+        "value": true
+      } ],
       "controlType": "CHECKBOX",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": true,
       "description": "The path where the array is e.g 'data'. Leave blank to use the top level object.",
@@ -190,7 +201,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": true,
       "description": "The amount of child elements to return in a page.",
@@ -208,7 +219,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -226,7 +237,7 @@
       "options": null,
       "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -271,7 +282,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -288,7 +299,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -305,7 +316,7 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -322,10 +333,10 @@
         "options": null,
         "optionsDataSource": null,
         "sampleDataType": null,
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "controlType": "INPUT_TEXT",
-      "expressionDisabled": null
+      "controlType": "EXPRESSION",
+      "expressionEnabled": null
     } ],
     "properties": [ {
       "advancedOption": null,
@@ -353,7 +364,7 @@
       } ],
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": null,
       "description": "The data to write to the file.",
@@ -381,7 +392,7 @@
         "options": null,
         "optionsDataSource": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -401,9 +412,9 @@
         "optionsDataSource": null,
         "properties": null,
         "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "expressionEnabled": null
       } ],
-      "expressionDisabled": null
+      "expressionEnabled": null
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.json\" will be used.",
@@ -420,7 +431,7 @@
       "options": null,
       "optionsDataSource": null,
       "sampleDataType": null,
-      "expressionDisabled": null
+      "expressionEnabled": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,

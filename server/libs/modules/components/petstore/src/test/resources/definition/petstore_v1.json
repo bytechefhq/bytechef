@@ -10,6 +10,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -27,6 +28,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Id",
         "placeholder": null,
@@ -39,12 +41,12 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Name",
         "placeholder": null,
@@ -56,12 +58,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Category",
         "placeholder": null,
@@ -79,6 +81,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Id",
           "placeholder": null,
@@ -91,12 +94,12 @@
           "minValue": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "controlType": "INPUT_INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Name",
           "placeholder": null,
@@ -108,17 +111,16 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "PhotoUrls",
+        "label": "Photo Urls",
         "placeholder": "Add",
         "required": true,
         "name": "photoUrls",
@@ -129,6 +131,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -140,18 +143,17 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Tags",
         "placeholder": "Add",
@@ -164,6 +166,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -181,6 +184,7 @@
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Id",
             "placeholder": null,
@@ -193,12 +197,12 @@
             "minValue": null,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "INPUT_INTEGER",
-            "expressionDisabled": null
+            "controlType": "INPUT_INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Name",
             "placeholder": null,
@@ -210,21 +214,19 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "controlType": "JSON_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Status",
         "placeholder": null,
@@ -251,16 +253,15 @@
           "value": "sold"
         } ],
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Pet",
       "placeholder": null,
@@ -278,6 +279,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Id",
         "placeholder": null,
@@ -290,12 +292,12 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Name",
         "placeholder": null,
@@ -307,12 +309,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Category",
         "placeholder": null,
@@ -330,6 +332,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Id",
           "placeholder": null,
@@ -342,12 +345,12 @@
           "minValue": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "controlType": "INPUT_INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Name",
           "placeholder": null,
@@ -359,17 +362,16 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "PhotoUrls",
+        "label": "Photo Urls",
         "placeholder": "Add",
         "required": true,
         "name": "photoUrls",
@@ -380,6 +382,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -391,18 +394,17 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Tags",
         "placeholder": "Add",
@@ -415,6 +417,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -432,6 +435,7 @@
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Id",
             "placeholder": null,
@@ -444,12 +448,12 @@
             "minValue": null,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "INPUT_INTEGER",
-            "expressionDisabled": null
+            "controlType": "INPUT_INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Name",
             "placeholder": null,
@@ -461,21 +465,19 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "controlType": "JSON_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Status",
         "placeholder": null,
@@ -502,11 +504,9 @@
           "value": "sold"
         } ],
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -522,6 +522,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -539,6 +540,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Id",
         "placeholder": null,
@@ -551,12 +553,12 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Name",
         "placeholder": null,
@@ -568,12 +570,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Category",
         "placeholder": null,
@@ -591,6 +593,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Id",
           "placeholder": null,
@@ -603,12 +606,12 @@
           "minValue": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "controlType": "INPUT_INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Name",
           "placeholder": null,
@@ -620,17 +623,16 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "PhotoUrls",
+        "label": "Photo Urls",
         "placeholder": "Add",
         "required": true,
         "name": "photoUrls",
@@ -641,6 +643,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -652,18 +655,17 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Tags",
         "placeholder": "Add",
@@ -676,6 +678,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -693,6 +696,7 @@
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Id",
             "placeholder": null,
@@ -705,12 +709,12 @@
             "minValue": null,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "INPUT_INTEGER",
-            "expressionDisabled": null
+            "controlType": "INPUT_INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Name",
             "placeholder": null,
@@ -722,21 +726,19 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "controlType": "JSON_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Status",
         "placeholder": null,
@@ -763,16 +765,15 @@
           "value": "sold"
         } ],
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Pet",
       "placeholder": null,
@@ -790,6 +791,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Id",
         "placeholder": null,
@@ -802,12 +804,12 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Name",
         "placeholder": null,
@@ -819,12 +821,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Category",
         "placeholder": null,
@@ -842,6 +844,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Id",
           "placeholder": null,
@@ -854,12 +857,12 @@
           "minValue": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "controlType": "INPUT_INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Name",
           "placeholder": null,
@@ -871,17 +874,16 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "PhotoUrls",
+        "label": "Photo Urls",
         "placeholder": "Add",
         "required": true,
         "name": "photoUrls",
@@ -892,6 +894,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -903,18 +906,17 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Tags",
         "placeholder": "Add",
@@ -927,6 +929,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -944,6 +947,7 @@
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Id",
             "placeholder": null,
@@ -956,12 +960,12 @@
             "minValue": null,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "INPUT_INTEGER",
-            "expressionDisabled": null
+            "controlType": "INPUT_INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Name",
             "placeholder": null,
@@ -973,21 +977,19 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "controlType": "JSON_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Status",
         "placeholder": null,
@@ -1014,11 +1016,9 @@
           "value": "sold"
         } ],
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -1034,6 +1034,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -1046,6 +1047,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -1063,6 +1065,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Id",
           "placeholder": null,
@@ -1075,12 +1078,12 @@
           "minValue": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "controlType": "INPUT_INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Name",
           "placeholder": null,
@@ -1092,12 +1095,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Category",
           "placeholder": null,
@@ -1115,6 +1118,7 @@
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Id",
             "placeholder": null,
@@ -1127,12 +1131,12 @@
             "minValue": null,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "INPUT_INTEGER",
-            "expressionDisabled": null
+            "controlType": "INPUT_INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Name",
             "placeholder": null,
@@ -1144,17 +1148,16 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "controlType": "JSON_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
-          "label": "PhotoUrls",
+          "label": "Photo Urls",
           "placeholder": "Add",
           "required": true,
           "name": "photoUrls",
@@ -1165,6 +1168,7 @@
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": null,
             "placeholder": null,
@@ -1176,18 +1180,17 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           } ],
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "controlType": "JSON_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Tags",
           "placeholder": "Add",
@@ -1200,6 +1203,7 @@
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": null,
             "placeholder": null,
@@ -1217,6 +1221,7 @@
               "advancedOption": null,
               "description": null,
               "displayCondition": null,
+              "expressionEnabled": null,
               "hidden": null,
               "label": "Id",
               "placeholder": null,
@@ -1229,12 +1234,12 @@
               "minValue": null,
               "options": null,
               "optionsDataSource": null,
-              "controlType": "INPUT_INTEGER",
-              "expressionDisabled": null
+              "controlType": "INPUT_INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
               "displayCondition": null,
+              "expressionEnabled": null,
               "hidden": null,
               "label": "Name",
               "placeholder": null,
@@ -1246,21 +1251,19 @@
               "controlType": "INPUT_TEXT",
               "options": null,
               "optionsDataSource": null,
-              "sampleDataType": null,
-              "expressionDisabled": null
+              "sampleDataType": null
             } ],
-            "controlType": "JSON_BUILDER",
-            "expressionDisabled": null
+            "controlType": "JSON_BUILDER"
           } ],
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "controlType": "JSON_BUILDER"
         }, {
           "advancedOption": null,
           "description": "pet status in the store",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Status",
           "placeholder": null,
@@ -1287,22 +1290,20 @@
             "value": "sold"
           } ],
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": "Status values that need to be considered for filter",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Status",
       "placeholder": null,
@@ -1329,8 +1330,7 @@
         "value": "sold"
       } ],
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -1346,6 +1346,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -1358,6 +1359,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -1375,6 +1377,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Id",
           "placeholder": null,
@@ -1387,12 +1390,12 @@
           "minValue": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "controlType": "INPUT_INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Name",
           "placeholder": null,
@@ -1404,12 +1407,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Category",
           "placeholder": null,
@@ -1427,6 +1430,7 @@
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Id",
             "placeholder": null,
@@ -1439,12 +1443,12 @@
             "minValue": null,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "INPUT_INTEGER",
-            "expressionDisabled": null
+            "controlType": "INPUT_INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Name",
             "placeholder": null,
@@ -1456,17 +1460,16 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "controlType": "JSON_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
-          "label": "PhotoUrls",
+          "label": "Photo Urls",
           "placeholder": "Add",
           "required": true,
           "name": "photoUrls",
@@ -1477,6 +1480,7 @@
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": null,
             "placeholder": null,
@@ -1488,18 +1492,17 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           } ],
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "controlType": "JSON_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Tags",
           "placeholder": "Add",
@@ -1512,6 +1515,7 @@
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": null,
             "placeholder": null,
@@ -1529,6 +1533,7 @@
               "advancedOption": null,
               "description": null,
               "displayCondition": null,
+              "expressionEnabled": null,
               "hidden": null,
               "label": "Id",
               "placeholder": null,
@@ -1541,12 +1546,12 @@
               "minValue": null,
               "options": null,
               "optionsDataSource": null,
-              "controlType": "INPUT_INTEGER",
-              "expressionDisabled": null
+              "controlType": "INPUT_INTEGER"
             }, {
               "advancedOption": null,
               "description": null,
               "displayCondition": null,
+              "expressionEnabled": null,
               "hidden": null,
               "label": "Name",
               "placeholder": null,
@@ -1558,21 +1563,19 @@
               "controlType": "INPUT_TEXT",
               "options": null,
               "optionsDataSource": null,
-              "sampleDataType": null,
-              "expressionDisabled": null
+              "sampleDataType": null
             } ],
-            "controlType": "JSON_BUILDER",
-            "expressionDisabled": null
+            "controlType": "JSON_BUILDER"
           } ],
           "multipleValues": true,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "controlType": "JSON_BUILDER"
         }, {
           "advancedOption": null,
           "description": "pet status in the store",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Status",
           "placeholder": null,
@@ -1599,22 +1602,20 @@
             "value": "sold"
           } ],
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": "Tags to filter by",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Tags",
       "placeholder": "Add",
@@ -1627,6 +1628,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -1638,14 +1640,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -1662,8 +1662,9 @@
       "advancedOption": null,
       "description": "",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
-      "label": "Api_key",
+      "label": "Api Key",
       "placeholder": null,
       "required": false,
       "name": "api_key",
@@ -1673,14 +1674,14 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     }, {
       "advancedOption": null,
       "description": "Pet id to delete",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
-      "label": "PetId",
+      "label": "Pet Id",
       "placeholder": null,
       "required": true,
       "name": "petId",
@@ -1691,8 +1692,7 @@
       "minValue": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "controlType": "INPUT_INTEGER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -1708,6 +1708,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -1725,6 +1726,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Id",
         "placeholder": null,
@@ -1737,12 +1739,12 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Name",
         "placeholder": null,
@@ -1754,12 +1756,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Category",
         "placeholder": null,
@@ -1777,6 +1779,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Id",
           "placeholder": null,
@@ -1789,12 +1792,12 @@
           "minValue": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "controlType": "INPUT_INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Name",
           "placeholder": null,
@@ -1806,17 +1809,16 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "PhotoUrls",
+        "label": "Photo Urls",
         "placeholder": "Add",
         "required": true,
         "name": "photoUrls",
@@ -1827,6 +1829,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -1838,18 +1841,17 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Tags",
         "placeholder": "Add",
@@ -1862,6 +1864,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -1879,6 +1882,7 @@
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Id",
             "placeholder": null,
@@ -1891,12 +1895,12 @@
             "minValue": null,
             "options": null,
             "optionsDataSource": null,
-            "controlType": "INPUT_INTEGER",
-            "expressionDisabled": null
+            "controlType": "INPUT_INTEGER"
           }, {
             "advancedOption": null,
             "description": null,
             "displayCondition": null,
+            "expressionEnabled": null,
             "hidden": null,
             "label": "Name",
             "placeholder": null,
@@ -1908,21 +1912,19 @@
             "controlType": "INPUT_TEXT",
             "options": null,
             "optionsDataSource": null,
-            "sampleDataType": null,
-            "expressionDisabled": null
+            "sampleDataType": null
           } ],
-          "controlType": "JSON_BUILDER",
-          "expressionDisabled": null
+          "controlType": "JSON_BUILDER"
         } ],
         "multipleValues": true,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Status",
         "placeholder": null,
@@ -1949,18 +1951,17 @@
           "value": "sold"
         } ],
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": "ID of pet to return",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
-      "label": "PetId",
+      "label": "Pet Id",
       "placeholder": null,
       "required": true,
       "name": "petId",
@@ -1971,8 +1972,7 @@
       "minValue": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "controlType": "INPUT_INTEGER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -1989,8 +1989,9 @@
       "advancedOption": null,
       "description": "ID of pet that needs to be updated",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
-      "label": "PetId",
+      "label": "Pet Id",
       "placeholder": null,
       "required": true,
       "name": "petId",
@@ -2001,12 +2002,12 @@
       "minValue": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "controlType": "INPUT_INTEGER"
     }, {
       "advancedOption": null,
       "description": "Name of pet that needs to be updated",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Name",
       "placeholder": null,
@@ -2018,12 +2019,12 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     }, {
       "advancedOption": null,
       "description": "Status of pet that needs to be updated",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Status",
       "placeholder": null,
@@ -2035,8 +2036,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -2052,6 +2052,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -2069,6 +2070,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Code",
         "placeholder": null,
@@ -2081,12 +2083,12 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Type",
         "placeholder": null,
@@ -2098,12 +2100,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Message",
         "placeholder": null,
@@ -2115,18 +2117,17 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": "ID of pet to update",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
-      "label": "PetId",
+      "label": "Pet Id",
       "placeholder": null,
       "required": true,
       "name": "petId",
@@ -2137,14 +2138,14 @@
       "minValue": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "controlType": "INPUT_INTEGER"
     }, {
       "advancedOption": null,
       "description": "Additional Metadata",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
-      "label": "AdditionalMetadata",
+      "label": "Additional Metadata",
       "placeholder": null,
       "required": false,
       "name": "additionalMetadata",
@@ -2154,12 +2155,12 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     }, {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -2177,6 +2178,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -2188,12 +2190,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -2205,12 +2207,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -2222,12 +2224,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -2239,11 +2241,9 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       } ],
-      "controlType": "INPUT_TEXT",
-      "expressionDisabled": null
+      "controlType": "EXPRESSION"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -2259,6 +2259,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -2271,6 +2272,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -2283,16 +2285,14 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       } ],
       "multipleValues": true,
       "objectType": null,
       "options": null,
       "optionsDataSource": null,
       "properties": null,
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "properties": [ ],
     "sampleOutputDataSource": null,
@@ -2309,6 +2309,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -2326,6 +2327,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Id",
         "placeholder": null,
@@ -2338,14 +2340,14 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "PetId",
+        "label": "Pet Id",
         "placeholder": null,
         "required": false,
         "name": "petId",
@@ -2356,12 +2358,12 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Quantity",
         "placeholder": null,
@@ -2374,14 +2376,14 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "ShipDate",
+        "label": "Ship Date",
         "placeholder": null,
         "required": false,
         "name": "shipDate",
@@ -2390,12 +2392,12 @@
         "exampleValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "DATE_TIME",
-        "expressionDisabled": null
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
         "description": "Order Status",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Status",
         "placeholder": null,
@@ -2422,12 +2424,12 @@
           "value": "delivered"
         } ],
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Complete",
         "placeholder": null,
@@ -2436,16 +2438,26 @@
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
+        "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Order",
       "placeholder": null,
@@ -2463,6 +2475,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Id",
         "placeholder": null,
@@ -2475,14 +2488,14 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "PetId",
+        "label": "Pet Id",
         "placeholder": null,
         "required": false,
         "name": "petId",
@@ -2493,12 +2506,12 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Quantity",
         "placeholder": null,
@@ -2511,14 +2524,14 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "ShipDate",
+        "label": "Ship Date",
         "placeholder": null,
         "required": false,
         "name": "shipDate",
@@ -2527,12 +2540,12 @@
         "exampleValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "DATE_TIME",
-        "expressionDisabled": null
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
         "description": "Order Status",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Status",
         "placeholder": null,
@@ -2559,12 +2572,12 @@
           "value": "delivered"
         } ],
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Complete",
         "placeholder": null,
@@ -2573,11 +2586,20 @@
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
+        "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -2594,8 +2616,9 @@
       "advancedOption": null,
       "description": "ID of the order that needs to be deleted",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
-      "label": "OrderId",
+      "label": "Order Id",
       "placeholder": null,
       "required": true,
       "name": "orderId",
@@ -2606,8 +2629,7 @@
       "minValue": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "controlType": "INPUT_INTEGER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -2623,6 +2645,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -2640,6 +2663,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Id",
         "placeholder": null,
@@ -2652,14 +2676,14 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "PetId",
+        "label": "Pet Id",
         "placeholder": null,
         "required": false,
         "name": "petId",
@@ -2670,12 +2694,12 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Quantity",
         "placeholder": null,
@@ -2688,14 +2712,14 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "ShipDate",
+        "label": "Ship Date",
         "placeholder": null,
         "required": false,
         "name": "shipDate",
@@ -2704,12 +2728,12 @@
         "exampleValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "DATE_TIME",
-        "expressionDisabled": null
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
         "description": "Order Status",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Status",
         "placeholder": null,
@@ -2736,12 +2760,12 @@
           "value": "delivered"
         } ],
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Complete",
         "placeholder": null,
@@ -2750,18 +2774,28 @@
         "type": "BOOLEAN",
         "defaultValue": null,
         "exampleValue": null,
-        "controlType": "CHECKBOX",
-        "expressionDisabled": null
+        "options": [ {
+          "description": null,
+          "displayCondition": null,
+          "name": "True",
+          "value": true
+        }, {
+          "description": null,
+          "displayCondition": null,
+          "name": "False",
+          "value": true
+        } ],
+        "controlType": "CHECKBOX"
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": "ID of order that needs to be fetched",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
-      "label": "OrderId",
+      "label": "Order Id",
       "placeholder": null,
       "required": true,
       "name": "orderId",
@@ -2772,8 +2806,7 @@
       "minValue": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER",
-      "expressionDisabled": null
+      "controlType": "INPUT_INTEGER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -2789,6 +2822,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -2806,6 +2840,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Id",
         "placeholder": null,
@@ -2818,12 +2853,12 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Username",
         "placeholder": null,
@@ -2835,14 +2870,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "FirstName",
+        "label": "First Name",
         "placeholder": null,
         "required": false,
         "name": "firstName",
@@ -2852,14 +2887,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "LastName",
+        "label": "Last Name",
         "placeholder": null,
         "required": false,
         "name": "lastName",
@@ -2869,12 +2904,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Email",
         "placeholder": null,
@@ -2886,12 +2921,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Password",
         "placeholder": null,
@@ -2903,12 +2938,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Phone",
         "placeholder": null,
@@ -2920,14 +2955,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "User Status",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "UserStatus",
+        "label": "User Status",
         "placeholder": null,
         "required": false,
         "name": "userStatus",
@@ -2938,16 +2973,15 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "User",
       "placeholder": null,
@@ -2965,6 +2999,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Id",
         "placeholder": null,
@@ -2977,12 +3012,12 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Username",
         "placeholder": null,
@@ -2994,14 +3029,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "FirstName",
+        "label": "First Name",
         "placeholder": null,
         "required": false,
         "name": "firstName",
@@ -3011,14 +3046,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "LastName",
+        "label": "Last Name",
         "placeholder": null,
         "required": false,
         "name": "lastName",
@@ -3028,12 +3063,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Email",
         "placeholder": null,
@@ -3045,12 +3080,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Password",
         "placeholder": null,
@@ -3062,12 +3097,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Phone",
         "placeholder": null,
@@ -3079,14 +3114,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "User Status",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "UserStatus",
+        "label": "User Status",
         "placeholder": null,
         "required": false,
         "name": "userStatus",
@@ -3097,11 +3132,9 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -3117,6 +3150,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -3129,6 +3163,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -3146,6 +3181,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Id",
           "placeholder": null,
@@ -3158,12 +3194,12 @@
           "minValue": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "controlType": "INPUT_INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Username",
           "placeholder": null,
@@ -3175,14 +3211,14 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
-          "label": "FirstName",
+          "label": "First Name",
           "placeholder": null,
           "required": false,
           "name": "firstName",
@@ -3192,14 +3228,14 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
-          "label": "LastName",
+          "label": "Last Name",
           "placeholder": null,
           "required": false,
           "name": "lastName",
@@ -3209,12 +3245,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Email",
           "placeholder": null,
@@ -3226,12 +3262,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Password",
           "placeholder": null,
@@ -3243,12 +3279,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Phone",
           "placeholder": null,
@@ -3260,14 +3296,14 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": "User Status",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
-          "label": "UserStatus",
+          "label": "User Status",
           "placeholder": null,
           "required": false,
           "name": "userStatus",
@@ -3278,22 +3314,20 @@
           "minValue": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": "Add",
@@ -3306,6 +3340,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -3323,6 +3358,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Id",
           "placeholder": null,
@@ -3335,12 +3371,12 @@
           "minValue": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "controlType": "INPUT_INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Username",
           "placeholder": null,
@@ -3352,14 +3388,14 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
-          "label": "FirstName",
+          "label": "First Name",
           "placeholder": null,
           "required": false,
           "name": "firstName",
@@ -3369,14 +3405,14 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
-          "label": "LastName",
+          "label": "Last Name",
           "placeholder": null,
           "required": false,
           "name": "lastName",
@@ -3386,12 +3422,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Email",
           "placeholder": null,
@@ -3403,12 +3439,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Password",
           "placeholder": null,
@@ -3420,12 +3456,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": "Phone",
           "placeholder": null,
@@ -3437,14 +3473,14 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": "User Status",
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
-          "label": "UserStatus",
+          "label": "User Status",
           "placeholder": null,
           "required": false,
           "name": "userStatus",
@@ -3455,17 +3491,14 @@
           "minValue": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "INPUT_INTEGER",
-          "expressionDisabled": null
+          "controlType": "INPUT_INTEGER"
         } ],
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -3482,6 +3515,7 @@
       "advancedOption": null,
       "description": "The name that needs to be deleted",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Username",
       "placeholder": null,
@@ -3493,8 +3527,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -3510,6 +3543,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -3527,6 +3561,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Id",
         "placeholder": null,
@@ -3539,12 +3574,12 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Username",
         "placeholder": null,
@@ -3556,14 +3591,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "FirstName",
+        "label": "First Name",
         "placeholder": null,
         "required": false,
         "name": "firstName",
@@ -3573,14 +3608,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "LastName",
+        "label": "Last Name",
         "placeholder": null,
         "required": false,
         "name": "lastName",
@@ -3590,12 +3625,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Email",
         "placeholder": null,
@@ -3607,12 +3642,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Password",
         "placeholder": null,
@@ -3624,12 +3659,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Phone",
         "placeholder": null,
@@ -3641,14 +3676,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "User Status",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "UserStatus",
+        "label": "User Status",
         "placeholder": null,
         "required": false,
         "name": "userStatus",
@@ -3659,16 +3694,15 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": "The name that needs to be fetched. Use user1 for testing. ",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Username",
       "placeholder": null,
@@ -3680,8 +3714,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -3697,6 +3730,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -3714,6 +3748,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Id",
         "placeholder": null,
@@ -3726,12 +3761,12 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Username",
         "placeholder": null,
@@ -3743,14 +3778,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "FirstName",
+        "label": "First Name",
         "placeholder": null,
         "required": false,
         "name": "firstName",
@@ -3760,14 +3795,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "LastName",
+        "label": "Last Name",
         "placeholder": null,
         "required": false,
         "name": "lastName",
@@ -3777,12 +3812,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Email",
         "placeholder": null,
@@ -3794,12 +3829,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Password",
         "placeholder": null,
@@ -3811,12 +3846,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Phone",
         "placeholder": null,
@@ -3828,14 +3863,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "User Status",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "UserStatus",
+        "label": "User Status",
         "placeholder": null,
         "required": false,
         "name": "userStatus",
@@ -3846,16 +3881,15 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": "name that need to be deleted",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Username",
       "placeholder": null,
@@ -3867,12 +3901,12 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     }, {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "User",
       "placeholder": null,
@@ -3890,6 +3924,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Id",
         "placeholder": null,
@@ -3902,12 +3937,12 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Username",
         "placeholder": null,
@@ -3919,14 +3954,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "FirstName",
+        "label": "First Name",
         "placeholder": null,
         "required": false,
         "name": "firstName",
@@ -3936,14 +3971,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "LastName",
+        "label": "Last Name",
         "placeholder": null,
         "required": false,
         "name": "lastName",
@@ -3953,12 +3988,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Email",
         "placeholder": null,
@@ -3970,12 +4005,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Password",
         "placeholder": null,
@@ -3987,12 +4022,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Phone",
         "placeholder": null,
@@ -4004,14 +4039,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "User Status",
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
-        "label": "UserStatus",
+        "label": "User Status",
         "placeholder": null,
         "required": false,
         "name": "userStatus",
@@ -4022,11 +4057,9 @@
         "minValue": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "INPUT_INTEGER",
-        "expressionDisabled": null
+        "controlType": "INPUT_INTEGER"
       } ],
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -4042,6 +4075,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Client Id",
         "placeholder": null,
@@ -4053,12 +4087,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Client Secret",
         "placeholder": null,
@@ -4070,8 +4104,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       } ],
       "title": "OAuth2 Implicit",
       "type": "OAUTH2_IMPLICIT_CODE"
@@ -4082,6 +4115,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": true,
         "label": "Key",
         "placeholder": null,
@@ -4093,12 +4127,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": "Value",
         "placeholder": null,
@@ -4110,8 +4144,7 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       } ],
       "title": "API Key",
       "type": "API_KEY"

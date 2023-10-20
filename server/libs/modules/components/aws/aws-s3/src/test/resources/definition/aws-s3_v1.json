@@ -10,6 +10,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -27,6 +28,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -38,12 +40,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -55,12 +57,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -72,12 +74,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -89,16 +91,15 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       } ],
-      "controlType": "INPUT_TEXT",
-      "expressionDisabled": null
+      "controlType": "EXPRESSION"
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": "Filename to set for binary data.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Filename",
       "placeholder": null,
@@ -110,12 +111,12 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     }, {
       "advancedOption": null,
       "description": "The object key.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Key",
       "placeholder": null,
@@ -127,8 +128,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -144,6 +144,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -155,13 +156,13 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": "The object key.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Key",
       "placeholder": null,
@@ -173,8 +174,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -190,6 +190,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -202,6 +203,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -219,6 +221,7 @@
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -230,12 +233,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -247,12 +250,12 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
+          "expressionEnabled": null,
           "hidden": null,
           "label": null,
           "placeholder": null,
@@ -264,22 +267,20 @@
           "controlType": "INPUT_TEXT",
           "options": null,
           "optionsDataSource": null,
-          "sampleDataType": null,
-          "expressionDisabled": null
+          "sampleDataType": null
         } ],
-        "controlType": "JSON_BUILDER",
-        "expressionDisabled": null
+        "controlType": "JSON_BUILDER"
       } ],
       "multipleValues": true,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "JSON_BUILDER",
-      "expressionDisabled": null
+      "controlType": "JSON_BUILDER"
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": "The prefix of an AWS S3 objects.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Prefix",
       "placeholder": null,
@@ -291,8 +292,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -308,6 +308,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -319,13 +320,13 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": "The object key.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Key",
       "placeholder": null,
@@ -337,12 +338,12 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     }, {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Signature Duration",
       "placeholder": "15M, 10H, PT-6H3M, etc.",
@@ -354,8 +355,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -371,6 +371,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -382,13 +383,13 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     } ],
     "properties": [ {
       "advancedOption": null,
       "description": "The object property which contains a reference to the file that needs to be written to AWS S3.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "File",
       "placeholder": null,
@@ -406,6 +407,7 @@
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -417,12 +419,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -434,12 +436,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -451,12 +453,12 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
+        "expressionEnabled": null,
         "hidden": null,
         "label": null,
         "placeholder": null,
@@ -468,15 +470,14 @@
         "controlType": "INPUT_TEXT",
         "options": null,
         "optionsDataSource": null,
-        "sampleDataType": null,
-        "expressionDisabled": null
+        "sampleDataType": null
       } ],
-      "controlType": "INPUT_TEXT",
-      "expressionDisabled": null
+      "controlType": "EXPRESSION"
     }, {
       "advancedOption": null,
       "description": "The object key.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Key",
       "placeholder": null,
@@ -488,12 +489,12 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     }, {
       "advancedOption": null,
       "description": "The canned ACL to apply to the object.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "ACL",
       "placeholder": null,
@@ -540,8 +541,7 @@
         "value": "public-read-write"
       } ],
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     } ],
     "sampleOutputDataSource": null,
     "outputSchemaDataSource": null,
@@ -557,6 +557,7 @@
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Access Key ID",
       "placeholder": null,
@@ -568,12 +569,12 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     }, {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Secret Access Key",
       "placeholder": null,
@@ -585,12 +586,12 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     }, {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -747,12 +748,12 @@
         "value": "cn-northwest-1"
       } ],
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     }, {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": "Bucket",
       "placeholder": null,
@@ -764,8 +765,7 @@
       "controlType": "INPUT_TEXT",
       "options": null,
       "optionsDataSource": null,
-      "sampleDataType": null,
-      "expressionDisabled": null
+      "sampleDataType": null
     } ],
     "title": "AWS S3",
     "version": 1

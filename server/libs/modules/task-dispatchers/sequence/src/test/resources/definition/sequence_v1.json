@@ -9,6 +9,7 @@
     "advancedOption": null,
     "description": "The task to use in each iteration.",
     "displayCondition": null,
+    "expressionEnabled": null,
     "hidden": null,
     "label": null,
     "placeholder": null,
@@ -21,6 +22,7 @@
       "advancedOption": null,
       "description": "The task or task dispatcher to use.",
       "displayCondition": null,
+      "expressionEnabled": null,
       "hidden": null,
       "label": null,
       "placeholder": null,
@@ -35,14 +37,12 @@
       "options": null,
       "optionsDataSource": null,
       "properties": null,
-      "controlType": "INPUT_TEXT",
-      "expressionDisabled": null
+      "controlType": "EXPRESSION"
     } ],
     "multipleValues": true,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "JSON_BUILDER",
-    "expressionDisabled": null
+    "controlType": "JSON_BUILDER"
   } ],
   "title": "Sequence",
   "version": 1
