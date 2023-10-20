@@ -1,3 +1,4 @@
 # openapi typescript fetch client
 **/data-access
+dist
 mockServiceWorker.js
