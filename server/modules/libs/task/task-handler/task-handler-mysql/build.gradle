@@ -5,6 +5,4 @@ dependencies {
 
     testImplementation "com.zaxxer:HikariCP"
     testImplementation project(":modules:libs:task:task-jdbc")
-    testImplementation project(":modules:libs:test-support")
-
 }

@@ -5,6 +5,7 @@ plugins {
     id "com.github.spotbugs"
     id "com.bytechef.java-common-conventions"
     id "org.sonarqube"
+    id "org.springframework.boot" version "${springBootVersion}" apply false
     id "pmd"
 }
 
@@ -168,6 +169,10 @@ subprojects {
             // exclude group: 'junit', module: 'junit'
             // exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
         }
+    }
+
+    dependencies {
+        implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
     }
 }
 

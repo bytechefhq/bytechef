@@ -1,18 +1,8 @@
-plugins {
-    id "org.springframework.boot" version "${springBootVersion}" apply false
-}
-
 subprojects {
     apply plugin: "com.bytechef.java-library-conventions"
-    apply plugin: "io.spring.dependency-management"
-
-    dependencyManagement {
-        imports {
-            mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
-        }
-    }
 
     dependencies {
         testImplementation "org.springframework.boot:spring-boot-starter-test"
+        testImplementation project(":modules:libs:test-support")
     }
 }

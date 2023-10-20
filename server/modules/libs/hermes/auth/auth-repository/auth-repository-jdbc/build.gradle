@@ -3,7 +3,4 @@ dependencies {
 
     implementation "org.springframework:spring-jdbc"
     implementation project(":modules:libs:hermes:encryption:encryption-api")
-
-    testImplementation "org.springframework.boot:spring-boot-starter-jdbc"
-    testImplementation project(":modules:libs:test-support")
 }

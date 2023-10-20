@@ -10,5 +10,4 @@ dependencies {
 
     testImplementation "org.springframework:spring-jdbc"
     testImplementation project(":modules:libs:hermes:descriptor:descriptor-repository:descriptor-repository-memory")
-    testImplementation project(":modules:libs:test-support")
 }

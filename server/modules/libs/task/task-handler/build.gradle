@@ -10,7 +10,7 @@ subprojects {
         compileOnly "org.springframework.boot:spring-boot"
         compileOnly project(":modules:libs:atlas:atlas-api")
         compileOnly project(":modules:libs:atlas:atlas-worker:atlas-worker-api")
-        compileOnly project(":modules:libs:task:task-commons:")
+        compileOnly project(":modules:libs:task:task-commons")
         compileOnly project(":modules:libs:hermes:descriptor:descriptor-api")
         compileOnly project(":modules:libs:hermes:auth:auth-service")
         compileOnly project(":modules:libs:hermes:file-storage:file-storage-api")
@@ -25,13 +25,13 @@ subprojects {
         testImplementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
         testImplementation project(":modules:libs:atlas:atlas-worker:atlas-worker-impl")
         testImplementation project(":modules:libs:hermes:descriptor:descriptor-api")
-        testImplementation project(":modules:libs:task:task-commons:")
+        testImplementation project(":modules:libs:task:task-commons")
         testImplementation project(":modules:libs:hermes:auth:auth-service")
         testImplementation project(":modules:libs:hermes:file-storage:file-storage-base64")
         testImplementation project(":modules:libs:hermes:file-storage:file-storage-filesystem")
         testImplementation project(":modules:libs:task:task-handler:task-handler-io")
         testImplementation project(":modules:libs:task:task-handler:task-handler-random")
         testImplementation project(":modules:libs:task:task-handler:task-handler-time")
-        testImplementation project(":modules:libs:test-support")
+        testImplementation project(":modules:libs:task:task-test")
     }
 }
