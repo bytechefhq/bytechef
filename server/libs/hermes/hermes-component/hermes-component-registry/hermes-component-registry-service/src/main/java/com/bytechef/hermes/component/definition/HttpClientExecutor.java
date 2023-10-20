@@ -420,26 +420,26 @@ public class HttpClientExecutor {
             return null;
         }
 
-        public void checkClientTrusted(final X509Certificate[] a_certificates, final String a_auth_type) {
+        public void checkClientTrusted(final X509Certificate[] x509Certificates, final String authType) {
         }
 
-        public void checkServerTrusted(final X509Certificate[] a_certificates, final String a_auth_type) {
-        }
-
-        public void checkClientTrusted(
-            final X509Certificate[] a_certificates, final String a_auth_type, final Socket a_socket) {
-        }
-
-        public void checkServerTrusted(
-            final X509Certificate[] a_certificates, final String a_auth_type, final Socket a_socket) {
+        public void checkServerTrusted(final X509Certificate[] x509Certificates, final String authType) {
         }
 
         public void checkClientTrusted(
-            final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine) {
+            final X509Certificate[] x509Certificates, final String certificates, final Socket socket) {
         }
 
         public void checkServerTrusted(
-            final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine) {
+            final X509Certificate[] x509Certificates, final String authType, final Socket socket) {
+        }
+
+        public void checkClientTrusted(
+            final X509Certificate[] x509Certificates, final String authType, final SSLEngine engine) {
+        }
+
+        public void checkServerTrusted(
+            final X509Certificate[] x509Certificates, final String authType, final SSLEngine engine) {
         }
     }
 }
