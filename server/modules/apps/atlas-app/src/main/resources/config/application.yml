@@ -88,8 +88,8 @@ atlas:
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
   storage:
-    provider: base64
-    fileStorageDir: /integri
+    provider: file
+    fileStorageDir: /tmp/integri/files
   worker:
     enabled: true
     subscriptions:
