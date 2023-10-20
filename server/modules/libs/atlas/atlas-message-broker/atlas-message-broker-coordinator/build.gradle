@@ -1,7 +1,0 @@
-dependencies {
-    api project(":modules:libs:atlas:atlas-event:atlas-event-api")
-    api project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-api")
-
-    implementation "org.springframework:spring-context"
-    implementation project(":modules:libs:atlas:atlas-coordinator:atlas-coordinator-api")
-}

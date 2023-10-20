@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.message.broker.coordinator.config;
+package com.bytechef.atlas.coordinator.config;
 
-import com.bytechef.atlas.config.AtlasProperties;
-import com.bytechef.atlas.config.CoordinatorProperties;
 import com.bytechef.atlas.coordinator.Coordinator;
-import com.bytechef.atlas.event.EventListener;
+import com.bytechef.atlas.coordinator.event.EventListener;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.config.MessageBrokerConfigurer;
+import com.bytechef.autoconfigure.annotation.ConditionalOnCoordinator;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
@@ -33,18 +32,21 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-public class MessageBrokerCoordinatorConfiguration implements ApplicationContextAware {
+@ConditionalOnCoordinator
+public class CoordinatorMessageBrokerConfiguration implements ApplicationContextAware {
 
-    @Autowired
-    private AtlasProperties atlasProperties;
+    private final CoordinatorProperties coordinatorProperties;
 
     private ApplicationContext applicationContext;
 
-    @Bean
-    MessageBrokerConfigurer coordinatorMessageBrokerConfigurator() {
-        return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            CoordinatorProperties coordinatorProperties = atlasProperties.getCoordinator();
+    @SuppressFBWarnings("EI2")
+    public CoordinatorMessageBrokerConfiguration(CoordinatorProperties coordinatorProperties) {
+        this.coordinatorProperties = coordinatorProperties;
+    }
 
+    @Bean
+    MessageBrokerConfigurer<?> coordinatorMessageBrokerConfigurer() {
+        return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
             Coordinator coordinator = applicationContext.getBean(Coordinator.class);
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
