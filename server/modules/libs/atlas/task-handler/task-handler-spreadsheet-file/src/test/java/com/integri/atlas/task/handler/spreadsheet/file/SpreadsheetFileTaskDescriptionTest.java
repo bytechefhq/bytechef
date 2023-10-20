@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class SpreadsheetFileTaskDescriptorTest {
+public class SpreadsheetFileTaskDescriptionTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -53,37 +53,39 @@ public class SpreadsheetFileTaskDescriptorTest {
                         "type":"SELECT",
                         "options":[
                             {
-                                "name":"Read to file",
-                                "value":"READ"
+                                "name":"Read from file",
+                                "value":"READ",
+                                "description": "Reads data from a spreadsheet file."
                             },
                             {
-                                "name":"Write from file",
-                                "value":"WRITE"
+                                "name":"Write to file",
+                                "value":"WRITE",
+                                 "description": "Writes the data to a spreadsheet file."
                             }
                         ]
                     },
                     {
-                        "description":"The Binary property which contains the spreadsheet data to read from.",
-                        "displayName":"Binary",
+                        "description":"The object property which contains the reference to the spreadsheet file to read from.",
+                        "displayName":"File",
                         "displayOption":{
                             "show":{
                                 "operation":["READ"]
                             }
                         },
-                        "name":"binary",
+                        "name":"fileEntry",
                         "required":true,
                         "type":"JSON"
                     },
                                         {
-                        "description":"The Binary property which contains JSON data.",
-                        "displayName":"Binary",
+                        "description":"The object property which contains reference to the file with JSON data.",
+                        "displayName":"File",
                         "displayOption":{
                             "show":{
                                 "operation":["WRITE"],
-                                 "inputType":["BINARY"]
+                                 "inputType":["FILE"]
                             }
                         },
-                        "name":"binary",
+                        "name":"fileEntry",
                         "required":true,
                         "type":"JSON"
                     },
@@ -199,8 +201,8 @@ public class SpreadsheetFileTaskDescriptorTest {
                                         "value":"JSON"
                                     },
                                     {
-                                        "name":"Binary",
-                                        "value":"BINARY"
+                                        "name":"File",
+                                        "value":"FILE"
                                     }
                                 ],
                                 "type":"SELECT"

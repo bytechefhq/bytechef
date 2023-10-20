@@ -45,18 +45,21 @@ public class SpreadsheetFileTaskDefinition implements TaskDefinition {
             SELECT_PROPERTY("operation")
                 .displayName("Operation")
                 .description("The operation to perform.")
-                .options(option("Read to file", "READ"), option("Write from file", "WRITE"))
+                .options(
+                    option("Read from file", "READ", "Reads data from a spreadsheet file."),
+                    option("Write to file", "WRITE", "Writes the data to a spreadsheet file.")
+                )
                 .defaultValue("READ")
                 .required(true),
-            JSON_PROPERTY("binary")
-                .displayName("Binary")
-                .description("The Binary property which contains the spreadsheet data to read from.")
+            JSON_PROPERTY("fileEntry")
+                .displayName("File")
+                .description("The object property which contains the reference to the spreadsheet file to read from.")
                 .displayOption(show("operation", "READ"))
                 .required(true),
-            JSON_PROPERTY("binary")
-                .displayName("Binary")
-                .description("The Binary property which contains JSON data.")
-                .displayOption(show("operation", parameterValues("WRITE"), "inputType", parameterValues("BINARY")))
+            JSON_PROPERTY("fileEntry")
+                .displayName("File")
+                .description("The object property which contains reference to the file with JSON data.")
+                .displayOption(show("operation", parameterValues("WRITE"), "inputType", parameterValues("FILE")))
                 .required(true),
             SELECT_PROPERTY("fileFormat")
                 .displayName("FileFormat")
@@ -103,7 +106,7 @@ public class SpreadsheetFileTaskDefinition implements TaskDefinition {
                         .displayName("Input Content Type")
                         .description("Input type to use when writing data.")
                         .displayOption(show("operation", "WRITE"))
-                        .options(option("JSON", "JSON"), option("Binary", "BINARY"))
+                        .options(option("JSON", "JSON"), option("File", "FILE"))
                         .defaultValue("JSON"),
                     GROUP_PROPERTY("range")
                         .displayName("Range")

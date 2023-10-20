@@ -16,8 +16,8 @@
 
 package com.integri.atlas.task.handler.spreadsheet.file;
 
-import com.integri.atlas.engine.core.binary.Binary;
-import com.integri.atlas.engine.core.binary.BinaryHelper;
+import com.integri.atlas.engine.core.file.storage.FileEntry;
+import com.integri.atlas.engine.core.file.storage.FileStorageService;
 import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
@@ -51,11 +51,11 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
         WRITE,
     }
 
-    private final BinaryHelper binaryHelper;
+    private final FileStorageService fileStorageService;
     private final JSONHelper jsonHelper;
 
-    public SpreadsheetFileTaskHandler(BinaryHelper binaryHelper, JSONHelper jsonHelper) {
-        this.binaryHelper = binaryHelper;
+    public SpreadsheetFileTaskHandler(FileStorageService fileStorageService, JSONHelper jsonHelper) {
+        this.fileStorageService = fileStorageService;
         this.jsonHelper = jsonHelper;
     }
 
@@ -66,8 +66,8 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
         Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
 
         if (operation == Operation.READ) {
-            Binary binary = taskExecution.getRequired("binary", Binary.class);
             String delimiter = taskExecution.getString("delimiter", ",");
+            FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);
             boolean headerRow = taskExecution.getBoolean("headerRow", true);
             boolean includeEmptyCells = taskExecution.getBoolean("includeEmptyCells", false);
             boolean readAsString = taskExecution.getBoolean("readAsString", false);
@@ -86,7 +86,7 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
                 rangeEndRow = range.get("endRow");
             }
 
-            String extension = binary.getExtension();
+            String extension = fileEntry.getExtension();
 
             FileFormat fileFormat = FileFormat.valueOf(extension.toUpperCase());
 
@@ -95,7 +95,7 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
 
             SpreadsheetProcessor spreadsheetProcessor = getSpreadsheetProcessor(fileFormat);
 
-            try (InputStream inputStream = binaryHelper.openDataInputStream(binary)) {
+            try (InputStream inputStream = fileStorageService.openInputStream(fileEntry.getUrl())) {
                 result =
                     spreadsheetProcessor.read(
                         inputStream,
@@ -119,10 +119,10 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
             );
             List<Map<String, ?>> items;
 
-            if (taskExecution.containsKey("binary")) {
-                Binary binary = taskExecution.get("binary", Binary.class);
+            if (taskExecution.containsKey("fileEntry")) {
+                FileEntry fileEntry = taskExecution.get("fileEntry", FileEntry.class);
 
-                items = jsonHelper.read(binaryHelper.readBinaryData(binary));
+                items = jsonHelper.read(fileStorageService.read(fileEntry.getUrl()));
             } else {
                 items = taskExecution.get("items");
             }
@@ -131,7 +131,7 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
 
             SpreadsheetProcessor spreadsheetProcessor = getSpreadsheetProcessor(fileFormat);
 
-            return binaryHelper.writeBinaryData(
+            return fileStorageService.write(
                 fileName,
                 new ByteArrayInputStream(
                     spreadsheetProcessor.write(items, new SpreadsheetProcessor.WriteConfiguration(fileName, sheetName))
