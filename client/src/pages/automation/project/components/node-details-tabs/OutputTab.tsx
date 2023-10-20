@@ -14,8 +14,8 @@ import {ReactComponent as ObjectIcon} from '../../../../../assets/object.svg';
 import {ReactComponent as OneOfIcon} from '../../../../../assets/oneof.svg';
 import {ReactComponent as StringIcon} from '../../../../../assets/string.svg';
 import {ReactComponent as TimeIcon} from '../../../../../assets/time.svg';
+import {PropertyType} from '../../../../../types/projectTypes';
 import {useNodeDetailsDialogStore} from '../../stores/useNodeDetailsDialogStore';
-import {PropertyType} from '../../types/projectTypes';
 
 const TYPE_ICONS = {
     ARRAY: <ArrayIcon className="h-5 w-5 text-gray-600" />,
