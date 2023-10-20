@@ -1,11 +1,11 @@
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
 import cx from 'classnames';
 import React, {forwardRef} from 'react';
-import CreatableSelect from 'react-select/creatable';
+import ReactSelectCreatable from 'react-select/creatable';
 import {Props} from 'react-select/dist/declarations/src';
-import './MultiSelect.css';
+import './CreatableSelect.css';
 
-type MultiSelectProps = {
+type CreatableSelectProps = {
     label: string;
     name: string;
     options: {label: string; value: string}[];
@@ -15,7 +15,7 @@ type MultiSelectProps = {
     onCreateOption?: (value: string) => void;
 } & Props;
 
-const MultiSelect = forwardRef<CreatableSelect, MultiSelectProps>(
+const CreatableSelect = forwardRef<ReactSelectCreatable, CreatableSelectProps>(
     ({error, label, name, ...props}) => (
         <fieldset className="mb-3">
             <label
@@ -31,7 +31,7 @@ const MultiSelect = forwardRef<CreatableSelect, MultiSelectProps>(
                     error ? 'relative rounded-md shadow-sm' : null,
                 ])}
             >
-                <CreatableSelect
+                <ReactSelectCreatable
                     classNamePrefix="react-select"
                     isMulti
                     {...props}
@@ -60,6 +60,6 @@ const MultiSelect = forwardRef<CreatableSelect, MultiSelectProps>(
     )
 );
 
-MultiSelect.displayName = 'MultiSelect';
+CreatableSelect.displayName = 'MultiSelect';
 
-export default MultiSelect;
+export default CreatableSelect;
