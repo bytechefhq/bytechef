@@ -12,15 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.web;
 
+import com.integri.atlas.workflow.core.Coordinator;
+import com.integri.atlas.workflow.core.Page;
+import com.integri.atlas.workflow.core.annotations.ConditionalOnCoordinator;
+import com.integri.atlas.workflow.core.job.Job;
+import com.integri.atlas.workflow.core.job.JobRepository;
+import com.integri.atlas.workflow.core.job.JobSummary;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
-
 import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
@@ -33,56 +40,51 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.integri.atlas.workflow.core.Coordinator;
-import com.integri.atlas.workflow.core.Page;
-import com.integri.atlas.workflow.core.annotations.ConditionalOnCoordinator;
-import com.integri.atlas.workflow.core.job.Job;
-import com.integri.atlas.workflow.core.job.JobRepository;
-import com.integri.atlas.workflow.core.job.JobSummary;
-
 @RestController
 @ConditionalOnCoordinator
 public class JobsController {
 
-  @Autowired private JobRepository jobRepository;
-  @Autowired private Coordinator coordinator;
+    @Autowired
+    private JobRepository jobRepository;
 
-  @GetMapping(value="/jobs")
-  public Page<JobSummary> list (@RequestParam(value="p",defaultValue="1") Integer aPageNumber) {
-    return jobRepository.getPage(aPageNumber);
-  }
+    @Autowired
+    private Coordinator coordinator;
 
-  @PostMapping("/jobs")
-  public Job create (@RequestBody Map<String, Object> aJobRequest) {
-    return coordinator.create(aJobRequest);
-  }
+    @GetMapping(value = "/jobs")
+    public Page<JobSummary> list(@RequestParam(value = "p", defaultValue = "1") Integer aPageNumber) {
+        return jobRepository.getPage(aPageNumber);
+    }
 
-  @GetMapping(value="/jobs/{id}")
-  public Job get (@PathVariable("id")String aJobId) {
-    Job job = jobRepository.getById (aJobId);
-    return job;
-  }
+    @PostMapping("/jobs")
+    public Job create(@RequestBody Map<String, Object> aJobRequest) {
+        return coordinator.create(aJobRequest);
+    }
 
-  @GetMapping(value="/jobs/latest")
-  public Job latest () {
-    Optional<Job> job = jobRepository.getLatest();
-    Assert.isTrue(job.isPresent(),"no jobs");
-    return job.get();
-  }
+    @GetMapping(value = "/jobs/{id}")
+    public Job get(@PathVariable("id") String aJobId) {
+        Job job = jobRepository.getById(aJobId);
+        return job;
+    }
 
-  @ExceptionHandler(IllegalArgumentException.class)
-  public void handleIllegalArgumentException (HttpServletResponse aResponse) throws IOException {
-    aResponse.sendError(HttpStatus.BAD_REQUEST.value());
-  }
+    @GetMapping(value = "/jobs/latest")
+    public Job latest() {
+        Optional<Job> job = jobRepository.getLatest();
+        Assert.isTrue(job.isPresent(), "no jobs");
+        return job.get();
+    }
 
-  @PutMapping(value="/jobs/{id}/restart")
-  public Job restart (@PathVariable("id")String aJobId) {
-    return coordinator.resume(aJobId);
-  }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public void handleIllegalArgumentException(HttpServletResponse aResponse) throws IOException {
+        aResponse.sendError(HttpStatus.BAD_REQUEST.value());
+    }
 
-  @PutMapping(value="/jobs/{id}/stop")
-  public Job step (@PathVariable("id")String aJobId) {
-    return coordinator.stop(aJobId);
-  }
+    @PutMapping(value = "/jobs/{id}/restart")
+    public Job restart(@PathVariable("id") String aJobId) {
+        return coordinator.resume(aJobId);
+    }
 
+    @PutMapping(value = "/jobs/{id}/stop")
+    public Job step(@PathVariable("id") String aJobId) {
+        return coordinator.stop(aJobId);
+    }
 }

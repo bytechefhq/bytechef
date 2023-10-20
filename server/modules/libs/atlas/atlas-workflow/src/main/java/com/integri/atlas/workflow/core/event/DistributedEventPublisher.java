@@ -12,13 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
-package com.integri.atlas.workflow.core.event;
 
-import java.util.Objects;
+package com.integri.atlas.workflow.core.event;
 
 import com.integri.atlas.workflow.core.messagebroker.MessageBroker;
 import com.integri.atlas.workflow.core.messagebroker.Queues;
+import java.util.Objects;
 
 /**
  * @author Arik Cohen
@@ -26,15 +28,14 @@ import com.integri.atlas.workflow.core.messagebroker.Queues;
  */
 public class DistributedEventPublisher implements EventPublisher {
 
-  private final MessageBroker messageBroker;
+    private final MessageBroker messageBroker;
 
-  public DistributedEventPublisher (MessageBroker aMessageBroker) {
-    messageBroker = Objects.requireNonNull(aMessageBroker);
-  }
+    public DistributedEventPublisher(MessageBroker aMessageBroker) {
+        messageBroker = Objects.requireNonNull(aMessageBroker);
+    }
 
-  @Override
-  public void publishEvent(PiperEvent aEvent) {
-    messageBroker.send(Queues.EVENTS, aEvent);
-  }
-
+    @Override
+    public void publishEvent(PiperEvent aEvent) {
+        messageBroker.send(Queues.EVENTS, aEvent);
+    }
 }

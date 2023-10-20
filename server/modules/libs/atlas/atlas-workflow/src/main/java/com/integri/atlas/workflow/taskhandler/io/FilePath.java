@@ -12,14 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
-package com.integri.atlas.workflow.taskhandler.io;
 
-import org.apache.commons.io.FilenameUtils;
-import org.springframework.stereotype.Component;
+package com.integri.atlas.workflow.taskhandler.io;
 
 import com.integri.atlas.workflow.core.task.TaskExecution;
 import com.integri.atlas.workflow.core.task.TaskHandler;
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.stereotype.Component;
 
 /**
  * Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator.
@@ -33,9 +35,8 @@ import com.integri.atlas.workflow.core.task.TaskHandler;
 @Component("io/filepath")
 class FilePath implements TaskHandler<Object> {
 
-  @Override
-  public Object handle (TaskExecution aTask) {
-    return FilenameUtils.getFullPathNoEndSeparator(aTask.getRequiredString("filename"));
-  }
-
+    @Override
+    public Object handle(TaskExecution aTask) {
+        return FilenameUtils.getFullPathNoEndSeparator(aTask.getRequiredString("filename"));
+    }
 }

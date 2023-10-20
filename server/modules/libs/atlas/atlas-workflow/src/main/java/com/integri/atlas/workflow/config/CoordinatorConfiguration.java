@@ -12,17 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.config;
-
-import java.util.Arrays;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.core.env.Environment;
 
 import com.integri.atlas.workflow.core.Coordinator;
 import com.integri.atlas.workflow.core.DefaultJobExecutor;
@@ -62,251 +56,275 @@ import com.integri.atlas.workflow.core.task.TaskDispatcherChain;
 import com.integri.atlas.workflow.core.task.TaskDispatcherResolver;
 import com.integri.atlas.workflow.core.task.TaskExecutionRepository;
 import com.integri.atlas.workflow.core.task.WorkTaskDispatcher;
+import java.util.Arrays;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
 
 @Configuration
 @ConditionalOnCoordinator
 public class CoordinatorConfiguration {
 
-  @Autowired private JobRepository jobRepository;
-  @Autowired private TaskExecutionRepository taskExecutionRepo;
-  @Autowired private ContextRepository contextRepository;
-  @Autowired private PipelineRepository pipelineRepository;
-  @Autowired private CounterRepository counterRepository;
-  @Autowired @Lazy private MessageBroker messageBroker;
-  @Autowired @Lazy private EventPublisher eventPublisher;
-  @Autowired private Environment environment;
+    @Autowired
+    private JobRepository jobRepository;
 
-  @Bean
-  Coordinator coordinator () {
-    Coordinator coordinator = new Coordinator();
-    coordinator.setContextRepository(contextRepository);
-    coordinator.setEventPublisher(eventPublisher);
-    coordinator.setJobRepository(jobRepository);
-    coordinator.setJobTaskRepository(taskExecutionRepo);
-    coordinator.setPipelineRepository(pipelineRepository);
-    coordinator.setJobExecutor(jobExecutor());
-    coordinator.setTaskDispatcher(taskDispatcher());
-    coordinator.setErrorHandler(errorHandler());
-    coordinator.setTaskCompletionHandler(taskCompletionHandler());
-    coordinator.setMessageBroker(messageBroker);
-    return coordinator;
-  }
+    @Autowired
+    private TaskExecutionRepository taskExecutionRepo;
 
-  @Bean
-  ErrorHandler errorHandler () {
-    return new ErrorHandlerChain(Arrays.asList(jobTaskErrorHandler()));
-  }
+    @Autowired
+    private ContextRepository contextRepository;
 
-  @Bean
-  TaskExecutionErrorHandler jobTaskErrorHandler () {
-    TaskExecutionErrorHandler jobTaskErrorHandler = new TaskExecutionErrorHandler();
-    jobTaskErrorHandler.setJobRepository(jobRepository);
-    jobTaskErrorHandler.setJobTaskRepository(taskExecutionRepo);
-    jobTaskErrorHandler.setTaskDispatcher(taskDispatcher());
-    jobTaskErrorHandler.setEventPublisher(eventPublisher);
-    return jobTaskErrorHandler;
-  }
+    @Autowired
+    private PipelineRepository pipelineRepository;
 
-  @Bean
-  TaskCompletionHandlerChain taskCompletionHandler () {
-    TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
-    taskCompletionHandlerChain.setTaskCompletionHandlers(Arrays.asList(
-      eachTaskCompletionHandler(taskCompletionHandlerChain),
-      mapTaskCompletionHandler(taskCompletionHandlerChain),
-      parallelTaskCompletionHandler(taskCompletionHandlerChain),
-      forkTaskCompletionHandler(taskCompletionHandlerChain),
-      switchTaskCompletionHandler(taskCompletionHandlerChain),
-      defaultTaskCompletionHandler()
-    ));
-    return taskCompletionHandlerChain;
-  }
+    @Autowired
+    private CounterRepository counterRepository;
 
-  @Bean
-  DefaultTaskCompletionHandler defaultTaskCompletionHandler () {
-    DefaultTaskCompletionHandler taskCompletionHandler = new DefaultTaskCompletionHandler();
-    taskCompletionHandler.setContextRepository(contextRepository);
-    taskCompletionHandler.setJobExecutor(jobExecutor());
-    taskCompletionHandler.setJobRepository(jobRepository);
-    taskCompletionHandler.setJobTaskRepository(taskExecutionRepo);
-    taskCompletionHandler.setPipelineRepository(pipelineRepository);
-    taskCompletionHandler.setEventPublisher(eventPublisher);
-    taskCompletionHandler.setTaskEvaluator(SpelTaskEvaluator.builder().environment(environment).build());
-    return taskCompletionHandler;
-  }
+    @Autowired
+    @Lazy
+    private MessageBroker messageBroker;
 
-  @Bean
-  SwitchTaskCompletionHandler switchTaskCompletionHandler (TaskCompletionHandler aTaskCompletionHandler) {
-    return new SwitchTaskCompletionHandler(
-      taskExecutionRepo,
-      aTaskCompletionHandler,
-      taskDispatcher(),
-      contextRepository,
-      SpelTaskEvaluator.builder().environment(environment).build()
-    );
-  }
+    @Autowired
+    @Lazy
+    private EventPublisher eventPublisher;
 
-  @Bean
-  SwitchTaskDispatcher switchTaskDispatcher (TaskDispatcher aTaskDispatcher) {
-    return new SwitchTaskDispatcher(
-      aTaskDispatcher,
-      taskExecutionRepo,
-      messageBroker,
-      contextRepository,
-      SpelTaskEvaluator.builder().environment(environment).build()
-    );
-  }
+    @Autowired
+    private Environment environment;
 
-  @Bean
-  EachTaskCompletionHandler eachTaskCompletionHandler (TaskCompletionHandler aTaskCompletionHandler) {
-    return new EachTaskCompletionHandler(taskExecutionRepo,aTaskCompletionHandler,counterRepository);
-  }
+    @Bean
+    Coordinator coordinator() {
+        Coordinator coordinator = new Coordinator();
+        coordinator.setContextRepository(contextRepository);
+        coordinator.setEventPublisher(eventPublisher);
+        coordinator.setJobRepository(jobRepository);
+        coordinator.setJobTaskRepository(taskExecutionRepo);
+        coordinator.setPipelineRepository(pipelineRepository);
+        coordinator.setJobExecutor(jobExecutor());
+        coordinator.setTaskDispatcher(taskDispatcher());
+        coordinator.setErrorHandler(errorHandler());
+        coordinator.setTaskCompletionHandler(taskCompletionHandler());
+        coordinator.setMessageBroker(messageBroker);
+        return coordinator;
+    }
 
-  @Bean
-  MapTaskCompletionHandler mapTaskCompletionHandler (TaskCompletionHandler aTaskCompletionHandler) {
-    return new MapTaskCompletionHandler(taskExecutionRepo,aTaskCompletionHandler,counterRepository);
-  }
+    @Bean
+    ErrorHandler errorHandler() {
+        return new ErrorHandlerChain(Arrays.asList(jobTaskErrorHandler()));
+    }
 
-  @Bean
-  ParallelTaskCompletionHandler parallelTaskCompletionHandler (TaskCompletionHandler aTaskCompletionHandler) {
-    ParallelTaskCompletionHandler dispatcher = new ParallelTaskCompletionHandler();
-    dispatcher.setCounterRepository(counterRepository);
-    dispatcher.setTaskCompletionHandler(aTaskCompletionHandler);
-    dispatcher.setTaskExecutionRepository(taskExecutionRepo);
-    return dispatcher;
-  }
+    @Bean
+    TaskExecutionErrorHandler jobTaskErrorHandler() {
+        TaskExecutionErrorHandler jobTaskErrorHandler = new TaskExecutionErrorHandler();
+        jobTaskErrorHandler.setJobRepository(jobRepository);
+        jobTaskErrorHandler.setJobTaskRepository(taskExecutionRepo);
+        jobTaskErrorHandler.setTaskDispatcher(taskDispatcher());
+        jobTaskErrorHandler.setEventPublisher(eventPublisher);
+        return jobTaskErrorHandler;
+    }
 
-  @Bean
-  ForkTaskCompletionHandler forkTaskCompletionHandler (TaskCompletionHandler aTaskCompletionHandler) {
-    return new ForkTaskCompletionHandler(
-      taskExecutionRepo,
-      aTaskCompletionHandler,
-      counterRepository,
-      taskDispatcher(),
-      contextRepository,
-      SpelTaskEvaluator.builder().environment(environment).build()
-    );
-  }
+    @Bean
+    TaskCompletionHandlerChain taskCompletionHandler() {
+        TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
+        taskCompletionHandlerChain.setTaskCompletionHandlers(
+            Arrays.asList(
+                eachTaskCompletionHandler(taskCompletionHandlerChain),
+                mapTaskCompletionHandler(taskCompletionHandlerChain),
+                parallelTaskCompletionHandler(taskCompletionHandlerChain),
+                forkTaskCompletionHandler(taskCompletionHandlerChain),
+                switchTaskCompletionHandler(taskCompletionHandlerChain),
+                defaultTaskCompletionHandler()
+            )
+        );
+        return taskCompletionHandlerChain;
+    }
 
-  @Bean
-  SubflowTaskDispatcher subflowTaskDispatcher () {
-    return new SubflowTaskDispatcher(messageBroker);
-  }
+    @Bean
+    DefaultTaskCompletionHandler defaultTaskCompletionHandler() {
+        DefaultTaskCompletionHandler taskCompletionHandler = new DefaultTaskCompletionHandler();
+        taskCompletionHandler.setContextRepository(contextRepository);
+        taskCompletionHandler.setJobExecutor(jobExecutor());
+        taskCompletionHandler.setJobRepository(jobRepository);
+        taskCompletionHandler.setJobTaskRepository(taskExecutionRepo);
+        taskCompletionHandler.setPipelineRepository(pipelineRepository);
+        taskCompletionHandler.setEventPublisher(eventPublisher);
+        taskCompletionHandler.setTaskEvaluator(SpelTaskEvaluator.builder().environment(environment).build());
+        return taskCompletionHandler;
+    }
 
-  @Bean
-  SubflowJobStatusEventListener subflowJobStatusEventListener () {
-    return new SubflowJobStatusEventListener(
-      jobRepository,
-      taskExecutionRepo,
-      coordinator(),
-      SpelTaskEvaluator.builder().environment(environment).build()
-    );
-  }
+    @Bean
+    SwitchTaskCompletionHandler switchTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
+        return new SwitchTaskCompletionHandler(
+            taskExecutionRepo,
+            aTaskCompletionHandler,
+            taskDispatcher(),
+            contextRepository,
+            SpelTaskEvaluator.builder().environment(environment).build()
+        );
+    }
 
-  @Bean
-  DefaultJobExecutor jobExecutor () {
-    DefaultJobExecutor jobExecutor = new DefaultJobExecutor();
-    jobExecutor.setContextRepository(contextRepository);
-    jobExecutor.setJobTaskRepository(taskExecutionRepo);
-    jobExecutor.setPipelineRepository(pipelineRepository);
-    jobExecutor.setTaskDispatcher(taskDispatcher());
-    jobExecutor.setTaskEvaluator(SpelTaskEvaluator.builder()
-                                                  .environment(environment)
-                                                  .build());
-    return jobExecutor;
-  }
+    @Bean
+    SwitchTaskDispatcher switchTaskDispatcher(TaskDispatcher aTaskDispatcher) {
+        return new SwitchTaskDispatcher(
+            aTaskDispatcher,
+            taskExecutionRepo,
+            messageBroker,
+            contextRepository,
+            SpelTaskEvaluator.builder().environment(environment).build()
+        );
+    }
 
-  @Bean
-  TaskDispatcherChain taskDispatcher () {
-    TaskDispatcherChain taskDispatcher = new TaskDispatcherChain();
-    List<TaskDispatcherResolver> resolvers =  Arrays.asList(
-      eachTaskDispatcher(taskDispatcher),
-      mapTaskDispatcher(taskDispatcher),
-      parallelTaskDispatcher(taskDispatcher),
-      forkTaskDispatcher(taskDispatcher),
-      switchTaskDispatcher(taskDispatcher),
-      controlTaskDispatcher(),
-      subflowTaskDispatcher(),
-      workTaskDispatcher()
-    );
-    taskDispatcher.setResolvers(resolvers);
-    return taskDispatcher;
-  }
+    @Bean
+    EachTaskCompletionHandler eachTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
+        return new EachTaskCompletionHandler(taskExecutionRepo, aTaskCompletionHandler, counterRepository);
+    }
 
-  @Bean
-  ControlTaskDispatcher controlTaskDispatcher () {
-    return new ControlTaskDispatcher(messageBroker);
-  }
+    @Bean
+    MapTaskCompletionHandler mapTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
+        return new MapTaskCompletionHandler(taskExecutionRepo, aTaskCompletionHandler, counterRepository);
+    }
 
-  @Bean
-  EachTaskDispatcher eachTaskDispatcher (TaskDispatcher aTaskDispatcher) {
-    return new EachTaskDispatcher(
-      aTaskDispatcher,
-      taskExecutionRepo,
-      messageBroker,
-      contextRepository,
-      counterRepository,
-      SpelTaskEvaluator.builder().environment(environment).build()
-    );
-  }
+    @Bean
+    ParallelTaskCompletionHandler parallelTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
+        ParallelTaskCompletionHandler dispatcher = new ParallelTaskCompletionHandler();
+        dispatcher.setCounterRepository(counterRepository);
+        dispatcher.setTaskCompletionHandler(aTaskCompletionHandler);
+        dispatcher.setTaskExecutionRepository(taskExecutionRepo);
+        return dispatcher;
+    }
 
-  @Bean
-  MapTaskDispatcher mapTaskDispatcher (TaskDispatcher aTaskDispatcher) {
-    return MapTaskDispatcher.builder()
-                            .taskDispatcher(aTaskDispatcher)
-                            .taskExecutionRepository(taskExecutionRepo)
-                            .messageBroker(messageBroker)
-                            .contextRepository(contextRepository)
-                            .counterRepository(counterRepository)
-                            .taskEvaluator(SpelTaskEvaluator.builder().environment(environment).build())
-                            .build();
-  }
+    @Bean
+    ForkTaskCompletionHandler forkTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
+        return new ForkTaskCompletionHandler(
+            taskExecutionRepo,
+            aTaskCompletionHandler,
+            counterRepository,
+            taskDispatcher(),
+            contextRepository,
+            SpelTaskEvaluator.builder().environment(environment).build()
+        );
+    }
 
-  @Bean
-  ParallelTaskDispatcher parallelTaskDispatcher (TaskDispatcher aTaskDispatcher) {
-    ParallelTaskDispatcher dispatcher = new ParallelTaskDispatcher();
-    dispatcher.setContextRepository(contextRepository);
-    dispatcher.setCounterRepository(counterRepository);
-    dispatcher.setMessageBroker(messageBroker);
-    dispatcher.setTaskDispatcher(aTaskDispatcher);
-    dispatcher.setTaskExecutionRepository(taskExecutionRepo);
-    return dispatcher;
-  }
+    @Bean
+    SubflowTaskDispatcher subflowTaskDispatcher() {
+        return new SubflowTaskDispatcher(messageBroker);
+    }
 
-  @Bean
-  ForkTaskDispatcher forkTaskDispatcher (TaskDispatcher aTaskDispatcher) {
-    ForkTaskDispatcher forkTaskDispatcher = new ForkTaskDispatcher();
-    forkTaskDispatcher.setTaskDispatcher(aTaskDispatcher);
-    forkTaskDispatcher.setTaskEvaluator(SpelTaskEvaluator.builder().environment(environment).build());
-    forkTaskDispatcher.setTaskExecutionRepo(taskExecutionRepo);
-    forkTaskDispatcher.setMessageBroker(messageBroker);
-    forkTaskDispatcher.setContextRepository(contextRepository);
-    forkTaskDispatcher.setCounterRepository(counterRepository);
-    return forkTaskDispatcher;
-  }
+    @Bean
+    SubflowJobStatusEventListener subflowJobStatusEventListener() {
+        return new SubflowJobStatusEventListener(
+            jobRepository,
+            taskExecutionRepo,
+            coordinator(),
+            SpelTaskEvaluator.builder().environment(environment).build()
+        );
+    }
 
-  @Bean
-  WorkTaskDispatcher workTaskDispatcher () {
-    return new WorkTaskDispatcher(messageBroker);
-  }
+    @Bean
+    DefaultJobExecutor jobExecutor() {
+        DefaultJobExecutor jobExecutor = new DefaultJobExecutor();
+        jobExecutor.setContextRepository(contextRepository);
+        jobExecutor.setJobTaskRepository(taskExecutionRepo);
+        jobExecutor.setPipelineRepository(pipelineRepository);
+        jobExecutor.setTaskDispatcher(taskDispatcher());
+        jobExecutor.setTaskEvaluator(SpelTaskEvaluator.builder().environment(environment).build());
+        return jobExecutor;
+    }
 
-  @Bean
-  TaskStartedEventListener taskStartedEventListener () {
-    return new TaskStartedEventListener(taskExecutionRepo, taskDispatcher(), jobRepository);
-  }
+    @Bean
+    TaskDispatcherChain taskDispatcher() {
+        TaskDispatcherChain taskDispatcher = new TaskDispatcherChain();
+        List<TaskDispatcherResolver> resolvers = Arrays.asList(
+            eachTaskDispatcher(taskDispatcher),
+            mapTaskDispatcher(taskDispatcher),
+            parallelTaskDispatcher(taskDispatcher),
+            forkTaskDispatcher(taskDispatcher),
+            switchTaskDispatcher(taskDispatcher),
+            controlTaskDispatcher(),
+            subflowTaskDispatcher(),
+            workTaskDispatcher()
+        );
+        taskDispatcher.setResolvers(resolvers);
+        return taskDispatcher;
+    }
 
-  @Bean
-  TaskProgressedEventListener taskProgressedEventListener () {
-    return new TaskProgressedEventListener(taskExecutionRepo);
-  }
+    @Bean
+    ControlTaskDispatcher controlTaskDispatcher() {
+        return new ControlTaskDispatcher(messageBroker);
+    }
 
-  @Bean
-  JobStatusWebhookEventListener webhookEventHandler () {
-    return new JobStatusWebhookEventListener(jobRepository);
-  }
+    @Bean
+    EachTaskDispatcher eachTaskDispatcher(TaskDispatcher aTaskDispatcher) {
+        return new EachTaskDispatcher(
+            aTaskDispatcher,
+            taskExecutionRepo,
+            messageBroker,
+            contextRepository,
+            counterRepository,
+            SpelTaskEvaluator.builder().environment(environment).build()
+        );
+    }
 
-  @Bean
-  TaskStartedWebhookEventListener taskStartedWebhookEventListener () {
-    return new TaskStartedWebhookEventListener(jobRepository);
-  }
+    @Bean
+    MapTaskDispatcher mapTaskDispatcher(TaskDispatcher aTaskDispatcher) {
+        return MapTaskDispatcher
+            .builder()
+            .taskDispatcher(aTaskDispatcher)
+            .taskExecutionRepository(taskExecutionRepo)
+            .messageBroker(messageBroker)
+            .contextRepository(contextRepository)
+            .counterRepository(counterRepository)
+            .taskEvaluator(SpelTaskEvaluator.builder().environment(environment).build())
+            .build();
+    }
 
+    @Bean
+    ParallelTaskDispatcher parallelTaskDispatcher(TaskDispatcher aTaskDispatcher) {
+        ParallelTaskDispatcher dispatcher = new ParallelTaskDispatcher();
+        dispatcher.setContextRepository(contextRepository);
+        dispatcher.setCounterRepository(counterRepository);
+        dispatcher.setMessageBroker(messageBroker);
+        dispatcher.setTaskDispatcher(aTaskDispatcher);
+        dispatcher.setTaskExecutionRepository(taskExecutionRepo);
+        return dispatcher;
+    }
+
+    @Bean
+    ForkTaskDispatcher forkTaskDispatcher(TaskDispatcher aTaskDispatcher) {
+        ForkTaskDispatcher forkTaskDispatcher = new ForkTaskDispatcher();
+        forkTaskDispatcher.setTaskDispatcher(aTaskDispatcher);
+        forkTaskDispatcher.setTaskEvaluator(SpelTaskEvaluator.builder().environment(environment).build());
+        forkTaskDispatcher.setTaskExecutionRepo(taskExecutionRepo);
+        forkTaskDispatcher.setMessageBroker(messageBroker);
+        forkTaskDispatcher.setContextRepository(contextRepository);
+        forkTaskDispatcher.setCounterRepository(counterRepository);
+        return forkTaskDispatcher;
+    }
+
+    @Bean
+    WorkTaskDispatcher workTaskDispatcher() {
+        return new WorkTaskDispatcher(messageBroker);
+    }
+
+    @Bean
+    TaskStartedEventListener taskStartedEventListener() {
+        return new TaskStartedEventListener(taskExecutionRepo, taskDispatcher(), jobRepository);
+    }
+
+    @Bean
+    TaskProgressedEventListener taskProgressedEventListener() {
+        return new TaskProgressedEventListener(taskExecutionRepo);
+    }
+
+    @Bean
+    JobStatusWebhookEventListener webhookEventHandler() {
+        return new JobStatusWebhookEventListener(jobRepository);
+    }
+
+    @Bean
+    TaskStartedWebhookEventListener taskStartedWebhookEventListener() {
+        return new TaskStartedWebhookEventListener(jobRepository);
+    }
 }

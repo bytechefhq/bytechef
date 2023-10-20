@@ -12,16 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
-package com.integri.atlas.workflow.core.task;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+package com.integri.atlas.workflow.core.task;
 
 import com.integri.atlas.workflow.core.DSL;
 import com.integri.atlas.workflow.core.messagebroker.MessageBroker;
 import com.integri.atlas.workflow.core.messagebroker.Queues;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * a {@link TaskDispatcher} implementation which handles the 'subflow'
@@ -33,27 +35,26 @@ import com.integri.atlas.workflow.core.messagebroker.Queues;
  */
 public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-  private final MessageBroker messageBroker;
+    private final MessageBroker messageBroker;
 
-  public SubflowTaskDispatcher (MessageBroker aMessageBroker) {
-    messageBroker = aMessageBroker;
-  }
-
-  @Override
-  public void dispatch(TaskExecution aTask) {
-    Map<String, Object> params = new HashMap<>();
-    params.put(DSL.INPUTS, aTask.getMap(DSL.INPUTS, Collections.emptyMap()));
-    params.put(DSL.PARENT_TASK_EXECUTION_ID, aTask.getId());
-    params.put(DSL.PIPELINE_ID, aTask.getRequiredString(DSL.PIPELINE_ID));
-    messageBroker.send(Queues.SUBFLOWS, params);
-  }
-
-  @Override
-  public TaskDispatcher resolve(Task aTask) {
-    if(aTask.getType().equals("subflow")) {
-      return this;
+    public SubflowTaskDispatcher(MessageBroker aMessageBroker) {
+        messageBroker = aMessageBroker;
     }
-    return null;
-  }
 
+    @Override
+    public void dispatch(TaskExecution aTask) {
+        Map<String, Object> params = new HashMap<>();
+        params.put(DSL.INPUTS, aTask.getMap(DSL.INPUTS, Collections.emptyMap()));
+        params.put(DSL.PARENT_TASK_EXECUTION_ID, aTask.getId());
+        params.put(DSL.PIPELINE_ID, aTask.getRequiredString(DSL.PIPELINE_ID));
+        messageBroker.send(Queues.SUBFLOWS, params);
+    }
+
+    @Override
+    public TaskDispatcher resolve(Task aTask) {
+        if (aTask.getType().equals("subflow")) {
+            return this;
+        }
+        return null;
+    }
 }

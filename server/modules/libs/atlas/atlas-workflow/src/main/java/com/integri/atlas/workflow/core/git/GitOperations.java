@@ -12,18 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.git;
 
+import com.integri.atlas.workflow.core.pipeline.IdentifiableResource;
 import java.util.List;
 
-import com.integri.atlas.workflow.core.pipeline.IdentifiableResource;
-
 public interface GitOperations {
+    List<IdentifiableResource> getHeadFiles();
 
-
-  List<IdentifiableResource> getHeadFiles ();
-
-  IdentifiableResource getFile (String aFileId);
-
+    IdentifiableResource getFile(String aFileId);
 }

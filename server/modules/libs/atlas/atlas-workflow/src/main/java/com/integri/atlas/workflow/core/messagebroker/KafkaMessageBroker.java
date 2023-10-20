@@ -12,45 +12,47 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.messagebroker;
 
+import com.integri.atlas.workflow.core.error.Retryable;
 import java.util.concurrent.TimeUnit;
-
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.Assert;
 
-import com.integri.atlas.workflow.core.error.Retryable;
-
 public class KafkaMessageBroker implements MessageBroker {
 
-  private KafkaTemplate<Integer, Object> kafkaTemplate;
+    private KafkaTemplate<Integer, Object> kafkaTemplate;
 
-  @Override
-  public void send (String aRoutingKey, Object aMessage) {
-    Assert.notNull(aRoutingKey,"routing key can't be null");
-    if(aMessage instanceof Retryable) {
-      Retryable r = (Retryable) aMessage;
-      delay(r.getRetryDelayMillis());
+    @Override
+    public void send(String aRoutingKey, Object aMessage) {
+        Assert.notNull(aRoutingKey, "routing key can't be null");
+        if (aMessage instanceof Retryable) {
+            Retryable r = (Retryable) aMessage;
+            delay(r.getRetryDelayMillis());
+        }
+
+        kafkaTemplate.send(
+            MessageBuilder
+                .withPayload(aMessage)
+                .setHeader(KafkaHeaders.TOPIC, aRoutingKey)
+                .setHeader("_type", aMessage.getClass().getName())
+                .build()
+        );
     }
 
-    kafkaTemplate.send(MessageBuilder
-            .withPayload(aMessage)
-            .setHeader(KafkaHeaders.TOPIC, aRoutingKey)
-            .setHeader("_type", aMessage.getClass().getName())
-            .build());
-  }
-
-  private void delay (long aValue) {
-    try {
-      TimeUnit.MILLISECONDS.sleep(aValue);
-    } catch (InterruptedException e) {
+    private void delay(long aValue) {
+        try {
+            TimeUnit.MILLISECONDS.sleep(aValue);
+        } catch (InterruptedException e) {}
     }
-  }
 
-  public void setKafkaTemplate(KafkaTemplate<Integer, Object> akafkaTemplate) {
-    kafkaTemplate = akafkaTemplate;
-  }
+    public void setKafkaTemplate(KafkaTemplate<Integer, Object> akafkaTemplate) {
+        kafkaTemplate = akafkaTemplate;
+    }
 }

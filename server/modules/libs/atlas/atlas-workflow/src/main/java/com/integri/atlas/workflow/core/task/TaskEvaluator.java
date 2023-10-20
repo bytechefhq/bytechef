@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.task;
 
 import com.integri.atlas.workflow.core.context.Context;
@@ -24,16 +27,14 @@ import com.integri.atlas.workflow.core.context.Context;
  * @since Mar 31, 2017
  */
 public interface TaskEvaluator {
-
-  /**
-   * Evaluate the {@link TaskExecution}
-   *
-   * @param aJobTask
-   *          The {@link TaskExecution} instance to evaluate
-   * @param aContext
-   *          The context to evaluate the task against
-   * @return the evaluate {@link TaskExecution}.
-   */
-  TaskExecution evaluate (TaskExecution aJobTask, Context aContext);
-
+    /**
+     * Evaluate the {@link TaskExecution}
+     *
+     * @param aJobTask
+     *          The {@link TaskExecution} instance to evaluate
+     * @param aContext
+     *          The context to evaluate the task against
+     * @return the evaluate {@link TaskExecution}.
+     */
+    TaskExecution evaluate(TaskExecution aJobTask, Context aContext);
 }

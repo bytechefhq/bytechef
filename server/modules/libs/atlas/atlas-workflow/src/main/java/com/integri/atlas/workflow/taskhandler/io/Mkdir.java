@@ -12,17 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.taskhandler.io;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import org.springframework.stereotype.Component;
 
 import com.integri.atlas.workflow.core.task.TaskExecution;
 import com.integri.atlas.workflow.core.task.TaskHandler;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import org.springframework.stereotype.Component;
 
 /**
  * Creates a directory by creating all nonexistent parent directories first.
@@ -35,10 +36,9 @@ import com.integri.atlas.workflow.core.task.TaskHandler;
 @Component("io/mkdir")
 class Mkdir implements TaskHandler<Object> {
 
-  @Override
-  public Object handle (TaskExecution aTask) throws IOException {
-    Files.createDirectories(Paths.get(aTask.getRequiredString("path")));
-    return null;
-  }
-
+    @Override
+    public Object handle(TaskExecution aTask) throws IOException {
+        Files.createDirectories(Paths.get(aTask.getRequiredString("path")));
+        return null;
+    }
 }

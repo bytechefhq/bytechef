@@ -12,14 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.task;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.util.Assert;
 
 import com.integri.atlas.workflow.core.DSL;
 import com.integri.atlas.workflow.core.MapObject;
@@ -28,6 +25,10 @@ import com.integri.atlas.workflow.core.context.MapContext;
 import com.integri.atlas.workflow.core.messagebroker.MessageBroker;
 import com.integri.atlas.workflow.core.messagebroker.Queues;
 import com.integri.atlas.workflow.core.uuid.UUIDGenerator;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import org.springframework.util.Assert;
 
 /**
  * A {@link TaskDispatcher} implementation which implements the parallel
@@ -40,65 +41,63 @@ import com.integri.atlas.workflow.core.uuid.UUIDGenerator;
  */
 public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-  private TaskDispatcher taskDispatcher;
-  private TaskExecutionRepository taskExecutionRepo;
-  private MessageBroker messageBroker;
-  private ContextRepository contextRepository;
-  private CounterRepository counterRepository;
+    private TaskDispatcher taskDispatcher;
+    private TaskExecutionRepository taskExecutionRepo;
+    private MessageBroker messageBroker;
+    private ContextRepository contextRepository;
+    private CounterRepository counterRepository;
 
-  @Override
-  public void dispatch (TaskExecution aTask) {
-    List<MapObject> tasks = aTask.getList("tasks", MapObject.class);
-    Assert.notNull(tasks,"'tasks' property can't be null");
-    if(tasks.size() > 0) {
-      counterRepository.set(aTask.getId(), tasks.size());
-      for(Map<String,Object> task : tasks) {
-        SimpleTaskExecution parallelTask = SimpleTaskExecution.of(task);
-        parallelTask.setId(UUIDGenerator.generate());
-        parallelTask.setParentId(aTask.getId());
-        parallelTask.setStatus(TaskStatus.CREATED);
-        parallelTask.setJobId(aTask.getJobId());
-        parallelTask.setCreateTime(new Date());
-        parallelTask.setPriority(aTask.getPriority());
-        MapContext context = new MapContext (contextRepository.peek(aTask.getId()));
-        contextRepository.push(parallelTask.getId(), context);
-        taskExecutionRepo.create(parallelTask);
-        taskDispatcher.dispatch(parallelTask);
-      }
+    @Override
+    public void dispatch(TaskExecution aTask) {
+        List<MapObject> tasks = aTask.getList("tasks", MapObject.class);
+        Assert.notNull(tasks, "'tasks' property can't be null");
+        if (tasks.size() > 0) {
+            counterRepository.set(aTask.getId(), tasks.size());
+            for (Map<String, Object> task : tasks) {
+                SimpleTaskExecution parallelTask = SimpleTaskExecution.of(task);
+                parallelTask.setId(UUIDGenerator.generate());
+                parallelTask.setParentId(aTask.getId());
+                parallelTask.setStatus(TaskStatus.CREATED);
+                parallelTask.setJobId(aTask.getJobId());
+                parallelTask.setCreateTime(new Date());
+                parallelTask.setPriority(aTask.getPriority());
+                MapContext context = new MapContext(contextRepository.peek(aTask.getId()));
+                contextRepository.push(parallelTask.getId(), context);
+                taskExecutionRepo.create(parallelTask);
+                taskDispatcher.dispatch(parallelTask);
+            }
+        } else {
+            SimpleTaskExecution completion = SimpleTaskExecution.of(aTask);
+            completion.setEndTime(new Date());
+            messageBroker.send(Queues.COMPLETIONS, completion);
+        }
     }
-    else {
-      SimpleTaskExecution completion = SimpleTaskExecution.of(aTask);
-      completion.setEndTime(new Date());
-      messageBroker.send(Queues.COMPLETIONS, completion);
+
+    @Override
+    public TaskDispatcher resolve(Task aTask) {
+        if (aTask.getType().equals(DSL.PARALLEL)) {
+            return this;
+        }
+        return null;
     }
-  }
 
-  @Override
-  public TaskDispatcher resolve (Task aTask) {
-    if(aTask.getType().equals(DSL.PARALLEL)) {
-      return this;
+    public void setContextRepository(ContextRepository aContextRepository) {
+        contextRepository = aContextRepository;
     }
-    return null;
-  }
 
-  public void setContextRepository(ContextRepository aContextRepository) {
-    contextRepository = aContextRepository;
-  }
+    public void setCounterRepository(CounterRepository aCounterRepository) {
+        counterRepository = aCounterRepository;
+    }
 
-  public void setCounterRepository(CounterRepository aCounterRepository) {
-    counterRepository = aCounterRepository;
-  }
+    public void setMessageBroker(MessageBroker aMessageBroker) {
+        messageBroker = aMessageBroker;
+    }
 
-  public void setMessageBroker(MessageBroker aMessageBroker) {
-    messageBroker = aMessageBroker;
-  }
+    public void setTaskDispatcher(TaskDispatcher aTaskDispatcher) {
+        taskDispatcher = aTaskDispatcher;
+    }
 
-  public void setTaskDispatcher(TaskDispatcher aTaskDispatcher) {
-    taskDispatcher = aTaskDispatcher;
-  }
-
-  public void setTaskExecutionRepository(TaskExecutionRepository aTaskExecutionRepo) {
-    taskExecutionRepo = aTaskExecutionRepo;
-  }
-
+    public void setTaskExecutionRepository(TaskExecutionRepository aTaskExecutionRepo) {
+        taskExecutionRepo = aTaskExecutionRepo;
+    }
 }

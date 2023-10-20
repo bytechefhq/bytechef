@@ -12,13 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core;
-
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import com.integri.atlas.workflow.core.context.Context;
 import com.integri.atlas.workflow.core.context.ContextRepository;
@@ -31,6 +29,9 @@ import com.integri.atlas.workflow.core.task.TaskExecution;
 import com.integri.atlas.workflow.core.task.TaskExecutionRepository;
 import com.integri.atlas.workflow.core.task.TaskStatus;
 import com.integri.atlas.workflow.core.uuid.UUIDGenerator;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Handles {@link TaskExecution} completions which are the child
@@ -46,69 +47,83 @@ import com.integri.atlas.workflow.core.uuid.UUIDGenerator;
  */
 public class ForkTaskCompletionHandler implements TaskCompletionHandler {
 
-  private final TaskExecutionRepository taskExecutionRepo;
-  private final TaskCompletionHandler taskCompletionHandler;
-  private final CounterRepository counterRepository;
-  private final TaskDispatcher taskDispatcher;
-  private final ContextRepository contextRepository;
-  private final TaskEvaluator taskEvaluator;
+    private final TaskExecutionRepository taskExecutionRepo;
+    private final TaskCompletionHandler taskCompletionHandler;
+    private final CounterRepository counterRepository;
+    private final TaskDispatcher taskDispatcher;
+    private final ContextRepository contextRepository;
+    private final TaskEvaluator taskEvaluator;
 
-  public ForkTaskCompletionHandler(TaskExecutionRepository aTaskExecutionRepo, TaskCompletionHandler aTaskCompletionHandler, CounterRepository aCounterRepository, TaskDispatcher aTaskDispatcher, ContextRepository aContextRepository, TaskEvaluator aTaskEvaluator) {
-    taskExecutionRepo = aTaskExecutionRepo;
-    taskCompletionHandler = aTaskCompletionHandler;
-    counterRepository = aCounterRepository;
-    taskDispatcher = aTaskDispatcher;
-    contextRepository = aContextRepository;
-    taskEvaluator = aTaskEvaluator;
-  }
-
-  @Override
-  public void handle (TaskExecution aTaskExecution) {
-    SimpleTaskExecution mtask = SimpleTaskExecution.of(aTaskExecution);
-    mtask.setStatus(TaskStatus.COMPLETED);
-    taskExecutionRepo.merge(mtask);
-
-    if(aTaskExecution.getOutput() != null && aTaskExecution.getName() != null) {
-      Context context = contextRepository.peek(aTaskExecution.getParentId()+"/"+aTaskExecution.getInteger("branch"));
-      MapContext newContext = new MapContext(context.asMap());
-      newContext.put(aTaskExecution.getName(), aTaskExecution.getOutput());
-      contextRepository.push(aTaskExecution.getParentId()+"/"+aTaskExecution.getInteger("branch"), newContext);
+    public ForkTaskCompletionHandler(
+        TaskExecutionRepository aTaskExecutionRepo,
+        TaskCompletionHandler aTaskCompletionHandler,
+        CounterRepository aCounterRepository,
+        TaskDispatcher aTaskDispatcher,
+        ContextRepository aContextRepository,
+        TaskEvaluator aTaskEvaluator
+    ) {
+        taskExecutionRepo = aTaskExecutionRepo;
+        taskCompletionHandler = aTaskCompletionHandler;
+        counterRepository = aCounterRepository;
+        taskDispatcher = aTaskDispatcher;
+        contextRepository = aContextRepository;
+        taskEvaluator = aTaskEvaluator;
     }
 
-    TaskExecution fork = taskExecutionRepo.findOne(aTaskExecution.getParentId());
-    List<List> list = fork.getList("branches", List.class);
-    List<Map<String,Object>> branch = list.get(aTaskExecution.getInteger("branch"));
-    if(aTaskExecution.getTaskNumber() < branch.size()) {
-      Map<String,Object> task = branch.get(aTaskExecution.getTaskNumber());
-      SimpleTaskExecution execution = SimpleTaskExecution.of(task);
-      execution.setId(UUIDGenerator.generate());
-      execution.setStatus(TaskStatus.CREATED);
-      execution.setCreateTime(new Date());
-      execution.set("branch", aTaskExecution.getInteger("branch"));
-      execution.setTaskNumber(aTaskExecution.getTaskNumber()+1);
-      execution.setJobId(aTaskExecution.getJobId());
-      execution.setParentId(aTaskExecution.getParentId());
-      execution.setPriority(aTaskExecution.getPriority());
-      Context context = contextRepository.peek(aTaskExecution.getParentId()+"/"+aTaskExecution.getInteger("branch"));
-      contextRepository.push(execution.getId(), context);
-      TaskExecution evaluatedExecution = taskEvaluator.evaluate(execution, context);
-      taskExecutionRepo.create(evaluatedExecution);
-      taskDispatcher.dispatch(evaluatedExecution);
-    }
-    else {
-      long branchesLeft = counterRepository.decrement(aTaskExecution.getParentId());
-      if(branchesLeft == 0) {
-        SimpleTaskExecution forkTask = SimpleTaskExecution.of(taskExecutionRepo.findOne(aTaskExecution.getParentId()));
-        forkTask.setEndTime(new Date ());
-        forkTask.setExecutionTime(forkTask.getEndTime().getTime()-forkTask.getStartTime().getTime());
-        taskCompletionHandler.handle(forkTask);
-      }
-    }
-  }
+    @Override
+    public void handle(TaskExecution aTaskExecution) {
+        SimpleTaskExecution mtask = SimpleTaskExecution.of(aTaskExecution);
+        mtask.setStatus(TaskStatus.COMPLETED);
+        taskExecutionRepo.merge(mtask);
 
-  @Override
-  public boolean canHandle (TaskExecution aTaskExecution) {
-    return aTaskExecution.getParentId()!=null && aTaskExecution.get("branch")!=null;
-  }
+        if (aTaskExecution.getOutput() != null && aTaskExecution.getName() != null) {
+            Context context = contextRepository.peek(
+                aTaskExecution.getParentId() + "/" + aTaskExecution.getInteger("branch")
+            );
+            MapContext newContext = new MapContext(context.asMap());
+            newContext.put(aTaskExecution.getName(), aTaskExecution.getOutput());
+            contextRepository.push(
+                aTaskExecution.getParentId() + "/" + aTaskExecution.getInteger("branch"),
+                newContext
+            );
+        }
 
+        TaskExecution fork = taskExecutionRepo.findOne(aTaskExecution.getParentId());
+        List<List> list = fork.getList("branches", List.class);
+        List<Map<String, Object>> branch = list.get(aTaskExecution.getInteger("branch"));
+        if (aTaskExecution.getTaskNumber() < branch.size()) {
+            Map<String, Object> task = branch.get(aTaskExecution.getTaskNumber());
+            SimpleTaskExecution execution = SimpleTaskExecution.of(task);
+            execution.setId(UUIDGenerator.generate());
+            execution.setStatus(TaskStatus.CREATED);
+            execution.setCreateTime(new Date());
+            execution.set("branch", aTaskExecution.getInteger("branch"));
+            execution.setTaskNumber(aTaskExecution.getTaskNumber() + 1);
+            execution.setJobId(aTaskExecution.getJobId());
+            execution.setParentId(aTaskExecution.getParentId());
+            execution.setPriority(aTaskExecution.getPriority());
+            Context context = contextRepository.peek(
+                aTaskExecution.getParentId() + "/" + aTaskExecution.getInteger("branch")
+            );
+            contextRepository.push(execution.getId(), context);
+            TaskExecution evaluatedExecution = taskEvaluator.evaluate(execution, context);
+            taskExecutionRepo.create(evaluatedExecution);
+            taskDispatcher.dispatch(evaluatedExecution);
+        } else {
+            long branchesLeft = counterRepository.decrement(aTaskExecution.getParentId());
+            if (branchesLeft == 0) {
+                SimpleTaskExecution forkTask = SimpleTaskExecution.of(
+                    taskExecutionRepo.findOne(aTaskExecution.getParentId())
+                );
+                forkTask.setEndTime(new Date());
+                forkTask.setExecutionTime(forkTask.getEndTime().getTime() - forkTask.getStartTime().getTime());
+                taskCompletionHandler.handle(forkTask);
+            }
+        }
+    }
+
+    @Override
+    public boolean canHandle(TaskExecution aTaskExecution) {
+        return aTaskExecution.getParentId() != null && aTaskExecution.get("branch") != null;
+    }
 }

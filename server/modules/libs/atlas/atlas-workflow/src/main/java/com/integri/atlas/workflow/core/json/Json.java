@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,26 +23,25 @@ import com.google.common.base.Throwables;
 
 public class Json {
 
-  private static final ObjectMapper defaultObjectMapper = new ObjectMapper ();
+    private static final ObjectMapper defaultObjectMapper = new ObjectMapper();
 
-  public static <T> T deserialize (ObjectMapper aObjectMapper, String aValue, Class<T> aClass) {
-    try {
-      return aObjectMapper.readValue(aValue, aClass);
-    } catch (Exception e) {
-      throw Throwables.propagate(e);
+    public static <T> T deserialize(ObjectMapper aObjectMapper, String aValue, Class<T> aClass) {
+        try {
+            return aObjectMapper.readValue(aValue, aClass);
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
     }
-  }
 
-  public static String serialize (Object aValue) {
-    return serialize(defaultObjectMapper, aValue);
-  }
-
-  public static String serialize (ObjectMapper aObjectMapper, Object aValue) {
-    try {
-      return aObjectMapper.writeValueAsString(aValue);
-    } catch (Exception e) {
-      throw Throwables.propagate(e);
+    public static String serialize(Object aValue) {
+        return serialize(defaultObjectMapper, aValue);
     }
-  }
 
+    public static String serialize(ObjectMapper aObjectMapper, Object aValue) {
+        try {
+            return aObjectMapper.writeValueAsString(aValue);
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
+    }
 }

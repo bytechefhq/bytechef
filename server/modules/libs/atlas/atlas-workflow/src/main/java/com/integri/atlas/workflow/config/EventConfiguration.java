@@ -12,15 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
-package com.integri.atlas.workflow.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
+package com.integri.atlas.workflow.config;
 
 import com.integri.atlas.workflow.core.event.DistributedEventPublisher;
 import com.integri.atlas.workflow.core.messagebroker.MessageBroker;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * @author Arik Cohen
@@ -29,9 +31,8 @@ import com.integri.atlas.workflow.core.messagebroker.MessageBroker;
 @Configuration
 class EventConfiguration {
 
-  @Bean
-  DistributedEventPublisher defaultEventPublisher (@Lazy MessageBroker aMessageBroker) {
-    return new DistributedEventPublisher (aMessageBroker);
-  }
-
+    @Bean
+    DistributedEventPublisher defaultEventPublisher(@Lazy MessageBroker aMessageBroker) {
+        return new DistributedEventPublisher(aMessageBroker);
+    }
 }

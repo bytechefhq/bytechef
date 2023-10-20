@@ -12,60 +12,60 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.event;
-
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.client.RestTemplate;
 
 import com.integri.atlas.workflow.core.Accessor;
 import com.integri.atlas.workflow.core.DSL;
 import com.integri.atlas.workflow.core.MapObject;
 import com.integri.atlas.workflow.core.job.Job;
 import com.integri.atlas.workflow.core.job.JobRepository;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.client.RestTemplate;
 
 /**
  *
  * @author Arik Cohen
  * @since Jun 9, 2017
  */
-public class TaskStartedWebhookEventListener implements  EventListener {
+public class TaskStartedWebhookEventListener implements EventListener {
 
-  private final JobRepository jobRepository;
+    private final JobRepository jobRepository;
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private final RestTemplate rest = new RestTemplate();
+    private final RestTemplate rest = new RestTemplate();
 
-  public TaskStartedWebhookEventListener(JobRepository aJobRepository) {
-    jobRepository = aJobRepository;
-  }
-
-  private void handleEvent (PiperEvent aEvent) {
-    String jobId = aEvent.getRequiredString(DSL.JOB_ID);
-    Job job = jobRepository.getById(jobId);
-    if(job == null) {
-      logger.warn("Unknown job: {}", jobId);
-      return;
+    public TaskStartedWebhookEventListener(JobRepository aJobRepository) {
+        jobRepository = aJobRepository;
     }
-    List<Accessor> webhooks = job.getWebhooks();
-    for(Accessor webhook : webhooks) {
-      if(Events.TASK_STARTED.equals(webhook.getRequiredString(DSL.TYPE))) {
-        MapObject webhookEvent = new MapObject(webhook.asMap());
-        webhookEvent.put(DSL.EVENT,aEvent.asMap());
-        rest.postForObject(webhook.getRequiredString(DSL.URL), webhookEvent, String.class);
-      }
-    }
-  }
 
-  @Override
-  public void onApplicationEvent (PiperEvent aEvent) {
-    if(aEvent.getType().equals(Events.TASK_STARTED)) {
-      handleEvent(aEvent);
+    private void handleEvent(PiperEvent aEvent) {
+        String jobId = aEvent.getRequiredString(DSL.JOB_ID);
+        Job job = jobRepository.getById(jobId);
+        if (job == null) {
+            logger.warn("Unknown job: {}", jobId);
+            return;
+        }
+        List<Accessor> webhooks = job.getWebhooks();
+        for (Accessor webhook : webhooks) {
+            if (Events.TASK_STARTED.equals(webhook.getRequiredString(DSL.TYPE))) {
+                MapObject webhookEvent = new MapObject(webhook.asMap());
+                webhookEvent.put(DSL.EVENT, aEvent.asMap());
+                rest.postForObject(webhook.getRequiredString(DSL.URL), webhookEvent, String.class);
+            }
+        }
     }
-  }
 
+    @Override
+    public void onApplicationEvent(PiperEvent aEvent) {
+        if (aEvent.getType().equals(Events.TASK_STARTED)) {
+            handleEvent(aEvent);
+        }
+    }
 }

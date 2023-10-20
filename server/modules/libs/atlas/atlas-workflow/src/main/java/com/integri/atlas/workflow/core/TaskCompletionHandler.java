@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core;
 
 import com.integri.atlas.workflow.core.task.TaskExecution;
@@ -25,9 +28,7 @@ import com.integri.atlas.workflow.core.task.TaskExecution;
  * @since Apr 23, 2017
  */
 public interface TaskCompletionHandler {
+    void handle(TaskExecution aJobTask);
 
-  void handle (TaskExecution aJobTask);
-
-  boolean canHandle (TaskExecution aJobTask);
-
+    boolean canHandle(TaskExecution aJobTask);
 }

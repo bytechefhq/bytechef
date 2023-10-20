@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -20,59 +23,58 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "piper")
 public class PiperProperties {
 
-  private SerializationProperties serialization;
-  private PersistenceProperties persistence;
-  private PipelineRepositoryProperties pipelineRepository;
-  private MessageBrokerProperties messageBroker;
-  private CoordinatorProperties coordinator = new CoordinatorProperties();
-  private WorkerProperties worker = new WorkerProperties();
+    private SerializationProperties serialization;
+    private PersistenceProperties persistence;
+    private PipelineRepositoryProperties pipelineRepository;
+    private MessageBrokerProperties messageBroker;
+    private CoordinatorProperties coordinator = new CoordinatorProperties();
+    private WorkerProperties worker = new WorkerProperties();
 
-  public SerializationProperties getSerialization() {
-    return serialization;
-  }
+    public SerializationProperties getSerialization() {
+        return serialization;
+    }
 
-  public void setSerialization(SerializationProperties aSerialization) {
-    serialization = aSerialization;
-  }
+    public void setSerialization(SerializationProperties aSerialization) {
+        serialization = aSerialization;
+    }
 
-  public PersistenceProperties getPersistence() {
-    return persistence;
-  }
+    public PersistenceProperties getPersistence() {
+        return persistence;
+    }
 
-  public void setPersistence(PersistenceProperties aPersistence) {
-    persistence = aPersistence;
-  }
+    public void setPersistence(PersistenceProperties aPersistence) {
+        persistence = aPersistence;
+    }
 
-  public PipelineRepositoryProperties getPipelineRepository() {
-    return pipelineRepository;
-  }
+    public PipelineRepositoryProperties getPipelineRepository() {
+        return pipelineRepository;
+    }
 
-  public void setPipelineRepository(PipelineRepositoryProperties aPipelineRepository) {
-    pipelineRepository = aPipelineRepository;
-  }
+    public void setPipelineRepository(PipelineRepositoryProperties aPipelineRepository) {
+        pipelineRepository = aPipelineRepository;
+    }
 
-  public MessageBrokerProperties getMessageBroker() {
-    return messageBroker;
-  }
+    public MessageBrokerProperties getMessageBroker() {
+        return messageBroker;
+    }
 
-  public void setMessageBroker(MessageBrokerProperties aMessageBroker) {
-    messageBroker = aMessageBroker;
-  }
+    public void setMessageBroker(MessageBrokerProperties aMessageBroker) {
+        messageBroker = aMessageBroker;
+    }
 
-  public CoordinatorProperties getCoordinator() {
-    return coordinator;
-  }
+    public CoordinatorProperties getCoordinator() {
+        return coordinator;
+    }
 
-  public void setCoordinator(CoordinatorProperties aCoordinator) {
-    coordinator = aCoordinator;
-  }
+    public void setCoordinator(CoordinatorProperties aCoordinator) {
+        coordinator = aCoordinator;
+    }
 
-  public WorkerProperties getWorker() {
-    return worker;
-  }
+    public WorkerProperties getWorker() {
+        return worker;
+    }
 
-  public void setWorker(WorkerProperties aWorker) {
-    worker = aWorker;
-  }
-
+    public void setWorker(WorkerProperties aWorker) {
+        worker = aWorker;
+    }
 }

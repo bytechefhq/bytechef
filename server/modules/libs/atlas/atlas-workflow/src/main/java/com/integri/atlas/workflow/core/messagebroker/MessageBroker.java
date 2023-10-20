@@ -12,9 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
-package com.integri.atlas.workflow.core.messagebroker;
 
+package com.integri.atlas.workflow.core.messagebroker;
 
 /**
  * <p>Abstraction for sending messages between the various componentes of the application.
@@ -24,15 +26,13 @@ package com.integri.atlas.workflow.core.messagebroker;
  * @since Jun 18, 2016
  */
 public interface MessageBroker {
-
-  /**
-   *
-   * @param aRoutingKey
-   *          a string representaiton used for routing the message
-   *          to the appropriate destination.
-   * @param aMessage
-   *          The message to send.
-   */
-  void send (String aRoutingKey, Object aMessage);
-
+    /**
+     *
+     * @param aRoutingKey
+     *          a string representaiton used for routing the message
+     *          to the appropriate destination.
+     * @param aMessage
+     *          The message to send.
+     */
+    void send(String aRoutingKey, Object aMessage);
 }

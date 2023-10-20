@@ -12,20 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.taskhandler.media;
 
+import com.integri.atlas.workflow.core.task.TaskExecution;
+import com.integri.atlas.workflow.core.task.TaskHandler;
 import java.util.List;
-
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-
-import com.integri.atlas.workflow.core.task.TaskExecution;
-import com.integri.atlas.workflow.core.task.TaskHandler;
 
 /**
  * a {@link TaskHandler} implementation which is used
@@ -37,18 +38,17 @@ import com.integri.atlas.workflow.core.task.TaskHandler;
 @Component("media/ffmpeg")
 class Ffmpeg implements TaskHandler<Object> {
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Override
-  public Object handle (TaskExecution aTask) throws Exception {
-    List<String> options = aTask.getList("options", String.class);
-    CommandLine cmd = new CommandLine ("ffmpeg");
-    options.forEach(o->cmd.addArgument(o));
-    logger.debug("{}",cmd);
-    DefaultExecutor exec = new DefaultExecutor();
-    int exitValue = exec.execute(cmd);
-    Assert.isTrue(exitValue == 0, "exit value: " + exitValue);
-    return null;
-  }
-
+    @Override
+    public Object handle(TaskExecution aTask) throws Exception {
+        List<String> options = aTask.getList("options", String.class);
+        CommandLine cmd = new CommandLine("ffmpeg");
+        options.forEach(o -> cmd.addArgument(o));
+        logger.debug("{}", cmd);
+        DefaultExecutor exec = new DefaultExecutor();
+        int exitValue = exec.execute(cmd);
+        Assert.isTrue(exitValue == 0, "exit value: " + exitValue);
+        return null;
+    }
 }

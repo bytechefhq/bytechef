@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.config;
 
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
@@ -22,10 +25,9 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 @Configuration
 public class JsonConfiguration implements Jackson2ObjectMapperBuilderCustomizer {
 
-  @Override
-  public void customize(Jackson2ObjectMapperBuilder aJacksonObjectMapperBuilder) {
-    //aJacksonObjectMapperBuilder.serializerByType(Throwable.class, new ExceptionSerializer());
-    //aJacksonObjectMapperBuilder.deserializerByType(JobTaskException.class, new JobTaskExceptionDeserializer());
-  }
-
+    @Override
+    public void customize(Jackson2ObjectMapperBuilder aJacksonObjectMapperBuilder) {
+        //aJacksonObjectMapperBuilder.serializerByType(Throwable.class, new ExceptionSerializer());
+        //aJacksonObjectMapperBuilder.deserializerByType(JobTaskException.class, new JobTaskExceptionDeserializer());
+    }
 }

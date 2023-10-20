@@ -12,13 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
-package com.integri.atlas.workflow.core.task;
 
-import java.util.Objects;
+package com.integri.atlas.workflow.core.task;
 
 import com.integri.atlas.workflow.core.messagebroker.Exchanges;
 import com.integri.atlas.workflow.core.messagebroker.MessageBroker;
+import java.util.Objects;
 
 /**
  *
@@ -27,23 +29,22 @@ import com.integri.atlas.workflow.core.messagebroker.MessageBroker;
  */
 public class ControlTaskDispatcher implements TaskDispatcher, TaskDispatcherResolver {
 
-  private final MessageBroker messageBroker;
+    private final MessageBroker messageBroker;
 
-  public ControlTaskDispatcher (MessageBroker aMessageBroker) {
-    messageBroker = Objects.requireNonNull(aMessageBroker);
-  }
-
-  @Override
-  public void dispatch(Task aTask) {
-    messageBroker.send(Exchanges.CONTROL+"/"+Exchanges.CONTROL, aTask);
-  }
-
-  @Override
-  public TaskDispatcher resolve(Task aTask) {
-    if(aTask instanceof ControlTask) {
-      return this;
+    public ControlTaskDispatcher(MessageBroker aMessageBroker) {
+        messageBroker = Objects.requireNonNull(aMessageBroker);
     }
-    return null;
-  }
 
+    @Override
+    public void dispatch(Task aTask) {
+        messageBroker.send(Exchanges.CONTROL + "/" + Exchanges.CONTROL, aTask);
+    }
+
+    @Override
+    public TaskDispatcher resolve(Task aTask) {
+        if (aTask instanceof ControlTask) {
+            return this;
+        }
+        return null;
+    }
 }

@@ -12,31 +12,31 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.job;
 
+import com.integri.atlas.workflow.core.Page;
 import java.util.Optional;
 
-import com.integri.atlas.workflow.core.Page;
-
 public interface JobRepository {
+    Page<JobSummary> getPage(int aPageNumber);
 
-  Page<JobSummary> getPage (int aPageNumber);
+    Job getById(String aId);
 
-  Job getById (String aId);
+    Optional<Job> getLatest();
 
-  Optional<Job> getLatest ();
+    void create(Job aJob);
 
-  void create (Job aJob);
+    Job merge(Job aJob);
 
-  Job merge (Job aJob);
+    Job getByTaskId(String aTaskId);
 
-  Job getByTaskId (String aTaskId);
+    int countRunningJobs();
 
-  int countRunningJobs ();
+    int countCompletedJobsToday();
 
-  int countCompletedJobsToday ();
-
-  int countCompletedJobsYesterday ();
-
+    int countCompletedJobsYesterday();
 }

@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.task;
 
 import com.integri.atlas.workflow.core.DSL;
@@ -32,42 +35,41 @@ import com.integri.atlas.workflow.core.TaskCompletionHandler;
  */
 public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
 
-  private TaskExecutionRepository taskExecutionRepo;
-  private TaskCompletionHandler taskCompletionHandler;
-  private CounterRepository counterRepository;
+    private TaskExecutionRepository taskExecutionRepo;
+    private TaskCompletionHandler taskCompletionHandler;
+    private CounterRepository counterRepository;
 
-  @Override
-  public void handle (TaskExecution aTaskExecution) {
-    SimpleTaskExecution mtask = SimpleTaskExecution.of(aTaskExecution);
-    mtask.setStatus(TaskStatus.COMPLETED);
-    taskExecutionRepo.merge(mtask);
-    long tasksLeft = counterRepository.decrement(aTaskExecution.getParentId());
-    if(tasksLeft == 0) {
-      taskCompletionHandler.handle(taskExecutionRepo.findOne(aTaskExecution.getParentId()));
-      counterRepository.delete(aTaskExecution.getParentId());
+    @Override
+    public void handle(TaskExecution aTaskExecution) {
+        SimpleTaskExecution mtask = SimpleTaskExecution.of(aTaskExecution);
+        mtask.setStatus(TaskStatus.COMPLETED);
+        taskExecutionRepo.merge(mtask);
+        long tasksLeft = counterRepository.decrement(aTaskExecution.getParentId());
+        if (tasksLeft == 0) {
+            taskCompletionHandler.handle(taskExecutionRepo.findOne(aTaskExecution.getParentId()));
+            counterRepository.delete(aTaskExecution.getParentId());
+        }
     }
-  }
 
-  @Override
-  public boolean canHandle (TaskExecution aTaskExecution) {
-    String parentId = aTaskExecution.getParentId();
-    if(parentId!=null) {
-      TaskExecution parentExecution = taskExecutionRepo.findOne(parentId);
-      return parentExecution.getType().equals(DSL.PARALLEL);
+    @Override
+    public boolean canHandle(TaskExecution aTaskExecution) {
+        String parentId = aTaskExecution.getParentId();
+        if (parentId != null) {
+            TaskExecution parentExecution = taskExecutionRepo.findOne(parentId);
+            return parentExecution.getType().equals(DSL.PARALLEL);
+        }
+        return false;
     }
-    return false;
-  }
 
-  public void setTaskExecutionRepository(TaskExecutionRepository aTaskExecutionRepo) {
-    taskExecutionRepo = aTaskExecutionRepo;
-  }
+    public void setTaskExecutionRepository(TaskExecutionRepository aTaskExecutionRepo) {
+        taskExecutionRepo = aTaskExecutionRepo;
+    }
 
-  public void setTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
-    taskCompletionHandler = aTaskCompletionHandler;
-  }
+    public void setTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
+        taskCompletionHandler = aTaskCompletionHandler;
+    }
 
-  public void setCounterRepository(CounterRepository aCounterRepository) {
-    counterRepository = aCounterRepository;
-  }
-
+    public void setCounterRepository(CounterRepository aCounterRepository) {
+        counterRepository = aCounterRepository;
+    }
 }

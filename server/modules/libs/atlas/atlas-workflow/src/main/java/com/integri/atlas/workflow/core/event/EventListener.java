@@ -12,9 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
-package com.integri.atlas.workflow.core.event;
 
+package com.integri.atlas.workflow.core.event;
 
 /**
  *
@@ -22,7 +24,5 @@ package com.integri.atlas.workflow.core.event;
  * @since Jun 9, 2017
  */
 public interface EventListener {
-
-  void onApplicationEvent (PiperEvent aEvent);
-
+    void onApplicationEvent(PiperEvent aEvent);
 }

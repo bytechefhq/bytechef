@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.event;
 
 import org.slf4j.Logger;
@@ -24,11 +27,10 @@ import org.slf4j.LoggerFactory;
  */
 public class LogEventListener implements EventListener {
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Override
-  public void onApplicationEvent (PiperEvent aEvent) {
-    logger.debug("{}",aEvent);
-  }
-
+    @Override
+    public void onApplicationEvent(PiperEvent aEvent) {
+        logger.debug("{}", aEvent);
+    }
 }

@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.context;
 
 /**
@@ -26,9 +29,7 @@ package com.integri.atlas.workflow.core.context;
  * @since Mar 2017
  */
 public interface ContextRepository {
+    void push(String aStackId, Context aContext);
 
-  void push (String aStackId, Context aContext);
-
-  Context peek (String aStackId);
-
+    Context peek(String aStackId);
 }

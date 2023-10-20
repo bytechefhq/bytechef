@@ -12,39 +12,38 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.web;
 
+import com.integri.atlas.workflow.core.annotations.ConditionalOnCoordinator;
+import com.integri.atlas.workflow.core.pipeline.Pipeline;
+import com.integri.atlas.workflow.core.pipeline.PipelineRepository;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.HandlerMapping;
 
-import com.integri.atlas.workflow.core.annotations.ConditionalOnCoordinator;
-import com.integri.atlas.workflow.core.pipeline.Pipeline;
-import com.integri.atlas.workflow.core.pipeline.PipelineRepository;
-
 @RestController
 @ConditionalOnCoordinator
 public class PipelinesController {
 
-  @Autowired
-  private PipelineRepository pipelineRepository;
+    @Autowired
+    private PipelineRepository pipelineRepository;
 
-  @GetMapping("/pipelines")
-  public List<Pipeline> list () {
-    return pipelineRepository.findAll();
-  }
+    @GetMapping("/pipelines")
+    public List<Pipeline> list() {
+        return pipelineRepository.findAll();
+    }
 
-  @GetMapping("/pipelines/**")
-  public Pipeline get (HttpServletRequest aRequest) {
-    String path = (String) aRequest.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-    String pipelineId = path.replaceFirst("/pipelines/", "");
-    return pipelineRepository.findOne(pipelineId);
-  }
-
+    @GetMapping("/pipelines/**")
+    public Pipeline get(HttpServletRequest aRequest) {
+        String path = (String) aRequest.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        String pipelineId = path.replaceFirst("/pipelines/", "");
+        return pipelineRepository.findOne(pipelineId);
+    }
 }

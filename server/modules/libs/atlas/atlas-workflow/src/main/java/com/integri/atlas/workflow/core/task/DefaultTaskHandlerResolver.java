@@ -12,12 +12,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.task;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -29,15 +31,14 @@ import org.springframework.stereotype.Component;
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class DefaultTaskHandlerResolver implements TaskHandlerResolver {
 
-  private Map<String, TaskHandler<?>> taskHandlers = new HashMap<String, TaskHandler<?>>();
+    private Map<String, TaskHandler<?>> taskHandlers = new HashMap<String, TaskHandler<?>>();
 
-  public DefaultTaskHandlerResolver (Map<String, TaskHandler<?>> aTaskHandlers) {
-    taskHandlers = aTaskHandlers;
-  }
+    public DefaultTaskHandlerResolver(Map<String, TaskHandler<?>> aTaskHandlers) {
+        taskHandlers = aTaskHandlers;
+    }
 
-  @Override
-  public TaskHandler<?> resolve(Task aJobTask) {
-    return taskHandlers.get(aJobTask.getType());
-  }
-
+    @Override
+    public TaskHandler<?> resolve(Task aJobTask) {
+        return taskHandlers.get(aJobTask.getType());
+    }
 }

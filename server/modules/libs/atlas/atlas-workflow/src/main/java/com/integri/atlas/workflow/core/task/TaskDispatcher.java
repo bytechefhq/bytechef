@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.task;
 
 /**
@@ -23,13 +26,11 @@ package com.integri.atlas.workflow.core.task;
  * @since Mar 26, 2017
  */
 public interface TaskDispatcher<T extends Task> {
-
-  /**
-   * Dispatches a {@link Task} instance.
-   *
-   * @param aTask
-   *          The task to dispatch
-   */
-  void dispatch (T aTask);
-
+    /**
+     * Dispatches a {@link Task} instance.
+     *
+     * @param aTask
+     *          The task to dispatch
+     */
+    void dispatch(T aTask);
 }

@@ -12,32 +12,32 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.context;
 
+import com.integri.atlas.workflow.core.MapObject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.integri.atlas.workflow.core.MapObject;
-
 public class MapContext extends MapObject implements Context {
 
-  public MapContext () {
-    super(new HashMap<>());
-  }
+    public MapContext() {
+        super(new HashMap<>());
+    }
 
-  public MapContext (String aKey, Object aValue) {
-    this(Collections.singletonMap(aKey, aValue));
-  }
+    public MapContext(String aKey, Object aValue) {
+        this(Collections.singletonMap(aKey, aValue));
+    }
 
-  public MapContext (Map<String, Object> aSource) {
-    super(aSource);
-  }
+    public MapContext(Map<String, Object> aSource) {
+        super(aSource);
+    }
 
-  public MapContext (Context aSource) {
-    super(aSource.asMap());
-  }
-
-
+    public MapContext(Context aSource) {
+        super(aSource.asMap());
+    }
 }

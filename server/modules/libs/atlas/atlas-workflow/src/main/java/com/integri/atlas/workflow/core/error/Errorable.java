@@ -12,7 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
+
 package com.integri.atlas.workflow.core.error;
 
 /**
@@ -24,11 +27,8 @@ package com.integri.atlas.workflow.core.error;
  * @since Apr 10, 2017
  */
 public interface Errorable {
-
-
-  /**
-   * Returns the error associated with the object.
-   */
-  Error getError ();
-
+    /**
+     * Returns the error associated with the object.
+     */
+    Error getError();
 }
