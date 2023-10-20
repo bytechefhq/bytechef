@@ -42,11 +42,11 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = NumberPropertyModel.class, name = "NUMBER"),
   @JsonSubTypes.Type(value = ObjectPropertyModel.class, name = "OBJECT"),
   @JsonSubTypes.Type(value = StringPropertyModel.class, name = "STRING"),
-  @JsonSubTypes.Type(value = TimePropertyModel.class, name = "TimeProperty"),
+  @JsonSubTypes.Type(value = TimePropertyModel.class, name = "TIME"),
   @JsonSubTypes.Type(value = ValuePropertyModel.class, name = "ValueProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-05T17:08:56.569805+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-07T12:23:14.195693+02:00[Europe/Zagreb]")
 public class PropertyModel {
 
   private Boolean advancedOption;
