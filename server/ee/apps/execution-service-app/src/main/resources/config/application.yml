@@ -116,6 +116,11 @@ bytechef:
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
   workflow:
-    # Output storage provider for workflow output data (base64 | filesystem) default: base64
-    output-storage:
-      provider: base64
+    async:
+      output-storage:
+        # Output storage provider for sync workflow output data (base64 | filesystem) default: base64
+        provider: base64
+    sync:
+      output-storage:
+        # Output storage provider for async workflow output data (base64 | filesystem) default: base64
+        provider: base64

@@ -60,6 +60,7 @@ import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHa
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.SubflowJobStatusEventListener;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -77,7 +78,8 @@ public class WebhookConfiguration {
         InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry, JobService jobService,
         MessageBroker messageBroker, ObjectMapper objectMapper, TaskExecutionService taskExecutionService,
         TaskHandlerRegistry taskHandlerRegistry, TriggerSyncExecutor triggerSyncExecutor,
-        WorkflowFileStorageFacade workflowFileStorageFacade, WorkflowService workflowService) {
+        @Qualifier("workflowSyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade,
+        WorkflowService workflowService) {
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
