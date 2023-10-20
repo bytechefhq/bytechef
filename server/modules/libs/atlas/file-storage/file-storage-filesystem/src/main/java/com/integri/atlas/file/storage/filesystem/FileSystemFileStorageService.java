@@ -29,6 +29,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.util.Comparator;
+import java.util.stream.Stream;
 
 /**
  * @author Ivica Cardic
@@ -51,6 +53,22 @@ public class FileSystemFileStorageService implements FileStorageService {
             throw new FileStorageException("Failed to delete file " + url, ioe);
         }
     }
+
+    @Override
+    public void deleteFiles(long retentionTime) throws FileStorageException {
+        Path path = resolveDirectory();
+
+        try (Stream<Path> stream = Files.walk(path)) {
+            stream
+                .sorted(Comparator.reverseOrder())
+                .map(Path::toFile)
+                .forEach(file -> {
+                    if ((System.currentTimeMillis() - file.lastModified()) >= retentionTime) {
+                        file.delete();
+                    }
+                });
+        } catch (IOException ioe) {
+            throw new FileStorageException("Failed to delete file " + path, ioe);
         }
     }
 

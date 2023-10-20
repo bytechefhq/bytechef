@@ -19,6 +19,7 @@ package com.integri.atlas.config;
 import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.file.storage.base64.Base64FileStorageService;
 import com.integri.atlas.file.storage.filesystem.FileSystemFileStorageService;
+import com.integri.atlas.file.storage.job.FileStorageFileRetentionCheckJobListener;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,13 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class FileStorageConfiguration {
+
+    @Bean
+    FileStorageFileRetentionCheckJobListener fileStorageFileRetentionCheckJobListener(
+        FileStorageService fileStorageService
+    ) {
+        return new FileStorageFileRetentionCheckJobListener(fileStorageService);
+    }
 
     @Bean
     @ConditionalOnProperty(name = "atlas.storage.provider", havingValue = "base64")

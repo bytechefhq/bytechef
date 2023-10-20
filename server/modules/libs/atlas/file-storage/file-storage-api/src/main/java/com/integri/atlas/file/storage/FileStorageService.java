@@ -25,6 +25,8 @@ import java.io.InputStream;
 public interface FileStorageService {
     void deleteFile(String url) throws FileStorageException;
 
+    void deleteFiles(long retentionTime) throws FileStorageException;
+
     boolean fileExists(String url) throws FileStorageException;
 
     FileEntry storeFileContent(String fileName, String data) throws FileStorageException;
