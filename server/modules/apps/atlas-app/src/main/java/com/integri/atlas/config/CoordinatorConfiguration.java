@@ -52,19 +52,19 @@ import com.integri.atlas.task.dispatcher.each.EachTaskDispatcher;
 import com.integri.atlas.task.dispatcher.each.completion.EachTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.fork.ForkTaskDispatcher;
 import com.integri.atlas.task.dispatcher.fork.completion.ForkTaskCompletionHandler;
-import com.integri.atlas.task.dispatcher.if_.IfTaskDeclaration;
+import com.integri.atlas.task.dispatcher.if_.IfTaskDefinition;
 import com.integri.atlas.task.dispatcher.if_.IfTaskDispatcher;
 import com.integri.atlas.task.dispatcher.if_.completion.IfTaskCompletionHandler;
-import com.integri.atlas.task.dispatcher.loop.LoopBreakTaskDeclaration;
+import com.integri.atlas.task.dispatcher.loop.LoopBreakTaskDefinition;
 import com.integri.atlas.task.dispatcher.loop.LoopBreakTaskDispatcher;
-import com.integri.atlas.task.dispatcher.loop.LoopTaskDeclaration;
+import com.integri.atlas.task.dispatcher.loop.LoopTaskDefinition;
 import com.integri.atlas.task.dispatcher.loop.LoopTaskDispatcher;
 import com.integri.atlas.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.map.MapTaskDispatcher;
 import com.integri.atlas.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.integri.atlas.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
-import com.integri.atlas.task.dispatcher.sequence.SequenceTaskDeclaration;
+import com.integri.atlas.task.dispatcher.sequence.SequenceTaskDefinition;
 import com.integri.atlas.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.integri.atlas.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.subflow.SubflowTaskDispatcher;
@@ -229,8 +229,8 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    IfTaskDeclaration ifTaskDeclaration() {
-        return new IfTaskDeclaration();
+    IfTaskDefinition ifTaskDefinition() {
+        return new IfTaskDefinition();
     }
 
     @Bean
@@ -271,8 +271,8 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    LoopBreakTaskDeclaration loopBreakTaskDeclaration() {
-        return new LoopBreakTaskDeclaration();
+    LoopBreakTaskDefinition loopBreakTaskDefinition() {
+        return new LoopBreakTaskDefinition();
     }
 
     @Bean
@@ -292,8 +292,8 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    LoopTaskDeclaration loopTaskDeclaration() {
-        return new LoopTaskDeclaration();
+    LoopTaskDefinition loopTaskDefinition() {
+        return new LoopTaskDefinition();
     }
 
     @Bean
@@ -357,8 +357,8 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    SequenceTaskDeclaration sequenceTaskDeclaration() {
-        return new SequenceTaskDeclaration();
+    SequenceTaskDefinition sequenceTaskDefinition() {
+        return new SequenceTaskDefinition();
     }
 
     @Bean

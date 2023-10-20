@@ -41,7 +41,7 @@ import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTas
 import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_SHEET_NAME;
 import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_TASK_SPREADSHEET_FILE;
 
-import com.integri.atlas.task.definition.TaskDeclaration;
+import com.integri.atlas.task.definition.TaskDefinition;
 import com.integri.atlas.task.definition.dsl.TaskSpecification;
 import org.springframework.stereotype.Component;
 
@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class SpreadsheetFileTaskDeclaration implements TaskDeclaration {
+public class SpreadsheetFileTaskDefinition implements TaskDefinition {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
         .create(PROPERTY_TASK_SPREADSHEET_FILE)

@@ -16,20 +16,20 @@
 
 package com.integri.atlas.task.dispatcher.loop;
 
-import static com.integri.atlas.task.dispatcher.loop.LoopTaskConstants.*;
+import static com.integri.atlas.task.dispatcher.loop.LoopBreakTaskConstants.TASK_LOOP_BREAK;
 
-import com.integri.atlas.task.definition.TaskDeclaration;
+import com.integri.atlas.task.definition.TaskDefinition;
 import com.integri.atlas.task.definition.dsl.TaskSpecification;
 
 /**
  * @author Ivica Cardic
  */
-public class LoopTaskDeclaration implements TaskDeclaration {
+public class LoopBreakTaskDefinition implements TaskDefinition {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
-        .create(TASK_LOOP)
-        .displayName("Loop")
-        .description("Loops sequentially over list of items.");
+        .create(TASK_LOOP_BREAK)
+        .displayName("Loop Break")
+        .description("Breaks loop execution.");
 
     @Override
     public TaskSpecification getSpecification() {

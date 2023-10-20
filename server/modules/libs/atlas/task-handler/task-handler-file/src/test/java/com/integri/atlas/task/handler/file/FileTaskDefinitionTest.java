@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.xml.converter;
+package com.integri.atlas.task.handler.file;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class XMLConverterTaskDeclarationTest {
+public class FileTaskDefinitionTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -40,12 +40,12 @@ public class XMLConverterTaskDeclarationTest {
         JSONAssert.assertEquals(
             """
             {
-                "description":"Converts between XML string and object/array.",
-                "displayName":"XML Converter",
-                "name":"xmlConverter",
+                "description":"Reads and writes data from a file",
+                "displayName":"File",
+                "name":"file",
                 "properties":[
                     {
-                        "defaultValue":"FROM_XML",
+                        "defaultValue":"READ",
                         "description":"The operation to perform.",
                         "displayName":"Operation",
                         "name":"operation",
@@ -53,48 +53,66 @@ public class XMLConverterTaskDeclarationTest {
                         "type":"SELECT",
                         "options":[
                             {
-                                "name":"Convert from XML string",
-                                "value":"FROM_XML",
-                                "description": "Converts the XML string to object/array."
+                                "name":"Read from file",
+                                "value":"READ",
+                                "description": "Reads data from a file."
                             },
                             {
-                                "name":"Convert to XML string",
-                                "value":"TO_XML",
-                                 "description": "Writes the object/array to a XML string."
+                                "name":"Write to file",
+                                "value":"WRITE",
+                                 "description": "Writes the data to a file."
                             }
                         ]
                     },
                     {
-                        "description":"XML string to convert to the data.",
-                        "displayName":"Input",
+                        "description":"The object property which contains a reference to the file to read from.",
+                        "displayName":"File",
                         "displayOption":{
                             "show":{
-                                "operation":["FROM_XML"]
+                                "operation":["READ"]
                             }
                         },
-                        "name":"input",
-                        "required":true,
-                        "type":"STRING"
-                    },
-                        {
-                        "description":"The data to convert to XML string.",
-                        "displayName":"Input",
-                        "displayOption":{
-                            "show":{
-                                "operation":["TO_XML"]
-                            }
-                        },
-                        "name":"input",
+                        "name":"fileEntry",
                         "required":true,
                         "type":"JSON"
                     },
+                    {
+                        "description":"String to write to the file.",
+                        "displayName":"Content",
+                        "displayOption":{
+                            "show":{
+                                "operation":["WRITE"]
+                            }
+                        },
+                        "name":"content",
+                        "required":true,
+                        "type":"STRING"
+                    },
+                    {
+                        "displayName":"Options",
+                        "name":"options",
+                        "type":"COLLECTION",
+                        "options":[
+                            {
+                                "defaultValue":"file.txt",
+                                "description":"File name to set for binary data. By default, \\"file.txt\\" will be used.",
+                                "displayName":"File Name",
+                                "displayOption":{
+                                    "show":{
+                                        "operation":["WRITE"]
+                                    }
+                                },
+                                "name":"fileName",
+                                "type":"STRING"
+                            }
+                        ],
+                        "placeholder":"Add Option"
+                    }
                 ],
                 "version":1.0
             }
             """,
-            (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(XMLConverterTaskDeclaration.TASK_SPECIFICATION)
-            ),
+            (JSONObject) JSONParser.parseJSON(objectMapper.writeValueAsString(FileTaskDefinition.TASK_SPECIFICATION)),
             true
         );
     }

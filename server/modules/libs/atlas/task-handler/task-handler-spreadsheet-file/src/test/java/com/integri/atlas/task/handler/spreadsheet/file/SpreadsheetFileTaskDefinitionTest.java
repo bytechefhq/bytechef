@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class SpreadsheetFileTaskDeclarationTest {
+public class SpreadsheetFileTaskDefinitionTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -243,7 +243,7 @@ public class SpreadsheetFileTaskDeclarationTest {
             }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(SpreadsheetFileTaskDeclaration.TASK_SPECIFICATION)
+                objectMapper.writeValueAsString(SpreadsheetFileTaskDefinition.TASK_SPECIFICATION)
             ),
             true
         );

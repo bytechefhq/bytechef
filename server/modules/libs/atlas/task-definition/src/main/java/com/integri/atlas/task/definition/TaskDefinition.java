@@ -21,6 +21,6 @@ import com.integri.atlas.task.definition.dsl.TaskSpecification;
 /**
  * @author Ivica Cardic
  */
-public interface TaskDeclaration {
+public interface TaskDefinition {
     TaskSpecification getSpecification();
 }

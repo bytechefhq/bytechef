@@ -46,7 +46,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class TaskDeclarationTest {
+public class TaskDefinitionTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {

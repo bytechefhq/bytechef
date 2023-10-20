@@ -41,13 +41,13 @@ import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_VAL
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_VALUE_2;
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.TASK_IF;
 
-import com.integri.atlas.task.definition.TaskDeclaration;
+import com.integri.atlas.task.definition.TaskDefinition;
 import com.integri.atlas.task.definition.dsl.TaskSpecification;
 
 /**
  * @author Ivica Cardic
  */
-public class IfTaskDeclaration implements TaskDeclaration {
+public class IfTaskDefinition implements TaskDefinition {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
         .create(TASK_IF)
