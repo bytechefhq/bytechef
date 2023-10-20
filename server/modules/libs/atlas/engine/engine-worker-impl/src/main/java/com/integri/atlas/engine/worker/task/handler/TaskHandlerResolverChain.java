@@ -32,11 +32,11 @@ import org.springframework.stereotype.Component;
  */
 @Primary
 @Component
-class TaskHandlerResolverChain implements TaskHandlerResolver {
+public class TaskHandlerResolverChain implements TaskHandlerResolver {
 
     private final List<TaskHandlerResolver> resolvers;
 
-    TaskHandlerResolverChain(List<TaskHandlerResolver> aResolvers) {
+    public TaskHandlerResolverChain(List<TaskHandlerResolver> aResolvers) {
         resolvers = Objects.requireNonNull(aResolvers);
     }
 
