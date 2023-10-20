@@ -15,65 +15,63 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.remote.web.rest.client.service;
+package com.bytechef.hermes.definition.registry.remote.client.facade;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
-import com.bytechef.hermes.definition.registry.remote.web.rest.client.AbstractWorkerClient;
-import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
+import com.bytechef.hermes.definition.registry.remote.client.AbstractWorkerClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.util.LinkedMultiValueMap;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public class ComponentDefinitionServiceClient extends AbstractWorkerClient
-    implements ComponentDefinitionService {
+public class ComponentDefinitionFacadeClient extends AbstractWorkerClient implements ComponentDefinitionFacade {
 
-    public ComponentDefinitionServiceClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+    public ComponentDefinitionFacadeClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
         super(discoveryClient, objectMapper);
     }
 
     @Override
-    public ComponentDefinitionDTO getComponentDefinition(String name, Integer version) {
-        return WORKER_WEB_CLIENT
-            .get()
-            .uri(uriBuilder -> toUri(
-                uriBuilder, name, "/component-definitions/{name}/{version}", name, checkVersion(version)))
-            .retrieve()
-            .bodyToMono(ComponentDefinitionDTO.class)
-            .block();
-    }
+    public List<ComponentDefinitionDTO> searchComponentDefinitions(
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
+        Boolean triggerDefinitions) {
 
-    @Override
-    public List<ComponentDefinitionDTO> getComponentDefinitions() {
         return Mono.zip(
             WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
                 .stream()
                 .map(serviceInstance -> WORKER_WEB_CLIENT
                     .get()
-                    .uri(uriBuilder -> toUri(uriBuilder, serviceInstance, "/component-definitions"))
-                    .retrieve()
-                    .bodyToMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
-                .toList(),
-            this::toComponentDefinitions)
-            .block();
-    }
+                    .uri(uriBuilder -> toUri(
+                        uriBuilder, serviceInstance, "/component-definitions/search", Map.of(),
+                        new LinkedMultiValueMap<>() {
+                            {
+                                if (actionDefinitions != null) {
+                                    put("actionDefinitions", List.of(actionDefinitions.toString()));
+                                }
 
-    @Override
-    public List<ComponentDefinitionDTO> getComponentDefinitions(String name) {
-        return Mono.zip(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
-                .stream()
-                .map(serviceInstance -> WORKER_WEB_CLIENT
-                    .get()
-                    .uri(uriBuilder -> toUri(uriBuilder, serviceInstance, "/component-definitions/{name}", name))
+                                if (connectionDefinitions != null) {
+                                    put("connectionDefinitions", List.of(connectionDefinitions.toString()));
+                                }
+
+                                if (connectionInstances != null) {
+                                    put("connectionInstances", List.of(connectionInstances.toString()));
+                                }
+
+                                if (triggerDefinitions != null) {
+                                    put("triggerDefinitions", List.of(triggerDefinitions.toString()));
+                                }
+                            }
+                        }))
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
                 .toList(),
@@ -86,14 +84,7 @@ public class ComponentDefinitionServiceClient extends AbstractWorkerClient
         return Arrays.stream(objectArray)
             .map(object -> (List<ComponentDefinitionDTO>) object)
             .flatMap(Collection::stream)
+            .distinct()
             .toList();
-    }
-
-    private static int checkVersion(Integer version) {
-        if (version == null) {
-            version = 1;
-        }
-
-        return version;
     }
 }

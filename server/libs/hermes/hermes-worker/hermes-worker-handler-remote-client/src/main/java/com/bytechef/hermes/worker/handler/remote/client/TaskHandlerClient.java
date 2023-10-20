@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.worker.handler.remote.web.rest.client;
+package com.bytechef.hermes.worker.handler.remote.client;
 
+import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
-import com.bytechef.hermes.domain.TriggerExecution;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.cloud.client.ServiceInstance;
@@ -33,18 +33,18 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Component
-public class TriggerHandlerClient {
+public class TaskHandlerClient {
 
     private final DiscoveryClient discoveryClient;
     private final ObjectMapper objectMapper;
 
-    public TriggerHandlerClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+    public TaskHandlerClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
         this.discoveryClient = discoveryClient;
         this.objectMapper = objectMapper;
     }
 
     @SuppressFBWarnings("NP")
-    public Object handle(String type, TriggerExecution triggerExecution) {
+    public Object handle(String type, TaskExecution taskExecution) {
         ServiceInstance serviceInstance = WorkerDiscoveryUtils.filterServiceInstance(
             discoveryClient.getInstances("worker-service-app"), StringUtils.split(type, "/")[0],
             objectMapper);
@@ -55,9 +55,9 @@ public class TriggerHandlerClient {
                 .scheme("http")
                 .host(serviceInstance.getHost())
                 .port(serviceInstance.getPort())
-                .path("/api/internal/trigger-handler")
+                .path("/api/internal/task-handler")
                 .build())
-            .bodyValue(Map.of("type", type, "triggerExecution", triggerExecution))
+            .bodyValue(Map.of("type", type, "taskExecution", taskExecution))
             .retrieve()
             .bodyToMono(Object.class)
             .block();

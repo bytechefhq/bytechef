@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.remote.web.rest.client.facade;
+package com.bytechef.hermes.definition.registry.remote.client.facade;
 
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
-import com.bytechef.hermes.definition.registry.remote.web.rest.client.AbstractWorkerClient;
+import com.bytechef.hermes.definition.registry.remote.client.AbstractWorkerClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;

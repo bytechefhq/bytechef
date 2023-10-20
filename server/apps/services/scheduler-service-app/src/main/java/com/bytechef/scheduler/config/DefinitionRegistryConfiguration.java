@@ -17,7 +17,7 @@
 
 package com.bytechef.scheduler.config;
 
-import com.bytechef.hermes.definition.registry.remote.web.rest.client.service.TriggerDefinitionServiceClient;
+import com.bytechef.hermes.definition.registry.remote.client.service.TriggerDefinitionServiceClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;

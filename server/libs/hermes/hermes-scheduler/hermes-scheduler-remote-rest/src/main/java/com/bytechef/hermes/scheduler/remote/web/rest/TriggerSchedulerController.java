@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.scheduler.web.rest;
+package com.bytechef.hermes.scheduler.remote.web.rest;
 
 import com.bytechef.hermes.scheduler.TaskScheduler;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;

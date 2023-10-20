@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.scheduler;
+package com.bytechef.hermes.scheduler.remote.client;
 
+import com.bytechef.hermes.scheduler.TaskScheduler;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
