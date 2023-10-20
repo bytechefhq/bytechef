@@ -76,6 +76,7 @@ dependencies {
     implementation project(":server:libs:modules:components:xlsxfile")
     implementation project(":server:libs:modules:components:xmlfile")
     implementation project(":server:libs:modules:components:xmlhelper")
+    implementation project(":server:libs:modules:task-dispatchers:branch")
     implementation project(":server:libs:modules:task-dispatchers:each")
     implementation project(":server:libs:modules:task-dispatchers:forkjoin")
     implementation project(":server:libs:modules:task-dispatchers:if")
@@ -84,7 +85,6 @@ dependencies {
     implementation project(":server:libs:modules:task-dispatchers:parallel")
     implementation project(":server:libs:modules:task-dispatchers:sequence")
     implementation project(":server:libs:modules:task-dispatchers:subflow")
-    implementation project(":server:libs:modules:task-dispatchers:switch")
 
     testImplementation project(":server:libs:test:test-int-support")
 }
