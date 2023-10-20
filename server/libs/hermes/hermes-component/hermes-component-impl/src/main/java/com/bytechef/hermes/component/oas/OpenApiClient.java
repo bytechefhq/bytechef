@@ -29,6 +29,7 @@ import com.bytechef.hermes.component.util.HttpClientUtils.Body;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.Type;
+import com.bytechef.hermes.definition.Property.ValueProperty;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -77,11 +78,11 @@ public class OpenApiClient {
     }
 
     private String createUrl(
-        Map<String, Object> metadata, Map<String, Object> parameters, List<? extends Property<?>> properties) {
+        Map<String, Object> metadata, Map<String, Object> parameters, List<? extends Property> properties) {
 
         String path = (String) metadata.get("path");
 
-        for (Property<?> property : properties) {
+        for (Property property : properties) {
             if (MapValueUtils.get(property.getMetadata(), TYPE, PropertyType.class) == PropertyType.PATH) {
                 path = path.replace(
                     "{" + property.getName() + "}", MapValueUtils.getRequiredString(parameters, property.getName()));
@@ -93,12 +94,12 @@ public class OpenApiClient {
 
     private Body getBody(
         BodyContentType bodyContentType, String mimeType, Map<String, Object> parameters,
-        List<? extends Property<?>> properties) {
+        List<? extends Property> properties) {
 
         Body body = null;
 
         if (bodyContentType != null) {
-            for (Property<?> property : properties) {
+            for (Property property : properties) {
                 if (!Objects.equals(
                     MapValueUtils.get(property.getMetadata(), TYPE, PropertyType.class), PropertyType.BODY)) {
 
@@ -136,24 +137,24 @@ public class OpenApiClient {
 
     private ResponseFormat getResponseFormat(ActionDefinition actionDefinition) {
         ResponseFormat responseFormat = null;
-        List<? extends Property<?>> outputProperties = OptionalUtils.orElse(
+        List<? extends ValueProperty<?>> outputProperties = OptionalUtils.orElse(
             actionDefinition.getOutputSchema(), Collections.emptyList());
 
         if (!outputProperties.isEmpty()) {
-            Property<?> property = outputProperties.get(0);
+            ValueProperty<?> outputProperty = outputProperties.get(0);
 
-            responseFormat = MapValueUtils.get(property.getMetadata(), "responseFormat", ResponseFormat.class);
+            responseFormat = MapValueUtils.get(outputProperty.getMetadata(), "responseFormat", ResponseFormat.class);
         }
 
         return responseFormat;
     }
 
     private Map<String, List<String>> getValuesMap(
-        Map<String, Object> parameters, List<? extends Property<?>> properties, PropertyType propertyType) {
+        Map<String, Object> parameters, List<? extends Property> properties, PropertyType propertyType) {
 
         Map<String, List<String>> valuesMap = new HashMap<>();
 
-        for (Property<?> property : properties) {
+        for (Property property : properties) {
             if (Objects.equals(MapValueUtils.get(property.getMetadata(), TYPE, PropertyType.class), propertyType)) {
                 List<String> values;
 
