@@ -64,7 +64,9 @@
                     "animate-slide-right-fade",
                     "line-clamp-2",
                     "nowheel",
-                    "w-112"
+                    "w-112",
+                    "bg-muted",
+                    "bg-background"
                 ]
             }
         ],
