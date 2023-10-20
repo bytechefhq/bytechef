@@ -1,0 +1,29 @@
+.react-select__control {
+    @apply border-gray-300;
+    @apply shadow-sm;
+    @apply sm:text-sm;
+    @apply dark:border-gray-700;
+    @apply dark:text-white;
+    @apply dark:bg-gray-800;
+    @apply dark:hover:border-gray-700 !important;
+}
+
+.react-select__control--is-focused {
+    @apply border-blue-500;
+    @apply ring-blue-500;
+    @apply ring-1 !important;
+    @apply hover:border-blue-500;
+    @apply dark:border-sky-500;
+    @apply dark:ring-sky-500;
+    @apply dark:hover:border-sky-500 !important;
+}
+
+.react-select__menu {
+    @apply dark:bg-gray-800;
+    @apply dark:text-white;
+    @apply sm:text-sm;
+}
+
+.react-select__option--is-focused {
+    @apply dark:text-black;
+}
