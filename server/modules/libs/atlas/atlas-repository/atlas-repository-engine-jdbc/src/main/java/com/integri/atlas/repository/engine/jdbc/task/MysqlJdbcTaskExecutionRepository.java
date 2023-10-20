@@ -16,122 +16,26 @@
 
 package com.integri.atlas.repository.engine.jdbc.task;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.core.json.Json;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import com.integri.atlas.engine.core.task.SimpleTaskExecution;
-import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
-import com.integri.atlas.engine.core.task.TaskStatus;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.transaction.annotation.Transactional;
-
 /**
  * @author Ivica Cardic
  */
-public class MysqlJdbcTaskExecutionRepository implements TaskExecutionRepository {
+public class MysqlJdbcTaskExecutionRepository extends AbstractJdbcTaskExecutionRepository {
 
-    private NamedParameterJdbcOperations jdbc;
-    private ObjectMapper json = new ObjectMapper();
+    private static final String CREATE_SQL = "insert into task_execution " +
+        "  (id,parent_id,job_id,serialized_execution,status,progress,create_time,priority,task_number) " +
+        "values " +
+        "  (:id,:parentId,:jobId,:serializedExecution,:status,:progress,:createTime,:priority,:taskNumber)";
+
+    private static final String MERGE_SQL = "update task_execution set " +
+        "  serialized_execution=:serializedExecution,status=:status,progress=:progress,start_time=:startTime,end_time=:endTime where id = :id ";
 
     @Override
-    public TaskExecution findOne(String aTaskExecutionId) {
-        List<TaskExecution> query = jdbc.query(
-            "select * from task_execution where id = :id",
-            Collections.singletonMap("id", aTaskExecutionId),
-            this::jobTaskRowMappper
-        );
-        if (query.size() == 1) {
-            return query.get(0);
-        }
-        return null;
+    protected String getCreateSql() {
+        return CREATE_SQL;
     }
 
     @Override
-    public List<TaskExecution> findByParentId(String aParentId) {
-        return jdbc.query(
-            "select * from task_execution where parent_id = :parentId order by task_number",
-            Collections.singletonMap("parentId", aParentId),
-            this::jobTaskRowMappper
-        );
-    }
-
-    @Override
-    public void create(TaskExecution aTaskExecution) {
-        SqlParameterSource sqlParameterSource = createSqlParameterSource(aTaskExecution);
-        String sql =
-            "insert into task_execution " +
-            "  (id,parent_id,job_id,serialized_execution,status,progress,create_time,priority,task_number) " +
-            "values " +
-            "  (:id,:parentId,:jobId,:serializedExecution,:status,:progress,:createTime,:priority,:taskNumber)";
-        jdbc.update(sql, sqlParameterSource);
-    }
-
-    @Override
-    @Transactional
-    public TaskExecution merge(TaskExecution aTaskExecution) {
-        TaskExecution current = jdbc.queryForObject(
-            "select * from task_execution where id = :id for update",
-            Collections.singletonMap("id", aTaskExecution.getId()),
-            this::jobTaskRowMappper
-        );
-        SimpleTaskExecution merged = SimpleTaskExecution.of(aTaskExecution);
-        if (current.getStatus().isTerminated() && aTaskExecution.getStatus() == TaskStatus.STARTED) {
-            merged = SimpleTaskExecution.of(current);
-            merged.setStartTime(aTaskExecution.getStartTime());
-        } else if (aTaskExecution.getStatus().isTerminated() && current.getStatus() == TaskStatus.STARTED) {
-            merged.setStartTime(current.getStartTime());
-        }
-        SqlParameterSource sqlParameterSource = createSqlParameterSource(merged);
-        String sql =
-            "update task_execution set " +
-            "  serialized_execution=:serializedExecution,status=:status,progress=:progress,start_time=:startTime,end_time=:endTime where id = :id ";
-        jdbc.update(sql, sqlParameterSource);
-        return merged;
-    }
-
-    @Override
-    public List<TaskExecution> getExecution(String aJobId) {
-        return jdbc.query(
-            "select * From task_execution where job_id = :jobId order by create_time asc",
-            Collections.singletonMap("jobId", aJobId),
-            this::jobTaskRowMappper
-        );
-    }
-
-    @SuppressWarnings("unchecked")
-    private TaskExecution jobTaskRowMappper(ResultSet aRs, int aIndex) throws SQLException {
-        return SimpleTaskExecution.of(Json.deserialize(json, aRs.getString("serialized_execution"), Map.class));
-    }
-
-    private SqlParameterSource createSqlParameterSource(TaskExecution aTaskExecution) {
-        MapSqlParameterSource sqlParameterSource = new MapSqlParameterSource();
-        sqlParameterSource.addValue("id", aTaskExecution.getId());
-        sqlParameterSource.addValue("parentId", aTaskExecution.getParentId());
-        sqlParameterSource.addValue("jobId", aTaskExecution.getJobId());
-        sqlParameterSource.addValue("status", aTaskExecution.getStatus().toString());
-        sqlParameterSource.addValue("progress", aTaskExecution.getProgress());
-        sqlParameterSource.addValue("createTime", aTaskExecution.getCreateTime());
-        sqlParameterSource.addValue("startTime", aTaskExecution.getStartTime());
-        sqlParameterSource.addValue("endTime", aTaskExecution.getEndTime());
-        sqlParameterSource.addValue("serializedExecution", Json.serialize(json, aTaskExecution));
-        sqlParameterSource.addValue("priority", aTaskExecution.getPriority());
-        sqlParameterSource.addValue("taskNumber", aTaskExecution.getTaskNumber());
-        return sqlParameterSource;
-    }
-
-    public void setJdbcOperations(NamedParameterJdbcOperations aJdbcOperations) {
-        jdbc = aJdbcOperations;
-    }
-
-    public void setObjectMapper(ObjectMapper aJson) {
-        json = aJson;
+    protected String getMergeSQL() {
+        return MERGE_SQL;
     }
 }

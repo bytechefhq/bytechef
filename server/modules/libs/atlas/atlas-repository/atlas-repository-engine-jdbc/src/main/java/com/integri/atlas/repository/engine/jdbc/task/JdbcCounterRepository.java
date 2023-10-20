@@ -23,12 +23,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.transaction.annotation.Transactional;
 
-public class PostgresJdbcCounterRepository implements CounterRepository {
+public class JdbcCounterRepository implements CounterRepository {
 
     private final JdbcOperations jdbc;
 
-
-    public PostgresJdbcCounterRepository(JdbcOperations aJdbcOperations) {
+    public JdbcCounterRepository(JdbcOperations aJdbcOperations) {
         jdbc = aJdbcOperations;
     }
 

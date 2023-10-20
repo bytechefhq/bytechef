@@ -18,57 +18,16 @@
 
 package com.integri.atlas.repository.engine.jdbc.context;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.integri.atlas.engine.core.json.Json;
-import com.integri.atlas.engine.core.context.Context;
-import com.integri.atlas.engine.core.context.repository.ContextRepository;
-import com.integri.atlas.engine.core.context.MapContext;
-import com.integri.atlas.engine.core.uuid.UUIDGenerator;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.Map;
-
 /**
  *
  * @author Arik Cohe
+ * @author Ivica Cardic
  * @since Apt 7, 2017
  */
-public class PostgresJdbcContextRepository implements ContextRepository {
-
-    private JdbcTemplate jdbc;
-    private ObjectMapper objectMapper = new ObjectMapper();
+public class PostgresJdbcContextRepository extends AbstractJdbcContextRepository {
 
     @Override
-    public void push(String aStackId, Context aContext) {
-        String sql = "insert into context (id,stack_id,serialized_context,create_time) values (?,?,?::jsonb,?)";
-        jdbc.update(sql, UUIDGenerator.generate(), aStackId, Json.serialize(objectMapper, aContext), new Date());
+    protected String getPushSql() {
+        return "insert into context (id,stack_id,serialized_context,create_time) values (?,?,?::jsonb,?)";
     }
-
-    @Override
-    public Context peek(String aStackId) {
-        try {
-            String sql = "select id,serialized_context from context where stack_id = ? order by create_time desc limit 1";
-            return jdbc.queryForObject(sql, new Object[]{aStackId}, this::contextRowMapper);
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
-    }
-
-    private Context contextRowMapper(ResultSet aResultSet, int aIndex) throws SQLException {
-        String serialized = aResultSet.getString(2);
-        return new MapContext(Json.deserialize(objectMapper, serialized, Map.class));
-    }
-
-    public void setJdbcTemplate(JdbcTemplate aJdbcTemplate) {
-        jdbc = aJdbcTemplate;
-    }
-
-    public void setObjectMapper(ObjectMapper aObjectMapper) {
-        objectMapper = aObjectMapper;
-    }
-
 }
