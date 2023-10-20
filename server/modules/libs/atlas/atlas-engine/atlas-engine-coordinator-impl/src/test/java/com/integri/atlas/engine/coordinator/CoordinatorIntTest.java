@@ -21,16 +21,16 @@ package com.integri.atlas.engine.coordinator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.ImmutableMap;
-import com.integri.atlas.engine.coordinator.context.JdbcContextRepository;
-import com.integri.atlas.engine.coordinator.job.JdbcJobRepository;
+import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.core.MapObject;
+import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.messagebroker.Queues;
 import com.integri.atlas.engine.core.messagebroker.SyncMessageBroker;
+import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.repository.yaml.workflow.ResourceBasedWorkflowRepository;
 import com.integri.atlas.engine.worker.task.DefaultTaskHandlerResolver;
-import com.integri.atlas.engine.coordinator.task.JdbcTaskExecutionRepository;
 import com.integri.atlas.engine.core.task.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.TaskHandler;
@@ -43,21 +43,24 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import javax.sql.DataSource;
 
 import com.integri.atlas.engine.worker.Worker;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @SpringBootTest
 public class CoordinatorIntTest {
 
     @Autowired
-    private DataSource dataSource;
+    private ContextRepository contextRepository;
+
+    @Autowired
+    private JobRepository jobRepository;
+
+    @Autowired
+    private TaskExecutionRepository taskRepository;
 
     @Test
     public void testStartJob() throws SQLException {
@@ -82,21 +85,7 @@ public class CoordinatorIntTest {
             .withTaskEvaluator(SpelTaskEvaluator.create())
             .build();
 
-        ObjectMapper objectMapper = createObjectMapper();
-
-        JdbcContextRepository contextRepository = new JdbcContextRepository();
-        contextRepository.setJdbcTemplate(new JdbcTemplate(dataSource));
-        contextRepository.setObjectMapper(objectMapper);
-
         coordinator.setContextRepository(contextRepository);
-
-        JdbcTaskExecutionRepository taskRepository = new JdbcTaskExecutionRepository();
-        taskRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
-        taskRepository.setObjectMapper(createObjectMapper());
-
-        JdbcJobRepository jobRepository = new JdbcJobRepository();
-        jobRepository.setJdbcOperations(new NamedParameterJdbcTemplate(dataSource));
-        jobRepository.setJobTaskRepository(taskRepository);
 
         coordinator.setJobRepository(jobRepository);
         coordinator.setWorkflowRepository(new ResourceBasedWorkflowRepository());
@@ -136,13 +125,6 @@ public class CoordinatorIntTest {
         Job completedJob = jobRepository.getById(job.getId());
 
         Assertions.assertEquals(JobStatus.COMPLETED, completedJob.getStatus());
-    }
-
-    private ObjectMapper createObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
-        return objectMapper;
     }
 
     @Test

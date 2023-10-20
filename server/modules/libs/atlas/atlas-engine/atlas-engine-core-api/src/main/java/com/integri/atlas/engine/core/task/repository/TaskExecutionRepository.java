@@ -16,7 +16,9 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.core.task;
+package com.integri.atlas.engine.core.task.repository;
+
+import com.integri.atlas.engine.core.task.TaskExecution;
 
 import java.util.List;
 

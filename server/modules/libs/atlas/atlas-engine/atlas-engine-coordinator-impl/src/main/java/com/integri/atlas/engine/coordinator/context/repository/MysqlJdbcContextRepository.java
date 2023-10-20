@@ -12,16 +12,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator.context;
+package com.integri.atlas.engine.coordinator.context.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.coordinator.json.Json;
 import com.integri.atlas.engine.core.context.Context;
-import com.integri.atlas.engine.core.context.ContextRepository;
+import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
 import java.sql.ResultSet;
@@ -32,11 +30,9 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- *
- * @author Arik Cohe
- * @since Apt 7, 2017
+ * @author Ivica Cardic
  */
-public class JdbcContextRepository implements ContextRepository {
+public class MysqlJdbcContextRepository implements ContextRepository {
 
     private JdbcTemplate jdbc;
     private ObjectMapper objectMapper = new ObjectMapper();

@@ -26,11 +26,11 @@ import static org.mockito.Mockito.when;
 
 import com.integri.atlas.engine.core.error.ErrorObject;
 import com.integri.atlas.engine.core.event.EventPublisher;
-import com.integri.atlas.engine.coordinator.job.JobRepository;
+import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.coordinator.job.SimpleJob;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskDispatcher;
-import com.integri.atlas.engine.core.task.TaskExecutionRepository;
+import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
 

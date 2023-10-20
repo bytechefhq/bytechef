@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.worker.task.map;
 
-import com.integri.atlas.engine.core.task.CounterRepository;
+import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import java.util.HashMap;
 import java.util.Map;
 

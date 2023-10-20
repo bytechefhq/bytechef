@@ -12,19 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator.job;
+package com.integri.atlas.engine.coordinator.job.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.integri.atlas.engine.coordinator.job.Job;
+import com.integri.atlas.engine.coordinator.job.JobSummary;
+import com.integri.atlas.engine.coordinator.job.SimpleJob;
 import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.coordinator.Page;
 import com.integri.atlas.engine.coordinator.ResultPage;
 import com.integri.atlas.engine.coordinator.json.Json;
 import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.TaskExecutionRepository;
+import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -36,7 +37,10 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.util.Assert;
 
-public class JdbcJobRepository implements JobRepository {
+/**
+ * @author Ivica Cardic
+ */
+public class MysqlJdbcJobRepository implements JobRepository {
 
     private NamedParameterJdbcOperations jdbc;
     private TaskExecutionRepository jobTaskRepository;

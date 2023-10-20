@@ -36,6 +36,9 @@ subprojects {
         if (project.hasProperty("testcontainers")) {
             environment "spring.profiles.active", "testcontainers"
         }
+        if (project.hasProperty("postgres")) {
+            environment "spring.profiles.active", "postgres"
+        }
 
         // uncomment if the tests reports are not generated
         // ignoreFailures true

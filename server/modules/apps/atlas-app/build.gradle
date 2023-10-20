@@ -6,7 +6,6 @@ springBoot {
 }
 
 dependencies {
-    implementation "mysql:mysql-connector-java"
     implementation "org.apache.commons:commons-lang3"
     implementation "org.springframework.boot:spring-boot-starter-activemq"
     implementation "org.springframework.boot:spring-boot-starter-cache"
@@ -37,4 +36,5 @@ dependencies {
     implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-worker-api")
     implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-worker-impl")
 
+    runtimeOnly "mysql:mysql-connector-java"
 }

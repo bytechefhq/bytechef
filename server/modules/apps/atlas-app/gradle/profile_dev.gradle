@@ -4,6 +4,10 @@ dependencies {
 
 def profiles = "dev"
 
+if (project.hasProperty("postgres")) {
+    profiles += ",postgres"
+}
+
 springBoot {
     buildInfo {
         properties {

@@ -1,5 +1,9 @@
 def profiles = "prod"
 
+if (project.hasProperty("postgres")) {
+    profiles += ",postgres"
+}
+
 springBoot {
     buildInfo()
 }

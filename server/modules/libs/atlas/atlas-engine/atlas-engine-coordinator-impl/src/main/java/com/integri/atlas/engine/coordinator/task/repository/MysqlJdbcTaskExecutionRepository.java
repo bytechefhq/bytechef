@@ -12,11 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator.task;
+package com.integri.atlas.engine.coordinator.task.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.coordinator.json.Json;
@@ -28,14 +26,17 @@ import java.util.Map;
 
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.TaskExecutionRepository;
+import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.core.task.TaskStatus;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.transaction.annotation.Transactional;
 
-public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
+/**
+ * @author Ivica Cardic
+ */
+public class MysqlJdbcTaskExecutionRepository implements TaskExecutionRepository {
 
     private NamedParameterJdbcOperations jdbc;
     private ObjectMapper json = new ObjectMapper();
