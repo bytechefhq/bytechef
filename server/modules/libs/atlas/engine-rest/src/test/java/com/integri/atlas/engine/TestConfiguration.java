@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.workflow;
+package com.integri.atlas.engine;
 
 import com.integri.atlas.engine.coordinator.Coordinator;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;

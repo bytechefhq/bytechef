@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.workflow.web;
+package com.integri.atlas.engine.web.rest;
 
 import com.integri.atlas.engine.coordinator.annotation.ConditionalOnCoordinator;
 import com.integri.atlas.engine.core.task.TaskDefinition;
