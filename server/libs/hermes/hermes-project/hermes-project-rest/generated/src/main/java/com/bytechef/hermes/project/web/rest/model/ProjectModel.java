@@ -2,9 +2,11 @@ package com.bytechef.hermes.project.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.hermes.project.web.rest.model.StatusModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T11:35:39.488347+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T19:53:05.522675+01:00[Europe/Zagreb]")
 public class ProjectModel {
 
   @JsonProperty("category")
@@ -54,16 +56,26 @@ public class ProjectModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
+  @JsonProperty("lastPublishedDate")
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private LocalDateTime lastPublishedDate;
+
+  @JsonProperty("projectVersion")
+  private Integer projectVersion;
+
+  @JsonProperty("status")
+  private StatusModel status;
+
   @JsonProperty("tags")
   @Valid
   private List<com.bytechef.tag.web.rest.model.TagModel> tags = null;
 
-  @JsonProperty("version")
-  private Integer version;
-
   @JsonProperty("workflowIds")
   @Valid
   private List<String> workflowIds = null;
+
+  @JsonProperty("__version")
+  private Integer version;
 
   public ProjectModel category(com.bytechef.category.web.rest.model.CategoryModel category) {
     this.category = category;
@@ -217,6 +229,63 @@ public class ProjectModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
+  public ProjectModel lastPublishedDate(LocalDateTime lastPublishedDate) {
+    this.lastPublishedDate = lastPublishedDate;
+    return this;
+  }
+
+  /**
+   * The last published date.
+   * @return lastPublishedDate
+  */
+  @Valid 
+  @Schema(name = "lastPublishedDate", description = "The last published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public LocalDateTime getLastPublishedDate() {
+    return lastPublishedDate;
+  }
+
+  public void setLastPublishedDate(LocalDateTime lastPublishedDate) {
+    this.lastPublishedDate = lastPublishedDate;
+  }
+
+  public ProjectModel projectVersion(Integer projectVersion) {
+    this.projectVersion = projectVersion;
+    return this;
+  }
+
+  /**
+   * The version of a project.
+   * @return projectVersion
+  */
+  
+  @Schema(name = "projectVersion", description = "The version of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public Integer getProjectVersion() {
+    return projectVersion;
+  }
+
+  public void setProjectVersion(Integer projectVersion) {
+    this.projectVersion = projectVersion;
+  }
+
+  public ProjectModel status(StatusModel status) {
+    this.status = status;
+    return this;
+  }
+
+  /**
+   * Get status
+   * @return status
+  */
+  @Valid 
+  @Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public StatusModel getStatus() {
+    return status;
+  }
+
+  public void setStatus(StatusModel status) {
+    this.status = status;
+  }
+
   public ProjectModel tags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
     this.tags = tags;
     return this;
@@ -242,25 +311,6 @@ public class ProjectModel {
 
   public void setTags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
     this.tags = tags;
-  }
-
-  public ProjectModel version(Integer version) {
-    this.version = version;
-    return this;
-  }
-
-  /**
-   * Get version
-   * @return version
-  */
-  
-  @Schema(name = "version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public Integer getVersion() {
-    return version;
-  }
-
-  public void setVersion(Integer version) {
-    this.version = version;
   }
 
   public ProjectModel workflowIds(List<String> workflowIds) {
@@ -290,6 +340,25 @@ public class ProjectModel {
     this.workflowIds = workflowIds;
   }
 
+  public ProjectModel version(Integer version) {
+    this.version = version;
+    return this;
+  }
+
+  /**
+   * Get version
+   * @return version
+  */
+  
+  @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -307,14 +376,17 @@ public class ProjectModel {
         Objects.equals(this.description, project.description) &&
         Objects.equals(this.lastModifiedBy, project.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, project.lastModifiedDate) &&
+        Objects.equals(this.lastPublishedDate, project.lastPublishedDate) &&
+        Objects.equals(this.projectVersion, project.projectVersion) &&
+        Objects.equals(this.status, project.status) &&
         Objects.equals(this.tags, project.tags) &&
-        Objects.equals(this.version, project.version) &&
-        Objects.equals(this.workflowIds, project.workflowIds);
+        Objects.equals(this.workflowIds, project.workflowIds) &&
+        Objects.equals(this.version, project.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(category, createdBy, createdDate, id, name, description, lastModifiedBy, lastModifiedDate, tags, version, workflowIds);
+    return Objects.hash(category, createdBy, createdDate, id, name, description, lastModifiedBy, lastModifiedDate, lastPublishedDate, projectVersion, status, tags, workflowIds, version);
   }
 
   @Override
@@ -329,9 +401,12 @@ public class ProjectModel {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
+    sb.append("    lastPublishedDate: ").append(toIndentedString(lastPublishedDate)).append("\n");
+    sb.append("    projectVersion: ").append(toIndentedString(projectVersion)).append("\n");
+    sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
-    sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("    workflowIds: ").append(toIndentedString(workflowIds)).append("\n");
+    sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
   }

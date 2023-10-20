@@ -1,4 +1,4 @@
-package com.bytechef.dione.integration.web.rest.model;
+package com.bytechef.hermes.project.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -21,21 +21,21 @@ import jakarta.annotation.Generated;
  * The request object that contains the array of tags.
  */
 
-@Schema(name = "putIntegrationTags_request", description = "The request object that contains the array of tags.")
-@JsonTypeName("putIntegrationTags_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T11:43:15.780734+01:00[Europe/Zagreb]")
-public class PutIntegrationTagsRequestModel {
+@Schema(name = "updateProjectTags_request", description = "The request object that contains the array of tags.")
+@JsonTypeName("updateProjectTags_request")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T19:53:05.522675+01:00[Europe/Zagreb]")
+public class UpdateProjectTagsRequestModel {
 
   @JsonProperty("tags")
   @Valid
   private List<com.bytechef.tag.web.rest.model.TagModel> tags = null;
 
-  public PutIntegrationTagsRequestModel tags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
+  public UpdateProjectTagsRequestModel tags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
     this.tags = tags;
     return this;
   }
 
-  public PutIntegrationTagsRequestModel addTagsItem(com.bytechef.tag.web.rest.model.TagModel tagsItem) {
+  public UpdateProjectTagsRequestModel addTagsItem(com.bytechef.tag.web.rest.model.TagModel tagsItem) {
     if (this.tags == null) {
       this.tags = new ArrayList<>();
     }
@@ -65,8 +65,8 @@ public class PutIntegrationTagsRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PutIntegrationTagsRequestModel putIntegrationTagsRequest = (PutIntegrationTagsRequestModel) o;
-    return Objects.equals(this.tags, putIntegrationTagsRequest.tags);
+    UpdateProjectTagsRequestModel updateProjectTagsRequest = (UpdateProjectTagsRequestModel) o;
+    return Objects.equals(this.tags, updateProjectTagsRequest.tags);
   }
 
   @Override
@@ -77,7 +77,7 @@ public class PutIntegrationTagsRequestModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PutIntegrationTagsRequestModel {\n");
+    sb.append("class UpdateProjectTagsRequestModel {\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("}");
     return sb.toString();

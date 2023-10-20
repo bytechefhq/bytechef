@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Tag", description = "A tag.")
 @JsonTypeName("Tag")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T11:08:21.049362+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T19:53:06.102700+01:00[Europe/Zagreb]")
 public class TagModel {
 
   @JsonProperty("createdBy")
@@ -46,7 +46,7 @@ public class TagModel {
   @JsonProperty("name")
   private String name;
 
-  @JsonProperty("version")
+  @JsonProperty("__version")
   private Integer version;
 
   public TagModel createdBy(String createdBy) {
@@ -173,7 +173,7 @@ public class TagModel {
    * @return version
   */
   
-  @Schema(name = "version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getVersion() {
     return version;
   }
