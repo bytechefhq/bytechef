@@ -1,7 +1,5 @@
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Provider} from '@radix-ui/react-tooltip';
-import Button from 'components/Button/Button';
-import cx from 'classnames';
 import {Component1Icon} from '@radix-ui/react-icons';
 
 interface ComponentType {
@@ -38,25 +36,32 @@ interface SidebarItemProps {
     };
 }
 
+interface SidebarProps {
+    view: string;
+}
+
 const Item = ({data}: SidebarItemProps): JSX.Element => (
-    <li className="mb-2 flex items-center rounded-lg bg-white p-2 text-center shadow-md hover:shadow">
-        <Component1Icon className="mr-2 h-5 w-5 flex-none" />
+    <li className="my-1 flex h-[72px] items-center rounded-md bg-white p-2 hover:cursor-pointer hover:bg-gray-100">
+        <Component1Icon className="mr-2 h-7 w-7 flex-none " />
 
         <div className="flex flex-col">
-            <p className="font-medium text-gray-900">{data.display.label}</p>
+            <p className="text-sm font-medium text-gray-900">
+                {data.display.label}
+            </p>
 
             {/* eslint-disable-next-line tailwindcss/no-custom-classname */}
-            <p className="text-left text-sm text-gray-500 line-clamp-2">
+            <p className="text-left text-xs text-gray-500 line-clamp-2">
                 {data.display.description}
             </p>
         </div>
     </li>
 );
 
-const LeftSidebar = (): JSX.Element => {
+const LeftSidebar: React.FC<SidebarProps> = ({
+    view = 'components',
+}): JSX.Element => {
     const [components, setComponents] = useState([]);
     const [flowControls, setFlowControls] = useState([]);
-    const [view, setView] = useState('components');
 
     useEffect(() => {
         fetch('http://localhost:5173/api/definitions/components')
@@ -70,48 +75,16 @@ const LeftSidebar = (): JSX.Element => {
 
     return (
         <Provider>
-            <div className="h-full w-1/5 bg-slate-200 dark:bg-gray-800">
-                <header className="flex justify-center space-x-4 p-4">
-                    <div className="flex">
-                        <Button
-                            className={cx(
-                                '!rounded-r-none !shadow-none',
-                                view === 'components' && '!bg-gray-700'
-                            )}
-                            label="Components"
-                            onClick={() => setView('components')}
-                        />
-
-                        <Button
-                            className={cx(
-                                '!rounded-l-none !shadow-none',
-                                view === 'low-controls' && '!bg-gray-700'
-                            )}
-                            label="Flow Controls"
-                            onClick={() => setView('flow-controls')}
-                        />
-                    </div>
-                </header>
-
-                <div className="flex h-full flex-col space-y-4 p-2">
-                    <ul
-                        role="list"
-                        className="divide-y divide-gray-200 overflow-auto p-2"
-                    >
-                        {view === 'components'
-                            ? components.map((component: ComponentType) => (
-                                  <Item key={component.name} data={component} />
-                              ))
-                            : flowControls.map(
-                                  (flowControl: FlowControlType) => (
-                                      <Item
-                                          key={flowControl.name}
-                                          data={flowControl}
-                                      />
-                                  )
-                              )}
-                    </ul>
-                </div>
+            <div className="px-2">
+                <ul role="list" className="mb-2">
+                    {view === 'components'
+                        ? components.map((component: ComponentType) => (
+                              <Item key={component.name} data={component} />
+                          ))
+                        : flowControls.map((flowControl: FlowControlType) => (
+                              <Item key={flowControl.name} data={flowControl} />
+                          ))}
+                </ul>
             </div>
         </Provider>
     );
