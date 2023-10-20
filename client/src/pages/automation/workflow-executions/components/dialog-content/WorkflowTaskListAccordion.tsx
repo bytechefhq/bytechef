@@ -29,7 +29,7 @@ const WorkflowTaskListAccordion = ({
             return (
                 workflowTask?.label && (
                     <AccordionItem key={id} value={id || ''}>
-                        <AccordionTrigger className="flex w-full items-center justify-between border-b border-gray-100 bg-white px-2 py-3">
+                        <AccordionTrigger className="flex w-full items-center justify-between border-gray-100 bg-white px-2 py-3 radix-state-closed:border-b">
                             <div className="flex items-center text-sm">
                                 {taskExecution?.component?.icon && (
                                     <InlineSVG
@@ -63,7 +63,7 @@ const WorkflowTaskListAccordion = ({
                             </div>
                         </AccordionTrigger>
 
-                        <AccordionContent className="space-y-4 p-3">
+                        <AccordionContent className="space-y-4 border-b border-gray-100 p-3">
                             <div className="rounded-lg">
                                 <header className="flex items-center justify-between rounded-md bg-gray-100 px-2 py-1">
                                     <span className="text-sm font-medium uppercase">
