@@ -21,7 +21,7 @@ import java.util.List;
 public class TaskAuthentication {
 
     private List<TaskCredential> credentials;
-    private List<TaskProperty> properties;
+    private List<TaskProperty<?>> properties;
 
     public static TaskAuthentication authentication() {
         return new TaskAuthentication();
@@ -37,7 +37,7 @@ public class TaskAuthentication {
         return this;
     }
 
-    public TaskAuthentication properties(TaskProperty... properties) {
+    public TaskAuthentication properties(TaskProperty<?>... properties) {
         this.properties = List.of(properties);
 
         return this;
@@ -47,7 +47,7 @@ public class TaskAuthentication {
         return credentials;
     }
 
-    public List<TaskProperty> getProperties() {
+    public List<TaskProperty<?>> getProperties() {
         return properties;
     }
 }
