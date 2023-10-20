@@ -23,20 +23,15 @@ import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
-import com.integri.atlas.repository.engine.jdbc.context.MysqlJdbcContextRepository;
-import com.integri.atlas.repository.engine.jdbc.context.PostgresJdbcContextRepository;
-import com.integri.atlas.repository.engine.jdbc.job.MysqlJdbcJobRepository;
-import com.integri.atlas.repository.engine.jdbc.job.PostgresJdbcJobRepository;
+import com.integri.atlas.repository.engine.jdbc.context.JdbcContextRepository;
 import com.integri.atlas.repository.engine.jdbc.counter.JdbcCounterRepository;
-import com.integri.atlas.repository.engine.jdbc.task.MysqlJdbcTaskExecutionRepository;
-import com.integri.atlas.repository.engine.jdbc.task.PostgresJdbcTaskExecutionRepository;
+import com.integri.atlas.repository.engine.jdbc.job.JdbcJobRepository;
+import com.integri.atlas.repository.engine.jdbc.task.JdbcTaskExecutionRepository;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -53,79 +48,30 @@ public class TestConfiguration {
         return new JdbcCounterRepository(aJdbcOperations);
     }
 
-    @Configuration
-    @ConditionalOnProperty(name = "spring.sql.init.platform", havingValue = "mysql")
-    public static class MysqlJdbcPersistenceConfiguration {
-
-        @Bean
-        TaskExecutionRepository jdbcJobTaskRepository(
-            NamedParameterJdbcTemplate aJdbcTemplate,
-            ObjectMapper aObjectMapper
-        ) {
-            MysqlJdbcTaskExecutionRepository jdbcJobTaskRepository = new MysqlJdbcTaskExecutionRepository();
-
-            jdbcJobTaskRepository.setJdbcOperations(aJdbcTemplate);
-            jdbcJobTaskRepository.setObjectMapper(aObjectMapper);
-
-            return jdbcJobTaskRepository;
-        }
-
-        @Bean
-        JobRepository jdbcJobRepository(NamedParameterJdbcTemplate aJdbcTemplate, ObjectMapper aObjectMapper) {
-            MysqlJdbcJobRepository jdbcJobRepository = new MysqlJdbcJobRepository();
-
-            jdbcJobRepository.setJdbcOperations(aJdbcTemplate);
-            jdbcJobRepository.setJobTaskRepository(jdbcJobTaskRepository(aJdbcTemplate, aObjectMapper));
-
-            return jdbcJobRepository;
-        }
-
-        @Bean
-        ContextRepository jdbcContextRepository(JdbcTemplate aJdbcTemplate, ObjectMapper aObjectMapper) {
-            MysqlJdbcContextRepository repo = new MysqlJdbcContextRepository();
-
-            repo.setJdbcTemplate(aJdbcTemplate);
-            repo.setObjectMapper(aObjectMapper);
-
-            return repo;
-        }
+    @Bean
+    TaskExecutionRepository jdbcJobTaskRepository(
+        NamedParameterJdbcTemplate aJdbcTemplate,
+        ObjectMapper aObjectMapper
+    ) {
+        JdbcTaskExecutionRepository jdbcJobTaskRepository = new JdbcTaskExecutionRepository();
+        jdbcJobTaskRepository.setJdbcOperations(aJdbcTemplate);
+        jdbcJobTaskRepository.setObjectMapper(aObjectMapper);
+        return jdbcJobTaskRepository;
     }
 
-    @Configuration
-    @ConditionalOnProperty(name = "spring.sql.init.platform", havingValue = "postgres")
-    public static class PostgresJdbcPersistenceConfiguration {
+    @Bean
+    JobRepository jdbcJobRepository(NamedParameterJdbcTemplate aJdbcTemplate, ObjectMapper aObjectMapper) {
+        JdbcJobRepository jdbcJobRepository = new JdbcJobRepository();
+        jdbcJobRepository.setJdbcOperations(aJdbcTemplate);
+        jdbcJobRepository.setJobTaskRepository(jdbcJobTaskRepository(aJdbcTemplate, aObjectMapper));
+        return jdbcJobRepository;
+    }
 
-        @Bean
-        TaskExecutionRepository jdbcJobTaskRepository(
-            NamedParameterJdbcTemplate aJdbcTemplate,
-            ObjectMapper aObjectMapper
-        ) {
-            PostgresJdbcTaskExecutionRepository jdbcJobTaskRepository = new PostgresJdbcTaskExecutionRepository();
-
-            jdbcJobTaskRepository.setJdbcOperations(aJdbcTemplate);
-            jdbcJobTaskRepository.setObjectMapper(aObjectMapper);
-
-            return jdbcJobTaskRepository;
-        }
-
-        @Bean
-        JobRepository jdbcJobRepository(NamedParameterJdbcTemplate aJdbcTemplate, ObjectMapper aObjectMapper) {
-            PostgresJdbcJobRepository jdbcJobRepository = new PostgresJdbcJobRepository();
-
-            jdbcJobRepository.setJdbcOperations(aJdbcTemplate);
-            jdbcJobRepository.setJobTaskRepository(jdbcJobTaskRepository(aJdbcTemplate, aObjectMapper));
-
-            return jdbcJobRepository;
-        }
-
-        @Bean
-        ContextRepository jdbcContextRepository(JdbcTemplate aJdbcTemplate, ObjectMapper aObjectMapper) {
-            PostgresJdbcContextRepository jdbcContextRepository = new PostgresJdbcContextRepository();
-
-            jdbcContextRepository.setJdbcTemplate(aJdbcTemplate);
-            jdbcContextRepository.setObjectMapper(aObjectMapper);
-
-            return jdbcContextRepository;
-        }
+    @Bean
+    ContextRepository jdbcContextRepository(JdbcTemplate aJdbcTemplate, ObjectMapper aObjectMapper) {
+        JdbcContextRepository repo = new JdbcContextRepository();
+        repo.setJdbcTemplate(aJdbcTemplate);
+        repo.setObjectMapper(aObjectMapper);
+        return repo;
     }
 }
