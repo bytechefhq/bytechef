@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.core.Accessor;
-import com.integri.atlas.engine.core.binary.Binary;
+import com.integri.atlas.engine.core.file.storage.FileEntry;
 import com.integri.atlas.task.handler.BaseTaskHandlerIntTest;
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class LocalFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
 
         Job job = startJob(
             "samples/localFile_READ.json",
-            Map.of("localFile", new LocalFileTaskHandler(binaryHelper)),
+            Map.of("localFile", new LocalFileTaskHandler(fileStorageService)),
             Map.of("fileName", sampleFile.getAbsolutePath())
         );
 
@@ -52,14 +52,16 @@ public class LocalFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
 
         Accessor outputs = job.getOutputs();
 
-        assertThat(outputs.get("readFromFile", Binary.class))
-            .hasFieldOrPropertyWithValue(
-                "data",
-                storageService.write("bucketName", Files.contentOf(getFile(), Charset.defaultCharset()))
-            )
+        FileEntry fileEntry = fileStorageService.write(
+            "sample.txt",
+            Files.contentOf(getFile(), Charset.defaultCharset())
+        );
+
+        assertThat(outputs.get("readFromFile", FileEntry.class))
             .hasFieldOrPropertyWithValue("extension", "txt")
             .hasFieldOrPropertyWithValue("mimeType", "text/plain")
-            .hasFieldOrPropertyWithValue("name", "sample.txt");
+            .hasFieldOrPropertyWithValue("name", "sample.txt")
+            .hasFieldOrPropertyWithValue("url", fileEntry.getUrl());
     }
 
     @Test
@@ -69,10 +71,10 @@ public class LocalFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
 
         Job job = startJob(
             "samples/localFile_WRITE.json",
-            Map.of("localFile", new LocalFileTaskHandler(binaryHelper)),
+            Map.of("localFile", new LocalFileTaskHandler(fileStorageService)),
             Map.of(
-                "binary",
-                binaryHelper.writeBinaryData(
+                "fileEntry",
+                fileStorageService.write(
                     sampleFile.getAbsolutePath(),
                     Files.contentOf(getFile(), Charset.defaultCharset())
                 ),

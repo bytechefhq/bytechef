@@ -17,13 +17,11 @@
 package com.integri.atlas.task.handler.local.file;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-import com.integri.atlas.engine.core.binary.Binary;
-import com.integri.atlas.engine.core.binary.BinaryHelper;
-import com.integri.atlas.engine.core.storage.StorageService;
-import com.integri.atlas.engine.core.storage.base64.Base64StorageService;
+import com.integri.atlas.engine.core.file.storage.FileEntry;
+import com.integri.atlas.engine.core.file.storage.FileStorageService;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
+import com.integri.atlas.file.storage.base64.Base64FileStorageService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -38,9 +36,8 @@ import org.springframework.core.io.ClassPathResource;
  */
 public class LocalFileTaskHandlerTest {
 
-    private static final StorageService storageService = new Base64StorageService();
-    private static final BinaryHelper binaryHelper = new BinaryHelper(storageService);
-    private static final LocalFileTaskHandler localFileTaskHandler = new LocalFileTaskHandler(binaryHelper);
+    private static final FileStorageService fileStorageService = new Base64FileStorageService();
+    private static final LocalFileTaskHandler localFileTaskHandler = new LocalFileTaskHandler(fileStorageService);
 
     @Test
     public void testReadOperation() throws Exception {
@@ -48,14 +45,13 @@ public class LocalFileTaskHandlerTest {
 
         SimpleTaskExecution taskExecution = getSimpleTaskExecution(file.getAbsolutePath(), "READ", null);
 
+        FileEntry fileEntry = fileStorageService.write(file.getName(), Files.contentOf(file, Charset.defaultCharset()));
+
         assertThat(localFileTaskHandler.handle(taskExecution))
-            .hasFieldOrPropertyWithValue(
-                "data",
-                storageService.write("bucketName", Files.contentOf(file, Charset.defaultCharset()))
-            )
             .hasFieldOrPropertyWithValue("extension", FilenameUtils.getExtension(file.getAbsolutePath()))
             .hasFieldOrPropertyWithValue("mimeType", "text/plain")
-            .hasFieldOrPropertyWithValue("name", FilenameUtils.getName(file.getAbsolutePath()));
+            .hasFieldOrPropertyWithValue("name", FilenameUtils.getName(file.getAbsolutePath()))
+            .hasFieldOrPropertyWithValue("url", fileEntry.getUrl());
     }
 
     @Test
@@ -65,7 +61,7 @@ public class LocalFileTaskHandlerTest {
         SimpleTaskExecution taskExecution = getSimpleTaskExecution(
             file.getAbsolutePath(),
             "WRITE",
-            Binary.of(file.getAbsolutePath(), storageService.write("bucketName", new FileInputStream(file)))
+            fileStorageService.write(file.getName(), new FileInputStream(file))
         );
 
         assertThat(localFileTaskHandler.handle(taskExecution)).hasFieldOrPropertyWithValue("bytes", 5L);
@@ -77,10 +73,10 @@ public class LocalFileTaskHandlerTest {
         return classPathResource.getFile();
     }
 
-    private SimpleTaskExecution getSimpleTaskExecution(String fileName, String operation, Binary binary) {
+    private SimpleTaskExecution getSimpleTaskExecution(String fileName, String operation, FileEntry fileEntry) {
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
-        taskExecution.put("binary", binary);
+        taskExecution.put("fileEntry", fileEntry);
         taskExecution.put("fileName", fileName);
         taskExecution.put("operation", operation);
 
