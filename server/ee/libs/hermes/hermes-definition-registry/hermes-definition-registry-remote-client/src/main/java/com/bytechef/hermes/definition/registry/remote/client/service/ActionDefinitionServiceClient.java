@@ -109,7 +109,7 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<ActionDefinitionDTO> getActionDefinitions(List<String> types) {
+    public List<ActionDefinitionDTO> getActionDefinitions(List<String> taskTypes) {
         // TODO
 
         throw new UnsupportedOperationException();

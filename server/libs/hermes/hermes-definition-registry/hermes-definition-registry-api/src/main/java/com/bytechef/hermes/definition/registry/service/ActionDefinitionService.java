@@ -55,5 +55,5 @@ public interface ActionDefinitionService {
 
     List<ActionDefinitionDTO> getActionDefinitions(String componentName, int componentVersion);
 
-    List<ActionDefinitionDTO> getActionDefinitions(List<String> types);
+    List<ActionDefinitionDTO> getActionDefinitions(List<String> taskTypes);
 }
