@@ -1,6 +1,6 @@
 
 /*
- * Copyright 2021 <your company/name>.
+ * Copyright 2016-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
 
 package com.bytechef.atlas.worker;
@@ -56,6 +58,10 @@ import static com.bytechef.atlas.configuration.constant.WorkflowConstants.POST;
 import static com.bytechef.atlas.configuration.constant.WorkflowConstants.PRE;
 import static com.bytechef.atlas.configuration.constant.WorkflowConstants.TYPE;
 
+/**
+ * @author Arik Cohen
+ * @author Ivica Cardic
+ */
 public class TaskWorkerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
@@ -70,20 +76,21 @@ public class TaskWorkerTest {
 
     @Test
     public void test1() {
-        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
-        messageBroker.receive(
+        syncMessageBroker.receive(
             CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
             t -> Assertions.assertEquals(
                 "done", workflowFileStorageFacade.readTaskExecutionOutput(
                     ((TaskExecutionCompleteEvent) t).getTaskExecution()
                         .getOutput())));
-        messageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
+        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
             t -> {});
 
         TaskWorker worker =
             new TaskWorker(
-                event -> messageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+                event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+                Executors.newSingleThreadExecutor(),
                 task -> taskExecution -> "done", workflowFileStorageFacade);
 
         TaskExecution taskExecution = TaskExecution.builder()
@@ -98,18 +105,19 @@ public class TaskWorkerTest {
 
     @Test
     public void test2() {
-        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
-        messageBroker.receive(
+        syncMessageBroker.receive(
             CoordinatorMessageRoute.ERROR_EVENTS,
             t -> Assertions.assertEquals("bad input", ((TaskExecutionErrorEvent) t).getTaskExecution()
                 .getError()
                 .getMessage()));
-        messageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
+        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
             t -> {});
 
         TaskWorker worker = new TaskWorker(
-            event -> messageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            Executors.newSingleThreadExecutor(),
             task -> taskExecution -> {
                 throw new IllegalArgumentException("bad input");
             }, workflowFileStorageFacade);
@@ -126,25 +134,26 @@ public class TaskWorkerTest {
 
     @Test
     public void test3() {
-        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
-        messageBroker.receive(
+        syncMessageBroker.receive(
             CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
             t -> Assertions.assertEquals(
                 "done", workflowFileStorageFacade.readTaskExecutionOutput(
                     ((TaskExecutionCompleteEvent) t).getTaskExecution()
                         .getOutput())));
-        messageBroker.receive(CoordinatorMessageRoute.ERROR_EVENTS,
+        syncMessageBroker.receive(CoordinatorMessageRoute.ERROR_EVENTS,
             t -> {
                 TaskExecution taskExecution = (TaskExecution) t;
 
                 Assertions.assertNull(taskExecution.getError());
             });
-        messageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
+        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
             t -> {});
 
         TaskWorker worker = new TaskWorker(
-            event -> messageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            Executors.newSingleThreadExecutor(),
             task -> {
                 String type = task.getType();
                 if ("var".equals(type)) {
@@ -178,19 +187,21 @@ public class TaskWorkerTest {
     public void test4() {
         UUID uuid = UUID.randomUUID();
 
-        String tempDir = new File(new File(System.getProperty("java.io.tmpdir")), uuid.toString())
-            .getAbsolutePath();
+        File tempFile = new File(new File(System.getProperty("java.io.tmpdir")), uuid.toString());
 
-        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
+        String tempDir = tempFile.getAbsolutePath();
 
-        messageBroker.receive(
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
+
+        syncMessageBroker.receive(
             CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
             t -> Assertions.assertFalse(new File(tempDir).exists()));
-        messageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
+        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
             t -> {});
 
         TaskWorker worker = new TaskWorker(
-            event -> messageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            Executors.newSingleThreadExecutor(),
             task -> {
                 String type = task.getType();
                 if ("var".equals(type)) {
@@ -238,20 +249,20 @@ public class TaskWorkerTest {
     public void test5() {
         UUID uuid = UUID.randomUUID();
 
-        String tempDir = new File(new File(System.getProperty("java.io.tmpdir")), uuid.toString())
-            .getAbsolutePath();
+        File tempFile = new File(new File(System.getProperty("java.io.tmpdir")), uuid.toString());
 
-        SyncMessageBroker messageBroker = new SyncMessageBroker(objectMapper);
+        String tempDir = tempFile.getAbsolutePath();
 
-        messageBroker.receive(CoordinatorMessageRoute.ERROR_EVENTS,
-            t -> {
-                Assertions.assertFalse(new File(tempDir).exists());
-            });
-        messageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
-            t -> {});
+        SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
+
+        syncMessageBroker.receive(
+            CoordinatorMessageRoute.ERROR_EVENTS,
+            t -> Assertions.assertFalse(new File(tempDir).exists()));
+        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS, t -> {});
 
         TaskWorker worker = new TaskWorker(
-            event -> messageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            Executors.newSingleThreadExecutor(),
             task -> {
                 String type = task.getType();
                 if ("var".equals(type)) {
@@ -307,6 +318,7 @@ public class TaskWorkerTest {
 
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            Executors.newSingleThreadExecutor(),
             task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
@@ -330,17 +342,16 @@ public class TaskWorkerTest {
         // give it a second to start executing
         TimeUnit.SECONDS.sleep(1);
 
-        Assertions.assertEquals(1, worker.getTaskExecutions()
-            .size());
+        Assertions.assertEquals(1, MapUtils.size(worker.getTaskExecutions()));
 
         // cancel the execution of the task
         worker.onCancelControlTaskEvent(
             new CancelControlTaskEvent(new CancelControlTask(taskExecution.getJobId(), taskExecution.getId())));
+
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
 
-        Assertions.assertEquals(0, worker.getTaskExecutions()
-            .size());
+        Assertions.assertEquals(0, MapUtils.size(worker.getTaskExecutions()));
     }
 
     @Test
@@ -353,6 +364,7 @@ public class TaskWorkerTest {
 
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            Executors.newSingleThreadExecutor(),
             task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
@@ -386,17 +398,16 @@ public class TaskWorkerTest {
         // give it a second to start executing
         TimeUnit.SECONDS.sleep(1);
 
-        Assertions.assertEquals(2, worker.getTaskExecutions()
-            .size());
+        Assertions.assertEquals(2, MapUtils.size(worker.getTaskExecutions()));
 
         // cancel the execution of the task
         worker.onCancelControlTaskEvent(
             new CancelControlTaskEvent(new CancelControlTask(taskExecution1.getJobId(), taskExecution1.getId())));
+
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
 
-        Assertions.assertEquals(1, worker.getTaskExecutions()
-            .size());
+        Assertions.assertEquals(1, MapUtils.size(worker.getTaskExecutions()));
     }
 
     @Test
@@ -409,6 +420,7 @@ public class TaskWorkerTest {
 
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
+            Executors.newFixedThreadPool(2),
             task -> taskExecution -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
@@ -443,16 +455,15 @@ public class TaskWorkerTest {
         // give it a second to start executing
         TimeUnit.SECONDS.sleep(1);
 
-        Assertions.assertEquals(2, worker.getTaskExecutions()
-            .size());
+        Assertions.assertEquals(2, MapUtils.size(worker.getTaskExecutions()));
 
         // cancel the execution of the task
         worker.onCancelControlTaskEvent(
             new CancelControlTaskEvent(new CancelControlTask(taskExecution1.getJobId(), taskExecution1.getId())));
+
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
 
-        Assertions.assertEquals(0, worker.getTaskExecutions()
-            .size());
+        Assertions.assertEquals(0, MapUtils.size(worker.getTaskExecutions()));
     }
 }

@@ -22,14 +22,21 @@ package com.bytechef.atlas.worker.config;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 
 import com.bytechef.atlas.worker.TaskWorker;
+import com.bytechef.atlas.worker.executor.TaskWorkerExecutor;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
+
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +68,11 @@ public class TaskWorkerConfiguration {
     }
 
     @Bean
+    TaskWorkerExecutor taskWorkerExecutor() {
+        return new TaskWorkerExecutor();
+    }
+
+    @Bean
     TaskHandlerResolver defaultTaskHandlerResolver(TaskHandlerRegistry taskHandlerRegistry) {
         return new DefaultTaskHandlerResolver(taskHandlerRegistry);
     }
@@ -86,9 +98,80 @@ public class TaskWorkerConfiguration {
 
     @Bean
     TaskWorker taskWorker(
-        ApplicationEventPublisher eventPublisher, TaskHandlerResolver taskHandlerResolver,
+        ApplicationEventPublisher eventPublisher, TaskWorkerExecutor taskWorkerExecutor,
+        TaskHandlerResolver taskHandlerResolver,
         @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade) {
 
-        return new TaskWorker(eventPublisher, taskHandlerResolver, workflowFileStorageFacade);
+        return new TaskWorker(
+            eventPublisher, new ExecutorServiceWrapper(taskWorkerExecutor), taskHandlerResolver,
+            workflowFileStorageFacade);
+    }
+
+    private record ExecutorServiceWrapper(TaskWorkerExecutor taskWorkerExecutor) implements ExecutorService {
+
+        @Override
+        public void shutdown() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public List<Runnable> shutdownNow() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean isShutdown() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean isTerminated() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean awaitTermination(long timeout, TimeUnit unit) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <T> Future<T> submit(Callable<T> task) {
+            return null;
+        }
+
+        @Override
+        public <T> Future<T> submit(Runnable task, T result) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void execute(Runnable command) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Future<?> submit(Runnable task) {
+            return taskWorkerExecutor.submit(task);
+        }
+
+        @Override
+        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <T> T invokeAny(Collection<? extends Callable<T>> tasks) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) {
+            throw new UnsupportedOperationException();
+        }
     }
 }

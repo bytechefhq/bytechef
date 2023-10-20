@@ -48,7 +48,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -78,24 +77,15 @@ public class TaskWorker {
     private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
     private final ApplicationEventPublisher eventPublisher;
-    private ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ExecutorService executorService;
     private final TaskHandlerResolver taskHandlerResolver;
-    private final Map<Long, TaskExecutionFuture<?>> taskExecutions = new ConcurrentHashMap<>();
+    private final Map<Long, TaskExecutionFuture<?>> taskExecutionFutureMap = new ConcurrentHashMap<>();
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     public TaskWorker(
-        ApplicationEventPublisher eventPublisher,
+        ApplicationEventPublisher eventPublisher, ExecutorService executorService,
         TaskHandlerResolver taskHandlerResolver,
         @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade) {
-
-        this.eventPublisher = eventPublisher;
-        this.taskHandlerResolver = taskHandlerResolver;
-        this.workflowFileStorageFacade = workflowFileStorageFacade;
-    }
-
-    public TaskWorker(
-        ApplicationEventPublisher eventPublisher, ExecutorService executorService,
-        TaskHandlerResolver taskHandlerResolver, WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.eventPublisher = eventPublisher;
         this.executorService = executorService;
@@ -129,7 +119,7 @@ public class TaskWorker {
             } catch (InterruptedException e) {
                 // ignore
             } catch (Exception e) {
-                TaskExecutionFuture<?> taskExecutionFuture = taskExecutions.get(taskExecution.getId());
+                TaskExecutionFuture<?> taskExecutionFuture = taskExecutionFutureMap.get(taskExecution.getId());
 
                 if (taskExecutionFuture == null || !taskExecutionFuture.isCancelled()) {
                     handleException(taskExecution, e);
@@ -139,7 +129,7 @@ public class TaskWorker {
             }
         });
 
-        taskExecutions.put(taskExecution.getId(), new TaskExecutionFuture<>(taskExecution, future));
+        taskExecutionFutureMap.put(taskExecution.getId(), new TaskExecutionFuture<>(taskExecution, future));
 
         try {
             future.get(calculateTimeout(taskExecution), TimeUnit.MILLISECONDS);
@@ -154,7 +144,7 @@ public class TaskWorker {
                 handleException(taskExecution, e);
             }
 
-            taskExecutions.remove(taskExecution.getId());
+            taskExecutionFutureMap.remove(taskExecution.getId());
         }
     }
 
@@ -170,7 +160,7 @@ public class TaskWorker {
 
             Long jobId = cancelControlTask.getJobId();
 
-            for (TaskExecutionFuture<?> taskExecutionFuture : taskExecutions.values()) {
+            for (TaskExecutionFuture<?> taskExecutionFuture : taskExecutionFutureMap.values()) {
                 if (Objects.equals(taskExecutionFuture.taskExecution.getJobId(), jobId)) {
                     logger.info(
                         "Cancelling task jobId={}->taskExecutionId={}", jobId,
@@ -183,7 +173,7 @@ public class TaskWorker {
     }
 
     Map<Long, TaskExecutionFuture<?>> getTaskExecutions() {
-        return Collections.unmodifiableMap(taskExecutions);
+        return Collections.unmodifiableMap(taskExecutionFutureMap);
     }
 
     @SuppressFBWarnings("NP")

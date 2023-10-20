@@ -19,6 +19,7 @@ package com.bytechef.hermes.worker.config;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.worker.TriggerWorker;
+import com.bytechef.hermes.worker.executor.TriggerWorkerExecutor;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
 import com.bytechef.hermes.worker.trigger.factory.TriggerHandlerMapFactory;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerRegistry;
@@ -30,7 +31,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Map;
-import java.util.concurrent.Executors;
 
 /**
  * @author Ivica Cardic
@@ -57,8 +57,9 @@ public class TriggerWorkerConfiguration {
 
     @Bean
     TriggerWorker triggerWorker(
-        ApplicationEventPublisher eventPublisher, TriggerHandlerResolver triggerHandlerResolver) {
+        ApplicationEventPublisher eventPublisher, TriggerWorkerExecutor triggerWorkerExecutor,
+        TriggerHandlerResolver triggerHandlerResolver) {
 
-        return new TriggerWorker(eventPublisher, Executors.newCachedThreadPool(), triggerHandlerResolver);
+        return new TriggerWorker(eventPublisher, triggerWorkerExecutor, triggerHandlerResolver);
     }
 }

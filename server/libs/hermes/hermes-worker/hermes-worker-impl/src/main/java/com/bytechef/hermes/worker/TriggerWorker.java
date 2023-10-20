@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.worker;
 
+import com.bytechef.hermes.worker.executor.TriggerWorkerExecutor;
 import com.bytechef.hermes.worker.trigger.event.CancelControlTriggerEvent;
 import com.bytechef.hermes.coordinator.event.TriggerExecutionCompleteEvent;
 import com.bytechef.hermes.coordinator.event.TriggerExecutionErrorEvent;
@@ -45,7 +46,6 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -60,16 +60,16 @@ public class TriggerWorker {
     private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
     private final ApplicationEventPublisher eventPublisher;
-    private final ExecutorService executorService;
+    private final TriggerWorkerExecutor triggerWorkerExecutor;
     private final Map<WorkflowExecutionId, TriggerExecutionFuture<?>> triggerExecutions = new ConcurrentHashMap<>();
     private final TriggerHandlerResolver triggerHandlerResolver;
 
     public TriggerWorker(
-        ApplicationEventPublisher eventPublisher, ExecutorService executorService,
+        ApplicationEventPublisher eventPublisher, TriggerWorkerExecutor executorService,
         TriggerHandlerResolver triggerHandlerResolver) {
 
         this.eventPublisher = eventPublisher;
-        this.executorService = executorService;
+        this.triggerWorkerExecutor = executorService;
         this.triggerHandlerResolver = triggerHandlerResolver;
     }
 
@@ -80,7 +80,7 @@ public class TriggerWorker {
         TriggerExecution triggerExecution = triggerExecutionEvent.getTriggerExecution();
         CountDownLatch latch = new CountDownLatch(1);
 
-        Future<?> future = executorService.submit(() -> {
+        Future<?> future = triggerWorkerExecutor.submit(() -> {
             try {
                 eventPublisher.publishEvent(new TriggerStartedApplicationEvent(
                     Objects.requireNonNull(triggerExecution.getId())));

@@ -24,6 +24,7 @@ import com.oblac.jrsmq.RedisSMQ;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.util.MethodInvoker;
@@ -32,7 +33,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -43,7 +43,7 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisListenerEndpointRegistrar.class);
 
-    private final ExecutorService executorService;
+    private final TaskExecutor taskExecutor;
     private final Map<String, Consumer<String>> invokerMap = new HashMap<>();
     private final RedisMessageDeserializer redisMessageDeserializer;
     private final RedisSMQ redisSMQ;
@@ -51,9 +51,9 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
 
     @SuppressFBWarnings("EI2")
     public RedisListenerEndpointRegistrar(
-        ExecutorService executorService, RedisMessageDeserializer redisMessageDeserializer, RedisSMQ redisSMQ) {
+        RedisMessageDeserializer redisMessageDeserializer, RedisSMQ redisSMQ, TaskExecutor taskExecutor) {
 
-        this.executorService = executorService;
+        this.taskExecutor = taskExecutor;
         this.redisMessageDeserializer = redisMessageDeserializer;
         this.redisSMQ = redisSMQ;
     }
@@ -81,7 +81,7 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
         checkQueueExists(queueName);
 
         if (messageRoute.isMessageExchange()) {
-            executorService.submit(() -> periodicallyCheckQueueForMessage(queueName));
+            taskExecutor.execute(() -> periodicallyCheckQueueForMessage(queueName));
         }
     }
 
@@ -101,7 +101,7 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
                 } else {
                     Consumer<String> invokerConsumer = invokerMap.get(queueName);
 
-                    executorService.submit(() -> invokerConsumer.accept(queueMessage.message()));
+                    taskExecutor.execute(() -> invokerConsumer.accept(queueMessage.message()));
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);

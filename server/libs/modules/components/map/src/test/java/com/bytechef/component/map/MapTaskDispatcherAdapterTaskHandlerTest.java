@@ -27,7 +27,6 @@ import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.atlas.worker.TaskWorker;
-import com.bytechef.component.map.concurrency.CurrentThreadExecutorService;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
@@ -37,6 +36,7 @@ import com.bytechef.commons.util.MapUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.message.event.MessageEvent;
@@ -161,7 +161,8 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
 
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
-            new CurrentThreadExecutorService(), taskHandlerResolver, workflowFileStorageFacade);
+            Executors.newSingleThreadExecutor(),
+            taskHandlerResolver, workflowFileStorageFacade);
 
         mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(objectMapper, taskHandlerResolver);
 
