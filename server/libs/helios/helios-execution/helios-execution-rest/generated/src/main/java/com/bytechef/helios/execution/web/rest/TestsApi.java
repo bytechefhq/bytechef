@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T20:55:03.230135+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-22T21:27:43.318208+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "automation-tests", description = "The Automation Tests API")
 public interface TestsApi {
@@ -46,7 +46,7 @@ public interface TestsApi {
      * POST /tests : Execute a workflow synchronously for testing purpose
      * Execute a workflow synchronously for testing purposes.
      *
-     * @param testParametersModel Parameters required to test a workflow, for example &#39;{\&quot;inputs\&quot;:{\&quot;yourName\&quot;:\&quot;Joe Jones\&quot;}}&#39; (required)
+     * @param testParametersModel Parameters required to run a job, for example &#39;{\&quot;workflowId\&quot;:\&quot;samples/hello\&quot;,\&quot;inputs\&quot;:{\&quot;yourName\&quot;:\&quot;Joe Jones\&quot;}}&#39; (required)
      * @return The output expected by the workflow. (status code 200)
      */
     @Operation(
@@ -67,7 +67,7 @@ public interface TestsApi {
         consumes = { "application/json" }
     )
     default ResponseEntity<JobModel> testWorkflow(
-        @Parameter(name = "TestParametersModel", description = "Parameters required to test a workflow, for example '{\"inputs\":{\"yourName\":\"Joe Jones\"}}'", required = true) @Valid @RequestBody TestParametersModel testParametersModel
+        @Parameter(name = "TestParametersModel", description = "Parameters required to run a job, for example '{\"workflowId\":\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'", required = true) @Valid @RequestBody TestParametersModel testParametersModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
