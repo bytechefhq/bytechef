@@ -17,6 +17,7 @@
 
 package com.bytechef.helios.connection.web.rest;
 
+import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.helios.connection.web.rest.model.ConnectionModel;
 import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.helios.connection.facade.ConnectionFacade;
@@ -36,6 +37,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
+@ConditionalOnEnabled("coordinator")
 public class ConnectionController implements ConnectionsApi {
 
     private final ConnectionFacade connectionFacade;

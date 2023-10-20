@@ -17,6 +17,7 @@
 
 package com.bytechef.helios.connection.web.rest;
 
+import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.helios.connection.facade.ConnectionFacade;
 import com.bytechef.helios.connection.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -32,6 +33,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
+@ConditionalOnEnabled("coordinator")
 public class ConnectionTagController implements ConnectionTagsApi {
 
     private final ConnectionFacade connectionFacade;

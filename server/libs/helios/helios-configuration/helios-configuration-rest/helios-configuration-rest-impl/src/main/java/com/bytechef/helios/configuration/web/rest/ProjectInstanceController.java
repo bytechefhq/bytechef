@@ -17,6 +17,7 @@
 
 package com.bytechef.helios.configuration.web.rest;
 
+import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.helios.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.helios.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.helios.configuration.web.rest.model.CreateProjectInstanceWorkflowJob200ResponseModel;
@@ -37,6 +38,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
+@ConditionalOnEnabled("coordinator")
 public class ProjectInstanceController implements ProjectInstancesApi {
 
     private final ConversionService conversionService;

@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.configuration.web.rest;
 
+import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
@@ -50,6 +51,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
+@ConditionalOnEnabled("coordinator")
 public class ComponentDefinitionController implements ComponentDefinitionsApi {
 
     private final ActionDefinitionFacade actionDefinitionFacade;

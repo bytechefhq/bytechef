@@ -17,6 +17,7 @@
 
 package com.bytechef.helios.configuration.web.rest;
 
+import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.helios.configuration.facade.ProjectFacade;
 import com.bytechef.helios.configuration.web.rest.model.CategoryModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -32,6 +33,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
+@ConditionalOnEnabled("coordinator")
 public class ProjectCategoryController implements ProjectCategoriesApi {
 
     private final ConversionService conversionService;

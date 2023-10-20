@@ -19,20 +19,20 @@
 
 package com.bytechef.atlas.worker.config;
 
+import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
-import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -44,16 +44,18 @@ import org.springframework.context.annotation.Primary;
  * @author Ivica Cardic
  */
 @Configuration
-
+@ConditionalOnEnabled("worker")
 @EnableConfigurationProperties(TaskWorkerProperties.class)
 public class TaskWorkerConfiguration {
 
-    @Autowired(required = false)
-    private List<TaskDispatcherAdapterFactory> taskDispatcherAdapterTaskHandlerFactories = Collections.emptyList();
+    private final List<TaskDispatcherAdapterFactory> taskDispatcherAdapterTaskHandlerFactories;
 
-    @Bean
-    TaskHandlerRegistry taskHandlerRegistry(Map<String, TaskHandler<?>> taskHandlerMap) {
-        return taskHandlerMap::get;
+    @SuppressFBWarnings("EI")
+    public TaskWorkerConfiguration(
+        @Autowired(required = false) List<TaskDispatcherAdapterFactory> taskDispatcherAdapterTaskHandlerFactories) {
+
+        this.taskDispatcherAdapterTaskHandlerFactories = taskDispatcherAdapterTaskHandlerFactories == null
+            ? Collections.emptyList() : taskDispatcherAdapterTaskHandlerFactories;
     }
 
     @Bean
@@ -69,13 +71,13 @@ public class TaskWorkerConfiguration {
 
     @Bean
     @Primary
-    TaskHandlerResolver taskHandlerResolver(Map<String, TaskHandler<?>> taskHandlerMap) {
+    TaskHandlerResolver taskHandlerResolver(TaskHandlerRegistry taskHandlerRegistry) {
         TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain();
 
         taskHandlerResolverChain.setTaskHandlerResolvers(
             List.of(
                 taskDispatcherAdapterTaskHandlerResolver(taskHandlerResolverChain),
-                defaultTaskHandlerResolver(taskHandlerRegistry(taskHandlerMap == null ? Map.of() : taskHandlerMap))));
+                defaultTaskHandlerResolver(taskHandlerRegistry)));
 
         return taskHandlerResolverChain;
     }
@@ -85,9 +87,9 @@ public class TaskWorkerConfiguration {
         EventPublisher eventPublisher, MessageBroker messageBroker, TaskHandlerResolver taskHandlerResolver) {
 
         return TaskWorker.builder()
-            .taskHandlerResolver(taskHandlerResolver)
-            .messageBroker(messageBroker)
             .eventPublisher(eventPublisher)
+            .messageBroker(messageBroker)
+            .taskHandlerResolver(taskHandlerResolver)
             .build();
     }
 }

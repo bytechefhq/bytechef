@@ -17,6 +17,7 @@
 
 package com.bytechef.helios.execution.web.rest;
 
+import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.helios.execution.facade.WorkflowExecutionFacade;
 import com.bytechef.helios.execution.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.helios.execution.web.rest.model.WorkflowExecutionModel;
@@ -34,6 +35,7 @@ import java.time.LocalDateTime;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
+@ConditionalOnEnabled("coordinator")
 public class ProjectWorkflowExecutionController implements WorkflowExecutionsApi {
 
     private final ConversionService conversionService;

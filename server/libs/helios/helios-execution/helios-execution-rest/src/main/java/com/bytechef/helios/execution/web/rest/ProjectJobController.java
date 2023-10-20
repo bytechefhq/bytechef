@@ -22,6 +22,7 @@ package com.bytechef.helios.execution.web.rest;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.facade.JobFactoryFacade;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
+import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.execution.web.rest.model.CreateJob200ResponseModel;
 import com.bytechef.helios.execution.web.rest.model.JobBasicModel;
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
+@ConditionalOnEnabled("coordinator")
 public class ProjectJobController implements JobsApi {
 
     private final ConversionService conversionService;
