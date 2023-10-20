@@ -18,9 +18,9 @@
 package com.bytechef.hermes.connection.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
+import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
-import com.bytechef.hermes.connection.web.rest.model.PutConnectionRequestModel;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -70,18 +70,20 @@ public class ConnectionController implements ConnectionsApi {
     public Mono<ResponseEntity<ConnectionModel>> postConnection(
         Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
 
-        return connectionModelMono.map(connectionModel -> ResponseEntity.ok(conversionService.convert(
-            connectionService.create(connectionModel.getName(), connectionModel.getComponentName(),
-                connectionModel.getComponentVersion(), connectionModel.getAuthorizationName(),
-                connectionModel.getParameters()),
-            ConnectionModel.class)));
+        return connectionModelMono.map(connectionModel -> ResponseEntity.ok(
+            conversionService.convert(
+                connectionService.create(
+                    conversionService.convert(connectionModel, Connection.class)),
+                ConnectionModel.class)));
     }
 
     @Override
     public Mono<ResponseEntity<ConnectionModel>> putConnection(
-        Long id, Mono<PutConnectionRequestModel> putConnectionRequestModelMono, ServerWebExchange exchange) {
-        return putConnectionRequestModelMono
-            .map(putConnectionRequestModel -> ResponseEntity.ok(conversionService.convert(
-                connectionService.update(id, putConnectionRequestModel.getName()), ConnectionModel.class)));
+        Long id, Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
+        return connectionModelMono.map(connectionModel -> ResponseEntity.ok(
+            conversionService.convert(
+                connectionService.update(
+                    conversionService.convert(connectionModel.id(id), Connection.class)),
+                ConnectionModel.class)));
     }
 }

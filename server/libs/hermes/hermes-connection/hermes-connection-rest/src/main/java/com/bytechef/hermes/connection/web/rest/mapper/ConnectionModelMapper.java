@@ -27,7 +27,7 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = ConnectionMapperSpringConfig.class)
-public interface ConnectionMapper extends Converter<Connection, ConnectionModel> {
+public interface ConnectionModelMapper extends Converter<ConnectionModel, Connection> {
 
-    ConnectionModel convert(Connection connection);
+    Connection convert(ConnectionModel connectionModel);
 }
