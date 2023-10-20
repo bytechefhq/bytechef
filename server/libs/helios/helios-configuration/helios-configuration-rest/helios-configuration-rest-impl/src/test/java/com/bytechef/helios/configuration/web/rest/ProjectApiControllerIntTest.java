@@ -178,7 +178,7 @@ public class ProjectApiControllerIntTest {
     @Test
     public void testGetProjectWorkflows() {
         try {
-            Workflow workflow = new Workflow("{}", Workflow.Format.JSON, "workflow1", Map.of(), Map.of());
+            Workflow workflow = new Workflow("workflow1", "{}", Workflow.Format.JSON, Map.of(), Map.of());
 
             when(projectFacade.getProjectWorkflows(1L)).thenReturn(List.of(workflow));
 
@@ -300,7 +300,7 @@ public class ProjectApiControllerIntTest {
             .label("workflowLabel")
             .description("workflowDescription");
         Workflow workflow = new Workflow(
-            "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}", "id",
+            "id", "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}",
             Workflow.Format.JSON.getId());
 
         when(projectFacade.addProjectWorkflow(anyLong(), any(), any(), any()))
