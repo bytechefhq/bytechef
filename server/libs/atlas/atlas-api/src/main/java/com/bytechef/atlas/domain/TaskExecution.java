@@ -223,8 +223,10 @@ public final class TaskExecution
         return Objects.equals(id, taskExecution.id);
     }
 
-    public void evaluate(TaskEvaluator taskEvaluator, Context context) {
+    public TaskExecution evaluate(TaskEvaluator taskEvaluator, Map<String, Object> context) {
         this.workflowTask = taskEvaluator.evaluate(this.workflowTask, context);
+
+        return this;
     }
 
     @Override

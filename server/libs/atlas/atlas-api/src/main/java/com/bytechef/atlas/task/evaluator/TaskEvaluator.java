@@ -19,7 +19,6 @@
 
 package com.bytechef.atlas.task.evaluator;
 
-import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.task.WorkflowTask;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,14 +101,14 @@ public class TaskEvaluator {
      * @param context      The context to evaluate the task against
      * @return the evaluate {@link WorkflowTask}.
      */
-    public WorkflowTask evaluate(WorkflowTask workflowTask, Context context) {
+    public WorkflowTask evaluate(WorkflowTask workflowTask, Map<String, Object> context) {
         Map<String, Object> map = evaluateInternal(workflowTask.toMap(), context);
 
         return new WorkflowTask(map);
     }
 
-    private StandardEvaluationContext createEvaluationContext(Context context) {
-        StandardEvaluationContext evaluationContext = new StandardEvaluationContext(context.getValue());
+    private StandardEvaluationContext createEvaluationContext(Map<String, Object> context) {
+        StandardEvaluationContext evaluationContext = new StandardEvaluationContext(context);
 
         evaluationContext.addPropertyAccessor(new MapPropertyAccessor());
         evaluationContext.addMethodResolver(methodResolver());
@@ -117,7 +116,7 @@ public class TaskEvaluator {
         return evaluationContext;
     }
 
-    private String evaluate(CompositeStringExpression compositeStringExpression, Context context) {
+    private String evaluate(CompositeStringExpression compositeStringExpression, Map<String, Object> context) {
         StringBuilder stringBuilder = new StringBuilder();
         Expression[] subExpressions = compositeStringExpression.getExpressions();
 
@@ -140,7 +139,7 @@ public class TaskEvaluator {
         return stringBuilder.toString();
     }
 
-    private Object evaluate(Object value, Context context) {
+    private Object evaluate(Object value, Map<String, Object> context) {
         if (value instanceof String) {
             Expression expression = parser.parseExpression((String) value, new TemplateParserContext(PREFIX, SUFFIX));
 
@@ -172,7 +171,7 @@ public class TaskEvaluator {
         return value;
     }
 
-    private Map<String, Object> evaluateInternal(Map<?, ?> map, Context context) {
+    private Map<String, Object> evaluateInternal(Map<?, ?> map, Map<String, Object> context) {
         Map<String, Object> newMap = new HashMap<>();
 
         for (Entry<?, ?> entry : map.entrySet()) {
