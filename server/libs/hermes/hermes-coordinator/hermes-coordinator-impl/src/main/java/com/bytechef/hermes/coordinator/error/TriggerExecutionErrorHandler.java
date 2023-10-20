@@ -59,4 +59,9 @@ public class TriggerExecutionErrorHandler implements ErrorHandler<TriggerExecuti
 
         triggerExecutionService.update(triggerExecution);
     }
+
+    @Override
+    public Class<?> getType() {
+        return TriggerExecutionErrorHandler.class;
+    }
 }

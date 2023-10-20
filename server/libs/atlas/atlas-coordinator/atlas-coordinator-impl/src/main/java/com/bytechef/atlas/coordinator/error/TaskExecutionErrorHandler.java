@@ -110,4 +110,9 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
             eventPublisher.publishEvent(new JobStatusEvent(job.getId(), job.getStatus()));
         }
     }
+
+    @Override
+    public Class<?> getType() {
+        return TaskExecutionErrorHandler.class;
+    }
 }

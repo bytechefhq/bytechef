@@ -32,35 +32,22 @@ public class ErrorHandlerChainTest {
 
     @Test
     public void test1() {
-        ErrorHandler<Job> errorHandler = job -> Assertions.assertEquals(Job.class, job.getClass());
-
         @SuppressWarnings({
             "rawtypes", "unchecked"
         })
-        ErrorHandlerChain chain = new ErrorHandlerChain((List) List.of(errorHandler));
+        ErrorHandlerChain chain = new ErrorHandlerChain((List) List.of(new JobErrorHandler()));
 
         chain.handle(new Job());
     }
 
     @Test
     public void test2() {
-        ErrorHandler<? extends Errorable> errorHandler1 = new ErrorHandler<Job>() {
-            @Override
-            public void handle(Job j) {
-                throw new IllegalStateException("should not get here");
-            }
-        };
-        ErrorHandler<? extends Errorable> errorHandler2 = new ErrorHandler<TaskExecution>() {
-            @Override
-            public void handle(TaskExecution jt) {
-                Assertions.assertEquals(TaskExecution.class, jt.getClass());
-            }
-        };
 
         @SuppressWarnings({
             "rawtypes", "unchecked"
         })
-        ErrorHandlerChain chain = new ErrorHandlerChain((List) Arrays.asList(errorHandler1, errorHandler2));
+        ErrorHandlerChain chain = new ErrorHandlerChain(
+            (List) Arrays.asList(new Test1ErrorHandler(), new Test2ErrorHandler()));
 
         chain.handle(new TaskExecution());
     }
@@ -73,11 +60,50 @@ public class ErrorHandlerChainTest {
         }
     }
 
+    private static class JobErrorHandler implements ErrorHandler<Job> {
+
+        @Override
+        public void handle(Job job) {
+            Assertions.assertEquals(Job.class, job.getClass());
+        }
+
+        @Override
+        public Class<?> getType() {
+            return JobErrorHandler.class;
+        }
+    };
+
     private static class TaskExecution implements Errorable {
 
         @Override
         public ExecutionError getError() {
             return null;
+        }
+    }
+
+    private static class Test1ErrorHandler implements ErrorHandler<ErrorHandlerChainTest.Job> {
+
+        @Override
+        public void handle(Job j) {
+            throw new IllegalStateException("should not get here");
+        }
+
+        @Override
+        public Class<?> getType() {
+            return Test1ErrorHandler.class;
+        }
+    };
+
+    private static class Test2ErrorHandler implements ErrorHandler<ErrorHandlerChainTest.TaskExecution> {
+
+        @Override
+        public void handle(ErrorHandlerChainTest.TaskExecution jt) {
+            Assertions.assertEquals(ErrorHandlerChainTest.TaskExecution.class, jt.getClass());
+        }
+
+        @Override
+        public Class<?> getType() {
+            return Test2ErrorHandler.class;
         }
     }
 }
