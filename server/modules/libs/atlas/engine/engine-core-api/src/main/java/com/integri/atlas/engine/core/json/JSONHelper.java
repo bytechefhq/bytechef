@@ -21,6 +21,9 @@ package com.integri.atlas.engine.core.json;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.InputStream;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * @author Arik Cohen
@@ -53,6 +56,14 @@ public class JSONHelper {
     public String serialize(Object value) {
         try {
             return objectMapper.writeValueAsString(value);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Stream<Map<String, ?>> stream(InputStream inputStream) {
+        try {
+            return new JSONParserStream(inputStream, objectMapper);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

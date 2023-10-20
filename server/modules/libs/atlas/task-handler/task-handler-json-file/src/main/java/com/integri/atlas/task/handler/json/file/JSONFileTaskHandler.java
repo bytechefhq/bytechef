@@ -30,6 +30,7 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -65,10 +66,10 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
         FileType fileType = FileType.valueOf(
             StringUtils.upperCase(taskExecution.get("fileType", String.class, "JSON"))
         );
-        boolean isArray = taskExecution.get("isArray", Boolean.class, true);
         Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
 
         if (operation == Operation.READ) {
+            boolean isArray = taskExecution.get("isArray", Boolean.class, true);
             FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);
 
             if (isArray) {
@@ -87,7 +88,13 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
                 }
 
                 if (fileType == FileType.JSON) {
-                    items = jsonHelper.deserialize(fileStorageService.readFileContent(fileEntry.getUrl()));
+                    try (
+                        Stream<Map<String, ?>> stream = jsonHelper.stream(
+                            fileStorageService.getFileContentStream(fileEntry.getUrl())
+                        )
+                    ) {
+                        items = stream.toList();
+                    }
                 } else {
                     try (
                         BufferedReader bufferedReader = new BufferedReader(
@@ -123,24 +130,14 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-            Object object = taskExecution.get("json");
-
-            if (object instanceof Map) {
+            if (fileType == FileType.JSON) {
                 try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
                     printWriter.println(jsonHelper.serialize(object));
                 }
             } else {
-                List<Map<String, ?>> items = (List<Map<String, ?>>) object;
-
-                if (fileType == FileType.JSON) {
-                    try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
-                        printWriter.println(jsonHelper.serialize(items));
-                    }
-                } else {
-                    try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
-                        for (Map<String, ?> item : items) {
-                            printWriter.println(jsonHelper.serialize(item));
-                        }
+                try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
+                    for (Map<String, ?> item : (List<Map<String, ?>>)object) {
+                        printWriter.println(jsonHelper.serialize(item));
                     }
                 }
             }

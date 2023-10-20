@@ -106,7 +106,7 @@ public class JSONFileTaskDeclarationTest {
                         "required":true,
                         "type":"JSON"
                     },
-                     {
+                    {
                         "defaultValue":true,
                         "description":"The input JSON is array?",
                         "displayName":"Is Array",
