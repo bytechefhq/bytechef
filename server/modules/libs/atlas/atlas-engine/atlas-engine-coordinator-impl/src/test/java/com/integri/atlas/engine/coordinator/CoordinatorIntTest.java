@@ -118,7 +118,7 @@ public class CoordinatorIntTest {
 
         Job job = coordinator.create(
             MapObject.of(
-                ImmutableMap.of("workflowId", "demo/hello", "inputs", Collections.singletonMap("yourName", "me"))
+                ImmutableMap.of("workflowId", "samples/hello", "inputs", Collections.singletonMap("yourName", "me"))
             )
         );
 
@@ -134,7 +134,7 @@ public class CoordinatorIntTest {
             () -> {
                 Coordinator coordinator = new Coordinator();
                 coordinator.setWorkflowRepository(new ResourceBasedWorkflowRepository(new YAMLWorkflowMapper()));
-                coordinator.create(MapObject.of(Collections.singletonMap("workflowId", "demo/hello")));
+                coordinator.create(MapObject.of(Collections.singletonMap("workflowId", "samples/hello")));
             }
         );
     }
