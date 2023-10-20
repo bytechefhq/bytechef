@@ -10,9 +10,9 @@ create table job (
   start_time               timestamp        null,
   end_time                 timestamp        null,
   priority                 int          not null,
-  inputs                   json        not null,
-  webhooks                 json        not null,
-  outputs                  json        not null,
+  inputs                   text        not null,
+  webhooks                 text        not null,
+  outputs                  text        not null,
   parent_task_execution_id varchar(256)
 );
 
@@ -30,7 +30,7 @@ create table task_execution (
   create_time          timestamp    not null,
   start_time           timestamp        null,
   end_time             timestamp        null,
-  serialized_execution json        not null,
+  serialized_execution text        not null,
   priority             int          not null,
   task_number          int          not null
 );
@@ -43,7 +43,7 @@ create table context (
   id                 varchar(256) not null primary key,
   stack_id           varchar(256) not null,
   create_time        timestamp    not null,
-  serialized_context json        not null
+  serialized_context text        not null
 );
 
 create index idx_context_stack_id on context (stack_id);
