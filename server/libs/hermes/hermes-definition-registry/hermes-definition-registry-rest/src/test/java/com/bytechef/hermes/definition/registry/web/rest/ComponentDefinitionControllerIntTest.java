@@ -94,7 +94,7 @@ public class ComponentDefinitionControllerIntTest {
 
     @Test
     public void testGetComponentDefinitions() {
-        Mockito.when(componentDefinitionFacade.search(null, null, null, null))
+        Mockito.when(componentDefinitionFacade.getComponentDefinitions(null, null, null, null, null))
             .thenReturn(List.of(new ComponentDefinitionDTO("component1"), new ComponentDefinitionDTO("component2")));
 
         try {

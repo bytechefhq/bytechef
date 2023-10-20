@@ -42,9 +42,9 @@ public class ComponentDefinitionFacadeClient extends AbstractWorkerClient implem
     }
 
     @Override
-    public List<ComponentDefinitionDTO> search(
+    public List<ComponentDefinitionDTO> getComponentDefinitions(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
-        Boolean triggerDefinitions) {
+        Boolean triggerDefinitions, List<String> include) {
 
         return Mono.zip(
             WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
@@ -52,7 +52,7 @@ public class ComponentDefinitionFacadeClient extends AbstractWorkerClient implem
                 .map(serviceInstance -> WORKER_WEB_CLIENT
                     .get()
                     .uri(uriBuilder -> toUri(
-                        uriBuilder, serviceInstance, "/component-definition-service/search", Map.of(),
+                        uriBuilder, serviceInstance, "/component-definition-facade/get-component-definitions", Map.of(),
                         new LinkedMultiValueMap<>() {
                             {
                                 if (actionDefinitions != null) {

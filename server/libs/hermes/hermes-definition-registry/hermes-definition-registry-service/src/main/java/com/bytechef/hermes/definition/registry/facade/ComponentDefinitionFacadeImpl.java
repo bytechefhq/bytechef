@@ -46,25 +46,30 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
     }
 
     @Override
-    public List<ComponentDefinitionDTO> search(
+    public List<ComponentDefinitionDTO> getComponentDefinitions(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
-        Boolean triggerDefinitions) {
+        Boolean triggerDefinitions, List<String> include) {
 
         List<Connection> connections = connectionService.getConnections();
 
         return componentDefinitionService.getComponentDefinitions()
             .stream()
             .filter(filter(
-                actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions, connections))
+                actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions, include,
+                connections))
             .distinct()
             .toList();
     }
 
     private static Predicate<ComponentDefinitionDTO> filter(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
-        Boolean triggerDefinitions, List<Connection> connections) {
+        Boolean triggerDefinitions, List<String> include, List<Connection> connections) {
 
         return componentDefinition -> {
+            if (include != null && !include.isEmpty() && !include.contains(componentDefinition.name())) {
+                return false;
+            }
+
             if (actionDefinitions != null && CollectionUtils.isEmpty(componentDefinition.actions())) {
                 return false;
             }
