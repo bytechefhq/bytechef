@@ -17,7 +17,6 @@
 
 package com.bytechef.helios.configuration.web.rest;
 
-import com.bytechef.helios.configuration.web.rest.model.CategoryModel;
 import com.bytechef.helios.configuration.web.rest.model.TagModel;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.helios.configuration.web.rest.model.CreateProjectWorkflowRequestModel;
@@ -95,23 +94,6 @@ public class ProjectController implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<List<CategoryModel>> getProjectCategories() {
-        return ResponseEntity.ok(
-            projectFacade.getProjectCategories()
-                .stream()
-                .map(category -> conversionService.convert(category, CategoryModel.class))
-                .toList());
-    }
-
-    @Override
-    public ResponseEntity<List<TagModel>> getProjectTags() {
-        return ResponseEntity.ok(projectFacade.getProjectTags()
-            .stream()
-            .map(tag -> conversionService.convert(tag, TagModel.class))
-            .toList());
-    }
-
-    @Override
     public ResponseEntity<List<ProjectModel>> getProjects(
         Long categoryId, Boolean projectInstances, Long tagId) {
 
@@ -123,7 +105,7 @@ public class ProjectController implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<List<WorkflowModel>> getProjectWorkflows(Long id) {
+    public ResponseEntity<List<WorkflowModel>> getProjectProjectWorkflows(Long id) {
         return ResponseEntity.ok(
             projectFacade.getProjectWorkflows(id)
                 .stream()
