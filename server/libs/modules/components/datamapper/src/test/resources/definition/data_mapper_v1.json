@@ -1,0 +1,340 @@
+{
+  "actions": [ {
+    "batch": false,
+    "display": {
+      "description": "The action maps values of a given object to fresh keys and returns a new object containing those newly mapped keys.",
+      "title": "Map Keys"
+    },
+    "name": "mapKeys",
+    "properties": [ {
+      "description": "Object containing one or more properties.",
+      "label": "Input",
+      "required": true,
+      "name": "input",
+      "type": "OBJECT",
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    }, {
+      "description": "Specify the necessary mappings by defining that \"From\" refers to a particular key from the Input, while \"To\" represents the name of a new key that is assigned the corresponding value of the \"From\" key.",
+      "label": "Mappings",
+      "required": true,
+      "name": "mappings",
+      "type": "ARRAY",
+      "items": [ {
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "label": "From",
+          "name": "from",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "label": "To",
+          "name": "to",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        } ],
+        "controlType": "JSON_BUILDER"
+      } ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    } ]
+  }, {
+    "batch": false,
+    "display": {
+      "description": "Map an array of key value objects to a single object.",
+      "title": "Map list to object"
+    },
+    "name": "mapListToObject",
+    "properties": [ {
+      "description": "An array of key value objects.",
+      "label": "Input",
+      "required": true,
+      "name": "input",
+      "type": "ARRAY",
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    }, {
+      "description": "The value's key will serve as the key in the newly created object.",
+      "label": "Field Key",
+      "required": true,
+      "name": "fieldKey",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "description": "The value of the key will become the value in the new object.",
+      "label": "Field Key",
+      "required": true,
+      "name": "fieldValue",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ]
+  }, {
+    "batch": false,
+    "display": {
+      "description": "Transform object properties by assigning new values and generate a new object with updated properties.",
+      "title": "Map multiple values between objects\n"
+    },
+    "name": "mapMultipleValuesBetweenObjects",
+    "properties": [ {
+      "description": "Object containing one or more properties.",
+      "label": "Input",
+      "required": true,
+      "name": "input",
+      "type": "OBJECT",
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    }, {
+      "description": "Object containing one or more properties.",
+      "label": "Value",
+      "required": true,
+      "name": "value",
+      "type": "OBJECT",
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    }, {
+      "description": "In defining mappings, the key \"From\" corresponds to an existing key in the Input, while the key \"To\" is utilized to determine the value to which the \"From\" key should be set, by referring to its key in the Values.",
+      "label": "Mappings",
+      "required": true,
+      "name": "mappings",
+      "type": "ARRAY",
+      "items": [ {
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "label": "From",
+          "name": "from",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "label": "To",
+          "name": "to",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        } ],
+        "controlType": "JSON_BUILDER"
+      } ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    } ]
+  }, {
+    "batch": false,
+    "display": {
+      "description": "Map object fields to new keys.",
+      "title": "Map objects"
+    },
+    "name": "mapObjects",
+    "properties": [ {
+      "description": "Object containing one or more properties.",
+      "label": "Input",
+      "required": true,
+      "name": "input",
+      "type": "OBJECT",
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    }, {
+      "description": "An object that consists of key-value pairs defines the source key as the key and the value as the key that needs mapping. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping.",
+      "label": "Mapping",
+      "required": true,
+      "name": "mapping",
+      "type": "OBJECT",
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    }, {
+      "description": "Should fields from the original object that do not have mappings be included?",
+      "label": "Include Unmapped",
+      "name": "includeUnmapped",
+      "type": "BOOLEAN",
+      "defaultValue": true,
+      "controlType": "CHECKBOX"
+    }, {
+      "description": "Should fields that have null values be included?",
+      "label": "Include Nulls",
+      "name": "includeNulls",
+      "type": "BOOLEAN",
+      "defaultValue": true,
+      "controlType": "CHECKBOX"
+    }, {
+      "description": "Should fields with empty string values be included?",
+      "label": "Include empty strings",
+      "name": "includeEmptyStrings",
+      "type": "BOOLEAN",
+      "defaultValue": true,
+      "controlType": "CHECKBOX"
+    }, {
+      "description": "A list of fields that are required on the mapped object.",
+      "label": "Required fields",
+      "name": "requiredFields",
+      "type": "ARRAY",
+      "items": [ {
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    } ]
+  }, {
+    "batch": false,
+    "display": {
+      "description": "Transform an object or an array of objects into an array of key-value pairs.",
+      "title": "Map objects to list"
+    },
+    "name": "mapObjectsToList",
+    "properties": [ {
+      "description": "Object containing one or more properties.",
+      "label": "Input",
+      "required": true,
+      "name": "input",
+      "type": "OBJECT",
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    }, {
+      "description": "The name of the key to map keys to.",
+      "label": "Field key",
+      "name": "fieldKey",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "description": "The name of the key to map keys to.",
+      "label": "Value key",
+      "name": "valueKey",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ]
+  }, {
+    "batch": false,
+    "display": {
+      "description": "The action maps a given value by matching it with the defined mappings, and it returns the outcome of the mapping. In case there is no mapping specified for the value, it returns the default value, and if there is no default defined, it returns null.",
+      "title": "Map one value"
+    },
+    "name": "mapOneValue",
+    "properties": [ {
+      "description": "The value you want to map.",
+      "label": "Value",
+      "name": "value",
+      "type": "ONE_OF",
+      "types": [ {
+        "type": "ARRAY",
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "type": "NUMBER",
+        "controlType": "INPUT_NUMBER"
+      }, {
+        "type": "OBJECT",
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "type": "NULL"
+      } ]
+    }, {
+      "description": "If no mapping exists, map this value by default.",
+      "label": "Default value",
+      "name": "defaultValue",
+      "type": "ONE_OF",
+      "types": [ {
+        "type": "ARRAY",
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "type": "NUMBER",
+        "controlType": "INPUT_NUMBER"
+      }, {
+        "type": "OBJECT",
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "type": "NULL"
+      } ]
+    }, {
+      "description": "A list of \"mappings\" for the value. If the value specified matches the \"From\", then the connector will return the \"To\" value.",
+      "label": "Mappings",
+      "required": true,
+      "name": "mappings",
+      "type": "ARRAY",
+      "items": [ {
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "label": "From",
+          "name": "from",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "label": "To",
+          "name": "to",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        } ],
+        "controlType": "JSON_BUILDER"
+      } ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    } ]
+  }, {
+    "batch": false,
+    "display": {
+      "description": "When provided with an object or an array of objects, the function maps one or more values to new values. It can be restricted to specific keys of the object. The resulting data structure is a new object or array with the original structure and updated values.",
+      "title": "Map values"
+    },
+    "name": "mapValues",
+    "properties": [ {
+      "description": "Object containing one or more properties.",
+      "label": "Input",
+      "required": true,
+      "name": "input",
+      "type": "ONE_OF",
+      "types": [ {
+        "type": "OBJECT",
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "type": "ARRAY",
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      } ]
+    }, {
+      "description": "Specify the necessary mappings by defining that \"From\" refers to a particular key from the Input, while \"To\" represents the name of a new key that is assigned the corresponding value of the \"From\" key.",
+      "label": "Mappings",
+      "required": true,
+      "name": "mappings",
+      "type": "ARRAY",
+      "items": [ {
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "label": "From",
+          "name": "from",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "label": "To",
+          "name": "to",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        } ],
+        "controlType": "JSON_BUILDER"
+      } ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    } ]
+  } ],
+  "display": {
+    "description": "The Data Mapper enables you to configure data mappings.",
+    "title": "Data Mapper"
+  },
+  "name": "dataMapper",
+  "version": 1
+}
