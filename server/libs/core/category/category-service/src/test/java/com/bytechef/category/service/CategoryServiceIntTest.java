@@ -22,7 +22,7 @@ import com.bytechef.category.repository.CategoryRepository;
 import com.bytechef.category.domain.Category;
 import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,9 +46,9 @@ public class CategoryServiceIntTest {
     @Autowired
     private CategoryService categoryService;
 
-    @BeforeEach
+    @AfterEach
     @SuppressFBWarnings("NP")
-    public void beforeEach() {
+    public void afterEach() {
         categoryRepository.deleteAll();
     }
 

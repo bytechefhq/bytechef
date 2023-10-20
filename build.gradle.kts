@@ -13,15 +13,6 @@ versionCatalogUpdate {
 subprojects {
     apply(plugin = "com.bytechef.java-common-conventions")
 
-    configurations {
-        all {
-            // https://github.com/testcontainers/testcontainers-java/issues/970
-            /* exclude junit 4 dependencies */
-            // exclude group: 'junit', module: 'junit'
-            // exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-        }
-    }
-
     dependencies {
         compileOnly(rootProject.libs.org.graalvm.sdk.graal.sdk)
 

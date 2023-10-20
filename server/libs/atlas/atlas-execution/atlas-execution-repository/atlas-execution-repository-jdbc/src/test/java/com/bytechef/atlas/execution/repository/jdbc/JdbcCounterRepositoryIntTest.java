@@ -22,12 +22,10 @@ import com.bytechef.atlas.execution.domain.Counter;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.jdbc.config.WorkflowExecutionRepositoryIntTestConfiguration;
-import com.bytechef.atlas.execution.repository.CounterRepository;
-import com.bytechef.atlas.execution.repository.JobRepository;
-import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,15 +44,24 @@ import java.util.Map;
 public class JdbcCounterRepositoryIntTest {
 
     @Autowired
-    private CounterRepository counterRepository;
+    private JdbcCounterRepository counterRepository;
 
     @Autowired
-    private JobRepository jobRepository;
+    private JdbcJobRepository jobRepository;
 
     @Autowired
-    private TaskExecutionRepository taskExecutionRepository;
+    private JdbcTaskExecutionRepository taskExecutionRepository;
 
     private Counter counter;
+
+    @AfterEach
+    public void afterEach() {
+        counterRepository.deleteAll();
+
+        taskExecutionRepository.deleteAll();
+        jobRepository.deleteAll();
+
+    }
 
     @BeforeEach
     @SuppressFBWarnings("NP")

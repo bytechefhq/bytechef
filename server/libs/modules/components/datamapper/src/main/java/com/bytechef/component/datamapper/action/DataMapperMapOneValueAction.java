@@ -17,7 +17,7 @@
 
 package com.bytechef.component.datamapper.action;
 
-import com.bytechef.hermes.component.ActionContext;
+import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
@@ -260,7 +260,7 @@ public class DataMapperMapOneValueAction {
         .outputSchema(getOutputSchemaFunction())
         .perform(DataMapperMapOneValueAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters, ActionContext context) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionDefinition.ActionContext context) {
         // TODO
         return null;
     }

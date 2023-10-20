@@ -136,6 +136,8 @@ bytechef:
     file-storage-dir: /tmp/bytechef/files
   context-repository:
     provider: jdbc
+  encryption:
+    provider: filesystem
   message-broker:
     # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
     provider: redis

@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":server:libs:hermes:hermes-data-storage:hermes-data-storage-api"))
+    implementation(project(":server:libs:hermes:hermes-data-storage:hermes-data-storage-api"))
 
     implementation("org.springframework:spring-context")
     implementation("org.springframework.boot:spring-boot-autoconfigure")

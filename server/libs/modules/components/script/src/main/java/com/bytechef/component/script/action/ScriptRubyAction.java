@@ -18,7 +18,7 @@
 package com.bytechef.component.script.action;
 
 import com.bytechef.component.script.constant.ScriptConstants;
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.definition.Property;

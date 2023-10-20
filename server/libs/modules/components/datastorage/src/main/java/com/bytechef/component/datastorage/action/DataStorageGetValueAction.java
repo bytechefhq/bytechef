@@ -17,7 +17,7 @@
 
 package com.bytechef.component.datastorage.action;
 
-import com.bytechef.hermes.component.ActionContext;
+import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.util.MapUtils;
@@ -119,7 +119,7 @@ public class DataStorageGetValueAction {
         .outputSchema(getOutputSchemaFunction())
         .perform(DataStorageGetValueAction::perform);
 
-    protected static Object perform(Map<String, ?> inputParameters, ActionContext actionContext) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionDefinition.ActionContext actionContext) {
         // TODO
 
         return null;

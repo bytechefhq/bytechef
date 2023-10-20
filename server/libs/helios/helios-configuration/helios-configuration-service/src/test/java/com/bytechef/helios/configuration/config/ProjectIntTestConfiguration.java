@@ -17,21 +17,19 @@
 
 package com.bytechef.helios.configuration.config;
 
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
-import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServiceImpl;
+import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.message.broker.MessageBroker;
 
-import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
@@ -44,7 +42,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
         "com.bytechef.tag"
     })
 @EnableAutoConfiguration
-@SpringBootConfiguration
+@Configuration
 public class ProjectIntTestConfiguration {
 
     @MockBean
@@ -54,15 +52,21 @@ public class ProjectIntTestConfiguration {
     private EventPublisher eventPublisher;
 
     @MockBean
+    private JobFacade jobFacade;
+
+    @MockBean
     private MessageBroker messageBroker;
 
     @MockBean
-    ComponentDefinitionRegistry componentDefinitionRegistry;
+    private TriggerLifecycleFacade triggerLifecycleFacade;
 
-    @Bean
-    ComponentDefinitionService componentDefinitionService(ComponentDefinitionRegistry componentDefinitionRegistry) {
-        return new ComponentDefinitionServiceImpl(componentDefinitionRegistry);
-    }
+//    @MockBean
+//    ComponentDefinitionRegistry componentDefinitionRegistry;
+
+//    @Bean
+//    ComponentDefinitionService componentDefinitionService(ComponentDefinitionRegistry componentDefinitionRegistry) {
+//        return new ComponentDefinitionServiceImpl(componentDefinitionRegistry);
+//    }
 
     @EnableCaching
     @TestConfiguration

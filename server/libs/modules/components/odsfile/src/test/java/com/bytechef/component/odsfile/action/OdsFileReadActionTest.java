@@ -18,7 +18,7 @@
 package com.bytechef.component.odsfile.action;
 
 import com.bytechef.component.odsfile.OdsFileComponentHandlerTest;
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.json.JSONArray;

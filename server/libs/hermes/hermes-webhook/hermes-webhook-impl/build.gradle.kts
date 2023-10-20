@@ -1,5 +1,7 @@
 dependencies {
-    api(project(":server:libs:hermes:hermes-webhook:hermes-webhook-api"))
+    implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))
+    implementation(project(":server:libs:hermes:hermes-coordinator:hermes-coordinator-api"))
+    implementation(project(":server:libs:hermes:hermes-webhook:hermes-webhook-api"))
 
     implementation("org.springframework:spring-context")
     implementation(project(":server:libs:atlas:atlas-sync-executor"))

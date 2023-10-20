@@ -21,7 +21,7 @@ import com.bytechef.event.listener.EventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.test.executor.JobTestExecutorImpl;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.sync.SyncMessageBroker;

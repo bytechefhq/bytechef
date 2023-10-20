@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.Context.Connection;
+import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.definition.Property.OutputProperty;
 
 import java.util.Map;

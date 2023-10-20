@@ -18,7 +18,7 @@
 package com.bytechef.component.schedule.trigger;
 
 import com.bytechef.component.schedule.util.ScheduleUtils;
-import com.bytechef.hermes.component.Context.Connection;
+import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;

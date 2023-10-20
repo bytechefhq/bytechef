@@ -17,8 +17,8 @@
 
 package com.bytechef.component.xmlfile.action;
 
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Context.FileEntry;
+import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.MapUtils;
@@ -79,7 +79,7 @@ public class XmlFileWriteAction {
         .outputSchema(fileEntry())
         .perform(XmlFileWriteAction::perform);
 
-    protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
+    protected static FileEntry perform(Map<String, ?> inputParameters, ActionDefinition.ActionContext context) {
         Object source = MapUtils.getRequired(inputParameters, SOURCE);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

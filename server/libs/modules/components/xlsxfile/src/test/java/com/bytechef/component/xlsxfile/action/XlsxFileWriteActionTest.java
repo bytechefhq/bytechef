@@ -19,7 +19,7 @@ package com.bytechef.component.xlsxfile.action;
 
 import com.bytechef.component.xlsxfile.XlsxFileComponentHandlerTest;
 import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.util.MapUtils;
 import org.assertj.core.api.AbstractStringAssert;
 import org.assertj.core.api.Assertions;

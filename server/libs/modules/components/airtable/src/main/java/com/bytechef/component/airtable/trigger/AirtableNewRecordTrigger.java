@@ -63,10 +63,9 @@ public class AirtableNewRecordTrigger {
 
     protected static TriggerDefinition.PollOutput poll(TriggerDefinition.PollContext context) {
         Map<String, ?> inputParameters = context.inputParameters();
-        Map<String, Object> closureParameters = context.closureParameters();
+        Map<String, ?> closureParameters = context.closureParameters();
 
-        LocalDateTime startDate = (LocalDateTime) closureParameters.getOrDefault(
-            LAST_TIME_CHECKED, LocalDateTime.now());
+        LocalDateTime startDate = MapUtils.getLocalDateTime(closureParameters, LAST_TIME_CHECKED, LocalDateTime.now());
         LocalDateTime endDate = LocalDateTime.now();
 
         @SuppressWarnings("unchecked")

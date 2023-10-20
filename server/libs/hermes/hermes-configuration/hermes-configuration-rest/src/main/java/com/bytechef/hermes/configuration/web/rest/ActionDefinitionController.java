@@ -19,8 +19,8 @@ package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionModel;
-import com.bytechef.hermes.definition.registry.component.ComponentOperation;
-import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
+import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;

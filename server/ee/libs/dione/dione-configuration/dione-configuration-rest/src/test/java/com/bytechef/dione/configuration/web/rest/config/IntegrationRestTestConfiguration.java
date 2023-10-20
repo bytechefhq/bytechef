@@ -17,8 +17,8 @@
 
 package com.bytechef.dione.configuration.web.rest.config;
 
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 @ComponentScan(basePackages = {
     "com.bytechef.hermes.workflow.web.rest",
@@ -26,6 +26,6 @@ import org.springframework.context.annotation.ComponentScan;
     "com.bytechef.dione.configuration.web.rest",
     "com.bytechef.tag.web.rest.mapper"
 })
-@SpringBootConfiguration
+@Configuration
 public class IntegrationRestTestConfiguration {
 }

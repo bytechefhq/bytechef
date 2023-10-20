@@ -19,11 +19,11 @@ package com.bytechef.hermes.execution.facade;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.hermes.definition.registry.component.ComponentOperation;
-import com.bytechef.hermes.definition.registry.domain.TriggerDefinition;
+import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
-import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
+import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
+import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 import org.springframework.stereotype.Service;

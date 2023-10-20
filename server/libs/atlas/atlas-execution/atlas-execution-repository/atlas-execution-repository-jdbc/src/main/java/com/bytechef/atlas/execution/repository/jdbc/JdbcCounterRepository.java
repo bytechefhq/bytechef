@@ -21,6 +21,7 @@ import com.bytechef.atlas.execution.domain.Counter;
 import com.bytechef.atlas.execution.repository.CounterRepository;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -29,7 +30,9 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
-public interface JdbcCounterRepository extends ListPagingAndSortingRepository<Counter, Long>, CounterRepository {
+public interface JdbcCounterRepository
+    extends ListPagingAndSortingRepository<Counter, Long>, ListCrudRepository<Counter, Long>,
+    CounterRepository {
 
     @Override
     @Query("SELECT value FROM counter WHERE id = :id FOR UPDATE")
@@ -38,4 +41,6 @@ public interface JdbcCounterRepository extends ListPagingAndSortingRepository<Co
     @Modifying
     @Query("UPDATE counter SET value = :value WHERE id = :id")
     void update(@Param("id") Long id, @Param("value") long value);
+
+    Counter save(Counter counter);
 }

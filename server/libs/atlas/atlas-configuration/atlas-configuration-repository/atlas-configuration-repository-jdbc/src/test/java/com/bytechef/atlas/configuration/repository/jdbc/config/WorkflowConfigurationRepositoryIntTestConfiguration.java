@@ -17,19 +17,19 @@
 
 package com.bytechef.atlas.configuration.repository.jdbc.config;
 
-import com.bytechef.atlas.configuration.repository.jdbc.converter.StringToWorkflowTaskConverter;
-import com.bytechef.atlas.configuration.repository.jdbc.converter.WorkflowTaskToStringConverter;
+import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
+import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 import java.util.Arrays;
@@ -43,7 +43,7 @@ import java.util.List;
         "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.liquibase.config",
     })
 @EnableAutoConfiguration
-@SpringBootConfiguration
+@Configuration
 public class WorkflowConfigurationRepositoryIntTestConfiguration {
 
     @Bean

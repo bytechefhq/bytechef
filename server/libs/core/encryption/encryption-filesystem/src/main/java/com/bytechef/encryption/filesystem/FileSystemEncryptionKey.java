@@ -26,7 +26,7 @@ import java.nio.file.Path;
  */
 public class FileSystemEncryptionKey extends AbstractEncryptionKey {
 
-    private String key;
+    private final String key;
 
     public FileSystemEncryptionKey() {
         Path userHome = Path.of(System.getProperty("user.home"));

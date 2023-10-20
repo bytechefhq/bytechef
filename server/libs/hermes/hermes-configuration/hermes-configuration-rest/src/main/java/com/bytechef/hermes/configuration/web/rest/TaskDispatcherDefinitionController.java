@@ -18,7 +18,7 @@
 package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
-import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
+import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherDefinitionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

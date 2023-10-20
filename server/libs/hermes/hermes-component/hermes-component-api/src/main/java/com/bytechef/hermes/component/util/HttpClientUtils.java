@@ -17,14 +17,18 @@
 
 package com.bytechef.hermes.component.util;
 
-import com.bytechef.hermes.component.Context.FileEntry;
+import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 
 /**
@@ -32,6 +36,27 @@ import java.util.ServiceLoader;
  * @author Ivica Cardic
  */
 public final class HttpClientUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(HttpClientUtils.class);
+
+    static HttpClientExecutor httpClientExecutor;
+
+    static {
+        try {
+            ServiceLoader<HttpClientExecutor> loader = ServiceLoader.load(HttpClientExecutor.class);
+
+            httpClientExecutor = loader.findFirst()
+                .orElse(null);
+        } catch (ServiceConfigurationError e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(e.getMessage(), e);
+            }
+        }
+
+        if (httpClientExecutor == null && logger.isWarnEnabled()) {
+            logger.warn("HttpClientExecutor instance is not available");
+        }
+    }
 
     /**
      *
@@ -67,19 +92,6 @@ public final class HttpClientUtils {
         PUT,
     }
 
-    static HttpClientExecutor httpClientExecutor;
-
-    static {
-        ServiceLoader<HttpClientExecutor> loader = ServiceLoader.load(HttpClientExecutor.class);
-
-        httpClientExecutor = loader.findFirst()
-            .orElse(null);
-
-        if (httpClientExecutor == null) {
-            System.err.println("HttpClientExecutor instance is not available");
-        }
-    }
-
     private HttpClientUtils() {
     }
 
@@ -88,12 +100,12 @@ public final class HttpClientUtils {
      * @param allowUnauthorizedCerts
      * @return
      */
-    public static Configuration allowUnauthorizedCerts(boolean allowUnauthorizedCerts) {
-        Configuration configuration = new Configuration();
+    public static Configuration.ConfigurationBuilder allowUnauthorizedCerts(boolean allowUnauthorizedCerts) {
+        Configuration.ConfigurationBuilder configurationBuilder = new Configuration.ConfigurationBuilder();
 
-        configuration.allowUnauthorizedCerts = allowUnauthorizedCerts;
+        configurationBuilder.allowUnauthorizedCerts = allowUnauthorizedCerts;
 
-        return configuration;
+        return configurationBuilder;
     }
 
     /**
@@ -101,12 +113,12 @@ public final class HttpClientUtils {
      * @param followAllRedirects
      * @return
      */
-    public static Configuration followAllRedirects(boolean followAllRedirects) {
-        Configuration configuration = new Configuration();
+    public static Configuration.ConfigurationBuilder followAllRedirects(boolean followAllRedirects) {
+        Configuration.ConfigurationBuilder configurationBuilder = new Configuration.ConfigurationBuilder();
 
-        configuration.followAllRedirects = followAllRedirects;
+        configurationBuilder.followAllRedirects = followAllRedirects;
 
-        return configuration;
+        return configurationBuilder;
     }
 
     /**
@@ -114,12 +126,12 @@ public final class HttpClientUtils {
      * @param filename
      * @return
      */
-    public static Configuration filename(String filename) {
-        Configuration configuration = new Configuration();
+    public static Configuration.ConfigurationBuilder filename(String filename) {
+        Configuration.ConfigurationBuilder configurationBuilder = new Configuration.ConfigurationBuilder();
 
-        configuration.filename = filename;
+        configurationBuilder.filename = filename;
 
-        return configuration;
+        return configurationBuilder;
     }
 
     /**
@@ -127,12 +139,12 @@ public final class HttpClientUtils {
      * @param followRedirect
      * @return
      */
-    public static Configuration followRedirect(boolean followRedirect) {
-        Configuration configuration = new Configuration();
+    public static Configuration.ConfigurationBuilder followRedirect(boolean followRedirect) {
+        Configuration.ConfigurationBuilder configurationBuilder = new Configuration.ConfigurationBuilder();
 
-        configuration.followRedirect = followRedirect;
+        configurationBuilder.followRedirect = followRedirect;
 
-        return configuration;
+        return configurationBuilder;
     }
 
     /**
@@ -140,12 +152,12 @@ public final class HttpClientUtils {
      * @param proxy
      * @return
      */
-    public static Configuration proxy(String proxy) {
-        Configuration configuration = new Configuration();
+    public static Configuration.ConfigurationBuilder proxy(String proxy) {
+        Configuration.ConfigurationBuilder configurationBuilder = new Configuration.ConfigurationBuilder();
 
-        configuration.proxy = proxy;
+        configurationBuilder.proxy = proxy;
 
-        return configuration;
+        return configurationBuilder;
     }
 
     /**
@@ -153,12 +165,12 @@ public final class HttpClientUtils {
      * @param responseType
      * @return
      */
-    public static Configuration responseType(ResponseType responseType) {
-        Configuration configuration = new Configuration();
+    public static Configuration.ConfigurationBuilder responseType(ResponseType responseType) {
+        Configuration.ConfigurationBuilder configurationBuilder = new Configuration.ConfigurationBuilder();
 
-        configuration.responseType = responseType;
+        configurationBuilder.responseType = responseType;
 
-        return configuration;
+        return configurationBuilder;
     }
 
     /**
@@ -166,12 +178,12 @@ public final class HttpClientUtils {
      * @param timeout
      * @return
      */
-    public static Configuration timeout(Duration timeout) {
-        Configuration configuration = new Configuration();
+    public static Configuration.ConfigurationBuilder timeout(Duration timeout) {
+        Configuration.ConfigurationBuilder configurationBuilder = new Configuration.ConfigurationBuilder();
 
-        configuration.timeout = timeout;
+        configurationBuilder.timeout = timeout;
 
-        return configuration;
+        return configurationBuilder;
     }
 
     /**
@@ -250,9 +262,6 @@ public final class HttpClientUtils {
         }
     }
 
-    /**
-     *
-     */
     public static class Configuration {
 
         private boolean allowUnauthorizedCerts;
@@ -261,98 +270,16 @@ public final class HttpClientUtils {
         private boolean followRedirect;
         private String proxy;
         private ResponseType responseType;
-        private Duration timeout = Duration.ofMillis(1000);
+        private Duration timeout;
 
-        private Configuration() {
+        Configuration() {
+        }
+
+        public static Configuration.ConfigurationBuilder newConfiguration() {
+            return new Configuration.ConfigurationBuilder();
         }
 
         /**
-         *
-         * @return
-         */
-        public static Configuration configuration() {
-            return new Configuration();
-        }
-
-        /**
-         *
-         * @param allowUnauthorizedCerts
-         * @return
-         */
-        public Configuration allowUnauthorizedCerts(boolean allowUnauthorizedCerts) {
-            this.allowUnauthorizedCerts = allowUnauthorizedCerts;
-
-            return this;
-        }
-
-        /**
-         *
-         * @param followAllRedirects
-         * @return
-         */
-        public Configuration followAllRedirects(boolean followAllRedirects) {
-            this.followAllRedirects = followAllRedirects;
-
-            return this;
-        }
-
-        /**
-         *
-         * @param filename
-         * @return
-         */
-        public Configuration filename(String filename) {
-            this.filename = filename;
-
-            return this;
-        }
-
-        /**
-         *
-         * @param followRedirect
-         * @return
-         */
-        public Configuration followRedirect(boolean followRedirect) {
-            this.followRedirect = followRedirect;
-
-            return this;
-        }
-
-        /**
-         *
-         * @param proxy
-         * @return
-         */
-        public Configuration proxy(String proxy) {
-            this.proxy = proxy;
-
-            return this;
-        }
-
-        /**
-         *
-         * @param responseType
-         * @return
-         */
-        public Configuration responseType(ResponseType responseType) {
-            this.responseType = responseType;
-
-            return this;
-        }
-
-        /**
-         *
-         * @param timeout
-         * @return
-         */
-        public Configuration timeout(Duration timeout) {
-            this.timeout = timeout;
-
-            return this;
-        }
-
-        /**
-         *
          * @return
          */
         public boolean isAllowUnauthorizedCerts() {
@@ -360,7 +287,6 @@ public final class HttpClientUtils {
         }
 
         /**
-         *
          * @return
          */
         public boolean isFollowAllRedirects() {
@@ -368,7 +294,6 @@ public final class HttpClientUtils {
         }
 
         /**
-         *
          * @return
          */
         public boolean isFollowRedirect() {
@@ -376,7 +301,6 @@ public final class HttpClientUtils {
         }
 
         /**
-         *
          * @return
          */
         public String getFilename() {
@@ -384,7 +308,6 @@ public final class HttpClientUtils {
         }
 
         /**
-         *
          * @return
          */
         public ResponseType getResponseType() {
@@ -392,7 +315,6 @@ public final class HttpClientUtils {
         }
 
         /**
-         *
          * @return
          */
         public String getProxy() {
@@ -400,11 +322,73 @@ public final class HttpClientUtils {
         }
 
         /**
-         *
          * @return
          */
         public Duration getTimeout() {
             return timeout;
+        }
+
+        public static final class ConfigurationBuilder {
+
+            private boolean allowUnauthorizedCerts;
+            private String filename;
+            private boolean followAllRedirects;
+            private boolean followRedirect;
+            private String proxy;
+            private ResponseType responseType;
+            private Duration timeout = Duration.ofMillis(1000);
+
+            private ConfigurationBuilder() {
+            }
+
+            public Configuration.ConfigurationBuilder allowUnauthorizedCerts(boolean allowUnauthorizedCerts) {
+                this.allowUnauthorizedCerts = allowUnauthorizedCerts;
+                return this;
+            }
+
+            public Configuration.ConfigurationBuilder filename(String filename) {
+                this.filename = filename;
+                return this;
+            }
+
+            public Configuration.ConfigurationBuilder followAllRedirects(boolean followAllRedirects) {
+                this.followAllRedirects = followAllRedirects;
+                return this;
+            }
+
+            public Configuration.ConfigurationBuilder followRedirect(boolean followRedirect) {
+                this.followRedirect = followRedirect;
+                return this;
+            }
+
+            public Configuration.ConfigurationBuilder proxy(String proxy) {
+                this.proxy = proxy;
+                return this;
+            }
+
+            public Configuration.ConfigurationBuilder responseType(ResponseType responseType) {
+                this.responseType = responseType;
+                return this;
+            }
+
+            public Configuration.ConfigurationBuilder timeout(Duration timeout) {
+                this.timeout = timeout;
+                return this;
+            }
+
+            public Configuration build() {
+                Configuration configuration = new Configuration();
+
+                configuration.proxy = this.proxy;
+                configuration.followRedirect = this.followRedirect;
+                configuration.timeout = this.timeout;
+                configuration.responseType = this.responseType;
+                configuration.followAllRedirects = this.followAllRedirects;
+                configuration.allowUnauthorizedCerts = this.allowUnauthorizedCerts;
+                configuration.filename = this.filename;
+
+                return configuration;
+            }
         }
     }
 
@@ -427,17 +411,18 @@ public final class HttpClientUtils {
 
         /**
          *
-         * @param configuration
+         * @param configurationBuilder
          * @return
          */
-        public Executor configuration(Configuration configuration) {
-            this.configuration = Objects.requireNonNull(configuration);
+        public Executor configuration(Configuration.ConfigurationBuilder configurationBuilder) {
+            this.configuration = Objects.requireNonNull(configurationBuilder)
+                .build();
 
             return this;
         }
 
         public Executor header(String name, String value) {
-            headers.put(name, List.of(value));
+            headers.put(Objects.requireNonNull(name), List.of(Objects.requireNonNull(value)));
 
             return this;
         }
@@ -448,15 +433,13 @@ public final class HttpClientUtils {
          * @return
          */
         public Executor headers(Map<String, List<String>> headers) {
-            if (headers != null) {
-                this.headers = new HashMap<>(headers);
-            }
+            this.headers = new HashMap<>(Objects.requireNonNull(headers));
 
             return this;
         }
 
         public Executor queryParameter(String name, String value) {
-            queryParameters.put(name, List.of(value));
+            queryParameters.put(Objects.requireNonNull(name), List.of(Objects.requireNonNull(value)));
 
             return this;
         }
@@ -467,9 +450,7 @@ public final class HttpClientUtils {
          * @return
          */
         public Executor queryParameters(Map<String, List<String>> queryParameters) {
-            if (queryParameters != null) {
-                this.queryParameters = new HashMap<>(queryParameters);
-            }
+            this.queryParameters = new HashMap<>(Objects.requireNonNull(queryParameters));
 
             return this;
         }

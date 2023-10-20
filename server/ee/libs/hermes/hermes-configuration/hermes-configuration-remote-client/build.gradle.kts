@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":server:libs:hermes:hermes-configuration:hermes-configuration-api"))
+    implementation(project(":server:libs:hermes:hermes-configuration:hermes-configuration-api"))
 
     implementation("org.springframework:spring-context")
 

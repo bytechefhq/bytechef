@@ -22,21 +22,8 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.event.listener.EventListenerChain;
-import com.bytechef.hermes.component.ComponentDefinitionFactory;
-import com.bytechef.hermes.component.context.factory.ContextConnectionFactory;
-import com.bytechef.hermes.component.context.factory.ContextConnectionFactoryImpl;
+import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
-import com.bytechef.hermes.component.context.factory.ContextFactory;
-import com.bytechef.hermes.component.context.factory.ContextFactoryImpl;
-import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
-import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistryImpl;
-import com.bytechef.hermes.definition.registry.component.factory.ComponentHandlerListFactory;
-import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
-import com.bytechef.hermes.definition.registry.service.ActionDefinitionServiceImpl;
-import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServiceImpl;
-import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
-import com.bytechef.hermes.definition.registry.service.TriggerDefinitionServiceImpl;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
@@ -55,15 +42,16 @@ import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.configuration.service.WorkflowServiceImpl;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.hermes.component.test.JobTestExecutor;
-import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.boot.SpringBootConfiguration;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -72,6 +60,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import java.util.Collections;
@@ -87,16 +76,13 @@ import java.util.Map;
         DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class
     })
 @Import({
-    ResourceWorkflowRepositoryConfiguration.class,
+    ResourceWorkflowRepositoryConfiguration.class
 })
-@SpringBootConfiguration
+@Configuration
 public class ComponentTestIntConfiguration {
 
     @MockBean(name = "connectionService")
     private ConnectionService connectionService;
-
-    @MockBean(name = "connectionDefinitionService")
-    private ConnectionDefinitionService connectionDefinitionService;
 
     @MockBean(name = "dataStorageService")
     private DataStorageService dataStorageService;
@@ -105,65 +91,12 @@ public class ComponentTestIntConfiguration {
     private MessageBroker messageBroker;
 
     @Bean
-    ActionDefinitionService actionDefinitionService(
-        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory,
-        ContextFactory contextFactory) {
-
-        return new ActionDefinitionServiceImpl(
-            componentDefinitionRegistry, contextConnectionFactory, contextFactory);
-    }
-
-    @Bean
-    ComponentDefinitionRegistry componentDefinitionRegistry(
-        List<ComponentDefinitionFactory> componentDefinitionFactories,
-        ComponentHandlerListFactory componentHandlerListFactory) {
-
-        return new ComponentDefinitionRegistryImpl(componentDefinitionFactories, componentHandlerListFactory);
-    }
-
-    @Bean
-    ComponentDefinitionService componentDefinitionService(ComponentDefinitionRegistry componentDefinitionRegistry) {
-        return new ComponentDefinitionServiceImpl(componentDefinitionRegistry);
-    }
-
-    @Bean
-    ContextConnectionFactory contextConnectionFactory(
-        ComponentDefinitionService componentDefinitionService,
-        ConnectionDefinitionService connectionDefinitionService) {
-
-        return new ContextConnectionFactoryImpl(componentDefinitionService, connectionDefinitionService);
-    }
-
-    @Bean
-    ContextFactory contextFactory(
-        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        DataStorageService dataStorageService, EventPublisher eventPublisher, FileStorageService fileStorageService) {
-
-        return new ContextFactoryImpl(
-            connectionDefinitionService, connectionService, dataStorageService, eventPublisher, fileStorageService);
-    }
-
-    @Bean
     FileStorageService fileStorageService() {
         return new Base64FileStorageService();
     }
 
-    @Bean
-    TriggerDefinitionService triggerDefinitionService(
-        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory,
-        ContextFactory contextFactory, MessageBroker messageBroker) {
-
-        return new TriggerDefinitionServiceImpl(
-            componentDefinitionRegistry, contextConnectionFactory, contextFactory, messageBroker);
-    }
-
     @TestConfiguration
     public static class EncryptionIntTestConfiguration {
-
-        @Bean
-        Encryption encryption(EncryptionKey encryptionKey) {
-            return new Encryption(encryptionKey);
-        }
 
         @Bean
         EncryptionKey encryptionKey() {
@@ -179,6 +112,36 @@ public class ComponentTestIntConfiguration {
             EventListener eventListener = new EventListenerChain(eventListeners);
 
             return eventListener::onApplicationEvent;
+        }
+    }
+
+    @TestConfiguration
+    public static class JacksonConfiguration {
+
+        @Bean
+        public ObjectMapper objectMapper() {
+            return new ObjectMapper()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                .registerModule(new JavaTimeModule())
+                .registerModule(new Jdk8Module());
+        }
+
+        @Bean
+        XmlMapper xmlMapper() {
+            return XmlMapper.xmlBuilder()
+                .serializationInclusion(JsonInclude.Include.NON_NULL)
+                .build();
+        }
+    }
+
+    @TestConfiguration
+    public static class WorkflowConfiguration {
+
+        @Bean
+        WorkflowService workflowService(List<WorkflowRepository> workflowRepositories) {
+            return new WorkflowServiceImpl(
+                new ConcurrentMapCacheManager(), Collections.emptyList(), workflowRepositories);
         }
     }
 
@@ -219,12 +182,6 @@ public class ComponentTestIntConfiguration {
         @Bean
         InMemoryTaskExecutionRepository taskExecutionRepository() {
             return new InMemoryTaskExecutionRepository();
-        }
-
-        @Bean
-        WorkflowService workflowService(List<WorkflowRepository> workflowRepositories) {
-            return new WorkflowServiceImpl(
-                new ConcurrentMapCacheManager(), Collections.emptyList(), workflowRepositories);
         }
     }
 }

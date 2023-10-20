@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.TriggerContext;
-import com.bytechef.hermes.component.Context.Connection;
+import com.bytechef.hermes.component.definition.Context.Connection;
+import com.bytechef.hermes.definition.Help;
 import com.bytechef.hermes.definition.Property.InputProperty;
 import com.bytechef.hermes.definition.Property.OutputProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalLong;
 
 /**
  * @author Ivica Cardic
@@ -255,15 +256,32 @@ public interface TriggerDefinition {
 
     /**
      *
-     * @param connection
-     * @param inputParameters
-     * @param dynamicWebhookEnableOutput
-     * @param workflowExecutionId
      */
-    @SuppressFBWarnings("EI")
-    record DynamicWebhookDisableContext(
-        Connection connection, Map<String, ?> inputParameters, DynamicWebhookEnableOutput dynamicWebhookEnableOutput,
-        String workflowExecutionId) {
+    interface DynamicWebhookDisableContext {
+
+        /**
+         *
+         * @return
+         */
+        Connection connection();
+
+        /**
+         *
+         * @return
+         */
+        Map<String, ?> inputParameters();
+
+        /**
+         *
+         * @return
+         */
+        DynamicWebhookEnableOutput dynamicWebhookEnableOutput();
+
+        /**
+         *
+         * @return
+         */
+        String workflowExecutionId();
     }
 
     /**
@@ -302,19 +320,51 @@ public interface TriggerDefinition {
     }
 
     /**
-     * @param inputParameters
-     * @param headers
-     * @param parameters
-     * @param body
-     * @param method
-     * @param dynamicWebhookEnableOutput
-     * @param triggerContext
+     *
      */
-    @SuppressFBWarnings("EI")
-    record DynamicWebhookRequestContext(
-        Map<String, ?> inputParameters, Map<String, String[]> headers, Map<String, String[]> parameters,
-        WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput dynamicWebhookEnableOutput,
-        TriggerContext triggerContext) {
+    interface DynamicWebhookRequestContext {
+
+        /**
+         *
+         * @return
+         */
+        HttpHeaders headers();
+
+        /**
+         *
+         * @return
+         */
+        Map<String, ?> inputParameters();
+
+        /**
+         *
+         * @return
+         */
+        HttpParameters parameters();
+
+        /**
+         *
+         * @return
+         */
+        WebhookBody body();
+
+        /**
+         *
+         * @return
+         */
+        WebhookMethod method();
+
+        /**
+         *
+         * @return
+         */
+        DynamicWebhookEnableOutput dynamicWebhookEnableOutput();
+
+        /**
+         *
+         * @return
+         */
+        TriggerContext triggerContext();
     }
 
     /**
@@ -334,24 +384,56 @@ public interface TriggerDefinition {
 
     /**
      *
-     * @param connection
-     * @param inputParameters
-     * @param webhookUrl
-     * @param workflowExecutionId
      */
-    @SuppressFBWarnings("EI")
-    record EnableDynamicWebhookContext(
-        Connection connection, Map<String, ?> inputParameters, String webhookUrl, String workflowExecutionId) {
+    interface EnableDynamicWebhookContext {
+
+        /**
+         *
+         * @return
+         */
+        Connection connection();
+
+        /**
+         *
+         * @return
+         */
+        Map<String, ?> inputParameters();
+
+        /**
+         *
+         * @return
+         */
+        String webhookUrl();
+
+        /**
+         *
+         * @return
+         */
+        String workflowExecutionId();
     }
 
     /**
-     * @param inputParameters
-     * @param closureParameters
-     * @param triggerContext
+     *
      */
-    @SuppressFBWarnings("EI")
-    record PollContext(
-        Map<String, ?> inputParameters, Map<String, Object> closureParameters, TriggerContext triggerContext) {
+    interface PollContext {
+
+        /**
+         *
+         * @return
+         */
+        Map<String, ?> closureParameters();
+
+        /**
+         *
+         * @return
+         */
+        Map<String, ?> inputParameters();
+
+        /**
+         *
+         * @return
+         */
+        TriggerContext triggerContext();
     }
 
     /**
@@ -366,6 +448,72 @@ public interface TriggerDefinition {
          * @param inputParameters
          */
         void accept(Connection connection, Map<String, ?> inputParameters, String workflowExecutionId);
+    }
+
+    /**
+     *
+     */
+    interface HttpHeaders {
+
+        /**
+         *
+         * @param name
+         * @return
+         */
+        List<String> allValues(String name);
+
+        /**
+         *
+         * @param name
+         * @return
+         */
+        Optional<String> firstValue(String name);
+
+        /**
+         *
+         * @param name
+         * @return
+         */
+        OptionalLong firstValueAsLong(String name);
+
+        /**
+         *
+         * @return
+         */
+        Map<String, List<String>> map();
+    }
+
+    /**
+     *
+     */
+    interface HttpParameters {
+
+        /**
+         *
+         * @param name
+         * @return
+         */
+        List<String> allValues(String name);
+
+        /**
+         *
+         * @param name
+         * @return
+         */
+        Optional<String> firstValue(String name);
+
+        /**
+         *
+         * @param name
+         * @return
+         */
+        OptionalLong firstValueAsLong(String name);
+
+        /**
+         *
+         * @return
+         */
+        Map<String, List<String>> map();
     }
 
     /**
@@ -428,17 +576,45 @@ public interface TriggerDefinition {
     }
 
     /**
-     * @param inputParameters
-     * @param headers
-     * @param parameters
-     * @param body
-     * @param method
-     * @param triggerContext
+     *
      */
-    @SuppressFBWarnings("EI")
-    record StaticWebhookRequestContext(
-        Map<String, ?> inputParameters, Map<String, String[]> headers, Map<String, String[]> parameters,
-        WebhookBody body, WebhookMethod method, TriggerContext triggerContext) {
+    interface StaticWebhookRequestContext {
+
+        /**
+         *
+         * @return
+         */
+        Map<String, ?> inputParameters();
+
+        /**
+         *
+         * @return
+         */
+        HttpHeaders headers();
+
+        /**
+         *
+         * @return
+         */
+        HttpParameters parameters();
+
+        /**
+         *
+         * @return
+         */
+        WebhookBody body();
+
+        /**
+         *
+         * @return
+         */
+        WebhookMethod method();
+
+        /**
+         *
+         * @return
+         */
+        TriggerContext triggerContext();
     }
 
     /**
@@ -459,6 +635,12 @@ public interface TriggerDefinition {
     /**
      *
      */
+    interface TriggerContext extends Context {
+    }
+
+    /**
+     *
+     */
     sealed interface TriggerOutput permits WebhookOutput, PollOutput {
 
         /**
@@ -471,12 +653,30 @@ public interface TriggerDefinition {
     /**
      *
      */
-    record WebhookBody(Object content, ContentType contentType, String mimeType) {
+    interface WebhookBody {
+
+        /**
+         *
+         * @return
+         */
+        Object content();
+
+        /**
+         *
+         * @return
+         */
+        ContentType contentType();
+
+        /**
+         *
+         * @return
+         */
+        String mimeType();
 
         /**
          *
          */
-        public enum ContentType {
+        enum ContentType {
             BINARY,
             FORM_DATA,
             FORM_URL_ENCODED,
@@ -571,17 +771,45 @@ public interface TriggerDefinition {
     }
 
     /**
-     * @param inputParameters
-     * @param headers
-     * @param parameters
-     * @param body
-     * @param method
-     * @param triggerContext
+     *
      */
-    @SuppressFBWarnings("EI")
-    record WebhookValidateContext(
-        Map<String, ?> inputParameters, Map<String, String[]> headers, Map<String, String[]> parameters,
-        WebhookBody body, WebhookMethod method, TriggerContext triggerContext) {
+    interface WebhookValidateContext {
+
+        /**
+         *
+         * @return
+         */
+        Map<String, ?> inputParameters();
+
+        /**
+         *
+         * @return
+         */
+        HttpHeaders headers();
+
+        /**
+         *
+         * @return
+         */
+        HttpParameters parameters();
+
+        /**
+         *
+         * @return
+         */
+        WebhookBody body();
+
+        /**
+         *
+         * @return
+         */
+        WebhookMethod method();
+
+        /**
+         *
+         * @return
+         */
+        TriggerContext triggerContext();
     }
 
     /**

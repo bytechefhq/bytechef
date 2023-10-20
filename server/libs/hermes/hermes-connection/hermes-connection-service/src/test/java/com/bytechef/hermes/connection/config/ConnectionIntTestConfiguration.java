@@ -24,11 +24,11 @@ import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 import java.util.Arrays;
@@ -38,10 +38,10 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @ComponentScan(basePackages = {
-    "com.bytechef.liquibase.config", "com.bytechef.hermes.connection"
+    "com.bytechef.encryption", "com.bytechef.liquibase.config", "com.bytechef.hermes.connection"
 })
 @EnableAutoConfiguration
-@SpringBootConfiguration
+@Configuration
 public class ConnectionIntTestConfiguration {
 
     @Bean
@@ -51,11 +51,6 @@ public class ConnectionIntTestConfiguration {
 
     @TestConfiguration
     public static class EncryptionIntTestConfiguration {
-
-        @Bean
-        Encryption encryption(EncryptionKey encryptionKey) {
-            return new Encryption(encryptionKey);
-        }
 
         @Bean
         EncryptionKey encryptionKey() {

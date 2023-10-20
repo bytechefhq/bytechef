@@ -29,7 +29,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -60,17 +60,17 @@ public class IntegrationServiceIntTest {
     @Autowired
     private TagRepository tagRepository;
 
-    @BeforeAll
+    @BeforeEach
     @SuppressFBWarnings("NP")
-    public void beforeAll() {
+    public void beforeEach() {
         categoryRepository.deleteAll();
 
         category = categoryRepository.save(new Category("name"));
     }
 
-    @BeforeEach
+    @AfterEach
     @SuppressFBWarnings("NP")
-    public void beforeEach() {
+    public void afterEach() {
         integrationRepository.deleteAll();
         tagRepository.deleteAll();
     }

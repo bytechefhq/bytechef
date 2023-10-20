@@ -18,8 +18,8 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.domain.Help;
-import com.bytechef.hermes.definition.registry.domain.TriggerDefinition;
+import com.bytechef.hermes.registry.domain.Help;
+import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
 import com.bytechef.hermes.configuration.web.rest.model.HelpModel;
 import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionModel;

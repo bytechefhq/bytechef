@@ -21,11 +21,11 @@ import com.bytechef.event.EventPublisher;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
@@ -37,7 +37,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
         "com.bytechef.liquibase.config"
     })
 @EnableAutoConfiguration
-@SpringBootConfiguration
+@Configuration
 public class WorkflowExecutionIntTestConfiguration {
 
     @MockBean

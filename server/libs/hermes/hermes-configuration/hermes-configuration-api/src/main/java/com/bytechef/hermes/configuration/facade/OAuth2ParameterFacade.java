@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.configuration.facade;
 
-import com.bytechef.hermes.definition.registry.domain.OAuth2AuthorizationParameters;
+import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 
 import java.util.Map;
 

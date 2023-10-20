@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.data.storage.domain;
 
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.definition.Context;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;

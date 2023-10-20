@@ -18,8 +18,10 @@
 package com.bytechef.component.xmlfile.action;
 
 import com.bytechef.component.xmlfile.XmlFileComponentHandlerIntTest;
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.component.util.XmlUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,42 +47,44 @@ import static com.bytechef.component.xmlfile.constant.XmlFileConstants.PAGE_SIZE
  */
 public class XmlFileReadActionTest {
 
-    private static final Context context = Mockito.mock(Context.class);
-
+    private static final ActionContext ACTION_CONTEXT = Mockito.mock(ActionContext.class);
     private static final String SAMPLE_ARRAY_XML = "sample_array.xml";
     private static final String SAMPLE_XML = "sample.xml";
 
     @BeforeEach
     public void beforeEach() {
-        Mockito.reset(context);
+        Mockito.reset(ACTION_CONTEXT);
     }
 
     @Test
     @SuppressWarnings("unchecked")
     public void testPerformRead() throws IOException {
         File file = getFile(SAMPLE_XML);
+        Map<String, ?> map = Map.of(
+            "Flower",
+            Map.of(
+                "id", "45",
+                "name", "Poppy",
+                "color", "RED",
+                "petals", "9",
+                "Florists", Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark")))));
 
-        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class)) {
+        try (MockedStatic<XmlUtils> xmlUtilsMockedStatic = Mockito.mockStatic(XmlUtils.class);
+            MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class)) {
             mapValueUtilsMockedStatic.when(() -> MapUtils.getRequired(
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
                 .thenReturn(Mockito.mock(Context.FileEntry.class));
             mapValueUtilsMockedStatic.when(() -> MapUtils.getBoolean(
                 Mockito.anyMap(), Mockito.eq(IS_ARRAY), Mockito.eq(true)))
                 .thenReturn(false);
+            xmlUtilsMockedStatic.when(() -> XmlUtils.read(Mockito.anyString()))
+                .thenReturn(map);
 
-            Mockito.when(context.readFileToString(Mockito.any(Context.FileEntry.class)))
+            Mockito.when(ACTION_CONTEXT.readFileToString(Mockito.any(Context.FileEntry.class)))
                 .thenReturn(java.nio.file.Files.readString(Path.of(file.getAbsolutePath())));
 
-            Assertions.assertThat((Map<String, ?>) XmlFileReadAction.perform(Map.of(), context))
-                .isEqualTo(
-                    Map.of(
-                        "Flower",
-                        Map.of(
-                            "id", "45",
-                            "name", "Poppy",
-                            "color", "RED",
-                            "petals", "9",
-                            "Florists", Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark"))))));
+            Assertions.assertThat((Map<String, ?>) XmlFileReadAction.perform(Map.of(), ACTION_CONTEXT))
+                .isEqualTo(map);
         }
     }
 
@@ -88,8 +92,22 @@ public class XmlFileReadActionTest {
     @SuppressFBWarnings("OBL")
     public void testPerformReadArray() throws FileNotFoundException {
         File file = getFile(SAMPLE_ARRAY_XML);
+        List<?> list = List.of(
+            Map.of(
+                "id", "45",
+                "name", "Poppy",
+                "color", "RED",
+                "petals", "9",
+                "Florists", Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark")))),
+            Map.of(
+                "id", "46",
+                "name", "Rose",
+                "color", "YELLOW",
+                "petals", "5"));
 
-        try (MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class)) {
+        try (MockedStatic<XmlUtils> xmlUtilsMockedStatic = Mockito.mockStatic(XmlUtils.class);
+            MockedStatic<MapUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapUtils.class)) {
+
             mapValueUtilsMockedStatic.when(() -> MapUtils.getRequired(
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
                 .thenReturn(Mockito.mock(Context.FileEntry.class));
@@ -100,24 +118,14 @@ public class XmlFileReadActionTest {
                 .thenReturn(null);
             mapValueUtilsMockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
                 .thenReturn(null);
+            xmlUtilsMockedStatic.when(() -> XmlUtils.stream(Mockito.any()))
+                .thenReturn(list.stream());
 
-            Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
+            Mockito.when(ACTION_CONTEXT.getFileStream(Mockito.any(Context.FileEntry.class)))
                 .thenReturn(new FileInputStream(file));
 
-            Assertions.assertThat((List<?>) XmlFileReadAction.perform(Map.of(), context))
-                .isEqualTo(
-                    List.of(
-                        Map.of(
-                            "id", "45",
-                            "name", "Poppy",
-                            "color", "RED",
-                            "petals", "9",
-                            "Florists", Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark")))),
-                        Map.of(
-                            "id", "46",
-                            "name", "Rose",
-                            "color", "YELLOW",
-                            "petals", "5")));
+            Assertions.assertThat((List<?>) XmlFileReadAction.perform(Map.of(), ACTION_CONTEXT))
+                .isEqualTo(list);
 
             mapValueUtilsMockedStatic.when(() -> MapUtils.getRequired(
                 Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
@@ -129,11 +137,13 @@ public class XmlFileReadActionTest {
                 .thenReturn(1);
             mapValueUtilsMockedStatic.when(() -> MapUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
                 .thenReturn(2);
+            xmlUtilsMockedStatic.when(() -> XmlUtils.stream(Mockito.any()))
+                .thenReturn(list.stream());
 
-            Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
+            Mockito.when(ACTION_CONTEXT.getFileStream(Mockito.any(Context.FileEntry.class)))
                 .thenReturn(new FileInputStream(file));
 
-            Assertions.assertThat(((List<?>) XmlFileReadAction.perform(Map.of(), context))
+            Assertions.assertThat(((List<?>) XmlFileReadAction.perform(Map.of(), ACTION_CONTEXT))
                 .size())
                 .isEqualTo(2);
         }

@@ -17,10 +17,13 @@
 
 package com.bytechef.hermes.component.util;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.stream.Stream;
 
@@ -29,111 +32,97 @@ import java.util.stream.Stream;
  */
 public final class XmlUtils {
 
-    static XmlMapper xmlMapper;
+    private static final Logger logger = LoggerFactory.getLogger(XmlUtils.class);
+
+    static XmlOperations xmlOperations;
 
     static {
-        ServiceLoader<XmlMapper> loader = ServiceLoader.load(XmlMapper.class);
+        try {
+            ServiceLoader<XmlOperations> serviceLoader = ServiceLoader.load(XmlOperations.class);
 
-        xmlMapper = loader.findFirst()
-            .orElse(null);
+            xmlOperations = serviceLoader.findFirst()
+                .orElse(null);
+        } catch (ServiceConfigurationError e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(e.getMessage(), e);
+            }
+        }
 
-        if (xmlMapper == null) {
-            System.err.println("XmlMapper instance is not available");
+        if (xmlOperations == null && logger.isWarnEnabled()) {
+            logger.warn("XmlOperations instance is not available");
         }
     }
 
     private XmlUtils() {
     }
 
-    /**
-     *
-     * @param inputStream
-     * @return
-     */
     public static Map<String, ?> read(InputStream inputStream) {
-        return xmlMapper.read(inputStream);
+        return xmlOperations.read(inputStream);
     }
 
-    /**
-     *
-     * @param xml
-     * @return
-     */
+    public static <T> Map<String, T> read(InputStream inputStream, Class<T> valueType) {
+        return xmlOperations.read(inputStream, valueType);
+    }
+
+    public static <T> Map<String, T> read(InputStream inputStream, TypeReference<T> typeReference) {
+        return xmlOperations.read(inputStream, typeReference);
+    }
+
     public static Map<String, ?> read(String xml) {
-        return xmlMapper.read(xml);
+        return xmlOperations.read(xml);
     }
 
-    /**
-     *
-     * @param xml
-     * @param valueType
-     * @return
-     * @param <T>
-     */
-    public static <T> T read(String xml, Class<T> valueType) {
-        return xmlMapper.read(xml, valueType);
+    public static <T> Map<String, T> read(String xml, Class<T> valueType) {
+        return xmlOperations.read(xml, valueType);
     }
 
-    /**
-     *
-     * @param xml
-     * @param valueTypeRef
-     * @return
-     * @param <T>
-     */
-    public static <T> T read(String xml, TypeReference<T> valueTypeRef) {
-        return xmlMapper.read(xml, valueTypeRef);
+    public static <T> Map<String, T> read(String xml, TypeReference<T> typeReference) {
+        return xmlOperations.read(xml, typeReference);
     }
 
-    /**
-     *
-     * @param inputStream
-     * @param path
-     * @return
-     * @param <T>
-     */
-    public static <T> T read(InputStream inputStream, String path) {
-        return xmlMapper.read(inputStream, path);
+    public static List<?> readList(InputStream inputStream, String path) {
+        return xmlOperations.readList(inputStream, path);
     }
 
-    /**
-     *
-     * @param inputStream
-     * @return
-     */
+    public static <T> List<T> readList(InputStream inputStream, String path, Class<T> elementType) {
+        return xmlOperations.readList(inputStream, path, elementType);
+    }
+
+    public static <T> List<T> readList(InputStream inputStream, String path, TypeReference<T> elementTypeReference) {
+        return xmlOperations.readList(inputStream, path, elementTypeReference);
+    }
+
     public static Stream<Map<String, ?>> stream(InputStream inputStream) {
-        return xmlMapper.stream(inputStream);
+        return xmlOperations.stream(inputStream);
     }
 
-    /**
-     *
-     * @param object
-     * @return
-     */
     public static String write(Object object) {
-        return xmlMapper.write(object);
+        return xmlOperations.write(object);
     }
 
-    /**
-     *
-     * @param object
-     * @param rootName
-     * @return
-     */
     public static String write(Object object, String rootName) {
-        return xmlMapper.write(object, rootName);
+        return xmlOperations.write(object, rootName);
     }
 
-    interface XmlMapper {
+    interface XmlOperations {
+
         Map<String, ?> read(InputStream inputStream);
+
+        <T> Map<String, T> read(InputStream inputStream, Class<T> valueType);
+
+        <T> Map<String, T> read(InputStream inputStream, TypeReference<T> valueTypeReference);
 
         Map<String, ?> read(String xml);
 
-        <T> T read(String xml, Class<T> valueType);
+        <T> Map<String, T> read(String xml, Class<T> valueType);
 
-        <T> T read(String xml, TypeReference<T> valueTypeRef);
+        <T> Map<String, T> read(String xml, TypeReference<T> valueTypeReference);
 
-        <T> T read(InputStream inputStream, String path);
+        List<?> readList(InputStream inputStream, String path);
+
+        <T> List<T> readList(InputStream inputStream, String path, Class<T> elementType);
+
+        <T> List<T> readList(InputStream inputStream, String path, TypeReference<T> elementTypeReference);
 
         Stream<Map<String, ?>> stream(InputStream inputStream);
 

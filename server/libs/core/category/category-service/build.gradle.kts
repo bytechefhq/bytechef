@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":server:libs:core:category:category-api"))
+    implementation(project(":server:libs:core:category:category-api"))
 
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-tx")

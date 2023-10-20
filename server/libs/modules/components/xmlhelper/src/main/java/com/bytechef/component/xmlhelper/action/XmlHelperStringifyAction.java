@@ -17,7 +17,7 @@
 
 package com.bytechef.component.xmlhelper.action;
 
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.util.MapUtils;
 import com.bytechef.hermes.component.util.XmlUtils;

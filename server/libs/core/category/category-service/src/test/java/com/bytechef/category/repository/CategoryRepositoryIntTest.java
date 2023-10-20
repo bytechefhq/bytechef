@@ -19,9 +19,10 @@ package com.bytechef.category.repository;
 
 import com.bytechef.category.config.CategoryIntTestConfiguration;
 import com.bytechef.category.domain.Category;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,8 +39,8 @@ public class CategoryRepositoryIntTest {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @BeforeEach
-    public void beforeEach() {
+    @AfterEach
+    public void afterEach() {
         categoryRepository.deleteAll();
     }
 
@@ -48,8 +49,7 @@ public class CategoryRepositoryIntTest {
     public void testCreate() {
         Category category = categoryRepository.save(new Category("name"));
 
-        assertThat(category).isEqualTo(categoryRepository.findById(category.getId())
-            .get());
+        assertThat(category).isEqualTo(OptionalUtils.get(categoryRepository.findById(category.getId())));
     }
 
     @Test

@@ -25,8 +25,6 @@ import com.bytechef.atlas.execution.repository.ContextRepository;
 import com.bytechef.atlas.execution.repository.CounterRepository;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
-import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
-import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.JobService;
@@ -36,12 +34,8 @@ import com.bytechef.atlas.execution.service.ContextServiceImpl;
 import com.bytechef.atlas.execution.service.CounterServiceImpl;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
-import com.bytechef.configuration.service.WorkflowServiceImpl;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -60,7 +54,7 @@ public class WorkflowExecutionConfiguration {
     }
 
     @Bean
-    JobFacade jobFactoryFacade(
+    JobFacade jobFacade(
         ContextService contextService, EventPublisher eventPublisher, JobService jobService,
         MessageBroker messageBroker, WorkflowService workflowService) {
 
@@ -75,13 +69,5 @@ public class WorkflowExecutionConfiguration {
     @Bean
     TaskExecutionService taskExecutionService(TaskExecutionRepository taskExecutionRepository) {
         return new TaskExecutionServiceImpl(taskExecutionRepository);
-    }
-
-    @Bean
-    WorkflowService workflowService(
-        CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
-        List<WorkflowRepository> workflowRepositories) {
-
-        return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
     }
 }
