@@ -137,7 +137,7 @@ public class JmsMessageBrokerConfiguration implements ApplicationContextAware, J
             registerListenerEndpoint(
                 aRegistrar,
                 Queues.SUBFLOWS,
-                coordinatorProperties.getSubscriptions().getJobs(),
+                coordinatorProperties.getSubscriptions().getSubflows(),
                 coordinator,
                 "create"
             );
