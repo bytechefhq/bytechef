@@ -1,5 +1,4 @@
 import React from 'react';
-import {Description} from './Description';
 import {Dropdown} from './Dropdown';
 import {Name} from './Name';
 import {Status} from './Status';
@@ -12,12 +11,13 @@ const Header: React.FC<{
 }> = ({id, name, status, description}) => {
     return (
         <div className="flex justify-between">
-            <div className="list-inside">
-                <Name name={name} />
+            <div className="">
+                <Name
+                    name={name}
+                    description={description || 'Description not available'}
+                />
 
                 <Status status={status} />
-
-                {description && <Description description={description} />}
             </div>
 
             <div className="mx-4">
