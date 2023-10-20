@@ -93,8 +93,6 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1,
                 new WorkflowTask(iteratee));
 
-            subTaskExecution = taskExecutionService.create(subTaskExecution);
-
             Map<String, Object> newContext = new HashMap<>(
                 contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
@@ -104,9 +102,11 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
             newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), 0);
 
-            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
-
             subTaskExecution.evaluate(taskEvaluator, newContext);
+
+            subTaskExecution = taskExecutionService.create(subTaskExecution);
+
+            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {

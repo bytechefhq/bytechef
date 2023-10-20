@@ -115,14 +115,14 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
                 switchTaskExecution.getJobId(), switchTaskExecution.getId(), switchTaskExecution.getPriority(),
                 taskExecution.getTaskNumber() + 1, workflowTask);
 
-            subTaskExecution = taskExecutionService.create(subTaskExecution);
-
             Map<String, Object> context = contextService.peek(
                 switchTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
-            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
-
             subTaskExecution.evaluate(taskEvaluator, context);
+
+            subTaskExecution = taskExecutionService.create(subTaskExecution);
+
+            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
 
             taskDispatcher.dispatch(subTaskExecution);
         }
