@@ -40,14 +40,14 @@ import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_VAL
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_VALUE_2;
 import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.TASK_IF;
 
-import com.integri.atlas.task.descriptor.handler.AbstractTaskDescriptorHandler;
+import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.DSL;
 import com.integri.atlas.task.descriptor.model.TaskDescriptor;
 
 /**
  * @author Ivica Cardic
  */
-public class IfTaskDescriptorHandler extends AbstractTaskDescriptorHandler {
+public class IfTaskDescriptorHandler implements TaskDescriptorHandler {
 
     private static final TaskDescriptor TASK_DESCRIPTOR = DSL
         .createTaskDescriptor(TASK_IF)

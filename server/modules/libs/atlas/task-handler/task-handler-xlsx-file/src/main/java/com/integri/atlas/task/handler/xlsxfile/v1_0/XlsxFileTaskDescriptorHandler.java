@@ -16,7 +16,7 @@
 
 package com.integri.atlas.task.handler.xlsxfile.v1_0;
 
-import com.integri.atlas.task.descriptor.handler.AbstractTaskDescriptorHandler;
+import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.TaskDescriptor;
 import com.integri.atlas.task.handler.xlsxfile.XlsxFileTaskConstants;
 import org.springframework.stereotype.Component;
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class XlsxFileTaskDescriptorHandler extends AbstractTaskDescriptorHandler {
+public class XlsxFileTaskDescriptorHandler implements TaskDescriptorHandler {
 
     @Override
     public TaskDescriptor getTaskDescriptor() {

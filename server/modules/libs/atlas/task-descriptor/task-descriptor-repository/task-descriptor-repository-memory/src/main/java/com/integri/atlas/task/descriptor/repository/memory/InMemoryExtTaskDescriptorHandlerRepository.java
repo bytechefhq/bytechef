@@ -17,9 +17,12 @@
 package com.integri.atlas.task.descriptor.repository.memory;
 
 import com.integri.atlas.task.descriptor.repository.ExtTaskDescriptorHandlerRepository;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -27,45 +30,90 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class InMemoryExtTaskDescriptorHandlerRepository implements ExtTaskDescriptorHandlerRepository {
 
-    Map<String, String> taskDescriptorHandlerNameTypeMap = new ConcurrentHashMap<>();
+    Map<String, Map<String, Set<Float>>> taskDescriptorHandlerNameTypeMap = new ConcurrentHashMap<>();
 
     @Override
-    public void create(String name, String type) {
-        taskDescriptorHandlerNameTypeMap.putIfAbsent(name, type);
+    public void create(String name, float version, String type) {
+        taskDescriptorHandlerNameTypeMap.compute(
+            name,
+            (nameKey, typeValuesMap) -> {
+                if (typeValuesMap == null) {
+                    typeValuesMap = new HashMap<>();
+                }
+
+                Set<Float> values = typeValuesMap.computeIfAbsent(type, typeKey -> new HashSet<>());
+
+                values.add(version);
+
+                return typeValuesMap;
+            }
+        );
     }
 
     @Override
-    public void delete(String name) {
-        taskDescriptorHandlerNameTypeMap.remove(name);
+    public void delete(String name, float version) {
+        if (taskDescriptorHandlerNameTypeMap.containsKey(name)) {
+            Map<String, Set<Float>> typeVersionsMap = taskDescriptorHandlerNameTypeMap.get(name);
+
+            for (Map.Entry<String, Set<Float>> entry : typeVersionsMap.entrySet()) {
+                Set<Float> versions = entry.getValue();
+
+                versions.remove(version);
+            }
+        }
     }
 
     @Override
-    public boolean existByNameAndType(String name, String type) {
-        return Objects.equals(taskDescriptorHandlerNameTypeMap.get(name), type);
+    public boolean existByNameAndVersionAndType(String name, float version, String type) {
+        boolean exists = false;
+
+        if (taskDescriptorHandlerNameTypeMap.containsKey(name)) {
+            Map<String, Set<Float>> typeVersionsMap = taskDescriptorHandlerNameTypeMap.get(name);
+
+            if (typeVersionsMap.containsKey(type)) {
+                exists = typeVersionsMap.get(type).stream().anyMatch(curVersion -> curVersion == version);
+            }
+        }
+
+        return exists;
     }
 
     @Override
-    public Map<String, String> findAll() {
+    public Map<String, Map<String, Set<Float>>> findAll() {
         return taskDescriptorHandlerNameTypeMap;
     }
 
     @Override
-    public List<String> findAllNamesByType(String type) {
+    public List<NameVersions> findAllNamesByType(String type) {
         return taskDescriptorHandlerNameTypeMap
             .entrySet()
             .stream()
-            .filter(entry -> Objects.equals(entry.getValue(), type))
-            .map(Map.Entry::getValue)
+            .filter(entry -> {
+                Map<String, Set<Float>> typeVersions = entry.getValue();
+
+                return typeVersions
+                    .entrySet()
+                    .stream()
+                    .anyMatch(typeVersionsEntry -> Objects.equals(typeVersionsEntry.getKey(), type));
+            })
+            .map(entry -> {
+                Map<String, Set<Float>> typeVersionsMap = entry.getValue();
+
+                return new NameVersions(entry.getKey(), typeVersionsMap.get(type));
+            })
             .toList();
     }
 
     @Override
-    public String findTypeByName(String name) {
-        return taskDescriptorHandlerNameTypeMap.get(name);
-    }
+    public String findTypeByNameAndVersion(String name, float version) {
+        Map<String, Set<Float>> typeVersionsMap = taskDescriptorHandlerNameTypeMap.get(name);
 
-    @Override
-    public void update(String name, String type) {
-        taskDescriptorHandlerNameTypeMap.put(name, type);
+        return typeVersionsMap
+            .entrySet()
+            .stream()
+            .filter(entry -> entry.getValue().contains(version))
+            .findFirst()
+            .map(Map.Entry::getKey)
+            .orElse(null);
     }
 }

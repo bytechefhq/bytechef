@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.csvfile.v1_0;
+package com.integri.atlas.task.handler.xmlfile.v1_0;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class CsvFileTaskDescriptorTest {
+public class XmlFileTaskDescriptorHandlerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -36,20 +36,20 @@ public class CsvFileTaskDescriptorTest {
     };
 
     @Test
-    public void testCsvFileTaskDescriptor() throws JsonProcessingException {
+    public void testGetXMLFileTaskDescriptor() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
-            {
-              "description": "Reads and writes data from a csv file.",
-              "displayName": "CSV File",
-              "name": "csvFile",
+           {
+              "description": "Reads and writes data from a XML file.",
+              "displayName": "XML File",
+              "name": "xmlFile",
               "operations": [
                 {
-                  "description": "Reads data from a csv file.",
+                  "description": "Reads data from a XML file.",
                   "name": "read",
                   "inputs": [
                     {
-                      "description": "The object property which contains a reference to the csv file to read from.",
+                      "description": "The object property which contains a reference to the XML file to read from.",
                       "displayName": "File",
                       "name": "fileEntry",
                       "required": true,
@@ -78,48 +78,60 @@ public class CsvFileTaskDescriptorTest {
                       ]
                     },
                     {
+                      "description": "The object input is array?",
+                      "displayName": "Is Array",
+                      "name": "isArray",
+                      "defaultValue": true,
+                      "type": "BOOLEAN"
+                    },
+                    {
                       "displayName": "Options",
                       "placeholder": "Add Option",
                       "options": [
                         {
-                          "description": "Delimiter to use when reading a csv file.",
-                          "displayName": "Delimiter",
-                          "name": "delimiter",
-                          "defaultValue": ",",
+                          "description": "The path where the array is e.g 'data'. Leave blank to use the top level object.",
+                          "displayOption": {
+                            "showWhen": {
+                              "isArray": {
+                                "values": [
+                                  true
+                                ]
+                              }
+                            }
+                          },
+                          "displayName": "Path",
+                          "name": "path",
                           "type": "STRING"
                         },
                         {
-                          "description": "The first row of the file contains the header names.",
-                          "displayName": "Header Row",
-                          "name": "headerRow",
-                          "defaultValue": true,
-                          "type": "BOOLEAN"
-                        },
-                        {
-                          "description": "When reading from file the empty cells will be filled with an empty string.",
-                          "displayName": "Include Empty Cells",
-                          "name": "includeEmptyCells",
-                          "defaultValue": false,
-                          "type": "BOOLEAN"
-                        },
-                        {
                           "description": "The amount of child elements to return in a page.",
+                          "displayOption": {
+                            "showWhen": {
+                              "isArray": {
+                                "values": [
+                                  true
+                                ]
+                              }
+                            }
+                          },
                           "displayName": "Page Size",
                           "name": "pageSize",
                           "type": "INTEGER"
                         },
                         {
                           "description": "The page number to get.",
+                          "displayOption": {
+                            "showWhen": {
+                              "isArray": {
+                                "values": [
+                                  true
+                                ]
+                              }
+                            }
+                          },
                           "displayName": "Page Number",
                           "name": "pageNumber",
                           "type": "INTEGER"
-                        },
-                        {
-                          "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
-                          "displayName": "Read As String",
-                          "name": "readAsString",
-                          "defaultValue": false,
-                          "type": "BOOLEAN"
                         }
                       ]
                     }
@@ -127,53 +139,37 @@ public class CsvFileTaskDescriptorTest {
                   "outputs": [
                     {
                       "type": "ARRAY"
+                    },
+                    {
+                      "type": "OBJECT"
                     }
                   ],
                   "displayName": "Read from file"
                 },
                 {
-                  "description": "Writes the data to a csv file.",
+                  "description": "Writes the data to a XML file.",
                   "name": "write",
                   "inputs": [
                     {
-                      "description": "The array of objects to write to the file.",
-                      "displayName": "Rows",
-                      "name": "rows",
+                      "description": "The data to write to the file.",
+                      "displayName": "Source",
+                      "name": "source",
                       "required": true,
-                      "type": "ARRAY",
-                      "items": [
+                      "types": [
                         {
-                          "type": "OBJECT",
-                          "additionalProperties": true,
-                          "properties": [
-                            {
-                              "type": "BOOLEAN"
-                            },
-                            {
-                              "type": "DATE_TIME"
-                            },
-                            {
-                              "type": "NUMBER"
-                            },
-                            {
-                              "type": "STRING"
-                            }
-                          ]
+                          "type": "ARRAY"
+                        },
+                        {
+                          "type": "OBJECT"
                         }
                       ]
                     },
                     {
-                      "displayName": "Options",
-                      "placeholder": "Add Option",
-                      "options": [
-                        {
-                          "description": "File name to set for binary data. By default, \\"file.csv\\" will be used.",
-                          "displayName": "File Name",
-                          "name": "fileName",
-                          "defaultValue": "",
-                          "type": "STRING"
-                        }
-                      ]
+                      "description": "File name to set for binary data. By default, \\"file.xml\\" will be used.",
+                      "displayName": "File Name",
+                      "name": "fileName",
+                      "defaultValue": "file.xml",
+                      "type": "STRING"
                     }
                   ],
                   "outputs": [
@@ -210,7 +206,7 @@ public class CsvFileTaskDescriptorTest {
             }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(new CsvFileTaskDescriptorHandler().getTaskDescriptor())
+                objectMapper.writeValueAsString(new XmlFileTaskDescriptorHandler().getTaskDescriptor())
             ),
             true
         );

@@ -40,9 +40,12 @@ public class TaskDescriptorController {
         this.taskDescriptorHandlerService = taskDescriptorHandlerService;
     }
 
-    @GetMapping(value = "/task-descriptors/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public TaskDescriptor getTaskDescriptor(@PathVariable("name") String name) {
-        TaskDescriptorHandler taskDescriptorHandler = taskDescriptorHandlerService.getTaskDescriptorHandler(name);
+    @GetMapping(value = "/task-descriptors/{name}/{version}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public TaskDescriptor getTaskDescriptor(@PathVariable("name") String name, @PathVariable("version") float version) {
+        TaskDescriptorHandler taskDescriptorHandler = taskDescriptorHandlerService.getTaskDescriptorHandler(
+            name,
+            version
+        );
 
         return taskDescriptorHandler.getTaskDescriptor();
     }

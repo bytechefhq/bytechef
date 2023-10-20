@@ -21,6 +21,6 @@ import com.integri.atlas.task.descriptor.model.TaskDescriptor;
 /**
  * @author Ivica Cardic
  */
-public interface TaskDescriptorHandler extends TaskAuthDescriptorHandler {
+public interface TaskDescriptorHandler {
     TaskDescriptor getTaskDescriptor();
 }

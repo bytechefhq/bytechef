@@ -16,6 +16,8 @@
 
 package com.integri.atlas.task.descriptor.repository.memory;
 
+import com.integri.atlas.task.descriptor.repository.ExtTaskDescriptorHandlerRepository.NameVersions;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,59 +30,61 @@ public class InMemoryExtTaskDescriptorHandlerRepositoryTest {
 
     @Test
     public void testCreate() {
-        inMemoryExtTaskDescriptorHandlerRepository.create("name", "type");
+        inMemoryExtTaskDescriptorHandlerRepository.create("name", 1.0f, "type");
 
-        Assertions.assertTrue(inMemoryExtTaskDescriptorHandlerRepository.existByNameAndType("name", "type"));
+        Assertions.assertTrue(
+            inMemoryExtTaskDescriptorHandlerRepository.existByNameAndVersionAndType("name", 1.0f, "type")
+        );
     }
 
     @Test
     public void testDelete() {
-        inMemoryExtTaskDescriptorHandlerRepository.create("name", "type");
+        inMemoryExtTaskDescriptorHandlerRepository.create("name", 1.0f, "type");
 
-        inMemoryExtTaskDescriptorHandlerRepository.delete("name");
+        inMemoryExtTaskDescriptorHandlerRepository.delete("name", 1.0f);
 
-        Assertions.assertFalse(inMemoryExtTaskDescriptorHandlerRepository.existByNameAndType("name", "type"));
+        Assertions.assertFalse(
+            inMemoryExtTaskDescriptorHandlerRepository.existByNameAndVersionAndType("name", 1.0f, "type")
+        );
     }
 
     @Test
     public void testExistByNameAndType() {
-        inMemoryExtTaskDescriptorHandlerRepository.create("name", "type");
+        inMemoryExtTaskDescriptorHandlerRepository.create("name", 1.0f, "type");
 
-        Assertions.assertTrue(inMemoryExtTaskDescriptorHandlerRepository.existByNameAndType("name", "type"));
+        Assertions.assertTrue(
+            inMemoryExtTaskDescriptorHandlerRepository.existByNameAndVersionAndType("name", 1.0f, "type")
+        );
     }
 
     @Test
     public void testFindAll() {
-        inMemoryExtTaskDescriptorHandlerRepository.create("name1", "type1");
-        inMemoryExtTaskDescriptorHandlerRepository.create("name2", "type2");
+        inMemoryExtTaskDescriptorHandlerRepository.create("name1", 1.0f, "type1");
+        inMemoryExtTaskDescriptorHandlerRepository.create("name2", 1.0f, "type2");
 
         Assertions.assertEquals(2, inMemoryExtTaskDescriptorHandlerRepository.findAll().size());
     }
 
     @Test
     public void testFindAllNamesByType() {
-        inMemoryExtTaskDescriptorHandlerRepository.create("name1", "type1");
-        inMemoryExtTaskDescriptorHandlerRepository.create("name2", "type2");
+        inMemoryExtTaskDescriptorHandlerRepository.create("name1", 1.0f, "type1");
+        inMemoryExtTaskDescriptorHandlerRepository.create("name1", 1.1f, "type1");
+        inMemoryExtTaskDescriptorHandlerRepository.create("name2", 1.0f, "type2");
 
-        Assertions.assertEquals(1, inMemoryExtTaskDescriptorHandlerRepository.findAllNamesByType("type2").size());
+        List<NameVersions> nameVersions = inMemoryExtTaskDescriptorHandlerRepository.findAllNamesByType("type2");
+
+        Assertions.assertEquals(1, nameVersions.size());
+        Assertions.assertEquals("name2", nameVersions.get(0).name());
     }
 
     @Test
-    public void testFindTypeByName() {
-        inMemoryExtTaskDescriptorHandlerRepository.create("name1", "type1");
-        inMemoryExtTaskDescriptorHandlerRepository.create("name2", "type2");
+    public void testFindTypeByNameAndVersion() {
+        inMemoryExtTaskDescriptorHandlerRepository.create("name1", 1.0f, "type1");
+        inMemoryExtTaskDescriptorHandlerRepository.create("name2", 1.0f, "type2");
 
-        Assertions.assertEquals("type2", inMemoryExtTaskDescriptorHandlerRepository.findTypeByName("name2"));
-    }
-
-    @Test
-    public void testUpdate() {
-        inMemoryExtTaskDescriptorHandlerRepository.create("name", "type");
-
-        Assertions.assertTrue(inMemoryExtTaskDescriptorHandlerRepository.existByNameAndType("name", "type"));
-
-        inMemoryExtTaskDescriptorHandlerRepository.update("name", "type2");
-
-        Assertions.assertTrue(inMemoryExtTaskDescriptorHandlerRepository.existByNameAndType("name", "type2"));
+        Assertions.assertEquals(
+            "type2",
+            inMemoryExtTaskDescriptorHandlerRepository.findTypeByNameAndVersion("name2", 1.0f)
+        );
     }
 }

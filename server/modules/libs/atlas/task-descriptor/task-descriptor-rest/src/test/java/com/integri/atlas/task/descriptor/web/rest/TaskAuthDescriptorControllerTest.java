@@ -20,12 +20,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
+import com.integri.atlas.task.descriptor.handler.TaskAuthDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.DSL;
-import com.integri.atlas.task.descriptor.model.TaskAuthDescriptor;
-import com.integri.atlas.task.descriptor.model.TaskDescriptor;
+import com.integri.atlas.task.descriptor.repository.ExtTaskAuthDescriptorHandlerRepository;
 import com.integri.atlas.task.descriptor.repository.ExtTaskDescriptorHandlerRepository;
-import com.integri.atlas.task.descriptor.service.TaskDescriptorHandlerService;
+import com.integri.atlas.task.descriptor.service.TaskAuthDescriptorHandlerService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -40,8 +39,11 @@ import org.springframework.test.web.servlet.MockMvc;
 /**
  * @author Ivica Cardic
  */
-@WebMvcTest
+@WebMvcTest(TaskAuthDescriptorController.class)
 public class TaskAuthDescriptorControllerTest {
+
+    @MockBean
+    private ExtTaskAuthDescriptorHandlerRepository extTaskAuthDescriptorHandlerRepository;
 
     @MockBean
     private ExtTaskDescriptorHandlerRepository extTaskDescriptorHandlerRepository;
@@ -56,39 +58,19 @@ public class TaskAuthDescriptorControllerTest {
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @MockBean
-    private TaskDescriptorHandlerService taskDescriptorHandlerService;
+    private TaskAuthDescriptorHandlerService taskAuthDescriptorHandlerService;
 
-    private static final List<TaskDescriptorHandler> TASK_DESCRIPTOR_HANDLERS = List.of(
-        new TaskDescriptorHandler() {
-            @Override
-            public List<TaskAuthDescriptor> getTaskAuthDescriptors() {
-                return List.of(DSL.createTaskAuthDescriptor("auth1"), DSL.createTaskAuthDescriptor("auth2"));
-            }
-
-            @Override
-            public TaskDescriptor getTaskDescriptor() {
-                return DSL.createTaskDescriptor("task1");
-            }
-        },
-        new TaskDescriptorHandler() {
-            @Override
-            public List<TaskAuthDescriptor> getTaskAuthDescriptors() {
-                return null;
-            }
-
-            @Override
-            public TaskDescriptor getTaskDescriptor() {
-                return DSL.createTaskDescriptor("task2");
-            }
-        }
+    private static final List<TaskAuthDescriptorHandler> TASK_AUTH_DESCRIPTOR_HANDLERS = List.of(
+        () -> DSL.createTaskAuthDescriptors("task1", List.of(DSL.createTaskAuthDescriptor("auth1"))),
+        () -> DSL.createTaskAuthDescriptors("task2", List.of(DSL.createTaskAuthDescriptor("auth2")))
     );
 
     @Test
     public void testGetTaskAuthDescriptor() throws Exception {
         Mockito
-            .doReturn(TASK_DESCRIPTOR_HANDLERS.get(0))
-            .when(taskDescriptorHandlerService)
-            .getTaskDescriptorHandler(Mockito.anyString());
+            .doReturn(TASK_AUTH_DESCRIPTOR_HANDLERS.get(0))
+            .when(taskAuthDescriptorHandlerService)
+            .getTaskAuthDescriptorHandler(Mockito.anyString());
 
         mockMvc
             .perform(get("/task-auth-descriptors/task1/auth1").accept(MediaType.APPLICATION_JSON))
@@ -107,7 +89,10 @@ public class TaskAuthDescriptorControllerTest {
 
     @Test
     public void testGetTaskAuthDescriptors() throws Exception {
-        Mockito.doReturn(TASK_DESCRIPTOR_HANDLERS).when(taskDescriptorHandlerService).getTaskDescriptorHandlers();
+        Mockito
+            .doReturn(TASK_AUTH_DESCRIPTOR_HANDLERS)
+            .when(taskAuthDescriptorHandlerService)
+            .getTaskAuthDescriptorHandlers();
 
         mockMvc
             .perform(get("/task-auth-descriptors").accept(MediaType.APPLICATION_JSON))
@@ -117,12 +102,8 @@ public class TaskAuthDescriptorControllerTest {
                     .json(
                         """
                         [
-                            {
-                                "name":"auth1"
-                            },
-                            {
-                                "name":"auth2"
-                            }
+                            {"taskName":"task1","taskAuthDescriptors":[{"name":"auth1"}]},
+                            {"taskName":"task2","taskAuthDescriptors":[{"name":"auth2"}]}
                         ]
                         """
                     )

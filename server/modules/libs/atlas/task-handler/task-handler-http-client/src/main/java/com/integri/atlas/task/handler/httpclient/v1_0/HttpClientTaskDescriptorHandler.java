@@ -24,7 +24,6 @@ import static com.integri.atlas.task.descriptor.model.DSL.INTEGER_PROPERTY;
 import static com.integri.atlas.task.descriptor.model.DSL.OBJECT_PROPERTY;
 import static com.integri.atlas.task.descriptor.model.DSL.OPERATION;
 import static com.integri.atlas.task.descriptor.model.DSL.STRING_PROPERTY;
-import static com.integri.atlas.task.descriptor.model.DSL.createTaskAuthDescriptor;
 import static com.integri.atlas.task.descriptor.model.DSL.createTaskDescriptor;
 import static com.integri.atlas.task.descriptor.model.DSL.option;
 import static com.integri.atlas.task.descriptor.model.DSL.showWhen;
@@ -57,12 +56,10 @@ import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.URI;
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.VALUE;
 
-import com.integri.atlas.task.descriptor.handler.AbstractTaskDescriptorHandler;
+import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.DSL;
-import com.integri.atlas.task.descriptor.model.TaskAuthDescriptor;
 import com.integri.atlas.task.descriptor.model.TaskDescriptor;
 import com.integri.atlas.task.descriptor.model.TaskProperty;
-import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Component;
 
@@ -70,7 +67,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class HttpClientTaskDescriptorHandler extends AbstractTaskDescriptorHandler {
+public class HttpClientTaskDescriptorHandler implements TaskDescriptorHandler {
 
     private static final TaskProperty[] COMMON_PROPERTIES = {
         //
@@ -193,39 +190,6 @@ public class HttpClientTaskDescriptorHandler extends AbstractTaskDescriptorHandl
         STRING_PROPERTY().displayOption(showWhen(RESPONSE_FORMAT).in(ResponseFormat.TEXT.name())),
         FILE_ENTRY_PROPERTY().displayOption(showWhen(RESPONSE_FORMAT).in(ResponseFormat.FILE.name())),
     };
-
-    private static final List<TaskAuthDescriptor> TASK_AUTH_DESCRIPTOR = List.of(
-        createTaskAuthDescriptor(API_KEY.name().toLowerCase())
-            .displayName("API Key")
-            .properties(
-                STRING_PROPERTY(KEY).displayName("Key").required(true).defaultValue("api_token"),
-                STRING_PROPERTY(VALUE).displayName("Value").required(true),
-                STRING_PROPERTY(ADD_TO)
-                    .displayName("Add to")
-                    .required(true)
-                    .options(
-                        option("Header", ApiTokenLocation.HEADER.name()),
-                        option("QueryParams", ApiTokenLocation.QUERY_PARAMS.name())
-                    )
-                    .required(true)
-            ),
-        createTaskAuthDescriptor(BEARER_TOKEN.name().toLowerCase())
-            .displayName("Bearer Token")
-            .properties(STRING_PROPERTY(TOKEN).displayName("Token").required(true)),
-        createTaskAuthDescriptor(BASIC_AUTH.name().toLowerCase())
-            .displayName("Basic Auth")
-            .properties(
-                STRING_PROPERTY(USERNAME).displayName("Username").required(true),
-                STRING_PROPERTY(PASSWORD).displayName("Password").required(true)
-            ),
-        createTaskAuthDescriptor(DIGEST_AUTH.name().toLowerCase())
-            .displayName("Digest Auth")
-            .properties(
-                STRING_PROPERTY(USERNAME).displayName("Username").required(true),
-                STRING_PROPERTY(PASSWORD).displayName("Password").required(true)
-            ),
-        createTaskAuthDescriptor(OAUTH2.name().toLowerCase()).displayName("OAuth2").properties()
-    );
 
     private static final TaskDescriptor TASK_DESCRIPTOR = createTaskDescriptor(HTTP_CLIENT)
         .displayName("HTTP Client")
@@ -378,11 +342,6 @@ public class HttpClientTaskDescriptorHandler extends AbstractTaskDescriptorHandl
                 )
                 .outputs(OUTPUTS_PROPERTIES)
         );
-
-    @Override
-    public List<TaskAuthDescriptor> getTaskAuthDescriptors() {
-        return TASK_AUTH_DESCRIPTOR;
-    }
 
     @Override
     public TaskDescriptor getTaskDescriptor() {

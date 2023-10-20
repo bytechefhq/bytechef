@@ -26,14 +26,14 @@ import static com.integri.atlas.task.handler.localfile.LocalFileTaskConstants.FI
 import static com.integri.atlas.task.handler.localfile.LocalFileTaskConstants.LOCAL_FILE;
 import static com.integri.atlas.task.handler.localfile.LocalFileTaskConstants.VERSION_1_0;
 
-import com.integri.atlas.task.descriptor.handler.AbstractTaskDescriptorHandler;
+import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.DSL;
 import com.integri.atlas.task.descriptor.model.TaskDescriptor;
 import com.integri.atlas.task.handler.localfile.LocalFileTaskConstants;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LocalFileTaskDescriptorHandler extends AbstractTaskDescriptorHandler {
+public class LocalFileTaskDescriptorHandler implements TaskDescriptorHandler {
 
     private static final TaskDescriptor TASK_DESCRIPTOR = DSL
         .createTaskDescriptor(LOCAL_FILE)

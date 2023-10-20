@@ -32,7 +32,7 @@ public class TaskDescriptorHandlerResolverChainIntTest {
 
     @Test
     public void testGetTaskDescriptorHandler() {
-        Assertions.assertNotNull(taskDescriptorHandlerResolverChain.resolve("memory"));
+        Assertions.assertNotNull(taskDescriptorHandlerResolverChain.resolve("csvFile", 1.0f));
     }
 
     @Test

@@ -27,7 +27,7 @@ import static com.integri.atlas.task.descriptor.model.DSL.OPERATION;
 import static com.integri.atlas.task.descriptor.model.DSL.OPTIONS;
 import static com.integri.atlas.task.descriptor.model.DSL.STRING_PROPERTY;
 
-import com.integri.atlas.task.descriptor.handler.AbstractTaskDescriptorHandler;
+import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.DSL;
 import com.integri.atlas.task.descriptor.model.TaskDescriptor;
 import com.integri.atlas.task.handler.csvfile.CsvFileTaskConstants;
@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-class CsvFileTaskDescriptorHandler extends AbstractTaskDescriptorHandler {
+class CsvFileTaskDescriptorHandler implements TaskDescriptorHandler {
 
     private static final TaskDescriptor TASK_DESCRIPTOR = DSL
         .createTaskDescriptor(CsvFileTaskConstants.CSV_FILE)

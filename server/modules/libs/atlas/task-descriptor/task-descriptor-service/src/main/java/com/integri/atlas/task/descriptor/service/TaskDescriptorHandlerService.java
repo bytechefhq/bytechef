@@ -40,25 +40,21 @@ public class TaskDescriptorHandlerService {
         this.taskDescriptorHandlerResolver = taskDescriptorHandlerResolver;
     }
 
-    public TaskDescriptorHandler getTaskDescriptorHandler(String name) {
+    public TaskDescriptorHandler getTaskDescriptorHandler(String name, float version) {
         Assert.notNull(name, "Name cannot be null");
 
-        return taskDescriptorHandlerResolver.resolve(name);
+        return taskDescriptorHandlerResolver.resolve(name, version);
     }
 
     public List<TaskDescriptorHandler> getTaskDescriptorHandlers() {
         return taskDescriptorHandlerResolver.getTaskDescriptorHandlers();
     }
 
-    public void registerExtTaskDescriptorHandler(String name, String type) {
-        if (extTaskDescriptorHandlerRepository.findTypeByName(name) == null) {
-            extTaskDescriptorHandlerRepository.create(name, type);
-        } else {
-            extTaskDescriptorHandlerRepository.update(name, type);
-        }
+    public void registerExtTaskDescriptorHandler(String name, float version, String type) {
+        extTaskDescriptorHandlerRepository.create(name, version, type);
     }
 
-    public void unregisterExtTaskDescriptorHandler(String name) {
-        extTaskDescriptorHandlerRepository.delete(name);
+    public void unregisterExtTaskDescriptorHandler(String name, float version) {
+        extTaskDescriptorHandlerRepository.delete(name, version);
     }
 }

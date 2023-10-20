@@ -21,6 +21,7 @@ import static com.integri.atlas.task.descriptor.resolver.RemoteExtTaskDescriptor
 import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
 import com.integri.atlas.task.descriptor.repository.ExtTaskDescriptorHandlerRepository;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,24 +42,29 @@ public class TaskDescriptorHandlerServiceIntTest {
 
     @BeforeEach
     public void beforeEach() {
-        for (Map.Entry<String, String> entry : extTaskDescriptorHandlerRepository.findAll().entrySet()) {
-            extTaskDescriptorHandlerRepository.delete(entry.getKey());
+        for (Map.Entry<String, Map<String, Set<Float>>> entry : extTaskDescriptorHandlerRepository
+            .findAll()
+            .entrySet()) {
+            extTaskDescriptorHandlerRepository.delete(entry.getKey(), 1.0f);
         }
     }
 
     @Test
     public void testGetTaskDescriptorHandler() {
-        TaskDescriptorHandler taskDescriptorHandler = taskDescriptorHandlerService.getTaskDescriptorHandler("memory");
+        TaskDescriptorHandler taskDescriptorHandler = taskDescriptorHandlerService.getTaskDescriptorHandler(
+            "csvFile",
+            1.0f
+        );
 
         Assertions.assertNotNull(taskDescriptorHandler);
 
-        taskDescriptorHandler = taskDescriptorHandlerService.getTaskDescriptorHandler("remote");
+        taskDescriptorHandler = taskDescriptorHandlerService.getTaskDescriptorHandler("jsonFile", 1.0f);
 
         Assertions.assertNull(taskDescriptorHandler);
 
-        taskDescriptorHandlerService.registerExtTaskDescriptorHandler("remote", REMOTE);
+        taskDescriptorHandlerService.registerExtTaskDescriptorHandler("jsonFile", 1.0f, REMOTE);
 
-        taskDescriptorHandler = taskDescriptorHandlerService.getTaskDescriptorHandler("remote");
+        taskDescriptorHandler = taskDescriptorHandlerService.getTaskDescriptorHandler("jsonFile", 1.0f);
 
         Assertions.assertNotNull(taskDescriptorHandler);
     }
@@ -70,24 +76,30 @@ public class TaskDescriptorHandlerServiceIntTest {
 
     @Test
     public void testRegisterExtTaskDescriptorHandler() {
-        taskDescriptorHandlerService.registerExtTaskDescriptorHandler("remote", REMOTE);
+        taskDescriptorHandlerService.registerExtTaskDescriptorHandler("jsonFile", 1.0f, REMOTE);
 
-        TaskDescriptorHandler taskDescriptorHandler = taskDescriptorHandlerService.getTaskDescriptorHandler("remote");
+        TaskDescriptorHandler taskDescriptorHandler = taskDescriptorHandlerService.getTaskDescriptorHandler(
+            "jsonFile",
+            1.0f
+        );
 
         Assertions.assertNotNull(taskDescriptorHandler);
     }
 
     @Test
     public void testUnregisterExtTaskDescriptorHandler() {
-        taskDescriptorHandlerService.registerExtTaskDescriptorHandler("remote", REMOTE);
+        taskDescriptorHandlerService.registerExtTaskDescriptorHandler("jsonFile", 1.0f, REMOTE);
 
-        TaskDescriptorHandler taskDescriptorHandler = taskDescriptorHandlerService.getTaskDescriptorHandler("remote");
+        TaskDescriptorHandler taskDescriptorHandler = taskDescriptorHandlerService.getTaskDescriptorHandler(
+            "jsonFile",
+            1.0f
+        );
 
         Assertions.assertNotNull(taskDescriptorHandler);
 
-        taskDescriptorHandlerService.unregisterExtTaskDescriptorHandler("remote");
+        taskDescriptorHandlerService.unregisterExtTaskDescriptorHandler("jsonFile", 1.0f);
 
-        taskDescriptorHandler = taskDescriptorHandlerService.getTaskDescriptorHandler("remote");
+        taskDescriptorHandler = taskDescriptorHandlerService.getTaskDescriptorHandler("jsonFile", 1.0f);
 
         Assertions.assertNull(taskDescriptorHandler);
     }

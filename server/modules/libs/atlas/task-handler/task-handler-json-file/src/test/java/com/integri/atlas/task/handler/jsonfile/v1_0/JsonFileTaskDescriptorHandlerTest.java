@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.xmlfile.v1_0;
+package com.integri.atlas.task.handler.jsonfile.v1_0;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class XmlFileTaskDescriptorTest {
+public class JsonFileTaskDescriptorHandlerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -36,20 +36,38 @@ public class XmlFileTaskDescriptorTest {
     };
 
     @Test
-    public void testXMLFileTaskDescriptor() throws JsonProcessingException {
+    public void testGetJSONFileTaskDescriptor() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
-           {
-              "description": "Reads and writes data from a XML file.",
-              "displayName": "XML File",
-              "name": "xmlFile",
+            {
+              "description": "Reads and writes data from a JSON file.",
+              "displayName": "JSON File",
+              "name": "jsonFile",
               "operations": [
                 {
-                  "description": "Reads data from a XML file.",
+                  "description": "Reads data from a JSON file.",
                   "name": "read",
                   "inputs": [
                     {
-                      "description": "The object property which contains a reference to the XML file to read from.",
+                      "description": "The file type to choose.",
+                      "displayName": "File Type",
+                      "name": "fileType",
+                      "required": true,
+                      "options": [
+                        {
+                          "name": "JSON",
+                          "value": "JSON"
+                        },
+                        {
+                          "name": "JSON Line",
+                          "value": "JSONL"
+                        }
+                      ],
+                      "defaultValue": "JSON",
+                      "type": "STRING"
+                    },
+                    {
+                      "description": "The object property which contains a reference to the JSON file to read from.",
                       "displayName": "File",
                       "name": "fileEntry",
                       "required": true,
@@ -147,9 +165,27 @@ public class XmlFileTaskDescriptorTest {
                   "displayName": "Read from file"
                 },
                 {
-                  "description": "Writes the data to a XML file.",
+                  "description": "Writes the data to a JSON file.",
                   "name": "write",
                   "inputs": [
+                    {
+                      "description": "The file type to choose.",
+                      "displayName": "File Type",
+                      "name": "fileType",
+                      "required": true,
+                      "options": [
+                        {
+                          "name": "JSON",
+                          "value": "JSON"
+                        },
+                        {
+                          "name": "JSON Line",
+                          "value": "JSONL"
+                        }
+                      ],
+                      "defaultValue": "JSON",
+                      "type": "STRING"
+                    },
                     {
                       "description": "The data to write to the file.",
                       "displayName": "Source",
@@ -165,10 +201,10 @@ public class XmlFileTaskDescriptorTest {
                       ]
                     },
                     {
-                      "description": "File name to set for binary data. By default, \\"file.xml\\" will be used.",
+                      "description": "File name to set for binary data. By default, \\"file.json\\" will be used.",
                       "displayName": "File Name",
                       "name": "fileName",
-                      "defaultValue": "file.xml",
+                      "defaultValue": "file.json",
                       "type": "STRING"
                     }
                   ],
@@ -206,7 +242,7 @@ public class XmlFileTaskDescriptorTest {
             }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(new XmlFileTaskDescriptorHandler().getTaskDescriptor())
+                objectMapper.writeValueAsString(new JsonFileTaskDescriptorHandler().getTaskDescriptor())
             ),
             true
         );

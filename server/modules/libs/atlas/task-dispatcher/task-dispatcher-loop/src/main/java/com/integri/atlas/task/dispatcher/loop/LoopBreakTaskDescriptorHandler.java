@@ -18,14 +18,14 @@ package com.integri.atlas.task.dispatcher.loop;
 
 import static com.integri.atlas.task.dispatcher.loop.LoopBreakTaskConstants.TASK_LOOP_BREAK;
 
-import com.integri.atlas.task.descriptor.handler.AbstractTaskDescriptorHandler;
+import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.DSL;
 import com.integri.atlas.task.descriptor.model.TaskDescriptor;
 
 /**
  * @author Ivica Cardic
  */
-public class LoopBreakTaskDescriptorHandler extends AbstractTaskDescriptorHandler {
+public class LoopBreakTaskDescriptorHandler implements TaskDescriptorHandler {
 
     private static final TaskDescriptor TASK_DESCRIPTOR = DSL
         .createTaskDescriptor(TASK_LOOP_BREAK)

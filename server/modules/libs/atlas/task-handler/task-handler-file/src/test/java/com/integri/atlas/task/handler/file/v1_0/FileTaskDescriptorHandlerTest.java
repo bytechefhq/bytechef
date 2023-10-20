@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.localfile.v1_0;
+package com.integri.atlas.task.handler.file.v1_0;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class LocalFileTaskDescriptorTest {
+public class FileTaskDescriptorHandlerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -36,60 +36,20 @@ public class LocalFileTaskDescriptorTest {
     };
 
     @Test
-    public void testLocalFileTaskDescriptor() throws JsonProcessingException {
+    public void testGetFileTaskDescriptor() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
             {
-              "description": "Reads or writes a binary file from/to disk",
-              "displayName": "Local File",
-              "name": "localFile",
+              "description": "Reads and writes data from a file",
+              "displayName": "File",
+              "name": "file",
               "operations": [
                 {
+                  "description": "Reads data from a csv file.",
                   "name": "read",
                   "inputs": [
                     {
-                      "description": "The path of the file to read.",
-                      "displayName": "File Name",
-                      "name": "fileName",
-                      "placeholder": "/data/your_file.pdf",
-                      "required": true,
-                      "type": "STRING"
-                    }
-                  ],
-                  "outputs": [
-                    {
-                      "type": "OBJECT",
-                      "properties": [
-                        {
-                          "name": "extension",
-                          "required": true,
-                          "type": "STRING"
-                        },
-                        {
-                          "name": "mimeType",
-                          "required": true,
-                          "type": "STRING"
-                        },
-                        {
-                          "name": "name",
-                          "required": true,
-                          "type": "STRING"
-                        },
-                        {
-                          "name": "url",
-                          "required": true,
-                          "type": "STRING"
-                        }
-                      ]
-                    }
-                  ],
-                  "displayName": "Read to file"
-                },
-                {
-                  "name": "write",
-                  "inputs": [
-                    {
-                      "description": "The object property which contains a reference to the file to be written.",
+                      "description": "The object property which contains a reference to the file to read from.",
                       "displayName": "File",
                       "name": "fileEntry",
                       "required": true,
@@ -116,13 +76,31 @@ public class LocalFileTaskDescriptorTest {
                           "type": "STRING"
                         }
                       ]
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "type": "STRING"
+                    }
+                  ],
+                  "displayName": "Read from file"
+                },
+                {
+                  "description": "Writes the data to a csv file.",
+                  "name": "write",
+                  "inputs": [
+                    {
+                      "description": "String to write to the file.",
+                      "displayName": "Content",
+                      "name": "content",
+                      "required": true,
+                      "type": "STRING"
                     },
                     {
-                      "description": "The path to which the file should be written.",
+                      "description": "File name to set for binary data. By default, \\"file.txt\\" will be used.",
                       "displayName": "File Name",
                       "name": "fileName",
-                      "placeholder": "/data/your_file.pdf",
-                      "required": true,
+                      "defaultValue": "file.txt",
                       "type": "STRING"
                     }
                   ],
@@ -131,20 +109,36 @@ public class LocalFileTaskDescriptorTest {
                       "type": "OBJECT",
                       "properties": [
                         {
-                          "name": "bytes",
-                          "type": "INTEGER"
+                          "name": "extension",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "mimeType",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "name",
+                          "required": true,
+                          "type": "STRING"
+                        },
+                        {
+                          "name": "url",
+                          "required": true,
+                          "type": "STRING"
                         }
                       ]
                     }
                   ],
-                  "displayName": "Write from file"
+                  "displayName": "Write to file"
                 }
               ],
               "version": 1
             }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(new LocalFileTaskDescriptorHandler().getTaskDescriptor())
+                objectMapper.writeValueAsString(new FileTaskDescriptorHandler().getTaskDescriptor())
             ),
             true
         );

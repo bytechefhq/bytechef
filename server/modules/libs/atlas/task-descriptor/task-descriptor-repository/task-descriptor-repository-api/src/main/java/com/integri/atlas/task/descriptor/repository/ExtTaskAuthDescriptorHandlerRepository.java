@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.objecthelpers.v1_0;
+package com.integri.atlas.task.descriptor.repository;
 
-import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
-import com.integri.atlas.task.descriptor.model.TaskDescriptor;
-import com.integri.atlas.task.handler.objecthelpers.ObjectHelpersTaskConstants;
-import org.springframework.stereotype.Component;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-@Component
-public class ObjectHelpersTaskDescriptorHandler implements TaskDescriptorHandler {
+public interface ExtTaskAuthDescriptorHandlerRepository {
+    void delete(String taskName);
 
-    @Override
-    public TaskDescriptor getTaskDescriptor() {
-        return ObjectHelpersTaskConstants.TASK_DESCRIPTOR;
-    }
+    void create(String taskName, String type);
+
+    boolean existByTaskNameAndType(String taskName, String type);
+
+    Map<String, String> findAll();
+
+    List<String> findAllTaskNamesByType(String type);
+
+    String findTypeByTaskName(String name);
 }

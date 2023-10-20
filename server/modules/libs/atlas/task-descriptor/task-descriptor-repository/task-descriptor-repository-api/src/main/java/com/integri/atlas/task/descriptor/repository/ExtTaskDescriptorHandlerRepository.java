@@ -18,22 +18,23 @@ package com.integri.atlas.task.descriptor.repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Ivica Cardic
  */
 public interface ExtTaskDescriptorHandlerRepository {
-    void create(String name, String type);
+    void create(String name, float version, String type);
 
-    void delete(String name);
+    void delete(String name, float version);
 
-    boolean existByNameAndType(String name, String type);
+    boolean existByNameAndVersionAndType(String name, float version, String type);
 
-    Map<String, String> findAll();
+    Map<String, Map<String, Set<Float>>> findAll();
 
-    List<String> findAllNamesByType(String type);
+    List<NameVersions> findAllNamesByType(String type);
 
-    String findTypeByName(String name);
+    String findTypeByNameAndVersion(String name, float version);
 
-    void update(String name, String type);
+    record NameVersions(String name, Set<Float> versions) {}
 }

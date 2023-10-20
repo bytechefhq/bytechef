@@ -40,7 +40,7 @@ import static com.integri.atlas.task.handler.jsonfile.JsonFileTaskConstants.PATH
 import static com.integri.atlas.task.handler.jsonfile.JsonFileTaskConstants.SOURCE;
 import static com.integri.atlas.task.handler.jsonfile.JsonFileTaskConstants.VERSION_1_0;
 
-import com.integri.atlas.task.descriptor.handler.AbstractTaskDescriptorHandler;
+import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.DSL;
 import com.integri.atlas.task.descriptor.model.TaskDescriptor;
 import com.integri.atlas.task.handler.jsonfile.JsonFileTaskConstants;
@@ -50,7 +50,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class JsonFileTaskDescriptorHandler extends AbstractTaskDescriptorHandler {
+public class JsonFileTaskDescriptorHandler implements TaskDescriptorHandler {
 
     private static final TaskDescriptor TASK_DESCRIPTOR = DSL
         .createTaskDescriptor(JSON_FILE)

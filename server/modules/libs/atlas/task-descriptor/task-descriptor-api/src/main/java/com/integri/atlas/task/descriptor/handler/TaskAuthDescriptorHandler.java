@@ -16,12 +16,11 @@
 
 package com.integri.atlas.task.descriptor.handler;
 
-import com.integri.atlas.task.descriptor.model.TaskAuthDescriptor;
-import java.util.List;
+import com.integri.atlas.task.descriptor.model.TaskAuthDescriptors;
 
 /**
  * @author Ivica Cardic
  */
 public interface TaskAuthDescriptorHandler {
-    List<TaskAuthDescriptor> getTaskAuthDescriptors();
+    TaskAuthDescriptors getTaskAuthDescriptors();
 }

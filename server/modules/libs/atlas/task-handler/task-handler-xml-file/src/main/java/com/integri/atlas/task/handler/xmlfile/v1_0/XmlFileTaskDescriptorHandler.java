@@ -28,7 +28,7 @@ import static com.integri.atlas.task.descriptor.model.DSL.STRING_PROPERTY;
 import static com.integri.atlas.task.descriptor.model.DSL.showWhen;
 import static com.integri.atlas.task.handler.xmlfile.XmlFileTaskConstants.*;
 
-import com.integri.atlas.task.descriptor.handler.AbstractTaskDescriptorHandler;
+import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.DSL;
 import com.integri.atlas.task.descriptor.model.TaskDescriptor;
 import org.springframework.stereotype.Component;
@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class XmlFileTaskDescriptorHandler extends AbstractTaskDescriptorHandler {
+public class XmlFileTaskDescriptorHandler implements TaskDescriptorHandler {
 
     private static final TaskDescriptor TASK_DESCRIPTOR = DSL
         .createTaskDescriptor(XML_FILE)

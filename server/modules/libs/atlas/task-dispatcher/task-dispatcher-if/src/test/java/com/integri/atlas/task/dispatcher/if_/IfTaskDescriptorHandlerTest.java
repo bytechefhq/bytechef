@@ -28,7 +28,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class IfTaskDescriptorTest {
+public class IfTaskDescriptorHandlerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -37,7 +37,7 @@ public class IfTaskDescriptorTest {
     };
 
     @Test
-    public void testIfTaskDescriptor() throws JsonProcessingException, JSONException {
+    public void testGetIfTaskDescriptor() throws JsonProcessingException, JSONException {
         JSONAssert.assertEquals(
             """
             {

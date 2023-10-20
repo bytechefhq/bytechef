@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.odsfile.v1_0;
+package com.integri.atlas.task.handler.xlsxfile.v1_0;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,7 +27,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class OdsFileTaskDescriptorTest {
+public class XlsxFileTaskDescriptorHandlerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -36,20 +36,20 @@ public class OdsFileTaskDescriptorTest {
     };
 
     @Test
-    public void testOdsFileTaskDescriptor() throws JsonProcessingException {
+    public void testGetXlsxFileTaskDescriptor() throws JsonProcessingException {
         JSONAssert.assertEquals(
             """
             {
-              "description": "Reads and writes data from a ODS file.",
-              "displayName": "ODS File",
-              "name": "odsFile",
+              "description": "Reads and writes data from a XLS/XLSX file.",
+              "displayName": "XLSX File",
+              "name": "xlsxFile",
               "operations": [
                 {
-                  "description": "Reads data from a ODS file.",
+                  "description": "Reads data from a XLS/XLSX file.",
                   "name": "read",
                   "inputs": [
                     {
-                      "description": "The object property which contains a reference to the ODS file to read from.",
+                      "description": "The object property which contains a reference to the XLS/XLSX file to read from.",
                       "displayName": "File",
                       "name": "fileEntry",
                       "required": true,
@@ -132,7 +132,7 @@ public class OdsFileTaskDescriptorTest {
                   "displayName": "Read from file"
                 },
                 {
-                  "description": "Writes the data to a ODS file.",
+                  "description": "Writes the data to a XLS/XLSX file.",
                   "name": "write",
                   "inputs": [
                     {
@@ -167,7 +167,7 @@ public class OdsFileTaskDescriptorTest {
                       "placeholder": "Add Option",
                       "options": [
                         {
-                          "description": "File name to set for binary data. By default, \\"file.ods\\" will be used.",
+                          "description": "File name to set for binary data. By default, \\"file.xlsx\\" will be used.",
                           "displayName": "File Name",
                           "name": "fileName",
                           "defaultValue": "",
@@ -217,7 +217,7 @@ public class OdsFileTaskDescriptorTest {
             }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(new OdsFileTaskDescriptorHandler().getTaskDescriptor())
+                objectMapper.writeValueAsString(new XlsxFileTaskDescriptorHandler().getTaskDescriptor())
             ),
             true
         );
