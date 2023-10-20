@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskConnection", description = "The connection used in a particular task.")
 @JsonTypeName("TaskConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-25T10:01:29.231011+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-28T08:16:45.262230+02:00[Europe/Zagreb]")
 public class TaskConnectionModel {
 
   private Long id;

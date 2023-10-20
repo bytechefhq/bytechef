@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ArrayProperty", description = "An array property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-26T07:19:25.648468+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-26T20:31:17.117022+02:00[Europe/Zagreb]")
 public class ArrayPropertyModel extends ValuePropertyModel {
 
   @Valid

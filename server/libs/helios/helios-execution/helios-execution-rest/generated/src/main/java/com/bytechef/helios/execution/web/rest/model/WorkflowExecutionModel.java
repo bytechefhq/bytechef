@@ -21,10 +21,10 @@ import jakarta.annotation.Generated;
  * Contains information about execution of a project workflow.
  */
 
-@Schema(name = "Execution", description = "Contains information about execution of a project workflow.")
-@JsonTypeName("Execution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-25T10:01:29.231011+02:00[Europe/Zagreb]")
-public class ExecutionModel {
+@Schema(name = "WorkflowExecution", description = "Contains information about execution of a project workflow.")
+@JsonTypeName("WorkflowExecution")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-28T08:16:45.262230+02:00[Europe/Zagreb]")
+public class WorkflowExecutionModel {
 
   private Long id;
 
@@ -36,7 +36,7 @@ public class ExecutionModel {
 
   private WorkflowBasicModel workflow;
 
-  public ExecutionModel id(Long id) {
+  public WorkflowExecutionModel id(Long id) {
     this.id = id;
     return this;
   }
@@ -56,7 +56,7 @@ public class ExecutionModel {
     this.id = id;
   }
 
-  public ExecutionModel instance(com.bytechef.helios.configuration.web.rest.model.ProjectInstanceModel instance) {
+  public WorkflowExecutionModel instance(com.bytechef.helios.configuration.web.rest.model.ProjectInstanceModel instance) {
     this.instance = instance;
     return this;
   }
@@ -76,7 +76,7 @@ public class ExecutionModel {
     this.instance = instance;
   }
 
-  public ExecutionModel job(JobModel job) {
+  public WorkflowExecutionModel job(JobModel job) {
     this.job = job;
     return this;
   }
@@ -96,7 +96,7 @@ public class ExecutionModel {
     this.job = job;
   }
 
-  public ExecutionModel project(com.bytechef.helios.configuration.web.rest.model.ProjectModel project) {
+  public WorkflowExecutionModel project(com.bytechef.helios.configuration.web.rest.model.ProjectModel project) {
     this.project = project;
     return this;
   }
@@ -116,7 +116,7 @@ public class ExecutionModel {
     this.project = project;
   }
 
-  public ExecutionModel workflow(WorkflowBasicModel workflow) {
+  public WorkflowExecutionModel workflow(WorkflowBasicModel workflow) {
     this.workflow = workflow;
     return this;
   }
@@ -144,12 +144,12 @@ public class ExecutionModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ExecutionModel execution = (ExecutionModel) o;
-    return Objects.equals(this.id, execution.id) &&
-        Objects.equals(this.instance, execution.instance) &&
-        Objects.equals(this.job, execution.job) &&
-        Objects.equals(this.project, execution.project) &&
-        Objects.equals(this.workflow, execution.workflow);
+    WorkflowExecutionModel workflowExecution = (WorkflowExecutionModel) o;
+    return Objects.equals(this.id, workflowExecution.id) &&
+        Objects.equals(this.instance, workflowExecution.instance) &&
+        Objects.equals(this.job, workflowExecution.job) &&
+        Objects.equals(this.project, workflowExecution.project) &&
+        Objects.equals(this.workflow, workflowExecution.workflow);
   }
 
   @Override
@@ -160,7 +160,7 @@ public class ExecutionModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ExecutionModel {\n");
+    sb.append("class WorkflowExecutionModel {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    instance: ").append(toIndentedString(instance)).append("\n");
     sb.append("    job: ").append(toIndentedString(job)).append("\n");

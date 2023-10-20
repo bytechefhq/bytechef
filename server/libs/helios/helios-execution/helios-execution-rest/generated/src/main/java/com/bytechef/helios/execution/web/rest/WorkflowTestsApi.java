@@ -33,17 +33,17 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-25T10:01:29.231011+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-28T08:16:45.262230+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "automation-tests", description = "The Automation Tests API")
-public interface TestsApi {
+public interface WorkflowTestsApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * POST /tests : Execute a workflow synchronously for testing purpose
+     * POST /workflow-tests : Execute a workflow synchronously for testing purpose
      * Execute a workflow synchronously for testing purposes.
      *
      * @param testParametersModel Parameters required to run a job, for example &#39;{\&quot;workflowId\&quot;:\&quot;samples/hello\&quot;,\&quot;inputs\&quot;:{\&quot;yourName\&quot;:\&quot;Joe Jones\&quot;}}&#39; (required)
@@ -62,7 +62,7 @@ public interface TestsApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/tests",
+        value = "/workflow-tests",
         produces = { "application/json" },
         consumes = { "application/json" }
     )

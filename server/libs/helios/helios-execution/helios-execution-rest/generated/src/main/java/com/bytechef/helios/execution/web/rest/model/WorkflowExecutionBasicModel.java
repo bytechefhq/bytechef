@@ -21,10 +21,10 @@ import jakarta.annotation.Generated;
  * Contains basic information about execution of a project workflow.
  */
 
-@Schema(name = "ExecutionBasic", description = "Contains basic information about execution of a project workflow.")
-@JsonTypeName("ExecutionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-25T10:01:29.231011+02:00[Europe/Zagreb]")
-public class ExecutionBasicModel {
+@Schema(name = "WorkflowExecutionBasic", description = "Contains basic information about execution of a project workflow.")
+@JsonTypeName("WorkflowExecutionBasic")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-28T08:16:45.262230+02:00[Europe/Zagreb]")
+public class WorkflowExecutionBasicModel {
 
   private Long id;
 
@@ -36,7 +36,7 @@ public class ExecutionBasicModel {
 
   private WorkflowBasicModel workflow;
 
-  public ExecutionBasicModel id(Long id) {
+  public WorkflowExecutionBasicModel id(Long id) {
     this.id = id;
     return this;
   }
@@ -56,7 +56,7 @@ public class ExecutionBasicModel {
     this.id = id;
   }
 
-  public ExecutionBasicModel instance(com.bytechef.helios.configuration.web.rest.model.ProjectInstanceBasicModel instance) {
+  public WorkflowExecutionBasicModel instance(com.bytechef.helios.configuration.web.rest.model.ProjectInstanceBasicModel instance) {
     this.instance = instance;
     return this;
   }
@@ -76,7 +76,7 @@ public class ExecutionBasicModel {
     this.instance = instance;
   }
 
-  public ExecutionBasicModel job(JobBasicModel job) {
+  public WorkflowExecutionBasicModel job(JobBasicModel job) {
     this.job = job;
     return this;
   }
@@ -96,7 +96,7 @@ public class ExecutionBasicModel {
     this.job = job;
   }
 
-  public ExecutionBasicModel project(com.bytechef.helios.configuration.web.rest.model.ProjectBasicModel project) {
+  public WorkflowExecutionBasicModel project(com.bytechef.helios.configuration.web.rest.model.ProjectBasicModel project) {
     this.project = project;
     return this;
   }
@@ -116,7 +116,7 @@ public class ExecutionBasicModel {
     this.project = project;
   }
 
-  public ExecutionBasicModel workflow(WorkflowBasicModel workflow) {
+  public WorkflowExecutionBasicModel workflow(WorkflowBasicModel workflow) {
     this.workflow = workflow;
     return this;
   }
@@ -144,12 +144,12 @@ public class ExecutionBasicModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ExecutionBasicModel executionBasic = (ExecutionBasicModel) o;
-    return Objects.equals(this.id, executionBasic.id) &&
-        Objects.equals(this.instance, executionBasic.instance) &&
-        Objects.equals(this.job, executionBasic.job) &&
-        Objects.equals(this.project, executionBasic.project) &&
-        Objects.equals(this.workflow, executionBasic.workflow);
+    WorkflowExecutionBasicModel workflowExecutionBasic = (WorkflowExecutionBasicModel) o;
+    return Objects.equals(this.id, workflowExecutionBasic.id) &&
+        Objects.equals(this.instance, workflowExecutionBasic.instance) &&
+        Objects.equals(this.job, workflowExecutionBasic.job) &&
+        Objects.equals(this.project, workflowExecutionBasic.project) &&
+        Objects.equals(this.workflow, workflowExecutionBasic.workflow);
   }
 
   @Override
@@ -160,7 +160,7 @@ public class ExecutionBasicModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ExecutionBasicModel {\n");
+    sb.append("class WorkflowExecutionBasicModel {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    instance: ").append(toIndentedString(instance)).append("\n");
     sb.append("    job: ").append(toIndentedString(job)).append("\n");
