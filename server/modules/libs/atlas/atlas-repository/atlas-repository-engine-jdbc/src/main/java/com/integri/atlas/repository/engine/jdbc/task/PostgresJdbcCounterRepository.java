@@ -12,23 +12,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator.task.repository;
+package com.integri.atlas.repository.engine.jdbc.task;
 
 import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * @author Ivica Cardic
- */
-public class MysqlJdbcCounterRepository implements CounterRepository {
+public class PostgresJdbcCounterRepository implements CounterRepository {
 
     private final JdbcOperations jdbc;
 
-    public MysqlJdbcCounterRepository(JdbcOperations aJdbcOperations) {
+
+    public PostgresJdbcCounterRepository(JdbcOperations aJdbcOperations) {
         jdbc = aJdbcOperations;
     }
 
@@ -39,11 +39,7 @@ public class MysqlJdbcCounterRepository implements CounterRepository {
             jdbc.queryForObject("select value from counter where id = ? for update", Long.class, aCounterName);
             jdbc.update("update counter set value = ? where id = ?", aValue, aCounterName);
         } catch (EmptyResultDataAccessException e) {
-            jdbc.update(
-                "insert into counter (id,value,create_time) values (?,?,current_timestamp)",
-                aCounterName,
-                aValue
-            );
+            jdbc.update("insert into counter (id,value,create_time) values (?,?,current_timestamp)", aCounterName, aValue);
         }
     }
 
@@ -56,8 +52,10 @@ public class MysqlJdbcCounterRepository implements CounterRepository {
         return value;
     }
 
+
     @Override
     public void delete(String aCounterName) {
         jdbc.update("delete from counter where id = ?", aCounterName);
     }
+
 }

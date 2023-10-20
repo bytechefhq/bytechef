@@ -18,6 +18,7 @@ dependencies {
     implementation project(":modules:libs:atlas:atlas-messagebroker:atlas-messagebroker-amqp")
     implementation project(":modules:libs:atlas:atlas-messagebroker:atlas-messagebroker-jms")
     implementation project(":modules:libs:atlas:atlas-messagebroker:atlas-messagebroker-kafka")
+    implementation project(":modules:libs:atlas:atlas-repository:atlas-repository-engine-jdbc")
     implementation project(":modules:libs:atlas:atlas-repository:atlas-workflow-repository-git")
     implementation project(":modules:libs:atlas:atlas-repository:atlas-workflow-repository-yaml")
     implementation project(":modules:libs:atlas:atlas-rest")
@@ -35,6 +36,4 @@ dependencies {
     implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-impl")
     implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-worker-api")
     implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-worker-impl")
-
-    runtimeOnly "mysql:mysql-connector-java"
 }

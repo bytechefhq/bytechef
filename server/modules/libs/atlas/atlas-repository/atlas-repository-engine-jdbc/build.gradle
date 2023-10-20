@@ -1,0 +1,13 @@
+dependencies {
+    api project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
+
+    implementation "org.springframework:spring-jdbc"
+    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-coordinator-api")
+    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-impl")
+
+    if (project.hasProperty("postgres")) {
+        runtimeOnly "org.postgresql:postgresql"
+    } else {
+        runtimeOnly "mysql:mysql-connector-java"
+    }
+}
