@@ -537,9 +537,6 @@ components:
         icon:
           description: "The icon."
           type: "string"
-        label:
-          description: "The label."
-          type: "string"
         subtitle:
           description: "The additional explanation."
           type: "string"
@@ -548,6 +545,9 @@ components:
           type: "array"
           items:
             type: "string"
+        title:
+          description: "The title."
+          type: "string"
     IntegerProperty:
       description: "An integer property type."
       type: "object"
