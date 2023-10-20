@@ -24,7 +24,7 @@ import com.bytechef.atlas.job.domain.Job;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import com.bytechef.task.commons.xml.XMLHelper;
-import com.bytechef.test.support.task.BaseTaskIntTest;
+import com.bytechef.test.task.BaseTaskIntTest;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;

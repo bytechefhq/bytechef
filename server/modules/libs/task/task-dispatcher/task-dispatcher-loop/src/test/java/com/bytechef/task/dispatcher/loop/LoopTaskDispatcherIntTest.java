@@ -29,7 +29,7 @@ import com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
 import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
 import com.bytechef.task.handler.core.Var;
-import com.bytechef.test.support.task.BaseTaskIntTest;
+import com.bytechef.test.task.BaseTaskIntTest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

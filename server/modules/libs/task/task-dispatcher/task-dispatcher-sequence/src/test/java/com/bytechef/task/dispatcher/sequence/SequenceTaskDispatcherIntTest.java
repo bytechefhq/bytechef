@@ -25,7 +25,7 @@ import com.bytechef.atlas.task.execution.evaluator.spel.SpelTaskEvaluator;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
 import com.bytechef.task.handler.core.Var;
-import com.bytechef.test.support.task.BaseTaskIntTest;
+import com.bytechef.test.task.BaseTaskIntTest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -18,8 +18,8 @@ package com.bytechef.hermes.test.support.json;
 
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-import com.bytechef.test.support.json.JSONArrayUtils;
-import com.bytechef.test.support.json.JSONObjectUtils;
+import com.bytechef.test.json.JSONArrayUtils;
+import com.bytechef.test.json.JSONObjectUtils;
 import java.util.List;
 import java.util.Map;
 import org.json.JSONArray;
