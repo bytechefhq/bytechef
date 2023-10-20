@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.dione.repository;
+package com.bytechef.dione.integration.repository;
 
 import com.bytechef.dione.integration.domain.Integration;
 import org.springframework.data.jdbc.repository.query.Query;

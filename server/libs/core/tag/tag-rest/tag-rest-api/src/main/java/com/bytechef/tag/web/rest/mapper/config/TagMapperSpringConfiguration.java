@@ -15,19 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.project.web.rest.mapper;
+package com.bytechef.tag.web.rest.mapper.config;
 
-import com.bytechef.category.domain.Category;
-import com.bytechef.hermes.project.web.rest.mapper.config.ProjectMapperSpringConfig;
-import com.bytechef.hermes.project.web.rest.model.CategoryModel;
-import org.mapstruct.Mapper;
-import org.springframework.core.convert.converter.Converter;
+import com.bytechef.tag.web.rest.mapper.adapter.TagConversionServiceAdapter;
+import org.mapstruct.MapperConfig;
+import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ProjectMapperSpringConfig.class)
-public interface CategoryMapper extends Converter<Category, CategoryModel> {
-
-    CategoryModel convert(Category category);
+@MapperConfig(componentModel = "spring", uses = TagConversionServiceAdapter.class)
+@SpringMapperConfig(
+    conversionServiceAdapterPackage = "com.bytechef.tag.web.rest.mapper.adapter",
+    conversionServiceAdapterClassName = "TagConversionServiceAdapter")
+public interface TagMapperSpringConfiguration {
 }

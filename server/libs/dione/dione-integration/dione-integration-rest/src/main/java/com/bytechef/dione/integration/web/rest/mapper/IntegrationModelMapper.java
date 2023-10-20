@@ -18,7 +18,7 @@
 package com.bytechef.dione.integration.web.rest.mapper;
 
 import com.bytechef.dione.integration.domain.Integration;
-import com.bytechef.dione.integration.web.rest.mapper.config.IntegrationMapperSpringConfig;
+import com.bytechef.dione.integration.web.rest.mapper.config.IntegrationMapperSpringConfiguration;
 import com.bytechef.dione.integration.web.rest.model.IntegrationModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -27,7 +27,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = IntegrationMapperSpringConfig.class)
+@Mapper(config = IntegrationMapperSpringConfiguration.class)
 public interface IntegrationModelMapper extends Converter<IntegrationModel, Integration> {
 
     @Mapping(target = "categoryId", ignore = true)

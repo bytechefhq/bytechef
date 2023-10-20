@@ -863,14 +863,14 @@ public class OpenApiComponentTaskHandlerIntTest {
         }
 
         @EnableJdbcRepositories(basePackages = "com.bytechef.hermes.connection.repository")
-        public static class ConnectionJdbcIntTestConfiguration
+        public static class ConnectionIntTestJdbcConfiguration
             extends AbstractIntTestJdbcConfiguration {
 
             private final Encryption encryption;
             private final ObjectMapper objectMapper;
 
             @SuppressFBWarnings("EI2")
-            public ConnectionJdbcIntTestConfiguration(Encryption encryption, ObjectMapper objectMapper) {
+            public ConnectionIntTestJdbcConfiguration(Encryption encryption, ObjectMapper objectMapper) {
                 this.encryption = encryption;
                 this.objectMapper = objectMapper;
             }

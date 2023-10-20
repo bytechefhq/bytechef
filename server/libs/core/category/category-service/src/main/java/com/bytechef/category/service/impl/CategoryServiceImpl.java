@@ -19,7 +19,7 @@ package com.bytechef.category.service.impl;
 
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.repository.CategoryRepository;
-import com.bytechef.category.servicee.CategoryService;
+import com.bytechef.category.service.CategoryService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

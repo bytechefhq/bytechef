@@ -21,7 +21,7 @@ import com.bytechef.dione.integration.config.IntegrationIntTestConfiguration;
 import com.bytechef.category.domain.Category;
 import com.bytechef.dione.integration.domain.Integration;
 import com.bytechef.category.repository.CategoryRepository;
-import com.bytechef.dione.repository.IntegrationRepository;
+import com.bytechef.dione.integration.repository.IntegrationRepository;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.annotation.EmbeddedSql;

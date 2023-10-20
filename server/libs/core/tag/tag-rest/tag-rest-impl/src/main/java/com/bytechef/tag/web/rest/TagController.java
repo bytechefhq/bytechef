@@ -21,6 +21,7 @@ import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import com.bytechef.tag.web.rest.model.TagModel;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +41,7 @@ public class TagController implements TagsApi {
     private final TagService tagService;
     private final ConversionService conversionService;
 
+    @SuppressFBWarnings("EI2")
     public TagController(TagService tagService, ConversionService conversionService) {
         this.tagService = tagService;
         this.conversionService = conversionService;

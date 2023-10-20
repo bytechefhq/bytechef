@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.dione.service.impl;
+package com.bytechef.dione.integration.service.impl;
 
 import com.bytechef.dione.integration.domain.Integration;
-import com.bytechef.dione.repository.IntegrationRepository;
+import com.bytechef.dione.integration.repository.IntegrationRepository;
 
 import java.util.List;
 import java.util.stream.StreamSupport;

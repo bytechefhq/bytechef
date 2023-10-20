@@ -17,14 +17,18 @@
 
 package com.bytechef.hermes.project.web.rest.mapper.config;
 
+import com.bytechef.category.web.rest.mapper.adapter.CategoryConversionServiceAdapter;
 import com.bytechef.hermes.project.web.rest.adapter.ProjectConversionServiceAdapter;
+import com.bytechef.tag.web.rest.mapper.adapter.TagConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring", uses = ProjectConversionServiceAdapter.class)
+@MapperConfig(componentModel = "spring", uses = {
+    CategoryConversionServiceAdapter.class, ProjectConversionServiceAdapter.class, TagConversionServiceAdapter.class
+})
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.hermes.project.web.rest.adapter",
     conversionServiceAdapterClassName = "ProjectConversionServiceAdapter")

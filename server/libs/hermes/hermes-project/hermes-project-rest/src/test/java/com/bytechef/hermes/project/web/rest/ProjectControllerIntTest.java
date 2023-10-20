@@ -25,16 +25,16 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.category.domain.Category;
+import com.bytechef.category.web.rest.model.CategoryModel;
 import com.bytechef.hermes.project.domain.Project;
 import com.bytechef.hermes.project.facade.ProjectFacade;
-import com.bytechef.category.servicee.CategoryService;
+import com.bytechef.category.service.CategoryService;
 import com.bytechef.hermes.project.web.rest.mapper.ProjectMapper;
-import com.bytechef.hermes.project.web.rest.model.CategoryModel;
 import com.bytechef.hermes.project.web.rest.model.ProjectModel;
 import com.bytechef.hermes.project.web.rest.model.PostProjectWorkflowRequestModel;
 import com.bytechef.hermes.project.web.rest.model.PutProjectTagsRequestModel;
-import com.bytechef.hermes.project.web.rest.model.TagModel;
 import com.bytechef.tag.domain.Tag;
+import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import org.junit.jupiter.api.Assertions;
@@ -46,7 +46,6 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Iterator;
@@ -56,7 +55,6 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-@ContextConfiguration
 @WebFluxTest(value = ProjectController.class)
 public class ProjectControllerIntTest {
 
@@ -388,14 +386,6 @@ public class ProjectControllerIntTest {
         Assertions.assertEquals("tag1", capturedTag.getName());
     }
 
-    @ComponentScan(basePackages = {
-        "com.bytechef.hermes.project.web.rest",
-        "com.bytechef.atlas.web.rest.mapper"
-    })
-    @SpringBootConfiguration
-    public static class IntegrationRestTestConfiguration {
-    }
-
     private static Project getProject() {
         Project project = new Project();
 
@@ -408,5 +398,16 @@ public class ProjectControllerIntTest {
         project.setTags(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
         return project;
+    }
+
+    @ComponentScan(basePackages = {
+        "com.bytechef.atlas.web.rest.mapper",
+        "com.bytechef.category.web.rest.mapper",
+        "com.bytechef.hermes.project.web.rest",
+        "com.bytechef.tag.web.rest.mapper"
+
+    })
+    @SpringBootConfiguration
+    public static class IntegrationRestTestConfiguration {
     }
 }
