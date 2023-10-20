@@ -22,6 +22,8 @@ package com.bytechef.atlas.configuration.task;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +39,7 @@ import org.springframework.util.Assert;
  * @author Ivica Cardic
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class WorkflowTask implements Task {
+public class WorkflowTask implements Task, Serializable {
 
     private List<WorkflowTask> finalize = Collections.emptyList();
     private String label;

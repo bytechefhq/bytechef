@@ -25,6 +25,8 @@ import com.bytechef.atlas.configuration.workflow.mapper.WorkflowReader;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -55,7 +57,7 @@ import org.springframework.util.Assert;
  * @author Ivica Cardic
  */
 @Table
-public final class Workflow implements Persistable<String> {
+public final class Workflow implements Persistable<String>, Serializable {
 
     public enum Format {
         JSON(1),
@@ -380,10 +382,10 @@ public final class Workflow implements Persistable<String> {
             '}';
     }
 
-    public record Input(String name, String label, String type, boolean required) {
+    public record Input(String name, String label, String type, boolean required) implements Serializable {
     }
 
-    public record Output(String name, Object value) {
+    public record Output(String name, Object value) implements Serializable {
     }
 
     private static Map<String, ?> readWorkflowMap(String definition, String id, int format) throws Exception {
