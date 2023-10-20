@@ -9,6 +9,8 @@ models/JobModel.ts
 models/JobParametersModel.ts
 models/PageModel.ts
 models/TaskExecutionModel.ts
+models/WebhookModel.ts
+models/WebhookRetryModel.ts
 models/WorkflowFormatModel.ts
 models/WorkflowModel.ts
 models/WorkflowTaskModel.ts
