@@ -16,7 +16,8 @@
 
 package com.bytechef.atlas.job.repository.jdbc.config;
 
-import com.bytechef.atlas.repository.config.WorkflowRepositoryConfig;
+import com.bytechef.atlas.repository.config.WorkflowRepositoryConfiguration;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Optional;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -36,9 +37,14 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  */
 @ComponentScan(basePackages = {"com.bytechef.atlas.repository.jdbc"})
 @EnableAutoConfiguration
-@Import({WorkflowRepositoryConfig.class})
+@Import({WorkflowRepositoryConfiguration.class})
 @SpringBootConfiguration
 public class WorkflowRepositoryIntTestConfiguration {
+
+    @Bean
+    ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
 
     @EnableCaching
     @TestConfiguration

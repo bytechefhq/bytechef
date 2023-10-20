@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2021 <your company/name>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,8 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
 package com.bytechef.atlas.repository.jdbc.config;
@@ -35,17 +33,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 
 /**
- * @author Arik Cohen
  * @author Ivica Cardic
  */
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef.workflow", name = "persistence.provider", havingValue = "jdbc")
-public class WorkflowJdbcPersistenceConfiguration extends AbstractJdbcConfiguration {
+public class WorkflowRepositoryJdbcConfiguration extends AbstractJdbcConfiguration {
 
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI2")
-    public WorkflowJdbcPersistenceConfiguration(ObjectMapper objectMapper) {
+    public WorkflowRepositoryJdbcConfiguration(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
