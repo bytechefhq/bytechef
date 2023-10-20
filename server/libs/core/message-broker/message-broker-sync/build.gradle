@@ -1,0 +1,5 @@
+dependencies {
+    api project(":server:libs:core:message-broker:message-broker-api")
+
+    implementation "org.springframework:spring-core"
+}
