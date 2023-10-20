@@ -4,6 +4,10 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+    ActionDefinitionModel,
+    ComponentDefinitionBasicModel,
+} from '@/middleware/hermes/configuration';
 import {useGetActionDefinitionsQuery} from '@/queries/actionDefinitions.queries';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -16,6 +20,11 @@ import {useDataPillPanelStore} from '../stores/useDataPillPanelStore';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import DataPillPanelBody from './DataPillPanelBody';
+
+export type ComponentActionData = {
+    component: ComponentDefinitionBasicModel;
+    workflowAlias: string;
+} & ActionDefinitionModel;
 
 const DataPillPanel = () => {
     const [panelContainerHeight, setPanelContainerHeight] = useState(0);
@@ -65,6 +74,23 @@ const DataPillPanel = () => {
         {taskTypes},
         !!componentActions?.length
     );
+
+    const componentActionData = actionData?.map((actionDatum, index) => {
+        const componentData = previousComponents?.find(
+            (component) =>
+                component.name === normalizedPreviousComponentNames[index]
+        );
+
+        return {
+            ...actionDatum,
+            component: componentData,
+            workflowAlias: componentNames[index],
+        };
+    });
+
+    if (!componentActionData?.length) {
+        return <></>;
+    }
 
     return (
         <Dialog.Root
@@ -137,6 +163,14 @@ const DataPillPanel = () => {
                                     containerHeight={panelContainerHeight}
                                     dataPillFilterQuery={dataPillFilterQuery}
                                     previousComponents={previousComponents!}
+                                    previousComponentNames={
+                                        previousComponentNames
+                                    }
+                                    componentActionData={
+                                        componentActionData.filter(
+                                            (data) => data.component
+                                        ) as Array<ComponentActionData>
+                                    }
                                 />
                             )}
                         </main>
