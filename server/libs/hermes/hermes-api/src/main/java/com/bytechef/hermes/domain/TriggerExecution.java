@@ -34,12 +34,14 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -95,6 +97,9 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     @Column("last_modified_date")
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
+
+    @Transient
+    private Map<String, Object> metadata = new HashMap<>();
 
     @Column
     private MapWrapper output;
@@ -209,6 +214,10 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         return this.id;
     }
 
+    public Map<String, Object> getMetadata() {
+        return new HashMap<>(metadata);
+    }
+
     @JsonIgnore
     public String getName() {
         return workflowTrigger.getName();
@@ -286,6 +295,12 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         return id == null;
     }
 
+    public TriggerExecution putMetadata(String key, Object value) {
+        metadata.put(key, value);
+
+        return this;
+    }
+
     public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
 
@@ -344,7 +359,8 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
             + error + ", priority="
             + priority + ", workflowExecutionId="
             + workflowExecutionId + ", workflowTrigger="
-            + workflowTrigger + ", createdBy='"
+            + workflowTrigger + ", metadata="
+            + metadata + ", createdBy='"
             + createdBy + '\'' + ", createdDate="
             + createdDate + ", lastModifiedBy='"
             + lastModifiedBy + '\'' + ", lastModifiedDate="

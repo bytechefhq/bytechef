@@ -466,6 +466,12 @@ public final class TaskExecution
         this.maxRetries = maxRetries;
     }
 
+    public void setMetadata(Map<String, Object> metadata) {
+        if (metadata != null) {
+            this.metadata = new HashMap<>(metadata);
+        }
+    }
+
     public void setOutput(Object output) {
         if (output != null) {
             this.output = new MapWrapper(Map.of("output", output));
@@ -533,7 +539,8 @@ public final class TaskExecution
             + retryAttempts + ", retryDelay='"
             + retryDelay + '\'' + ", retryDelayFactor="
             + retryDelayFactor + ", workflowTask="
-            + workflowTask + ", createdBy='"
+            + workflowTask + ", metadata="
+            + metadata + ", createdBy='"
             + createdBy + '\'' + ", createdDate="
             + createdDate + ", lastModifiedBy='"
             + lastModifiedBy + '\'' + ", lastModifiedDate="
@@ -550,6 +557,7 @@ public final class TaskExecution
         private Long parentId;
         private int priority;
         private int progress;
+        private Map<String, Object> metadata;
         private int maxRetries;
         private int retryAttempts;
         private String retryDelay = "1s";
@@ -579,6 +587,11 @@ public final class TaskExecution
 
         public Builder jobId(Long jobId) {
             this.jobId = jobId;
+            return this;
+        }
+
+        public Builder metadata(Map<String, Object> metadata) {
+            this.metadata = metadata;
             return this;
         }
 
@@ -651,6 +664,7 @@ public final class TaskExecution
             taskExecution.setError(error);
             taskExecution.setId(id);
             taskExecution.setJobId(jobId);
+            taskExecution.setMetadata(metadata);
             taskExecution.setOutput(output);
             taskExecution.setParentId(parentId);
             taskExecution.setPriority(priority);

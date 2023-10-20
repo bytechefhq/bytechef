@@ -1,4 +1,0 @@
-dependencies {
-    api project(":server:libs:helios:helios-project:helios-project-api")
-    api project(":server:libs:hermes:hermes-connection:hermes-connection-api")
-}

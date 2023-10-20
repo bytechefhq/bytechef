@@ -17,29 +17,10 @@
 
 package com.bytechef.hermes.connection;
 
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 /**
  * @author Ivica Cardic
  */
-@Component
-public class InstanceConnectionFetcherAccessor {
+public interface InstanceConnectionFetcherAccessor {
 
-    private final Map<String, InstanceConnectionFetcher> instanceConnectionFetcherMap;
-
-    public InstanceConnectionFetcherAccessor(List<InstanceConnectionFetcher> instanceConnectionFetchers) {
-        this.instanceConnectionFetcherMap = instanceConnectionFetchers
-            .stream()
-            .collect(
-                Collectors.toMap(
-                    InstanceConnectionFetcher::getType, instanceConnectionFetcher -> instanceConnectionFetcher));
-    }
-
-    public InstanceConnectionFetcher getInstanceConnectionFetcher(String type) {
-        return instanceConnectionFetcherMap.get(type);
-    }
+    InstanceConnectionFetcher getInstanceConnectionFetcher(String type);
 }

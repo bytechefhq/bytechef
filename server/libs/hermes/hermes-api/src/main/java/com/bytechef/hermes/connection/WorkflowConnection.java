@@ -60,14 +60,10 @@ public class WorkflowConnection {
             workflowTask.getName());
     }
 
-    public static Optional<WorkflowConnection> of(WorkflowTrigger workflowTrigger) {
+    public static Map<String, WorkflowConnection> of(WorkflowTrigger workflowTrigger) {
         return toMap(
-            workflowTrigger.getExtension(
-                CONNECTIONS, new ParameterizedTypeReference<>() {}, Map.of()),
-            workflowTrigger.getName())
-                .values()
-                .stream()
-                .findFirst();
+            workflowTrigger.getExtension(CONNECTIONS, new ParameterizedTypeReference<>() {}, Map.of()),
+            workflowTrigger.getName());
     }
 
     public static List<WorkflowConnection> of(Workflow workflow) {
@@ -76,7 +72,7 @@ public class WorkflowConnection {
         WorkflowTrigger.of(workflow)
             .stream()
             .map(WorkflowConnection::of)
-            .forEach(optional -> optional.ifPresent(workflowConnections::add));
+            .forEach(workflowConnectionMap -> workflowConnections.addAll(workflowConnectionMap.values()));
 
         workflow.getTasks()
             .stream()

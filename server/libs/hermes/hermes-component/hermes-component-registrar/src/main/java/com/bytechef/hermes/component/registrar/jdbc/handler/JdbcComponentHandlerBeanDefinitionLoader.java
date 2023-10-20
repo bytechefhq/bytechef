@@ -74,7 +74,6 @@ public class JdbcComponentHandlerBeanDefinitionLoader implements ComponentHandle
             .addConstructorArgReference("dataSourceFactory")
             .addConstructorArgReference("eventPublisher")
             .addConstructorArgReference("fileStorageService")
-            .addConstructorArgReference("instanceConnectionFetcherAccessor")
             .addConstructorArgValue(jdbcComponentHandler)
             .getBeanDefinition();
     }

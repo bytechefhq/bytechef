@@ -22,7 +22,7 @@ import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.helios.project.constant.ProjectConstants;
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
-import com.bytechef.hermes.job.InstanceJobFactory;
+import com.bytechef.hermes.coordinator.job.InstanceJobFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 

@@ -22,6 +22,7 @@ import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.category.service.CategoryService;
+import com.bytechef.helios.project.connection.ProjectInstanceConnectionFetcher;
 import com.bytechef.helios.project.facade.ProjectFacade;
 import com.bytechef.helios.project.facade.ProjectFacadeImpl;
 import com.bytechef.helios.project.facade.ProjectInstanceFacadeImpl;
@@ -63,5 +64,12 @@ public class ProjectConfiguration {
         return new ProjectFacadeImpl(
             categoryService, contextService, jobService, projectInstanceService, projectService, taskExecutionService,
             tagService, workflowService);
+    }
+
+    @Bean
+    ProjectInstanceConnectionFetcher projectInstanceConnectionFetcher(
+        ConnectionService connectionService, ProjectInstanceWorkflowService projectInstanceWorkflowService) {
+
+        return new ProjectInstanceConnectionFetcher(connectionService, projectInstanceWorkflowService);
     }
 }

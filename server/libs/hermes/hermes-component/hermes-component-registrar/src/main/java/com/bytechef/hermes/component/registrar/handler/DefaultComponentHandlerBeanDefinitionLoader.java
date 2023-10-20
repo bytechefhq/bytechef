@@ -43,7 +43,6 @@ public class DefaultComponentHandlerBeanDefinitionLoader
             .addConstructorArgReference("connectionService")
             .addConstructorArgReference("eventPublisher")
             .addConstructorArgReference("fileStorageService")
-            .addConstructorArgReference("instanceConnectionFetcherAccessor")
             .getBeanDefinition();
     }
 }

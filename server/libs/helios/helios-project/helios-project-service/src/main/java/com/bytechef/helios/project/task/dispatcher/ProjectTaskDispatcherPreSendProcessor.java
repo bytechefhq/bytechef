@@ -22,7 +22,10 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.helios.project.constant.ProjectConstants;
+import com.bytechef.helios.project.dispatcher.AbstractDispatcherPreSendProcessor;
 import com.bytechef.helios.project.service.ProjectInstanceService;
+import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
+import com.bytechef.hermes.connection.WorkflowConnection;
 import com.bytechef.hermes.constant.MetadataConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
@@ -33,13 +36,19 @@ import java.util.Objects;
  * @author Ivica Cardic
  */
 @Component
-public class ProjectTaskDispatcherPreSendProcessor implements TaskDispatcherPreSendProcessor {
+public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPreSendProcessor
+    implements TaskDispatcherPreSendProcessor {
 
     private final JobService jobService;
     private final ProjectInstanceService projectInstanceService;
 
     @SuppressFBWarnings("EI")
-    public ProjectTaskDispatcherPreSendProcessor(JobService jobService, ProjectInstanceService projectInstanceService) {
+    public ProjectTaskDispatcherPreSendProcessor(
+        JobService jobService, ProjectInstanceService projectInstanceService,
+        ProjectInstanceWorkflowService projectInstanceWorkflowService) {
+
+        super(projectInstanceWorkflowService);
+
         this.jobService = jobService;
         this.projectInstanceService = projectInstanceService;
     }
@@ -47,6 +56,10 @@ public class ProjectTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
     @Override
     @SuppressFBWarnings("NP")
     public TaskExecution process(TaskExecution taskExecution) {
+        taskExecution.putMetadata(
+            MetadataConstants.CONNECTION_IDS,
+            getConnectionIdMap(WorkflowConnection.of(taskExecution.getWorkflowTask())));
+
         projectInstanceService.fetchJobProjectInstance(Objects.requireNonNull(taskExecution.getJobId()))
             .ifPresent(projectInstance -> taskExecution
                 .putMetadata(MetadataConstants.INSTANCE_ID, projectInstance.getId())

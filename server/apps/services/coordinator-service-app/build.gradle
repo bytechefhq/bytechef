@@ -32,7 +32,7 @@ dependencies {
     implementation project(":server:libs:core:message-broker:message-broker-redis")
     implementation project(":server:libs:core:rest:rest-impl")
     implementation project(":server:libs:helios:helios-project:helios-project-service")
-    implementation project(":server:libs:hermes:hermes-coordinator")
+    implementation project(":server:libs:hermes:hermes-coordinator:hermes-coordinator-impl")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-rsocket")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
     implementation project(":server:libs:hermes:hermes-service")

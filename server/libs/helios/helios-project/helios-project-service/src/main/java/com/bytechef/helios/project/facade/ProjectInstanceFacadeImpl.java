@@ -30,11 +30,11 @@ import com.bytechef.helios.project.job.ProjectInstanceJobFactory;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.project.service.ProjectService;
+import com.bytechef.hermes.connection.InstanceConnectionFetcher;
 import com.bytechef.hermes.connection.InstanceConnectionFetcherAccessor;
 import com.bytechef.hermes.connection.WorkflowConnection;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.connection.InstanceConnectionFetcher;
 import com.bytechef.hermes.trigger.WorkflowTrigger;
 import com.bytechef.hermes.trigger.executor.TriggerLifecycleExecutor;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
@@ -112,9 +112,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                     WorkflowExecutionId.of(
                         workflow.getId(), projectInstanceDTO.id(), ProjectConstants.PROJECT,
                         workflowTrigger.getTriggerName()),
-                    WorkflowConnection.of(workflowTrigger)
-                        .map(this::getConnection)
-                        .orElse(null),
+                    getConnection(workflowTrigger),
                     projectInstanceWorkflow.getInputs());
             }
         }
@@ -152,9 +150,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                     WorkflowExecutionId.of(
                         workflow.getId(), projectInstanceId, ProjectConstants.PROJECT,
                         workflowTrigger.getTriggerName()),
-                    WorkflowConnection.of(workflowTrigger)
-                        .map(this::getConnection)
-                        .orElse(null));
+                    getConnection(workflowTrigger));
             }
         }
 
@@ -281,6 +277,15 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                 return instanceConnectionFetcher.getConnection(
                     workflowConnection.getKey(), OptionalUtils.get(workflowConnection.getTaskName()));
             });
+    }
+
+    private Connection getConnection(WorkflowTrigger workflowTrigger) {
+        return WorkflowConnection.of(workflowTrigger)
+            .values()
+            .stream()
+            .findFirst()
+            .map(this::getConnection)
+            .orElse(null);
     }
 
     private List<Project> getProjects(List<ProjectInstance> projectInstances) {

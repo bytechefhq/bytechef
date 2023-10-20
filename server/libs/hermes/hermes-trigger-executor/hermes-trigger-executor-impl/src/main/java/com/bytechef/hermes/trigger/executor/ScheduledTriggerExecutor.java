@@ -19,14 +19,13 @@ package com.bytechef.hermes.trigger.executor;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.trigger.TriggerDispatcher;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.domain.TriggerExecution;
-import com.bytechef.hermes.message.broker.TriggerMessageRoute;
 import com.bytechef.hermes.service.TriggerExecutionService;
 import com.bytechef.hermes.service.TriggerLifecycleService;
 import com.bytechef.hermes.trigger.WorkflowTrigger;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
-import com.bytechef.message.broker.MessageBroker;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -38,18 +37,18 @@ import java.util.Map;
 @Service
 public class ScheduledTriggerExecutor {
 
-    private final MessageBroker messageBroker;
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
+    private final TriggerDispatcher triggerDispatcher;
     private final TriggerLifecycleService triggerLifecycleService;
 
     public ScheduledTriggerExecutor(
-        MessageBroker messageBroker, TriggerExecutionService triggerExecutionService,
-        TriggerDefinitionFacade triggerDefinitionFacade, TriggerLifecycleService triggerLifecycleService) {
+        TriggerExecutionService triggerExecutionService, TriggerDefinitionFacade triggerDefinitionFacade,
+        TriggerDispatcher triggerDispatcher, TriggerLifecycleService triggerLifecycleService) {
 
-        this.messageBroker = messageBroker;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
+        this.triggerDispatcher = triggerDispatcher;
         this.triggerLifecycleService = triggerLifecycleService;
     }
 
@@ -85,6 +84,6 @@ public class ScheduledTriggerExecutor {
 
         triggerExecution.evaluate(context);
 
-        messageBroker.send(TriggerMessageRoute.TRIGGERS, triggerExecution);
+        triggerDispatcher.dispatch(triggerExecution);
     }
 }

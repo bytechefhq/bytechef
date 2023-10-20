@@ -28,8 +28,6 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.ContextImpl;
 import com.bytechef.hermes.component.registrar.oas.OpenApiClient;
 import com.bytechef.hermes.component.util.ComponentContextSupplier;
-import com.bytechef.hermes.connection.InstanceConnectionFetcherAccessor;
-import com.bytechef.hermes.connection.WorkflowConnection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.constant.MetadataConstants;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
@@ -48,14 +46,12 @@ public class OpenApiComponentActionTaskHandler implements TaskHandler<Object> {
     private final ConnectionService connectionService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
-    private final InstanceConnectionFetcherAccessor instanceConnectionFetcherAccessor;
     private final OpenApiComponentHandler openApiComponentHandler;
 
     @SuppressFBWarnings("EI2")
     public OpenApiComponentActionTaskHandler(
         ActionDefinition actionDefinition, ConnectionDefinitionService connectionDefinitionService,
         ConnectionService connectionService, EventPublisher eventPublisher, FileStorageService fileStorageService,
-        InstanceConnectionFetcherAccessor instanceConnectionFetcherAccessor,
         OpenApiComponentHandler openApiComponentHandler) {
 
         this.actionDefinition = actionDefinition;
@@ -63,18 +59,15 @@ public class OpenApiComponentActionTaskHandler implements TaskHandler<Object> {
         this.connectionService = connectionService;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
-        this.instanceConnectionFetcherAccessor = instanceConnectionFetcherAccessor;
         this.openApiComponentHandler = openApiComponentHandler;
     }
 
     @Override
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
         ActionContext context = new ContextImpl(
-            connectionDefinitionService, connectionService, eventPublisher, fileStorageService,
-            instanceConnectionFetcherAccessor,
-            MapValueUtils.getString(taskExecution.getMetadata(), MetadataConstants.INSTANCE_TYPE),
-            taskExecution.getId(),
-            WorkflowConnection.of(taskExecution.getWorkflowTask()));
+            connectionDefinitionService,
+            MapValueUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS),
+            connectionService, eventPublisher, fileStorageService, taskExecution.getId());
 
         return ComponentContextSupplier.get(
             context, openApiComponentHandler.getDefinition(),

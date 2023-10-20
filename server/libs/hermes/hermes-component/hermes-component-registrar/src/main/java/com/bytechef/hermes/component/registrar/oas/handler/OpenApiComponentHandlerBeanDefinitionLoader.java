@@ -43,7 +43,6 @@ public class OpenApiComponentHandlerBeanDefinitionLoader
             .addConstructorArgReference("connectionService")
             .addConstructorArgReference("eventPublisher")
             .addConstructorArgReference("fileStorageService")
-            .addConstructorArgReference("instanceConnectionFetcherAccessor")
             .addConstructorArgValue(openApiComponentHandler)
             .getBeanDefinition();
     }
