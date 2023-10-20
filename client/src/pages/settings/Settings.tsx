@@ -29,7 +29,7 @@ export default function Settings() {
                         <LeftSidebarNavItem
                             key={item.href}
                             item={{
-                                current: location.pathname === item.href,
+                                filterData: location.pathname === item.href,
                                 name: item.title,
                             }}
                             toLink={item.href}

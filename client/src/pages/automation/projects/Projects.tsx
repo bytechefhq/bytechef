@@ -29,7 +29,7 @@ const Projects = () => {
         type: searchParams.get('tagId') ? Type.Tag : Type.Category,
     };
 
-    const [current, setCurrent] = useState<{id?: number; type: Type}>(
+    const [filterData, setFilterData] = useState<{id?: number; type: Type}>(
         defaultCurrentState
     );
 
@@ -37,22 +37,18 @@ const Projects = () => {
 
     const {data: categories, isLoading: categoriesLoading} =
         useGetProjectCategoriesQuery();
+
     const {data: tags, isLoading: tagsLoading} = useGetProjectTagsQuery();
 
-    const title =
-        !categoriesLoading &&
-        current.type === Type.Category &&
-        current.id &&
-        categories &&
-        categories.length > 0
-            ? categories.filter((category) => category.id === current.id)[0]
-                  .name!
-            : !tagsLoading &&
-              current.type === Type.Tag &&
-              tags &&
-              tags.length > 0
-            ? tags && tags.filter((tag) => tag.id === current.id)[0].name!
-            : 'All Categories';
+    const matchingCategory = categories?.find(
+        (category) => category.id === filterData.id
+    );
+
+    const matchingTag = tags?.find((tag) => tag.id === filterData.id);
+
+    const pageTitle = matchingCategory
+        ? matchingCategory?.name
+        : matchingTag && matchingTag?.name;
 
     return (
         <LayoutContainer
@@ -73,7 +69,7 @@ const Projects = () => {
                             }}
                         />
                     }
-                    title={title}
+                    title={`Projects: ${pageTitle || 'All'}`}
                 />
             }
             leftSidebarHeader={
@@ -86,18 +82,17 @@ const Projects = () => {
                         <>
                             <LeftSidebarNavItem
                                 item={{
-                                    current:
-                                        !current?.id &&
-                                        current.type === Type.Category,
+                                    filterData:
+                                        !filterData?.id &&
+                                        filterData.type === Type.Category,
                                     name: 'All Categories',
                                     onItemClick: (id?: number | string) => {
-                                        setCurrent({
+                                        setFilterData({
                                             id: id as number,
                                             type: Type.Category,
                                         });
                                     },
                                 }}
-                                toLink=""
                             />
 
                             {!categoriesLoading &&
@@ -105,15 +100,16 @@ const Projects = () => {
                                     <LeftSidebarNavItem
                                         key={item.name}
                                         item={{
-                                            current:
-                                                current?.id === item.id &&
-                                                current.type === Type.Category,
+                                            filterData:
+                                                filterData?.id === item.id &&
+                                                filterData.type ===
+                                                    Type.Category,
                                             id: item.id,
                                             name: item.name,
                                             onItemClick: (
                                                 id?: number | string
                                             ) => {
-                                                setCurrent({
+                                                setFilterData({
                                                     id: id as number,
                                                     type: Type.Category,
                                                 });
@@ -128,20 +124,22 @@ const Projects = () => {
                     bottomBody={
                         <>
                             {!tagsLoading &&
-                                (tags && !!tags.length ? (
+                                (tags?.length ? (
                                     tags?.map((item) => (
                                         <LeftSidebarNavItem
                                             key={item.id}
                                             item={{
-                                                current:
-                                                    current?.id === item.id &&
-                                                    current.type === Type.Tag,
+                                                filterData:
+                                                    filterData?.id ===
+                                                        item.id &&
+                                                    filterData.type ===
+                                                        Type.Tag,
                                                 id: item.id!,
                                                 name: item.name,
                                                 onItemClick: (
                                                     id?: number | string
                                                 ) => {
-                                                    setCurrent({
+                                                    setFilterData({
                                                         id: id as number,
                                                         type: Type.Tag,
                                                     });

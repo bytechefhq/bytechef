@@ -27,11 +27,14 @@ const Connections = () => {
         type: searchParams.get('tagId') ? Type.Tag : Type.Component,
     };
 
-    const [current, setCurrent] = useState<{id?: number | string; type: Type}>(
-        defaultCurrentState
-    );
+    const [filterData, setFilterData] = useState<{
+        id?: number | string;
+        type: Type;
+    }>(defaultCurrentState);
+
     const {data: components, isLoading: componentsLoading} =
         useGetComponentDefinitionsQuery({connectionInstances: true});
+
     const {data: tags, isLoading: tagsLoading} = useGetConnectionTagsQuery();
 
     const title: string = getTitle();
@@ -39,21 +42,23 @@ const Connections = () => {
     function getTitle(): string {
         if (
             !componentsLoading &&
-            current.type === Type.Component &&
-            current.id &&
+            filterData.type === Type.Component &&
+            filterData.id &&
             components &&
             components.length > 0
         ) {
             return components.filter(
-                (component) => component.name === current.id
+                (component) => component.name === filterData.id
             )[0].name!;
         } else if (
             !tagsLoading &&
-            current.type === Type.Tag &&
+            filterData.type === Type.Tag &&
             tags &&
             tags.length > 0
         ) {
-            return tags && tags.filter((tag) => tag.id === current.id)[0].name!;
+            return (
+                tags && tags.filter((tag) => tag.id === filterData.id)[0].name!
+            );
         } else {
             return 'All Components';
         }
@@ -78,15 +83,17 @@ const Connections = () => {
                         <>
                             <LeftSidebarNavItem
                                 item={{
-                                    current:
-                                        !current?.id &&
-                                        current.type === Type.Component,
+                                    filterData:
+                                        !filterData?.id &&
+                                        filterData.type === Type.Component,
                                     name: 'All Components',
                                     onItemClick: (id?: number | string) => {
-                                        setCurrent({id, type: Type.Component});
+                                        setFilterData({
+                                            id,
+                                            type: Type.Component,
+                                        });
                                     },
                                 }}
-                                toLink=""
                             />
 
                             {!componentsLoading &&
@@ -94,19 +101,19 @@ const Connections = () => {
                                     <LeftSidebarNavItem
                                         key={item.name}
                                         item={{
-                                            current:
-                                                current?.id === item.name &&
-                                                current.type === Type.Component,
+                                            filterData:
+                                                filterData?.id === item.name &&
+                                                filterData.type ===
+                                                    Type.Component,
                                             id: item.name!,
                                             name: item.title!,
                                             onItemClick: (
                                                 id?: number | string
-                                            ) => {
-                                                setCurrent({
+                                            ) =>
+                                                setFilterData({
                                                     id,
                                                     type: Type.Component,
-                                                });
-                                            },
+                                                }),
                                         }}
                                         toLink={`?componentName=${item.name}`}
                                     />
@@ -124,15 +131,17 @@ const Connections = () => {
                                         <LeftSidebarNavItem
                                             key={item.id}
                                             item={{
-                                                current:
-                                                    current?.id === item.id &&
-                                                    current.type === Type.Tag,
+                                                filterData:
+                                                    filterData?.id ===
+                                                        item.id &&
+                                                    filterData.type ===
+                                                        Type.Tag,
                                                 id: item.id!,
                                                 name: item.name,
                                                 onItemClick: (
                                                     id?: number | string
                                                 ) => {
-                                                    setCurrent({
+                                                    setFilterData({
                                                         id,
                                                         type: Type.Tag,
                                                     });

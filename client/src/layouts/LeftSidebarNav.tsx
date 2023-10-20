@@ -54,30 +54,30 @@ const LeftSidebarNav = ({
 
 type LeftSidebarNavItemProps = {
     item: {
-        current: boolean;
+        filterData: boolean;
         name: string;
         onItemClick?: (id?: number | string) => void;
         id?: number | string;
     };
-    toLink: string;
+    toLink?: string;
     icon?: ReactNode;
 };
 
 const LeftSidebarNavItem = ({
     icon,
-    item: {current, id, name, onItemClick},
-    toLink,
+    item: {filterData, id, name, onItemClick},
+    toLink = '',
 }: LeftSidebarNavItemProps) => (
     <Link
         to={toLink}
         className={cn(
             buttonVariants({variant: 'ghost'}),
-            current
+            filterData
                 ? 'bg-muted hover:bg-muted'
                 : 'hover:bg-transparent hover:underline',
             'justify-start'
         )}
-        aria-current={current ? 'page' : undefined}
+        aria-current={filterData ? 'page' : undefined}
         onClick={() => (onItemClick ? onItemClick(id) : null)}
     >
         {icon}
