@@ -372,12 +372,12 @@
   } ],
   "category": null,
   "connection": null,
-  "description": "JSON Helper allows you to do various operations on objects.",
-  "icon": null,
+  "description": "Object Helper allows you to do various operations on objects.",
+  "icon": "path:assets/objecthelper.svg",
   "tags": null,
-  "name": "jsonHelper",
+  "name": "objectHelper",
   "resources": null,
   "version": 1,
-  "title": "JSON Helper",
+  "title": "Object Helper",
   "triggers": null
 }
