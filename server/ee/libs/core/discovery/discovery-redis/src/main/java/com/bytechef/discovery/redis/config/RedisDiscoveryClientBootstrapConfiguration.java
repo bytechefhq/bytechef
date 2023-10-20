@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Import;
 /**
  * @author Ivica Cardic
  */
-@ConditionalOnProperty(value = "spring.cloud.config.discovery")
+@ConditionalOnProperty(value = "spring.cloud.config.discovery.enabled")
 @Configuration
 @Import({
     RedisAutoConfiguration.class, RedisRegistryAutoConfiguration.class
