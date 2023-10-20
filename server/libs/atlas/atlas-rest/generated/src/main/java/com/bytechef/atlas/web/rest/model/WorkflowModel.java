@@ -2,6 +2,7 @@ package com.bytechef.atlas.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.atlas.web.rest.model.WorkflowFormatModel;
 import com.bytechef.atlas.web.rest.model.WorkflowTaskModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -23,16 +24,13 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * The lueprint that describe the execution of a job.
+ * The blueprint that describe the execution of a job.
  */
 
-@Schema(name = "Workflow", description = "The lueprint that describe the execution of a job.")
+@Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-18T09:37:42.127301+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-26T09:25:21.049913+01:00[Europe/Zagreb]")
 public class WorkflowModel {
-
-  @JsonProperty("definition")
-  private String definition;
 
   @JsonProperty("createdBy")
   private String createdBy;
@@ -41,45 +39,8 @@ public class WorkflowModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
-  /**
-   * The format of the workflow definition.
-   */
-  public enum FormatEnum {
-    JSON("JSON"),
-    
-    YML("YML"),
-    
-    YAML("YAML");
-
-    private String value;
-
-    FormatEnum(String value) {
-      this.value = value;
-    }
-
-    @JsonValue
-    public String getValue() {
-      return value;
-    }
-
-    @Override
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static FormatEnum fromValue(String value) {
-      for (FormatEnum b : FormatEnum.values()) {
-        if (b.value.equals(value)) {
-          return b;
-        }
-      }
-      throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-  }
-
   @JsonProperty("format")
-  private FormatEnum format;
+  private WorkflowFormatModel format;
 
   @JsonProperty("id")
   private String id;
@@ -98,12 +59,51 @@ public class WorkflowModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
-  @JsonProperty("providerType")
-  private String providerType;
-
   @JsonProperty("outputs")
   @Valid
   private List<Map<String, Object>> outputs = null;
+
+  /**
+   * The type of the source which stores the workflow definition.
+   */
+  public enum SourceTypeEnum {
+    CLASSPATH("CLASSPATH"),
+    
+    FILESYSTEM("FILESYSTEM"),
+    
+    GIT("GIT"),
+    
+    JDBC("JDBC");
+
+    private String value;
+
+    SourceTypeEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static SourceTypeEnum fromValue(String value) {
+      for (SourceTypeEnum b : SourceTypeEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  @JsonProperty("sourceType")
+  private SourceTypeEnum sourceType;
 
   @JsonProperty("retry")
   private Integer retry;
@@ -111,25 +111,6 @@ public class WorkflowModel {
   @JsonProperty("tasks")
   @Valid
   private List<WorkflowTaskModel> tasks = null;
-
-  public WorkflowModel definition(String definition) {
-    this.definition = definition;
-    return this;
-  }
-
-  /**
-   * Definition of the workflow that is executed as a job.
-   * @return definition
-  */
-  
-  @Schema(name = "definition", description = "Definition of the workflow that is executed as a job.", required = false)
-  public String getDefinition() {
-    return definition;
-  }
-
-  public void setDefinition(String definition) {
-    this.definition = definition;
-  }
 
   public WorkflowModel createdBy(String createdBy) {
     this.createdBy = createdBy;
@@ -169,22 +150,22 @@ public class WorkflowModel {
     this.createdDate = createdDate;
   }
 
-  public WorkflowModel format(FormatEnum format) {
+  public WorkflowModel format(WorkflowFormatModel format) {
     this.format = format;
     return this;
   }
 
   /**
-   * The format of the workflow definition.
+   * Get format
    * @return format
   */
-  
-  @Schema(name = "format", description = "The format of the workflow definition.", required = false)
-  public FormatEnum getFormat() {
+  @Valid 
+  @Schema(name = "format", required = false)
+  public WorkflowFormatModel getFormat() {
     return format;
   }
 
-  public void setFormat(FormatEnum format) {
+  public void setFormat(WorkflowFormatModel format) {
     this.format = format;
   }
 
@@ -225,7 +206,7 @@ public class WorkflowModel {
    * @return inputs
   */
   @Valid 
-  @Schema(name = "inputs", description = "The workflow's expected list of inputs.", required = false)
+  @Schema(name = "inputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's expected list of inputs.", required = false)
   public List<Map<String, Object>> getInputs() {
     return inputs;
   }
@@ -244,7 +225,7 @@ public class WorkflowModel {
    * @return label
   */
   
-  @Schema(name = "label", description = "The descriptive name for the workflow", required = false)
+  @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The descriptive name for the workflow", required = false)
   public String getLabel() {
     return label;
   }
@@ -291,25 +272,6 @@ public class WorkflowModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public WorkflowModel providerType(String providerType) {
-    this.providerType = providerType;
-    return this;
-  }
-
-  /**
-   * The type of the provider which stores the workflow definition.
-   * @return providerType
-  */
-  
-  @Schema(name = "providerType", accessMode = Schema.AccessMode.READ_ONLY, description = "The type of the provider which stores the workflow definition.", required = false)
-  public String getProviderType() {
-    return providerType;
-  }
-
-  public void setProviderType(String providerType) {
-    this.providerType = providerType;
-  }
-
   public WorkflowModel outputs(List<Map<String, Object>> outputs) {
     this.outputs = outputs;
     return this;
@@ -328,13 +290,32 @@ public class WorkflowModel {
    * @return outputs
   */
   @Valid 
-  @Schema(name = "outputs", description = "The workflow's list of expected outputs.", required = false)
+  @Schema(name = "outputs", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflow's list of expected outputs.", required = false)
   public List<Map<String, Object>> getOutputs() {
     return outputs;
   }
 
   public void setOutputs(List<Map<String, Object>> outputs) {
     this.outputs = outputs;
+  }
+
+  public WorkflowModel sourceType(SourceTypeEnum sourceType) {
+    this.sourceType = sourceType;
+    return this;
+  }
+
+  /**
+   * The type of the source which stores the workflow definition.
+   * @return sourceType
+  */
+  
+  @Schema(name = "sourceType", accessMode = Schema.AccessMode.READ_ONLY, description = "The type of the source which stores the workflow definition.", required = false)
+  public SourceTypeEnum getSourceType() {
+    return sourceType;
+  }
+
+  public void setSourceType(SourceTypeEnum sourceType) {
+    this.sourceType = sourceType;
   }
 
   public WorkflowModel retry(Integer retry) {
@@ -347,7 +328,7 @@ public class WorkflowModel {
    * @return retry
   */
   
-  @Schema(name = "retry", description = "The maximum number of times a task may retry.", required = false)
+  @Schema(name = "retry", accessMode = Schema.AccessMode.READ_ONLY, description = "The maximum number of times a task may retry.", required = false)
   public Integer getRetry() {
     return retry;
   }
@@ -374,7 +355,7 @@ public class WorkflowModel {
    * @return tasks
   */
   @Valid 
-  @Schema(name = "tasks", description = "The steps that make up the workflow.", required = false)
+  @Schema(name = "tasks", accessMode = Schema.AccessMode.READ_ONLY, description = "The steps that make up the workflow.", required = false)
   public List<WorkflowTaskModel> getTasks() {
     return tasks;
   }
@@ -392,8 +373,7 @@ public class WorkflowModel {
       return false;
     }
     WorkflowModel workflow = (WorkflowModel) o;
-    return Objects.equals(this.definition, workflow.definition) &&
-        Objects.equals(this.createdBy, workflow.createdBy) &&
+    return Objects.equals(this.createdBy, workflow.createdBy) &&
         Objects.equals(this.createdDate, workflow.createdDate) &&
         Objects.equals(this.format, workflow.format) &&
         Objects.equals(this.id, workflow.id) &&
@@ -401,22 +381,21 @@ public class WorkflowModel {
         Objects.equals(this.label, workflow.label) &&
         Objects.equals(this.lastModifiedBy, workflow.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, workflow.lastModifiedDate) &&
-        Objects.equals(this.providerType, workflow.providerType) &&
         Objects.equals(this.outputs, workflow.outputs) &&
+        Objects.equals(this.sourceType, workflow.sourceType) &&
         Objects.equals(this.retry, workflow.retry) &&
         Objects.equals(this.tasks, workflow.tasks);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(definition, createdBy, createdDate, format, id, inputs, label, lastModifiedBy, lastModifiedDate, providerType, outputs, retry, tasks);
+    return Objects.hash(createdBy, createdDate, format, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, sourceType, retry, tasks);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowModel {\n");
-    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    format: ").append(toIndentedString(format)).append("\n");
@@ -425,8 +404,8 @@ public class WorkflowModel {
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
-    sb.append("    providerType: ").append(toIndentedString(providerType)).append("\n");
     sb.append("    outputs: ").append(toIndentedString(outputs)).append("\n");
+    sb.append("    sourceType: ").append(toIndentedString(sourceType)).append("\n");
     sb.append("    retry: ").append(toIndentedString(retry)).append("\n");
     sb.append("    tasks: ").append(toIndentedString(tasks)).append("\n");
     sb.append("}");

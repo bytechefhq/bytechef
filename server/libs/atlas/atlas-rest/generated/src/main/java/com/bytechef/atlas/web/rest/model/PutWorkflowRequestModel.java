@@ -6,7 +6,6 @@ import com.bytechef.atlas.web.rest.model.WorkflowFormatModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonValue;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -18,12 +17,12 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * PostWorkflowRequestModel
+ * PutWorkflowRequestModel
  */
 
-@JsonTypeName("postWorkflow_request")
+@JsonTypeName("putWorkflow_request")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-26T09:25:21.049913+01:00[Europe/Zagreb]")
-public class PostWorkflowRequestModel {
+public class PutWorkflowRequestModel {
 
   @JsonProperty("definition")
   private String definition;
@@ -31,43 +30,7 @@ public class PostWorkflowRequestModel {
   @JsonProperty("format")
   private WorkflowFormatModel format;
 
-  /**
-   * Gets or Sets sourceType
-   */
-  public enum SourceTypeEnum {
-    JDBC("JDBC");
-
-    private String value;
-
-    SourceTypeEnum(String value) {
-      this.value = value;
-    }
-
-    @JsonValue
-    public String getValue() {
-      return value;
-    }
-
-    @Override
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static SourceTypeEnum fromValue(String value) {
-      for (SourceTypeEnum b : SourceTypeEnum.values()) {
-        if (b.value.equals(value)) {
-          return b;
-        }
-      }
-      throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-  }
-
-  @JsonProperty("sourceType")
-  private SourceTypeEnum sourceType;
-
-  public PostWorkflowRequestModel definition(String definition) {
+  public PutWorkflowRequestModel definition(String definition) {
     this.definition = definition;
     return this;
   }
@@ -86,7 +49,7 @@ public class PostWorkflowRequestModel {
     this.definition = definition;
   }
 
-  public PostWorkflowRequestModel format(WorkflowFormatModel format) {
+  public PutWorkflowRequestModel format(WorkflowFormatModel format) {
     this.format = format;
     return this;
   }
@@ -105,25 +68,6 @@ public class PostWorkflowRequestModel {
     this.format = format;
   }
 
-  public PostWorkflowRequestModel sourceType(SourceTypeEnum sourceType) {
-    this.sourceType = sourceType;
-    return this;
-  }
-
-  /**
-   * Get sourceType
-   * @return sourceType
-  */
-  
-  @Schema(name = "sourceType", required = false)
-  public SourceTypeEnum getSourceType() {
-    return sourceType;
-  }
-
-  public void setSourceType(SourceTypeEnum sourceType) {
-    this.sourceType = sourceType;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -132,24 +76,22 @@ public class PostWorkflowRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PostWorkflowRequestModel postWorkflowRequest = (PostWorkflowRequestModel) o;
-    return Objects.equals(this.definition, postWorkflowRequest.definition) &&
-        Objects.equals(this.format, postWorkflowRequest.format) &&
-        Objects.equals(this.sourceType, postWorkflowRequest.sourceType);
+    PutWorkflowRequestModel putWorkflowRequest = (PutWorkflowRequestModel) o;
+    return Objects.equals(this.definition, putWorkflowRequest.definition) &&
+        Objects.equals(this.format, putWorkflowRequest.format);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(definition, format, sourceType);
+    return Objects.hash(definition, format);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PostWorkflowRequestModel {\n");
+    sb.append("class PutWorkflowRequestModel {\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("    format: ").append(toIndentedString(format)).append("\n");
-    sb.append("    sourceType: ").append(toIndentedString(sourceType)).append("\n");
     sb.append("}");
     return sb.toString();
   }
