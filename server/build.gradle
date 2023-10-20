@@ -130,7 +130,7 @@ subprojects {
         reports.html.enabled = false
     }
 
-    task integrationTest(type: Test) {
+    task testIntegration(type: Test) {
         useJUnitPlatform()
         description = "Execute integration tests."
         group = "verification"
@@ -150,16 +150,16 @@ subprojects {
         reports.html.enabled = false
     }
 
-    check.dependsOn integrationTest
+    check.dependsOn testIntegration
 
     task testReport(type: TestReport) {
         destinationDir = file("$buildDir/reports/tests")
         reportOn test
     }
 
-    task integrationTestReport(type: TestReport) {
+    task testIntegrationReport(type: TestReport) {
         destinationDir = file("$buildDir/reports/tests")
-        reportOn integrationTest
+        reportOn testIntegration
     }
 
     task cleanResources(type: Delete) {

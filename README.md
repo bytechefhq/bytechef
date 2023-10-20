@@ -955,5 +955,5 @@ Integri Atlas is released under version 2.0 of the [Apache License](LICENSE).
 # Useful gradle tasks
 1. gw spotlessApply - run source formatting
 2. gw test - run unit tests
-3. gw integrationTest - run integration tests with local postgres
-4. gw integrationTest -Ptestcontainers - run integration tests with postgres via docker
+3. gw testIntegration - run integration tests with local postgres
+4. gw testIntegration -Ptestcontainers - run integration tests with postgres via docker
