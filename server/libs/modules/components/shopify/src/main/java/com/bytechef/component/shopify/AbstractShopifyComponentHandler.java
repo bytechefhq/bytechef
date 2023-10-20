@@ -24,11 +24,16 @@ import com.bytechef.component.shopify.action.ProductsActions;
 import com.bytechef.hermes.component.RestComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 
+/**
+ * Provides the base implementation for the REST based component.
+ *
+ * @generated
+ */
 public abstract class AbstractShopifyComponentHandler implements RestComponentHandler {
     private final ComponentDefinition componentDefinition = component("shopify")
-        .display(display("Shopify")
-            .description(
-                "The REST Admin API lets you build apps and other integrations for the Shopify admin."))
+        .display(
+            display("Shopify")
+                .description("The REST Admin API lets you build apps and other integrations for the Shopify admin."))
         .actions(ProductsActions.ACTIONS);
 
     @Override
