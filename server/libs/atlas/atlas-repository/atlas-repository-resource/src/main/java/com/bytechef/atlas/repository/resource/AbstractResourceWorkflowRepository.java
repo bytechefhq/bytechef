@@ -40,10 +40,10 @@ import org.springframework.core.io.support.ResourcePatternResolver;
  */
 public abstract class AbstractResourceWorkflowRepository implements WorkflowRepository {
 
-    private String locationPattern;
-    private WorkflowMapper workflowMapper;
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
+    private final String locationPattern;
+    private final WorkflowMapper workflowMapper;
 
     private static final String PREFIX = "workflows/";
 
