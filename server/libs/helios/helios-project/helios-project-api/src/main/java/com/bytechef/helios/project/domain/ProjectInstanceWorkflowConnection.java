@@ -31,7 +31,7 @@ import java.util.Objects;
  * @author Ivica Cardic
  */
 @Table("project_instance_connection")
-public class ProjectInstanceConnection implements Persistable<Long> {
+public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
 
     @Id
     private Long id;
@@ -39,11 +39,11 @@ public class ProjectInstanceConnection implements Persistable<Long> {
     @Column("connection_id")
     private AggregateReference<Connection, Long> connectionId;
 
-    public ProjectInstanceConnection() {
+    public ProjectInstanceWorkflowConnection() {
     }
 
     @SuppressFBWarnings("NP")
-    public ProjectInstanceConnection(Long connectionId) {
+    public ProjectInstanceWorkflowConnection(Long connectionId) {
         this.connectionId = connectionId == null ? null : AggregateReference.to(connectionId);
     }
 
@@ -56,7 +56,7 @@ public class ProjectInstanceConnection implements Persistable<Long> {
             return false;
         }
 
-        ProjectInstanceConnection that = (ProjectInstanceConnection) o;
+        ProjectInstanceWorkflowConnection that = (ProjectInstanceWorkflowConnection) o;
 
         return Objects.equals(id, that.id) && Objects.equals(connectionId, that.connectionId);
     }
@@ -80,14 +80,10 @@ public class ProjectInstanceConnection implements Persistable<Long> {
         return id == null;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     @Override
     public String toString() {
         return "ProjectTag{" + ", id='"
-            + id + '\'' + ", tagId='"
+            + id + '\'' + ", connectionId='"
             + getConnectionId() + '\'' + '}';
     }
 }

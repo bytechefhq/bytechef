@@ -78,10 +78,6 @@ public final class ProjectTag implements Persistable<Long> {
         return id == null;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     @Override
     public String toString() {
         return "ProjectTag{id='"

@@ -59,9 +59,11 @@ public class ProjectController implements ProjectsApi {
     public Mono<ResponseEntity<ProjectModel>> createProject(
         Mono<ProjectModel> projectModelMono, ServerWebExchange exchange) {
 
-        return projectModelMono.map(projectModel -> conversionService.convert(
-            projectFacade.createProject(conversionService.convert(projectModel, ProjectDTO.class)),
-            ProjectModel.class))
+        return projectModelMono
+            .map(
+                projectModel -> conversionService.convert(
+                    projectFacade.createProject(conversionService.convert(projectModel, ProjectDTO.class)),
+                    ProjectModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -71,10 +73,12 @@ public class ProjectController implements ProjectsApi {
         Long id, Mono<CreateProjectWorkflowRequestModel> createProjectWorkflowRequestModelMono,
         ServerWebExchange exchange) {
 
-        return createProjectWorkflowRequestModelMono.map(requestModel -> conversionService.convert(
-            projectFacade.addWorkflow(
-                id, requestModel.getLabel(), requestModel.getDescription(), requestModel.getDefinition()),
-            WorkflowModel.class))
+        return createProjectWorkflowRequestModelMono
+            .map(
+                requestModel -> conversionService.convert(
+                    projectFacade.addWorkflow(
+                        id, requestModel.getLabel(), requestModel.getDescription(), requestModel.getDefinition()),
+                    WorkflowModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -83,23 +87,24 @@ public class ProjectController implements ProjectsApi {
         projectFacade.deleteProject(id);
 
         return Mono.just(
-            ResponseEntity.ok()
+            ResponseEntity
+                .ok()
                 .build());
     }
 
     @Override
     @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<ProjectModel>> duplicateProject(Long id, ServerWebExchange exchange) {
-        return Mono.just(
-            conversionService.convert(projectFacade.duplicateProject(id), ProjectModel.class))
+        return Mono
+            .just(conversionService.convert(projectFacade.duplicateProject(id), ProjectModel.class))
             .map(ResponseEntity::ok);
     }
 
     @Override
     @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<ProjectModel>> getProject(Long id, ServerWebExchange exchange) {
-        return Mono.just(
-            conversionService.convert(projectFacade.getProject(id), ProjectModel.class))
+        return Mono
+            .just(conversionService.convert(projectFacade.getProject(id), ProjectModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -132,9 +137,11 @@ public class ProjectController implements ProjectsApi {
     public Mono<ResponseEntity<ProjectModel>> updateProject(
         Long id, Mono<ProjectModel> projectModelMono, ServerWebExchange exchange) {
 
-        return projectModelMono.map(projectModel -> conversionService.convert(
-            projectFacade.update(conversionService.convert(projectModel.id(id), ProjectDTO.class)),
-            ProjectModel.class))
+        return projectModelMono
+            .map(
+                projectModel -> conversionService.convert(
+                    projectFacade.update(conversionService.convert(projectModel.id(id), ProjectDTO.class)),
+                    ProjectModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -151,7 +158,8 @@ public class ProjectController implements ProjectsApi {
                     .map(tagModel -> conversionService.convert(tagModel, Tag.class))
                     .toList());
 
-            return ResponseEntity.noContent()
+            return ResponseEntity
+                .noContent()
                 .build();
         });
     }

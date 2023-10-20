@@ -17,13 +17,21 @@
 
 package com.bytechef.helios.project.repository;
 
-import com.bytechef.helios.project.domain.ProjectInstanceJob;
+import com.bytechef.helios.project.domain.ProjectInstanceWorkflow;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
 @Repository
-public interface ProjectInstanceJobRepository extends ListCrudRepository<ProjectInstanceJob, Long> {
+public interface ProjectInstanceWorkflowRepository extends ListCrudRepository<ProjectInstanceWorkflow, Long> {
+
+    List<ProjectInstanceWorkflow> findAllByProjectInstanceId(long projectInstanceId);
+
+    List<ProjectInstanceWorkflow> findAllByProjectInstanceIdIn(List<Long> projectInstanceIds);
+
+    ProjectInstanceWorkflow findByProjectInstanceIdAndWorkflowId(long projectInstanceId, String workflowId);
 }

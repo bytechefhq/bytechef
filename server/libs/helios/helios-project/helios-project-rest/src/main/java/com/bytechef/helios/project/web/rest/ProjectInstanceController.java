@@ -19,9 +19,9 @@ package com.bytechef.helios.project.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.helios.project.dto.ProjectInstanceDTO;
-import com.bytechef.helios.project.facade.ProjectFacade;
+import com.bytechef.helios.project.facade.ProjectInstanceFacade;
 import com.bytechef.helios.project.web.rest.model.CreateProjectInstanceJob200ResponseModel;
-import com.bytechef.helios.project.web.rest.model.JobParametersModel;
+import com.bytechef.helios.project.web.rest.model.CreateProjectInstanceJobRequestModel;
 import com.bytechef.helios.project.web.rest.model.ProjectInstanceModel;
 import com.bytechef.helios.project.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
@@ -46,12 +46,12 @@ import java.util.List;
 public class ProjectInstanceController implements ProjectInstancesApi {
 
     private final ConversionService conversionService;
-    private final ProjectFacade projectFacade;
+    private final ProjectInstanceFacade projectInstanceFacade;
 
     @SuppressFBWarnings("EI")
-    public ProjectInstanceController(ConversionService conversionService, ProjectFacade projectFacade) {
+    public ProjectInstanceController(ConversionService conversionService, ProjectInstanceFacade projectInstanceFacade) {
         this.conversionService = conversionService;
-        this.projectFacade = projectFacade;
+        this.projectInstanceFacade = projectInstanceFacade;
     }
 
     @Override
@@ -59,27 +59,32 @@ public class ProjectInstanceController implements ProjectInstancesApi {
     public Mono<ResponseEntity<ProjectInstanceModel>> createProjectInstance(
         Mono<ProjectInstanceModel> projectInstanceModelMono, ServerWebExchange exchange) {
 
-        return projectInstanceModelMono.map(projectInstanceModel -> conversionService.convert(
-            projectFacade.createProjectInstance(
-                conversionService.convert(
-                    projectInstanceModel, ProjectInstanceDTO.class)),
-            ProjectInstanceModel.class))
+        return projectInstanceModelMono
+            .map(
+                projectInstanceModel -> conversionService.convert(
+                    projectInstanceFacade.createProjectInstance(
+                        conversionService.convert(
+                            projectInstanceModel, ProjectInstanceDTO.class)),
+                    ProjectInstanceModel.class))
             .map(ResponseEntity::ok);
     }
 
     @Override
     public Mono<ResponseEntity<CreateProjectInstanceJob200ResponseModel>> createProjectInstanceJob(
-        Long id, Mono<JobParametersModel> jobParametersModelMono, ServerWebExchange exchange) {
+        Long id, Mono<CreateProjectInstanceJobRequestModel> createProjectInstanceJobRequestModelMono,
+        ServerWebExchange exchange) {
 
-        return jobParametersModelMono
-            .map(jobParametersModel -> new CreateProjectInstanceJob200ResponseModel()
-                .jobId(projectFacade.createProjectInstanceJob(id, jobParametersModel.getWorkflowId())))
+        return createProjectInstanceJobRequestModelMono
+            .map(createProjectInstanceJobRequestModel -> new CreateProjectInstanceJob200ResponseModel()
+                .jobId(
+                    projectInstanceFacade.createProjectInstanceJob(
+                        id, createProjectInstanceJobRequestModel.getWorkflowId())))
             .map(ResponseEntity::ok);
     }
 
     @Override
     public Mono<ResponseEntity<Void>> deleteProjectInstance(Long id, ServerWebExchange exchange) {
-        projectFacade.deleteProjectInstance(id);
+        projectInstanceFacade.deleteProjectInstance(id);
 
         return Mono.just(
             ResponseEntity.ok()
@@ -89,8 +94,9 @@ public class ProjectInstanceController implements ProjectInstancesApi {
     @Override
     @SuppressFBWarnings("NP")
     public Mono<ResponseEntity<ProjectInstanceModel>> getProjectInstance(Long id, ServerWebExchange exchange) {
-        return Mono.just(
-            conversionService.convert(projectFacade.getProjectInstance(id), ProjectInstanceModel.class))
+        return Mono
+            .just(
+                conversionService.convert(projectInstanceFacade.getProjectInstance(id), ProjectInstanceModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -100,7 +106,7 @@ public class ProjectInstanceController implements ProjectInstancesApi {
 
         return Mono.just(
             Flux.fromIterable(
-                projectFacade.searchProjectInstances(projectIds, tagIds)
+                projectInstanceFacade.searchProjectInstances(projectIds, tagIds)
                     .stream()
                     .map(projectInstance -> conversionService.convert(projectInstance, ProjectInstanceModel.class))
                     .toList()))
@@ -112,11 +118,13 @@ public class ProjectInstanceController implements ProjectInstancesApi {
     public Mono<ResponseEntity<ProjectInstanceModel>> updateProjectInstance(
         Long id, Mono<ProjectInstanceModel> projectInstanceModelMono, ServerWebExchange exchange) {
 
-        return projectInstanceModelMono.map(projectInstanceModel -> conversionService.convert(
-            projectFacade.update(
-                conversionService.convert(
-                    projectInstanceModel.id(id), ProjectInstanceDTO.class)),
-            ProjectInstanceModel.class))
+        return projectInstanceModelMono
+            .map(
+                projectInstanceModel -> conversionService.convert(
+                    projectInstanceFacade.update(
+                        conversionService.convert(
+                            projectInstanceModel.id(id), ProjectInstanceDTO.class)),
+                    ProjectInstanceModel.class))
             .map(ResponseEntity::ok);
     }
 
@@ -127,13 +135,14 @@ public class ProjectInstanceController implements ProjectInstancesApi {
         return updateTagsRequestModelMono.map(updateTagsRequestModel -> {
             List<TagModel> tagModels = updateTagsRequestModel.getTags();
 
-            projectFacade.updateProjectInstanceTags(
+            projectInstanceFacade.updateProjectInstanceTags(
                 id,
                 tagModels.stream()
                     .map(tagModel -> conversionService.convert(tagModel, Tag.class))
                     .toList());
 
-            return ResponseEntity.noContent()
+            return ResponseEntity
+                .noContent()
                 .build();
         });
     }

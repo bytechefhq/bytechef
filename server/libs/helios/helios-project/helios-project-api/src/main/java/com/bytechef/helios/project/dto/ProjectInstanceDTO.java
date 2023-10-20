@@ -17,7 +17,8 @@
 
 package com.bytechef.helios.project.dto;
 
-import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.helios.project.domain.ProjectInstance.Status;
+import com.bytechef.helios.project.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.project.domain.Project;
 import com.bytechef.helios.project.domain.ProjectInstance;
 import com.bytechef.tag.domain.Tag;
@@ -25,35 +26,25 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
 public record ProjectInstanceDTO(
-    List<Long> connectionIds, List<Connection> connections, Map<String, Object> configurationParameters,
-    String createdBy, LocalDateTime createdDate, String description, Long id, String name,
-    LocalDateTime lastExecutionDate, String lastModifiedBy, LocalDateTime lastModifiedDate, Long projectId,
-    Project project, ProjectInstance.Status status, List<Tag> tags, int version) {
-
-    public ProjectInstanceDTO(ProjectInstance projectInstance, List<Tag> tags) {
-        this(projectInstance, null, null, tags);
-    }
-
-    public ProjectInstanceDTO(ProjectInstance projectInstance, Project project, List<Tag> tags) {
-        this(projectInstance, null, project, tags);
-    }
+    String createdBy, LocalDateTime createdDate, String description, Long id, String name, String lastModifiedBy,
+    LocalDateTime lastModifiedDate, Project project, Long projectId,
+    List<ProjectInstanceWorkflow> projectInstanceWorkflows, Status status, List<Tag> tags, int version) {
 
     public ProjectInstanceDTO(
-        ProjectInstance projectInstance, List<Connection> connections, Project project, List<Tag> tags) {
+        ProjectInstance projectInstance, List<ProjectInstanceWorkflow> projectInstanceWorkflows, Project project,
+        List<Tag> tags) {
 
         this(
-            projectInstance.getConnectionIds(), connections, projectInstance.getConfigurationParameters(),
             projectInstance.getCreatedBy(), projectInstance.getCreatedDate(), projectInstance.getDescription(),
-            projectInstance.getId(), projectInstance.getName(), projectInstance.getLastExecutionDate(),
-            projectInstance.getLastModifiedBy(), projectInstance.getLastModifiedDate(),
-            projectInstance.getProjectId(), project, projectInstance.getStatus(), tags, projectInstance.getVersion());
+            projectInstance.getId(), projectInstance.getName(), projectInstance.getLastModifiedBy(),
+            projectInstance.getLastModifiedDate(), project, projectInstance.getProjectId(), projectInstanceWorkflows,
+            projectInstance.getStatus(), tags, projectInstance.getVersion());
     }
 
     public static Builder builder() {
@@ -63,12 +54,9 @@ public record ProjectInstanceDTO(
     public ProjectInstance toProjectInstance() {
         ProjectInstance projectInstance = new ProjectInstance();
 
-        projectInstance.setConnectionIds(connectionIds);
-        projectInstance.setConfigurationParameters(configurationParameters);
         projectInstance.setDescription(description);
         projectInstance.setId(id);
         projectInstance.setName(name);
-        projectInstance.setLastExecutionDate(lastExecutionDate);
         projectInstance.setProjectId(projectId);
         projectInstance.setStatus(status);
         projectInstance.setTags(tags);
@@ -77,41 +65,22 @@ public record ProjectInstanceDTO(
         return projectInstance;
     }
 
-    @SuppressFBWarnings("EI")
     public static final class Builder {
-        private List<Long> connectionIds;
-        private List<Connection> connections;
-        private Map<String, Object> configurationParameters;
         private String createdBy;
         private LocalDateTime createdDate;
         private String description;
         private Long id;
         private String name;
-        private LocalDateTime lastExecutionDate;
         private String lastModifiedBy;
         private LocalDateTime lastModifiedDate;
-        private Long projectId;
         private Project project;
-        private ProjectInstance.Status status;
+        private Long projectId;
+        private List<ProjectInstanceWorkflow> projectInstanceWorkflows;
+        private Status status;
         private List<Tag> tags;
         private int version;
 
         private Builder() {
-        }
-
-        public Builder connectionIds(List<Long> connectionIds) {
-            this.connectionIds = connectionIds;
-            return this;
-        }
-
-        public Builder connections(List<Connection> connections) {
-            this.connections = connections;
-            return this;
-        }
-
-        public Builder configurationParameters(Map<String, Object> configurationParameters) {
-            this.configurationParameters = configurationParameters;
-            return this;
         }
 
         public Builder createdBy(String createdBy) {
@@ -139,11 +108,6 @@ public record ProjectInstanceDTO(
             return this;
         }
 
-        public Builder lastExecutionDate(LocalDateTime lastExecutionDate) {
-            this.lastExecutionDate = lastExecutionDate;
-            return this;
-        }
-
         public Builder lastModifiedBy(String lastModifiedBy) {
             this.lastModifiedBy = lastModifiedBy;
             return this;
@@ -154,17 +118,22 @@ public record ProjectInstanceDTO(
             return this;
         }
 
-        public Builder projectId(Long projectId) {
-            this.projectId = projectId;
-            return this;
-        }
-
         public Builder project(Project project) {
             this.project = project;
             return this;
         }
 
-        public Builder status(ProjectInstance.Status status) {
+        public Builder projectId(Long projectId) {
+            this.projectId = projectId;
+            return this;
+        }
+
+        public Builder projectInstanceWorkflows(List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
+            this.projectInstanceWorkflows = projectInstanceWorkflows;
+            return this;
+        }
+
+        public Builder status(Status status) {
             this.status = status;
             return this;
         }
@@ -181,8 +150,8 @@ public record ProjectInstanceDTO(
 
         public ProjectInstanceDTO build() {
             return new ProjectInstanceDTO(
-                connectionIds, connections, configurationParameters, createdBy, createdDate, description, id, name,
-                lastExecutionDate, lastModifiedBy, lastModifiedDate, projectId, project, status, tags, version);
+                createdBy, createdDate, description, id, name, lastModifiedBy, lastModifiedDate, project, projectId,
+                projectInstanceWorkflows, status, tags, version);
         }
     }
 }

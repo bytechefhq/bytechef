@@ -20,7 +20,6 @@ package com.bytechef.helios.project.service;
 import com.bytechef.helios.project.domain.ProjectInstance;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -28,13 +27,13 @@ import java.util.Optional;
  */
 public interface ProjectInstanceService {
 
-    void addJob(long projectInstanceId, long jobId);
-
     ProjectInstance create(ProjectInstance projectInstance);
 
     void delete(long id);
 
     Optional<ProjectInstance> fetchJobProjectInstance(long jobId);
+
+    ProjectInstance getJobProjectInstance(long jobId);
 
     ProjectInstance getProjectInstance(long id);
 
@@ -47,6 +46,5 @@ public interface ProjectInstanceService {
     ProjectInstance update(long id, List<Long> tagIds);
 
     ProjectInstance update(
-        long id, List<Long> connectionIds, Map<String, Object> configurationParameters, String description, String name,
-        Long projectId, ProjectInstance.Status status, List<Long> tagIds, int version);
+        long id, String description, String name, ProjectInstance.Status status, List<Long> tagIds, int version);
 }

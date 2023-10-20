@@ -17,7 +17,6 @@
 
 package com.bytechef.helios.project.domain;
 
-import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.tag.domain.Tag;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -36,7 +35,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -49,9 +47,6 @@ public class ProjectInstance implements Persistable<Long> {
     public enum Status {
         DISABLED, ENABLED
     }
-
-    @Column
-    private MapWrapper configurationParameters = new MapWrapper();
 
     @CreatedBy
     @Column("created_by")
@@ -73,10 +68,6 @@ public class ProjectInstance implements Persistable<Long> {
     @Column
     private String name;
 
-    @Column("last_execution_date")
-    @LastModifiedDate
-    private LocalDateTime lastExecutionDate;
-
     @Column("last_modified_by")
     @LastModifiedBy
     private String lastModifiedBy;
@@ -87,9 +78,6 @@ public class ProjectInstance implements Persistable<Long> {
 
     @Column("project_id")
     private AggregateReference<Project, Long> projectId;
-
-    @MappedCollection(idColumn = "project_instance_id")
-    private Set<ProjectInstanceConnection> projectInstanceConnections = Collections.emptySet();
 
     @MappedCollection(idColumn = "project_instance_id")
     private Set<ProjectInstanceTag> projectInstanceTags = Collections.emptySet();
@@ -118,10 +106,6 @@ public class ProjectInstance implements Persistable<Long> {
     @Override
     public int hashCode() {
         return getClass().hashCode();
-    }
-
-    public Map<String, Object> getConfigurationParameters() {
-        return Collections.unmodifiableMap(configurationParameters.getMap());
     }
 
     public String getCreatedBy() {
@@ -153,10 +137,6 @@ public class ProjectInstance implements Persistable<Long> {
         return lastModifiedDate;
     }
 
-    public LocalDateTime getLastExecutionDate() {
-        return lastExecutionDate;
-    }
-
     public Long getProjectId() {
         return projectId == null ? null : projectId.getId();
     }
@@ -172,12 +152,6 @@ public class ProjectInstance implements Persistable<Long> {
             .toList();
     }
 
-    public List<Long> getConnectionIds() {
-        return projectInstanceConnections.stream()
-            .map(ProjectInstanceConnection::getConnectionId)
-            .toList();
-    }
-
     public int getVersion() {
         return version;
     }
@@ -187,32 +161,12 @@ public class ProjectInstance implements Persistable<Long> {
         return id == null;
     }
 
-    public void setConfigurationParameters(Map<String, Object> configurationParameters) {
-        if (configurationParameters != null) {
-            this.configurationParameters = new MapWrapper(configurationParameters);
-        }
-    }
-
-    public void setConnectionIds(List<Long> connectionIds) {
-        projectInstanceConnections = new HashSet<>();
-
-        if (connectionIds != null) {
-            for (Long connectionId : connectionIds) {
-                projectInstanceConnections.add(new ProjectInstanceConnection(connectionId));
-            }
-        }
-    }
-
     public void setDescription(String description) {
         this.description = description;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public void setLastExecutionDate(LocalDateTime lastExecutionDate) {
-        this.lastExecutionDate = lastExecutionDate;
     }
 
     public void setName(String name) {
@@ -255,25 +209,12 @@ public class ProjectInstance implements Persistable<Long> {
             ", enabled='" + status +
             ", projectId=" + projectId +
             ", description='" + description + '\'' +
-            ", parameters=" + configurationParameters +
-            ", projectInstanceConnections=" + projectInstanceConnections +
             ", projectInstanceTags=" + projectInstanceTags +
-            ", lastExecutionDate=" + lastExecutionDate +
             ", version=" + version +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
             '}';
-    }
-
-    public ProjectInstance update(ProjectInstance projectInstance) {
-        this.id = projectInstance.id;
-        this.name = projectInstance.name;
-        this.projectId = projectInstance.projectId;
-        this.projectInstanceConnections = projectInstance.projectInstanceConnections;
-        this.projectInstanceTags = projectInstance.projectInstanceTags;
-
-        return this;
     }
 }

@@ -29,8 +29,8 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-@Table("project_instance_job")
-public final class ProjectInstanceJob implements Persistable<Long> {
+@Table("project_instance_workflow_job")
+public final class ProjectInstanceWorkflowJob implements Persistable<Long> {
 
     @Id
     private Long id;
@@ -38,14 +38,14 @@ public final class ProjectInstanceJob implements Persistable<Long> {
     @Column("job_id")
     private AggregateReference<Tag, Long> jobId;
 
-    @Column("project_instance_id")
-    private AggregateReference<Tag, Long> projectinstanceId;
+    @Column("project_instance_workflow_id")
+    private AggregateReference<Tag, Long> projectInstanceWorkflowId;
 
-    public ProjectInstanceJob() {
+    public ProjectInstanceWorkflowJob() {
     }
 
-    public ProjectInstanceJob(long projectinstanceId, long jobId) {
-        this.projectinstanceId = AggregateReference.to(projectinstanceId);
+    public ProjectInstanceWorkflowJob(long projectInstanceWorkflowId, long jobId) {
+        this.projectInstanceWorkflowId = AggregateReference.to(projectInstanceWorkflowId);
         this.jobId = AggregateReference.to(jobId);
     }
 
@@ -58,7 +58,7 @@ public final class ProjectInstanceJob implements Persistable<Long> {
             return false;
         }
 
-        ProjectInstanceJob that = (ProjectInstanceJob) o;
+        ProjectInstanceWorkflowJob that = (ProjectInstanceWorkflowJob) o;
 
         return Objects.equals(id, that.id) && Objects.equals(jobId, that.jobId);
     }
@@ -82,16 +82,12 @@ public final class ProjectInstanceJob implements Persistable<Long> {
         return id == null;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     @Override
     public String toString() {
         return "ProjectInstanceJob{" +
             "id=" + id +
             ", jobId=" + jobId +
-            ", projectinstanceId=" + projectinstanceId +
+            ", projectInstanceWorkflowId=" + projectInstanceWorkflowId +
             '}';
     }
 }

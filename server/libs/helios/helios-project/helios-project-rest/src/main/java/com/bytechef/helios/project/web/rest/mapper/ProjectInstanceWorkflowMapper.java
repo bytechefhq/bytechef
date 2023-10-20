@@ -17,10 +17,8 @@
 
 package com.bytechef.helios.project.web.rest.mapper;
 
-import com.bytechef.helios.project.domain.ProjectInstanceWorkflow;
-import com.bytechef.helios.project.dto.ProjectInstanceDTO;
+import com.bytechef.helios.project.dto.ProjectInstanceWorkflowDTO;
 import com.bytechef.helios.project.web.rest.mapper.config.ProjectMapperSpringConfig;
-import com.bytechef.helios.project.web.rest.model.ProjectInstanceModel;
 import com.bytechef.helios.project.web.rest.model.ProjectInstanceWorkflowModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -30,11 +28,10 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = ProjectMapperSpringConfig.class)
-public interface ProjectInstanceModelMapper extends Converter<ProjectInstanceModel, ProjectInstanceDTO> {
+public interface ProjectInstanceWorkflowMapper
+    extends Converter<ProjectInstanceWorkflowDTO, ProjectInstanceWorkflowModel> {
 
     @Override
-    @Mapping(target = "project", ignore = true)
-    ProjectInstanceDTO convert(ProjectInstanceModel projectInstanceModel);
-
-    ProjectInstanceWorkflow map(ProjectInstanceWorkflowModel projectInstanceWorkflowModel);
+    @Mapping(target = "connections", ignore = true)
+    ProjectInstanceWorkflowModel convert(ProjectInstanceWorkflowDTO projectInstanceWorkflowDTO);
 }
