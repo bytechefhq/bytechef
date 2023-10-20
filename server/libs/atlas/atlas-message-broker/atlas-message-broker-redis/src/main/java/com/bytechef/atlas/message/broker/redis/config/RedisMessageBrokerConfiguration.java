@@ -143,7 +143,7 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
 
         WorkflowExchange workflowExchange = WorkflowExchange.TASKS;
 
-        if (Objects.equals(queueName, TaskQueues.CONTROL)) {
+        if (Objects.equals(queueName, TaskQueues.TASKS_CONTROL)) {
             workflowExchange = WorkflowExchange.CONTROL;
             queueName = WorkflowExchange.CONTROL + "/" + WorkflowExchange.CONTROL;
         }

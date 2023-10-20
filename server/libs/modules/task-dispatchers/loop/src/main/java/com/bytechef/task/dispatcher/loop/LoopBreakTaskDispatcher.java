@@ -54,7 +54,7 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
 
         loopTaskExecution.setEndDate(LocalDateTime.now());
 
-        messageBroker.send(TaskQueues.COMPLETIONS, loopTaskExecution);
+        messageBroker.send(TaskQueues.TASKS_COMPLETIONS, loopTaskExecution);
     }
 
     private TaskExecution findLoopTaskExecution(Long taskExecutionId) {

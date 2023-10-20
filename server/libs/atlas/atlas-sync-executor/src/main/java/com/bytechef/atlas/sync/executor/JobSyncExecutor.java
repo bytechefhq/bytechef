@@ -76,7 +76,7 @@ public class JobSyncExecutor {
             syncMessageBroker = new SyncMessageBroker();
         }
 
-        syncMessageBroker.receive(TaskQueues.ERRORS, message -> {
+        syncMessageBroker.receive(TaskQueues.TASKS_ERRORS, message -> {
             TaskExecution erroredTaskExecution = (TaskExecution) message;
 
             ExecutionError error = erroredTaskExecution.getError();
@@ -144,8 +144,8 @@ public class JobSyncExecutor {
             .taskExecutionService(builder.taskExecutionService)
             .build();
 
-        syncMessageBroker.receive(TaskQueues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
-        syncMessageBroker.receive(TaskQueues.JOBS, jobId -> coordinator.start((Long) jobId));
+        syncMessageBroker.receive(TaskQueues.TASKS_COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
+        syncMessageBroker.receive(TaskQueues.TASKS_JOBS, jobId -> coordinator.start((Long) jobId));
     }
 
     public static Builder builder() {

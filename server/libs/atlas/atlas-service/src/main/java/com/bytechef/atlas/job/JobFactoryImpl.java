@@ -57,7 +57,7 @@ public class JobFactoryImpl implements JobFactory {
 
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
 
-        messageBroker.send(TaskQueues.JOBS, job.getId());
+        messageBroker.send(TaskQueues.TASKS_JOBS, job.getId());
 
         return job.getId();
     }

@@ -115,7 +115,7 @@ public class ConditionTaskDispatcher implements TaskDispatcher<TaskExecution>, T
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
-            messageBroker.send(TaskQueues.COMPLETIONS, taskExecution);
+            messageBroker.send(TaskQueues.TASKS_COMPLETIONS, taskExecution);
         }
     }
 

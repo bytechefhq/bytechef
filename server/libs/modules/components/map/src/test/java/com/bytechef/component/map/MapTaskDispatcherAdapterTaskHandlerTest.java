@@ -86,19 +86,19 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
     public void test3() {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
-        messageBroker.receive(TaskQueues.COMPLETIONS, t -> {
+        messageBroker.receive(TaskQueues.TASKS_COMPLETIONS, t -> {
             TaskExecution taskExecution = (TaskExecution) t;
 
             Assertions.assertNull(taskExecution.getOutput());
         });
 
-        messageBroker.receive(TaskQueues.ERRORS, t -> {
+        messageBroker.receive(TaskQueues.TASKS_ERRORS, t -> {
             TaskExecution taskExecution = (TaskExecution) t;
 
             Assertions.assertNull(taskExecution.getError());
         });
 
-        messageBroker.receive(TaskQueues.EVENTS, t -> {});
+        messageBroker.receive(TaskQueues.TASKS_EVENTS, t -> {});
 
         MapTaskDispatcherAdapterTaskHandler[] mapAdapterTaskHandlerRefs = new MapTaskDispatcherAdapterTaskHandler[1];
 

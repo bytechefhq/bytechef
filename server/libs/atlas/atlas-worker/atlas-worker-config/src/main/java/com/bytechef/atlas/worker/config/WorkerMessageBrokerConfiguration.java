@@ -56,7 +56,7 @@ public class WorkerMessageBrokerConfiguration {
                 listenerEndpointRegistrar, k, Integer.parseInt((String) v), worker, "handle"));
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, TaskQueues.CONTROL, 1, worker, "handle");
+                listenerEndpointRegistrar, TaskQueues.TASKS_CONTROL, 1, worker, "handle");
         };
     }
 }

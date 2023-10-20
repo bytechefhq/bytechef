@@ -56,7 +56,7 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
             taskExecution.getId(),
             MapValueUtils.getRequiredString(taskExecution.getParameters(), WorkflowConstants.WORKFLOW_ID));
 
-        messageBroker.send(TaskQueues.SUBFLOWS, jobParameters);
+        messageBroker.send(TaskQueues.TASKS_SUBFLOWS, jobParameters);
     }
 
     @Override

@@ -96,7 +96,7 @@ public class AmqpMessageBrokerConfiguration
         Exchange exchange;
         Queue queue;
 
-        if (Objects.equals(queueName, TaskQueues.CONTROL)) {
+        if (Objects.equals(queueName, TaskQueues.TASKS_CONTROL)) {
             exchange = controlExchange();
             queue = controlQueue();
         } else {
@@ -105,7 +105,7 @@ public class AmqpMessageBrokerConfiguration
             Map<String, Object> args = new HashMap<String, Object>();
 
             args.put("x-dead-letter-exchange", "");
-            args.put("x-dead-letter-routing-key", TaskQueues.DLQ);
+            args.put("x-dead-letter-routing-key", TaskQueues.TASKS_DLQ);
 
             queue = new Queue(queueName, true, false, false, args);
         }
@@ -134,7 +134,7 @@ public class AmqpMessageBrokerConfiguration
 
     @Bean
     Queue dlqQueue() {
-        return new Queue(TaskQueues.DLQ);
+        return new Queue(TaskQueues.TASKS_DLQ);
     }
 
     @Bean

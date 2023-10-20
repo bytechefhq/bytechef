@@ -22,6 +22,6 @@ package com.bytechef.hermes.message.broker;
  */
 public class TriggerQueues {
 
-    public static final String TRIGGER_COMPLETIONS = "trigger.completions";
     public static final String TRIGGERS = "triggers";
+    public static final String TRIGGERS_COMPLETIONS = "triggers.completions";
 }

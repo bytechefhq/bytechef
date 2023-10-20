@@ -94,7 +94,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
                 taskExecution.setEndDate(LocalDateTime.now());
                 taskExecution.setExecutionTime(0);
 
-                messageBroker.send(TaskQueues.COMPLETIONS, taskExecution);
+                messageBroker.send(TaskQueues.TASKS_COMPLETIONS, taskExecution);
             } else {
                 WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
@@ -124,7 +124,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
             // TODO check, it seems wrong
             taskExecution.setOutput(selectedCase.get("value"));
 
-            messageBroker.send(TaskQueues.COMPLETIONS, taskExecution);
+            messageBroker.send(TaskQueues.TASKS_COMPLETIONS, taskExecution);
         }
     }
 

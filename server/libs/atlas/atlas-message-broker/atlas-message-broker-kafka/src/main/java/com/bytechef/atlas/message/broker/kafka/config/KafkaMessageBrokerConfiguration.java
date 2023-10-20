@@ -91,7 +91,7 @@ public class KafkaMessageBrokerConfiguration
         KafkaListenerEndpointRegistrar listenerEndpointRegistrar, String queueName, int concurrency, Object delegate,
         String methodName) {
 
-        if (Objects.equals(queueName, TaskQueues.CONTROL)) {
+        if (Objects.equals(queueName, TaskQueues.TASKS_CONTROL)) {
             queueName = WorkflowExchange.CONTROL + "/" + WorkflowExchange.CONTROL;
         }
 

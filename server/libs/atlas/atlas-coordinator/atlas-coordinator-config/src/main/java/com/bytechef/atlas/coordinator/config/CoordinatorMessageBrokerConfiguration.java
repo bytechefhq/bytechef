@@ -55,43 +55,43 @@ public class CoordinatorMessageBrokerConfiguration {
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                TaskQueues.COMPLETIONS,
+                TaskQueues.TASKS_COMPLETIONS,
                 coordinatorSubscriptions.getCompletions(),
                 coordinator,
                 "complete");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                TaskQueues.ERRORS,
+                TaskQueues.TASKS_ERRORS,
                 coordinatorSubscriptions.getErrors(),
                 coordinator,
                 "handleError");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                TaskQueues.EVENTS,
+                TaskQueues.TASKS_EVENTS,
                 coordinatorSubscriptions.getEvents(),
                 applicationContext.getBean(EventListener.class),
                 "onApplicationEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                TaskQueues.JOBS,
+                TaskQueues.TASKS_JOBS,
                 coordinatorSubscriptions.getJobs(),
                 coordinator,
                 "start");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                TaskQueues.RESTARTS,
+                TaskQueues.TASKS_RESTARTS,
                 coordinatorSubscriptions.getRequests(),
                 coordinator,
                 "resume");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                TaskQueues.SUBFLOWS,
+                TaskQueues.TASKS_SUBFLOWS,
                 coordinatorSubscriptions.getJobs(),
                 coordinator,
                 "create");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                TaskQueues.STOPS,
+                TaskQueues.TASKS_STOPS,
                 coordinatorSubscriptions.getRequests(),
                 coordinator,
                 "stop");

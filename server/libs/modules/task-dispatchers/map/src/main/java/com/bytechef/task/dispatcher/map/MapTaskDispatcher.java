@@ -87,7 +87,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
             taskExecution.setEndDate(LocalDateTime.now());
             taskExecution.setExecutionTime(0);
 
-            messageBroker.send(TaskQueues.COMPLETIONS, taskExecution);
+            messageBroker.send(TaskQueues.TASKS_COMPLETIONS, taskExecution);
         } else {
             counterService.set(taskExecution.getId(), list.size());
 
