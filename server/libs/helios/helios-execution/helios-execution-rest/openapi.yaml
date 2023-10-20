@@ -6,19 +6,19 @@ info:
 servers:
 - url: "http://localhost:5173/api/automation"
 tags:
-- name: "automation-jobs"
-  description: "The Automation Jobs API"
-- name: "automation-executions"
-  description: "The Automation Executions API"
-- name: "automation-tests"
-  description: "The Automation Tests API"
+- name: "automation-job"
+  description: "The Automation Job API"
+- name: "automation-execution"
+  description: "The Automation Execution API"
+- name: "automation-test"
+  description: "The Automation Test API"
 paths:
   /jobs:
     get:
       description: "Get a page of jobs."
       summary: "Get a page of jobs"
       tags:
-      - "automation-jobs"
+      - "automation-job"
       operationId: "getJobs"
       parameters:
       - name: "pageNumber"
@@ -40,7 +40,7 @@ paths:
       description: "Create a request for running a new job."
       summary: "Create a request for running a new job"
       tags:
-      - "automation-jobs"
+      - "automation-job"
       operationId: "createJob"
       requestBody:
         description: "Parameters required to run a job, for example '{\"workflowId\"\
@@ -67,7 +67,7 @@ paths:
       description: "Get the latest job."
       summary: "Get the latest job"
       tags:
-      - "automation-jobs"
+      - "automation-job"
       operationId: "getLatestJob"
       responses:
         "200":
@@ -81,7 +81,7 @@ paths:
       description: "Get a job by id."
       summary: "Get a job by id"
       tags:
-      - "automation-jobs"
+      - "automation-job"
       operationId: "getJob"
       parameters:
       - name: "id"
@@ -103,7 +103,7 @@ paths:
       description: "Restart a job."
       summary: "Restart a job"
       tags:
-      - "automation-jobs"
+      - "automation-job"
       operationId: "restartJob"
       parameters:
       - name: "id"
@@ -121,7 +121,7 @@ paths:
       description: "Stop a job."
       summary: "Stop a job"
       tags:
-      - "automation-jobs"
+      - "automation-job"
       operationId: "stopJob"
       parameters:
       - name: "id"
@@ -139,7 +139,7 @@ paths:
       description: "Get project workflow executions."
       summary: "Get project workflow executions"
       tags:
-      - "automation-executions"
+      - "automation-execution"
       operationId: "getExecutions"
       parameters:
       - name: "jobStatus"
@@ -208,7 +208,7 @@ paths:
       description: "Get workflow execution by id."
       summary: "Get workflow executions by id"
       tags:
-      - "automation-executions"
+      - "automation-execution"
       operationId: "getExecution"
       parameters:
       - name: "id"
@@ -230,10 +230,10 @@ paths:
       description: "Execute a workflow synchronously for testing purposes."
       summary: "Execute a workflow synchronously for testing purpose"
       tags:
-      - "automation-tests"
+      - "automation-test"
       operationId: "testWorkflow"
       requestBody:
-        description: "Parameters required to run a job, for example '{\"workflowId\"\
+        description: "Parameters required to run a test job, for example '{\"workflowId\"\
           :\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'"
         content:
           application/json:
