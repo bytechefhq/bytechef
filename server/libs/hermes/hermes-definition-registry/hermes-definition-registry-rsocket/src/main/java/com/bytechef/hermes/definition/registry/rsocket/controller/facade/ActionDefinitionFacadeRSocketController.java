@@ -43,41 +43,46 @@ public class ActionDefinitionFacadeRSocketController {
 
     @MessageMapping("ActionDefinitionFacade.executeEditorDescription")
     public Mono<String> executeEditorDescription(EditorDescription editorDescription) {
-        return actionDefinitionFacade.executeEditorDescription(
-            editorDescription.actionName, editorDescription.componentName, editorDescription.componentVersion,
-            editorDescription.actionParameters, editorDescription.connectionId);
+        return Mono.just(
+            actionDefinitionFacade.executeEditorDescription(
+                editorDescription.actionName, editorDescription.componentName, editorDescription.componentVersion,
+                editorDescription.actionParameters, editorDescription.connectionId));
     }
 
     @MessageMapping("ActionDefinitionFacade.executeOptions")
     public Mono<List<Option<?>>> executeOptions(Options options) {
 
-        return actionDefinitionFacade.executeOptions(
-            options.propertyName, options.actionName, options.componentName, options.componentVersion,
-            options.actionParameters, options.connectionId);
+        return Mono.just(
+            actionDefinitionFacade.executeOptions(
+                options.propertyName, options.actionName, options.componentName, options.componentVersion,
+                options.actionParameters, options.connectionId));
     }
 
     @MessageMapping("ActionDefinitionFacade.executeProperties")
     public Mono<List<? extends Property<?>>> executeProperties(Properties properties) {
 
-        return actionDefinitionFacade.executeDynamicProperties(
-            properties.propertyName, properties.actionName, properties.componentName, properties.componentVersion,
-            properties.actionParameters, properties.connectionId);
+        return Mono.just(
+            actionDefinitionFacade.executeDynamicProperties(
+                properties.propertyName, properties.actionName, properties.componentName, properties.componentVersion,
+                properties.actionParameters, properties.connectionId));
     }
 
     @MessageMapping("ActionDefinitionFacade.executeOutputSchema")
     public Mono<List<? extends Property<?>>> executeOutputSchema(OutputSchema outputSchema) {
 
-        return actionDefinitionFacade.executeOutputSchema(
-            outputSchema.actionName, outputSchema.componentName, outputSchema.componentVersion,
-            outputSchema.actionParameters, outputSchema.connectionId);
+        return Mono.just(
+            actionDefinitionFacade.executeOutputSchema(
+                outputSchema.actionName, outputSchema.componentName, outputSchema.componentVersion,
+                outputSchema.actionParameters, outputSchema.connectionId));
     }
 
     @MessageMapping("ActionDefinitionService.executeSampleOutput")
     public Mono<Object> executeSampleOutput(SampleOutput sampleOutput) {
 
-        return actionDefinitionFacade.executeSampleOutput(
-            sampleOutput.actionName, sampleOutput.componentName, sampleOutput.componentVersion,
-            sampleOutput.actionParameters, sampleOutput.connectionId);
+        return Mono.just(
+            actionDefinitionFacade.executeSampleOutput(
+                sampleOutput.actionName, sampleOutput.componentName, sampleOutput.componentVersion,
+                sampleOutput.actionParameters, sampleOutput.connectionId));
     }
 
     private record EditorDescription(

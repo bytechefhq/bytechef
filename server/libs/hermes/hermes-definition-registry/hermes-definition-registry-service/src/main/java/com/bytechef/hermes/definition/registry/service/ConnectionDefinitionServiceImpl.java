@@ -34,7 +34,6 @@ import com.bytechef.hermes.definition.registry.dto.AuthorizationDTO;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.List;
@@ -120,24 +119,22 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public Mono<ConnectionDefinitionDTO> getConnectionDefinitionMono(
+    public ConnectionDefinitionDTO getConnectionDefinition(
         String componentName, int componentVersion) {
-        return Mono.just(
-            toConnectionDefinitionDTO(
-                componentDefinitionRegistry.getConnectionDefinition(componentName, componentVersion)));
+        return toConnectionDefinitionDTO(
+            componentDefinitionRegistry.getConnectionDefinition(componentName, componentVersion));
     }
 
     @Override
-    public Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono() {
-        return Mono.just(
-            componentDefinitionRegistry.getConnectionDefinitions()
-                .stream()
-                .map(this::toConnectionDefinitionDTO)
-                .toList());
+    public List<ConnectionDefinitionDTO> getConnectionDefinitions() {
+        return componentDefinitionRegistry.getConnectionDefinitions()
+            .stream()
+            .map(this::toConnectionDefinitionDTO)
+            .toList();
     }
 
     @Override
-    public Mono<OAuth2AuthorizationParametersDTO> getOAuth2Parameters(
+    public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
         String componentName, int connectionVersion, Map<String, Object> connectionParameters,
         String authorizationName) {
 
@@ -148,20 +145,19 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         ClientIdFunction clientIdFunction = authorization.getClientId();
         ScopesFunction scopesFunction = authorization.getScopes();
 
-        return Mono.just(new OAuth2AuthorizationParametersDTO(
+        return new OAuth2AuthorizationParametersDTO(
             authorizationUrlFunction.apply(new InputParametersImpl(connectionParameters)),
             clientIdFunction.apply(new InputParametersImpl(connectionParameters)),
-            scopesFunction.apply(new InputParametersImpl(connectionParameters))));
+            scopesFunction.apply(new InputParametersImpl(connectionParameters)));
     }
 
     @Override
-    public Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono(
+    public List<ConnectionDefinitionDTO> getConnectionDefinitions(
         String componentName, int componentVersion) {
 
-        return Mono.just(
-            CollectionUtils.map(
-                componentDefinitionRegistry.getConnectionDefinitions(componentName, componentVersion),
-                this::toConnectionDefinitionDTO));
+        return CollectionUtils.map(
+            componentDefinitionRegistry.getConnectionDefinitions(componentName, componentVersion),
+            this::toConnectionDefinitionDTO);
     }
 
     private List<AuthorizationDTO> toAuthorizationDTOs(List<? extends Authorization> authorizations) {

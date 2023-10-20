@@ -55,36 +55,30 @@ public class ComponentDefinitionServiceRSocketClient extends AbstractRSocketClie
     }
 
     @Override
-    public Mono<ComponentDefinitionDTO> getComponentDefinitionMono(String name, Integer version) {
-        return getRSocketRequester(name)
-            .route("ComponentDefinitionService.getComponentDefinition")
-            .data(Map.of("name", name, "version", version))
-            .retrieveMono(ComponentDefinitionDTO.class);
+    public List<ComponentDefinitionDTO> getComponentDefinitions() {
+        return MonoUtils.get(
+            Mono.zip(
+                DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
+                    .stream()
+                    .map(serviceInstance -> RSocketUtils.getRSocketRequester(serviceInstance, rSocketRequesterBuilder)
+                        .route("ComponentDefinitionService.getComponentDefinitions")
+                        .retrieveMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
+                    .toList(),
+                this::toComponentDefinitions));
     }
 
     @Override
-    public Mono<List<ComponentDefinitionDTO>> getComponentDefinitionsMono() {
-        return Mono.zip(
-            DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
-                .stream()
-                .map(serviceInstance -> RSocketUtils.getRSocketRequester(serviceInstance, rSocketRequesterBuilder)
-                    .route("ComponentDefinitionService.getComponentDefinitions")
-                    .retrieveMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
-                .toList(),
-            this::toComponentDefinitions);
-    }
-
-    @Override
-    public Mono<List<ComponentDefinitionDTO>> getComponentDefinitionsMono(String name) {
-        return Mono.zip(
-            DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
-                .stream()
-                .map(serviceInstance -> RSocketUtils.getRSocketRequester(serviceInstance, rSocketRequesterBuilder)
-                    .route("ComponentDefinitionService.getComponentDefinitionsForName")
-                    .data(name)
-                    .retrieveMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
-                .toList(),
-            this::toComponentDefinitions);
+    public List<ComponentDefinitionDTO> getComponentDefinitions(String name) {
+        return MonoUtils.get(
+            Mono.zip(
+                DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
+                    .stream()
+                    .map(serviceInstance -> RSocketUtils.getRSocketRequester(serviceInstance, rSocketRequesterBuilder)
+                        .route("ComponentDefinitionService.getComponentDefinitionsForName")
+                        .data(name)
+                        .retrieveMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
+                    .toList(),
+                this::toComponentDefinitions));
     }
 
     @SuppressWarnings("unchecked")

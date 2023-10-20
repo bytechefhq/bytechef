@@ -112,54 +112,58 @@ public class ConnectionDefinitionServiceRSocketClient extends AbstractRSocketCli
     }
 
     @Override
-    public Mono<ConnectionDefinitionDTO> getConnectionDefinitionMono(
+    public ConnectionDefinitionDTO getConnectionDefinition(
         String componentName, int componentVersion) {
 
-        return getRSocketRequester(componentName)
-            .route("ConnectionDefinitionService.getComponentConnectionDefinition")
-            .data(Map.of("componentName", componentName, "componentVersion", componentVersion))
-            .retrieveMono(ConnectionDefinitionDTO.class)
-            .map(connectionDefinition -> connectionDefinition);
+        return MonoUtils.get(
+            getRSocketRequester(componentName)
+                .route("ConnectionDefinitionService.getComponentConnectionDefinition")
+                .data(Map.of("componentName", componentName, "componentVersion", componentVersion))
+                .retrieveMono(ConnectionDefinitionDTO.class)
+                .map(connectionDefinition -> connectionDefinition));
     }
 
     @Override
-    public Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono(
+    public List<ConnectionDefinitionDTO> getConnectionDefinitions(
         String componentName, int componentVersion) {
 
-        return Mono.zip(
-            DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
-                .stream()
-                .map(serviceInstance -> RSocketUtils.getRSocketRequester(serviceInstance, rSocketRequesterBuilder)
-                    .route("ConnectionDefinitionService.getComponentConnectionDefinitions")
-                    .data(Map.of("componentName", componentName, "componentVersion", componentVersion))
-                    .retrieveMono(
-                        new ParameterizedTypeReference<List<ConnectionDefinitionDTO>>() {}))
-                .toList(),
-            this::toConnectionDefinitions);
+        return MonoUtils.get(
+            Mono.zip(
+                DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
+                    .stream()
+                    .map(serviceInstance -> RSocketUtils.getRSocketRequester(serviceInstance, rSocketRequesterBuilder)
+                        .route("ConnectionDefinitionService.getComponentConnectionDefinitions")
+                        .data(Map.of("componentName", componentName, "componentVersion", componentVersion))
+                        .retrieveMono(
+                            new ParameterizedTypeReference<List<ConnectionDefinitionDTO>>() {}))
+                    .toList(),
+                this::toConnectionDefinitions));
     }
 
     @Override
-    public Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono() {
-        return Mono.zip(
-            DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
-                .stream()
-                .map(serviceInstance -> RSocketUtils.getRSocketRequester(serviceInstance, rSocketRequesterBuilder)
-                    .route("ConnectionDefinitionService.getConnectionDefinitions")
-                    .retrieveMono(
-                        new ParameterizedTypeReference<List<ConnectionDefinitionDTO>>() {}))
-                .toList(),
-            this::toConnectionDefinitions);
+    public List<ConnectionDefinitionDTO> getConnectionDefinitions() {
+        return MonoUtils.get(
+            Mono.zip(
+                DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
+                    .stream()
+                    .map(serviceInstance -> RSocketUtils.getRSocketRequester(serviceInstance, rSocketRequesterBuilder)
+                        .route("ConnectionDefinitionService.getConnectionDefinitions")
+                        .retrieveMono(
+                            new ParameterizedTypeReference<List<ConnectionDefinitionDTO>>() {}))
+                    .toList(),
+                this::toConnectionDefinitions));
     }
 
     @Override
-    public Mono<OAuth2AuthorizationParametersDTO> getOAuth2Parameters(
+    public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
         String componentName, int connectionVersion, Map<String, Object> connectionParameters,
         String authorizationName) {
 
-        return getRSocketRequester(componentName)
-            .route("ConnectionDefinitionService.getOAuth2Parameters")
-            .data(new Connection(componentName, connectionVersion, connectionParameters, authorizationName))
-            .retrieveMono(OAuth2AuthorizationParametersDTO.class);
+        return MonoUtils.get(
+            getRSocketRequester(componentName)
+                .route("ConnectionDefinitionService.getOAuth2Parameters")
+                .data(new Connection(componentName, connectionVersion, connectionParameters, authorizationName))
+                .retrieveMono(OAuth2AuthorizationParametersDTO.class));
     }
 
     @SuppressWarnings("unchecked")

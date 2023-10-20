@@ -85,26 +85,29 @@ public class ConnectionDefinitionServiceRSocketController {
 
     @MessageMapping("ConnectionDefinitionService.getComponentConnectionDefinition")
     public Mono<ConnectionDefinitionDTO> getComponentConnectionDefinition(Map<String, Object> map) {
-        return connectionDefinitionService.getConnectionDefinitionMono(
-            (String) map.get("componentName"), (Integer) map.get("componentVersion"));
+        return Mono.just(
+            connectionDefinitionService.getConnectionDefinition(
+                (String) map.get("componentName"), (Integer) map.get("componentVersion")));
     }
 
     @MessageMapping("ConnectionDefinitionService.getComponentConnectionDefinitions")
     public Mono<List<ConnectionDefinitionDTO>> getComponentConnectionDefinitions(Map<String, Object> map) {
-        return connectionDefinitionService.getConnectionDefinitionsMono(
-            (String) map.get("componentName"), (Integer) map.get("componentVersion"));
+        return Mono.just(
+            connectionDefinitionService.getConnectionDefinitions(
+                (String) map.get("componentName"), (Integer) map.get("componentVersion")));
     }
 
     @MessageMapping("ConnectionDefinitionService.getConnectionDefinitions")
     public Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitions() {
-        return connectionDefinitionService.getConnectionDefinitionsMono();
+        return Mono.just(connectionDefinitionService.getConnectionDefinitions());
     }
 
     @MessageMapping("ConnectionDefinitionService.getOAuth2Parameters")
     public Mono<OAuth2AuthorizationParametersDTO> getOAuth2Parameters(Connection connection) {
-        return connectionDefinitionService.getOAuth2Parameters(
-            connection.componentName, connection.connectionVersion, connection.parameters,
-            connection.authorizationName);
+        return Mono.just(
+            connectionDefinitionService.getOAuth2Parameters(
+                connection.componentName, connection.connectionVersion, connection.parameters,
+                connection.authorizationName));
     }
 
     private record AuthorizationCallbackRequest(Connection connection, String redirectUri) {

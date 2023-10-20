@@ -17,12 +17,12 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
+import com.bytechef.commons.reactor.util.MonoUtils;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -39,32 +39,35 @@ public class TaskDispatcherDefinitionServiceRSocketClient implements TaskDispatc
     }
 
     @Override
-    public Mono<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitionMono(String name, Integer version) {
-        return rSocketRequester
-            .route("TaskDispatcherDefinitionService.getTaskDispatcherDefinition")
-            .data(Map.of("name", name, "version", version))
-            .retrieveMono(TaskDispatcherDefinitionDTO.class)
-            .map(taskDispatcherDefinition -> taskDispatcherDefinition);
+    public TaskDispatcherDefinitionDTO getTaskDispatcherDefinition(String name, Integer version) {
+        return MonoUtils.get(
+            rSocketRequester
+                .route("TaskDispatcherDefinitionService.getTaskDispatcherDefinition")
+                .data(Map.of("name", name, "version", version))
+                .retrieveMono(TaskDispatcherDefinitionDTO.class)
+                .map(taskDispatcherDefinition -> taskDispatcherDefinition));
     }
 
     @Override
-    public Mono<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitionsMono() {
-        return rSocketRequester
-            .route("TaskDispatcherDefinitionService.getTaskDispatcherDefinitions")
-            .retrieveMono(
-                new ParameterizedTypeReference<List<TaskDispatcherDefinitionDTO>>() {})
-            .map(taskDispatcherDefinitions -> CollectionUtils.map(
-                taskDispatcherDefinitions, taskDispatcherDefinition -> taskDispatcherDefinition));
+    public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitions() {
+        return MonoUtils.get(
+            rSocketRequester
+                .route("TaskDispatcherDefinitionService.getTaskDispatcherDefinitions")
+                .retrieveMono(
+                    new ParameterizedTypeReference<List<TaskDispatcherDefinitionDTO>>() {})
+                .map(taskDispatcherDefinitions -> CollectionUtils.map(
+                    taskDispatcherDefinitions, taskDispatcherDefinition -> taskDispatcherDefinition)));
     }
 
     @Override
-    public Mono<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitionsMono(String name) {
-        return rSocketRequester
-            .route("TaskDispatcherDefinitionService.getComponentDefinitionsForName")
-            .data(name)
-            .retrieveMono(
-                new ParameterizedTypeReference<List<TaskDispatcherDefinitionDTO>>() {})
-            .map(taskDispatcherDefinitions -> CollectionUtils.map(
-                taskDispatcherDefinitions, taskDispatcherDefinition -> taskDispatcherDefinition));
+    public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitions(String name) {
+        return MonoUtils.get(
+            rSocketRequester
+                .route("TaskDispatcherDefinitionService.getComponentDefinitionsForName")
+                .data(name)
+                .retrieveMono(
+                    new ParameterizedTypeReference<List<TaskDispatcherDefinitionDTO>>() {})
+                .map(taskDispatcherDefinitions -> CollectionUtils.map(
+                    taskDispatcherDefinitions, taskDispatcherDefinition -> taskDispatcherDefinition)));
     }
 }

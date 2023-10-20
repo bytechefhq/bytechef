@@ -22,7 +22,6 @@ import com.bytechef.hermes.component.definition.Authorization.AuthorizationConte
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -50,13 +49,13 @@ public interface ConnectionDefinitionService {
 
     AuthorizationType getAuthorizationType(String authorizationName, String componentName, int connectionVersion);
 
-    Mono<ConnectionDefinitionDTO> getConnectionDefinitionMono(String componentName, int componentVersion);
+    ConnectionDefinitionDTO getConnectionDefinition(String componentName, int componentVersion);
 
-    Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono(String componentName, int version);
+    List<ConnectionDefinitionDTO> getConnectionDefinitions(String componentName, int version);
 
-    Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono();
+    List<ConnectionDefinitionDTO> getConnectionDefinitions();
 
-    Mono<OAuth2AuthorizationParametersDTO> getOAuth2Parameters(
+    OAuth2AuthorizationParametersDTO getOAuth2Parameters(
         String componentName, int connectionVersion, Map<String, Object> connectionParameters,
         String authorizationName);
 }

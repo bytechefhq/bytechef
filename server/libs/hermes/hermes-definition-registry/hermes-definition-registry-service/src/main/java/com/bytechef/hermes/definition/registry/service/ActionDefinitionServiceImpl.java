@@ -36,7 +36,6 @@ import com.bytechef.hermes.definition.registry.component.factory.ContextConnecti
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.component.action.CustomAction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -134,7 +133,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public Mono<Object> executeSampleOutput(
+    public Object executeSampleOutput(
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         String authorizationName, Map<String, Object> connectionParameters) {
 
@@ -146,14 +145,14 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         SampleOutputDataSource.SampleOutputFunction sampleOutputFunction = sampleOutputDataSource.getSampleOutput();
 
-        return Mono.just(sampleOutputFunction.apply(
+        return sampleOutputFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            new InputParametersImpl(actionParameters)));
+            new InputParametersImpl(actionParameters));
     }
 
     @Override
-    public Mono<ActionDefinitionDTO> getComponentActionDefinitionMono(
+    public ActionDefinitionDTO getComponentActionDefinition(
         String actionName, String componentName, int componentVersion) {
 
         ActionDefinition actionDefinition;
@@ -168,11 +167,11 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 actionName, componentName, componentVersion);
         }
 
-        return Mono.just(toActionDefinitionDTO(actionDefinition));
+        return toActionDefinitionDTO(actionDefinition);
     }
 
     @Override
-    public Mono<List<ActionDefinitionDTO>> getComponentActionDefinitionsMono(
+    public List<ActionDefinitionDTO> getComponentActionDefinitions(
         String componentName, int componentVersion) {
 
         List<ActionDefinitionDTO> actionDefinitionDTOs =
@@ -191,7 +190,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 toActionDefinitionDTO(CustomAction.getCustomActionDefinition(componentDefinition)));
         }
 
-        return Mono.just(actionDefinitionDTOs);
+        return actionDefinitionDTOs;
     }
 
     private ActionDefinitionDTO toActionDefinitionDTO(ActionDefinition actionDefinition) {

@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
+import com.bytechef.commons.reactor.util.MonoUtils;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
@@ -25,7 +26,6 @@ import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -83,24 +83,27 @@ public class ActionDefinitionServiceRSocketClient extends AbstractRSocketClient
     }
 
     @Override
-    public Mono<ActionDefinitionDTO> getComponentActionDefinitionMono(
+    public ActionDefinitionDTO getComponentActionDefinition(
         String actionName, String componentName, int componentVersion) {
 
-        return getRSocketRequester(componentName)
-            .route("ActionDefinitionService.getComponentActionDefinition")
-            .data(
-                Map.of("componentName", componentName, "componentVersion", componentVersion, "actionName", actionName))
-            .retrieveMono(ActionDefinitionDTO.class);
+        return MonoUtils.get(
+            getRSocketRequester(componentName)
+                .route("ActionDefinitionService.getComponentActionDefinition")
+                .data(
+                    Map.of("componentName", componentName, "componentVersion", componentVersion, "actionName",
+                        actionName))
+                .retrieveMono(ActionDefinitionDTO.class));
     }
 
     @Override
-    public Mono<List<ActionDefinitionDTO>> getComponentActionDefinitionsMono(
+    public List<ActionDefinitionDTO> getComponentActionDefinitions(
         String componentName, int componentVersion) {
 
-        return getRSocketRequester(componentName)
-            .route("ActionDefinitionService.getComponentActionDefinitions")
-            .data(
-                Map.of("componentName", componentName, "componentVersion", componentVersion))
-            .retrieveMono(new ParameterizedTypeReference<>() {});
+        return MonoUtils.get(
+            getRSocketRequester(componentName)
+                .route("ActionDefinitionService.getComponentActionDefinitions")
+                .data(
+                    Map.of("componentName", componentName, "componentVersion", componentVersion))
+                .retrieveMono(new ParameterizedTypeReference<>() {}));
     }
 }

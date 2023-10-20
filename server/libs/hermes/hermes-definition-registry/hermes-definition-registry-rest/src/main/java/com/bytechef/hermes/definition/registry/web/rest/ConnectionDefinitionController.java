@@ -52,7 +52,7 @@ public class ConnectionDefinitionController implements ConnectionDefinitionsApi 
         Mono<GetOAuth2AuthorizationParametersRequestModel> parametersRequestModelMono, ServerWebExchange exchange) {
 
         return parametersRequestModelMono
-            .flatMap(parametersRequestModel -> connectionDefinitionService.getOAuth2Parameters(
+            .map(parametersRequestModel -> connectionDefinitionService.getOAuth2Parameters(
                 parametersRequestModel.getComponentName(), parametersRequestModel.getConnectionVersion(),
                 oAuth2Properties.checkPredefinedApp(
                     parametersRequestModel.getComponentName(), parametersRequestModel.getParameters()),

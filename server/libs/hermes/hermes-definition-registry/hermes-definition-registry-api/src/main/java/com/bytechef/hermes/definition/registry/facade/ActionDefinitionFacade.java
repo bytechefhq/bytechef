@@ -19,30 +19,29 @@ package com.bytechef.hermes.definition.registry.facade;
 
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Property;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
 
 public interface ActionDefinitionFacade {
 
-    Mono<String> executeEditorDescription(
+    String executeEditorDescription(
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         long connectionId);
 
-    Mono<List<Option<?>>> executeOptions(
+    List<Option<?>> executeOptions(
         String propertyName, String actionName, String componentName, int componentVersion,
         Map<String, Object> actionParameters, long connectionId);
 
-    Mono<List<? extends Property<?>>> executeOutputSchema(
+    List<? extends Property<?>> executeOutputSchema(
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         long connectionId);
 
-    Mono<Object> executeSampleOutput(
+    Object executeSampleOutput(
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         long connectionId);
 
-    Mono<List<? extends Property<?>>> executeDynamicProperties(
+    List<? extends Property<?>> executeDynamicProperties(
         String propertyName, String actionName, String componentName, int componentVersion,
         Map<String, Object> actionParameters, long connectionId);
 }

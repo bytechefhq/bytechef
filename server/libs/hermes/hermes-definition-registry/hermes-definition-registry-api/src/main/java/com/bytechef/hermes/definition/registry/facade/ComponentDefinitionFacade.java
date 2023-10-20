@@ -18,7 +18,6 @@
 package com.bytechef.hermes.definition.registry.facade;
 
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -27,7 +26,7 @@ import java.util.List;
  */
 public interface ComponentDefinitionFacade {
 
-    Mono<List<ComponentDefinitionDTO>> getComponentDefinitionsMono(
+    List<ComponentDefinitionDTO> getComponentDefinitions(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
         Boolean triggerDefinitions);
 }

@@ -31,7 +31,6 @@ import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionBasicDTO;
 import com.bytechef.hermes.definition.registry.component.action.CustomAction;
 import com.bytechef.hermes.definition.registry.util.DefinitionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,26 +56,19 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public Mono<ComponentDefinitionDTO> getComponentDefinitionMono(String name, Integer version) {
-        return Mono.just(getComponentDefinition(name, version));
+    public List<ComponentDefinitionDTO> getComponentDefinitions() {
+        return componentDefinitionRegistry.getComponentDefinitions()
+            .stream()
+            .map(this::toComponentDefinitionDTO)
+            .toList();
     }
 
     @Override
-    public Mono<List<ComponentDefinitionDTO>> getComponentDefinitionsMono() {
-        return Mono.just(
-            componentDefinitionRegistry.getComponentDefinitions()
-                .stream()
-                .map(this::toComponentDefinitionDTO)
-                .toList());
-    }
-
-    @Override
-    public Mono<List<ComponentDefinitionDTO>> getComponentDefinitionsMono(String name) {
-        return Mono.just(
-            componentDefinitionRegistry.getComponentDefinitions(name)
-                .stream()
-                .map(this::toComponentDefinitionDTO)
-                .toList());
+    public List<ComponentDefinitionDTO> getComponentDefinitions(String name) {
+        return componentDefinitionRegistry.getComponentDefinitions(name)
+            .stream()
+            .map(this::toComponentDefinitionDTO)
+            .toList();
     }
 
     private ComponentDefinitionDTO toComponentDefinitionDTO(ComponentDefinition componentDefinition) {

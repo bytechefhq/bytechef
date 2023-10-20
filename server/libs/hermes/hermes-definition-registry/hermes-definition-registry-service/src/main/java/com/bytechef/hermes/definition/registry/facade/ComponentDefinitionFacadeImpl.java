@@ -23,7 +23,6 @@ import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.util.CollectionUtils;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
@@ -45,35 +44,35 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
     }
 
     @Override
-    public Mono<List<ComponentDefinitionDTO>> getComponentDefinitionsMono(
+    public List<ComponentDefinitionDTO> getComponentDefinitions(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
         Boolean triggerDefinitions) {
 
         List<Connection> connections = connectionService.getConnections();
 
-        return componentDefinitionService.getComponentDefinitionsMono()
-            .map(componentDefinitions -> componentDefinitions.stream()
-                .filter(componentDefinition -> {
-                    if (actionDefinitions != null && CollectionUtils.isEmpty(componentDefinition.actions())) {
-                        return false;
-                    }
+        return componentDefinitionService.getComponentDefinitions()
+            .stream()
+            .filter(componentDefinition -> {
+                if (actionDefinitions != null && CollectionUtils.isEmpty(componentDefinition.actions())) {
+                    return false;
+                }
 
-                    if (connectionDefinitions != null && componentDefinition.connection() == null) {
-                        return false;
-                    }
+                if (connectionDefinitions != null && componentDefinition.connection() == null) {
+                    return false;
+                }
 
-                    if (connectionInstances != null && noneMatch(connections, componentDefinition)) {
-                        return false;
-                    }
+                if (connectionInstances != null && noneMatch(connections, componentDefinition)) {
+                    return false;
+                }
 
-                    if (triggerDefinitions != null && CollectionUtils.isEmpty(componentDefinition.triggers())) {
-                        return false;
-                    }
+                if (triggerDefinitions != null && CollectionUtils.isEmpty(componentDefinition.triggers())) {
+                    return false;
+                }
 
-                    return true;
-                })
-                .distinct()
-                .toList());
+                return true;
+            })
+            .distinct()
+            .toList();
     }
 
     private static boolean noneMatch(List<Connection> connections, ComponentDefinitionDTO componentDefinition) {

@@ -89,10 +89,12 @@ public class JobController implements JobsApi {
     @Override
     public Mono<ResponseEntity<Flux<TaskExecutionModel>>> getJobTaskExecutions(
         Long jobId, ServerWebExchange exchange) {
-        return Mono.just(Flux.fromIterable(taskExecutionFacade.getJobTaskExecutions(jobId)
-            .stream()
-            .map(taskExecution -> conversionService.convert(taskExecution, TaskExecutionModel.class))
-            .toList()))
+        return Mono.just(
+            Flux.fromIterable(
+                taskExecutionFacade.getJobTaskExecutions(jobId)
+                    .stream()
+                    .map(taskExecution -> conversionService.convert(taskExecution, TaskExecutionModel.class))
+                    .toList()))
             .map(ResponseEntity::ok);
     }
 
@@ -100,8 +102,7 @@ public class JobController implements JobsApi {
     @SuppressWarnings("unchecked")
     public Mono<ResponseEntity<Page>> getJobs(Integer pageNumber, ServerWebExchange exchange) {
         return Mono.just(
-            jobService
-                .getJobs(pageNumber)
+            jobService.getJobs(pageNumber)
                 .map(job -> conversionService.convert(job, JobModel.class)))
             .map(ResponseEntity::ok);
     }

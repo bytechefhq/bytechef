@@ -26,7 +26,6 @@ import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -162,27 +161,15 @@ public class TriggerDefinitionServiceRSocketClient extends AbstractRSocketClient
     }
 
     @Override
-    public Mono<TriggerDefinitionDTO> getTriggerDefinitionMono(
-        String triggerName, String componentName, int componentVersion) {
-
-        return getRSocketRequester(componentName)
-            .route("TriggerDefinitionService.getTriggerDefinition")
-            .data(
-                Map.of(
-                    "componentName", componentName, "componentVersion", componentVersion,
-                    "triggerName", triggerName))
-            .retrieveMono(TriggerDefinitionDTO.class);
-    }
-
-    @Override
-    public Mono<List<TriggerDefinitionDTO>> getTriggerDefinitions(
+    public List<TriggerDefinitionDTO> getTriggerDefinitions(
         String componentName, int componentVersion) {
 
-        return getRSocketRequester(componentName)
-            .route("TriggerDefinitionService.getTriggerDefinitions")
-            .data(
-                Map.of("componentName", componentName, "componentVersion", componentVersion))
-            .retrieveMono(new ParameterizedTypeReference<>() {});
+        return MonoUtils.get(
+            getRSocketRequester(componentName)
+                .route("TriggerDefinitionService.getTriggerDefinitions")
+                .data(
+                    Map.of("componentName", componentName, "componentVersion", componentVersion))
+                .retrieveMono(new ParameterizedTypeReference<>() {}));
     }
 
     private record DynamicWebhookDisable(

@@ -56,20 +56,23 @@ public class TriggerDefinitionServiceRSocketController {
     public Mono<DynamicWebhookEnableOutput> executeDynamicWebhookEnable(
         DynamicWebhookEnable dynamicWebhookEnable) {
 
-        return Mono.just(triggerDefinitionService.executeDynamicWebhookEnable(
-            dynamicWebhookEnable.triggerName, dynamicWebhookEnable.componentName, dynamicWebhookEnable.componentVersion,
-            dynamicWebhookEnable.connectionParameters, dynamicWebhookEnable.authorizationName,
-            dynamicWebhookEnable.triggerParameters, dynamicWebhookEnable.webhookUrl,
-            dynamicWebhookEnable.workflowExecutionId));
+        return Mono.just(
+            triggerDefinitionService.executeDynamicWebhookEnable(
+                dynamicWebhookEnable.triggerName, dynamicWebhookEnable.componentName,
+                dynamicWebhookEnable.componentVersion,
+                dynamicWebhookEnable.connectionParameters, dynamicWebhookEnable.authorizationName,
+                dynamicWebhookEnable.triggerParameters, dynamicWebhookEnable.webhookUrl,
+                dynamicWebhookEnable.workflowExecutionId));
     }
 
     @MessageMapping("TriggerDefinitionService.executeDynamicWebhookRefresh")
     public Mono<DynamicWebhookEnableOutput> executeDynamicWebhookRefresh(
         DynamicWebhookRefresh dynamicWebhookRefresh) {
 
-        return Mono.just(triggerDefinitionService.executeDynamicWebhookRefresh(
-            dynamicWebhookRefresh.componentName, dynamicWebhookRefresh.componentVersion,
-            dynamicWebhookRefresh.triggerName, dynamicWebhookRefresh.output));
+        return Mono.just(
+            triggerDefinitionService.executeDynamicWebhookRefresh(
+                dynamicWebhookRefresh.componentName, dynamicWebhookRefresh.componentVersion,
+                dynamicWebhookRefresh.triggerName, dynamicWebhookRefresh.output));
     }
 
     @MessageMapping("TriggerDefinitionFacade.executeListenerDisable")
@@ -94,14 +97,17 @@ public class TriggerDefinitionServiceRSocketController {
 
     @MessageMapping("TriggerDefinitionService.getTriggerDefinition")
     public Mono<TriggerDefinitionDTO> getTriggerDefinitionMono(Map<String, Object> map) {
-        return triggerDefinitionService.getTriggerDefinitionMono(
-            (String) map.get("triggerName"), (String) map.get("componentName"), (Integer) map.get("componentVersion"));
+        return Mono.just(
+            triggerDefinitionService.getTriggerDefinition(
+                (String) map.get("triggerName"), (String) map.get("componentName"),
+                (Integer) map.get("componentVersion")));
     }
 
     @MessageMapping("TriggerDefinitionService.getTriggerDefinitions")
     public Mono<List<TriggerDefinitionDTO>> getTriggerDefinitions(Map<String, Object> map) {
-        return triggerDefinitionService.getTriggerDefinitions(
-            (String) map.get("componentName"), (Integer) map.get("componentVersion"));
+        return Mono.just(
+            triggerDefinitionService.getTriggerDefinitions(
+                (String) map.get("componentName"), (Integer) map.get("componentVersion")));
     }
 
     private record DynamicWebhookDisable(

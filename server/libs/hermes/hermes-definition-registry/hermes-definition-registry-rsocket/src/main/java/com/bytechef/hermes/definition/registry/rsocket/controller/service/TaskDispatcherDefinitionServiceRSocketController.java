@@ -44,17 +44,18 @@ public class TaskDispatcherDefinitionServiceRSocketController {
 
     @MessageMapping("TaskDispatcherDefinitionService.getTaskDispatcherDefinition")
     public Mono<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitions(Map<String, Object> map) {
-        return taskDispatcherDefinitionService.getTaskDispatcherDefinitionMono(
-            (String) map.get("name"), (Integer) map.get("version"));
+        return Mono.just(
+            taskDispatcherDefinitionService.getTaskDispatcherDefinition(
+                (String) map.get("name"), (Integer) map.get("version")));
     }
 
     @MessageMapping("TaskDispatcherDefinitionService.getTaskDispatcherDefinitions")
     public Mono<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitions() {
-        return taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono();
+        return Mono.just(taskDispatcherDefinitionService.getTaskDispatcherDefinitions());
     }
 
     @MessageMapping("TaskDispatcherDefinitionService.getComponentDefinitionsForName")
     public Mono<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitions(String name) {
-        return taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono(name);
+        return Mono.just(taskDispatcherDefinitionService.getTaskDispatcherDefinitions(name));
     }
 }

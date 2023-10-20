@@ -1134,7 +1134,8 @@ components:
       type: "object"
       properties:
         loadPropertiesDependsOn:
-          description: "The list of property names on which value change the properties should load/reload."
+          description: "The list of property names on which value change the properties\
+            \ should load/reload."
           type: "array"
           items:
             type: "string"

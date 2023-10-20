@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.client.facade;
 
+import com.bytechef.commons.reactor.util.MonoUtils;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
@@ -24,7 +25,6 @@ import com.bytechef.hermes.definition.registry.rsocket.client.AbstractRSocketCli
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -41,65 +41,70 @@ public class ActionDefinitionFacadeRSocketClient extends AbstractRSocketClient i
     }
 
     @Override
-    public Mono<String> executeEditorDescription(
+    public String executeEditorDescription(
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         long connectionId) {
 
-        return getRSocketRequester(componentName)
-            .route("ActionDefinitionFacade.executeEditorDescription")
-            .data(new EditorDescription(
-                actionName, actionParameters, componentName, componentVersion, connectionId))
-            .retrieveMono(String.class);
+        return MonoUtils.get(
+            getRSocketRequester(componentName)
+                .route("ActionDefinitionFacade.executeEditorDescription")
+                .data(new EditorDescription(
+                    actionName, actionParameters, componentName, componentVersion, connectionId))
+                .retrieveMono(String.class));
     }
 
     @Override
-    public Mono<List<Option<?>>> executeOptions(
+    public List<Option<?>> executeOptions(
         String propertyName, String actionName, String componentName, int componentVersion,
         Map<String, Object> actionParameters, long connectionId) {
 
-        return getRSocketRequester(componentName)
-            .route("ActionDefinitionFacade.executeOptions")
-            .data(new Options(
-                actionName, actionParameters, componentName, componentVersion, connectionId,
-                propertyName))
-            .retrieveMono(new ParameterizedTypeReference<>() {});
+        return MonoUtils.get(
+            getRSocketRequester(componentName)
+                .route("ActionDefinitionFacade.executeOptions")
+                .data(new Options(
+                    actionName, actionParameters, componentName, componentVersion, connectionId,
+                    propertyName))
+                .retrieveMono(new ParameterizedTypeReference<>() {}));
     }
 
     @Override
-    public Mono<List<? extends Property<?>>> executeOutputSchema(
+    public List<? extends Property<?>> executeOutputSchema(
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         long connectionId) {
 
-        return getRSocketRequester(componentName)
-            .route("ActionDefinitionFacade.executeOutputSchema")
-            .data(new OutputSchema(
-                actionName, actionParameters, componentName, componentVersion, connectionId))
-            .retrieveMono(new ParameterizedTypeReference<>() {});
+        return MonoUtils.get(
+            getRSocketRequester(componentName)
+                .route("ActionDefinitionFacade.executeOutputSchema")
+                .data(new OutputSchema(
+                    actionName, actionParameters, componentName, componentVersion, connectionId))
+                .retrieveMono(new ParameterizedTypeReference<>() {}));
     }
 
     @Override
-    public Mono<List<? extends Property<?>>> executeDynamicProperties(
+    public List<? extends Property<?>> executeDynamicProperties(
         String propertyName, String actionName, String componentName, int componentVersion,
         Map<String, Object> actionParameters, long connectionId) {
 
-        return getRSocketRequester(componentName)
-            .route("ActionDefinitionFacade.executeProperties")
-            .data(new Properties(
-                actionName, actionParameters, componentName, componentVersion, connectionId,
-                propertyName))
-            .retrieveMono(new ParameterizedTypeReference<>() {});
+        return MonoUtils.get(
+            getRSocketRequester(componentName)
+                .route("ActionDefinitionFacade.executeProperties")
+                .data(new Properties(
+                    actionName, actionParameters, componentName, componentVersion, connectionId,
+                    propertyName))
+                .retrieveMono(new ParameterizedTypeReference<>() {}));
     }
 
     @Override
-    public Mono<Object> executeSampleOutput(
+    public Object executeSampleOutput(
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         long connectionId) {
 
-        return getRSocketRequester(componentName)
-            .route("ActionDefinitionFacade.executeSampleOutput")
-            .data(new SampleOutput(
-                actionName, actionParameters, componentName, componentVersion, connectionId))
-            .retrieveMono(new ParameterizedTypeReference<>() {});
+        return MonoUtils.get(
+            getRSocketRequester(componentName)
+                .route("ActionDefinitionFacade.executeSampleOutput")
+                .data(new SampleOutput(
+                    actionName, actionParameters, componentName, componentVersion, connectionId))
+                .retrieveMono(new ParameterizedTypeReference<>() {}));
     }
 
     private record EditorDescription(
