@@ -11,12 +11,6 @@
             <column name="status" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>
-            <column name="instance_id" type="BIGINT" autoIncrement="true">
-                <constraints nullable="false"/>
-            </column>
-            <column name="instance_type" type="INT">
-                <constraints nullable="false"/>
-            </column>
             <column name="workflow_id" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>

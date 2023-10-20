@@ -37,7 +37,7 @@ public class RemoteTriggerLifecycleFacadeController {
         value = "/execute-trigger-disable")
     public void executeTriggerDisable(TriggerRequest triggerRequest) {
         triggerLifecycleFacade.executeTriggerDisable(
-            triggerRequest.workflowId, triggerRequest.instanceId, triggerRequest.instanceType,
+            triggerRequest.workflowId, triggerRequest.type, triggerRequest.instanceId,
             triggerRequest.workflowTriggerName, triggerRequest.workflowTriggerType, triggerRequest.triggerParameters,
             triggerRequest.connectionId);
     }
@@ -47,14 +47,14 @@ public class RemoteTriggerLifecycleFacadeController {
         value = "/trigger-lifecycle-facade/execute-trigger-enable")
     public void executeTriggerEnable(TriggerRequest triggerRequest) {
         triggerLifecycleFacade.executeTriggerEnable(
-            triggerRequest.workflowId, triggerRequest.instanceId, triggerRequest.instanceType,
+            triggerRequest.workflowId, triggerRequest.type, triggerRequest.instanceId,
             triggerRequest.workflowTriggerName, triggerRequest.workflowTriggerType, triggerRequest.triggerParameters,
             triggerRequest.connectionId, triggerRequest.webhookUrl);
     }
 
     @SuppressFBWarnings("EI")
     public record TriggerRequest(
-        String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, long instanceId, int type, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
     }
 }

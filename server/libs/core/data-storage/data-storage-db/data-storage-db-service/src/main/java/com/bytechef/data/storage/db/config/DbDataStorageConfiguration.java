@@ -55,18 +55,27 @@ public class DbDataStorageConfiguration {
     private record DataStorageServiceImpl(DbDataStorageService dbDataStorageService) implements DataStorageService {
 
         @Override
-        public <T> Optional<T> fetch(String context, int scope, long scopeId, String key) {
-            return dbDataStorageService.fetch(context, scope, scopeId, key);
+        public <T> Optional<T> fetch(
+            String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
+            int type) {
+
+            return dbDataStorageService.fetch(componentName, componentVersion, actionName, scope, scopeId, key, type);
         }
 
         @Override
-        public <T> T get(String context, int scope, long scopeId, String key) {
-            return dbDataStorageService.get(context, scope, scopeId, key);
+        public <T> T get(
+            String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
+            int type) {
+
+            return dbDataStorageService.get(componentName, componentVersion, actionName, scope, scopeId, key, type);
         }
 
         @Override
-        public void put(String context, int scope, long scopeId, String key, Object value) {
-            dbDataStorageService.put(context, scope, scopeId, key, value);
+        public void put(
+            String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
+            int type, Object value) {
+
+            dbDataStorageService.put(componentName, componentVersion, actionName, scope, scopeId, key, type, value);
         }
     }
 }

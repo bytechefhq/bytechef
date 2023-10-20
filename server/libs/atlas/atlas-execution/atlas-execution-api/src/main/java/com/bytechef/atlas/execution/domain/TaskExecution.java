@@ -290,10 +290,6 @@ public final class TaskExecution
         return Collections.unmodifiableMap(metadata);
     }
 
-    public Object getMetadata(String key) {
-        return metadata.get(key);
-    }
-
     @JsonIgnore
     public String getName() {
         return workflowTask.getName();

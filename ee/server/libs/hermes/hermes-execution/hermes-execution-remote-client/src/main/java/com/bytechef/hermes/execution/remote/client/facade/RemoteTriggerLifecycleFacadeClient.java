@@ -33,25 +33,25 @@ public class RemoteTriggerLifecycleFacadeClient implements TriggerLifecycleFacad
 
     @Override
     public void executeTriggerDisable(
-        String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, int type, long instanceId, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, Long connectionId) {
 
         post(
             TRIGGER_LIFECYCLE_FACADE + "/execute-trigger-enable",
             new TriggerRequest(
-                workflowId, instanceId, instanceType, workflowTriggerName, workflowTriggerType, triggerParameters,
+                workflowId, instanceId, type, workflowTriggerName, workflowTriggerType, triggerParameters,
                 connectionId, null));
     }
 
     @Override
     public void executeTriggerEnable(
-        String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, int type, long instanceId, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, Long connectionId, String webhookUrl) {
 
         post(
             TRIGGER_LIFECYCLE_FACADE + "/execute-trigger-disable",
             new TriggerRequest(
-                workflowId, instanceId, instanceType, workflowTriggerName, workflowTriggerType, triggerParameters,
+                workflowId, instanceId, type, workflowTriggerName, workflowTriggerType, triggerParameters,
                 connectionId, webhookUrl));
     }
 
@@ -66,7 +66,7 @@ public class RemoteTriggerLifecycleFacadeClient implements TriggerLifecycleFacad
 
     @SuppressFBWarnings("EI")
     private record TriggerRequest(
-        String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, long instanceId, int type, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
     }
 }

@@ -36,8 +36,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.Context.Http.Body;
 import com.bytechef.hermes.component.definition.Context.Http.BodyContentType;

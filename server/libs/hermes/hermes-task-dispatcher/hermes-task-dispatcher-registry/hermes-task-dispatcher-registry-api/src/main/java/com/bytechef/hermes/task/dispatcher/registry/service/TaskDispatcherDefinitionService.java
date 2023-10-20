@@ -16,13 +16,17 @@
 
 package com.bytechef.hermes.task.dispatcher.registry.service;
 
+import com.bytechef.hermes.registry.domain.ValueProperty;
 import com.bytechef.hermes.task.dispatcher.registry.domain.TaskDispatcherDefinition;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public interface TaskDispatcherDefinitionService {
+
+    List<? extends ValueProperty<?>> executeOutputSchema(String name, int version, Map<String, Object> inputParameters);
 
     TaskDispatcherDefinition getTaskDispatcherDefinition(String name, Integer version);
 

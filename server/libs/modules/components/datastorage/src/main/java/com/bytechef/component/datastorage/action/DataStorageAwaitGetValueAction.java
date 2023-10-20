@@ -20,15 +20,13 @@ import static com.bytechef.component.datastorage.constant.DataStorageConstants.K
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE_OPTIONS;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.TIMEOUT;
-import static com.bytechef.component.datastorage.constant.DataStorageConstants.VALUE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.any;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.definition.ParameterMap;
 
 /**
@@ -56,11 +54,7 @@ public class DataStorageAwaitGetValueAction {
                 .minValue(1)
                 .maxValue(300)
                 .required(true))
-        .outputSchema(
-            object()
-                .properties(
-                    any(VALUE),
-                    integer(TIMEOUT)))
+        .outputSchema(getOutputSchemaFunction())
         .perform(DataStorageAwaitGetValueAction::perform);
 
     protected static Object perform(
@@ -69,5 +63,14 @@ public class DataStorageAwaitGetValueAction {
         // TODO
 
         return null;
+    }
+
+    protected static OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (inputParameters, connectionParameters, context) -> null;
+//        object()
+//            .properties(
+//                any(VALUE),
+//                integer(TIMEOUT)))
     }
 }

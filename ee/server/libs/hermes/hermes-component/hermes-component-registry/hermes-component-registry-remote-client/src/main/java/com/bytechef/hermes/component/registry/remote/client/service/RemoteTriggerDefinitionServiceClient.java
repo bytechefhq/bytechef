@@ -9,6 +9,7 @@ package com.bytechef.hermes.component.registry.remote.client.service;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.webclient.DefaultWebClient;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.registry.ComponentOperation;
@@ -49,99 +50,104 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
 
     @Override
     public void executeDynamicWebhookDisable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, Map<String, ?> outputParameters, ComponentConnection connection,
-        TriggerContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
+        @NonNull Map<String, ?> outputParameters, ComponentConnection connection, @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<? extends ValueProperty<?>> executeDynamicProperties(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String propertyName, ComponentConnection connection,
-        TriggerContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, ComponentConnection connection,
+        @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
-        String componentName, int componentVersion, String triggerName,
-        Map<String, ?> inputParameters, String webhookUrl, String workflowExecutionId, ComponentConnection connection,
-        TriggerContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String webhookUrl, @NonNull String workflowExecutionId,
+        ComponentConnection connection, @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> outputParameters,
-        TriggerContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> outputParameters, @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public String executeEditorDescription(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
-        ComponentConnection connection, TriggerContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> triggerParameters, ComponentConnection connection, @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void executeListenerDisable(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, ComponentConnection connection, TriggerContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, ComponentConnection connection,
+        @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void executeOnEnableListener(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String workflowExecutionId, ComponentConnection connection, TriggerContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, ComponentConnection connection,
+        @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Option> executeOptions(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String propertyName, String searchText, ComponentConnection connection, TriggerContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, String searchText,
+        ComponentConnection connection, @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<? extends ValueProperty<?>> executeOutputSchema(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        ComponentConnection connection, TriggerContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Object executeSampleOutput(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        ComponentConnection connection, TriggerContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public TriggerOutput executeTrigger(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        Object triggerState, WebhookRequest webhookRequest, ComponentConnection connection, TriggerContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, Object triggerState, @NonNull WebhookRequest webhookRequest,
+        ComponentConnection connection, @NonNull TriggerContext context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean executeWebhookValidate(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        WebhookRequest webhookRequest, ComponentConnection connection, TriggerContext context) {
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
+        @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest, ComponentConnection connection,
+        @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
@@ -170,7 +176,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public List<TriggerDefinition> getTriggerDefinitions(List<ComponentOperation> componentOperations) {
+    public List<TriggerDefinition> getTriggerDefinitions(@NonNull List<ComponentOperation> componentOperations) {
         return CollectionUtils.map(
             componentOperations,
             componentOperation -> getTriggerDefinition(

@@ -48,14 +48,15 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
 
     @Override
     public ApplyResponse executeAuthorizationApply(
-        String componentName, ComponentConnection connection, Context context) {
+        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public AuthorizationCallbackResponse executeAuthorizationCallback(
-        String componentName, ComponentConnection connection, Context context, String redirectUri) {
+        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context,
+        @NonNull String redirectUri) {
 
         throw new UnsupportedOperationException();
     }
@@ -66,13 +67,14 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     }
 
     @Override
-    public Optional<String> executeBaseUri(String componentName, ComponentConnection connection, Context context) {
+    public Optional<String> executeBaseUri(
+        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        String componentName, ComponentConnection connection, Context context) {
+        @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
 
         throw new UnsupportedOperationException();
     }

@@ -20,7 +20,6 @@ import static com.bytechef.component.filestorage.constant.FileStorageConstants.F
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -37,7 +36,7 @@ public class FileStorageReadActionTest {
     @Disabled
     @Test
     public void testPerformRead() {
-        Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
+        ActionContext.FileEntry fileEntry = Mockito.mock(ActionContext.FileEntry.class);
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
         Mockito.when(parameterMap.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
@@ -45,8 +44,8 @@ public class FileStorageReadActionTest {
 
         FileStorageReadAction.perform(parameterMap, parameterMap, context);
 
-        ArgumentCaptor<Context.FileEntry> fileEntryArgumentCaptor =
-            ArgumentCaptor.forClass(Context.FileEntry.class);
+        ArgumentCaptor<ActionContext.FileEntry> fileEntryArgumentCaptor =
+            ArgumentCaptor.forClass(ActionContext.FileEntry.class);
 
         Mockito.verify(context)
             .file(file -> file.readToString(fileEntryArgumentCaptor.capture()));

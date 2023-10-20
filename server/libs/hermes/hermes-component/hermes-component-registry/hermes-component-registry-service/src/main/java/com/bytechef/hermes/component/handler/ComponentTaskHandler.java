@@ -53,8 +53,11 @@ public class ComponentTaskHandler implements TaskHandler<Object> {
 
         try {
             return actionDefinitionFacade.executePerform(
-                componentName, componentVersion, actionName, Validate.notNull(taskExecution.getId(), "id"),
-                taskExecution.getParameters(),
+                componentName, componentVersion, actionName,
+                MapUtils.getInteger(taskExecution.getMetadata(), MetadataConstants.TYPE, 0),
+                MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.INSTANCE_ID),
+                MapUtils.getString(taskExecution.getMetadata(), MetadataConstants.WORKFLOW_ID),
+                Validate.notNull(taskExecution.getId(), "id"), taskExecution.getParameters(),
                 OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);

@@ -7,13 +7,19 @@
 
 package com.bytechef.hermes.task.dispatcher.registry.remote.web.rest.service;
 
+import com.bytechef.hermes.registry.domain.ValueProperty;
 import com.bytechef.hermes.task.dispatcher.registry.domain.TaskDispatcherDefinition;
 import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,6 +41,20 @@ public class RemoteTaskDispatcherDefinitionServiceController {
         TaskDispatcherDefinitionService taskDispatcherDefinitionService) {
 
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/execute-output-schema",
+        consumes = {
+            "application/json"
+        })
+    public ResponseEntity<List<? extends ValueProperty<?>>> executeOutputSchema(
+        @Valid @RequestBody OutputSchemaRequest outputSchemaRequest) {
+
+        return ResponseEntity.ok(
+            taskDispatcherDefinitionService.executeOutputSchema(
+                outputSchemaRequest.name, outputSchemaRequest.version, outputSchemaRequest.taskDispatcherParameters));
     }
 
     @RequestMapping(
@@ -69,5 +89,9 @@ public class RemoteTaskDispatcherDefinitionServiceController {
         @PathVariable("name") String name) {
 
         return ResponseEntity.ok(taskDispatcherDefinitionService.getTaskDispatcherDefinitionVersions(name));
+    }
+
+    @SuppressFBWarnings("EI")
+    public record OutputSchemaRequest(@NotNull String name, int version, Map<String, Object> taskDispatcherParameters) {
     }
 }

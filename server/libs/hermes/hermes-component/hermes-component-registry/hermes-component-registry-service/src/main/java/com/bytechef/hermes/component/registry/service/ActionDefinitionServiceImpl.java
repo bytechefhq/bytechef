@@ -22,6 +22,7 @@ import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.EditorDescriptionDataSource;
 import com.bytechef.hermes.component.definition.EditorDescriptionDataSource.EditorDescriptionFunction;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
@@ -62,7 +63,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public List<? extends ValueProperty<?>> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
+        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull Context context) {
 
         ComponentPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
             componentName, componentVersion, actionName, propertyName);
@@ -81,7 +82,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
+        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull Context context) {
 
         EditorDescriptionFunction editorDescriptionFunction = getEditorDescriptionFunction(
             componentName, componentVersion, actionName);
@@ -95,7 +96,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, String searchText, ComponentConnection connection,
-        @NonNull ActionContext context) {
+        @NonNull Context context) {
 
         ComponentOptionsFunction optionsFunction = getComponentOptionsFunction(
             componentName, componentVersion, actionName, propertyName);
@@ -110,7 +111,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public List<? extends ValueProperty<?>> executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
+        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull Context context) {
 
         OutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(
             componentName, componentVersion, actionName);
@@ -139,7 +140,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     @Override
     public Object executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> actionParameters, ComponentConnection connection, @NonNull ActionContext context) {
+        @NonNull Map<String, ?> actionParameters, ComponentConnection connection, @NonNull Context context) {
 
         SampleOutputFunction sampleOutputFunction = getSampleOutputFunction(
             componentName, componentVersion, actionName);
@@ -225,8 +226,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName()));
     }
 
-    private OutputSchemaFunction
-        getOutputSchemaFunction(String componentName, int componentVersion, String actionName) {
+    private OutputSchemaFunction getOutputSchemaFunction(
+        String componentName, int componentVersion, String actionName) {
+
         com.bytechef.hermes.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(
                 componentName, componentVersion, actionName);

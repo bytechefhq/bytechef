@@ -18,10 +18,12 @@ package com.bytechef.hermes.component.definition.factory;
 
 import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
+import com.bytechef.hermes.component.definition.ActionContextImpl;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ContextImpl;
 import com.bytechef.hermes.component.definition.HttpClientExecutor;
+import com.bytechef.hermes.component.definition.TriggerContextImpl;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,27 +62,23 @@ public class ContextFactory {
     }
 
     public ActionContext createActionContext(
-        @NonNull String componentName, @Nullable ComponentConnection connection, @NonNull Long taskExecutionId) {
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, int type,
+        @Nullable Long instanceId, @Nullable String workflowId, @NonNull Long taskExecutionId,
+        @Nullable ComponentConnection connection) {
 
-        return createContextImpl(componentName, connection, taskExecutionId);
-    }
-
-    public ActionContext createActionContext(@NonNull String componentName, @Nullable ComponentConnection connection) {
-        return createContextImpl(componentName, connection, null);
+        return new ActionContextImpl(
+            componentName, componentVersion, actionName, instanceId, type, workflowId, taskExecutionId,
+            connection, dataStorageService, eventPublisher, fileStorageService, httpClientExecutor, objectMapper,
+            xmlMapper);
     }
 
     public Context createContext(@NonNull String componentName, @Nullable ComponentConnection connection) {
-        return createContextImpl(componentName, connection, null);
+        return new ContextImpl(componentName, connection, httpClientExecutor, objectMapper, xmlMapper);
     }
 
-    public TriggerContext
-        createTriggerContext(@NonNull String componentName, @Nullable ComponentConnection connection) {
-        return createContextImpl(componentName, connection, null);
-    }
+    public TriggerContext createTriggerContext(
+        @NonNull String componentName, @Nullable ComponentConnection connection) {
 
-    private ContextImpl createContextImpl(String componentName, ComponentConnection connection, Long taskExecutionId) {
-        return new ContextImpl(
-            eventPublisher, componentName, connection, dataStorageService, objectMapper, fileStorageService,
-            httpClientExecutor, taskExecutionId, xmlMapper);
+        return new TriggerContextImpl(componentName, connection, httpClientExecutor, objectMapper, xmlMapper);
     }
 }

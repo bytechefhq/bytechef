@@ -22,6 +22,7 @@ import static com.bytechef.component.webhook.constant.WebhookConstants.HEADERS;
 import static com.bytechef.component.webhook.constant.WebhookConstants.METHOD;
 import static com.bytechef.component.webhook.constant.WebhookConstants.PARAMETERS;
 
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.hermes.component.definition.TriggerDefinition.HttpParameters;
@@ -64,7 +65,7 @@ public class WebhookUtils {
     public static WebhookValidateFunction getWebhookValidateFunction() {
         return (
             ParameterMap inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
-            WebhookMethod method, TriggerContext triggerContext) -> Objects.equals(
+            WebhookMethod method, Context triggerContext) -> Objects.equals(
                 getCsrfToken(headers), inputParameters.getRequiredString(CSRF_TOKEN));
     }
 

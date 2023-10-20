@@ -20,7 +20,6 @@ import static com.bytechef.component.var.constant.VarConstants.SET;
 import static com.bytechef.component.var.constant.VarConstants.TYPE;
 import static com.bytechef.component.var.constant.VarConstants.VALUE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.any;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.date;
@@ -35,6 +34,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.time;
 
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.definition.ParameterMap;
 
 /**
@@ -110,12 +110,17 @@ public class VarSetAction {
                 .description("Value of any type to set.")
                 .displayCondition("type === 10")
                 .required(true))
-        .outputSchema(any())
+        .outputSchema(getOutputSchemaFunction())
         .perform(VarSetAction::perform);
 
     protected static Object perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
 
         return inputParameters.getRequired(VALUE);
+    }
+
+    protected static OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (inputParameters, connectionParameters, context) -> null;
     }
 }

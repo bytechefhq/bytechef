@@ -24,10 +24,10 @@ import java.util.Map;
 public interface TriggerLifecycleFacade {
 
     void executeTriggerDisable(
-        String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, int type, long instanceId, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, Long connectionId);
 
     void executeTriggerEnable(
-        String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, int type, long instanceId, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, Long connectionId, String webhookUrl);
 }

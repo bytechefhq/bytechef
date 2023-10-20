@@ -31,9 +31,9 @@ import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.FileEntry;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.io.InputStream;

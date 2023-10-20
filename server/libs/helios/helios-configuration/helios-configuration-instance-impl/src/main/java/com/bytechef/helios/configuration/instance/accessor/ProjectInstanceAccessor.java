@@ -64,7 +64,7 @@ public class ProjectInstanceAccessor implements InstanceAccessor {
     }
 
     @Override
-    public int getInstanceType() {
+    public int getType() {
         return ProjectConstants.PROJECT_TYPE;
     }
 }

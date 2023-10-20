@@ -26,25 +26,25 @@ import org.apache.commons.lang3.Validate;
 public class WorkflowExecutionId implements Serializable {
 
     private long instanceId;
-    private int instanceType;
+    private int type;
     private String workflowId;
     private String triggerName;
 
     private WorkflowExecutionId() {
     }
 
-    private WorkflowExecutionId(int instanceType, long instanceId, String workflowId, String triggerName) {
+    private WorkflowExecutionId(int type, long instanceId, String workflowId, String triggerName) {
         this.instanceId = instanceId;
-        this.instanceType = instanceType;
         this.triggerName = triggerName;
+        this.type = type;
         this.workflowId = workflowId;
     }
 
-    public static WorkflowExecutionId of(int instanceType, long instanceId, String workflowId, String triggerName) {
+    public static WorkflowExecutionId of(int type, long instanceId, String workflowId, String triggerName) {
         Validate.notBlank(workflowId, "'workflowId' must not be null");
         Validate.notBlank(triggerName, "'workflowTriggerName' must not be null");
 
-        return new WorkflowExecutionId(instanceType, instanceId, workflowId, triggerName);
+        return new WorkflowExecutionId(type, instanceId, workflowId, triggerName);
     }
 
     public static WorkflowExecutionId parse(String id) {
@@ -59,8 +59,8 @@ public class WorkflowExecutionId implements Serializable {
         return instanceId;
     }
 
-    public int getInstanceType() {
-        return instanceType;
+    public int getType() {
+        return type;
     }
 
     public String getWorkflowId() {
@@ -74,7 +74,7 @@ public class WorkflowExecutionId implements Serializable {
     @Override
     public String toString() {
         return EncodingUtils.encodeBase64ToString(
-            instanceType +
+            type +
                 ":" +
                 instanceId +
                 ":" +

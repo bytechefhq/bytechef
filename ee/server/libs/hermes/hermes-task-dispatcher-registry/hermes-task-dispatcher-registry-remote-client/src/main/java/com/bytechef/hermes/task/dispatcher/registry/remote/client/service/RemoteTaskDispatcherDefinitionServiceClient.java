@@ -8,10 +8,12 @@
 package com.bytechef.hermes.task.dispatcher.registry.remote.client.service;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.hermes.registry.domain.ValueProperty;
 import com.bytechef.hermes.task.dispatcher.registry.domain.TaskDispatcherDefinition;
 import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +33,20 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
     @SuppressFBWarnings("EI")
     public RemoteTaskDispatcherDefinitionServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
         this.loadBalancedWebClient = loadBalancedWebClient;
+    }
+
+    @Override
+    public List<? extends ValueProperty<?>> executeOutputSchema(
+        String name, int version, Map<String, Object> inputParameters) {
+
+        return loadBalancedWebClient.post(
+            uriBuilder -> uriBuilder
+                .host(COORDINATOR_APP)
+                .path(
+                    TASK_DISPATCHER_DEFINITION_SERVICE + "/execute-output-schema")
+                .build(),
+            new OutputSchemaRequest(name, version, inputParameters),
+            new ParameterizedTypeReference<>() {});
     }
 
     @Override
@@ -62,5 +78,8 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
                 .path(TASK_DISPATCHER_DEFINITION_SERVICE + "/get-task-dispatcher-definition-versions/{name}")
                 .build(name),
             new ParameterizedTypeReference<>() {});
+    }
+
+    private record OutputSchemaRequest(String name, int version, Map<String, ?> taskDispatcherParameters) {
     }
 }

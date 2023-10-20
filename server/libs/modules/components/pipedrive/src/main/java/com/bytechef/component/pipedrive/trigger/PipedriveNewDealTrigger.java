@@ -27,12 +27,12 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.hermes.component.definition.TriggerDefinition.HttpParameters;
-import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
@@ -256,14 +256,14 @@ public class PipedriveNewDealTrigger {
 
     protected static void dynamicWebhookDisable(
         Map<String, ?> inputParameters, ParameterMap connectionParameters, Map<String, ?> outputParameters,
-        String workflowExecutionId, TriggerContext context) {
+        String workflowExecutionId, Context context) {
 
         PipedriveUtils.unsubscribeWebhook((String) outputParameters.get("id"), context);
     }
 
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
         Map<String, ?> inputParameters, ParameterMap connectionParameters, String webhookUrl,
-        String workflowExecutionId, TriggerContext context) {
+        String workflowExecutionId, Context context) {
 
         return new DynamicWebhookEnableOutput(
             Map.of("id", PipedriveUtils.subscribeWebhook("deal", "added", webhookUrl, context)), null);
@@ -272,7 +272,7 @@ public class PipedriveNewDealTrigger {
     @SuppressWarnings("unchecked")
     protected static WebhookOutput dynamicWebhookRequest(
         ParameterMap inputParameters, ParameterMap connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, TriggerContext context) {
+        WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, Context context) {
 
         return WebhookOutput.map((Map<?, ?>) ((Map<String, ?>) body.content()).get("current"));
     }

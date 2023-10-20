@@ -8,19 +8,28 @@
                 <column name="id" type="BIGINT" autoIncrement="true">
                     <constraints primaryKey="true" nullable="false"/>
                 </column>
-                <column name="context" type="VARCHAR(256)">
+                <column name="component_name" type="VARCHAR(256)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="component_version" type="INT">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="action_name" type="VARCHAR(256)">
                     <constraints nullable="false"/>
                 </column>
                 <column name="scope" type="INT">
                     <constraints nullable="false"/>
                 </column>
-                <column name="scope_id" type="BIGINT">
+                <column name="scope_id" type="VARCHAR(256)">
                     <constraints nullable="true"/>
                 </column>
                 <column name="key" type="VARCHAR(256)">
                     <constraints nullable="false"/>
                 </column>
-                <column name="data" type="TEXT">
+                <column name="value" type="TEXT">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="type" type="INT">
                     <constraints nullable="false"/>
                 </column>
                 <column name="created_date" type="TIMESTAMP">

@@ -83,18 +83,27 @@ public class GitWorkflowRepository implements WorkflowRepository {
     @Override
     public Optional<Workflow> findById(String id) {
         synchronized (this) {
-            WorkflowResource resource = gitWorkflowOperationsMap.keySet()
+            return gitWorkflowOperationsMap.keySet()
                 .stream()
                 .map(type -> {
+                    Workflow workflow = null;
+
                     GitWorkflowOperations gitWorkflowOperations = gitWorkflowOperationsMap.get(type);
 
-                    return gitWorkflowOperations.getFile(decode(id));
+                    String fileId = decode(id);
+
+                    if (fileId != null) {
+                        WorkflowResource workflowResource = gitWorkflowOperations.getFile(fileId);
+
+                        if (workflowResource != null) {
+                            workflow = readWorkflow(workflowResource, type);
+                        }
+                    }
+
+                    return workflow;
                 })
                 .filter(Objects::nonNull)
-                .findFirst()
-                .orElse(null);
-
-            return Optional.ofNullable(resource == null ? null : readWorkflow(resource, 0));
+                .findFirst();
         }
     }
 
@@ -111,14 +120,24 @@ public class GitWorkflowRepository implements WorkflowRepository {
 
             workflow.setId(encode(Validate.notNull(workflow.getId(), "id")));
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            if (logger.isDebugEnabled()) {
+                logger.debug(e.getMessage());
+            }
         }
 
         return workflow;
     }
 
     private static String decode(String str) {
-        return EncodingUtils.decodeBase64ToString(str);
+        try {
+            return EncodingUtils.decodeBase64ToString(str);
+        } catch (IllegalArgumentException e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(e.getMessage());
+            }
+        }
+
+        return null;
     }
 
     private static String encode(String id) {

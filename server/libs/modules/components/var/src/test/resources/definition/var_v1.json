@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Assign value to a variable that can be used in the following steps.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "set",
@@ -270,27 +269,15 @@
       "optionsDataSource": null,
       "controlType": "TIME"
     } ],
+    "sampleOutput": null,
     "title": "Set value",
-    "outputSchema": {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "ANY",
-      "defaultValue": null,
-      "exampleValue": null,
-      "controlType": null
+    "editorDescriptionDataSource": null,
+    "outputSchema": null,
+    "outputSchemaDataSource": {
+      "outputSchema": { }
     },
-    "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "perform": { }
   } ],
   "category": null,
   "connection": null,
@@ -299,11 +286,11 @@
   "description": "Sets a value which can then be referenced in other tasks.",
   "icon": "path:assets/var.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "var",
   "resources": null,
   "version": 1,
   "title": "Var",
-  "triggers": null
+  "triggers": null,
+  "filterCompatibleConnections": null
 }

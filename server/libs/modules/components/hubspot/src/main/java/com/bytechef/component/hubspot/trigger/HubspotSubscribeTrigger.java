@@ -23,6 +23,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.Context.Http.Body;
 import com.bytechef.hermes.component.definition.ParameterMap;
@@ -30,7 +31,6 @@ import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.hermes.component.definition.TriggerDefinition.HttpParameters;
-import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
@@ -150,7 +150,7 @@ public class HubspotSubscribeTrigger {
 
     protected static void dynamicWebhookDisable(
         ParameterMap inputParameters, ParameterMap connectionParameters, Map<String, ?> outputParameters,
-        String workflowExecutionId, TriggerContext context) {
+        String workflowExecutionId, Context context) {
 
         context
             .http(http -> http.delete("/webhooks/v3/%s/settings".formatted(inputParameters.getString(APP_ID))))
@@ -160,7 +160,7 @@ public class HubspotSubscribeTrigger {
     @SuppressFBWarnings("RV")
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
         ParameterMap inputParameters, ParameterMap connectionParameters, String webhookUrl, String workflowExecutionId,
-        TriggerContext context) {
+        Context context) {
 
         context
             .http(http -> http.put("/webhooks/v3/%s/settings".formatted(inputParameters.getString(APP_ID))))
@@ -190,7 +190,7 @@ public class HubspotSubscribeTrigger {
     protected static WebhookOutput dynamicWebhookRequest(
         Map<String, ?> inputParameters, ParameterMap connectionParameters, HttpHeaders headers,
         HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
-        TriggerContext context) {
+        Context context) {
 
         return WebhookOutput.list((List<Map<?, ?>>) body.content());
     }

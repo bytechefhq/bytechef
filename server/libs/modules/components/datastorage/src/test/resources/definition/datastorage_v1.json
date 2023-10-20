@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Append value to the end of a list. If the list does not exist, it will be created.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "appendValueToList",
@@ -48,8 +47,8 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The identifier of a list must be unique within the chosen scope, or a new value will overwrite the existing one.",
@@ -135,8 +134,8 @@
         "name": "Time",
         "value": 10
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -154,8 +153,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -197,8 +196,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE"
+      "controlType": "DATE",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -214,8 +213,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE_TIME"
+      "controlType": "DATE_TIME",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -233,8 +232,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -268,8 +267,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -289,8 +288,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under given key.",
@@ -324,8 +323,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "TIME"
+      "controlType": "TIME",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "When the specified list doesn't exist, it will be created with the provided value during the append operation.",
@@ -379,11 +378,12 @@
       } ],
       "controlType": "CHECKBOX"
     } ],
+    "sampleOutput": null,
     "title": "Append Value to List",
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -393,7 +393,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "The numeric value can be incremented atomically, and the action can be used concurrently from multiple executions.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "atomicIncrement",
@@ -452,8 +451,8 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value that can be added to the existing numeric value, which may have a negative value.",
@@ -471,11 +470,11 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Atomic Increment",
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -511,14 +510,15 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -528,7 +528,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "awaitGetValue",
@@ -587,8 +586,8 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "If a value is not found within the specified time, the action returns a null value. Therefore, the maximum wait time should be set accordingly.",
@@ -606,69 +605,17 @@
       "maxValue": 300,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Await Get Value",
-    "perform": { },
-    "outputSchema": {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "OBJECT",
-      "defaultValue": null,
-      "exampleValue": null,
-      "additionalProperties": null,
-      "multipleValues": null,
-      "objectType": null,
-      "options": null,
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "metadata": { },
-        "placeholder": null,
-        "required": null,
-        "name": "value",
-        "type": "ANY",
-        "defaultValue": null,
-        "exampleValue": null,
-        "controlType": null
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "metadata": { },
-        "placeholder": null,
-        "required": null,
-        "name": "timeout",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
-      } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+    "outputSchema": null,
+    "outputSchemaDataSource": {
+      "outputSchema": { }
     },
-    "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -678,7 +625,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Remove a value associated with a key in the specified scope.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "deleteValue",
@@ -737,14 +683,15 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Delete Value",
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -754,7 +701,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Delete a value from the given index in a list.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "deleteValueFromlist",
@@ -813,8 +759,8 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The specified index in the list will be removed, and if it doesn't exist, the list will remain unaltered.",
@@ -832,14 +778,15 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Delete Value from List",
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -849,7 +796,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Retrieve all the currently existing keys from storage, along with their values within the provided scope.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "getAllEntries",
@@ -890,16 +836,17 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Get All Entries(Keys and Values)",
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -909,7 +856,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Retrieve a previously assigned value within the specified scope using its corresponding key.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "getValue",
@@ -968,8 +914,8 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value type.",
@@ -1037,8 +983,8 @@
         "name": "Time",
         "value": 10
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -1056,8 +1002,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -1099,8 +1045,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE"
+      "controlType": "DATE",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -1116,8 +1062,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE_TIME"
+      "controlType": "DATE_TIME",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -1135,8 +1081,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -1170,8 +1116,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -1191,8 +1137,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
@@ -1226,16 +1172,17 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "TIME"
+      "controlType": "TIME",
+      "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Get Value",
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -1245,7 +1192,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Set a value under a key, in the specified scope.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "setValue",
@@ -1304,8 +1250,8 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value type.",
@@ -1373,8 +1319,8 @@
         "name": "Time",
         "value": 10
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1392,8 +1338,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1435,8 +1381,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE"
+      "controlType": "DATE",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1452,8 +1398,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE_TIME"
+      "controlType": "DATE_TIME",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1471,8 +1417,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1506,8 +1452,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1527,8 +1473,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1562,14 +1508,15 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "TIME"
+      "controlType": "TIME",
+      "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Set Value",
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -1579,7 +1526,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Set value under a specified index in a list.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "setValueInList",
@@ -1638,8 +1584,8 @@
         "name": "Account",
         "value": 4
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The index in a list to set a value under. The previous value will be overridden.",
@@ -1657,8 +1603,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value type.",
@@ -1726,8 +1672,8 @@
         "name": "Time",
         "value": 10
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
@@ -1745,8 +1691,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
@@ -1788,8 +1734,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE"
+      "controlType": "DATE",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
@@ -1805,8 +1751,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE_TIME"
+      "controlType": "DATE_TIME",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1824,8 +1770,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified key.",
@@ -1859,8 +1805,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
@@ -1880,8 +1826,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The value to set under the specified list's key.",
@@ -1915,14 +1861,15 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "TIME"
+      "controlType": "TIME",
+      "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Set Value in List",
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   } ],
   "category": null,
@@ -1932,11 +1879,11 @@
   "description": "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.",
   "icon": "path:assets/datastorage.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "dataStorage",
   "resources": null,
   "version": 1,
   "title": "Data Storage",
-  "triggers": null
+  "triggers": null,
+  "filterCompatibleConnections": null
 }

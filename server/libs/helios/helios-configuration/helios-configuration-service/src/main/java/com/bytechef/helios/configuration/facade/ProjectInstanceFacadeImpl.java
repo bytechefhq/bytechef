@@ -130,7 +130,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             new JobParameters(
                 workflowId, projectInstanceWorkflow.getInputs(),
                 Map.of(
-                    MetadataConstants.INSTANCE_ID, id, MetadataConstants.INSTANCE_TYPE,
+                    MetadataConstants.INSTANCE_ID, id, MetadataConstants.TYPE,
                     ProjectConstants.PROJECT_TYPE)));
     }
 
@@ -324,7 +324,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             triggerLifecycleFacade.executeTriggerDisable(
-                workflow.getId(), projectInstanceWorkflow.getProjectInstanceId(), ProjectConstants.PROJECT_TYPE,
+                workflow.getId(), ProjectConstants.PROJECT_TYPE, projectInstanceWorkflow.getProjectInstanceId(),
                 workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getParameters(),
                 getConnectionId(workflowTrigger));
         }
@@ -339,7 +339,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             triggerLifecycleFacade.executeTriggerEnable(
-                workflow.getId(), projectInstanceWorkflow.getProjectInstanceId(), ProjectConstants.PROJECT_TYPE,
+                workflow.getId(), ProjectConstants.PROJECT_TYPE, projectInstanceWorkflow.getProjectInstanceId(),
                 workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getParameters(),
                 getConnectionId(workflowTrigger), webhookUrl);
         }

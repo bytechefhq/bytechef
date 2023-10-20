@@ -26,7 +26,6 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.component.odsfile.OdsFileComponentHandlerTest;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
@@ -234,11 +233,11 @@ public class OdsFileReadActionTest {
     @SuppressFBWarnings("OBL")
     private ParameterMap getReadParameters(
         boolean headerRow, boolean includeEmptyCells, Integer pageNumber, Integer pageSize, boolean readAsString,
-        File file, ParameterMap parameterMap, Context context)
+        File file, ParameterMap parameterMap, ActionContext context)
         throws FileNotFoundException {
 
-        Mockito.when(parameterMap.getRequired(Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
-            .thenReturn(Mockito.mock(Context.FileEntry.class));
+        Mockito.when(parameterMap.getRequired(Mockito.eq(FILE_ENTRY), Mockito.eq(ActionContext.FileEntry.class)))
+            .thenReturn(Mockito.mock(ActionContext.FileEntry.class));
         Mockito.when(parameterMap.getBoolean(Mockito.eq(HEADER_ROW), Mockito.eq(true)))
             .thenReturn(headerRow);
         Mockito.when(parameterMap.getBoolean(Mockito.eq(INCLUDE_EMPTY_CELLS), Mockito.eq(false)))
@@ -252,7 +251,7 @@ public class OdsFileReadActionTest {
             .thenReturn(readAsString);
 
         if (file != null) {
-            Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(Context.FileEntry.class))))
+            Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(ActionContext.FileEntry.class))))
                 .thenReturn(new FileInputStream(file));
         }
 

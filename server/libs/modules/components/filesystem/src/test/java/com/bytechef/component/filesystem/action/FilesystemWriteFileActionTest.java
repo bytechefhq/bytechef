@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
@@ -45,11 +44,11 @@ public class FilesystemWriteFileActionTest {
         File file = getSampleFile();
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
-        Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(Context.FileEntry.class))))
+        Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(ActionContext.FileEntry.class))))
             .thenReturn(new FileInputStream(file));
 
         Mockito.when(parameterMap.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
-            .thenReturn(Mockito.mock(Context.FileEntry.class));
+            .thenReturn(Mockito.mock(ActionContext.FileEntry.class));
         Mockito.when(parameterMap.getRequiredString(Mockito.eq(FILENAME)))
             .thenReturn(file.getAbsolutePath());
 

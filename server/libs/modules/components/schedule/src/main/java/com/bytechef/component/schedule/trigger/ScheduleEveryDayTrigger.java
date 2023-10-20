@@ -29,9 +29,9 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
-import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
@@ -112,14 +112,14 @@ public class ScheduleEveryDayTrigger {
 
     protected void listenerDisable(
         ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
-        TriggerContext context) {
+        Context context) {
 
         triggerScheduler.cancelScheduleTrigger(workflowExecutionId);
     }
 
     protected void listenerEnable(
         ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
-        ListenerEmitter listenerEmitter, TriggerContext context) {
+        ListenerEmitter listenerEmitter, Context context) {
 
         triggerScheduler.scheduleScheduleTrigger(
             "0 %s %s ? * %s".formatted(

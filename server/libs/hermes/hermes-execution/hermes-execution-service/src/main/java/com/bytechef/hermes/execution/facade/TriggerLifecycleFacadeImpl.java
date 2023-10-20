@@ -55,7 +55,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
     @Override
     public void executeTriggerDisable(
-        String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, int type, long instanceId, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, Long connectionId) {
 
         ComponentOperation componentOperation = ComponentOperation.ofType(workflowTriggerType);
@@ -65,7 +65,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
             componentOperation.operationName());
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            instanceType, instanceId, workflowId, workflowTriggerName);
+            type, instanceId, workflowId, workflowTriggerName);
 
         DynamicWebhookEnableOutput output = OptionalUtils.orElse(
             triggerStateService.fetchValue(workflowExecutionId), null);
@@ -97,7 +97,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
     @Override
     public void executeTriggerEnable(
-        String workflowId, long instanceId, int instanceType, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, int type, long instanceId, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, Long connectionId, String webhookUrl) {
 
         ComponentOperation componentOperation = ComponentOperation.ofType(workflowTriggerType);
@@ -107,7 +107,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
             componentOperation.operationName());
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            instanceType, instanceId, workflowId, workflowTriggerName);
+            type, instanceId, workflowId, workflowTriggerName);
 
         switch (triggerDefinition.getType()) {
             case HYBRID, DYNAMIC_WEBHOOK -> {

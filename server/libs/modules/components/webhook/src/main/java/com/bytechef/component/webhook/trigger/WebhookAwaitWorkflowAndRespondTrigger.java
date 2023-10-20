@@ -16,15 +16,9 @@
 
 package com.bytechef.component.webhook.trigger;
 
-import static com.bytechef.component.webhook.constant.WebhookConstants.BODY;
 import static com.bytechef.component.webhook.constant.WebhookConstants.CSRF_TOKEN;
-import static com.bytechef.component.webhook.constant.WebhookConstants.HEADERS;
-import static com.bytechef.component.webhook.constant.WebhookConstants.METHOD;
-import static com.bytechef.component.webhook.constant.WebhookConstants.PARAMETERS;
 import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
-import static com.bytechef.hermes.definition.DefinitionDSL.any;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.component.webhook.util.WebhookUtils;
@@ -59,11 +53,12 @@ public class WebhookAwaitWorkflowAndRespondTrigger {
 
     protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (inputParameters, connectionParameters, context) -> object()
-            .properties(
-                string(METHOD),
-                object(HEADERS),
-                object(PARAMETERS),
-                any(BODY));
+        return (inputParameters, connectionParameters, context) -> null;
+//            object()
+//            .properties(
+//                string(METHOD),
+//                object(HEADERS),
+//                object(PARAMETERS),
+//                any(BODY));
     }
 }

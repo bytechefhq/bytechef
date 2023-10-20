@@ -37,29 +37,32 @@ public class RemoteDbDataStorageServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/fetch-value/{context}/{scope}/{scopeId}/{key}",
+        value = "/fetch-value/{componentName}/{componentVersion}/{actionName}/{scope}/{scopeId}/{key}/{type}",
         consumes = {
             "application/json"
         })
     public ResponseEntity<Object> fetchValue(
-        @PathVariable String context, @PathVariable int scope, @PathVariable long scopeId,
-        @PathVariable String key) {
+        @PathVariable String componentName, @PathVariable int componentVersion, @PathVariable String actionName,
+        @PathVariable int scope, @PathVariable String scopeId, @PathVariable String key,
+        @PathVariable int type) {
 
         return ResponseEntity.ok(
-            OptionalUtils.orElse(dataStorageService.fetch(context, scope, scopeId, key), null));
+            OptionalUtils.orElse(dataStorageService.fetch(
+                componentName, componentVersion, actionName, scope, scopeId, key, type), null));
     }
 
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/save/{context}/{scope}/{scopeId}/{key}",
+        value = "/save/{componentName}/{componentVersion}/{actionName}/{scope}/{scopeId}/{key}/{type}",
         consumes = {
             "application/json"
         })
     public ResponseEntity<Void> save(
-        @PathVariable String context, @PathVariable int scope, @PathVariable long scopeId,
-        @PathVariable String key, @RequestBody Object data) {
+        @PathVariable String componentName, @PathVariable int componentVersion, @PathVariable String actionName,
+        @PathVariable int scope, @PathVariable String scopeId, @PathVariable String key,
+        @PathVariable int type, @RequestBody Object data) {
 
-        dataStorageService.put(context, scope, scopeId, key, data);
+        dataStorageService.put(componentName, componentVersion, actionName, scope, scopeId, key, type, data);
 
         return ResponseEntity.noContent()
             .build();

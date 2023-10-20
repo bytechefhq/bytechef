@@ -104,13 +104,13 @@ public class DefinitionRegistryConfiguration {
 
         @Override
         public Authorization.AuthorizationType getAuthorizationType(
-            String componentName, int connectionVersion, String authorizationName) {
+            @NonNull String componentName, int connectionVersion, @NonNull String authorizationName) {
 
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public ConnectionDefinition getConnectionDefinition(String componentName, int componentVersion) {
+        public ConnectionDefinition getConnectionDefinition(@NonNull String componentName, int componentVersion) {
             throw new UnsupportedOperationException();
         }
 
@@ -120,7 +120,8 @@ public class DefinitionRegistryConfiguration {
         }
 
         @Override
-        public List<ConnectionDefinition> getConnectionDefinitions(String componentName, Integer componentVersion) {
+        public List<ConnectionDefinition>
+            getConnectionDefinitions(@NonNull String componentName, @NonNull Integer componentVersion) {
             throw new UnsupportedOperationException();
         }
     }

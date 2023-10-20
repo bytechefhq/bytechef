@@ -271,7 +271,7 @@ public interface TriggerDefinition {
          */
         void accept(
             ParameterMap inputParameters, ParameterMap connectionParameters, ParameterMap outputParameters,
-            String workflowExecutionId, TriggerContext context);
+            String workflowExecutionId, Context context);
 
     }
 
@@ -291,7 +291,7 @@ public interface TriggerDefinition {
          */
         DynamicWebhookEnableOutput apply(
             ParameterMap inputParameters, ParameterMap connectionParameters, String webhookUrl,
-            String workflowExecutionId, TriggerContext triggerContext);
+            String workflowExecutionId, Context context);
 
     }
 
@@ -322,7 +322,7 @@ public interface TriggerDefinition {
         /**
          *
          * @param inputParameters
-         * @param getConnectionParameters
+         * @param connectionParameters
          * @param headers
          * @param parameters
          * @param body
@@ -332,7 +332,7 @@ public interface TriggerDefinition {
          * @return
          */
         WebhookOutput apply(
-            ParameterMap inputParameters, ParameterMap getConnectionParameters, HttpHeaders headers,
+            ParameterMap inputParameters, ParameterMap connectionParameters, HttpHeaders headers,
             HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
             TriggerContext context) throws ComponentExecutionException;
     }
@@ -417,7 +417,7 @@ public interface TriggerDefinition {
          */
         void accept(
             ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
-            TriggerContext context);
+            Context context);
     }
 
     /**
@@ -446,7 +446,7 @@ public interface TriggerDefinition {
          */
         void accept(
             ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
-            ListenerEmitter listenerEmitter, TriggerContext context);
+            ListenerEmitter listenerEmitter, Context context);
     }
 
     /**
@@ -663,6 +663,6 @@ public interface TriggerDefinition {
          */
         boolean apply(
             ParameterMap inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
-            WebhookMethod method, TriggerContext context);
+            WebhookMethod method, Context context);
     }
 }

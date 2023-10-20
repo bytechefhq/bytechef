@@ -19,8 +19,8 @@ package com.bytechef.component.pipedrive.util;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
-import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.definition.Option;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ public class PipedriveUtils {
     private static final Logger logger = LoggerFactory.getLogger(PipedriveUtils.class);
 
     public static String subscribeWebhook(
-        String eventObject, String eventAction, String webhookUrl, TriggerContext context) {
+        String eventObject, String eventAction, String webhookUrl, Context context) {
 
         Map<?, ?> result = context
             .http(http -> http.post("/api/v1/webhooks"))
@@ -53,7 +53,7 @@ public class PipedriveUtils {
         return (String) result.get("id");
     }
 
-    public static void unsubscribeWebhook(String webhookId, TriggerContext context) {
+    public static void unsubscribeWebhook(String webhookId, Context context) {
         context
             .http(http -> http.delete("/api/v1/webhooks/%s".formatted(webhookId)))
             .configuration(Http.responseType(Http.ResponseType.JSON))

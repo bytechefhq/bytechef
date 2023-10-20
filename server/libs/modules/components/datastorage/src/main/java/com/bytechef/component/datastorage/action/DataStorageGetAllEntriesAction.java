@@ -19,12 +19,7 @@ package com.bytechef.component.datastorage.action;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE_OPTIONS;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.any;
-import static com.bytechef.hermes.definition.DefinitionDSL.array;
-import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -59,12 +54,11 @@ public class DataStorageGetAllEntriesAction {
 
     protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (inputParameters, connection, context) -> object()
-            .properties(
-                array("item")
-                    .items(
-                        dateTime("created"),
-                        string("key"),
-                        any("key")));
+        return (inputParameters, connection, context) -> null;
+//        array("item")
+//            .items(
+//                dateTime("created"),
+//                string("key"),
+//                any("key"))
     }
 }
