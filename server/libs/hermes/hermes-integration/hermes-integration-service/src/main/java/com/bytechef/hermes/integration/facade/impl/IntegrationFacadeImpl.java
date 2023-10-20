@@ -147,7 +147,11 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         for (Integration integration : integrations) {
             integration.setTags(
                 tags.stream()
-                    .filter(tag -> tagIds.contains(tag.getId()))
+                    .filter(tag -> {
+                        List<Long> curTagIds = integration.getTagIds();
+
+                        return curTagIds.contains(tag.getId());
+                    })
                     .toList());
         }
 
