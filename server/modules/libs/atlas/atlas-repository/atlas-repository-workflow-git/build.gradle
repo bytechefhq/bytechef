@@ -1,0 +1,12 @@
+dependencies {
+    api project(":modules:libs:atlas:atlas-engine:atlas-engine-coordinator-api")
+
+    implementation "com.google.guava:guava"
+    implementation "commons-io:commons-io"
+    implementation 'org.eclipse.jgit:org.eclipse.jgit'
+    implementation "org.springframework:spring-core"
+    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-impl")
+
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testImplementation project(":modules:libs:atlas:atlas-engine:atlas-engine-coordinator-impl")
+}
