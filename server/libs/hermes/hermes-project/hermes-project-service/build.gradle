@@ -1,0 +1,18 @@
+dependencies {
+    api project(":server:libs:hermes:hermes-project:hermes-project-api")
+
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework:spring-tx"
+    implementation "org.springframework.data:spring-data-jdbc"
+    implementation project(":server:libs:atlas:atlas-api")
+    implementation project(":server:libs:core:commons:commons-data")
+    implementation project(":server:libs:core:commons:commons-util")
+
+    testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-impl")
+    testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-jdbc")
+    testImplementation project(":server:libs:atlas:atlas-service")
+    testImplementation project(":server:libs:core:category:category-service")
+    testImplementation project(":server:libs:core:tag:tag-service")
+    testImplementation project(":server:libs:db-migration")
+    testImplementation project(":server:libs:test:test-int-support")
+}

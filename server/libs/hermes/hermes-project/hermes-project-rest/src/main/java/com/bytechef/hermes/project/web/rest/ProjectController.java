@@ -1,0 +1,176 @@
+
+/*
+ * Copyright 2021 <your company/name>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.hermes.project.web.rest;
+
+import com.bytechef.atlas.web.rest.model.WorkflowModel;
+import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
+import com.bytechef.hermes.project.domain.Project;
+import com.bytechef.hermes.project.facade.ProjectFacade;
+import com.bytechef.category.servicee.CategoryService;
+import com.bytechef.hermes.project.web.rest.model.CategoryModel;
+import com.bytechef.hermes.project.web.rest.model.ProjectModel;
+import com.bytechef.hermes.project.web.rest.model.PostProjectWorkflowRequestModel;
+import com.bytechef.hermes.project.web.rest.model.PutProjectTagsRequestModel;
+import com.bytechef.hermes.project.web.rest.model.TagModel;
+import com.bytechef.tag.domain.Tag;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
+
+/**
+ * @author Ivica Cardic
+ */
+@RestController
+@ConditionalOnApi
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+public class ProjectController implements ProjectsApi {
+
+    private final CategoryService categoryService;
+    private final ConversionService conversionService;
+    private final ProjectFacade projectFacade;
+
+    @SuppressFBWarnings("EI2")
+    public ProjectController(
+        CategoryService categoryService, ConversionService conversionService, ProjectFacade projectFacade) {
+
+        this.categoryService = categoryService;
+        this.conversionService = conversionService;
+        this.projectFacade = projectFacade;
+    }
+
+    @Override
+    public Mono<ResponseEntity<Void>> deleteProject(Long id, ServerWebExchange exchange) {
+        projectFacade.delete(id);
+
+        return Mono.just(
+            ResponseEntity.ok()
+                .build());
+    }
+
+    @Override
+    public Mono<ResponseEntity<ProjectModel>> getProject(Long id, ServerWebExchange exchange) {
+        return Mono.just(
+            ResponseEntity.ok(
+                conversionService.convert(projectFacade.getProject(id), ProjectModel.class)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<Flux<CategoryModel>>> getProjectCategories(ServerWebExchange exchange) {
+        return Mono.just(
+            ResponseEntity.ok(
+                Flux.fromIterable(
+                    categoryService.getCategories()
+                        .stream()
+                        .map(category -> conversionService.convert(category, CategoryModel.class))
+                        .toList())));
+    }
+
+    @Override
+    public Mono<ResponseEntity<Flux<ProjectModel>>> getProjects(
+        List<Long> categoryIds, List<Long> tagIds, ServerWebExchange exchange) {
+        return Mono.just(
+            ResponseEntity.ok(
+                Flux.fromIterable(
+                    projectFacade.getProjects(categoryIds, tagIds)
+                        .stream()
+                        .map(project -> conversionService.convert(project, ProjectModel.class))
+                        .toList())));
+    }
+
+    @Override
+    public Mono<ResponseEntity<Flux<TagModel>>> getProjectTags(ServerWebExchange exchange) {
+        return Mono.just(
+            ResponseEntity.ok(
+                Flux.fromIterable(
+                    projectFacade.getProjectTags()
+                        .stream()
+                        .map(tag -> conversionService.convert(tag, TagModel.class))
+                        .toList())));
+    }
+
+    @Override
+    public Mono<ResponseEntity<Flux<WorkflowModel>>> getProjectWorkflows(Long id, ServerWebExchange exchange) {
+        return Mono.just(
+            ResponseEntity.ok(
+                Flux.fromIterable(
+                    projectFacade.getProjectWorkflows(id)
+                        .stream()
+                        .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
+                        .toList())));
+    }
+
+    @Override
+    @Transactional
+    public Mono<ResponseEntity<ProjectModel>> postProject(
+        Mono<ProjectModel> projectModelMono, ServerWebExchange exchange) {
+
+        return projectModelMono.map(projectModel -> ResponseEntity.ok(
+            conversionService.convert(
+                projectFacade.create(
+                    conversionService.convert(projectModel, Project.class)),
+                ProjectModel.class)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<ProjectModel>> postProjectWorkflow(
+        Long id, Mono<PostProjectWorkflowRequestModel> postProjectWorkflowRequestModelMono,
+        ServerWebExchange exchange) {
+
+        return postProjectWorkflowRequestModelMono.map(requestModel -> ResponseEntity.ok(
+            conversionService.convert(
+                projectFacade.addWorkflow(
+                    id, requestModel.getName(), requestModel.getDescription(), requestModel.getDefinition()),
+                ProjectModel.class)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<ProjectModel>> putProject(
+        Long id, Mono<ProjectModel> projectModelMono, ServerWebExchange exchange) {
+
+        return projectModelMono.map(projectModel -> ResponseEntity.ok(
+            conversionService.convert(
+                projectFacade.update(conversionService.convert(projectModel.id(id), Project.class)),
+                ProjectModel.class)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<Void>> putProjectTags(
+        Long id, Mono<PutProjectTagsRequestModel> putConnectionTagsRequestModelMono, ServerWebExchange exchange) {
+
+        return putConnectionTagsRequestModelMono.map(putProjectTagsRequestModel -> {
+            List<TagModel> tagModels = putProjectTagsRequestModel.getTags();
+
+            projectFacade.update(
+                id,
+                tagModels.stream()
+                    .map(tagModel -> conversionService.convert(tagModel, Tag.class))
+                    .toList());
+
+            return ResponseEntity.noContent()
+                .build();
+        });
+    }
+}

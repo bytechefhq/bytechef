@@ -1,0 +1,363 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v1
+servers:
+  - url: http://localhost:5173/api
+paths:
+  /projects:
+    get:
+      description: Get projects.
+      summary: Get projects.
+      tags:
+        - projects
+      operationId: getProjects
+      parameters:
+        - name: categoryIds
+          description: The list of the category ids used for filtering projects.
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
+        - name: tagIds
+          description: The list of tag ids of used for filtering projects.
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
+      responses:
+        "200":
+          description: The list of projects.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+    post:
+      description: Create a new project.
+      summary: Create a new project.
+      tags:
+        - projects
+      operationId: postProject
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+        required: true
+      responses:
+        "200":
+          description: The project object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+  /projects/categories:
+    get:
+      description: Get categories.
+      summary: Get categories.
+      tags:
+        - projects
+      operationId: getProjectCategories
+      responses:
+        "200":
+          description: The list of categories.
+          content:
+            application/json:
+              schema:
+                description: The response object that contains the array of categories.
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+  /projects/tags:
+    get:
+      description: Get project tags.
+      summary: Get project tags.
+      tags:
+        - projects
+      operationId: getProjectTags
+      responses:
+        "200":
+          description: The list of project tags.
+          content:
+            application/json:
+              schema:
+                description: The response object that contains the array of tags.
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+  /projects/{id}:
+    delete:
+      description: Delete an project.
+      summary: Delete an project.
+      tags:
+        - projects
+      operationId: deleteProject
+      parameters:
+        - name: id
+          description: The id of an project.
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Successful operation.
+    get:
+      description: Get an project by id.
+      summary: Get an project by id.
+      tags:
+        - projects
+      operationId: getProject
+      parameters:
+        - name: id
+          description: The id of an project.
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: The project object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+    put:
+      description: Update an existing project.
+      summary: Update an existing project.
+      tags:
+        - projects
+      operationId: putProject
+      parameters:
+        - name: id
+          description: The id of an project.
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+        required: true
+      responses:
+        "200":
+          description: The updated project object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+  /projects/{id}/workflows:
+    get:
+      description: Get workflows for particular project.
+      summary: Get workflows for particular project.
+      tags:
+        - projects
+      operationId: getProjectWorkflows
+      parameters:
+        - name: id
+          description: The id of an project.
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: The updated project object.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow'
+    post:
+      description: Create new workflow and adds it to an existing project.
+      summary: Create new workflow and adds it to an existing project.
+      tags:
+        - projects
+      operationId: postProjectWorkflow
+      parameters:
+        - name: id
+          description: The id of an project.
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  description: The workflow name.
+                  type: string
+                description:
+                  description: The workflow description.
+                  type: string
+                definition:
+                  description: The workflow definition.
+                  type: string
+        required: true
+      responses:
+        "200":
+          description: The updated project object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+  /projects/{id}/tags:
+    put:
+      description: Updates tags of an existing project.
+      summary: Updates tags of an existing project.
+      tags:
+        - projects
+      operationId: putProjectTags
+      parameters:
+        - name: id
+          description: The id of an project.
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: The request object that contains the array of tags.
+              type: object
+              properties:
+                tags:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Tag'
+        required: true
+      responses:
+        "200":
+          description: Successful operation.
+components:
+  schemas:
+    Category:
+      description: An project category.
+      required:
+        - name
+      properties:
+        createdBy:
+          description: The created by.
+          type: string
+          readOnly: true
+        createdDate:
+          description: The created date.
+          type: string
+          format: date-time
+          readOnly: true
+        id:
+          description: The id of the category.
+          type: integer
+          format: int64
+        name:
+          description: The name of the category.
+          type: string
+        lastModifiedBy:
+          description: The last modified by.
+          type: string
+          readOnly: true
+        lastModifiedDate:
+          description: The last modified date.
+          type: string
+          format: date-time
+          readOnly: true
+        version:
+          type: integer
+          format: int32
+    Project:
+      description: A group of workflows that make one logical project.
+      type: object
+      required:
+        - name
+      properties:
+        category:
+          $ref: '#/components/schemas/Category'
+        createdBy:
+          description: The created by.
+          type: string
+          readOnly: true
+        createdDate:
+          description: The created date.
+          type: string
+          format: date-time
+          readOnly: true
+        id:
+          description: The id of an project.
+          type: integer
+          format: int64
+          readOnly: true
+        name:
+          description: The name of the project.
+          type: string
+        description:
+          description: The description of the project.
+          type: string
+        lastModifiedBy:
+          description: The last modified by.
+          type: string
+          readOnly: true
+        lastModifiedDate:
+          description: The last modified date.
+          type: string
+          format: date-time
+          readOnly: true
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        version:
+          type: integer
+          format: int32
+        workflowIds:
+          description: The workflow ids belonging to this project.
+          type: array
+          items:
+            type: string
+            readOnly: true
+    Tag:
+      description: An project tag.
+      required:
+        - name
+      properties:
+        id:
+          description: The id of the tag.
+          type: integer
+          format: int64
+        lastModifiedBy:
+          description: The last modified by.
+          type: string
+          readOnly: true
+        lastModifiedDate:
+          description: The last modified date.
+          type: string
+          format: date-time
+          readOnly: true
+        name:
+          description: The name of the tag.
+          type: string
+        version:
+          type: integer
+          format: int32
