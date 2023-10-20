@@ -1,0 +1,320 @@
+info:
+  title: Common Definition Specification
+  description: Common Definition structs.
+  version: v1
+schemas:
+  AnyProperty:
+    description: An any property type.
+    type: object
+    required:
+      - type
+    allOf:
+      - $ref: '#/schemas/Property'
+      - type: object
+        properties:
+          required:
+            type: boolean
+          types:
+            description: Possible types of properties that can be used.
+            type: array
+            items:
+              oneOf:
+                - $ref: '#/schemas/ArrayProperty'
+                - $ref: '#/schemas/BooleanProperty'
+                - $ref: '#/schemas/DateProperty'
+                - $ref: '#/schemas/DateTimeProperty'
+                - $ref: '#/schemas/IntegerProperty'
+                - $ref: '#/schemas/NullProperty'
+                - $ref: '#/schemas/NumberProperty'
+                - $ref: '#/schemas/StringProperty'
+                - $ref: '#/schemas/ObjectProperty'
+          type:
+            type: string
+  ArrayProperty:
+    description: An array property type.
+    type: object
+    required:
+      - type
+    allOf:
+      - $ref: '#/schemas/ValueProperty'
+      - type: object
+        properties:
+          items:
+            description: Types of the array items.
+            type: array
+            items:
+              oneOf:
+                - $ref: '#/schemas/AnyProperty'
+                - $ref: '#/schemas/ArrayProperty'
+                - $ref: '#/schemas/BooleanProperty'
+                - $ref: '#/schemas/DateProperty'
+                - $ref: '#/schemas/DateTimeProperty'
+                - $ref: '#/schemas/IntegerProperty'
+                - $ref: '#/schemas/NumberProperty'
+                - $ref: '#/schemas/StringProperty'
+                - $ref: '#/schemas/ObjectProperty'
+          type:
+            type: string
+  BooleanProperty:
+    description: A boolean property type.
+    type: object
+    required:
+      - type
+    allOf:
+      - $ref: '#/schemas/SingleValueProperty'
+      - type: object
+        properties:
+          type:
+            type: string
+  DateProperty:
+    description: A date property type.
+    type: object
+    required:
+      - type
+    allOf:
+      - $ref: '#/schemas/SingleValueProperty'
+      - type: object
+        properties:
+          type:
+            type: string
+  DateTimeProperty:
+    description: A date-time property type.
+    type: object
+    required:
+      - type
+    allOf:
+      - $ref: '#/schemas/SingleValueProperty'
+      - type: object
+        properties:
+          type:
+            type: string
+  Display:
+    description: Info about the component.
+    type: object
+    properties:
+      description:
+        description: The component description.
+        type: string
+      icon:
+        description: The component icon.
+        type: string
+      label:
+        description: The component label.
+        type: string
+  DisplayOption:
+    description: Defines rules when a property should be shown or hidden.
+    type: object
+    properties:
+      hideWhen:
+        description: The map of property names and list of values to check against if the property should be hidden.
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            type: object
+      showWhen:
+        description: The map of property names and list of values to check against if the property should be shown.
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            type: object
+  EditorType:
+    description: A type of the editor to show in UI.
+    type: string
+    enum:
+      - CODE
+  IntegerProperty:
+    description: An integer property type.
+    type: object
+    required:
+      - type
+    allOf:
+      - $ref: '#/schemas/SingleValueProperty'
+      - type: object
+        properties:
+          maxValue:
+            description: The maximum property value.
+            type: integer
+            format: int32
+          minValue:
+            description: The minimum property value.
+            type: integer
+            format: int32
+          type:
+            type: string
+  NullProperty:
+    description: A null property type.
+    type: object
+    required:
+      - type
+    allOf:
+      - $ref: '#/schemas/SingleValueProperty'
+      - type: object
+        properties:
+          type:
+            type: string
+  NumberProperty:
+    description: A number property type.
+    type: object
+    required:
+      - type
+    allOf:
+      - $ref: '#/schemas/SingleValueProperty'
+      - type: object
+        properties:
+          maxValue:
+            description: The maximum property value.
+            type: integer
+            format: int32
+          minValue:
+            description: The minimum property value.
+            type: integer
+            format: int32
+          numberPrecision:
+            description: The number value precision.
+            type: integer
+            format: int32
+          type:
+            type: string
+  ObjectProperty:
+    description: An object property type.
+    type: object
+    required:
+      - type
+    allOf:
+      - $ref: '#/schemas/ValueProperty'
+      - type: object
+        properties:
+          additionalProperties:
+            description: The object can contain dynamically defined properties.
+            type: boolean
+          objectType:
+            description: The object type.
+            type: string
+          properties:
+            description: The list of valid object property types.
+            type: array
+            items:
+              oneOf:
+                - $ref: '#/schemas/AnyProperty'
+                - $ref: '#/schemas/ArrayProperty'
+                - $ref: '#/schemas/BooleanProperty'
+                - $ref: '#/schemas/DateProperty'
+                - $ref: '#/schemas/DateTimeProperty'
+                - $ref: '#/schemas/IntegerProperty'
+                - $ref: '#/schemas/NullProperty'
+                - $ref: '#/schemas/NumberProperty'
+                - $ref: '#/schemas/StringProperty'
+                - $ref: '#/schemas/ObjectProperty'
+          type:
+            type: string
+  SingleValueProperty:
+    description: A base property for all single value properties.
+    type: object
+    allOf:
+      - $ref: '#/schemas/ValueProperty'
+      - type: object
+        properties:
+          options:
+            description: The list of valid property options.
+            type: array
+            items:
+              $ref: '#/schemas/PropertyOption'
+  Property:
+    description: A base property.
+    type: object
+    properties:
+      description:
+        description: The property description.
+        type: string
+      displayOption:
+        $ref: '#/schemas/DisplayOption'
+      label:
+        description: The property label.
+        type: string
+      metadata:
+        description: Additional data that can be used during processing.
+        type: object
+        additionalProperties:
+          type: object
+          items:
+            type: object
+      name:
+        description: The property name.
+        type: string
+      required:
+        description: If the property is required or not.
+        type: boolean
+    discriminator:
+      propertyName: type
+      mapping:
+        ANY: '#/schemas/AnyProperty'
+        ARRAY: '#/schemas/ArrayProperty'
+        BOOLEAN: '#/schemas/BooleanProperty'
+        DATE: '#/schemas/DateProperty'
+        DATE_TIME: '#/schemas/DateTimeProperty'
+        INTEGER: '#/schemas/IntegerProperty'
+        "NULL": '#/schemas/NullProperty'
+        NUMBER: '#/schemas/NumberProperty'
+        STRING: '#/schemas/StringProperty'
+        OBJECT: '#/schemas/ObjectProperty'
+  PropertyOption:
+    description: Defines valid property value.
+    type: object
+    properties:
+      description:
+        description: Description of the option.
+        type: string
+      displayOption:
+        $ref: '#/schemas/DisplayOption'
+      name:
+        description: Name of the option.
+        type: string
+      value:
+        description: Value of the option.
+        oneOf:
+          - type: string
+          - type: integer
+            format: int32
+  Resources:
+    description: A set of available resources.
+    type: object
+    properties:
+      documentationUrl:
+        description: The url of available documentation.
+        type: string
+  StringProperty:
+    description: A string property.
+    type: object
+    required:
+      - type
+    allOf:
+      - $ref: '#/schemas/SingleValueProperty'
+      - type: object
+        properties:
+          editorType:
+            $ref: '#/schemas/EditorType'
+          type:
+            type: string
+  ValueProperty:
+    description: A base property for all value based properties.
+    type: object
+    allOf:
+      - $ref: '#/schemas/Property'
+      - type: object
+        properties:
+          defaultValue:
+            description: The property default value.
+            type: object
+          exampleValue:
+            description: The property example value.
+            type: object
+          loadOptionsDependsOn:
+            description: The list of property names on which value change the property options should load/reload.
+            type: array
+            items:
+              type: string
+          loadOptionsFunction:
+            description: The code that should dynamically load options for the property.
+            type: object
