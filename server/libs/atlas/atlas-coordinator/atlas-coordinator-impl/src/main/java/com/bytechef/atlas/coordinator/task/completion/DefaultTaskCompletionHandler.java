@@ -82,7 +82,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     @Override
     @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
-        log.debug("Completing task '{}' with id {}", taskExecution.getType(), taskExecution.getId());
+        log.debug("{}/'{}'/'{}' TASK DONE", taskExecution.getId(), taskExecution.getType(), taskExecution.getName());
 
         Job job = jobService.getTaskExecutionJob(taskExecution.getId());
 
