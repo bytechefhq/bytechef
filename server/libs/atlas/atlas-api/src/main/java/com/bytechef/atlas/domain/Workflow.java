@@ -40,6 +40,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -117,8 +118,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     @Transient
     private final List<WorkflowTask> tasks;
 
-    // TODO Add version
-    // @Version
+    @Version
     @SuppressFBWarnings("UuF")
     private int version;
 
@@ -230,6 +230,10 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         return tasks;
     }
 
+    public int getVersion() {
+        return version;
+    }
+
     @Override
     public boolean isNew() {
         return id == null;
@@ -269,6 +273,10 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
 
     public void setSourceType(SourceType sourceType) {
         this.sourceType = sourceType;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 
     @Override

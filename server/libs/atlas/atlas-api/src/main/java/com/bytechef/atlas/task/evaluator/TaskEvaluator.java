@@ -176,7 +176,7 @@ public class TaskEvaluator {
         Map<String, Object> newMap = new HashMap<>();
 
         for (Entry<?, ?> entry : map.entrySet()) {
-            newMap.put((String)entry.getKey(), evaluate(entry.getValue(), context));
+            newMap.put((String) entry.getKey(), evaluate(entry.getValue(), context));
         }
 
         return newMap;
