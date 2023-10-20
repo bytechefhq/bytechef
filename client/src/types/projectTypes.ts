@@ -1,4 +1,5 @@
 import {
+    AnyPropertyModel,
     ArrayPropertyModel,
     BooleanPropertyModel,
     DatePropertyModel,
@@ -8,12 +9,12 @@ import {
     NullPropertyModel,
     NumberPropertyModel,
     ObjectPropertyModel,
-    OneOfPropertyModel,
     StringPropertyModel,
     TimePropertyModel,
 } from 'middleware/core/definition-registry';
 
-export type PropertyType = ArrayPropertyModel &
+export type PropertyType = AnyPropertyModel &
+    ArrayPropertyModel &
     BooleanPropertyModel &
     DatePropertyModel &
     DateTimePropertyModel &
@@ -22,6 +23,5 @@ export type PropertyType = ArrayPropertyModel &
     NumberPropertyModel &
     NullPropertyModel &
     ObjectPropertyModel &
-    OneOfPropertyModel &
     StringPropertyModel &
     TimePropertyModel;

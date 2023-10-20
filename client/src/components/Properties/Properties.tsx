@@ -58,7 +58,6 @@ export const Property = ({
         options,
         required,
         type,
-        types,
     } = property;
 
     const hasError = (propertyName: string) =>
@@ -255,21 +254,10 @@ export const Property = ({
 
             {controlType === 'SCHEMA_DESIGNER' && <span>Schema designer</span>}
 
-            {!controlType && type === 'ONE_OF' && (
-                <ul>
-                    {(types as Array<PropertyType>).map(
-                        ({controlType, type}, index) => (
-                            <li
-                                className="h-full rounded-md bg-gray-100 p-2"
-                                key={`${controlType}_${type}_${index}`}
-                            >
-                                <span>
-                                    {controlType} - {type}
-                                </span>
-                            </li>
-                        )
-                    )}
-                </ul>
+            {!controlType && type === 'ANY' && (
+                <span>
+                    {controlType} - {type}
+                </span>
             )}
 
             {type === 'ARRAY' && <ArrayProperty property={property} />}
