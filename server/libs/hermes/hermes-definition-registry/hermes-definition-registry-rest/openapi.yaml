@@ -355,14 +355,16 @@ components:
         \ the task inside the workflow."
       type: "object"
       required:
-      - "display"
       - "name"
       properties:
-        display:
-          $ref: "#/components/schemas/Display"
+        description:
+          description: "The description."
+          type: "string"
         exampleOutput:
           description: "The example value of the action's output."
           type: "object"
+        help:
+          $ref: "#/components/schemas/Help"
         name:
           description: "The action name."
           type: "string"
@@ -376,8 +378,9 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
-        resources:
-          $ref: "#/components/schemas/Resources"
+        title:
+          description: "The title"
+          type: "string"
     ActionDefinitionBasic:
       description: "An action is a portion of reusable code that accomplish a specific\
         \ task. When building a workflow, each action is represented as a task inside\
@@ -386,16 +389,19 @@ components:
         \ the task inside the workflow."
       type: "object"
       required:
-      - "display"
       - "name"
       properties:
+        description:
+          description: "The description."
+          type: "string"
+        help:
+          $ref: "#/components/schemas/Help"
         name:
           description: "The action name."
           type: "string"
-        display:
-          $ref: "#/components/schemas/Display"
-        resources:
-          $ref: "#/components/schemas/Resources"
+        title:
+          description: "The title"
+          type: "string"
     ArrayProperty:
       description: "An array property type."
       type: "object"
@@ -422,8 +428,9 @@ components:
       description: "Contains information required for a connection's authorization."
       type: "object"
       properties:
-        display:
-          $ref: "#/components/schemas/Display"
+        description:
+          description: "The description."
+          type: "string"
         name:
           description: "The authorization name."
           type: "string"
@@ -432,6 +439,9 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
+        title:
+          description: "The title"
+          type: "string"
         type:
           $ref: "#/components/schemas/AuthorizationType"
     AuthorizationType:
@@ -459,7 +469,6 @@ components:
         \ to an outside service."
       type: "object"
       required:
-      - "display"
       - "name"
       - "version"
       properties:
@@ -468,15 +477,30 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/ActionDefinitionBasic"
+        category:
+          description: "The category."
+          type: "string"
         connection:
           $ref: "#/components/schemas/ConnectionDefinitionBasic"
-        display:
-          $ref: "#/components/schemas/Display"
+        description:
+          description: "The description."
+          type: "string"
+        icon:
+          description: "The icon."
+          type: "string"
         name:
           description: "The name."
           type: "string"
         resources:
           $ref: "#/components/schemas/Resources"
+        tags:
+          description: "Tags for categorization."
+          type: "array"
+          items:
+            type: "string"
+        title:
+          description: "The title"
+          type: "string"
         triggers:
           description: "The list of all available triggers the component can perform."
           type: "array"
@@ -491,22 +515,34 @@ components:
         \ to an outside service."
       type: "object"
       required:
-      - "display"
       - "name"
-      - "v"
       properties:
-        display:
-          $ref: "#/components/schemas/Display"
+        category:
+          description: "The category."
+          type: "string"
+        description:
+          description: "The description."
+          type: "string"
+        icon:
+          description: "The icon."
+          type: "string"
         name:
           description: "The name of a component."
           type: "string"
         resources:
           $ref: "#/components/schemas/Resources"
+        tags:
+          description: "Tags for categorization."
+          type: "array"
+          items:
+            type: "string"
+        title:
+          description: "The title"
+          type: "string"
     ConnectionDefinition:
       description: "Definition of a connection to an outside service."
       type: "object"
       required:
-      - "display"
       - "name"
       - "version"
       properties:
@@ -521,8 +557,9 @@ components:
         baseUri:
           description: "Defines the base URI for all future HTTP requests."
           type: "string"
-        display:
-          $ref: "#/components/schemas/Display"
+        description:
+          description: "The description."
+          type: "string"
         name:
           description: "The connection name."
           type: "string"
@@ -531,8 +568,9 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
-        resources:
-          $ref: "#/components/schemas/Resources"
+        title:
+          description: "The title"
+          type: "string"
         version:
           description: "The version of a connection."
           type: "integer"
@@ -540,17 +578,18 @@ components:
       description: "Definition of a connection to an outside service."
       type: "object"
       required:
-      - "display"
       - "name"
       - "version"
       properties:
-        display:
-          $ref: "#/components/schemas/Display"
+        description:
+          description: "The description."
+          type: "string"
         name:
           description: "The connection name."
           type: "string"
-        resources:
-          $ref: "#/components/schemas/Resources"
+        title:
+          description: "The title"
+          type: "string"
         version:
           description: "The version of a connection."
           type: "integer"
@@ -611,29 +650,18 @@ components:
         properties:
           propertiesDataSource:
             $ref: "#/components/schemas/PropertiesDataSource"
-    Display:
-      description: "A display information."
+    Help:
+      description: "The help text that is meant to guide your users as to how to configure\
+        \ this action or trigger."
       type: "object"
+      required:
+      - "body"
       properties:
-        category:
-          description: "The category."
+        body:
+          description: "The help text"
           type: "string"
-        description:
-          description: "The description."
-          type: "string"
-        icon:
-          description: "The icon."
-          type: "string"
-        subtitle:
-          description: "The additional explanation."
-          type: "string"
-        tags:
-          description: "Tags for categorization."
-          type: "array"
-          items:
-            type: "string"
-        title:
-          description: "The title."
+        learnMoreUrl:
+          description: "The url to additional documentation"
           type: "string"
     IntegerProperty:
       description: "An integer property type."
@@ -784,7 +812,7 @@ components:
         displayCondition:
           description: "Defines rules when a property should be shown or hidden."
           type: "string"
-        expressionEnabled:
+        expressionDisabled:
           description: "Defines if the property can contain expressions or only constant\
             \ values."
           type: "boolean"
@@ -866,12 +894,15 @@ components:
         \ be executed."
       type: "object"
       required:
-      - "display"
       - "name"
       - "version"
       properties:
-        display:
-          $ref: "#/components/schemas/Display"
+        description:
+          description: "The description."
+          type: "string"
+        icon:
+          description: "The icon."
+          type: "string"
         name:
           description: "The task dispatcher name.."
           type: "string"
@@ -895,21 +926,30 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
+        title:
+          description: "The title"
+          type: "string"
     TaskDispatcherDefinitionBasic:
       description: "A task dispatcher defines a strategy for dispatching tasks to\
         \ be executed."
       type: "object"
       required:
-      - "display"
       - "name"
       properties:
-        display:
-          $ref: "#/components/schemas/Display"
+        description:
+          description: "The description."
+          type: "string"
+        icon:
+          description: "The icon."
+          type: "string"
         name:
           description: "The task dispatcher name.."
           type: "string"
         resources:
           $ref: "#/components/schemas/Resources"
+        title:
+          description: "The title"
+          type: "string"
     TimeProperty:
       description: "A time property."
       type: "object"
@@ -931,15 +971,17 @@ components:
         \ outside services."
       type: "object"
       required:
-      - "display"
       - "name"
       - "type"
       properties:
-        display:
-          $ref: "#/components/schemas/Display"
+        description:
+          description: "The description."
+          type: "string"
         exampleOutput:
           description: "The example value of the action's output."
           type: "object"
+        help:
+          $ref: "#/components/schemas/Help"
         name:
           description: "The action name."
           type: "string"
@@ -953,8 +995,9 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
-        resources:
-          $ref: "#/components/schemas/Resources"
+        title:
+          description: "The title"
+          type: "string"
         type:
           $ref: "#/components/schemas/TriggerType"
     TriggerDefinitionBasic:
@@ -962,14 +1005,19 @@ components:
         \ outside services."
       type: "object"
       required:
-      - "display"
       - "name"
       - "type"
       properties:
-        display:
-          $ref: "#/components/schemas/Display"
+        description:
+          description: "The description."
+          type: "string"
+        help:
+          $ref: "#/components/schemas/Help"
         name:
           description: "The action name."
+          type: "string"
+        title:
+          description: "The title"
           type: "string"
         type:
           $ref: "#/components/schemas/TriggerType"
