@@ -61,7 +61,7 @@ public class ResourceBasedWorkflowRepository implements WorkflowRepository {
         try {
             String uri = aResource.getURI().toString();
             String id = uri.substring(uri.lastIndexOf(PREFIX) + PREFIX.length(), uri.lastIndexOf('.'));
-            return workflowMapper.readValue(new IdentifiableResource(id, aResource));
+            return workflowMapper.readValue(new WorkflowResource(id, aResource, WorkflowFormatType.parse(uri)));
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }

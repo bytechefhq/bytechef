@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,22 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.repository.workflow.git;
+package com.integri.atlas.engine.coordinator.workflow.repository;
 
-import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowResource;
-import java.util.List;
+import com.integri.atlas.engine.coordinator.workflow.Workflow;
 
-public interface GitOperations {
-    List<WorkflowResource> getHeadFiles();
+/**
+ * @author Ivica Cardic
+ */
+public class JSONWorkflowMapper implements WorkflowMapper, WorkflowMapperResolver {
 
-    WorkflowResource getFile(String aFileId);
+    @Override
+    public Workflow readValue(WorkflowResource workflowResource) {
+        return null;
+    }
+
+    @Override
+    public WorkflowMapper resolve(WorkflowResource workflowResource) {
+        return workflowResource.getFormatType() == WorkflowFormatType.JSON ? this : null;
+    }
 }

@@ -18,7 +18,8 @@
 
 package com.integri.atlas.workflow.repository.git;
 
-import com.integri.atlas.engine.coordinator.workflow.repository.IdentifiableResource;
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowFormatType;
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowResource;
 import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import java.util.Arrays;
 import java.util.List;
@@ -45,15 +46,18 @@ public class GitWorkflowRepositoryTest {
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
         @Override
-        public List<IdentifiableResource> getHeadFiles() {
+        public List<WorkflowResource> getHeadFiles() {
             return Arrays.asList(
-                new IdentifiableResource("demo/hello/123", resolver.getResource("file:workflows/demo/hello.yaml"))
+                new WorkflowResource(
+                    "demo/hello/123", resolver.getResource("file:workflows/demo/hello.yaml"),
+                    WorkflowFormatType.YAML)
             );
         }
 
         @Override
-        public IdentifiableResource getFile(String aFileId) {
-            return new IdentifiableResource("demo/hello/123", resolver.getResource("file:workflows/demo/hello.yaml"));
+        public WorkflowResource getFile(String aFileId) {
+            return new WorkflowResource(
+                "demo/hello/123", resolver.getResource("file:workflows/demo/hello.yaml"), WorkflowFormatType.YAML);
         }
     }
 }

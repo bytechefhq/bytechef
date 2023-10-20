@@ -44,11 +44,11 @@ import java.util.Map;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-public class YAMLWorkflowMapper implements WorkflowMapper {
+public class YAMLWorkflowMapper implements WorkflowMapper, WorkflowMapperResolver {
 
     private final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
-    public Workflow readValue(IdentifiableResource aResource) {
+    public Workflow readValue(WorkflowResource aResource) {
         try {
             Map<String, Object> yamlMap = parse(aResource);
             yamlMap.put(DSL.ID, aResource.getId());
@@ -58,6 +58,11 @@ public class YAMLWorkflowMapper implements WorkflowMapper {
             workflow.setError(new ErrorObject(e.getMessage(), ExceptionUtils.getStackFrames(e)));
             return workflow;
         }
+    }
+
+    @Override
+    public WorkflowMapper resolve(WorkflowResource workflowResource) {
+        return workflowResource.getFormatType() == WorkflowFormatType.YAML ? this : null;
     }
 
     private Map<String, Object> parse(Resource aResource) {

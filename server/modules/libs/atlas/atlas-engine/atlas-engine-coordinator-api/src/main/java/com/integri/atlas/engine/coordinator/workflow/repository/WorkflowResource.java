@@ -23,20 +23,31 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+
 import org.springframework.core.io.Resource;
 
-public class IdentifiableResource implements Resource {
+/**
+ * @author Arik Cohen
+ * @author Ivica Cardic
+ */
+public class WorkflowResource implements Resource {
 
     private final String id;
     private final Resource resource;
+    private final WorkflowFormatType formatType;
 
-    public IdentifiableResource(String aId, Resource aResource) {
+    public WorkflowResource(String aId, Resource aResource, WorkflowFormatType formatType) {
         id = aId;
         resource = aResource;
+        this.formatType = formatType;
     }
 
     public String getId() {
         return id;
+    }
+
+    public WorkflowFormatType getFormatType() {
+        return formatType;
     }
 
     @Override

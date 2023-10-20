@@ -20,7 +20,8 @@ package com.integri.atlas.repository.workflow.git;
 
 import com.google.common.base.Throwables;
 import com.google.common.io.Files;
-import com.integri.atlas.engine.coordinator.workflow.repository.IdentifiableResource;
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowFormatType;
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowResource;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,14 +67,14 @@ public class JGitTemplate implements GitOperations {
     }
 
     @Override
-    public List<IdentifiableResource> getHeadFiles() {
+    public List<WorkflowResource> getHeadFiles() {
         Repository repo = getRepository();
         return getHeadFiles(repo, searchPaths);
     }
 
-    private List<IdentifiableResource> getHeadFiles(Repository aRepository, String... aSearchPaths) {
+    private List<WorkflowResource> getHeadFiles(Repository aRepository, String... aSearchPaths) {
         List<String> searchPaths = Arrays.asList(aSearchPaths);
-        List<IdentifiableResource> resources = new ArrayList<>();
+        List<WorkflowResource> resources = new ArrayList<>();
         try (
             ObjectReader reader = aRepository.newObjectReader();
             RevWalk walk = new RevWalk(reader);
@@ -126,7 +127,7 @@ public class JGitTemplate implements GitOperations {
     }
 
     @Override
-    public IdentifiableResource getFile(String aFileId) {
+    public WorkflowResource getFile(String aFileId) {
         try {
             Repository repository = getRepository();
             int blobIdDelim = aFileId.lastIndexOf(':');
@@ -142,10 +143,10 @@ public class JGitTemplate implements GitOperations {
         }
     }
 
-    private IdentifiableResource readBlob(Repository aRepo, String aPath, String aBlobId) throws Exception {
+    private WorkflowResource readBlob(Repository aRepo, String aPath, String aBlobId) throws Exception {
         try (ObjectReader reader = aRepo.newObjectReader()) {
             if (aBlobId.equals(LATEST)) {
-                List<IdentifiableResource> headFiles = getHeadFiles(aRepo, aPath);
+                List<WorkflowResource> headFiles = getHeadFiles(aRepo, aPath);
                 Assert.notEmpty(headFiles, "could not find: " + aPath + ":" + aBlobId);
                 return headFiles.get(0);
             }
@@ -153,7 +154,8 @@ public class JGitTemplate implements GitOperations {
             Assert.notNull(objectId, "could not find: " + aPath + ":" + aBlobId);
             byte[] data = reader.open(objectId).getBytes();
             AbbreviatedObjectId abbreviated = reader.abbreviate(objectId);
-            return new IdentifiableResource(aPath + ":" + abbreviated.name(), new ByteArrayResource(data));
+            return new WorkflowResource(
+                aPath + ":" + abbreviated.name(), new ByteArrayResource(data), WorkflowFormatType.parse(aPath));
         }
     }
 
