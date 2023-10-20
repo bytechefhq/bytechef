@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-28T22:05:18.177079+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-03T12:13:58.765927+02:00[Europe/Zagreb]")
 public class ProjectModel {
 
   private CategoryModel category;
