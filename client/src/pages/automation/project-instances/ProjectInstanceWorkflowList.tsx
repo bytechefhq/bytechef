@@ -1,4 +1,4 @@
-import Switch from 'components/Switch/Switch';
+import {Switch} from '@/components/ui/switch';
 import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
 import {Link} from 'react-router-dom';
 

@@ -1,3 +1,4 @@
+import {Switch} from '@/components/ui/switch';
 import {
     ProjectInstanceModel,
     ProjectModel,
@@ -10,7 +11,6 @@ import {
 import {ProjectKeys} from '@/queries/projects.queries';
 import {CalendarIcon, ChevronDownIcon} from '@heroicons/react/24/outline';
 import {useQueryClient} from '@tanstack/react-query';
-import Switch from 'components/Switch/Switch';
 import {useState} from 'react';
 
 import AlertDialog from '../../../components/AlertDialog/AlertDialog';
