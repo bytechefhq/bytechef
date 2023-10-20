@@ -1,5 +1,5 @@
 [versions]
-ch-qos-logback = "1.4.6"
+ch-qos-logback = "1.4.7"
 checkstyle = "10.6.0"
 com-fasterxml-jackson-core = "2.15.0-rc3"
 com-fasterxml-jackson-dataformat = "2.15.0-rc3"
@@ -8,7 +8,7 @@ com-google-auto-service = "1.0.1"
 info-picocli = "4.7.3"
 org-mapstruct = "1.5.4.Final"
 org-mapstruct-extensions-spring = "1.0.0"
-org-springframework-boot = "3.0.5"
+org-springframework-boot = "3.0.6"
 org-springframework-cloud = "4.0.2"
 org-springframework-cloud-dependencies = "2022.0.2"
 org-testcontainers = "1.18.0"
@@ -82,7 +82,7 @@ org-springframework-retry-spring-retry = "org.springframework.retry:spring-retry
 org-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "org-testcontainers" }
 org-testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "org-testcontainers" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.48"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.49"
 
 [plugins]
 com-diffplug-spotless = "com.diffplug.spotless:6.18.0"
@@ -93,4 +93,4 @@ com-gorylenko-gradle-git-properties = "com.gorylenko.gradle-git-properties:2.4.1
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.0"
 org-openapi-generator = "org.openapi.generator:6.5.0"
 org-sonarqube = "org.sonarqube:4.0.0.2929"
-org-springframework-boot = "org.springframework.boot:3.0.5"
+org-springframework-boot = "org.springframework.boot:3.0.6"
