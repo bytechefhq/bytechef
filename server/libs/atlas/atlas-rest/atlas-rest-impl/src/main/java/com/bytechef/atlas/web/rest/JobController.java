@@ -25,9 +25,9 @@ import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.web.rest.model.CreateJob200ResponseModel;
 import com.bytechef.atlas.web.rest.model.JobModel;
 import com.bytechef.atlas.web.rest.model.JobParametersModel;
-import com.bytechef.atlas.web.rest.model.PostJob200ResponseModel;
 import com.bytechef.atlas.web.rest.model.TaskExecutionModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -98,7 +98,7 @@ public class JobController implements JobsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<PostJob200ResponseModel>> postJob(
+    public Mono<ResponseEntity<CreateJob200ResponseModel>> createJob(
         Mono<JobParametersModel> workflowParametersModelMono, ServerWebExchange exchange) {
         return workflowParametersModelMono.map(workflowParametersModel -> {
             JobParameters jobParameters = conversionService.convert(
@@ -106,7 +106,7 @@ public class JobController implements JobsApi {
 
             long jobId = jobFacade.create(jobParameters);
 
-            return ResponseEntity.ok(new PostJob200ResponseModel().jobId(jobId));
+            return ResponseEntity.ok(new CreateJob200ResponseModel().jobId(jobId));
         });
     }
 

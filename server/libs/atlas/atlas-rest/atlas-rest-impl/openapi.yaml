@@ -34,7 +34,7 @@ paths:
       summary: Create a request for running a new job.
       tags:
         - jobs
-      operationId: postJob
+      operationId: createJob
       requestBody:
         description: Parameters required to run a job, for example '{"workflowId":"samples/hello","inputs":{"yourName":"Joe Jones"}}'
         content:
@@ -192,7 +192,7 @@ paths:
       summary: Create a new workflow.
       tags:
         - workflows
-      operationId: postWorkflow
+      operationId: createWorkflow
       requestBody:
         description: The workflow object that needs to be created.
         content:
@@ -249,7 +249,7 @@ paths:
       summary: Update an existing workflow.
       tags:
         - workflows
-      operationId: putWorkflow
+      operationId: updateWorkflow
       parameters:
         - name: id
           description: The id of the workflow to update.
@@ -622,9 +622,8 @@ components:
           items:
             $ref: '#/components/schemas/WorkflowTask'
           readOnly: true
-        version:
+        __version:
           type: integer
-          format: int32
     WorkflowFormat:
       type: string
       enum:
