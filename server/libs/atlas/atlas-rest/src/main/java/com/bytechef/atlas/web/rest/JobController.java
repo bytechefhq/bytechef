@@ -99,8 +99,8 @@ public class JobController implements JobsApi {
     public Mono<ResponseEntity<PostJob200ResponseModel>> postJob(
         Mono<JobParametersModel> workflowParametersModelMono, ServerWebExchange exchange) {
         return workflowParametersModelMono.map(workflowParametersModel -> {
-            JobParameters jobParameters = conversionService.convert(workflowParametersModel,
-                JobParameters.class);
+            JobParameters jobParameters = conversionService.convert(
+                workflowParametersModel, JobParameters.class);
 
             String id = UUIDUtils.generate();
 
