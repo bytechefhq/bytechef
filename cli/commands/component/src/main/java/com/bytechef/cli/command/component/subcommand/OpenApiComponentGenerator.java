@@ -1658,7 +1658,10 @@ public class OpenApiComponentGenerator {
             JavaFile javaFile = JavaFile.builder(
                 getPackageName(),
                 TypeSpec.classBuilder(getComponentHandlerClassName(componentName))
-                    .addJavadoc("@generated")
+                    .addJavadoc("""
+                            This class will not be overwritten on the subsequent calls of generator.
+                            @generated
+                        """)
                     .addAnnotation(
                         AnnotationSpec.builder(ClassName.get("com.google.auto.service", "AutoService"))
                             .addMember("value", "$T.class",
