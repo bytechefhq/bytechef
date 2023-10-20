@@ -207,16 +207,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workflow'
-  /workflows/clear-cache:
-    get:
-      summary: Clear workflows cache.
-      description: Clear workflows cache.
-      tags:
-        - workflows
-      operationId: clearCache
-      responses:
-        "200":
-          description: Successful operation.
   /workflows/{id}:
     delete:
       description: Delete a workflow.

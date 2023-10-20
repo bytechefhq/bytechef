@@ -60,24 +60,10 @@ public class WorkflowServiceImpl implements WorkflowService {
     public WorkflowServiceImpl(@Qualifier("workflowRepositoryCacheManager") CacheManager cacheManager,
         List<WorkflowCrudRepository> workflowCrudRepositories,
         List<WorkflowRepository> workflowRepositories) {
-        Assert.notNull(cacheManager, "'cacheManager' can not be null");
-        Assert.notNull(workflowCrudRepositories, "'workflowCrudRepositories' can not be null");
-        Assert.notNull(workflowRepositories, "'workflowRepositories' can not be null");
 
         this.cacheManager = cacheManager;
         this.workflowCrudRepositories = workflowCrudRepositories;
         this.workflowRepositories = workflowRepositories;
-    }
-
-    @Override
-    @SuppressFBWarnings("NP")
-    public void clearCache() {
-        for (String cacheName : cacheManager.getCacheNames()) {
-            Cache cache = cacheManager.getCache(cacheName);
-
-            Objects.requireNonNull(cache)
-                .clear();
-        }
     }
 
     @Override

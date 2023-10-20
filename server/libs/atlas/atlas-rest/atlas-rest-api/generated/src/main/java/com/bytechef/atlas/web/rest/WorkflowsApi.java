@@ -38,34 +38,6 @@ import jakarta.annotation.Generated;
 public interface WorkflowsApi {
 
     /**
-     * GET /workflows/clear-cache : Clear workflows cache.
-     * Clear workflows cache.
-     *
-     * @return Successful operation. (status code 200)
-     */
-    @Operation(
-        operationId = "clearCache",
-        summary = "Clear workflows cache.",
-        tags = { "workflows" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/workflows/clear-cache"
-    )
-    default Mono<ResponseEntity<Void>> clearCache(
-        @Parameter(hidden = true) final ServerWebExchange exchange
-    ) {
-        Mono<Void> result = Mono.empty();
-        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        return result.then(Mono.empty());
-
-    }
-
-
-    /**
      * DELETE /workflows/{id} : Delete a workflow.
      * Delete a workflow.
      *

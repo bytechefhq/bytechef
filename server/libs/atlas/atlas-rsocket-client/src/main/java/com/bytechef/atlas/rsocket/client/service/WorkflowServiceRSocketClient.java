@@ -38,14 +38,6 @@ public class WorkflowServiceRSocketClient implements WorkflowService {
     }
 
     @Override
-    public void clearCache() {
-        rSocketRequester
-            .route("clearCache")
-            .send()
-            .block();
-    }
-
-    @Override
     public Workflow create(String definition, Workflow.Format format, Workflow.SourceType sourceType) {
         return rSocketRequester
             .route("createWorkflow")

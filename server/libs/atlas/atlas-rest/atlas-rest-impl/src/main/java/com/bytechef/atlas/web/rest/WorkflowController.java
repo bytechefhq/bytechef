@@ -33,6 +33,9 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Arik Cohen
  * @author Ivica Cardic
@@ -52,19 +55,12 @@ public class WorkflowController implements WorkflowsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> clearCache(ServerWebExchange exchange) {
-        workflowService.clearCache();
-
-        return Mono.just(ResponseEntity.ok()
-            .build());
-    }
-
-    @Override
     public Mono<ResponseEntity<Void>> deleteWorkflow(String id, ServerWebExchange exchange) {
         workflowService.delete(id);
 
-        return Mono.just(ResponseEntity.ok()
-            .build());
+        return Mono.just(
+            ResponseEntity.ok()
+                .build());
     }
 
     @Override
@@ -75,10 +71,13 @@ public class WorkflowController implements WorkflowsApi {
 
     @Override
     public Mono<ResponseEntity<Flux<WorkflowModel>>> getWorkflows(ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(workflowService.getWorkflows()
-            .stream()
-            .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
-            .toList())));
+        List<WorkflowModel> workflowModels = new ArrayList<>();
+
+        for (Workflow workflow : workflowService.getWorkflows()) {
+            workflowModels.add(conversionService.convert(workflow, WorkflowModel.class));
+        }
+
+        return Mono.just(ResponseEntity.ok(Flux.fromIterable(workflowModels)));
     }
 
     @Override
@@ -102,7 +101,8 @@ public class WorkflowController implements WorkflowsApi {
     public Mono<ResponseEntity<WorkflowModel>> putWorkflow(
         String id, Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
         return workflowModelMono.map(workflowModel -> ResponseEntity.ok(
-            conversionService.convert(workflowService.update(id, workflowModel.getDefinition()),
+            conversionService.convert(
+                workflowService.update(id, workflowModel.getDefinition()),
                 WorkflowModel.class)));
     }
 }
