@@ -19,6 +19,7 @@ package com.bytechef.atlas.service.impl;
 import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.dto.JobParametersDTO;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.priority.Prioritizable;
 import com.bytechef.atlas.repository.JobRepository;
@@ -26,7 +27,6 @@ import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.commons.collection.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,6 @@ import java.util.Optional;
 import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,8 +59,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job add(Map<String, Object> jobParams) {
-        String workflowId = MapUtils.getRequiredString(jobParams, WORKFLOW_ID);
+    public Job add(JobParametersDTO jobParametersDTO) {
+        String workflowId = jobParametersDTO.getWorkflowId();
 
         Workflow workflow = workflowRepository.findById(workflowId).orElseThrow();
 
@@ -73,22 +72,21 @@ public class JobServiceImpl implements JobService {
                                 "%s: %s", workflowId, workflow.getError().getMessage())
                         : "");
 
-        validate(jobParams, workflow);
+        validate(jobParametersDTO, workflow);
 
         Job job = new Job();
 
-        job.setId(
-                jobParams.containsKey(WorkflowConstants.ID)
-                        ? MapUtils.getString(jobParams, WorkflowConstants.ID)
-                        : null);
-        job.setInputs(MapUtils.getMap(jobParams, WorkflowConstants.INPUTS, Collections.emptyMap()));
+        job.setId(jobParametersDTO.getJobId() == null ? null : jobParametersDTO.getJobId());
+        job.setInputs(jobParametersDTO.getInputs());
         job.setNew(true);
-        job.setLabel(MapUtils.getString(jobParams, WorkflowConstants.LABEL, workflow.getLabel()));
-        job.setParentTaskExecutionId(MapUtils.getString(jobParams, WorkflowConstants.PARENT_TASK_EXECUTION_ID));
-        job.setPriority(MapUtils.getInteger(jobParams, WorkflowConstants.PRIORITY, Prioritizable.DEFAULT_PRIORITY));
+        job.setLabel(jobParametersDTO.getLabel() == null ? workflow.getLabel() : jobParametersDTO.getLabel());
+        job.setParentTaskExecutionId(jobParametersDTO.getParentTaskExecutionId());
+        job.setPriority(
+                jobParametersDTO.getPriority() == null
+                        ? Prioritizable.DEFAULT_PRIORITY
+                        : jobParametersDTO.getPriority());
         job.setStatus(JobStatus.CREATED);
-        job.setWebhooks(MapUtils.getList(
-                jobParams, WorkflowConstants.WEBHOOKS, new ParameterizedTypeReference<>() {}, Collections.emptyList()));
+        job.setWebhooks(jobParametersDTO.getWebhooks());
         job.setWorkflowId(workflow.getId());
 
         log.debug("Job {} started", job.getId());
@@ -186,9 +184,10 @@ public class JobServiceImpl implements JobService {
         return aJob.getStatus() == JobStatus.STOPPED || aJob.getStatus() == JobStatus.FAILED;
     }
 
-    private void validate(Map<String, Object> createJobParams, Workflow workflow) {
+    private void validate(JobParametersDTO workflowParameters, Workflow workflow) {
         // validate inputs
-        Map<String, Object> inputs = MapUtils.getMap(createJobParams, WorkflowConstants.INPUTS, Collections.emptyMap());
+
+        Map<String, Object> inputs = workflowParameters.getInputs();
 
         for (Map<String, Object> input : workflow.getInputs()) {
             if (MapUtils.getBoolean(input, WorkflowConstants.REQUIRED, false)) {
@@ -199,13 +198,8 @@ public class JobServiceImpl implements JobService {
         }
 
         // validate webhooks
-        List<Map<String, Object>> webhooks = MapUtils.getList(
-                createJobParams,
-                WorkflowConstants.WEBHOOKS,
-                new ParameterizedTypeReference<>() {},
-                Collections.emptyList());
 
-        for (Map<String, Object> webhook : webhooks) {
+        for (Map<String, Object> webhook : workflowParameters.getWebhooks()) {
             Assert.notNull(webhook.get(WorkflowConstants.TYPE), "must define 'type' on webhook");
             Assert.notNull(webhook.get(WorkflowConstants.URL), "must define 'url' on webhook");
         }
