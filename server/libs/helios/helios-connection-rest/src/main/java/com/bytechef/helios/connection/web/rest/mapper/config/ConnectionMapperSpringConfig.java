@@ -15,11 +15,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.project.web.rest.mapper.config;
+package com.bytechef.helios.connection.web.rest.mapper.config;
 
-import com.bytechef.hermes.workflow.web.rest.adapter.WorkflowConversionServiceAdapter;
-import com.bytechef.category.web.rest.mapper.adapter.CategoryConversionServiceAdapter;
-import com.bytechef.helios.project.web.rest.adapter.ProjectConversionServiceAdapter;
+import com.bytechef.helios.connection.web.rest.adapter.ConnectionConversionServiceAdapter;
 import com.bytechef.tag.web.rest.mapper.adapter.TagConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
@@ -28,11 +26,10 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    CategoryConversionServiceAdapter.class, ProjectConversionServiceAdapter.class, TagConversionServiceAdapter.class,
-    WorkflowConversionServiceAdapter.class
+    ConnectionConversionServiceAdapter.class, TagConversionServiceAdapter.class
 })
 @SpringMapperConfig(
-    conversionServiceAdapterPackage = "com.bytechef.helios.project.web.rest.adapter",
-    conversionServiceAdapterClassName = "ProjectConversionServiceAdapter")
-public interface ProjectMapperSpringConfig {
+    conversionServiceAdapterPackage = "com.bytechef.helios.connection.web.rest.adapter",
+    conversionServiceAdapterClassName = "ConnectionConversionServiceAdapter")
+public interface ConnectionMapperSpringConfig {
 }
