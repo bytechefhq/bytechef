@@ -21,6 +21,7 @@ import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.remote.web.rest.client.AbstractWorkerClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 
@@ -32,8 +33,8 @@ import java.util.Map;
  */
 public class ActionDefinitionFacadeClient extends AbstractWorkerClient implements ActionDefinitionFacade {
 
-    public ActionDefinitionFacadeClient(DiscoveryClient discoveryClient) {
-        super(discoveryClient);
+    public ActionDefinitionFacadeClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        super(discoveryClient, objectMapper);
     }
 
     @Override

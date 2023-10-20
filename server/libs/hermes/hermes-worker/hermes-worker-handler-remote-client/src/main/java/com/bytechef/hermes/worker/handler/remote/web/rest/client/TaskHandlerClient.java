@@ -19,6 +19,7 @@ package com.bytechef.hermes.worker.handler.remote.web.rest.client;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -35,15 +36,18 @@ import java.util.Map;
 public class TaskHandlerClient {
 
     private final DiscoveryClient discoveryClient;
+    private final ObjectMapper objectMapper;
 
-    public TaskHandlerClient(DiscoveryClient discoveryClient) {
+    public TaskHandlerClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
         this.discoveryClient = discoveryClient;
+        this.objectMapper = objectMapper;
     }
 
     @SuppressFBWarnings("NP")
     public Object handle(String type, TaskExecution taskExecution) {
         ServiceInstance serviceInstance = WorkerDiscoveryUtils.filterServiceInstance(
-            discoveryClient.getInstances("worker-service-app"), StringUtils.split(type, "/")[0]);
+            discoveryClient.getInstances("worker-service-app"), StringUtils.split(type, "/")[0],
+            objectMapper);
 
         return WebClient.create()
             .post()

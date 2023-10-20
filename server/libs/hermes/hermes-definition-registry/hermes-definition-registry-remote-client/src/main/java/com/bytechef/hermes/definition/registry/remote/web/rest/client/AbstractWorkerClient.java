@@ -18,6 +18,7 @@
 package com.bytechef.hermes.definition.registry.remote.web.rest.client;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.util.CollectionUtils;
@@ -34,9 +35,11 @@ public abstract class AbstractWorkerClient {
     protected static final WebClient WORKER_WEB_CLIENT = WebClient.create();
 
     protected final DiscoveryClient discoveryClient;
+    protected final ObjectMapper objectMapper;
 
-    public AbstractWorkerClient(DiscoveryClient discoveryClient) {
+    public AbstractWorkerClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
         this.discoveryClient = discoveryClient;
+        this.objectMapper = objectMapper;
     }
 
     protected URI toUri(
@@ -62,7 +65,7 @@ public abstract class AbstractWorkerClient {
 
     private UriBuilder process(UriBuilder uriBuilder, String componentName, String path) {
         ServiceInstance serviceInstance = WorkerDiscoveryUtils.filterServiceInstance(
-            discoveryClient.getInstances(WORKER_SERVICE_APP), componentName);
+            discoveryClient.getInstances(WORKER_SERVICE_APP), componentName, objectMapper);
 
         return process(uriBuilder, serviceInstance, path);
     }

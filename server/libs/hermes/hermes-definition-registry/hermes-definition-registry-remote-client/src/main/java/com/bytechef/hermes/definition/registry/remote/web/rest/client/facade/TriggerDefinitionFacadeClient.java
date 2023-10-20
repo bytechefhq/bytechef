@@ -21,6 +21,7 @@ import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.definition.registry.remote.web.rest.client.AbstractWorkerClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 
@@ -32,8 +33,8 @@ import java.util.Map;
  */
 public class TriggerDefinitionFacadeClient extends AbstractWorkerClient implements TriggerDefinitionFacade {
 
-    public TriggerDefinitionFacadeClient(DiscoveryClient discoveryClient) {
-        super(discoveryClient);
+    public TriggerDefinitionFacadeClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        super(discoveryClient, objectMapper);
     }
 
     @Override

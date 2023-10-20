@@ -46,6 +46,7 @@ import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.component.factory.ContextConnectionFactory;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -101,9 +102,9 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     ConnectionDefinitionServiceClient connectionDefinitionServiceClient(
-        DiscoveryClient discoveryClient) {
+        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        return new ConnectionDefinitionServiceClient(discoveryClient);
+        return new ConnectionDefinitionServiceClient(discoveryClient, objectMapper);
     }
 
     @Bean

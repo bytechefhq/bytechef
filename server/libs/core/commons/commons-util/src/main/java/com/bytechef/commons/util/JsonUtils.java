@@ -17,31 +17,16 @@
 
 package com.bytechef.commons.util;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 /**
  * @author Ivica Cardic
  */
 public final class JsonUtils {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper() {
-        {
-            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-            registerModule(new JavaTimeModule());
-            registerModule(new Jdk8Module());
-
-            setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        }
-    };
-
-    public static <T> T read(String json) {
+    public static <T> T read(String json, ObjectMapper objectMapper) {
         try {
             return objectMapper.readValue(json, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
@@ -49,7 +34,7 @@ public final class JsonUtils {
         }
     }
 
-    public static String write(Object object) {
+    public static String write(Object object, ObjectMapper objectMapper) {
         try {
             return objectMapper.writeValueAsString(object);
         } catch (Exception e) {

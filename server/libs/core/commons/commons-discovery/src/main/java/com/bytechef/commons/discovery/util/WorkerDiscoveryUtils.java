@@ -19,6 +19,7 @@ package com.bytechef.commons.discovery.util;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapValueUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.util.StringUtils;
 
@@ -36,11 +37,13 @@ import java.util.stream.Collectors;
  */
 public class WorkerDiscoveryUtils {
 
-    public static ServiceInstance filterServiceInstance(List<ServiceInstance> serviceInstances, String componentName) {
+    public static ServiceInstance filterServiceInstance(
+        List<ServiceInstance> serviceInstances, String componentName, ObjectMapper objectMapper) {
+
         for (ServiceInstance serviceInstance : serviceInstances) {
             Map<String, String> metadataMap = serviceInstance.getMetadata();
 
-            List<String> componentNames = getComponentNames(metadataMap);
+            List<String> componentNames = getComponentNames(metadataMap, objectMapper);
 
             for (String curComponentName : componentNames) {
                 if (curComponentName.equalsIgnoreCase(componentName)) {
@@ -52,8 +55,10 @@ public class WorkerDiscoveryUtils {
         throw new IllegalStateException("None od worker instances contains component %s ".formatted(componentName));
     }
 
-    public static Set<ServiceInstance> filterServiceInstances(List<ServiceInstance> serviceInstances) {
-        Set<String> instanceIds = toUniqueInstanceIds(serviceInstances);
+    public static Set<ServiceInstance> filterServiceInstances(
+        List<ServiceInstance> serviceInstances, ObjectMapper objectMapper) {
+
+        Set<String> instanceIds = toUniqueInstanceIds(serviceInstances, objectMapper);
 
         return instanceIds.stream()
             .map(instanceId -> serviceInstances.stream()
@@ -64,12 +69,12 @@ public class WorkerDiscoveryUtils {
             .collect(Collectors.toSet());
     }
 
-    private static List<String> getComponentNames(Map<String, String> metadataMap) {
+    private static List<String> getComponentNames(Map<String, String> metadataMap, ObjectMapper objectMapper) {
         if (metadataMap.containsKey("components")) {
             String componentsString = metadataMap.get("components");
 
             if (StringUtils.hasText(componentsString)) {
-                List<Map<String, String>> components = JsonUtils.read(componentsString);
+                List<Map<String, String>> components = JsonUtils.read(componentsString, objectMapper);
 
                 return components.stream()
                     .map(componentMap -> MapValueUtils.getString(componentMap, "name"))
@@ -80,13 +85,13 @@ public class WorkerDiscoveryUtils {
         return List.of();
     }
 
-    private static Set<String> toUniqueInstanceIds(List<ServiceInstance> serviceInstances) {
+    private static Set<String> toUniqueInstanceIds(List<ServiceInstance> serviceInstances, ObjectMapper objectMapper) {
         Map<String, Set<String>> componentNameInstanceIds = new HashMap<>();
 
         for (ServiceInstance serviceInstance : serviceInstances) {
             Map<String, String> metadataMap = serviceInstance.getMetadata();
 
-            List<String> componentNames = getComponentNames(metadataMap);
+            List<String> componentNames = getComponentNames(metadataMap, objectMapper);
 
             for (String componentName : componentNames) {
                 componentNameInstanceIds.compute(componentName, (key, instanceIds) -> {
