@@ -178,7 +178,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         return new ProjectDTO(
             project,
-            OptionalUtils.orElse(categoryService.fetchCategory(project.getCategoryId()), null),
+            project.getCategoryId() == null
+                ? null : OptionalUtils.get(categoryService.fetchCategory(project.getCategoryId())),
             tagService.getTags(project.getTagIds()));
     }
 
@@ -189,7 +190,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         return new ProjectDTO(
             project,
-            OptionalUtils.orElse(categoryService.fetchCategory(project.getCategoryId()), null),
+            project.getCategoryId() == null ? null
+                : OptionalUtils.get(categoryService.fetchCategory(project.getCategoryId())),
             tagService.getTags(project.getTagIds()));
     }
 
@@ -424,7 +426,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
         Project project = projectService.update(id, CollectionUtils.map(tags, Tag::getId));
 
         return new ProjectDTO(
-            project, OptionalUtils.orElse(categoryService.fetchCategory(project.getCategoryId()), null), tags);
+            project,
+            project.getCategoryId() == null
+                ? null
+                : OptionalUtils.get(categoryService.fetchCategory(project.getCategoryId())),
+            tags);
     }
 
     private List<String> copyWorkflowIds(List<String> workflowIds) {

@@ -116,12 +116,14 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     @Override
     @Transactional(readOnly = true)
     public IntegrationDTO getIntegration(Long id) {
-        Integration project = integrationService.getIntegration(id);
+        Integration integration = integrationService.getIntegration(id);
 
         return new IntegrationDTO(
-            project,
-            OptionalUtils.orElse(categoryService.fetchCategory(project.getCategoryId()), null),
-            tagService.getTags(project.getTagIds()));
+            integration,
+            integration.getCategoryId() == null
+                ? null
+                : OptionalUtils.get(categoryService.fetchCategory(integration.getCategoryId())),
+            tagService.getTags(integration.getTagIds()));
     }
 
     @Override
@@ -198,7 +200,11 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
             id, com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId));
 
         return new IntegrationDTO(
-            integration, OptionalUtils.orElse(categoryService.fetchCategory(integration.getCategoryId()), null), tags);
+            integration,
+            integration.getCategoryId() == null
+                ? null
+                : OptionalUtils.get(categoryService.fetchCategory(integration.getCategoryId())),
+            tags);
     }
 
     @Override
