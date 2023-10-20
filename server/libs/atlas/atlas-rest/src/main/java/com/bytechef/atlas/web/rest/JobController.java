@@ -20,6 +20,7 @@
 package com.bytechef.atlas.web.rest;
 
 import com.bytechef.atlas.dto.JobParameters;
+import com.bytechef.atlas.facade.JobFacade;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.service.JobService;
@@ -29,7 +30,6 @@ import com.bytechef.atlas.web.rest.model.JobParametersModel;
 import com.bytechef.atlas.web.rest.model.PostJob200ResponseModel;
 import com.bytechef.atlas.web.rest.model.TaskExecutionModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.commons.utils.UUIDUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
@@ -50,6 +50,7 @@ import reactor.core.publisher.Mono;
 public class JobController implements JobsApi {
 
     private final ConversionService conversionService;
+    private final JobFacade jobFacade;
     private final JobService jobService;
     private final MessageBroker messageBroker;
     private final TaskExecutionService taskExecutionService;
@@ -57,23 +58,24 @@ public class JobController implements JobsApi {
     @SuppressFBWarnings("EI2")
     public JobController(
         ConversionService conversionService,
-        JobService jobService,
+        JobFacade jobFacade, JobService jobService,
         MessageBroker messageBroker,
         TaskExecutionService taskExecutionService) {
         this.conversionService = conversionService;
+        this.jobFacade = jobFacade;
         this.jobService = jobService;
         this.messageBroker = messageBroker;
         this.taskExecutionService = taskExecutionService;
     }
 
     @Override
-    public Mono<ResponseEntity<JobModel>> getJob(String id, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<JobModel>> getJob(Long id, ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(conversionService.convert(jobService.getJob(id), JobModel.class)));
     }
 
     @Override
     public Mono<ResponseEntity<Flux<TaskExecutionModel>>> getJobTaskExecutions(
-        String jobId, ServerWebExchange exchange) {
+        Long jobId, ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(Flux.fromIterable(taskExecutionService.getJobTaskExecutions(jobId)
             .stream()
             .map(taskExecution -> conversionService.convert(taskExecution, TaskExecutionModel.class))
@@ -102,25 +104,21 @@ public class JobController implements JobsApi {
             JobParameters jobParameters = conversionService.convert(
                 workflowParametersModel, JobParameters.class);
 
-            String id = UUIDUtils.generate();
+            long jobId = jobFacade.create(jobParameters);
 
-            jobParameters.setJobId(id);
-
-            messageBroker.send(Queues.REQUESTS, jobParameters);
-
-            return ResponseEntity.ok(new PostJob200ResponseModel().jobId(id));
+            return ResponseEntity.ok(new PostJob200ResponseModel().jobId(jobId));
         });
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> restartJob(String id, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Void>> restartJob(Long id, ServerWebExchange exchange) {
         messageBroker.send(Queues.RESTARTS, id);
 
         return Mono.empty();
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> stopJob(String id, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Void>> stopJob(Long id, ServerWebExchange exchange) {
         messageBroker.send(Queues.STOPS, id);
 
         return Mono.empty();

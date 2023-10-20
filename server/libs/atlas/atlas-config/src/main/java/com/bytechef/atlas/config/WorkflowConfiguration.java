@@ -17,6 +17,10 @@
 
 package com.bytechef.atlas.config;
 
+import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.atlas.facade.JobFacade;
+import com.bytechef.atlas.facade.impl.JobFacadeImpl;
+import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.repository.ContextRepository;
 import com.bytechef.atlas.repository.CounterRepository;
 import com.bytechef.atlas.repository.JobRepository;
@@ -53,6 +57,13 @@ public class WorkflowConfiguration {
     @Bean
     public CounterService counterService(CounterRepository counterRepository) {
         return new CounterServiceImpl(counterRepository);
+    }
+
+    @Bean
+    public JobFacade jobFacade(
+        ContextService contextService, EventPublisher eventPublisher, JobService jobService,
+        MessageBroker messageBroker) {
+        return new JobFacadeImpl(contextService, eventPublisher, jobService, messageBroker);
     }
 
     @Bean

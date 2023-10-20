@@ -74,15 +74,16 @@ public class JobExecutor {
         }
     }
 
+    @SuppressFBWarnings("NP")
     private void executeNextTask(Job job, Workflow workflow) {
+        Context context = contextService.peek(job.getId(), Context.Classname.JOB);
         TaskExecution nextTaskExecution = nextTaskExecution(job, workflow);
-        Context context = contextService.peek(job.getId());
-
-        contextService.push(nextTaskExecution.getId(), context);
-
-        nextTaskExecution.evaluate(taskEvaluator, context);
 
         nextTaskExecution = taskExecutionService.create(nextTaskExecution);
+
+        contextService.push(nextTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
+
+        nextTaskExecution.evaluate(taskEvaluator, context);
 
         taskDispatcher.dispatch(nextTaskExecution);
     }

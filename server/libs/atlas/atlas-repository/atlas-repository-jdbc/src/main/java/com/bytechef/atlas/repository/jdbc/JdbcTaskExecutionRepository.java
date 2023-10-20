@@ -40,34 +40,34 @@ import org.springframework.stereotype.Repository;
 @Repository
 @ConditionalOnProperty(prefix = "bytechef.workflow", name = "persistence.provider", havingValue = "jdbc")
 public interface JdbcTaskExecutionRepository
-    extends PagingAndSortingRepository<TaskExecution, String>, TaskExecutionRepository {
+    extends PagingAndSortingRepository<TaskExecution, Long>, TaskExecutionRepository {
 
-    List<TaskExecution> findAllByJobRefOrderByCreatedDate(AggregateReference<Job, String> jobRef);
+    List<TaskExecution> findAllByJobRefOrderByCreatedDate(AggregateReference<Job, Long> jobRef);
 
-    List<TaskExecution> findAllByJobRefInOrderByCreatedDate(List<AggregateReference<Job, String>> jobRefs);
+    List<TaskExecution> findAllByJobRefInOrderByCreatedDate(List<AggregateReference<Job, Long>> jobRefs);
 
-    List<TaskExecution> findAllByJobRefOrderByTaskNumber(AggregateReference<Job, String> jobRef);
+    List<TaskExecution> findAllByJobRefOrderByTaskNumber(AggregateReference<Job, Long> jobRef);
 
-    List<TaskExecution> findAllByParentRef(AggregateReference<TaskExecution, String> parentRef);
+    List<TaskExecution> findAllByParentRef(AggregateReference<TaskExecution, Long> parentRef);
 
     @Override
     @Query("SELECT * FROM task_execution WHERE id = :id FOR UPDATE")
-    Optional<TaskExecution> findByIdForUpdate(@Param("id") String id);
+    Optional<TaskExecution> findByIdForUpdate(@Param("id") long id);
 
     @Override
     @Modifying
     @Query("UPDATE task_execution SET status = :status WHERE id = :id")
-    void updateStatus(@Param("id") String id, @Param("status") TaskStatus status);
+    void updateStatus(@Param("id") long id, @Param("status") TaskStatus status);
 
     @Override
     @Modifying
     @Query("UPDATE task_execution SET status = :status AND start_time = :startTime WHERE id = :id")
     void updateStatusAndStartTime(
-        @Param("id") String id, @Param("status") TaskStatus status, @Param("startTime") LocalDateTime startTime);
+        @Param("id") long id, @Param("status") TaskStatus status, @Param("startTime") LocalDateTime startTime);
 
     @Override
     @Modifying
     @Query("UPDATE task_execution SET status = :status AND end_time = :endTime WHERE id = :id")
     void updateStatusAndEndTime(
-        @Param("id") String id, @Param("status") TaskStatus status, @Param("endTime") LocalDateTime endTime);
+        @Param("id") long id, @Param("status") TaskStatus status, @Param("endTime") LocalDateTime endTime);
 }

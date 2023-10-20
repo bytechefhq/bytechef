@@ -15,27 +15,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.repository.jdbc.event;
+package com.bytechef.atlas.facade;
 
-import com.bytechef.atlas.domain.Job;
-import com.bytechef.commons.utils.UUIDUtils;
-import org.springframework.core.annotation.Order;
-import org.springframework.data.relational.core.mapping.event.BeforeConvertCallback;
-import org.springframework.stereotype.Component;
+import com.bytechef.atlas.dto.JobParameters;
 
 /**
  * @author Ivica Cardic
  */
-@Order(1)
-@Component
-public class JobCallback implements BeforeConvertCallback<Job> {
+public interface JobFacade {
 
-    @Override
-    public Job onBeforeConvert(Job job) {
-        if (job.isNew() && job.getId() == null) {
-            job.setId(UUIDUtils.generate());
-        }
-
-        return job;
-    }
+    long create(JobParameters jobParameters);
 }

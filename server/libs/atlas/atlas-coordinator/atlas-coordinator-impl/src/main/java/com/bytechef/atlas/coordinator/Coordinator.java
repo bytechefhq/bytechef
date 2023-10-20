@@ -21,7 +21,6 @@ package com.bytechef.atlas.coordinator;
 
 import com.bytechef.atlas.coordinator.job.executor.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
-import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.dto.JobParameters;
@@ -30,9 +29,7 @@ import com.bytechef.atlas.error.Errorable;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
-import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.message.broker.Queues;
-import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.facade.JobFacade;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.CancelControlTask;
@@ -46,7 +43,6 @@ import java.util.List;
 
 import com.bytechef.commons.utils.ExceptionUtils;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 /**
  * The central class responsible for coordinating and executing jobs.
@@ -58,32 +54,28 @@ import org.springframework.util.Assert;
 @Transactional
 public class Coordinator {
 
-    private final ContextService contextService;
     private final ErrorHandler<? super Errorable> errorHandler;
     private final EventPublisher eventPublisher;
     private final JobExecutor jobExecutor;
+    private final JobFacade jobFacade;
     private final JobService jobService;
-    private final MessageBroker messageBroker;
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
 
     public Coordinator(
-        ContextService contextService,
         ErrorHandler<? super Errorable> errorHandler,
         EventPublisher eventPublisher,
         JobExecutor jobExecutor,
-        JobService jobService,
-        MessageBroker messageBroker,
+        JobFacade jobFacade, JobService jobService,
         TaskCompletionHandler taskCompletionHandler,
         TaskDispatcher<? super Task> taskDispatcher,
         TaskExecutionService taskExecutionService) {
-        this.contextService = contextService;
         this.errorHandler = errorHandler;
         this.eventPublisher = eventPublisher;
         this.jobExecutor = jobExecutor;
+        this.jobFacade = jobFacade;
         this.jobService = jobService;
-        this.messageBroker = messageBroker;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
@@ -95,20 +87,10 @@ public class Coordinator {
      * @param jobParameters The Key-Value map representing the workflow parameters
      */
     public void create(JobParameters jobParameters) {
-        Assert.notNull(jobParameters, "'jobParameters' must not be null.");
-
-        Job job = jobService.create(jobParameters);
-
-        Context context = new Context(job.getInputs());
-
-        contextService.push(job.getId(), context);
-
-        eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
-
-        messageBroker.send(Queues.JOBS, job.getId());
+        jobFacade.create(jobParameters);
     }
 
-    public void start(String jobId) {
+    public void start(Long jobId) {
         Job job = jobService.start(jobId);
 
         jobExecutor.execute(job);
@@ -122,7 +104,7 @@ public class Coordinator {
      * @param jobId The id of the job to stop
      * @return The stopped {@link Job}
      */
-    public Job stop(String jobId) {
+    public Job stop(Long jobId) {
         Job job = jobService.stop(jobId);
 
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
@@ -150,7 +132,7 @@ public class Coordinator {
      * @param jobId The id of the job to resume.
      * @return The resumed job
      */
-    public Job resume(String jobId) {
+    public Job resume(Long jobId) {
         Job job = jobService.resume(jobId);
 
         jobExecutor.execute(job);

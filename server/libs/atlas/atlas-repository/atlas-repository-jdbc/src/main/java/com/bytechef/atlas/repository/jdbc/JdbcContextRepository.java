@@ -31,5 +31,9 @@ import org.springframework.stereotype.Repository;
 public interface JdbcContextRepository extends PagingAndSortingRepository<Context, Long>, ContextRepository {
 
     @Override
-    Context findTop1ByStackIdOrderByCreatedDateDesc(String stackId);
+    Context findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(long stackId, int classnameId);
+
+    @Override
+    Context findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
+        long stackId, int subStackId, int classnameId);
 }

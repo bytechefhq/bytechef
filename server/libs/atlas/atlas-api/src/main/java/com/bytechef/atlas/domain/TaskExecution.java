@@ -29,7 +29,6 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.LocalDateTimeUtils;
-import com.bytechef.commons.utils.UUIDUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -38,6 +37,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -69,7 +69,7 @@ import org.springframework.util.Assert;
  */
 @Table
 public final class TaskExecution
-    implements Errorable, Persistable<String>, Prioritizable, Progressable, Retryable, Task {
+    implements Errorable, Persistable<Long>, Prioritizable, Progressable, Retryable, Task {
 
     private static final int DEFAULT_TASK_NUMBER = -1;
 
@@ -91,13 +91,13 @@ public final class TaskExecution
     private long executionTime = 0;
 
     @Id
-    private String id;
+    private Long id;
 
     @Transient
     private boolean isNew;
 
     @Column("job_id")
-    private AggregateReference<Job, String> jobRef;
+    private AggregateReference<Job, Long> jobRef;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -111,7 +111,7 @@ public final class TaskExecution
     private Object output;
 
     @Column("parent_id")
-    private AggregateReference<TaskExecution, String> parentRef;
+    private AggregateReference<TaskExecution, Long> parentRef;
 
     @Column
     private int priority;
@@ -151,14 +151,24 @@ public final class TaskExecution
     public TaskExecution() {
     }
 
+    public TaskExecution(long id) {
+        this.id = id;
+    }
+
+    public TaskExecution(long id, @NonNull WorkflowTask workflowTask) {
+        this(workflowTask);
+
+        this.id = id;
+        this.workflowTask = workflowTask;
+    }
+
     public TaskExecution(@NonNull WorkflowTask workflowTask) {
         Assert.notNull(workflowTask, "'workflowTask' must not be null.");
 
         this.workflowTask = workflowTask;
     }
 
-    private TaskExecution(String jobId, String parentId, int priority, int taskNumber, WorkflowTask workflowTask) {
-        this.id = UUIDUtils.generate();
+    private TaskExecution(Long jobId, Long parentId, int priority, int taskNumber, WorkflowTask workflowTask) {
         this.jobRef = new AggregateReference.IdOnlyAggregateReference<>(jobId);
 
         if (parentId != null) {
@@ -171,34 +181,28 @@ public final class TaskExecution
         this.workflowTask = workflowTask;
     }
 
-    public static TaskExecution of(@NonNull String jobId, @NonNull WorkflowTask workflowTask) {
-        Assert.notNull(jobId, "'jobId' must not be null.");
+    public static TaskExecution of(long jobId, @NonNull WorkflowTask workflowTask) {
         Assert.notNull(workflowTask, "'workflowTask' must not be null.");
 
         return new TaskExecution(jobId, null, 0, DEFAULT_TASK_NUMBER, workflowTask);
     }
 
-    public static TaskExecution of(@NonNull String jobId, int priority, WorkflowTask workflowTask) {
-        Assert.notNull(jobId, "'jobId' must not be null.");
+    public static TaskExecution of(long jobId, int priority, WorkflowTask workflowTask) {
         Assert.notNull(workflowTask, "'workflowTask' must not be null.");
 
         return new TaskExecution(jobId, null, priority, DEFAULT_TASK_NUMBER, workflowTask);
     }
 
     public static TaskExecution of(
-        @NonNull String jobId, @NonNull String parentId, int priority, @NonNull WorkflowTask workflowTask) {
-        Assert.notNull(jobId, "'jobId' must not be null.");
-        Assert.notNull(parentId, "'parentId' must not be null.");
+        long jobId, long parentId, int priority, @NonNull WorkflowTask workflowTask) {
         Assert.notNull(workflowTask, "'workflowTask' must not be null.");
 
         return new TaskExecution(jobId, parentId, priority, DEFAULT_TASK_NUMBER, workflowTask);
     }
 
     public static TaskExecution of(
-        @NonNull String jobId, @NonNull String parentId, int priority, int taskNumber,
-        @NonNull WorkflowTask workflowTask) {
-        Assert.notNull(jobId, "'jobId' must not be null.");
-        Assert.notNull(parentId, "'parentId' must not be null.");
+        long jobId, long parentId, int priority, int taskNumber, @NonNull WorkflowTask workflowTask) {
+
         Assert.notNull(workflowTask, "'workflowTask' must not be null.");
 
         return new TaskExecution(jobId, parentId, priority, taskNumber, workflowTask);
@@ -275,12 +279,12 @@ public final class TaskExecution
      *
      * @return String the id of the task execution.
      */
-    public String getId() {
+    public Long getId() {
         return this.id;
     }
 
     @JsonIgnore
-    public AggregateReference<Job, String> getJobRef() {
+    public AggregateReference<Job, Long> getJobRef() {
         return jobRef;
     }
 
@@ -289,7 +293,7 @@ public final class TaskExecution
      *
      * @return String the id of the job
      */
-    public String getJobId() {
+    public Long getJobId() {
         return jobRef == null ? null : jobRef.getId();
     }
 
@@ -326,7 +330,7 @@ public final class TaskExecution
     }
 
     @JsonIgnore
-    public AggregateReference<TaskExecution, String> getParentRef() {
+    public AggregateReference<TaskExecution, Long> getParentRef() {
         return parentRef;
     }
 
@@ -335,7 +339,7 @@ public final class TaskExecution
      *
      * @return String the id of the parent task.
      */
-    public String getParentId() {
+    public Long getParentId() {
         return parentRef == null ? null : parentRef.getId();
     }
 
@@ -452,7 +456,7 @@ public final class TaskExecution
         this.executionTime = executionTime;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -460,11 +464,11 @@ public final class TaskExecution
         this.isNew = isNew;
     }
 
-    public void setJobRef(AggregateReference<Job, String> jobRef) {
+    public void setJobRef(AggregateReference<Job, Long> jobRef) {
         this.jobRef = jobRef;
     }
 
-    public void setJobId(String jobId) {
+    public void setJobId(Long jobId) {
         if (jobId != null) {
             this.jobRef = new AggregateReference.IdOnlyAggregateReference<>(jobId);
         }
@@ -474,11 +478,11 @@ public final class TaskExecution
         this.output = output;
     }
 
-    public void setParentRef(AggregateReference<TaskExecution, String> parentRef) {
+    public void setParentRef(AggregateReference<TaskExecution, Long> parentRef) {
         this.parentRef = parentRef;
     }
 
-    public void setParentId(String parentId) {
+    public void setParentId(Long parentId) {
         if (parentId != null) {
             this.parentRef = new AggregateReference.IdOnlyAggregateReference<>(parentId);
         }

@@ -40,7 +40,7 @@ public interface TaskExecutionRepository {
      * @param jobRef
      * @return List<TaskExecution>
      */
-    List<TaskExecution> findAllByJobRefOrderByCreatedDate(AggregateReference<Job, String> jobRef);
+    List<TaskExecution> findAllByJobRefOrderByCreatedDate(AggregateReference<Job, Long> jobRef);
 
     /**
      * Returns the execution steps of the given jobs
@@ -48,7 +48,7 @@ public interface TaskExecutionRepository {
      * @param jobRefs
      * @return List<TaskExecution>
      */
-    List<TaskExecution> findAllByJobRefInOrderByCreatedDate(List<AggregateReference<Job, String>> jobRefs);
+    List<TaskExecution> findAllByJobRefInOrderByCreatedDate(List<AggregateReference<Job, Long>> jobRefs);
 
     /**
      * Returns a collection of {@link TaskExecution} instances which belong to the job of the given id.
@@ -56,7 +56,7 @@ public interface TaskExecutionRepository {
      * @param jobRef
      * @return
      */
-    List<TaskExecution> findAllByJobRefOrderByTaskNumber(AggregateReference<Job, String> jobRef);
+    List<TaskExecution> findAllByJobRefOrderByTaskNumber(AggregateReference<Job, Long> jobRef);
 
     /**
      * Returns a collection of {@link TaskExecution} instances which are the children of the given parent id.
@@ -64,7 +64,7 @@ public interface TaskExecutionRepository {
      * @param parentRef
      * @return
      */
-    List<TaskExecution> findAllByParentRef(AggregateReference<TaskExecution, String> parentRef);
+    List<TaskExecution> findAllByParentRef(AggregateReference<TaskExecution, Long> parentRef);
 
     /**
      * Find a single {@link TaskExecution} instance by its id.
@@ -72,9 +72,9 @@ public interface TaskExecutionRepository {
      * @param id
      * @return TaskExecution
      */
-    Optional<TaskExecution> findById(String id);
+    Optional<TaskExecution> findById(long id);
 
-    Optional<TaskExecution> findByIdForUpdate(String id);
+    Optional<TaskExecution> findByIdForUpdate(long id);
 
     /**
      * Creates a new persistent represenation of the given {@link TaskExecution}.
@@ -83,11 +83,11 @@ public interface TaskExecutionRepository {
      */
     TaskExecution save(TaskExecution taskExecution);
 
-    void updateStatus(String id, TaskStatus taskStatus);
+    void updateStatus(long id, TaskStatus taskStatus);
 
     void updateStatusAndStartTime(
-        @Param("id") String id, @Param("status") TaskStatus status, @Param("startTime") LocalDateTime startTime);
+        @Param("id") long id, @Param("status") TaskStatus status, @Param("startTime") LocalDateTime startTime);
 
     void updateStatusAndEndTime(
-        @Param("id") String id, @Param("status") TaskStatus status, @Param("endTime") LocalDateTime endTime);
+        @Param("id") long id, @Param("status") TaskStatus status, @Param("endTime") LocalDateTime endTime);
 }

@@ -69,7 +69,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Worker {
 
-    private final Map<String, TaskExecutionFuture<?>> taskExecutions = new ConcurrentHashMap<>();
+    private final Map<Long, TaskExecutionFuture<?>> taskExecutions = new ConcurrentHashMap<>();
     private final TaskEvaluator taskEvaluator;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -146,7 +146,7 @@ public class Worker {
         logger.debug("received control task: {}", controlTask);
 
         if (CancelControlTask.TYPE_CANCEL.equals(controlTask.getType())) {
-            String jobId = ((CancelControlTask) controlTask).getJobId();
+            Long jobId = ((CancelControlTask) controlTask).getJobId();
 
             for (TaskExecutionFuture<?> taskExecutionFuture : taskExecutions.values()) {
                 if (Objects.equals(taskExecutionFuture.taskExecution.getJobId(), jobId)) {
@@ -158,7 +158,7 @@ public class Worker {
         }
     }
 
-    Map<String, TaskExecutionFuture<?>> getTaskExecutions() {
+    Map<Long, TaskExecutionFuture<?>> getTaskExecutions() {
         return Collections.unmodifiableMap(taskExecutions);
     }
 

@@ -21,7 +21,6 @@ import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.web.rest.mapper.config.WorkflowMapperSpringConfig;
 import com.bytechef.atlas.web.rest.model.JobParametersModel;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -30,6 +29,5 @@ import org.springframework.core.convert.converter.Converter;
 @Mapper(config = WorkflowMapperSpringConfig.class)
 public interface JobParametersModelMapper extends Converter<JobParametersModel, JobParameters> {
 
-    @Mapping(target = "jobId", ignore = true)
     JobParameters convert(JobParametersModel jobParametersModel);
 }

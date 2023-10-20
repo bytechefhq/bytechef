@@ -34,11 +34,12 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface ContextRepository {
 
-    void deleteById(String id);
-
     Iterable<Context> findAll();
 
-    Context findTop1ByStackIdOrderByCreatedDateDesc(String stackId);
+    Context findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(long stackId, int classnameId);
+
+    Context findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
+        long stackId, int subStackId, int classnameId);
 
     Context save(Context context);
 }

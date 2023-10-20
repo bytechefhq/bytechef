@@ -40,19 +40,17 @@ public class JdbcWorkflowRepositoryIntTest {
 
     @Test
     public void testFindById() {
-        Workflow workflow = new Workflow();
+        Workflow workflow = new Workflow("""
+            label: My Label
 
-        workflow.setDefinition(
-            """
-                label: My Label
+            tasks:
+              - name: stringNumber
+                type: var/1.0
+                action: set
+                value: "1234"
+            """,
+            Workflow.Format.YAML);
 
-                tasks:
-                  - name: stringNumber
-                    type: var/1.0
-                    action: set
-                    value: "1234"
-                """);
-        workflow.setFormat(Workflow.Format.YAML);
         workflow.setNew(true);
 
         workflow = workflowCrudRepository.save(workflow);

@@ -31,6 +31,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -65,11 +66,13 @@ public class JobStatusWebhookEventListener implements EventListener {
     }
 
     private void handleEvent(JobStatusWorkflowEvent workflowEvent) {
-        String jobId = workflowEvent.getJobId();
+        Long jobId = workflowEvent.getJobId();
+
         Job job = jobService.getJob(jobId);
 
         if (job == null) {
             logger.warn("Unknown job: {}", jobId);
+
             return;
         }
 

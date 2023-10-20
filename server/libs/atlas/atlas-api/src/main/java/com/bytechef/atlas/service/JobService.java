@@ -21,6 +21,7 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.dto.JobParameters;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 
 /**
@@ -34,17 +35,17 @@ public interface JobService {
 
     Page<Job> getJobs(int pageNumber);
 
-    Job getJob(String id);
+    Job getJob(long id);
 
     Optional<Job> fetchLatestJob();
 
-    Job getTaskExecutionJob(String taskExecutionId);
+    Job getTaskExecutionJob(long taskExecutionId);
 
-    Job resume(String jobId);
+    Job resume(long id);
 
-    Job start(String jobId);
+    Job start(long id);
 
-    Job stop(String jobId);
+    Job stop(long id);
 
     Job update(Job job);
 }

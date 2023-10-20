@@ -20,8 +20,8 @@ package com.bytechef.atlas.repository.jdbc.event;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowResource;
-import com.bytechef.commons.utils.UUIDUtils;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ByteArrayResource;
@@ -50,7 +50,9 @@ public class WorkflowCallback implements AfterConvertCallback<Workflow>, BeforeC
     @Override
     public Workflow onBeforeConvert(Workflow workflow) {
         if (workflow.isNew()) {
-            workflow.setId(UUIDUtils.generate());
+            UUID uuid = UUID.randomUUID();
+
+            workflow.setId(uuid.toString());
         }
 
         return workflow;
@@ -65,12 +67,7 @@ public class WorkflowCallback implements AfterConvertCallback<Workflow>, BeforeC
                 new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)),
                 workflow.getFormat()));
 
-        newWorkflow.setCreatedBy(workflow.getCreatedBy());
-        newWorkflow.setCreatedDate(workflow.getCreatedDate());
-        newWorkflow.setDefinition(definition);
-        newWorkflow.setLastModifiedBy(workflow.getLastModifiedBy());
-        newWorkflow.setLastModifiedDate(workflow.getLastModifiedDate());
-        newWorkflow.setVersion(workflow.getVersion());
+        newWorkflow.update(workflow);
 
         return newWorkflow;
     }

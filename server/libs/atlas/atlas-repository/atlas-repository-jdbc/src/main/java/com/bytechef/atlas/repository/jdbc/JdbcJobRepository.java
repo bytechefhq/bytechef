@@ -20,6 +20,7 @@ package com.bytechef.atlas.repository.jdbc;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.repository.JobRepository;
 import java.util.Optional;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -31,7 +32,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @ConditionalOnProperty(prefix = "bytechef.workflow", name = "persistence.provider", havingValue = "jdbc")
-public interface JdbcJobRepository extends PagingAndSortingRepository<Job, String>, JobRepository {
+public interface JdbcJobRepository extends PagingAndSortingRepository<Job, Long>, JobRepository {
 
     @Override
     @Query("SELECT COUNT(*) FROM job WHERE status='COMPLETED' AND end_time >= current_date-1 AND end_time < current_date")
@@ -51,5 +52,5 @@ public interface JdbcJobRepository extends PagingAndSortingRepository<Job, Strin
 
     @Override
     @Query("SELECT * FROM job j WHERE j.id = (SELECT job_id FROM task_execution te WHERE te.id=:taskExecutionId)")
-    Job findByTaskExecutionId(@Param("taskExecutionId") String taskExecutionId);
+    Job findByTaskExecutionId(@Param("taskExecutionId") Long taskExecutionId);
 }

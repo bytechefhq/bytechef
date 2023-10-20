@@ -56,30 +56,25 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
 
     @Override
     @Transactional(readOnly = true)
-    public TaskExecution getTaskExecution(@NonNull String id) {
-        Assert.notNull(id, "'id' must not be null.");
-
+    public TaskExecution getTaskExecution(long id) {
         return taskExecutionRepository.findById(id)
             .orElseThrow();
     }
 
     @Override
-    public List<TaskExecution> getJobTaskExecutions(@NonNull String jobId) {
-        Assert.notNull(jobId, "'jobId' must not be null.");
-
+    public List<TaskExecution> getJobTaskExecutions(long jobId) {
         return taskExecutionRepository.findAllByJobRefOrderByCreatedDate(
             new AggregateReference.IdOnlyAggregateReference<>(jobId));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<TaskExecution> getParentTaskExecutions(@NonNull String parentId) {
-        Assert.notNull(parentId, "'parentId' must not be null.");
-
+    public List<TaskExecution> getParentTaskExecutions(long parentId) {
         return taskExecutionRepository.findAllByParentRef(new AggregateReference.IdOnlyAggregateReference<>(parentId));
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public TaskExecution update(@NonNull TaskExecution taskExecution) {
         Assert.notNull(taskExecution, "'taskExecution' must not be null.");
 
@@ -105,7 +100,7 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
 
     @Override
     public void updateStatus(
-        @NonNull String id, @NonNull TaskStatus taskStatus, LocalDateTime startTime, LocalDateTime endTime) {
+        long id, @NonNull TaskStatus taskStatus, LocalDateTime startTime, LocalDateTime endTime) {
 
         if (startTime == null && endTime == null) {
             taskExecutionRepository.updateStatus(id, taskStatus);

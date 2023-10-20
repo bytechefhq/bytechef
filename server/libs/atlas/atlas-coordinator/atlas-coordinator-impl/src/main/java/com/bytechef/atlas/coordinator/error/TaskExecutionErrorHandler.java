@@ -30,7 +30,6 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.UUIDUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -65,6 +64,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public void handle(TaskExecution taskExecution) {
         ExecutionError error = taskExecution.getError();
 
@@ -77,7 +77,6 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
 
         // if the task is retryable, then retry it
         if (taskExecution.getRetryAttempts() < taskExecution.getRetry()) {
-            taskExecution.setId(UUIDUtils.generate());
             taskExecution.setStatus(TaskStatus.CREATED);
             taskExecution.setError(null);
             taskExecution.setRetryAttempts(taskExecution.getRetryAttempts() + 1);

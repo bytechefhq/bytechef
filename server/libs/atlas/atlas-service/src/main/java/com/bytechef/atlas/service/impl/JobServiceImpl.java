@@ -22,7 +22,6 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.error.ExecutionError;
-import com.bytechef.atlas.priority.Prioritizable;
 import com.bytechef.atlas.repository.JobRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.service.JobService;
@@ -60,6 +59,33 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<Job> getJobs() {
+        return StreamSupport.stream(jobRepository.findAll()
+            .spliterator(), false)
+            .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Job getJob(@NonNull long id) {
+        return jobRepository.findById(id)
+            .orElseThrow();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Job> getJobs(int pageNumber) {
+        return jobRepository.findAll(PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Job> fetchLatestJob() {
+        return jobRepository.findLatestJob();
+    }
+
+    @Override
     public Job create(@NonNull JobParameters jobParameters) {
         Assert.notNull(jobParameters, "'jobParameters' must not be null.");
 
@@ -86,15 +112,11 @@ public class JobServiceImpl implements JobService {
 
         Job job = new Job();
 
-        job.setId(jobParameters.getJobId() == null ? null : jobParameters.getJobId());
         job.setInputs(jobParameters.getInputs());
-        job.setNew(true);
         job.setLabel(jobParameters.getLabel() == null ? workflow.getLabel() : jobParameters.getLabel());
+        job.setNew(true);
         job.setParentTaskExecutionId(jobParameters.getParentTaskExecutionId());
-        job.setPriority(
-            jobParameters.getPriority() == null
-                ? Prioritizable.DEFAULT_PRIORITY
-                : jobParameters.getPriority());
+        job.setPriority(jobParameters.getPriority());
         job.setStatus(Job.Status.CREATED);
         job.setWebhooks(jobParameters.getWebhooks());
         job.setWorkflowId(workflow.getId());
@@ -108,45 +130,12 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Job> getJobs() {
-        return StreamSupport.stream(jobRepository.findAll()
-            .spliterator(), false)
-            .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Job getJob(@NonNull String id) {
-        Assert.notNull(id, "'id' must not be null.");
-
-        return jobRepository.findById(id)
-            .orElseThrow();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<Job> getJobs(int pageNumber) {
-        return jobRepository.findAll(PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Job> fetchLatestJob() {
-        return jobRepository.findLatestJob();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Job getTaskExecutionJob(@NonNull String taskExecutionId) {
-        Assert.notNull(taskExecutionId, "'taskExecutionId' must not be null.");
-
+    public Job getTaskExecutionJob(long taskExecutionId) {
         return jobRepository.findByTaskExecutionId(taskExecutionId);
     }
 
     @Override
-    public Job resume(@NonNull String id) {
-        Assert.notNull(id, "'id' must not be null.");
-
+    public Job resume(long id) {
         log.debug("Resuming job {}", id);
 
         Job job = jobRepository.findById(id)
@@ -164,9 +153,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job start(@NonNull String id) {
-        Assert.notNull(id, "'id' must not be null.");
-
+    public Job start(long id) {
         Job job = jobRepository.findById(id)
             .orElseThrow();
 
@@ -180,9 +167,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job stop(@NonNull String id) {
-        Assert.notNull(id, "'id' must not be null.");
-
+    public Job stop(long id) {
         Job job = jobRepository.findById(id)
             .orElseThrow();
 

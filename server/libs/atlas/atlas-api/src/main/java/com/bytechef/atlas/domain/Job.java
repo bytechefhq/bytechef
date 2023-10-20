@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -51,14 +52,14 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table
-public final class Job implements Errorable, Persistable<String>, Prioritizable {
+public final class Job implements Errorable, Persistable<Long>, Prioritizable {
 
     public enum Status {
-        CREATED,
-        STARTED,
-        STOPPED,
-        FAILED,
         COMPLETED,
+        CREATED,
+        FAILED,
+        STOPPED,
+        STARTED,
     }
 
     @CreatedBy
@@ -79,7 +80,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
     private ExecutionError error;
 
     @Id
-    private String id;
+    private Long id;
 
     @Transient
     private boolean isNew;
@@ -102,7 +103,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
     private MapWrapper outputs = new MapWrapper();
 
     @Column("parent_task_execution_id")
-    private AggregateReference<TaskExecution, String> parentTaskExecutionRef;
+    private AggregateReference<TaskExecution, Long> parentTaskExecutionRef;
 
     private int priority = Prioritizable.DEFAULT_PRIORITY;
 
@@ -125,7 +126,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
     public Job() {
     }
 
-    public Job(String id) {
+    public Job(long id) {
         this.id = id;
     }
 
@@ -172,7 +173,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
     }
 
     /** Return the ID of the job. */
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
@@ -209,7 +210,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
     }
 
     @JsonIgnore
-    public AggregateReference<TaskExecution, String> getParentTaskExecutionRef() {
+    public AggregateReference<TaskExecution, Long> getParentTaskExecutionRef() {
         return parentTaskExecutionRef;
     }
 
@@ -218,7 +219,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
      *
      * @return The ID of the parent task if this is a subflow job or <code>null</code> otherwise.
      */
-    public String getParentTaskExecutionId() {
+    public Long getParentTaskExecutionId() {
         return parentTaskExecutionRef == null ? null : parentTaskExecutionRef.getId();
     }
 
@@ -297,7 +298,7 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
         this.error = error;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -317,11 +318,11 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
         this.outputs = new MapWrapper(outputs);
     }
 
-    public void setParentTaskExecutionRef(AggregateReference<TaskExecution, String> parentTaskExecutionRef) {
+    public void setParentTaskExecutionRef(AggregateReference<TaskExecution, Long> parentTaskExecutionRef) {
         this.parentTaskExecutionRef = parentTaskExecutionRef;
     }
 
-    public void setParentTaskExecutionId(String parentTaskExecutionId) {
+    public void setParentTaskExecutionId(Long parentTaskExecutionId) {
         if (parentTaskExecutionId != null) {
             this.parentTaskExecutionRef = new AggregateReference.IdOnlyAggregateReference<>(parentTaskExecutionId);
         }
@@ -331,12 +332,12 @@ public final class Job implements Errorable, Persistable<String>, Prioritizable 
         this.priority = priority;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public void setWebhooks(List<Map<String, Object>> webhooks) {

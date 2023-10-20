@@ -26,42 +26,39 @@ public class TaskStartedWorkflowEvent extends WorkflowEvent {
 
     public static final String TASK_STARTED = "task.started";
 
-    private String jobId;
-    private String taskId;
+    private Long jobId;
+    private Long taskExecutionId;
 
     public TaskStartedWorkflowEvent() {
         this.type = TASK_STARTED;
     }
 
-    public TaskStartedWorkflowEvent(String taskId) {
-        Assert.notNull(taskId, "'taskId' must not be null.");
+    public TaskStartedWorkflowEvent(Long taskExecutionId) {
+        Assert.notNull(taskExecutionId, "'taskId' must not be null.");
 
-        this.taskId = taskId;
+        this.taskExecutionId = taskExecutionId;
         this.type = TASK_STARTED;
     }
 
-    public TaskStartedWorkflowEvent(String jobId, String taskId) {
-        Assert.notNull(jobId, "'jobId' must not be null.");
-        Assert.notNull(taskId, "'taskId' must not be null.");
-
+    public TaskStartedWorkflowEvent(long jobId, long taskExecutionId) {
         this.jobId = jobId;
-        this.taskId = taskId;
+        this.taskExecutionId = taskExecutionId;
         this.type = TASK_STARTED;
     }
 
-    public String getJobId() {
+    public Long getJobId() {
         return jobId;
     }
 
-    public String getTaskId() {
-        return taskId;
+    public Long getTaskExecutionId() {
+        return taskExecutionId;
     }
 
     @Override
     public String toString() {
         return "TaskStartedWorkflowEvent{" + "jobId='"
-            + jobId + '\'' + ", taskId='"
-            + taskId + '\'' + "} "
+            + jobId + '\'' + ", taskExecutionId='"
+            + taskExecutionId + '\'' + "} "
             + super.toString();
     }
 }

@@ -31,13 +31,13 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @ConditionalOnProperty(prefix = "bytechef.workflow", name = "persistence.provider", havingValue = "jdbc")
-public interface JdbcCounterRepository extends PagingAndSortingRepository<Counter, String>, CounterRepository {
+public interface JdbcCounterRepository extends PagingAndSortingRepository<Counter, Long>, CounterRepository {
 
     @Override
     @Query("SELECT value FROM counter WHERE id = :id FOR UPDATE")
-    Long findValueByIdForUpdate(@Param("id") String id);
+    Long findValueByIdForUpdate(@Param("id") Long id);
 
     @Modifying
     @Query("UPDATE counter SET value = :value WHERE id = :id")
-    void update(@Param("id") String id, @Param("value") long value);
+    void update(@Param("id") Long id, @Param("value") long value);
 }

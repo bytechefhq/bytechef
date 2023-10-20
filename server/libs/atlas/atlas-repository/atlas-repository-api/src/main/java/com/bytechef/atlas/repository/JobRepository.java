@@ -21,6 +21,7 @@ package com.bytechef.atlas.repository;
 
 import com.bytechef.atlas.domain.Job;
 import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -37,17 +38,17 @@ public interface JobRepository {
 
     int countRunningJobs();
 
-    void deleteById(String id);
+    void deleteById(Long id);
 
     Iterable<Job> findAll();
 
     Page<Job> findAll(Pageable pageable);
 
-    Optional<Job> findById(String id);
+    Optional<Job> findById(Long id);
 
     Optional<Job> findLatestJob();
 
-    Job findByTaskExecutionId(String taskExecutionId);
+    Job findByTaskExecutionId(Long taskExecutionId);
 
     Job save(Job job);
 }

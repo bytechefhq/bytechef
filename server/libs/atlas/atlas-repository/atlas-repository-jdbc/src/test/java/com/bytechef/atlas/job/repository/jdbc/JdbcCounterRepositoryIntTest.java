@@ -18,12 +18,17 @@
 package com.bytechef.atlas.job.repository.jdbc;
 
 import com.bytechef.atlas.domain.Counter;
+import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.job.repository.jdbc.config.WorkflowRepositoryIntTestConfiguration;
 import com.bytechef.atlas.repository.CounterRepository;
+import com.bytechef.atlas.repository.JobRepository;
+import com.bytechef.atlas.repository.TaskExecutionRepository;
+import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Random;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,10 +45,30 @@ public class JdbcCounterRepositoryIntTest {
     @Autowired
     private CounterRepository counterRepository;
 
+    @Autowired
+    private JobRepository jobRepository;
+
+    @Autowired
+    private TaskExecutionRepository taskExecutionRepository;
+
+    private Counter counter;
+
+    @BeforeEach
+    @SuppressFBWarnings("NP")
+    public void beforeEach() {
+        Job job = jobRepository.save(getJob());
+
+        TaskExecution taskExecution = getTaskExecution(job.getId());
+
+        taskExecution = taskExecutionRepository.save(taskExecution);
+
+        counter = getCounter(taskExecution.getId());
+
+        counter = counterRepository.save(counter);
+    }
+
     @Test
     public void testFindValueById() {
-        Counter counter = counterRepository.save(getCounter());
-
         Long value = counterRepository.findValueByIdForUpdate(counter.getId());
 
         Assertions.assertEquals(counter.getValue(), value);
@@ -51,8 +76,6 @@ public class JdbcCounterRepositoryIntTest {
 
     @Test
     public void testUpdate() {
-        Counter counter = counterRepository.save(getCounter());
-
         Long value = counterRepository.findValueByIdForUpdate(counter.getId());
 
         Assertions.assertEquals(counter.getValue(), value);
@@ -65,13 +88,30 @@ public class JdbcCounterRepositoryIntTest {
     }
 
     @SuppressFBWarnings("DMI")
-    private Counter getCounter() {
+    private static Counter getCounter(long taskExecutionId) {
         Counter counter = new Counter();
 
-        counter.setId(new Random().nextLong() + "");
+        counter.setId(taskExecutionId);
         counter.setNew(true);
         counter.setValue(3L);
 
         return counter;
+    }
+
+    private static Job getJob() {
+        Job job = new Job();
+
+        job.setNew(true);
+        job.setStatus(Job.Status.CREATED);
+        job.setWorkflowId("demo:1234");
+
+        return job;
+    }
+
+    private static TaskExecution getTaskExecution(long jobId) {
+        TaskExecution taskExecution = TaskExecution.of(jobId, new WorkflowTask());
+
+        taskExecution.setNew(true);
+        return taskExecution;
     }
 }

@@ -49,15 +49,15 @@ public class TaskExecutionErrorHandlerTest {
 
     @Test
     public void test1() {
-        when(jobService.getTaskExecutionJob("1234")).thenReturn(new Job("4567"));
+        when(jobService.getTaskExecutionJob(1234L)).thenReturn(new Job(4567L));
 
         TaskExecutionErrorHandler taskExecutionErrorHandler = new TaskExecutionErrorHandler(eventPublisher, jobService,
             taskDispatcher, taskExecutionService);
 
         TaskExecution erroredTaskExecution = new TaskExecution();
 
-        erroredTaskExecution.setId("1234");
         erroredTaskExecution.setError(new ExecutionError("something bad happened", List.of()));
+        erroredTaskExecution.setId(1234L);
 
         taskExecutionErrorHandler.handle(erroredTaskExecution);
         taskExecutionErrorHandler.handle(erroredTaskExecution);
@@ -67,15 +67,15 @@ public class TaskExecutionErrorHandlerTest {
 
     @Test
     public void test2() {
-        when(jobService.getTaskExecutionJob("1234")).thenReturn(new Job());
+        when(jobService.getTaskExecutionJob(1234L)).thenReturn(new Job());
 
-        TaskExecutionErrorHandler taskExecutionErrorHandler = new TaskExecutionErrorHandler(eventPublisher, jobService,
-            taskDispatcher, taskExecutionService);
+        TaskExecutionErrorHandler taskExecutionErrorHandler = new TaskExecutionErrorHandler(
+            eventPublisher, jobService, taskDispatcher, taskExecutionService);
 
         TaskExecution erroredTaskExecution = new TaskExecution();
 
-        erroredTaskExecution.setId("1234");
         erroredTaskExecution.setError(new ExecutionError("something bad happened", List.of()));
+        erroredTaskExecution.setId(1234L);
         erroredTaskExecution.setRetry(1);
 
         taskExecutionErrorHandler.handle(erroredTaskExecution);
