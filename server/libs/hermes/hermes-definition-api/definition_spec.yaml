@@ -30,21 +30,74 @@ schemas:
           multipleValues:
             description: If the array can contain multiple items.
             type: boolean
+          options:
+            description: The list of valid property options.
+            type: array
+            items:
+              $ref: '#/schemas/Option'
+          optionsDataSource:
+            ref$: '#/schemas/OptionsDataSource'
   BooleanProperty:
     description: A boolean property type.
     type: object
     allOf:
       - $ref: '#/schemas/ValueProperty'
+  ControlType:
+    description: A type of the control to show in UI.
+    type: string
+    enum:
+      - CHECKBOX
+      - CODE_EDITOR
+      - DATE
+      - DATE_TIME
+      - INPUT_EMAIL
+      - INPUT_INTEGER
+      - INPUT_NUMBER
+      - INPUT_PASSWORD
+      - INPUT_PHONE
+      - INPUT_TEXT
+      - INPUT_URL
+      - JSON_BUILDER
+      - MULTI_SELECT
+      - SELECT
+      - TEXT_AREA
   DateProperty:
     description: A date property type.
     type: object
     allOf:
       - $ref: '#/schemas/ValueProperty'
+      - type: object
+        properties:
+          options:
+            description: The list of valid property options.
+            type: array
+            items:
+              $ref: '#/schemas/Option'
+          optionsDataSource:
+            ref$: '#/schemas/OptionsDataSource'
   DateTimeProperty:
     description: A date-time property type.
     type: object
     allOf:
       - $ref: '#/schemas/ValueProperty'
+      - type: object
+        properties:
+          options:
+            description: The list of valid property options.
+            type: array
+            items:
+              $ref: '#/schemas/Option'
+          optionsDataSource:
+            ref$: '#/schemas/OptionsDataSource'
+  DynamicPropertiesProperty:
+    description: A dynamic properties property type.
+    type: object
+    allOf:
+      - $ref: '#/schemas/Property'
+      - type: object
+        properties:
+          propertiesDataSource:
+            ref$: '#/schemas/PropertiesDataSource'
   Display:
     description: A display information.
     type: object
@@ -69,30 +122,6 @@ schemas:
         type: array
         items:
           type: string
-  DisplayOption:
-    description: Defines rules when a property should be shown or hidden.
-    type: object
-    properties:
-      hide:
-        description: The map of property names and list of values to check against if the property should be hidden.
-        type: object
-        additionalProperties:
-          type: array
-          items:
-            type: object
-      show:
-        description: The map of property names and list of values to check against if the property should be shown.
-        type: object
-        additionalProperties:
-          type: array
-          items:
-            type: object
-  ControlType:
-    description: A type of the control to show in UI.
-    type: string
-    enum:
-      - CODE
-      - PASSWORD
   IntegerProperty:
     description: An integer property type.
     type: object
@@ -110,6 +139,13 @@ schemas:
             description: The minimum property value.
             type: integer
             format: int32
+          options:
+            description: The list of valid property options.
+            type: array
+            items:
+              $ref: '#/schemas/Option'
+          optionsDataSource:
+            ref$: '#/schemas/OptionsDataSource'
   NumberProperty:
     description: A number property type.
     type: object
@@ -129,6 +165,13 @@ schemas:
             description: The number value precision.
             type: integer
             format: int32
+          options:
+            description: The list of valid property options.
+            type: array
+            items:
+              $ref: '#/schemas/Option'
+          optionsDataSource:
+            ref$: '#/schemas/OptionsDataSource'
   ObjectProperty:
     description: An object property type.
     type: object
@@ -147,11 +190,58 @@ schemas:
           objectType:
             description: The object type.
             type: string
+          options:
+            description: The list of valid property options.
+            type: array
+            items:
+              $ref: '#/schemas/Option'
+          optionsDataSource:
+            ref$: '#/schemas/OptionsDataSource'
           properties:
             description: The list of valid object property types.
             type: array
             items:
               $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Property'
+  Option:
+    description: Defines valid property value.
+    type: object
+    properties:
+      description:
+        description: Description of the option.
+        type: string
+      displayCondition:
+        description: Defines rules when a property should be shown or hidden.
+        type: string
+      name:
+        description: The name of an option.
+        type: string
+      value:
+        description: The value of an option.
+        type: object
+  OptionsDataSource:
+    description: Defines function that should dynamically load options for the property.
+    type: object
+    properties:
+      loadOptionsDependsOn:
+        description: The list of property names on which value change the property options should load/reload.
+        type: array
+        items:
+          type: string
+  #      loadOptionsFunction:
+  #        description: The function that should dynamically load options for the property.
+  #        type: object
+  PropertiesDataSource:
+    description: Defines function that should load properties.
+    type: object
+    properties:
+      loadPropertiesDependsOn:
+        description: The list of property names on which value change the properties should load/reload.
+        type: array
+        items:
+          type: string
+  #      loadPropertiesFunction:
+  #        description: The function that should dynamically load properties.
+  #        type: object
   Property:
     description: A base property.
     type: object
@@ -164,10 +254,14 @@ schemas:
       description:
         description: The property description.
         type: string
-      displayOption:
-        $ref: '#/schemas/DisplayOption'
+      displayCondition:
+        description: Defines rules when a property should be shown or hidden.
+        type: string
+      expressionEnabled:
+        description: Defines if the property can contain expressions or only constant values.
+        type: boolean
       hidden:
-        description: If the property should be visible or not."
+        description: If the property should be visible or not.
         type: boolean
       label:
         description: The property label.
@@ -188,8 +282,6 @@ schemas:
         type: boolean
       type:
         $ref: '#/schemas/PropertyType'
-#      __model_type:
-#        type: string
     discriminator:
       propertyName: __model_type
       mapping:
@@ -197,38 +289,12 @@ schemas:
         BOOLEAN: '#/schemas/BooleanProperty'
         DATE: '#/schemas/DateProperty'
         DATE_TIME: '#/schemas/DateTimeProperty'
+        DYNAMIC_PROPERTIES: '#/schemas/DynamicPropertiesProperty'
         INTEGER: '#/schemas/IntegerProperty'
         NUMBER: '#/schemas/NumberProperty'
         STRING: '#/schemas/StringProperty'
         OBJECT: '#/schemas/ObjectProperty'
         ONE_OF: '#/schemas/OneOfProperty'
-  PropertyOption:
-    description: Defines valid property value.
-    type: object
-    properties:
-      description:
-        description: Description of the option.
-        type: string
-      displayOption:
-        $ref: '#/schemas/DisplayOption'
-      name:
-        description: The name of an option.
-        type: string
-      value:
-        description: The value of an option.
-        type: object
-  PropertyOptionDataSource:
-    description: Defines function that should dynamically load options for the property.
-    type: object
-    properties:
-      loadOptionsDependsOn:
-        description: The list of property names on which value change the property options should load/reload.
-        type: array
-        items:
-          type: string
-      loadOptionsFunction:
-        description: The function that should dynamically load options for the property.
-        type: object
   PropertyType:
     description: A type of property.
     type:
@@ -237,6 +303,7 @@ schemas:
       - BOOLEAN
       - DATE
       - DATE_TIME
+      - DYNAMIC_PROPERTIES
       - INTEGER
       - "NULL"
       - NUMBER
@@ -257,8 +324,13 @@ schemas:
       - $ref: '#/schemas/ValueProperty'
       - type: object
         properties:
-          controlType:
-            $ref: '#/schemas/ControlType'
+          options:
+            description: The list of valid property options.
+            type: array
+            items:
+              $ref: '#/schemas/Option'
+          optionsDataSource:
+            ref$: '#/schemas/OptionsDataSource'
   ValueProperty:
     description: A base property for all value based properties.
     type: object
@@ -266,17 +338,11 @@ schemas:
       - $ref: '#/schemas/Property'
       - type: object
         properties:
+          controlType:
+            $ref: '#/schemas/ControlType'
           defaultValue:
             description: The property default value.
             type: object
-          exampleValue:
-            description: The property example value.
+          sampleValue:
+            description: The property sample value.
             type: object
-          options:
-            description: The list of valid property options.
-            type: array
-            items:
-              $ref: '#/schemas/PropertyOption'
-#          optionDataSource:
-#            oneOf:
-#              - '#/schemas/PropertyOptionDataSource'

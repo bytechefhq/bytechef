@@ -15,20 +15,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition;
+package com.bytechef.hermes.component.definition;
 
+import com.bytechef.hermes.component.Connection;
+import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.definition.Option;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
-import java.util.Map;
+import java.util.function.BiFunction;
 
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = DefinitionDSL.ModifiableDisplayOption.class)
-public sealed interface DisplayOption permits DefinitionDSL.ModifiableDisplayOption {
+@JsonDeserialize(as = ComponentDSL.ModifiableComponentOptionsDataSource.class)
+public sealed interface ComponentOptionsDataSource
+    extends com.bytechef.hermes.definition.OptionsDataSource permits ComponentDSL.ModifiableComponentOptionsDataSource {
 
-    Map<String, List<Object>> getHide();
-
-    Map<String, List<Object>> getShow();
+    /**
+     * The function that returns options.
+     *
+     * @return The function implementation
+     */
+    BiFunction<Connection, Parameters, List<Option>> getOptionsFunction();
 }

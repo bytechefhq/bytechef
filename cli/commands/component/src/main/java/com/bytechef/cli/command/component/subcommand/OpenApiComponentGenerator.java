@@ -250,7 +250,9 @@ public class OpenApiComponentGenerator {
         List<String> javacOpts = new ArrayList<>();
 
         javacOpts.add("-classpath");
-        javacOpts.add("libs/hermes-component-api-1.0.jar:libs/hermes-definition-api-1.0.jar");
+        javacOpts.add(
+            "libs/auto-service-annotations-1.0.1.jar:libs/hermes-component-api-1.0.jar:" +
+                "libs/hermes-definition-api-1.0.jar");
 
         Path parentPath = sourcePath.getParent();
 
@@ -402,10 +404,10 @@ public class OpenApiComponentGenerator {
             builder.add(".outputSchema($L)", codeBlock);
         }
 
-        Object example = outputEntry == null ? null : outputEntry.example();
+        Object exampleOutput = outputEntry == null ? null : outputEntry.exampleOutput();
 
-        if (example != null) {
-            builder.add(".exampleOutput($S)", example);
+        if (exampleOutput != null) {
+            builder.add(".exampleOutput($S)", exampleOutput);
         }
 
         return builder.build();
@@ -1420,8 +1422,10 @@ public class OpenApiComponentGenerator {
                     }
                 }
 
-                builder.add(".options($L)", codeBlocks.stream()
-                    .collect(CodeBlock.joining(",")));
+                if (!Objects.equals(type, "boolean")) {
+                    builder.add(".options($L)", codeBlocks.stream()
+                        .collect(CodeBlock.joining(",")));
+                }
             }
 
             if (required != null) {
@@ -1703,7 +1707,7 @@ public class OpenApiComponentGenerator {
         }
     }
 
-    private record OutputEntry(CodeBlock outputCodeBlock, Object example) {
+    private record OutputEntry(CodeBlock outputCodeBlock, Object exampleOutput) {
     }
 
     private record PropertiesEntry(CodeBlock propertiesCodeBlock, String bodyContentType, String mimeType) {

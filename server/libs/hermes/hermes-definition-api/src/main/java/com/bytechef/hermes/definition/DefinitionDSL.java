@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.definition;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -27,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 public class DefinitionDSL {
 
@@ -67,68 +65,6 @@ public class DefinitionDSL {
         return new ModifiableDisplay(label);
     }
 
-    public static ModifiableDisplayOption.HideDisplayOptionCondition hide(String propertyName, Object value) {
-        return new ModifiableDisplayOption.HideDisplayOptionCondition(Map.of(propertyName, List.of(value)));
-    }
-
-    public static ModifiableDisplayOption.HideDisplayOptionCondition hide(String propertyName, List<Object> values) {
-        return new ModifiableDisplayOption.HideDisplayOptionCondition(Map.of(propertyName, values));
-    }
-
-    public static ModifiableDisplayOption.HideDisplayOptionCondition hide(
-        String propertyName1, List<Object> values1, String propertyName2, List<Object> values2) {
-        return new ModifiableDisplayOption.HideDisplayOptionCondition(
-            Map.of(propertyName1, values1, propertyName2, values2));
-    }
-
-    public static ModifiableDisplayOption.HideDisplayOptionCondition hide(
-        String propertyName1,
-        List<Object> values1,
-        String propertyName2,
-        List<Object> values2,
-        String propertyName3,
-        List<Object> values3) {
-        return new ModifiableDisplayOption.HideDisplayOptionCondition(
-            Map.of(propertyName1, values1, propertyName2, values2, propertyName3, values3));
-    }
-
-    public static ModifiableDisplayOption.HideDisplayOptionCondition hide(
-        String propertyName1,
-        List<Object> values1,
-        String propertyName2,
-        List<Object> values2,
-        String propertyName3,
-        List<Object> values3,
-        String propertyName4,
-        List<Object> values4) {
-        return new ModifiableDisplayOption.HideDisplayOptionCondition(
-            Map.of(propertyName1, values1, propertyName2, values2, propertyName3, values3, propertyName4, values4));
-    }
-
-    public static ModifiableDisplayOption.HideDisplayOptionCondition hide(
-        String propertyName1,
-        List<Object> values1,
-        String propertyName2,
-        List<Object> values2,
-        String propertyName3,
-        List<Object> values3,
-        String propertyName4,
-        List<Object> values4,
-        String propertyName5,
-        List<Object> values5) {
-        return new ModifiableDisplayOption.HideDisplayOptionCondition(Map.of(
-            propertyName1,
-            values1,
-            propertyName2,
-            values2,
-            propertyName3,
-            values3,
-            propertyName4,
-            values4,
-            propertyName5,
-            values5));
-    }
-
     public static ModifiableProperty.ModifiableIntegerProperty integer() {
         return new ModifiableProperty.ModifiableIntegerProperty(null);
     }
@@ -161,126 +97,64 @@ public class DefinitionDSL {
         return new ModifiableProperty.ModifiableOneOfProperty(name);
     }
 
-    public static ModifiablePropertyOption option(String name, boolean value) {
-        return new ModifiablePropertyOption(name, value);
+    public static ModifiableOption<Boolean> option(String name, boolean value) {
+        return new ModifiableOption<>(name, value);
     }
 
-    public static ModifiablePropertyOption option(String name, boolean value, String description) {
-        return new ModifiablePropertyOption(name, value, description);
+    public static ModifiableOption<Boolean> option(String name, boolean value, String description) {
+        return new ModifiableOption<>(name, value, description);
     }
 
-    public static ModifiablePropertyOption option(String name, double value) {
-        return new ModifiablePropertyOption(name, value);
+    public static ModifiableOption<Double> option(String name, double value) {
+        return new ModifiableOption<>(name, value);
     }
 
-    public static ModifiablePropertyOption option(String name, double value, String description) {
-        return new ModifiablePropertyOption(name, value, description);
+    public static ModifiableOption<Double> option(String name, double value, String description) {
+        return new ModifiableOption<>(name, value, description);
     }
 
-    public static ModifiablePropertyOption option(String name, int value) {
-        return new ModifiablePropertyOption(name, value);
+    public static ModifiableOption<Integer> option(String name, int value) {
+        return new ModifiableOption<>(name, value);
     }
 
-    public static ModifiablePropertyOption option(String name, int value, String description) {
-        return new ModifiablePropertyOption(name, value, description);
+    public static ModifiableOption<Integer> option(String name, int value, String description) {
+        return new ModifiableOption<>(name, value, description);
     }
 
-    public static ModifiablePropertyOption option(String name, LocalDate value) {
-        return new ModifiablePropertyOption(name, value);
+    public static ModifiableOption<LocalDate> option(String name, LocalDate value) {
+        return new ModifiableOption<>(name, value);
     }
 
-    public static ModifiablePropertyOption option(String name, LocalDate value, String description) {
-        return new ModifiablePropertyOption(name, value, description);
+    public static ModifiableOption<LocalDate> option(String name, LocalDate value, String description) {
+        return new ModifiableOption<>(name, value, description);
     }
 
-    public static ModifiablePropertyOption option(String name, LocalDateTime value) {
-        return new ModifiablePropertyOption(name, value);
+    public static ModifiableOption<LocalDateTime> option(String name, LocalDateTime value) {
+        return new ModifiableOption<>(name, value);
     }
 
-    public static ModifiablePropertyOption option(String name, LocalDateTime value, String description) {
-        return new ModifiablePropertyOption(name, value, description);
+    public static ModifiableOption<LocalDateTime> option(String name, LocalDateTime value, String description) {
+        return new ModifiableOption<>(name, value, description);
     }
 
-    public static ModifiablePropertyOption option(String name, Object value) {
-        return new ModifiablePropertyOption(name, value);
+    public static ModifiableOption<Object> option(String name, Object value) {
+        return new ModifiableOption<>(name, value);
     }
 
-    public static ModifiablePropertyOption option(String name, Object value, String description) {
-        return new ModifiablePropertyOption(name, value, description);
+    public static ModifiableOption<Object> option(String name, Object value, String description) {
+        return new ModifiableOption<Object>(name, value, description);
     }
 
-    public static ModifiablePropertyOption option(String name, String value) {
-        return new ModifiablePropertyOption(name, value);
+    public static ModifiableOption<String> option(String name, String value) {
+        return new ModifiableOption<>(name, value);
     }
 
-    public static ModifiablePropertyOption option(String name, String value, String description) {
-        return new ModifiablePropertyOption(name, value, description);
+    public static ModifiableOption<String> option(String name, String value, String description) {
+        return new ModifiableOption<>(name, value, description);
     }
 
     public static ModifiableResources resources() {
         return new ModifiableResources();
-    }
-
-    public static ModifiableDisplayOption.ShowDisplayOptionCondition show(String propertyName, Object value) {
-        return new ModifiableDisplayOption.ShowDisplayOptionCondition(Map.of(propertyName, List.of(value)));
-    }
-
-    public static ModifiableDisplayOption.ShowDisplayOptionCondition show(String propertyName, List<Object> values) {
-        return new ModifiableDisplayOption.ShowDisplayOptionCondition(Map.of(propertyName, values));
-    }
-
-    public static ModifiableDisplayOption.ShowDisplayOptionCondition show(
-        String propertyName1, List<Object> values1, String propertyName2, List<Object> values2) {
-        return new ModifiableDisplayOption.ShowDisplayOptionCondition(
-            Map.of(propertyName1, values1, propertyName2, values2));
-    }
-
-    public static ModifiableDisplayOption.ShowDisplayOptionCondition show(
-        String propertyName1,
-        List<Object> values1,
-        String propertyName2,
-        List<Object> values2,
-        String propertyName3,
-        List<Object> values3) {
-        return new ModifiableDisplayOption.ShowDisplayOptionCondition(
-            Map.of(propertyName1, values1, propertyName2, values2, propertyName3, values3));
-    }
-
-    public static ModifiableDisplayOption.ShowDisplayOptionCondition show(
-        String propertyName1,
-        List<Object> values1,
-        String propertyName2,
-        List<Object> values2,
-        String propertyName3,
-        List<Object> values3,
-        String propertyName4,
-        List<Object> values4) {
-        return new ModifiableDisplayOption.ShowDisplayOptionCondition(
-            Map.of(propertyName1, values1, propertyName2, values2, propertyName3, values3, propertyName4, values4));
-    }
-
-    public static ModifiableDisplayOption.ShowDisplayOptionCondition show(
-        String propertyName1,
-        List<Object> values1,
-        String propertyName2,
-        List<Object> values2,
-        String propertyName3,
-        List<Object> values3,
-        String propertyName4,
-        List<Object> values4,
-        String propertyName5,
-        List<Object> values5) {
-        return new ModifiableDisplayOption.ShowDisplayOptionCondition(Map.of(
-            propertyName1,
-            values1,
-            propertyName2,
-            values2,
-            propertyName3,
-            values3,
-            propertyName4,
-            values4,
-            propertyName5,
-            values5));
     }
 
     public static ModifiableProperty.ModifiableStringProperty string() {
@@ -383,63 +257,29 @@ public class DefinitionDSL {
         }
     }
 
-    public static final class ModifiableDisplayOption implements DisplayOption {
+    protected static class ModifiablePropertiesDataSource implements PropertiesDataSource {
 
-        private Map<String, List<Object>> hide;
-        private Map<String, List<Object>> show;
+        private List<String> loadPropertiesDependsOn;
 
-        private ModifiableDisplayOption() {
+        protected ModifiablePropertiesDataSource(List<String> loadPropertiesDependOnPropertyNames) {
+            this.loadPropertiesDependsOn = loadPropertiesDependOnPropertyNames;
         }
 
-        private ModifiableDisplayOption(Map<String, List<Object>> hide, Map<String, List<Object>> show) {
-            this.hide = hide;
-            this.show = show;
-        }
-
-        public Map<String, List<Object>> getHide() {
-            return hide == null ? null : new HashMap<>(hide);
-        }
-
-        public Map<String, List<Object>> getShow() {
-            return show == null ? null : new HashMap<>(show);
-        }
-
-        abstract static class DisplayOptionCondition {
-
-            protected final Map<String, List<Object>> conditions;
-
-            public DisplayOptionCondition(Map<String, List<Object>> conditions) {
-                this.conditions = conditions;
-            }
-
-            public Map<String, List<Object>> getConditions() {
-                return conditions;
-            }
-        }
-
-        public static final class HideDisplayOptionCondition extends DisplayOptionCondition {
-
-            public HideDisplayOptionCondition(Map<String, List<Object>> conditions) {
-                super(conditions);
-            }
-        }
-
-        public static final class ShowDisplayOptionCondition extends DisplayOptionCondition {
-
-            public ShowDisplayOptionCondition(Map<String, List<Object>> conditions) {
-                super(conditions);
-            }
+        @Override
+        public List<String> getLoadPropertiesDependsOn() {
+            return new ArrayList<>(loadPropertiesDependsOn);
         }
     }
 
     // CHECKSTYLE:OFF
     public static sealed abstract class ModifiableProperty<M extends ModifiableProperty<M, P>, P extends Property<P>>
         implements
-        Property<P>permits ModifiableProperty.ModifiableOneOfProperty,ModifiableProperty.ModifiableValueProperty {
+        Property<P>permits ModifiableProperty.ModifiableDynamicPropertiesProperty,ModifiableProperty.ModifiableOneOfProperty,ModifiableProperty.ModifiableValueProperty {
 
         private Boolean advancedOption;
         private String description;
-        private DisplayOption displayOption;
+        private String displayCondition;
+        private Boolean expressionEnabled;
         private Boolean hidden;
         private String label;
         private Map<String, Object> metadata;
@@ -471,33 +311,15 @@ public class DefinitionDSL {
         }
 
         @SuppressWarnings("unchecked")
-        public M displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-            this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
+        public M displayCondition(String displayCondition) {
+            this.displayCondition = displayCondition;
 
             return (M) this;
         }
 
         @SuppressWarnings("unchecked")
-        public M displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-            this.displayOption = new ModifiableDisplayOption(null, show.conditions);
-
-            return (M) this;
-        }
-
-        @SuppressWarnings("unchecked")
-        public M displayOption(
-            ModifiableDisplayOption.ShowDisplayOptionCondition show,
-            ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-            this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-            return (M) this;
-        }
-
-        @SuppressWarnings("unchecked")
-        public M displayOption(
-            ModifiableDisplayOption.HideDisplayOptionCondition hide,
-            ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-            this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
+        public M expressionEnabled(boolean expressionEnabled) {
+            this.expressionEnabled = expressionEnabled;
 
             return (M) this;
         }
@@ -560,8 +382,13 @@ public class DefinitionDSL {
         }
 
         @Override
-        public DisplayOption getDisplayOption() {
-            return displayOption;
+        public String getDisplayCondition() {
+            return displayCondition;
+        }
+
+        @Override
+        public Boolean getExpressionEnabled() {
+            return expressionEnabled;
         }
 
         @Override
@@ -605,10 +432,12 @@ public class DefinitionDSL {
             implements Property.ArrayProperty {
 
             private List<Property<?>> items;
-            private Boolean multipleValues; // default true
+            private Boolean multipleValues = true;
+            private List<Option<?>> options;
+            private OptionsDataSource optionsDataSource;
 
             private ModifiableArrayProperty() {
-                super(null, Type.ARRAY);
+                this(null);
             }
 
             private ModifiableArrayProperty(String name) {
@@ -713,6 +542,27 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableArrayProperty options(Option... options) {
+                this.options = List.of(options);
+
+                return this;
+            }
+
+            public ModifiableArrayProperty optionsDataSource(OptionsDataSource optionsDataSource) {
+                this.optionsDataSource = optionsDataSource;
+
+                return this;
+            }
+
+            @Override
+            public ControlType getControlType() {
+                if ((options == null || options.isEmpty()) && optionsDataSource == null) {
+                    return ControlType.JSON_BUILDER;
+                } else {
+                    return ControlType.MULTI_SELECT;
+                }
+            }
+
             @Override
             public List<Property<?>> getItems() {
                 return items;
@@ -722,6 +572,16 @@ public class DefinitionDSL {
             public Boolean getMultipleValues() {
                 return multipleValues;
             }
+
+            @Override
+            public List<Option<?>> getOptions() {
+                return options;
+            }
+
+            @Override
+            public OptionsDataSource getOptionsDataSource() {
+                return optionsDataSource;
+            }
         }
 
         @JsonTypeName("BOOLEAN")
@@ -730,7 +590,7 @@ public class DefinitionDSL {
             implements Property.BooleanProperty {
 
             private ModifiableBooleanProperty() {
-                super(null, Type.BOOLEAN);
+                this(null);
             }
 
             private ModifiableBooleanProperty(String name) {
@@ -748,14 +608,22 @@ public class DefinitionDSL {
 
                 return this;
             }
+
+            @Override
+            public ControlType getControlType() {
+                return ControlType.CHECKBOX;
+            }
         }
 
         @JsonTypeName("DATE")
         public static final class ModifiableDateProperty extends
             ModifiableValueProperty<LocalDate, ModifiableDateProperty, DateProperty> implements Property.DateProperty {
 
+            private List<Option<?>> options;
+            private OptionsDataSource optionsDataSource;
+
             private ModifiableDateProperty() {
-                super(null, Type.DATE);
+                this(null);
             }
 
             private ModifiableDateProperty(String name) {
@@ -773,6 +641,37 @@ public class DefinitionDSL {
 
                 return this;
             }
+
+            public ModifiableDateProperty options(Option... options) {
+                this.options = List.of(options);
+
+                return this;
+            }
+
+            public ModifiableDateProperty optionsDataSource(OptionsDataSource optionsDataSource) {
+                this.optionsDataSource = optionsDataSource;
+
+                return this;
+            }
+
+            @Override
+            public ControlType getControlType() {
+                if ((options == null || options.isEmpty()) && optionsDataSource == null) {
+                    return ControlType.DATE;
+                } else {
+                    return ControlType.SELECT;
+                }
+            }
+
+            @Override
+            public List<Option<?>> getOptions() {
+                return options;
+            }
+
+            @Override
+            public OptionsDataSource getOptionsDataSource() {
+                return optionsDataSource;
+            }
         }
 
         @JsonTypeName("DATE_TIME")
@@ -780,8 +679,11 @@ public class DefinitionDSL {
             extends ModifiableValueProperty<LocalDateTime, ModifiableDateTimeProperty, DateTimeProperty>
             implements Property.DateTimeProperty {
 
+            private List<Option<?>> options;
+            private OptionsDataSource optionsDataSource;
+
             private ModifiableDateTimeProperty() {
-                super(null, Type.DATE_TIME);
+                this(null);
             }
 
             private ModifiableDateTimeProperty(String name) {
@@ -799,6 +701,37 @@ public class DefinitionDSL {
 
                 return this;
             }
+
+            public ModifiableDateTimeProperty options(Option... options) {
+                this.options = List.of(options);
+
+                return this;
+            }
+
+            public ModifiableDateTimeProperty optionsDataSource(OptionsDataSource optionsDataSource) {
+                this.optionsDataSource = optionsDataSource;
+
+                return this;
+            }
+
+            @Override
+            public ControlType getControlType() {
+                if ((options == null || options.isEmpty()) && optionsDataSource == null) {
+                    return ControlType.DATE_TIME;
+                } else {
+                    return ControlType.SELECT;
+                }
+            }
+
+            @Override
+            public List<Option<?>> getOptions() {
+                return options;
+            }
+
+            @Override
+            public OptionsDataSource getOptionsDataSource() {
+                return optionsDataSource;
+            }
         }
 
         @JsonTypeName("INTEGER")
@@ -808,9 +741,11 @@ public class DefinitionDSL {
 
             private Integer maxValue;
             private Integer minValue;
+            private List<Option<?>> options;
+            private OptionsDataSource optionsDataSource;
 
             private ModifiableIntegerProperty() {
-                super(null, Type.INTEGER);
+                this(null);
             }
 
             private ModifiableIntegerProperty(String name) {
@@ -841,6 +776,27 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableIntegerProperty options(Option... options) {
+                this.options = List.of(options);
+
+                return this;
+            }
+
+            public ModifiableIntegerProperty optionsDataSource(OptionsDataSource optionsDataSource) {
+                this.optionsDataSource = optionsDataSource;
+
+                return this;
+            }
+
+            @Override
+            public ControlType getControlType() {
+                if ((options == null || options.isEmpty()) && optionsDataSource == null) {
+                    return ControlType.INPUT_INTEGER;
+                } else {
+                    return ControlType.SELECT;
+                }
+            }
+
             @Override
             public Integer getMaxValue() {
                 return maxValue;
@@ -849,6 +805,16 @@ public class DefinitionDSL {
             @Override
             public Integer getMinValue() {
                 return minValue;
+            }
+
+            @Override
+            public List<Option<?>> getOptions() {
+                return options;
+            }
+
+            @Override
+            public OptionsDataSource getOptionsDataSource() {
+                return optionsDataSource;
             }
         }
 
@@ -860,9 +826,11 @@ public class DefinitionDSL {
             private Integer maxValue;
             private Integer minValue;
             private Integer numberPrecision;
+            private List<Option<?>> options;
+            private OptionsDataSource optionsDataSource;
 
             private ModifiableNumberProperty() {
-                super(null, Type.NUMBER);
+                this(null);
             }
 
             private ModifiableNumberProperty(String name) {
@@ -893,26 +861,26 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableNumberProperty exampleValue(int value) {
-                this.exampleValue = (double) value;
+            public ModifiableNumberProperty exampleValue(int exampleValue) {
+                this.exampleValue = (double) exampleValue;
 
                 return this;
             }
 
-            public ModifiableNumberProperty exampleValue(long value) {
-                this.exampleValue = (double) value;
+            public ModifiableNumberProperty exampleValue(long exampleValue) {
+                this.exampleValue = (double) exampleValue;
 
                 return this;
             }
 
-            public ModifiableNumberProperty exampleValue(float value) {
-                this.exampleValue = (double) value;
+            public ModifiableNumberProperty exampleValue(float exampleValue) {
+                this.exampleValue = (double) exampleValue;
 
                 return this;
             }
 
-            public ModifiableNumberProperty exampleValue(double value) {
-                this.exampleValue = value;
+            public ModifiableNumberProperty exampleValue(double exampleValue) {
+                this.exampleValue = exampleValue;
 
                 return this;
             }
@@ -935,6 +903,27 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableNumberProperty options(Option... options) {
+                this.options = List.of(options);
+
+                return this;
+            }
+
+            public ModifiableNumberProperty optionsDataSource(OptionsDataSource optionsDataSource) {
+                this.optionsDataSource = optionsDataSource;
+
+                return this;
+            }
+
+            @Override
+            public ControlType getControlType() {
+                if ((options == null || options.isEmpty()) && optionsDataSource == null) {
+                    return ControlType.INPUT_NUMBER;
+                } else {
+                    return ControlType.SELECT;
+                }
+            }
+
             @Override
             public Integer getMaxValue() {
                 return maxValue;
@@ -949,6 +938,16 @@ public class DefinitionDSL {
             public Integer getNumberPrecision() {
                 return numberPrecision;
             }
+
+            @Override
+            public List<Option<?>> getOptions() {
+                return options;
+            }
+
+            @Override
+            public OptionsDataSource getOptionsDataSource() {
+                return optionsDataSource;
+            }
         }
 
         @JsonTypeName("OBJECT")
@@ -957,12 +956,14 @@ public class DefinitionDSL {
             implements Property.ObjectProperty {
 
             private List<? extends Property<?>> additionalProperties;
-            private Boolean multipleValues; // default true
+            private Boolean multipleValues = true;
             private String objectType;
+            private List<Option<?>> options;
+            private OptionsDataSource optionsDataSource;
             private List<? extends Property<?>> properties;
 
             private ModifiableObjectProperty() {
-                super(null, Type.OBJECT);
+                this(null);
             }
 
             private ModifiableObjectProperty(String name) {
@@ -1012,6 +1013,18 @@ public class DefinitionDSL {
                 return this;
             }
 
+            public ModifiableObjectProperty options(Option... options) {
+                this.options = List.of(options);
+
+                return this;
+            }
+
+            public ModifiableObjectProperty optionsDataSource(OptionsDataSource optionsDataSource) {
+                this.optionsDataSource = optionsDataSource;
+
+                return this;
+            }
+
             public ModifiableObjectProperty properties(Property<?>... properties) {
                 if (properties != null) {
                     this.properties = List.of(properties);
@@ -1036,6 +1049,18 @@ public class DefinitionDSL {
                 return additionalProperties == null ? null : new ArrayList<>(additionalProperties);
             }
 
+            @Override
+            public ControlType getControlType() {
+                if (objectType != null) {
+                    return ControlType.INPUT_TEXT;
+                }
+                if ((options == null || options.isEmpty()) && optionsDataSource == null) {
+                    return ControlType.JSON_BUILDER;
+                } else {
+                    return ControlType.MULTI_SELECT;
+                }
+            }
+
             public Boolean getMultipleValues() {
                 return multipleValues;
             }
@@ -1046,8 +1071,39 @@ public class DefinitionDSL {
             }
 
             @Override
+            public List<Option<?>> getOptions() {
+                return options;
+            }
+
+            @Override
+            public OptionsDataSource getOptionsDataSource() {
+                return optionsDataSource;
+            }
+
+            @Override
             public List<? extends Property<?>> getProperties() {
                 return properties == null ? null : new ArrayList<>(properties);
+            }
+        }
+
+        @JsonTypeName("DYNAMIC_PROPERTIES")
+        public static final class ModifiableDynamicPropertiesProperty
+            extends ModifiableProperty<ModifiableDynamicPropertiesProperty, DynamicPropertiesProperty>
+            implements Property.DynamicPropertiesProperty {
+
+            private PropertiesDataSource propertiesDataSource;
+
+            public ModifiableDynamicPropertiesProperty propertiesDataSource(
+                PropertiesDataSource propertiesDataSource) {
+
+                this.propertiesDataSource = propertiesDataSource;
+
+                return this;
+            }
+
+            @Override
+            public PropertiesDataSource getPropertiesDataSource() {
+                return propertiesDataSource;
             }
         }
 
@@ -1073,8 +1129,8 @@ public class DefinitionDSL {
                 super(name, Type.ONE_OF);
             }
 
-            public ModifiableOneOfProperty types(Property<?>... properties) {
-                this.types = List.of(properties);
+            public ModifiableOneOfProperty types(Property<?>... types) {
+                this.types = List.of(types);
 
                 return this;
             }
@@ -1090,13 +1146,21 @@ public class DefinitionDSL {
             implements Property.StringProperty {
 
             private ControlType controlType;
+            private List<Option<?>> options;
+            private OptionsDataSource optionsDataSource;
 
             private ModifiableStringProperty() {
-                super(null, Type.STRING);
+                this(null);
             }
 
             private ModifiableStringProperty(String name) {
                 super(name, Type.STRING);
+            }
+
+            public ModifiableStringProperty controlType(ControlType controlType) {
+                this.controlType = controlType;
+
+                return this;
             }
 
             public ModifiableStringProperty defaultValue(String value) {
@@ -1111,15 +1175,39 @@ public class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableStringProperty controlType(ControlType controlType) {
-                this.controlType = controlType;
+            public ModifiableStringProperty options(Option... options) {
+                this.options = List.of(options);
+
+                return this;
+            }
+
+            public ModifiableStringProperty optionsDataSource(OptionsDataSource optionsDataSource) {
+                this.optionsDataSource = optionsDataSource;
 
                 return this;
             }
 
             @Override
             public ControlType getControlType() {
-                return controlType;
+                if (this.controlType == null) {
+                    if ((options == null || options.isEmpty()) && optionsDataSource == null) {
+                        return ControlType.INPUT_TEXT;
+                    } else {
+                        return ControlType.SELECT;
+                    }
+                } else {
+                    return controlType;
+                }
+            }
+
+            @Override
+            public List<Option<?>> getOptions() {
+                return options;
+            }
+
+            @Override
+            public OptionsDataSource getOptionsDataSource() {
+                return optionsDataSource;
             }
         }
 
@@ -1130,8 +1218,6 @@ public class DefinitionDSL {
 
             protected V defaultValue;
             protected V exampleValue;
-            private List<PropertyOption> options;
-            private PropertyOptionDataSource optionDataSource;
 
             private ModifiableValueProperty(Property.Type type) {
                 this(null, type);
@@ -1139,20 +1225,6 @@ public class DefinitionDSL {
 
             protected ModifiableValueProperty(String name, Property.Type type) {
                 super(name, type);
-            }
-
-            @SuppressWarnings("unchecked")
-            public M options(PropertyOption... options) {
-                this.options = List.of(options);
-
-                return (M) this;
-            }
-
-            @SuppressWarnings("unchecked")
-            public M propertyOptionDataSource(PropertyOptionDataSource propertyOptionDataSource) {
-                this.optionDataSource = propertyOptionDataSource;
-
-                return (M) this;
             }
 
             @Override
@@ -1164,71 +1236,39 @@ public class DefinitionDSL {
             public V getExampleValue() {
                 return exampleValue;
             }
-
-            @Override
-            public List<PropertyOption> getOptions() {
-                return options;
-            }
-
-            @Override
-            public PropertyOptionDataSource getOptionsDataSource() {
-                return optionDataSource;
-            }
         }
     }
     // CHECKSTYLE:ON
 
-    public static final class ModifiablePropertyOption implements PropertyOption {
+    public static final class ModifiableOption<T> implements Option<T> {
 
         private String description;
-        private DisplayOption displayOption;
+        private String displayCondition;
         private String name;
-        private Object value;
+        private T value;
 
-        private ModifiablePropertyOption() {
+        private ModifiableOption() {
         }
 
-        private ModifiablePropertyOption(String name, Object value) {
+        private ModifiableOption(String name, T value) {
             this.name = name;
             this.value = value;
         }
 
-        private ModifiablePropertyOption(String name, Object value, String description) {
+        private ModifiableOption(String name, T value, String description) {
             this.name = name;
             this.value = value;
             this.description = description;
         }
 
-        public ModifiablePropertyOption description(String description) {
+        public ModifiableOption description(String description) {
             this.description = description;
 
             return this;
         }
 
-        public ModifiablePropertyOption displayOption(ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-            this.displayOption = new ModifiableDisplayOption(hide.conditions, null);
-
-            return this;
-        }
-
-        public ModifiablePropertyOption displayOption(ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-            this.displayOption = new ModifiableDisplayOption(null, show.conditions);
-
-            return this;
-        }
-
-        public ModifiablePropertyOption displayOption(
-            ModifiableDisplayOption.ShowDisplayOptionCondition show,
-            ModifiableDisplayOption.HideDisplayOptionCondition hide) {
-            this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
-
-            return this;
-        }
-
-        public ModifiablePropertyOption displayOption(
-            ModifiableDisplayOption.HideDisplayOptionCondition hide,
-            ModifiableDisplayOption.ShowDisplayOptionCondition show) {
-            this.displayOption = new ModifiableDisplayOption(hide.conditions, show.conditions);
+        public ModifiableOption displayCondition(String displayCondition) {
+            this.displayCondition = displayCondition;
 
             return this;
         }
@@ -1239,8 +1279,8 @@ public class DefinitionDSL {
         }
 
         @Override
-        public DisplayOption getDisplayOption() {
-            return displayOption;
+        public String getDisplayCondition() {
+            return displayCondition;
         }
 
         @Override
@@ -1249,43 +1289,22 @@ public class DefinitionDSL {
         }
 
         @Override
-        public Object getValue() {
+        public T getValue() {
             return value;
         }
     }
 
-    public static final class ModifiablePropertyOptionDataSource implements PropertyOptionDataSource {
+    protected static class ModifiableOptionsDataSource implements OptionsDataSource {
 
-        protected List<String> loadOptionsDependsOn;
+        private List<String> loadOptionsDependsOn;
 
-        @JsonIgnore
-        private Function<Object, Object> loadOptionsFunction;
-
-        private ModifiablePropertyOptionDataSource() {
-        }
-
-        @SuppressWarnings("unchecked")
-        public PropertyOptionDataSource loadOptionsDependsOn(String... propertyNames) {
-            this.loadOptionsDependsOn = List.of(propertyNames);
-
-            return this;
-        }
-
-        @SuppressWarnings("unchecked")
-        public PropertyOptionDataSource loadOptionsFunction(Function<Object, Object> loadOptionsFunction) {
-            this.loadOptionsFunction = loadOptionsFunction;
-
-            return this;
+        protected ModifiableOptionsDataSource(List<String> loadOptionsDependOnPropertyNames) {
+            this.loadOptionsDependsOn = loadOptionsDependOnPropertyNames;
         }
 
         @Override
         public List<String> getLoadOptionsDependsOn() {
-            return loadOptionsDependsOn;
-        }
-
-        @Override
-        public Function<Object, Object> getLoadOptionsFunction() {
-            return loadOptionsFunction;
+            return new ArrayList<>(loadOptionsDependsOn);
         }
     }
 

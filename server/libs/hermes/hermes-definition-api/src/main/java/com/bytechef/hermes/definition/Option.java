@@ -19,21 +19,17 @@ package com.bytechef.hermes.definition;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import java.util.List;
-import java.util.function.Function;
-
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = DefinitionDSL.ModifiablePropertyOptionDataSource.class)
-public sealed interface PropertyOptionDataSource permits DefinitionDSL.ModifiablePropertyOptionDataSource {
+@JsonDeserialize(as = DefinitionDSL.ModifiableOption.class)
+public sealed interface Option<T> permits DefinitionDSL.ModifiableOption {
 
-    List<String> getLoadOptionsDependsOn();
+    String getDescription();
 
-    /**
-     * The function that should dynamically load options for the property.
-     *
-     * @return a load options function implementation
-     */
-    Function<Object, Object> getLoadOptionsFunction();
+    String getDisplayCondition();
+
+    String getName();
+
+    T getValue();
 }
