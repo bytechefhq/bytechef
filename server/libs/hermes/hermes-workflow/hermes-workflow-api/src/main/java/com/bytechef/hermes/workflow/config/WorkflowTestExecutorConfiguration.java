@@ -21,13 +21,10 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFacto
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.repository.memory.InMemoryContextRepository;
-import com.bytechef.atlas.repository.memory.InMemoryCounterRepository;
 import com.bytechef.atlas.repository.memory.InMemoryJobRepository;
 import com.bytechef.atlas.repository.memory.InMemoryTaskExecutionRepository;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.ContextServiceImpl;
-import com.bytechef.atlas.service.CounterService;
-import com.bytechef.atlas.service.CounterServiceImpl;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.JobServiceImpl;
 import com.bytechef.atlas.service.TaskExecutionService;
@@ -59,8 +56,6 @@ public class WorkflowTestExecutorConfiguration {
         Map<String, TaskHandler<?>> taskHandlerMap, List<WorkflowRepository> workflowRepositories) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
-
-        CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository());
 
         InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository();
 
