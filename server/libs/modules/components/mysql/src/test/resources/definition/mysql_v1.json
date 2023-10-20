@@ -9,21 +9,21 @@
       "outputSchema": [
         {
           "type": "ARRAY",
-          "controlType": "JSON_BUILDER",
           "items": [
             {
               "type": "OBJECT",
-              "controlType": "JSON_BUILDER",
               "multipleValues": true,
               "properties": [
                 {
                   "type": "INTEGER",
                   "controlType": "INPUT_INTEGER"
                 }
-              ]
+              ],
+              "controlType": "JSON_BUILDER"
             }
           ],
-          "multipleValues": true
+          "multipleValues": true,
+          "controlType": "JSON_BUILDER"
         }
       ],
       "properties": [
@@ -41,7 +41,6 @@
           "label": "Parameters",
           "name": "parameters",
           "type": "OBJECT",
-          "controlType": "JSON_BUILDER",
           "multipleValues": true,
           "properties": [
             {
@@ -60,7 +59,8 @@
               "type": "STRING",
               "controlType": "INPUT_TEXT"
             }
-          ]
+          ],
+          "controlType": "JSON_BUILDER"
         }
       ]
     },
@@ -73,14 +73,14 @@
       "outputSchema": [
         {
           "type": "OBJECT",
-          "controlType": "JSON_BUILDER",
           "multipleValues": true,
           "properties": [
             {
               "type": "INTEGER",
               "controlType": "INPUT_INTEGER"
             }
-          ]
+          ],
+          "controlType": "JSON_BUILDER"
         }
       ],
       "properties": [
@@ -90,8 +90,8 @@
           "required": true,
           "name": "schema",
           "type": "STRING",
-          "controlType": "INPUT_TEXT",
-          "defaultValue": "public"
+          "defaultValue": "public",
+          "controlType": "INPUT_TEXT"
         },
         {
           "description": "Name of the table in which to insert data to.",
@@ -106,33 +106,31 @@
           "label": "Columns",
           "name": "columns",
           "type": "ARRAY",
-          "controlType": "JSON_BUILDER",
           "items": [
             {
               "type": "STRING",
               "controlType": "INPUT_TEXT"
             }
           ],
-          "multipleValues": true
+          "multipleValues": true,
+          "controlType": "JSON_BUILDER"
         },
         {
           "description": "List of rows.",
           "label": "Rows",
           "name": "rows",
           "type": "ARRAY",
-          "controlType": "JSON_BUILDER",
           "items": [
             {
               "type": "OBJECT",
-              "controlType": "JSON_BUILDER",
               "additionalProperties": [
                 {
                   "type": "ONE_OF",
                   "types": [
                     {
                       "type": "ARRAY",
-                      "controlType": "JSON_BUILDER",
-                      "multipleValues": true
+                      "multipleValues": true,
+                      "controlType": "JSON_BUILDER"
                     },
                     {
                       "type": "BOOLEAN",
@@ -156,8 +154,8 @@
                     },
                     {
                       "type": "OBJECT",
-                      "controlType": "JSON_BUILDER",
-                      "multipleValues": true
+                      "multipleValues": true,
+                      "controlType": "JSON_BUILDER"
                     },
                     {
                       "type": "STRING",
@@ -166,10 +164,12 @@
                   ]
                 }
               ],
-              "multipleValues": true
+              "multipleValues": true,
+              "controlType": "JSON_BUILDER"
             }
           ],
-          "multipleValues": true
+          "multipleValues": true,
+          "controlType": "JSON_BUILDER"
         }
       ]
     },
@@ -182,14 +182,14 @@
       "outputSchema": [
         {
           "type": "OBJECT",
-          "controlType": "JSON_BUILDER",
           "multipleValues": true,
           "properties": [
             {
               "type": "INTEGER",
               "controlType": "INPUT_INTEGER"
             }
-          ]
+          ],
+          "controlType": "JSON_BUILDER"
         }
       ],
       "properties": [
@@ -199,8 +199,8 @@
           "required": true,
           "name": "schema",
           "type": "STRING",
-          "controlType": "INPUT_TEXT",
-          "defaultValue": "public"
+          "defaultValue": "public",
+          "controlType": "INPUT_TEXT"
         },
         {
           "description": "Name of the table in which to update data in.",
@@ -215,14 +215,14 @@
           "label": "Columns",
           "name": "columns",
           "type": "ARRAY",
-          "controlType": "JSON_BUILDER",
           "items": [
             {
               "type": "STRING",
               "controlType": "INPUT_TEXT"
             }
           ],
-          "multipleValues": true
+          "multipleValues": true,
+          "controlType": "JSON_BUILDER"
         },
         {
           "description": "The name of the property which decides which rows in the database should be updated.",
@@ -237,19 +237,17 @@
           "label": "Rows",
           "name": "rows",
           "type": "ARRAY",
-          "controlType": "JSON_BUILDER",
           "items": [
             {
               "type": "OBJECT",
-              "controlType": "JSON_BUILDER",
               "additionalProperties": [
                 {
                   "type": "ONE_OF",
                   "types": [
                     {
                       "type": "ARRAY",
-                      "controlType": "JSON_BUILDER",
-                      "multipleValues": true
+                      "multipleValues": true,
+                      "controlType": "JSON_BUILDER"
                     },
                     {
                       "type": "BOOLEAN",
@@ -273,8 +271,8 @@
                     },
                     {
                       "type": "OBJECT",
-                      "controlType": "JSON_BUILDER",
-                      "multipleValues": true
+                      "multipleValues": true,
+                      "controlType": "JSON_BUILDER"
                     },
                     {
                       "type": "STRING",
@@ -283,10 +281,12 @@
                   ]
                 }
               ],
-              "multipleValues": true
+              "multipleValues": true,
+              "controlType": "JSON_BUILDER"
             }
           ],
-          "multipleValues": true
+          "multipleValues": true,
+          "controlType": "JSON_BUILDER"
         }
       ]
     },
@@ -299,14 +299,14 @@
       "outputSchema": [
         {
           "type": "OBJECT",
-          "controlType": "JSON_BUILDER",
           "multipleValues": true,
           "properties": [
             {
               "type": "INTEGER",
               "controlType": "INPUT_INTEGER"
             }
-          ]
+          ],
+          "controlType": "JSON_BUILDER"
         }
       ],
       "properties": [
@@ -316,8 +316,8 @@
           "required": true,
           "name": "schema",
           "type": "STRING",
-          "controlType": "INPUT_TEXT",
-          "defaultValue": "public"
+          "defaultValue": "public",
+          "controlType": "INPUT_TEXT"
         },
         {
           "description": "Name of the table in which to update data in.",
@@ -340,19 +340,17 @@
           "label": "Rows",
           "name": "rows",
           "type": "ARRAY",
-          "controlType": "JSON_BUILDER",
           "items": [
             {
               "type": "OBJECT",
-              "controlType": "JSON_BUILDER",
               "additionalProperties": [
                 {
                   "type": "ONE_OF",
                   "types": [
                     {
                       "type": "ARRAY",
-                      "controlType": "JSON_BUILDER",
-                      "multipleValues": true
+                      "multipleValues": true,
+                      "controlType": "JSON_BUILDER"
                     },
                     {
                       "type": "BOOLEAN",
@@ -376,8 +374,8 @@
                     },
                     {
                       "type": "OBJECT",
-                      "controlType": "JSON_BUILDER",
-                      "multipleValues": true
+                      "multipleValues": true,
+                      "controlType": "JSON_BUILDER"
                     },
                     {
                       "type": "STRING",
@@ -386,10 +384,12 @@
                   ]
                 }
               ],
-              "multipleValues": true
+              "multipleValues": true,
+              "controlType": "JSON_BUILDER"
             }
           ],
-          "multipleValues": true
+          "multipleValues": true,
+          "controlType": "JSON_BUILDER"
         }
       ]
     },
@@ -402,14 +402,14 @@
       "outputSchema": [
         {
           "type": "OBJECT",
-          "controlType": "JSON_BUILDER",
           "multipleValues": true,
           "properties": [
             {
               "type": "INTEGER",
               "controlType": "INPUT_INTEGER"
             }
-          ]
+          ],
+          "controlType": "JSON_BUILDER"
         }
       ],
       "properties": [
@@ -427,19 +427,17 @@
           "label": "Rows",
           "name": "rows",
           "type": "ARRAY",
-          "controlType": "JSON_BUILDER",
           "items": [
             {
               "type": "OBJECT",
-              "controlType": "JSON_BUILDER",
               "additionalProperties": [
                 {
                   "type": "ONE_OF",
                   "types": [
                     {
                       "type": "ARRAY",
-                      "controlType": "JSON_BUILDER",
-                      "multipleValues": true
+                      "multipleValues": true,
+                      "controlType": "JSON_BUILDER"
                     },
                     {
                       "type": "BOOLEAN",
@@ -463,8 +461,8 @@
                     },
                     {
                       "type": "OBJECT",
-                      "controlType": "JSON_BUILDER",
-                      "multipleValues": true
+                      "multipleValues": true,
+                      "controlType": "JSON_BUILDER"
                     },
                     {
                       "type": "STRING",
@@ -473,17 +471,18 @@
                   ]
                 }
               ],
-              "multipleValues": true
+              "multipleValues": true,
+              "controlType": "JSON_BUILDER"
             }
           ],
-          "multipleValues": true
+          "multipleValues": true,
+          "controlType": "JSON_BUILDER"
         },
         {
           "description": "The list of properties which should be used as parameters.",
           "label": "Parameters",
           "name": "parameters",
           "type": "OBJECT",
-          "controlType": "JSON_BUILDER",
           "multipleValues": true,
           "properties": [
             {
@@ -502,17 +501,19 @@
               "type": "STRING",
               "controlType": "INPUT_TEXT"
             }
-          ]
+          ],
+          "controlType": "JSON_BUILDER"
         }
       ]
     }
   ],
   "connection": {
-    "componentName": "mysql",
-    "display": {
+    "authorizationRequired": false,
+    "componentDisplay": {
       "description": "Query, insert nd update data from MySQL.",
       "label": "MySQL"
     },
+    "componentName": "mysql",
     "properties": [
       {
         "label": "Host",
@@ -549,9 +550,7 @@
         "type": "STRING",
         "controlType": "INPUT_PASSWORD"
       }
-    ],
-    "version": 1,
-    "authorizationRequired": true
+    ]
   },
   "display": {
     "description": "Query, insert nd update data from MySQL.",
