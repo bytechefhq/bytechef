@@ -68,8 +68,9 @@ const ProjectInstanceList = ({project}: {project: ProjectModel}) => {
                                 <AccordionItem
                                     value={projectInstance.id!.toString()}
                                     key={projectInstance.id}
+                                    className="data-[state=closed]:border-b data-[state=closed]:border-b-gray-100"
                                 >
-                                    <div className="w-full rounded-md px-2 py-3 hover:bg-gray-50 data-[state=closed]:border-b data-[state=closed]:border-b-gray-100">
+                                    <div className="w-full rounded-md px-2 py-3 hover:bg-gray-50">
                                         <ProjectInstanceListItem
                                             projectInstance={projectInstance}
                                             key={projectInstance.id}
