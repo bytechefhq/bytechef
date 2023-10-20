@@ -63,9 +63,9 @@ export interface GetProjectWorkflowsRequest {
 }
 
 export interface GetProjectsRequest {
-    categoryIds?: Array<number>;
+    categoryId?: number;
     projectInstances?: boolean;
-    tagIds?: Array<number>;
+    tagId?: number;
 }
 
 export interface UpdateProjectRequest {
@@ -347,16 +347,16 @@ export class ProjectsApi extends runtime.BaseAPI {
     async getProjectsRaw(requestParameters: GetProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectModel>>> {
         const queryParameters: any = {};
 
-        if (requestParameters.categoryIds) {
-            queryParameters['categoryIds'] = requestParameters.categoryIds;
+        if (requestParameters.categoryId !== undefined) {
+            queryParameters['categoryId'] = requestParameters.categoryId;
         }
 
         if (requestParameters.projectInstances !== undefined) {
             queryParameters['projectInstances'] = requestParameters.projectInstances;
         }
 
-        if (requestParameters.tagIds) {
-            queryParameters['tagIds'] = requestParameters.tagIds;
+        if (requestParameters.tagId !== undefined) {
+            queryParameters['tagId'] = requestParameters.tagId;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
