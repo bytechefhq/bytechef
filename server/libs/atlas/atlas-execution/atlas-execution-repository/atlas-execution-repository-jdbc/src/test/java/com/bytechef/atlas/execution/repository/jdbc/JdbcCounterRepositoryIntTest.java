@@ -23,7 +23,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.jdbc.config.WorkflowExecutionRepositoryIntTestConfiguration;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
-import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -31,16 +31,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
-@SpringBootTest(
-    classes = WorkflowExecutionRepositoryIntTestConfiguration.class,
-    properties = "bytechef.persistence.provider=jdbc")
+@SpringBootTest(classes = WorkflowExecutionRepositoryIntTestConfiguration.class)
+@Import(PostgreSQLContainerConfiguration.class)
 public class JdbcCounterRepositoryIntTest {
 
     @Autowired

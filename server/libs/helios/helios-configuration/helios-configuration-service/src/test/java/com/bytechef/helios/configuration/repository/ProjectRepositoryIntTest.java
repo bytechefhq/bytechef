@@ -20,7 +20,7 @@ package com.bytechef.helios.configuration.repository;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.config.ProjectIntTestConfiguration;
-import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
@@ -29,18 +29,15 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
-@SpringBootTest(
-    classes = ProjectIntTestConfiguration.class,
-    properties = {
-        "bytechef.context-repository.provider=jdbc", "bytechef.persistence.provider=jdbc"
-    })
+@SpringBootTest(classes = ProjectIntTestConfiguration.class)
+@Import(PostgreSQLContainerConfiguration.class)
 public class ProjectRepositoryIntTest {
 
     @Autowired

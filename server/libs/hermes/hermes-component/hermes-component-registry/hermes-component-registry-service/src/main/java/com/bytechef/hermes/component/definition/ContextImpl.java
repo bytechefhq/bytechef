@@ -17,13 +17,13 @@
 
 package com.bytechef.hermes.component.definition;
 
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.execution.event.TaskProgressedEvent;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.data.storage.service.DataStorageService;
+import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.InputStream;
@@ -42,21 +42,21 @@ public class ContextImpl implements ActionDefinition.ActionContext, TriggerDefin
     private final ConnectionService connectionService;
     private final DataStorageService dataStorageService;
     private final EventPublisher eventPublisher;
-    private final FileStorageService fileStorageService;
+    private final WorkflowFileStorage workflowFileStorage;
     private final Long taskExecutionId;
 
     @SuppressFBWarnings("EI")
     public ContextImpl(
-        Map<String, Long> connectionIdMap, Long taskExecutionId,
-        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        DataStorageService dataStorageService, FileStorageService fileStorageService, EventPublisher eventPublisher) {
+        Map<String, Long> connectionIdMap, ConnectionDefinitionService connectionDefinitionService,
+        ConnectionService connectionService, EventPublisher eventPublisher, DataStorageService dataStorageService,
+        WorkflowFileStorage workflowFileStorage, Long taskExecutionId) {
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionIdMap = connectionIdMap;
         this.connectionService = connectionService;
         this.dataStorageService = dataStorageService;
         this.eventPublisher = eventPublisher;
-        this.fileStorageService = fileStorageService;
+        this.workflowFileStorage = workflowFileStorage;
         this.taskExecutionId = taskExecutionId;
     }
 
@@ -103,8 +103,8 @@ public class ContextImpl implements ActionDefinition.ActionContext, TriggerDefin
 
     @Override
     public InputStream getFileStream(Context.FileEntry fileEntry) {
-        return fileStorageService.getFileStream(new com.bytechef.hermes.file.storage.domain.FileEntry(
-            fileEntry.getName(), fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getUrl()));
+        return workflowFileStorage.getFileStream(new com.bytechef.file.storage.domain.FileEntry(
+            fileEntry.getName(), fileEntry.getUrl()));
     }
 
     @Override
@@ -114,8 +114,8 @@ public class ContextImpl implements ActionDefinition.ActionContext, TriggerDefin
 
     @Override
     public String readFileToString(Context.FileEntry fileEntry) {
-        return fileStorageService.readFileToString(new com.bytechef.hermes.file.storage.domain.FileEntry(
-            fileEntry.getName(), fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getUrl()));
+        return workflowFileStorage.readFileToString(new com.bytechef.file.storage.domain.FileEntry(
+            fileEntry.getName(), fileEntry.getUrl()));
     }
 
     @Override
@@ -125,13 +125,13 @@ public class ContextImpl implements ActionDefinition.ActionContext, TriggerDefin
 
     @Override
     public FileEntry storeFileContent(String fileName, String data) {
-        return new ContextFileEntryImpl(fileStorageService.storeFileContent(fileName, data));
+        return new ContextFileEntryImpl(workflowFileStorage.storeFileContent(fileName, data));
     }
 
     @Override
     public FileEntry storeFileContent(String fileName, InputStream inputStream) {
         try {
-            return new ContextFileEntryImpl(fileStorageService.storeFileContent(fileName, inputStream));
+            return new ContextFileEntryImpl(workflowFileStorage.storeFileContent(fileName, inputStream));
         } catch (Exception exception) {
             throw new ComponentExecutionException("Unable to store file " + fileName, exception);
         }

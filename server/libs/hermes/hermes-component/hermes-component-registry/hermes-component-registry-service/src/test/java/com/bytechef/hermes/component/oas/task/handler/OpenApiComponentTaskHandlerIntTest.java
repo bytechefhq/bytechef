@@ -20,6 +20,8 @@ package com.bytechef.hermes.component.oas.task.handler;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.component.petstore.PetstoreComponentHandler;
@@ -36,14 +38,14 @@ import com.bytechef.hermes.component.util.HttpClientUtils.Response;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
-import com.bytechef.hermes.data.storage.service.DataStorageService;
+import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
-import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.hermes.file.storage.domain.FileEntry;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.test.annotation.EmbeddedSql;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -67,6 +69,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 import java.nio.charset.StandardCharsets;
@@ -92,8 +95,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
 @SpringBootTest
+@Import(PostgreSQLContainerConfiguration.class)
 @WireMockTest(httpPort = 9999)
 public class OpenApiComponentTaskHandlerIntTest {
 
@@ -559,7 +562,7 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         openApiComponentTaskHandler = createOpenApiComponentHandler("uploadFile");
 
-        FileEntry fileEntry = FILE_STORAGE_SERVICE.storeFileContent("text.txt", "This is text");
+        FileEntry fileEntry = FILE_STORAGE_SERVICE.storeFileContent("data", "text.txt", "This is text");
 
         taskExecution = getTaskExecution(Map.of("petId", 10, "fileEntry", new MockContextFileEntry(fileEntry)));
 
@@ -863,6 +866,11 @@ public class OpenApiComponentTaskHandlerIntTest {
             return XmlMapper.xmlBuilder()
                 .serializationInclusion(JsonInclude.Include.NON_NULL)
                 .build();
+        }
+
+        @Bean
+        WorkflowFileStorage workflowFileStorage(ObjectMapper objectMapper) {
+            return new WorkflowFileStorageImpl(new Base64FileStorageService(), objectMapper);
         }
 
         @TestConfiguration

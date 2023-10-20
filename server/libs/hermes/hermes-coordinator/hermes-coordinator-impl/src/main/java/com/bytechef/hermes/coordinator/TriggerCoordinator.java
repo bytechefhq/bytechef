@@ -154,7 +154,7 @@ public class TriggerCoordinator {
 
         triggerExecution = triggerExecutionService.create(
             triggerExecution.evaluate(
-                instanceWorkflowAccessor.getInputs(
+                instanceWorkflowAccessor.getInputMap(
                     workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId())));
 
         triggerExecution.setState(OptionalUtils.orElse(triggerStateService.fetchValue(workflowExecutionId), null));

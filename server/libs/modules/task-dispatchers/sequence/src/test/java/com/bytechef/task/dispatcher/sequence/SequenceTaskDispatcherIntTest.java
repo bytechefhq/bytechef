@@ -17,15 +17,15 @@
 
 package com.bytechef.task.dispatcher.sequence;
 
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
@@ -50,6 +50,9 @@ public class SequenceTaskDispatcherIntTest {
     @Autowired
     private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
 
+    @Autowired
+    private WorkflowFileStorage workflowFileStorage;
+
     @BeforeEach
     void beforeEach() {
         testVarTaskHandler = new TestVarTaskHandler<>(Map::put);
@@ -58,14 +61,14 @@ public class SequenceTaskDispatcherIntTest {
     @Test
     public void testDispatch() {
         taskDispatcherWorkflowTestSupport.execute(
-            Base64.getEncoder()
-                .encodeToString("sequence_v1".getBytes(StandardCharsets.UTF_8)),
+            EncodingUtils.encodeBase64ToString("sequence_v1"),
             (counterService, taskExecutionService) -> List.of(
                 (taskCompletionHandler, taskDispatcher) -> new SequenceTaskCompletionHandler(
-                    contextService, taskCompletionHandler, taskDispatcher, taskExecutionService)),
+                    contextService, taskCompletionHandler, taskDispatcher, taskExecutionService,
+                    workflowFileStorage)),
             (contextService, counterService, messageBroker, taskExecutionService) -> List.of(
                 (taskDispatcher) -> new SequenceTaskDispatcher(
-                    contextService, messageBroker, taskDispatcher, taskExecutionService)),
+                    contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorage)),
             () -> Map.of("var", testVarTaskHandler));
 
         Assertions.assertEquals(1, (Integer) testVarTaskHandler.get("value1"));

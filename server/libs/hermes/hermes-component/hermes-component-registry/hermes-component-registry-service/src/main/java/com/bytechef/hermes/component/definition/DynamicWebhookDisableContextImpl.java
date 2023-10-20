@@ -20,9 +20,11 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.hermes.component.definition.Context.Connection;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Map;
 
+@SuppressFBWarnings("EI")
 public record DynamicWebhookDisableContextImpl(
     Map<String, ?> inputParameters, Connection connection, DynamicWebhookEnableOutput dynamicWebhookEnableOutput,
     String workflowExecutionId)

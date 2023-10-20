@@ -25,9 +25,10 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.domain.TaskExecution.Status;
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.execution.event.JobStatusEvent;
-import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -60,18 +61,21 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private final JobExecutor jobExecutor;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
+    private final WorkflowFileStorage workflowFileStorage;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public DefaultTaskCompletionHandler(
         ContextService contextService, EventPublisher eventPublisher, JobExecutor jobExecutor, JobService jobService,
-        TaskExecutionService taskExecutionService, WorkflowService workflowService) {
+        TaskExecutionService taskExecutionService, WorkflowFileStorage workflowFileStorage,
+        WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;
         this.jobExecutor = jobExecutor;
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
+        this.workflowFileStorage = workflowFileStorage;
         this.workflowService = workflowService;
     }
 
@@ -107,11 +111,16 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
             if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
                 Map<String, Object> newContext = new HashMap<>(
-                    contextService.peek(Objects.requireNonNull(job.getId()), Context.Classname.JOB));
+                    workflowFileStorage.readContextValue(
+                        contextService.peek(Objects.requireNonNull(job.getId()), Context.Classname.JOB)));
 
-                newContext.put(taskExecution.getName(), taskExecution.getOutput());
+                newContext.put(
+                    taskExecution.getName(),
+                    workflowFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
 
-                contextService.push(job.getId(), Context.Classname.JOB, newContext);
+                contextService.push(
+                    job.getId(), Context.Classname.JOB,
+                    workflowFileStorage.storeContextValue(job.getId(), Context.Classname.JOB, newContext));
             }
 
             if (hasMoreTasks(job)) {
@@ -130,7 +139,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private void complete(Job job) {
         Assert.notNull(job.getId(), "'job.id' must not be null");
 
-        Map<String, ?> context = contextService.peek(job.getId(), Context.Classname.JOB);
+        Map<String, ?> context = workflowFileStorage.readContextValue(
+            contextService.peek(job.getId(), Context.Classname.JOB));
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
         Map<String, Object> source = new HashMap<>();
@@ -142,11 +152,11 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         job.setCurrentTask(-1);
         job.setEndDate(LocalDateTime.now());
         job.setStatus(Job.Status.COMPLETED);
-        job.setOutputs(Evaluator.evaluate(source, context));
+        job.setOutputs(workflowFileStorage.storeJobOutputs(job.getId(), Evaluator.evaluate(source, context)));
 
         job = jobService.update(job);
 
-        eventPublisher.publishEvent(new JobStatusEvent(job.getId(), job.getStatus()));
+        eventPublisher.publishEvent(new JobStatusEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
 
         if (logger.isDebugEnabled()) {
             logger.debug("Job id={}, label='{}' completed", job.getId(), job.getLabel());

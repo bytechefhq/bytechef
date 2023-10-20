@@ -17,12 +17,12 @@
 
 package com.bytechef.encryption;
 
+import com.bytechef.commons.util.EncodingUtils;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Arrays;
-import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -31,9 +31,6 @@ import javax.crypto.spec.SecretKeySpec;
  */
 @Component
 public class EncryptionImpl implements Encryption {
-
-    private static final Base64.Decoder DECODER = Base64.getDecoder();
-    private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     private final EncryptionKey encryptionKey;
 
@@ -46,7 +43,7 @@ public class EncryptionImpl implements Encryption {
         try {
             Cipher cipher = getCipher(Cipher.DECRYPT_MODE);
 
-            return new String(cipher.doFinal(DECODER.decode(encryptedString)), StandardCharsets.UTF_8);
+            return new String(cipher.doFinal(EncodingUtils.decodeBase64(encryptedString)), StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -57,7 +54,7 @@ public class EncryptionImpl implements Encryption {
         try {
             Cipher cipher = getCipher(Cipher.ENCRYPT_MODE);
 
-            return ENCODER.encodeToString(cipher.doFinal(content.getBytes(StandardCharsets.UTF_8)));
+            return EncodingUtils.encodeBase64ToString(cipher.doFinal(content.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -66,8 +63,7 @@ public class EncryptionImpl implements Encryption {
     private Cipher getCipher(int encryptMode) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
 
-        byte[] decodedKey = DECODER
-            .decode(encryptionKey.getKey());
+        byte[] decodedKey = EncodingUtils.decodeBase64(encryptionKey.getKey());
 
         Key secretKey = new SecretKeySpec(Arrays.copyOf(decodedKey, 16), "AES");
 

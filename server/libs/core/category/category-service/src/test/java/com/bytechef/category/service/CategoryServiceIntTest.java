@@ -20,12 +20,13 @@ package com.bytechef.category.service;
 import com.bytechef.category.config.CategoryIntTestConfiguration;
 import com.bytechef.category.repository.CategoryRepository;
 import com.bytechef.category.domain.Category;
-import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -36,8 +37,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
 @SpringBootTest(classes = CategoryIntTestConfiguration.class)
+@Import(PostgreSQLContainerConfiguration.class)
 public class CategoryServiceIntTest {
 
     @Autowired

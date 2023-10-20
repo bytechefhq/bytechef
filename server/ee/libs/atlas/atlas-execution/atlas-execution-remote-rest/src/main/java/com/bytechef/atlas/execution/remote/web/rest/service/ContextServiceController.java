@@ -19,6 +19,7 @@ package com.bytechef.atlas.execution.remote.web.rest.service;
 
 import com.bytechef.atlas.execution.domain.Context.Classname;
 import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
@@ -28,8 +29,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -52,7 +51,7 @@ public class ContextServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Map<String, ?>> peek(@PathVariable long stackId, @PathVariable Classname classname) {
+    public ResponseEntity<FileEntry> peek(@PathVariable long stackId, @PathVariable Classname classname) {
         return ResponseEntity.ok(contextService.peek(stackId, classname));
     }
 
@@ -62,7 +61,7 @@ public class ContextServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Map<String, ?>> peek(
+    public ResponseEntity<FileEntry> peek(
         @PathVariable long stackId, @PathVariable int subStackId, @PathVariable Classname classname) {
 
         return ResponseEntity.ok(contextService.peek(stackId, subStackId, classname));
@@ -75,10 +74,9 @@ public class ContextServiceController {
             "application/json"
         })
     public ResponseEntity<Void> push(
-        @PathVariable long stackId, @PathVariable Classname classname,
-        @Valid @RequestBody Map<String, Object> context) {
+        @PathVariable long stackId, @PathVariable Classname classname, @Valid @RequestBody FileEntry value) {
 
-        contextService.push(stackId, classname, context);
+        contextService.push(stackId, classname, value);
 
         return ResponseEntity.noContent()
             .build();
@@ -92,9 +90,9 @@ public class ContextServiceController {
         })
     public ResponseEntity<Void> push(
         @PathVariable long stackId, @PathVariable int subStackId, @PathVariable Classname classname,
-        @Valid @RequestBody Map<String, Object> context) {
+        @Valid @RequestBody FileEntry value) {
 
-        contextService.push(stackId, subStackId, classname, context);
+        contextService.push(stackId, subStackId, classname, value);
 
         return ResponseEntity.noContent()
             .build();

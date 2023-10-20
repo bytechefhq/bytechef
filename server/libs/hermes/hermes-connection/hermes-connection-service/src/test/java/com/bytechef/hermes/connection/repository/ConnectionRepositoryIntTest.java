@@ -21,21 +21,22 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Map;
 
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
 @SpringBootTest(classes = ConnectionIntTestConfiguration.class)
+@Import(PostgreSQLContainerConfiguration.class)
 public class ConnectionRepositoryIntTest {
 
     @Autowired

@@ -18,6 +18,7 @@
 package com.bytechef.task.dispatcher.parallel.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
@@ -47,6 +48,9 @@ public class ParallelTaskDispatcherConfiguration {
     @Autowired
     private TaskExecutionService taskExecutionService;
 
+    @Autowired
+    private WorkflowFileStorage workflowFileStorage;
+
     @Bean("parallelTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory parallelTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new ParallelTaskCompletionHandler(counterService,
@@ -56,6 +60,7 @@ public class ParallelTaskDispatcherConfiguration {
     @Bean("parallelTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory parallelTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new ParallelTaskDispatcher(
-            contextService, counterService, messageBroker, taskDispatcher, taskExecutionService);
+            contextService, counterService, messageBroker, taskDispatcher, taskExecutionService,
+            workflowFileStorage);
     }
 }

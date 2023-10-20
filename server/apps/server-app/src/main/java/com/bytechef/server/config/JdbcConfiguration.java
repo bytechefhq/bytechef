@@ -34,8 +34,10 @@ import com.bytechef.hermes.execution.converter.StringToTriggerStateValueConverte
 import com.bytechef.hermes.execution.converter.StringToWorkflowExecutionIdConverter;
 import com.bytechef.hermes.execution.converter.TriggerStateValueToStringConverter;
 import com.bytechef.hermes.execution.converter.WorkflowExecutionIdToStringConverter;
-import com.bytechef.hermes.data.storage.converter.DataStorageValueToStringConverter;
-import com.bytechef.hermes.data.storage.converter.StringToDataStorageValueConverter;
+import com.bytechef.data.storage.converter.DataStorageValueToStringConverter;
+import com.bytechef.data.storage.converter.StringToDataStorageValueConverter;
+import com.bytechef.file.storage.converter.FileEntryToStringConverter;
+import com.bytechef.file.storage.converter.StringToFileEntryConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -85,9 +87,11 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
             new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
             new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
             new ExecutionErrorToStringConverter(objectMapper),
+            new FileEntryToStringConverter(objectMapper),
             new MapWrapperToStringConverter(objectMapper),
             new StringToDataStorageValueConverter(objectMapper),
             new StringToExecutionErrorConverter(objectMapper),
+            new StringToFileEntryConverter(objectMapper),
             new StringToMapWrapperConverter(objectMapper),
             new StringToWebhooksConverter(objectMapper),
             new StringToWorkflowExecutionIdConverter(),

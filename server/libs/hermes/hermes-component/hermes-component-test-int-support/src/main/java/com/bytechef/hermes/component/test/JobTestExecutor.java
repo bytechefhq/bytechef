@@ -27,7 +27,10 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
 
 import java.util.Map;
 
@@ -68,6 +71,8 @@ public class JobTestExecutor {
             .jobService(jobService)
             .taskExecutionService(taskExecutionService)
             .taskHandlerRegistry(MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get)
+            .workflowFileStorageFacade(
+                new WorkflowFileStorageImpl(new Base64FileStorageService(), new ObjectMapper()))
             .workflowService(workflowService)
             .build();
 

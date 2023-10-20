@@ -18,6 +18,7 @@
 package com.bytechef.task.dispatcher.condition.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -43,15 +44,18 @@ public class ConditionTaskDispatcherConfiguration {
     @Autowired
     private TaskExecutionService taskExecutionService;
 
+    @Autowired
+    private WorkflowFileStorage workflowFileStorage;
+
     @Bean("conditionTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory conditionTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
-            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService);
+            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, workflowFileStorage);
     }
 
     @Bean("conditionTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory conditionTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new ConditionTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskExecutionService);
+            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorage);
     }
 }

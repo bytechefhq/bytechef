@@ -20,20 +20,21 @@ package com.bytechef.tag.repository;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.tag.config.TagIntTestConfiguration;
 import com.bytechef.tag.domain.Tag;
-import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
 @SpringBootTest(classes = TagIntTestConfiguration.class)
+@Import(PostgreSQLContainerConfiguration.class)
 public class TagRepositoryIntTest {
 
     @Autowired

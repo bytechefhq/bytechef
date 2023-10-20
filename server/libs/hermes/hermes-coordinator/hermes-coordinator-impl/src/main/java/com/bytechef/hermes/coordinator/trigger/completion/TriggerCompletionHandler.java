@@ -73,7 +73,7 @@ public class TriggerCompletionHandler {
             instanceWorkflowAccessorRegistry.getInstanceWorkflowAccessor(
                 workflowExecutionId.getInstanceType());
 
-        Map<String, Object> inputs = (Map<String, Object>) instanceWorkflowAccessor.getInputs(
+        Map<String, Object> inputs = (Map<String, Object>) instanceWorkflowAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
 
         if (!triggerExecution.isBatch() && triggerExecution.getOutput() instanceof Collection<?> collectionOutput) {

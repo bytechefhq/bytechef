@@ -23,12 +23,14 @@ import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstan
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -40,15 +42,17 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
     private final CounterService counterService;
+    private final WorkflowFileStorage workflowFileStorage;
 
     @SuppressFBWarnings("EI")
     public MapTaskCompletionHandler(
         TaskExecutionService taskExecutionService, TaskCompletionHandler taskCompletionHandler,
-        CounterService counterService) {
+        CounterService counterService, WorkflowFileStorage workflowFileStorage) {
 
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.counterService = counterService;
+        this.workflowFileStorage = workflowFileStorage;
     }
 
     @Override
@@ -72,7 +76,7 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        long subtasksLeft = counterService.decrement(taskExecution.getParentId());
+        long subtasksLeft = counterService.decrement(Objects.requireNonNull(taskExecution.getParentId()));
 
         if (subtasksLeft == 0) {
             List<TaskExecution> childTaskExecutions = taskExecutionService
@@ -82,9 +86,11 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
             mapTaskExecution.setEndDate(LocalDateTime.now());
 
             mapTaskExecution.setOutput(
-                childTaskExecutions.stream()
-                    .map(TaskExecution::getOutput)
-                    .collect(Collectors.toList()));
+                workflowFileStorage.storeTaskExecutionOutput(
+                    mapTaskExecution.getId(),
+                    childTaskExecutions.stream()
+                        .map(output -> workflowFileStorage.readTaskExecutionOutput(output.getOutput()))
+                        .collect(Collectors.toList())));
 
             taskCompletionHandler.handle(mapTaskExecution);
             counterService.delete(taskExecution.getParentId());

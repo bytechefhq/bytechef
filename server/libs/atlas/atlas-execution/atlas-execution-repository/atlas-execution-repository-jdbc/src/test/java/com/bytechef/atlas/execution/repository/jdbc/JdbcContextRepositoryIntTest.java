@@ -18,30 +18,30 @@
 package com.bytechef.atlas.execution.repository.jdbc;
 
 import com.bytechef.atlas.execution.domain.Context;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.atlas.execution.repository.jdbc.config.WorkflowExecutionRepositoryIntTestConfiguration;
-import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Map;
 
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
-@SpringBootTest(
-    classes = WorkflowExecutionRepositoryIntTestConfiguration.class,
-    properties = {
-        "bytechef.context-repository.provider=jdbc",
-        "bytechef.persistence.provider=jdbc"
-    })
+@SpringBootTest(classes = WorkflowExecutionRepositoryIntTestConfiguration.class)
+@Import(PostgreSQLContainerConfiguration.class)
 public class JdbcContextRepositoryIntTest {
 
     @Autowired
     private JdbcContextRepository contextRepository;
+
+    @Autowired
+    private WorkflowFileStorage workflowFileStorage;
 
     @AfterEach
     public void afterEach() {
@@ -50,7 +50,9 @@ public class JdbcContextRepositoryIntTest {
 
     @Test
     public void testFindByStackId() {
-        Context context = new Context(1L, Context.Classname.TASK_EXECUTION, Map.of("key", "value"));
+        Context context = new Context(
+            1L, Context.Classname.TASK_EXECUTION,
+            workflowFileStorage.storeContextValue(1L, Context.Classname.TASK_EXECUTION, Map.of("key", "value")));
 
         context = contextRepository.save(context);
 

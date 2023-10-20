@@ -18,6 +18,7 @@
 package com.bytechef.component.var;
 
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 
@@ -34,17 +35,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 @ComponentIntTest
 public class VarComponentHandlerIntTest {
 
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
     @Autowired
     private JobTestExecutor jobTestExecutor;
+
+    @Autowired
+    private WorkflowFileStorage workflowFileStorage;
 
     @Test
     public void testVar() {
         Job job = jobTestExecutor.execute(
-            Base64.getEncoder()
-                .encodeToString("var_v1".getBytes(StandardCharsets.UTF_8)),
+            ENCODER.encodeToString("var_v1".getBytes(StandardCharsets.UTF_8)),
             Map.of());
 
-        Map<String, ?> outputs = job.getOutputs();
+        Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
 
         Assertions.assertEquals("1234", outputs.get("stringNumber"));
         Assertions.assertEquals(1234, (Integer) outputs.get("intNumber"));

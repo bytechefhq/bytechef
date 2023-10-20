@@ -17,6 +17,8 @@
 
 package com.bytechef.hermes.task.dispatcher.test.config;
 
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
@@ -36,6 +38,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.configuration.service.WorkflowServiceImpl;
 import com.bytechef.event.listener.EventListenerChain;
+import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -97,10 +100,12 @@ public class TaskDispatcherIntTestConfiguration {
         @Bean
         TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport(
             ContextService contextService, CounterService counterService, EventPublisher eventPublisher,
-            JobService jobService, TaskExecutionService taskExecutionService, WorkflowService workflowService) {
+            JobService jobService, TaskExecutionService taskExecutionService,
+            WorkflowFileStorage workflowFileStorage, WorkflowService workflowService) {
 
             return new TaskDispatcherWorkflowTestSupport(
-                contextService, counterService, jobService, eventPublisher, taskExecutionService, workflowService);
+                contextService, counterService, jobService, eventPublisher, taskExecutionService,
+                workflowFileStorage, workflowService);
         }
 
         @Bean
@@ -117,6 +122,15 @@ public class TaskDispatcherIntTestConfiguration {
         WorkflowService workflowService(List<WorkflowRepository> workflowRepositories) {
             return new WorkflowServiceImpl(new ConcurrentMapCacheManager(), Collections.emptyList(),
                 workflowRepositories);
+        }
+    }
+
+    @TestConfiguration
+    public static class WorkflowFileStorageConfiguration {
+
+        @Bean
+        WorkflowFileStorage workflowFileStorageFacade(ObjectMapper objectMapper) {
+            return new WorkflowFileStorageImpl(new Base64FileStorageService(), objectMapper);
         }
     }
 }

@@ -20,20 +20,21 @@ package com.bytechef.category.repository;
 import com.bytechef.category.config.CategoryIntTestConfiguration;
 import com.bytechef.category.domain.Category;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.test.annotation.EmbeddedSql;
+import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
 @SpringBootTest(classes = CategoryIntTestConfiguration.class)
+@Import(PostgreSQLContainerConfiguration.class)
 public class CategoryRepositoryIntTest {
 
     @Autowired

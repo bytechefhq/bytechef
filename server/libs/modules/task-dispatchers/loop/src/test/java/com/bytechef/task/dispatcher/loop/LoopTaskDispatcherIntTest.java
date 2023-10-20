@@ -19,6 +19,8 @@ package com.bytechef.task.dispatcher.loop;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
@@ -32,9 +34,7 @@ import com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
 import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -61,6 +61,9 @@ public class LoopTaskDispatcherIntTest {
     @Autowired
     private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
 
+    @Autowired
+    private WorkflowFileStorage workflowFileStorage;
+
     @BeforeEach
     void beforeEach() {
         testVarTaskHandler = new TestVarTaskHandler<>(
@@ -71,8 +74,7 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch1() {
         taskDispatcherWorkflowTestSupport.execute(
-            Base64.getEncoder()
-                .encodeToString("loop_v1_1".getBytes(StandardCharsets.UTF_8)),
+            EncodingUtils.encodeBase64ToString("loop_v1_1"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
@@ -85,8 +87,7 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch2() {
         taskDispatcherWorkflowTestSupport.execute(
-            Base64.getEncoder()
-                .encodeToString("loop_v1_2".getBytes(StandardCharsets.UTF_8)),
+            EncodingUtils.encodeBase64ToString("loop_v1_2"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
@@ -101,8 +102,7 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch3() {
         taskDispatcherWorkflowTestSupport.execute(
-            Base64.getEncoder()
-                .encodeToString("loop_v1_3".getBytes(StandardCharsets.UTF_8)),
+            EncodingUtils.encodeBase64ToString("loop_v1_3"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
@@ -115,8 +115,7 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch4() {
         taskDispatcherWorkflowTestSupport.execute(
-            Base64.getEncoder()
-                .encodeToString("loop_v1_4".getBytes(StandardCharsets.UTF_8)),
+            EncodingUtils.encodeBase64ToString("loop_v1_4"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
@@ -129,8 +128,7 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch5() {
         taskDispatcherWorkflowTestSupport.execute(
-            Base64.getEncoder()
-                .encodeToString("loop_v1_5".getBytes(StandardCharsets.UTF_8)),
+            EncodingUtils.encodeBase64ToString("loop_v1_5"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
@@ -143,8 +141,7 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch6() {
         taskDispatcherWorkflowTestSupport.execute(
-            Base64.getEncoder()
-                .encodeToString("loop_v1_6".getBytes(StandardCharsets.UTF_8)),
+            EncodingUtils.encodeBase64ToString("loop_v1_6"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
         Assertions.assertEquals(
@@ -160,11 +157,12 @@ public class LoopTaskDispatcherIntTest {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService),
+                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, workflowFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService),
+                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, workflowFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new SequenceTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService));
+                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService,
+                workflowFileStorage));
     }
 
     @SuppressWarnings("PMD")
@@ -174,12 +172,12 @@ public class LoopTaskDispatcherIntTest {
 
         return List.of(
             (taskDispatcher) -> new ConditionTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService),
+                contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorage),
             (taskDispatcher) -> new LoopBreakTaskDispatcher(messageBroker, taskExecutionService),
             (taskDispatcher) -> new LoopTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService),
+                contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorage),
             (taskDispatcher) -> new SequenceTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskExecutionService));
+                contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorage));
     }
 
     private TaskDispatcherWorkflowTestSupport.TaskHandlerMapSupplier getTaskHandlerMap() {

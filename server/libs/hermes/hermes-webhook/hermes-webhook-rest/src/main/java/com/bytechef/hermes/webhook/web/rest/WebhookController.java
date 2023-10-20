@@ -19,6 +19,7 @@ package com.bytechef.hermes.webhook.web.rest;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody.ContentType;
@@ -30,7 +31,6 @@ import com.bytechef.hermes.component.registry.trigger.WebhookRequest.WebhookBody
 import com.bytechef.hermes.component.util.XmlUtils;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.webhook.executor.WebhookExecutor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -65,7 +65,7 @@ import java.util.Map;
 @ConditionalOnEnabled("coordinator")
 public class WebhookController {
 
-    private final FileStorageService fileStorageService;
+    private final WorkflowFileStorage workflowFileStorage;
     private final ObjectMapper objectMapper;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WebhookExecutor webhookExecutor;
@@ -73,11 +73,11 @@ public class WebhookController {
 
     @SuppressFBWarnings("EI")
     public WebhookController(
-        FileStorageService fileStorageService, ObjectMapper objectMapper,
+        WorkflowFileStorage workflowFileStorage, ObjectMapper objectMapper,
         TriggerDefinitionService triggerDefinitionService, WebhookExecutor webhookExecutor,
         WorkflowService workflowService) {
 
-        this.fileStorageService = fileStorageService;
+        this.workflowFileStorage = workflowFileStorage;
         this.objectMapper = objectMapper;
         this.triggerDefinitionService = triggerDefinitionService;
         this.webhookExecutor = webhookExecutor;
@@ -113,7 +113,7 @@ public class WebhookController {
                     if (isBinaryPart(part)) {
                         multipartFormDataMap.put(
                             part.getName(),
-                            fileStorageService.storeFileContent(part.getName(), part.getInputStream()));
+                            workflowFileStorage.storeFileContent(part.getName(), part.getInputStream()));
                     } else {
                         multipartFormDataMap.put(
                             part.getName(),
@@ -162,8 +162,8 @@ public class WebhookController {
                 body = new WebhookBodyImpl(content, ContentType.XML, httpServletRequest.getContentType());
             } else if (mediaType.startsWith("application/")) {
                 body = new WebhookBodyImpl(
-                    fileStorageService.storeFileContent(
-                        "file." + getFileExtension(httpServletRequest.getContentType()),
+                    workflowFileStorage.storeFileContent(
+                        getFilename(httpServletRequest.getContentType()),
                         httpServletRequest.getInputStream()),
                     ContentType.BINARY, httpServletRequest.getContentType());
             } else {
@@ -201,12 +201,12 @@ public class WebhookController {
         return ComponentOperation.ofType(workflowTrigger.getType());
     }
 
-    private static String getFileExtension(String mimeTypeString) {
+    private static String getFilename(String mimeTypeString) {
         MimeType mimeType = MimeTypeUtils.parseMimeType(mimeTypeString);
 
         String subtype = mimeType.getSubtype();
 
-        return subtype.toLowerCase();
+        return "file." + subtype.toLowerCase();
     }
 
     private static Map<String, String[]> getHeaderMap(HttpServletRequest httpServletRequest) {

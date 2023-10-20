@@ -18,6 +18,7 @@
 package com.bytechef.task.dispatcher.each.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
@@ -47,15 +48,19 @@ public class EachTaskDispatcherConfiguration {
     @Autowired
     private TaskExecutionService taskExecutionService;
 
+    @Autowired
+    private WorkflowFileStorage workflowFileStorage;
+
     @Bean("eachTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory eachTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new EachTaskCompletionHandler(
-            taskExecutionService, taskCompletionHandler, counterService);
+            counterService, taskCompletionHandler, taskExecutionService);
     }
 
     @Bean("eachTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory eachTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new EachTaskDispatcher(
-            taskDispatcher, taskExecutionService, messageBroker, contextService, counterService);
+            messageBroker, contextService, counterService, taskDispatcher, taskExecutionService,
+            workflowFileStorage);
     }
 }

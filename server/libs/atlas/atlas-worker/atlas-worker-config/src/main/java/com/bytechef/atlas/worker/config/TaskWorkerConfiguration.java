@@ -19,6 +19,7 @@
 
 package com.bytechef.atlas.worker.config;
 
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.factory.TaskHandlerMapFactory;
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
@@ -99,8 +100,9 @@ public class TaskWorkerConfiguration {
 
     @Bean
     TaskWorker taskWorker(
-        EventPublisher eventPublisher, MessageBroker messageBroker, TaskHandlerResolver taskHandlerResolver) {
+        EventPublisher eventPublisher, MessageBroker messageBroker, TaskHandlerResolver taskHandlerResolver,
+        WorkflowFileStorage workflowFileStorage) {
 
-        return new TaskWorker(eventPublisher, messageBroker, taskHandlerResolver);
+        return new TaskWorker(eventPublisher, messageBroker, taskHandlerResolver, workflowFileStorage);
     }
 }

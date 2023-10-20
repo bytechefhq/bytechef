@@ -22,9 +22,10 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.file.storage.service.FileStorageService;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -42,30 +43,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 @ComponentIntTest
 public class CsvFileComponentHandlerIntTest {
 
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
     @Autowired
     private FileStorageService fileStorageService;
 
     @Autowired
     private JobTestExecutor jobTestExecutor;
 
+    @Autowired
+    private WorkflowFileStorage workflowFileStorage;
+
     @Test
     public void testRead() throws JSONException {
         File sampleFile = getFile("sample_header.csv");
 
         Job job = jobTestExecutor.execute(
-            Base64.getEncoder()
-                .encodeToString("csvfile_v1_read".getBytes(StandardCharsets.UTF_8)),
+            ENCODER.encodeToString("csvfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
                 fileStorageService
                     .storeFileContent(
-                        sampleFile.getAbsolutePath(),
+                        "data", sampleFile.getAbsolutePath(),
                         Files.contentOf(sampleFile, StandardCharsets.UTF_8))
                     .toMap()));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = job.getOutputs();
+        Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
 
         assertEquals(
             new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
@@ -76,7 +81,7 @@ public class CsvFileComponentHandlerIntTest {
     @Test
     public void testWrite() throws JSONException {
         Job job = jobTestExecutor.execute(
-            Base64.getEncoder()
+            ENCODER
                 .encodeToString("csvfile_v1_write".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "rows",
@@ -84,7 +89,7 @@ public class CsvFileComponentHandlerIntTest {
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = job.getOutputs();
+        Map<String, ?> outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
 
         assertThat(((Map) outputs.get("writeCsvFile")).get(WorkflowConstants.NAME))
             .isEqualTo("file.csv");
@@ -92,16 +97,16 @@ public class CsvFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_header.csv");
 
         job = jobTestExecutor.execute(
-            Base64.getEncoder()
+            ENCODER
                 .encodeToString("csvfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
                 fileStorageService
                     .storeFileContent(
-                        sampleFile.getName(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
+                        "data", sampleFile.getName(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))
                     .toMap()));
 
-        outputs = job.getOutputs();
+        outputs = workflowFileStorage.readJobOutputs(job.getOutputs());
 
         assertEquals(
             new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
