@@ -16,19 +16,19 @@
 
 package com.integri.atlas.task.handler.postgresql;
 
-import static com.integri.atlas.task.handler.jdbc.JdbcTaskConstants.OPERATION_DELETE;
-import static com.integri.atlas.task.handler.jdbc.JdbcTaskConstants.OPERATION_EXECUTE;
-import static com.integri.atlas.task.handler.jdbc.JdbcTaskConstants.OPERATION_INSERT;
-import static com.integri.atlas.task.handler.jdbc.JdbcTaskConstants.OPERATION_QUERY;
-import static com.integri.atlas.task.handler.jdbc.JdbcTaskConstants.OPERATION_UPDATE;
+import static com.integri.atlas.task.handler.commons.jdbc.JdbcTaskConstants.OPERATION_DELETE;
+import static com.integri.atlas.task.handler.commons.jdbc.JdbcTaskConstants.OPERATION_EXECUTE;
+import static com.integri.atlas.task.handler.commons.jdbc.JdbcTaskConstants.OPERATION_INSERT;
+import static com.integri.atlas.task.handler.commons.jdbc.JdbcTaskConstants.OPERATION_QUERY;
+import static com.integri.atlas.task.handler.commons.jdbc.JdbcTaskConstants.OPERATION_UPDATE;
 import static com.integri.atlas.task.handler.postgresql.PostgreSQLTaskConstants.TASK_POSTGRESQL;
 
-import com.integri.atlas.task.handler.jdbc.DataSourceFactory;
-import com.integri.atlas.task.handler.jdbc.DeleteJdbcTaskHandler;
-import com.integri.atlas.task.handler.jdbc.ExecuteJdbcTaskHandler;
-import com.integri.atlas.task.handler.jdbc.InsertJdbcTaskHandler;
-import com.integri.atlas.task.handler.jdbc.QueryJdbcTaskHandler;
-import com.integri.atlas.task.handler.jdbc.UpdateJdbcTaskHandler;
+import com.integri.atlas.task.handler.commons.jdbc.DataSourceFactory;
+import com.integri.atlas.task.handler.commons.jdbc.DeleteJdbcTaskHandler;
+import com.integri.atlas.task.handler.commons.jdbc.ExecuteJdbcTaskHandler;
+import com.integri.atlas.task.handler.commons.jdbc.InsertJdbcTaskHandler;
+import com.integri.atlas.task.handler.commons.jdbc.QueryJdbcTaskHandler;
+import com.integri.atlas.task.handler.commons.jdbc.UpdateJdbcTaskHandler;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;

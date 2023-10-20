@@ -20,7 +20,7 @@ import static com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskCo
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import com.integri.atlas.task.handler.json.JsonHelper;
+import com.integri.atlas.task.handler.commons.json.JsonHelper;
 import org.springframework.stereotype.Component;
 
 /**

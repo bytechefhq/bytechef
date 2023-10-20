@@ -19,6 +19,8 @@ package com.integri.atlas.task.handler.xml;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
 import java.util.Map;
+
+import com.integri.atlas.task.handler.commons.xml.XmlHelper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 

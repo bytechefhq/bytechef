@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.jdbc;
+package com.integri.atlas.task.handler.commons.jdbc;
 
-import static com.integri.atlas.task.handler.jdbc.JdbcTaskConstants.PROPERTY_DELETE_KEY;
-import static com.integri.atlas.task.handler.jdbc.JdbcTaskConstants.PROPERTY_ROWS;
-import static com.integri.atlas.task.handler.jdbc.JdbcTaskConstants.PROPERTY_SCHEMA;
-import static com.integri.atlas.task.handler.jdbc.JdbcTaskConstants.PROPERTY_TABLE;
+import static com.integri.atlas.task.handler.commons.jdbc.JdbcTaskConstants.PROPERTY_DELETE_KEY;
+import static com.integri.atlas.task.handler.commons.jdbc.JdbcTaskConstants.PROPERTY_ROWS;
+import static com.integri.atlas.task.handler.commons.jdbc.JdbcTaskConstants.PROPERTY_SCHEMA;
+import static com.integri.atlas.task.handler.commons.jdbc.JdbcTaskConstants.PROPERTY_TABLE;
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;

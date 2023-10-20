@@ -45,7 +45,7 @@ import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolverChain;
 import com.integri.atlas.engine.workflow.service.WorkflowService;
 import com.integri.atlas.file.storage.service.FileStorageService;
-import com.integri.atlas.task.handler.json.JsonHelper;
+import com.integri.atlas.task.handler.commons.json.JsonHelper;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;

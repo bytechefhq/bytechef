@@ -22,7 +22,7 @@ import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.file.storage.service.FileStorageService;
 import com.integri.atlas.task.handler.http.client.HttpClientTaskConstants;
-import com.integri.atlas.task.handler.json.JsonHelper;
+import com.integri.atlas.task.handler.commons.json.JsonHelper;
 import java.io.InputStream;
 import java.net.http.HttpResponse;
 import java.util.Map;

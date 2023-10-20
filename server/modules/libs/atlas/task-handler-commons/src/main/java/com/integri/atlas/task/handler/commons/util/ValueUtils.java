@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.util;
+package com.integri.atlas.task.handler.commons.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

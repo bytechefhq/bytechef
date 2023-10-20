@@ -22,7 +22,7 @@ import static com.integri.atlas.task.handler.mysql.MySQLTaskConstants.TASK_MYSQL
 import com.integri.atlas.task.definition.TaskDefinitionHandler;
 import com.integri.atlas.task.definition.dsl.DSL;
 import com.integri.atlas.task.definition.dsl.TaskDefinition;
-import com.integri.atlas.task.handler.jdbc.JdbcTaskConstants;
+import com.integri.atlas.task.handler.commons.jdbc.JdbcTaskConstants;
 import org.springframework.stereotype.Component;
 
 /**

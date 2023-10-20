@@ -24,7 +24,7 @@ import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.file.storage.base64.service.Base64FileStorageService;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.service.FileStorageService;
-import com.integri.atlas.task.handler.json.JsonHelper;
+import com.integri.atlas.task.handler.commons.json.JsonHelper;
 import com.integri.atlas.test.json.JSONArrayUtil;
 import com.integri.atlas.test.json.JSONObjectUtil;
 import java.io.File;
