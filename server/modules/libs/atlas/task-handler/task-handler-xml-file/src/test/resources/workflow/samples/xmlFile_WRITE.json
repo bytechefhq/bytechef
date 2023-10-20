@@ -1,0 +1,26 @@
+{
+  "label": "JSON File - READ operation",
+  "inputs": [
+    {
+      "name": "items",
+      "label": "JSON array of items",
+      "type": "JSON",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "writeXMLFile",
+      "value": "${writeXMLFile}"
+    }
+  ],
+  "tasks": [
+    {
+      "name": "writeXMLFile",
+      "label": "Write to the XML file",
+      "type": "xmlFile",
+      "operation": "WRITE",
+      "items": "${items}"
+    }
+  ]
+}
