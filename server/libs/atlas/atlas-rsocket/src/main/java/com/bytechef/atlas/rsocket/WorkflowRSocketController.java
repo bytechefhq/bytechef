@@ -40,7 +40,8 @@ public class WorkflowRSocketController {
 
     @MessageMapping("createWorkflow")
     public Mono<Workflow> createWorkflow(Workflow workflow) {
-        return Mono.create(sink -> sink.success(workflowService.create(workflow, workflow.getProviderType())));
+        return Mono.create(sink -> sink.success(
+            workflowService.create(workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType())));
     }
 
     @MessageMapping("getWorkflow")
@@ -55,6 +56,6 @@ public class WorkflowRSocketController {
 
     @MessageMapping("updateWorkflow")
     public Mono<Workflow> updateWorkflow(Workflow workflow) {
-        return Mono.create(sink -> sink.success(workflowService.update(workflow)));
+        return Mono.create(sink -> sink.success(workflowService.update(workflow.getId(), workflow.getDefinition())));
     }
 }
