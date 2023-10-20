@@ -17,7 +17,11 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     outputDir = "$projectDir/generated".toString()
     schemaMappings = [
         Category: "com.bytechef.category.web.rest.model.CategoryModel",
+        ExecutionError: "com.bytechef.atlas.web.rest.model.ExecutionErrorModel",
+        Job: "com.bytechef.atlas.web.rest.model.JobModel",
+        Page: "org.springframework.data.domain.Page",
         Tag: "com.bytechef.tag.web.rest.model.TagModel",
+        TaskExecution: "com.bytechef.atlas.web.rest.model.TaskExecutionModel",
         Workflow: "com.bytechef.atlas.web.rest.model.WorkflowModel",
         WorkflowFormat: "com.bytechef.atlas.web.rest.model.WorkflowFormatModel",
         WorkflowTask: "com.bytechef.atlas.web.rest.model.WorkflowTaskModel"
@@ -47,7 +51,7 @@ dependencies {
     api project(":server:libs:atlas:atlas-rest:atlas-rest-api")
     api project(":server:libs:core:category:category-rest:category-rest-api")
     api project(":server:libs:core:tag:tag-rest:tag-rest-api")
-    api project(":server:libs:hermes:hermes-project:hermes-project-api")
+    api project(":server:libs:helios:helios-project:helios-project-api")
 
     implementation libs.org.openapitools.jackson.databind.nullable
     implementation "jakarta.annotation:jakarta.annotation-api"
