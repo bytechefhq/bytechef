@@ -285,8 +285,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade, Instanc
             for (WorkflowTrigger workflowTrigger : workflowTriggers) {
                 triggerLifecycleExecutor.executeTriggerDisable(
                     workflowTrigger,
-                    WorkflowExecutionId.of(
-                        workflow.getId(), id, ProjectConstants.PROJECT, workflowTrigger.getTriggerName()),
+                    WorkflowExecutionId.of(workflow.getId(), id, ProjectConstants.PROJECT, workflowTrigger),
                     getConnection(workflowTrigger));
             }
         }
@@ -301,8 +300,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade, Instanc
             for (WorkflowTrigger workflowTrigger : workflowTriggers) {
                 triggerLifecycleExecutor.executeTriggerEnable(
                     workflowTrigger,
-                    WorkflowExecutionId.of(
-                        workflow.getId(), id, ProjectConstants.PROJECT, workflowTrigger.getTriggerName()),
+                    WorkflowExecutionId.of(workflow.getId(), id, ProjectConstants.PROJECT, workflowTrigger),
                     getConnection(workflowTrigger));
             }
         }

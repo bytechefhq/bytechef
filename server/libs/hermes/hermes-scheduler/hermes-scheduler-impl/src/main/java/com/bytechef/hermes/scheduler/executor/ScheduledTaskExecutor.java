@@ -65,6 +65,9 @@ public class ScheduledTaskExecutor {
             workflowExecutionId.getTriggerName(), componentName, componentVersion, output);
 
         if (output != null) {
+            triggerLifecycleService.save(
+                workflowExecutionId.getInstanceId(), workflowExecutionId.toString(), output);
+
             webhookExpirationDate = output.webhookExpirationDate();
         }
 

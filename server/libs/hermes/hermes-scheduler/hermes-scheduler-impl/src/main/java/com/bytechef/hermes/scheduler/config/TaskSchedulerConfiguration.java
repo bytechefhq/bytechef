@@ -21,7 +21,6 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.InstantUtils;
 import com.bytechef.hermes.scheduler.constant.SchedulerConstants;
 import com.bytechef.hermes.scheduler.data.PollTriggerScheduleAndData;
-import com.bytechef.hermes.scheduler.data.RefreshDynamicWebhookTriggerData;
 import com.bytechef.hermes.scheduler.data.TriggerWorkflowScheduleAndData;
 import com.bytechef.hermes.scheduler.executor.ScheduledTaskExecutor;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
@@ -54,39 +53,32 @@ public class TaskSchedulerConfiguration {
             .execute((TaskInstance<PollTriggerScheduleAndData> taskInstance, ExecutionContext executionContext) -> {
                 PollTriggerScheduleAndData triggerScheduleAndData = taskInstance.getData();
 
-                PollTriggerScheduleAndData.Data data = triggerScheduleAndData.getData();
-
                 ScheduledTaskExecutor scheduledTaskExecutor = applicationContext.getBean(
                     ScheduledTaskExecutor.class);
 
-                scheduledTaskExecutor.pollTrigger(data.workflowExecutionId());
+                scheduledTaskExecutor.pollTrigger(triggerScheduleAndData.getData());
             });
     }
 
     @Bean
-    Task<RefreshDynamicWebhookTriggerData> refreshDynamicWebhookTriggerTask() {
+    Task<WorkflowExecutionId> refreshDynamicWebhookTriggerTask() {
         return Tasks.oneTime(SchedulerConstants.REFRESH_DYNAMIC_WEBHOOK_TRIGGER_ONE_TIME_TASK)
             .execute((taskInstance, executionContext) -> {
-                RefreshDynamicWebhookTriggerData triggerScheduleAndData = taskInstance.getData();
-
-                RefreshDynamicWebhookTriggerData.Data data = triggerScheduleAndData.getData();
-
-                WorkflowExecutionId workflowExecutionId = data.workflowExecutionId();
+                WorkflowExecutionId workflowExecutionId = taskInstance.getData();
 
                 ScheduledTaskExecutor scheduledTaskExecutor = applicationContext.getBean(
                     ScheduledTaskExecutor.class);
 
                 LocalDateTime webhookExpirationDate = scheduledTaskExecutor.refreshDynamicWebhookTrigger(
-                    workflowExecutionId, data.componentName(), data.componentVersion());
+                    workflowExecutionId, workflowExecutionId.getComponentName(),
+                    workflowExecutionId.getComponentVersion());
 
                 if (webhookExpirationDate != null) {
                     SchedulerClient schedulerClient = executionContext.getSchedulerClient();
 
                     schedulerClient.reschedule(
                         SchedulerConstants.REFRESH_DYNAMIC_WEBHOOK_TRIGGER_ONE_TIME_TASK.instance(
-                            workflowExecutionId.toString(),
-                            new RefreshDynamicWebhookTriggerData(
-                                workflowExecutionId, data.componentName(), data.componentVersion())),
+                            workflowExecutionId.toString(), workflowExecutionId),
                         InstantUtils.getInstant(webhookExpirationDate));
                 }
             });
