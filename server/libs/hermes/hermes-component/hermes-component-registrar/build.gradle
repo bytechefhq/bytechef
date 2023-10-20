@@ -1,16 +1,19 @@
 dependencies {
+    api project(":server:libs:atlas:atlas-worker:atlas-worker-api")
+    api project(":server:libs:core:message-broker:message-broker-api")
+    api project(":server:libs:hermes:hermes-api")
+    api project(":server:libs:hermes:hermes-connection:hermes-connection-api")
+    api project(":server:libs:hermes:hermes-data-storage:hermes-data-storage-api")
+    api project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
+    api project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-api")
+    api project(":server:libs:hermes:hermes-worker:hermes-worker-api")
+
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-jdbc"
     implementation "org.springframework.boot:spring-boot"
-    implementation project(":server:libs:atlas:atlas-worker:atlas-worker-api")
-    implementation project(":server:libs:core:message-broker:message-broker-api")
     implementation project(":server:libs:core:commons:commons-util")
-    implementation project(":server:libs:hermes:hermes-api")
     implementation project(":server:libs:hermes:hermes-component:hermes-component-impl")
-    implementation project(":server:libs:hermes:hermes-connection:hermes-connection-api")
-    implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
-    implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-api")
-    implementation project(":server:libs:hermes:hermes-worker:hermes-worker-api")
+
 
     testImplementation "com.fasterxml.jackson.core:jackson-databind"
     testImplementation libs.com.github.tomakehurst.wiremock
