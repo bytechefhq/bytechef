@@ -17,8 +17,11 @@
 
 package com.bytechef.commons.util;
 
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.ResolvableType;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.util.Assert;
 
 import java.lang.reflect.Array;
 import java.time.Duration;
@@ -314,6 +317,23 @@ public final class MapValueUtils {
         return list;
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> List<T> getList(Map<String, ?> map, String key, ParameterizedTypeReference<T> elementType) {
+
+        return getList(map, key, (Class<T>) ResolvableType.forType(elementType)
+            .getRawClass());
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> List<T> getList(
+        Map<String, ?> map, String key, ParameterizedTypeReference<T> elementType, List<T> defaultValue) {
+
+        List<T> list = getList(map, key, (Class<T>) ResolvableType.forType(elementType)
+            .getRawClass(), defaultValue);
+
+        return list != null ? list : defaultValue;
+    }
+
     public static LocalDate getLocalDate(Map<String, ?> map, String key) {
         return get(map, key, LocalDate.class);
     }
@@ -526,6 +546,15 @@ public final class MapValueUtils {
         List<T> value = getList(map, key, elementType);
 
         Objects.requireNonNull(value, "Unknown value for : " + key);
+
+        return value;
+    }
+
+    public static <T> List<T> getRequiredList(
+        Map<String, ?> map, String key, ParameterizedTypeReference<T> elementType) {
+        List<T> value = getList(map, key, elementType);
+
+        Assert.notNull(value, "Unknown value for : " + key);
 
         return value;
     }

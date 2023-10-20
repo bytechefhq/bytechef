@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.Assert;
 
 /**
@@ -133,12 +134,10 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
         return null;
     }
 
-    @SuppressWarnings({
-        "rawtypes", "unchecked"
-    })
     private Map<String, ?> resolveCase(TaskExecution taskExecution) {
         Object expression = MapValueUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
-        List<Map<String, Object>> cases = (List) MapValueUtils.getList(taskExecution.getParameters(), CASES, Map.class);
+        List<Map<String, Object>> cases = MapValueUtils.getList(
+            taskExecution.getParameters(), CASES, new ParameterizedTypeReference<>() {});
 
         Assert.notNull(cases, "you must specify 'cases' in a branch statement");
 
