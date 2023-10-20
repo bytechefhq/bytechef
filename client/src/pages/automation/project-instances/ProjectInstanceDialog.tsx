@@ -103,7 +103,10 @@ const ProjectInstanceDialog = ({
         },
         {
             content: (
-                <ProjectInstanceDialogWorkflowsStep getValues={getValues} />
+                <ProjectInstanceDialogWorkflowsStep
+                    getValues={getValues}
+                    register={register}
+                />
             ),
             name: 'Workflows',
         },
@@ -111,6 +114,8 @@ const ProjectInstanceDialog = ({
 
     function saveProjectInstance() {
         const formData = getValues();
+
+        console.log('formData', formData);
 
         if (!formData) {
             return;
