@@ -16,13 +16,13 @@
 import * as runtime from '../runtime';
 import type {
   Connection,
-  ConnectionUpdate,
+  PutConnectionRequest,
 } from '../models';
 import {
     ConnectionFromJSON,
     ConnectionToJSON,
-    ConnectionUpdateFromJSON,
-    ConnectionUpdateToJSON,
+    PutConnectionRequestFromJSON,
+    PutConnectionRequestToJSON,
 } from '../models';
 
 export interface DeleteConnectionRequest {
@@ -37,9 +37,9 @@ export interface PostConnectionRequest {
     connection: Connection;
 }
 
-export interface PutConnectionRequest {
+export interface PutConnectionOperationRequest {
     id: string;
-    connectionUpdate: ConnectionUpdate;
+    putConnectionRequest: PutConnectionRequest;
 }
 
 /**
@@ -168,13 +168,13 @@ export class ConnectionsApi extends runtime.BaseAPI {
     /**
      * TODO
      */
-    async putConnectionRaw(requestParameters: PutConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Connection>> {
+    async putConnectionRaw(requestParameters: PutConnectionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Connection>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling putConnection.');
         }
 
-        if (requestParameters.connectionUpdate === null || requestParameters.connectionUpdate === undefined) {
-            throw new runtime.RequiredError('connectionUpdate','Required parameter requestParameters.connectionUpdate was null or undefined when calling putConnection.');
+        if (requestParameters.putConnectionRequest === null || requestParameters.putConnectionRequest === undefined) {
+            throw new runtime.RequiredError('putConnectionRequest','Required parameter requestParameters.putConnectionRequest was null or undefined when calling putConnection.');
         }
 
         const queryParameters: any = {};
@@ -188,7 +188,7 @@ export class ConnectionsApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: ConnectionUpdateToJSON(requestParameters.connectionUpdate),
+            body: PutConnectionRequestToJSON(requestParameters.putConnectionRequest),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ConnectionFromJSON(jsonValue));
@@ -197,7 +197,7 @@ export class ConnectionsApi extends runtime.BaseAPI {
     /**
      * TODO
      */
-    async putConnection(requestParameters: PutConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Connection> {
+    async putConnection(requestParameters: PutConnectionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Connection> {
         const response = await this.putConnectionRaw(requestParameters, initOverrides);
         return await response.value();
     }
