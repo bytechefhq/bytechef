@@ -27,5 +27,5 @@ public class SwaggerUtils {
         .pathsToMatch(new String[] {
             "/api/automation/**"
         })
-        .build();;
+        .build();
 }

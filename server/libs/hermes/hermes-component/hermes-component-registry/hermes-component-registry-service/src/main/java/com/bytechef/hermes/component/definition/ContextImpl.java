@@ -120,31 +120,22 @@ public class ContextImpl implements ActionContext, TriggerContext {
     private record DataImpl(DataStorageService dataStorageService) implements Data {
 
         @Override
-            public <T> Optional<T> fetchValue(String context, Scope scope, long scopeId, String key) {
-                return dataStorageService.fetch(context, scope.getId(), scopeId, key);
-            }
+        public <T> Optional<T> fetchValue(String context, Scope scope, long scopeId, String key) {
+            return dataStorageService.fetch(context, scope.getId(), scopeId, key);
+        }
 
-            @Override
-            public <T> T getValue(String context, Scope scope, long scopeId, String key) {
-                return dataStorageService.get(context, scope.getId(), scopeId, key);
-            }
+        @Override
+        public <T> T getValue(String context, Scope scope, long scopeId, String key) {
+            return dataStorageService.get(context, scope.getId(), scopeId, key);
+        }
 
-            @Override
-            public void setValue(String context, Scope scope, long scopeId, String key, Object value) {
-                dataStorageService.put(context, scope.getId(), scopeId, key, value);
-            }
+        @Override
+        public void setValue(String context, Scope scope, long scopeId, String key, Object value) {
+            dataStorageService.put(context, scope.getId(), scopeId, key, value);
         }
     }
 
-    private static class EventImpl implements Event {
-
-        private final ApplicationEventPublisher eventPublisher;
-        private final long taskExecutionId;
-
-        public EventImpl(ApplicationEventPublisher eventPublisher, long taskExecutionId) {
-            this.eventPublisher = eventPublisher;
-            this.taskExecutionId = taskExecutionId;
-        }
+    private record EventImpl(ApplicationEventPublisher eventPublisher, long taskExecutionId) implements Event {
 
         @Override
         public void publishActionProgressEvent(int progress) {
@@ -152,22 +143,16 @@ public class ContextImpl implements ActionContext, TriggerContext {
         }
     }
 
-    private static class FileImpl implements File {
-
-        private final FileStorageService fileStorageService;
-
-        public FileImpl(FileStorageService fileStorageService) {
-            this.fileStorageService = fileStorageService;
-        }
+    private record FileImpl(FileStorageService fileStorageService) implements File {
 
         @Override
-        public InputStream getStream(Context.FileEntry fileEntry) {
+        public InputStream getStream(FileEntry fileEntry) {
             return fileStorageService.getFileStream(
                 FileEntryConstants.FILES_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry());
         }
 
         @Override
-        public String readToString(Context.FileEntry fileEntry) {
+        public String readToString(FileEntry fileEntry) {
             return fileStorageService.readFileToString(
                 FileEntryConstants.FILES_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry());
         }
@@ -189,26 +174,14 @@ public class ContextImpl implements ActionContext, TriggerContext {
         }
     }
 
-    private static class HttpImpl implements Http {
-
-        private final String componentName;
-        private final ComponentConnection connection;
-        private final Context context;
-        private final HttpClientExecutor httpClientExecutor;
-
-        private HttpImpl(
-            String componentName, ComponentConnection connection, Context context,
-            HttpClientExecutor httpClientExecutor) {
-
-            this.componentName = componentName;
-            this.connection = connection;
-            this.context = context;
-            this.httpClientExecutor = httpClientExecutor;
-        }
+    private record HttpImpl(
+        String componentName, ComponentConnection connection, Context context, HttpClientExecutor httpClientExecutor)
+        implements Http {
 
         @Override
         public Executor delete(String url) {
-            return new ExecutorImpl(url, RequestMethod.DELETE, componentName, connection, context, httpClientExecutor);
+            return new ExecutorImpl(
+                url, RequestMethod.DELETE, componentName, connection, context, httpClientExecutor);
         }
 
         @Override
@@ -218,7 +191,8 @@ public class ContextImpl implements ActionContext, TriggerContext {
 
         @Override
         public Executor head(String url) {
-            return new ExecutorImpl(url, RequestMethod.HEAD, componentName, connection, context, httpClientExecutor);
+            return new ExecutorImpl(
+                url, RequestMethod.HEAD, componentName, connection, context, httpClientExecutor);
         }
 
         @Override
@@ -228,12 +202,14 @@ public class ContextImpl implements ActionContext, TriggerContext {
 
         @Override
         public Executor patch(String url) {
-            return new ExecutorImpl(url, RequestMethod.PATCH, componentName, connection, context, httpClientExecutor);
+            return new ExecutorImpl(
+                url, RequestMethod.PATCH, componentName, connection, context, httpClientExecutor);
         }
 
         @Override
         public Executor post(String url) {
-            return new ExecutorImpl(url, RequestMethod.POST, componentName, connection, context, httpClientExecutor);
+            return new ExecutorImpl(
+                url, RequestMethod.POST, componentName, connection, context, httpClientExecutor);
         }
 
         @Override
@@ -243,7 +219,7 @@ public class ContextImpl implements ActionContext, TriggerContext {
 
         private static class ExecutorImpl implements Executor {
 
-            private Http.Body body;
+            private Body body;
             private final String componentName;
             private Configuration configuration = new Configuration();
             private final ComponentConnection connection;
@@ -303,14 +279,14 @@ public class ContextImpl implements ActionContext, TriggerContext {
             }
 
             @Override
-            public Executor body(Http.Body body) {
+            public Executor body(Body body) {
                 this.body = body;
 
                 return this;
             }
 
             @Override
-            public Http.Response execute() throws ComponentExecutionException {
+            public Response execute() throws ComponentExecutionException {
                 try {
                     return httpClientExecutor.execute(
                         url, headers, queryParameters, body, configuration, requestMethod, componentName, connection,
