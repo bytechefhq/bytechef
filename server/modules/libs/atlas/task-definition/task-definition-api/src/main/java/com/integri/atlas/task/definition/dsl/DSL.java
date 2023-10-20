@@ -23,6 +23,8 @@ import static com.integri.atlas.task.definition.dsl.TaskPropertyOptionValue.opti
  */
 public class DSL {
 
+    public static final String PROPERTY_TASK_AUTH_ID = "taskAuthId";
+
     public static TaskProperty.AnyTaskProperty ANY_PROPERTY() {
         return ANY_PROPERTY(null);
     }

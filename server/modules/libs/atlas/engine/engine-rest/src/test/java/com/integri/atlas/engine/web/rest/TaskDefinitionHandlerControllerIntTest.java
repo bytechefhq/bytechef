@@ -47,7 +47,7 @@ public class TaskDefinitionHandlerControllerIntTest {
                     .json(
                         """
                 {
-                    "authentication":null,
+                    "auth":null,
                     "description":null,
                     "displayName":null,
                     "name":"task1",
@@ -71,7 +71,7 @@ public class TaskDefinitionHandlerControllerIntTest {
                         """
                         [
                             {
-                                "authentication":null,
+                                "auth":null,
                                 "description":null,
                                 "displayName":null,
                                 "name":"task1",
@@ -80,7 +80,7 @@ public class TaskDefinitionHandlerControllerIntTest {
                                 "version":1.0
                             },
                             {
-                                "authentication":null,
+                                "auth":null,
                                 "description":null,
                                 "displayName":null,
                                 "name":"task2",

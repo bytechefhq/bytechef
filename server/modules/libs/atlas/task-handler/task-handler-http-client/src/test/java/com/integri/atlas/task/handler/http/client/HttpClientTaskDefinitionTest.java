@@ -40,7 +40,7 @@ public class HttpClientTaskDefinitionTest {
         JSONAssert.assertEquals(
             """
             {
-              "authentication": {
+              "auth": {
                 "options": [
                   {
                     "name": "API Key",
