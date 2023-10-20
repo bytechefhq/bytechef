@@ -41,7 +41,7 @@ import java.util.List;
 public class JobExecutor {
 
     private final ContextService contextService;
-    private final TaskDispatcher taskDispatcher;
+    private final TaskDispatcher<? super TaskExecution> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
     private final TaskEvaluator taskEvaluator;
     private final WorkflowService workflowService;
@@ -49,7 +49,7 @@ public class JobExecutor {
     @SuppressFBWarnings("EI2")
     public JobExecutor(
         ContextService contextService,
-        TaskDispatcher taskDispatcher,
+        TaskDispatcher<? super TaskExecution> taskDispatcher,
         TaskExecutionService taskExecutionService,
         TaskEvaluator taskEvaluator,
         WorkflowService workflowService) {

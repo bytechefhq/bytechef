@@ -34,7 +34,7 @@ public class JmsMessageBroker implements MessageBroker {
 
     @Override
     public void send(String routingKey, Object message) {
-        Assert.notNull(routingKey, "routing key can't be null");
+        Assert.notNull(routingKey, "'routingKey' must not be null");
         if (message instanceof Retryable) {
             Retryable r = (Retryable) message;
             delay(r.getRetryDelayMillis());

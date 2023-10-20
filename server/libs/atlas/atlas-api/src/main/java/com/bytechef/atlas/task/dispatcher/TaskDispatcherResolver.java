@@ -22,20 +22,19 @@ package com.bytechef.atlas.task.dispatcher;
 import com.bytechef.atlas.task.Task;
 
 /**
- * The strategey interface used for resolving the apprpriate {@link TaskDispatcher} instance for a given
- * {@link TaskExecution}.
+ * The strategey interface used for resolving the apprpriate {@link TaskDispatcher} instance for a given {@link Task}.
  *
  * @author Arik Cohen
  * @since Mar 26, 2017
  */
 public interface TaskDispatcherResolver {
     /**
-     * Resolves a {@link TaskDispatcher} for the given {@link TaskExecution} instance or <code>null
+     * Resolves a {@link TaskDispatcher} for the given {@link Task} instance or <code>null
      * </code> if one can not be resolved.
      *
-     * @param task The {@link TaskExecution} instance
+     * @param task The {@link Task} instance
      * @return a {@link TaskDispatcher} instance to execute the given task or <code>null</code> if unable to resolve
      *         one.
      */
-    TaskDispatcher resolve(Task task);
+    TaskDispatcher<? extends Task> resolve(Task task);
 }

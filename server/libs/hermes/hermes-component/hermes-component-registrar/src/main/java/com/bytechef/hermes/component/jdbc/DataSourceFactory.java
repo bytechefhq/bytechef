@@ -34,9 +34,9 @@ public class DataSourceFactory {
     private final Map<String, DataSource> dataSourceMap = new ConcurrentHashMap<>();
 
     public DataSource getDataSource(Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
-        Assert.notNull(connection, "connectionParameters cannot be null");
-        Assert.notNull(databaseJdbcName, "databaseJdbcName cannot be null");
-        Assert.notNull(jdbcDriverClassName, "jdbcDriverClassName cannot be null");
+        Assert.notNull(connection, "'connectionParameters' must not be null.");
+        Assert.notNull(databaseJdbcName, "'databaseJdbcName' must not be null.");
+        Assert.notNull(jdbcDriverClassName, "'jdbcDriverClassName' must not be null.");
 
         String url = "jdbc:" + databaseJdbcName + "://"
             + connection.getParameter(JdbcConstants.HOST)

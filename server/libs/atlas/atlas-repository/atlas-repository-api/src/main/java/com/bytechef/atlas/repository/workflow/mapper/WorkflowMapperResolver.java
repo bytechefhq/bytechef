@@ -21,5 +21,6 @@ package com.bytechef.atlas.repository.workflow.mapper;
  * @author Ivica Cardic
  */
 public interface WorkflowMapperResolver {
+
     WorkflowMapper resolve(WorkflowResource resource);
 }

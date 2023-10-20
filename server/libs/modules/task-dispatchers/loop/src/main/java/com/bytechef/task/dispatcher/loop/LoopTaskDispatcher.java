@@ -42,6 +42,8 @@ import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+
 import org.springframework.util.Assert;
 
 /**
@@ -54,14 +56,14 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     private final ContextService contextService;
     private final MessageBroker messageBroker;
-    private final TaskDispatcher taskDispatcher;
+    private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
 
     public LoopTaskDispatcher(
         ContextService contextService,
         MessageBroker messageBroker,
-        TaskDispatcher taskDispatcher,
+        TaskDispatcher<? super Task> taskDispatcher,
         TaskEvaluator taskEvaluator,
         TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
@@ -118,9 +120,8 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     }
 
     @Override
-    public TaskDispatcher resolve(Task task) {
-        if (task.getType()
-            .equals(LOOP + "/v" + VERSION_1)) {
+    public TaskDispatcher<? extends Task> resolve(Task task) {
+        if (Objects.equals(task.getType(), LOOP + "/v" + VERSION_1)) {
             return this;
         }
 

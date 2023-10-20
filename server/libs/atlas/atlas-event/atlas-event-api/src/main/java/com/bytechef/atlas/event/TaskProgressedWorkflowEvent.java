@@ -34,8 +34,8 @@ public class TaskProgressedWorkflowEvent extends WorkflowEvent {
     }
 
     public TaskProgressedWorkflowEvent(String taskId, int progress) {
-        Assert.notNull(taskId, "taskId must not be null");
-        Assert.notNull(progress, "progress must not be null");
+        Assert.notNull(taskId, "'taskId' must not be null.");
+        Assert.notNull(progress, "'progress' must not be null.");
 
         this.progress = progress;
         this.taskId = taskId;

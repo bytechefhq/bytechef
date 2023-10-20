@@ -45,10 +45,11 @@ public class ControlTaskDispatcher implements TaskDispatcher<ControlTask>, TaskD
     }
 
     @Override
-    public TaskDispatcher resolve(Task task) {
+    public TaskDispatcher<? extends Task> resolve(Task task) {
         if (task instanceof ControlTask) {
             return this;
         }
+
         return null;
     }
 }

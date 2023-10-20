@@ -60,8 +60,7 @@ public class JobRSocketClient implements JobService {
     public List<Job> getJobs() {
         return rSocketRequester
             .route("getJobs")
-            .retrieveMono(new ParameterizedTypeReference<List<Job>>() {
-            })
+            .retrieveMono(new ParameterizedTypeReference<List<Job>>() {})
             .block();
     }
 
@@ -70,8 +69,7 @@ public class JobRSocketClient implements JobService {
         return rSocketRequester
             .route("getJobsPage")
             .data(pageNumber)
-            .retrieveMono(new ParameterizedTypeReference<Page<Job>>() {
-            })
+            .retrieveMono(new ParameterizedTypeReference<Page<Job>>() {})
             .block();
     }
 

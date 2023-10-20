@@ -27,6 +27,7 @@ import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.CancelControlTask;
+import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -41,14 +42,14 @@ import org.slf4j.LoggerFactory;
 public class TaskStartedEventListener implements EventListener {
 
     private final TaskExecutionService taskExecutionService;
-    private final TaskDispatcher taskDispatcher;
+    private final TaskDispatcher<? super Task> taskDispatcher;
     private final JobService jobService;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @SuppressFBWarnings("EI2")
     public TaskStartedEventListener(
-        TaskExecutionService taskExecutionService, TaskDispatcher taskDispatcher, JobService jobService) {
+        TaskExecutionService taskExecutionService, TaskDispatcher<? super Task> taskDispatcher, JobService jobService) {
         this.taskExecutionService = taskExecutionService;
         this.taskDispatcher = taskDispatcher;
         this.jobService = jobService;
@@ -62,7 +63,7 @@ public class TaskStartedEventListener implements EventListener {
             TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskId);
 
             if (taskExecution == null) {
-                logger.error("Unkown task: {}", taskId);
+                logger.error("Unknown task: {}", taskId);
 
                 return;
             }

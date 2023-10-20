@@ -43,27 +43,28 @@ class MapPropertyAccessor implements PropertyAccessor {
     }
 
     @Override
-    public boolean canRead(EvaluationContext aContext, Object aTarget, String aName) throws AccessException {
-        if (!(aTarget instanceof Map)) {
+    public boolean canRead(EvaluationContext evaluationContext, Object target, String name) throws AccessException {
+        if (!(target instanceof Map)) {
             return false;
         }
-        return ((Map) aTarget).containsKey(aName);
+        return ((Map) target).containsKey(name);
     }
 
     @Override
-    public TypedValue read(EvaluationContext aContext, @NonNull Object aTarget, String aName) throws AccessException {
-        Map<String, Object> map = (Map<String, Object>) aTarget;
-        Object value = map.get(aName);
+    public TypedValue read(EvaluationContext evaluationContext, @NonNull Object target, String name)
+        throws AccessException {
+        Map<String, Object> map = (Map<String, Object>) target;
+        Object value = map.get(name);
         return new TypedValue(value, TypeDescriptor.forObject(value));
     }
 
     @Override
-    public boolean canWrite(EvaluationContext aContext, Object aTarget, String aName) throws AccessException {
+    public boolean canWrite(EvaluationContext evaluationContext, Object target, String name) throws AccessException {
         return false;
     }
 
     @Override
-    public void write(EvaluationContext aContext, Object aTarget, String aName, Object aNewValue)
+    public void write(EvaluationContext evaluationContext, Object target, String name, Object aNewValue)
         throws AccessException {
         throw new UnsupportedOperationException();
     }

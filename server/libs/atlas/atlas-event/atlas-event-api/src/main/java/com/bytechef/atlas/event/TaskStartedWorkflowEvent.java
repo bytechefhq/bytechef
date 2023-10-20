@@ -34,15 +34,15 @@ public class TaskStartedWorkflowEvent extends WorkflowEvent {
     }
 
     public TaskStartedWorkflowEvent(String taskId) {
-        Assert.notNull(taskId, "taskId must not be null");
+        Assert.notNull(taskId, "'taskId' must not be null.");
 
         this.taskId = taskId;
         this.type = TASK_STARTED;
     }
 
     public TaskStartedWorkflowEvent(String jobId, String taskId) {
-        Assert.notNull(jobId, "jobId must not be null");
-        Assert.notNull(taskId, "taskId must not be null");
+        Assert.notNull(jobId, "'jobId' must not be null.");
+        Assert.notNull(taskId, "'taskId' must not be null.");
 
         this.jobId = jobId;
         this.taskId = taskId;

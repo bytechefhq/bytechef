@@ -64,7 +64,7 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     }
 
     @Override
-    public TaskDispatcher<TaskExecution> resolve(Task task) {
+    public TaskDispatcher<? extends Task> resolve(Task task) {
         if (task instanceof TaskExecution) {
             return this;
         }

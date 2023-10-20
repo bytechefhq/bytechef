@@ -17,12 +17,12 @@
 
 package com.bytechef.atlas.task.dispatcher;
 
-import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.task.Task;
 
 /**
  * @author Ivica Cardic
  */
 public interface TaskDispatcherResolverFactory {
 
-    TaskDispatcherResolver createTaskDispatcherResolver(TaskDispatcher<? super TaskExecution> taskDispatcher);
+    TaskDispatcherResolver createTaskDispatcherResolver(TaskDispatcher<? super Task> taskDispatcher);
 }

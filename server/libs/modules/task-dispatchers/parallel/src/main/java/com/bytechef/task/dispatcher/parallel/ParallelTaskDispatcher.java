@@ -39,6 +39,8 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.util.Assert;
 
 /**
@@ -54,14 +56,14 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     private final ContextService contextService;
     private final CounterService counterService;
     private final MessageBroker messageBroker;
-    private final TaskDispatcher taskDispatcher;
+    private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
 
     public ParallelTaskDispatcher(
         ContextService contextService,
         CounterService counterService,
         MessageBroker messageBroker,
-        TaskDispatcher taskDispatcher,
+        TaskDispatcher<? super Task> taskDispatcher,
         TaskExecutionService taskExecutionService) {
         this.contextService = contextService;
         this.counterService = counterService;
@@ -106,9 +108,8 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     }
 
     @Override
-    public TaskDispatcher resolve(Task aTask) {
-        if (aTask.getType()
-            .equals(PARALLEL + "/v" + VERSION_1)) {
+    public TaskDispatcher<? extends Task> resolve(Task task) {
+        if (Objects.equals(task.getType(), PARALLEL + "/v" + VERSION_1)) {
             return this;
         }
         return null;

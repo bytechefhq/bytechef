@@ -33,6 +33,7 @@ import com.bytechef.commons.utils.MapUtils;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * a {@link TaskDispatcher} implementation which handles the 'subflow' task type. Subflows are essentially isolated job
@@ -65,9 +66,8 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     }
 
     @Override
-    public TaskDispatcher resolve(Task task) {
-        if (task.getType()
-            .equals(SUBFLOW + "/v" + VERSION_1)) {
+    public TaskDispatcher<? extends Task> resolve(Task task) {
+        if (Objects.equals(task.getType(), SUBFLOW + "/v" + VERSION_1)) {
             return this;
         }
 

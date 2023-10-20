@@ -98,16 +98,15 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     @SuppressFBWarnings("NP")
     @Transactional(readOnly = true)
-    public Workflow getWorkflow(String id) {
-        Assert.notNull(id, "id cannot be null.");
+    public Workflow getWorkflow(@NonNull String id) {
+        Assert.notNull(id, "'id' must not be null.");
 
         Cache cacheOne = Objects.requireNonNull(cacheManager.getCache(CACHE_ONE));
 
         if (cacheOne.get(id) != null) {
-            Cache.ValueWrapper valueWrapper = cacheOne.get(id);
+            Cache.ValueWrapper valueWrapper = Objects.requireNonNull(cacheOne.get(id));
 
-            return (Workflow) Objects.requireNonNull(valueWrapper)
-                .get();
+            return (Workflow) valueWrapper.get();
         }
 
         Cache cacheAll = Objects.requireNonNull(cacheManager.getCache(CACHE_ALL));

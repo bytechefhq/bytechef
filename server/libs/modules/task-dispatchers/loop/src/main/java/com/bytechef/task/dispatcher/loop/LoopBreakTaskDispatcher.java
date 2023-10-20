@@ -30,6 +30,8 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
+import java.util.Objects;
+
 import org.springframework.util.Assert;
 
 /**
@@ -73,9 +75,8 @@ public class LoopBreakTaskDispatcher implements TaskDispatcher<TaskExecution>, T
     }
 
     @Override
-    public TaskDispatcher resolve(Task task) {
-        if (task.getType()
-            .equals(LOOP_BREAK + "/v" + VERSION_1)) {
+    public TaskDispatcher<? extends Task> resolve(Task task) {
+        if (Objects.equals(task.getType(), LOOP_BREAK + "/v" + VERSION_1)) {
             return this;
         }
 

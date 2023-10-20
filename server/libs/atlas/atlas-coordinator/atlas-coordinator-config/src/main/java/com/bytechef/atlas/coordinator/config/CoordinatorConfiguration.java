@@ -40,8 +40,8 @@ import com.bytechef.atlas.coordinator.task.dispatcher.ControlTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
-import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.error.ErrorHandler;
+import com.bytechef.atlas.error.Errorable;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
@@ -145,8 +145,11 @@ public class CoordinatorConfiguration {
 
     @Bean
     @Primary
-    ErrorHandler<?> errorHandler() {
-        return new ErrorHandlerChain(List.of(taskExecutionErrorHandler()));
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    ErrorHandler<? super Errorable> errorHandler() {
+        return new ErrorHandlerChain((List) List.of(taskExecutionErrorHandler()));
     }
 
     @Bean
@@ -171,10 +174,9 @@ public class CoordinatorConfiguration {
     }
 
     @Bean
-    @SuppressWarnings("unchecked")
     TaskExecutionErrorHandler taskExecutionErrorHandler() {
         return new TaskExecutionErrorHandler(
-            eventPublisher, jobService, (TaskDispatcher<TaskExecution>) taskDispatcher(), taskExecutionService);
+            eventPublisher, jobService, taskDispatcher(), taskExecutionService);
     }
 
     @Bean
@@ -182,19 +184,20 @@ public class CoordinatorConfiguration {
     TaskCompletionHandler taskCompletionHandler() {
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
 
-        taskCompletionHandlerChain.setTaskCompletionHandlers(Stream.concat(
+        Stream<TaskCompletionHandler> taskCompletionHandlerStream = Stream.concat(
             taskCompletionHandlerFactories.stream()
                 .map(taskCompletionHandlerFactory -> taskCompletionHandlerFactory.createTaskCompletionHandler(
                     taskCompletionHandlerChain, taskDispatcher())),
-            Stream.of(defaultTaskCompletionHandler()))
-            .toList());
+            Stream.of(defaultTaskCompletionHandler()));
+
+        taskCompletionHandlerChain.setTaskCompletionHandlers(taskCompletionHandlerStream.toList());
 
         return taskCompletionHandlerChain;
     }
 
     @Bean
     @Primary
-    TaskDispatcher<? extends Task> taskDispatcher() {
+    TaskDispatcher<? super Task> taskDispatcher() {
         TaskDispatcherChain taskDispatcherChain = new TaskDispatcherChain();
 
         List<TaskDispatcherResolver> resolvers = Stream.concat(

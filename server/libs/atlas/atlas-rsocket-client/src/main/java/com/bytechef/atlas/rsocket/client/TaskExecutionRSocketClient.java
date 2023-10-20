@@ -59,8 +59,7 @@ public class TaskExecutionRSocketClient implements TaskExecutionService {
         return rSocketRequester
             .route("getJobTaskExecutions")
             .data(jobId)
-            .retrieveMono(new ParameterizedTypeReference<List<TaskExecution>>() {
-            })
+            .retrieveMono(new ParameterizedTypeReference<List<TaskExecution>>() {})
             .block();
     }
 
@@ -69,8 +68,7 @@ public class TaskExecutionRSocketClient implements TaskExecutionService {
         return rSocketRequester
             .route("getParentTaskExecutions")
             .data(parentId)
-            .retrieveMono(new ParameterizedTypeReference<List<TaskExecution>>() {
-            })
+            .retrieveMono(new ParameterizedTypeReference<List<TaskExecution>>() {})
             .block();
     }
 
