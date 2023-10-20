@@ -72,7 +72,7 @@ export interface WorkflowTask {
      * @type {string}
      * @memberof WorkflowTask
      */
-    type?: string;
+    type: string;
 }
 
 /**
@@ -81,6 +81,7 @@ export interface WorkflowTask {
 export function instanceOfWorkflowTask(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "type" in value;
 
     return isInstance;
 }
@@ -103,7 +104,7 @@ export function WorkflowTaskFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'post': !exists(json, 'post') ? undefined : ((json['post'] as Array<any>).map(WorkflowTaskFromJSON)),
         'pre': !exists(json, 'pre') ? undefined : ((json['pre'] as Array<any>).map(WorkflowTaskFromJSON)),
         'timeout': !exists(json, 'timeout') ? undefined : json['timeout'],
-        'type': !exists(json, 'type') ? undefined : json['type'],
+        'type': json['type'],
     };
 }
 

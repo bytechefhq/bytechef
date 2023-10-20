@@ -9,9 +9,10 @@ models/JobParameters.ts
 models/Page.ts
 models/PostJob200Response.ts
 models/PostWorkflowRequest.ts
-models/PostWorkflowRequestAllOf.ts
+models/PutWorkflowRequest.ts
 models/TaskExecution.ts
 models/Workflow.ts
+models/WorkflowFormat.ts
 models/WorkflowTask.ts
 models/index.ts
 runtime.ts

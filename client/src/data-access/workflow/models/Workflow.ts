@@ -13,6 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { WorkflowFormat } from './WorkflowFormat';
+import {
+    WorkflowFormatFromJSON,
+    WorkflowFormatFromJSONTyped,
+    WorkflowFormatToJSON,
+} from './WorkflowFormat';
 import type { WorkflowTask } from './WorkflowTask';
 import {
     WorkflowTaskFromJSON,
@@ -21,17 +27,11 @@ import {
 } from './WorkflowTask';
 
 /**
- * The lueprint that describe the execution of a job.
+ * The blueprint that describe the execution of a job.
  * @export
  * @interface Workflow
  */
 export interface Workflow {
-    /**
-     * Definition of the workflow that is executed as a job.
-     * @type {string}
-     * @memberof Workflow
-     */
-    definition?: string;
     /**
      * The created by.
      * @type {string}
@@ -45,11 +45,11 @@ export interface Workflow {
      */
     readonly createdDate?: Date;
     /**
-     * The format of the workflow definition.
-     * @type {string}
+     * 
+     * @type {WorkflowFormat}
      * @memberof Workflow
      */
-    format?: WorkflowFormatEnum;
+    format?: WorkflowFormat;
     /**
      * The id of the workflow.
      * @type {string}
@@ -61,13 +61,13 @@ export interface Workflow {
      * @type {Array<{ [key: string]: object; }>}
      * @memberof Workflow
      */
-    inputs?: Array<{ [key: string]: object; }>;
+    readonly inputs?: Array<{ [key: string]: object; }>;
     /**
      * The descriptive name for the workflow
      * @type {string}
      * @memberof Workflow
      */
-    label?: string;
+    readonly label?: string;
     /**
      * The last modified by.
      * @type {string}
@@ -81,41 +81,42 @@ export interface Workflow {
      */
     readonly lastModifiedDate?: Date;
     /**
-     * The type of the provider which stores the workflow definition.
-     * @type {string}
-     * @memberof Workflow
-     */
-    readonly providerType?: string;
-    /**
      * The workflow's list of expected outputs.
      * @type {Array<{ [key: string]: object; }>}
      * @memberof Workflow
      */
-    outputs?: Array<{ [key: string]: object; }>;
+    readonly outputs?: Array<{ [key: string]: object; }>;
+    /**
+     * The type of the source which stores the workflow definition.
+     * @type {string}
+     * @memberof Workflow
+     */
+    readonly sourceType?: WorkflowSourceTypeEnum;
     /**
      * The maximum number of times a task may retry.
      * @type {number}
      * @memberof Workflow
      */
-    retry?: number;
+    readonly retry?: number;
     /**
      * The steps that make up the workflow.
      * @type {Array<WorkflowTask>}
      * @memberof Workflow
      */
-    tasks?: Array<WorkflowTask>;
+    readonly tasks?: Array<WorkflowTask>;
 }
 
 
 /**
  * @export
  */
-export const WorkflowFormatEnum = {
-    Json: 'JSON',
-    Yml: 'YML',
-    Yaml: 'YAML'
+export const WorkflowSourceTypeEnum = {
+    Classpath: 'CLASSPATH',
+    Filesystem: 'FILESYSTEM',
+    Git: 'GIT',
+    Jdbc: 'JDBC'
 } as const;
-export type WorkflowFormatEnum = typeof WorkflowFormatEnum[keyof typeof WorkflowFormatEnum];
+export type WorkflowSourceTypeEnum = typeof WorkflowSourceTypeEnum[keyof typeof WorkflowSourceTypeEnum];
 
 
 /**
@@ -137,17 +138,16 @@ export function WorkflowFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     }
     return {
         
-        'definition': !exists(json, 'definition') ? undefined : json['definition'],
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'format': !exists(json, 'format') ? undefined : json['format'],
+        'format': !exists(json, 'format') ? undefined : WorkflowFormatFromJSON(json['format']),
         'id': !exists(json, 'id') ? undefined : json['id'],
         'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
         'label': !exists(json, 'label') ? undefined : json['label'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'providerType': !exists(json, 'providerType') ? undefined : json['providerType'],
         'outputs': !exists(json, 'outputs') ? undefined : json['outputs'],
+        'sourceType': !exists(json, 'sourceType') ? undefined : json['sourceType'],
         'retry': !exists(json, 'retry') ? undefined : json['retry'],
         'tasks': !exists(json, 'tasks') ? undefined : ((json['tasks'] as Array<any>).map(WorkflowTaskFromJSON)),
     };
@@ -162,13 +162,7 @@ export function WorkflowToJSON(value?: Workflow | null): any {
     }
     return {
         
-        'definition': value.definition,
-        'format': value.format,
-        'inputs': value.inputs,
-        'label': value.label,
-        'outputs': value.outputs,
-        'retry': value.retry,
-        'tasks': value.tasks === undefined ? undefined : ((value.tasks as Array<any>).map(WorkflowTaskToJSON)),
+        'format': WorkflowFormatToJSON(value.format),
     };
 }
 
