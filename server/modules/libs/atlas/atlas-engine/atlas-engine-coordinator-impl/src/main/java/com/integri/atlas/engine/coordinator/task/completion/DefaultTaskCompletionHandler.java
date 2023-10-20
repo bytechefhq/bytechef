@@ -16,12 +16,14 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator;
+package com.integri.atlas.engine.coordinator.task.completion;
 
+import com.integri.atlas.engine.coordinator.JobExecutor;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.coordinator.job.SimpleJob;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
+import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
 import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
 import com.integri.atlas.engine.core.Accessor;

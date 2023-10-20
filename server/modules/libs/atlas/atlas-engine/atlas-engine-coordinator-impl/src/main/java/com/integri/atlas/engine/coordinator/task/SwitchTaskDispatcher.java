@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.coordinator.task;
 
-import com.integri.atlas.engine.coordinator.SwitchTaskCompletionHandler;
+import com.integri.atlas.engine.coordinator.task.completion.SwitchTaskCompletionHandler;
 import com.integri.atlas.engine.core.Accessor;
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.MapContext;

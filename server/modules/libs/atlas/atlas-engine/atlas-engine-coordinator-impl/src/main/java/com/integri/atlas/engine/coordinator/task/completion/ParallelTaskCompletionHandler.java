@@ -16,55 +16,43 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator;
+package com.integri.atlas.engine.coordinator.task.completion;
 
+import com.integri.atlas.engine.coordinator.task.ParallelTaskDispatcher;
+import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
 import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.TaskStatus;
 import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
+ * <p>A {@link TaskCompletionHandler} implementation which handles completions
+ * of parallel construct tasks.</p>
+ *
+ * <p>This handler keeps track of how many tasks were completed so far and
+ * when all parallel tasks completed for a given task it will then complete
+ * the overall <code>parallel</code> task.</p>
+ *
  * @author Arik Cohen
- * @since June 4, 2017
+ * @since May 12, 2017
+ * @see ParallelTaskDispatcher
  */
-public class MapTaskCompletionHandler implements TaskCompletionHandler {
+public class ParallelTaskCompletionHandler implements TaskCompletionHandler {
 
-    private final TaskExecutionRepository taskExecutionRepo;
-    private final TaskCompletionHandler taskCompletionHandler;
-    private final CounterRepository counterRepository;
-
-    public MapTaskCompletionHandler(
-        TaskExecutionRepository aTaskExecutionRepo,
-        TaskCompletionHandler aTaskCompletionHandler,
-        CounterRepository aCounterRepository
-    ) {
-        taskExecutionRepo = aTaskExecutionRepo;
-        taskCompletionHandler = aTaskCompletionHandler;
-        counterRepository = aCounterRepository;
-    }
+    private TaskExecutionRepository taskExecutionRepo;
+    private TaskCompletionHandler taskCompletionHandler;
+    private CounterRepository counterRepository;
 
     @Override
     public void handle(TaskExecution aTaskExecution) {
         SimpleTaskExecution mtask = SimpleTaskExecution.of(aTaskExecution);
         mtask.setStatus(TaskStatus.COMPLETED);
         taskExecutionRepo.merge(mtask);
-        long subtasksLeft = counterRepository.decrement(aTaskExecution.getParentId());
-        if (subtasksLeft == 0) {
-            List<TaskExecution> children = taskExecutionRepo.findByParentId(aTaskExecution.getParentId());
-            SimpleTaskExecution parentExecution = SimpleTaskExecution.of(
-                taskExecutionRepo.findOne(aTaskExecution.getParentId())
-            );
-            parentExecution.setEndTime(new Date());
-            parentExecution.setExecutionTime(
-                parentExecution.getEndTime().getTime() - parentExecution.getStartTime().getTime()
-            );
-            parentExecution.setOutput(children.stream().map(c -> c.getOutput()).collect(Collectors.toList()));
-            taskCompletionHandler.handle(parentExecution);
+        long tasksLeft = counterRepository.decrement(aTaskExecution.getParentId());
+        if (tasksLeft == 0) {
+            taskCompletionHandler.handle(taskExecutionRepo.findOne(aTaskExecution.getParentId()));
             counterRepository.delete(aTaskExecution.getParentId());
         }
     }
@@ -74,8 +62,20 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
         String parentId = aTaskExecution.getParentId();
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionRepo.findOne(parentId);
-            return parentExecution.getType().equals(DSL.MAP);
+            return parentExecution.getType().equals(DSL.PARALLEL);
         }
         return false;
+    }
+
+    public void setTaskExecutionRepository(TaskExecutionRepository aTaskExecutionRepo) {
+        taskExecutionRepo = aTaskExecutionRepo;
+    }
+
+    public void setTaskCompletionHandler(TaskCompletionHandler aTaskCompletionHandler) {
+        taskCompletionHandler = aTaskCompletionHandler;
+    }
+
+    public void setCounterRepository(CounterRepository aCounterRepository) {
+        counterRepository = aCounterRepository;
     }
 }
