@@ -18,7 +18,7 @@
 
 package com.integri.atlas.task.dispatcher.subflow.event;
 
-import com.integri.atlas.engine.coordinator.CoordinatorControl;
+import com.integri.atlas.engine.coordinator.Coordinator;
 import com.integri.atlas.engine.coordinator.event.EventListener;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
@@ -48,13 +48,13 @@ public class SubflowJobStatusEventListener implements EventListener {
 
     private final JobRepository jobRepository;
     private final TaskExecutionRepository taskExecutionRepository;
-    private final CoordinatorControl coordinator;
+    private final Coordinator coordinator;
     private final TaskEvaluator taskEvaluator;
 
     public SubflowJobStatusEventListener(
         JobRepository aJobRepository,
         TaskExecutionRepository aTaskExecutionRepository,
-        CoordinatorControl aCoordinator,
+        Coordinator aCoordinator,
         TaskEvaluator aTaskEvaluator
     ) {
         jobRepository = Objects.requireNonNull(aJobRepository);

@@ -16,7 +16,7 @@
 
 package com.integri.atlas.task.handler;
 
-import com.integri.atlas.engine.coordinator.Coordinator;
+import com.integri.atlas.engine.coordinator.CoordinatorImpl;
 import com.integri.atlas.engine.coordinator.error.TaskExecutionErrorHandler;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.executor.DefaultJobExecutor;
@@ -99,7 +99,7 @@ public abstract class BaseTaskIntTest {
     }
 
     protected Job startJob(String workflowId, Map<String, ?> inputs) {
-        Coordinator coordinator = new Coordinator();
+        CoordinatorImpl coordinator = new CoordinatorImpl();
 
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 

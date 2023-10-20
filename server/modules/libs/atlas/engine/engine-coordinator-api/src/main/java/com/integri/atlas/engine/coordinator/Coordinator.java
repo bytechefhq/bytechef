@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public interface CoordinatorControl {
+public interface Coordinator {
     void complete(TaskExecution completion);
 
     Job create(Map<String, Object> aJobParams);
@@ -32,6 +32,8 @@ public interface CoordinatorControl {
     void handleError(Errorable errorable);
 
     Job resume(String aJobId);
+
+    void start(Job job);
 
     Job stop(String jobId);
 }

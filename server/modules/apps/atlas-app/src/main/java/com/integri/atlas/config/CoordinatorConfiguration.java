@@ -19,6 +19,7 @@
 package com.integri.atlas.config;
 
 import com.integri.atlas.engine.coordinator.Coordinator;
+import com.integri.atlas.engine.coordinator.CoordinatorImpl;
 import com.integri.atlas.engine.coordinator.annotation.ConditionalOnCoordinator;
 import com.integri.atlas.engine.coordinator.error.ErrorHandlerChain;
 import com.integri.atlas.engine.coordinator.error.TaskExecutionErrorHandler;
@@ -102,7 +103,8 @@ public class CoordinatorConfiguration {
 
     @Bean
     Coordinator coordinator() {
-        Coordinator coordinator = new Coordinator();
+        CoordinatorImpl coordinator = new CoordinatorImpl();
+
         coordinator.setContextRepository(contextRepository);
         coordinator.setEventPublisher(eventPublisher);
         coordinator.setJobRepository(jobRepository);
@@ -113,6 +115,7 @@ public class CoordinatorConfiguration {
         coordinator.setErrorHandler(errorHandler());
         coordinator.setTaskCompletionHandler(taskCompletionHandler());
         coordinator.setMessageBroker(messageBroker);
+
         return coordinator;
     }
 

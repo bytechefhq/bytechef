@@ -63,7 +63,7 @@ import org.springframework.util.Assert;
  * @author Arik Cohen
  * @since Jun 12, 2016
  */
-public class Coordinator implements CoordinatorControl {
+public class CoordinatorImpl implements Coordinator {
 
     private WorkflowRepository workflowRepository;
     private JobRepository jobRepository;
@@ -135,6 +135,7 @@ public class Coordinator implements CoordinatorControl {
         return job;
     }
 
+    @Override
     public void start(Job aJob) {
         SimpleJob job = new SimpleJob(aJob);
         job.setStartTime(new Date());
