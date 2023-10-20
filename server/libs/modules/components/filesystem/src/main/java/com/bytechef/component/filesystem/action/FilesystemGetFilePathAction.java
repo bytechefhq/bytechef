@@ -18,7 +18,7 @@
 package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.util.MapValueUtils;
 
 import java.io.File;
@@ -35,7 +35,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class FilesystemGetFilePathAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action(GET_FILE_PATH)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_FILE_PATH)
         .title("File Path")
         .description(
             "Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator.")

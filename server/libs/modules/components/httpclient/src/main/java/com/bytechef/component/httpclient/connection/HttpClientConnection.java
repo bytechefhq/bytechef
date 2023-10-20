@@ -18,7 +18,7 @@
 package com.bytechef.component.httpclient.connection;
 
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.definition.Property;
 
 import static com.bytechef.hermes.component.definition.Authorization.ADD_TO;
@@ -42,7 +42,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 public class HttpClientConnection {
 
-    public static final ConnectionDefinition CONNECTION_DEFINITION = connection()
+    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .properties(string(BASE_URI).label("Base URI"))
         .authorizations(
             authorization(Authorization.AuthorizationType.API_KEY.name()

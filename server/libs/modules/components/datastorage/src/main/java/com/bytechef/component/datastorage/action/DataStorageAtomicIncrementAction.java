@@ -18,7 +18,7 @@
 package com.bytechef.component.datastorage.action;
 
 import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 
 import java.util.Map;
 
@@ -38,7 +38,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class DataStorageAtomicIncrementAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action("atomicIncrement")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("atomicIncrement")
         .title("Atomic Increment")
         .description(
             "The numeric value can be incremented atomically, and the action can be used concurrently from multiple executions.")

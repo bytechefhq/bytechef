@@ -18,7 +18,7 @@
 package com.bytechef.component.aws.s3.connection;
 
 import com.bytechef.component.aws.s3.constant.AwsS3Constants;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
@@ -27,7 +27,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 public class AwsS3Connection {
 
-    public static final ConnectionDefinition CONNECTION_DEFINITION = connection()
+    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .properties(
             string(AwsS3Constants.ACCESS_KEY_ID)
                 .label("Access Key ID")

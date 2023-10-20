@@ -18,7 +18,7 @@
 package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.util.MapValueUtils;
 
 import java.io.File;
@@ -40,7 +40,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class FilesystemRmAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action(RM)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(RM)
         .title("Remove")
         .description("Removes the content of a directory.")
         .properties(

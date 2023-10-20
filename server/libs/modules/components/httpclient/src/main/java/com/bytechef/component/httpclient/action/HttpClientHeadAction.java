@@ -19,7 +19,7 @@ package com.bytechef.component.httpclient.action;
 
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
 import com.bytechef.component.httpclient.util.HttpClientActionUtils;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 
 import java.util.Map;
@@ -33,7 +33,7 @@ import static com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
  */
 public class HttpClientHeadAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action(HEAD)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(HEAD)
         .title("HEAD")
         .description("The request method to use.")
         .properties(HttpClientActionUtils.toArray(

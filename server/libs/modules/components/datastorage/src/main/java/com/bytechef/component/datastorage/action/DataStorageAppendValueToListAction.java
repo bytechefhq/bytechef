@@ -19,7 +19,7 @@ package com.bytechef.component.datastorage.action;
 
 import com.bytechef.component.datastorage.constant.DataStorageConstants;
 import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 
 import java.util.Map;
 
@@ -48,7 +48,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.time;
  */
 public class DataStorageAppendValueToListAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action("appendValueToList")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("appendValueToList")
         .title("Append Value to List")
         .description("Append value to the end of a list. If the list does not exist, it will be created.")
         .properties(

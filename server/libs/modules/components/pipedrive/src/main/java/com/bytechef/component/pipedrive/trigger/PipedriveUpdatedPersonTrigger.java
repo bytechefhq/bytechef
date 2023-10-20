@@ -20,6 +20,7 @@ package com.bytechef.component.pipedrive.trigger;
 import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableContext;
@@ -43,7 +44,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.time;
  */
 public class PipedriveUpdatedPersonTrigger {
 
-    public static final TriggerDefinition TRIGGER_DEFINITION = ComponentDSL.trigger("updatedPerson")
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = ComponentDSL.trigger("updatedPerson")
         .title("Updated Person")
         .description("Trigger off whenever an existing person is updated.")
         .type(TriggerDefinition.TriggerType.DYNAMIC_WEBHOOK)

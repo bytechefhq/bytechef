@@ -18,7 +18,7 @@
 package com.bytechef.component.datastorage.action;
 
 import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 
 import java.util.Map;
 
@@ -35,7 +35,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class DataStorageDeleteValueAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action("deleteValue")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteValue")
         .title("Delete Value")
         .description("Remove a value associated with a key in the specified scope.")
         .properties(

@@ -19,8 +19,8 @@ package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
-import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.MapValueUtils;
 
@@ -40,7 +40,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class FilesystemReadFileAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action(READ_FILE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(READ_FILE)
         .title("Read from file")
         .properties(string(FILENAME)
             .label("Filename")

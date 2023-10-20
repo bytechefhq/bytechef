@@ -18,7 +18,7 @@
 package com.bytechef.component.var.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.util.MapValueUtils;
 
 import java.util.Map;
@@ -43,7 +43,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.time;
  * @author Ivica Cardic
  */
 public class VarSetAction {
-    public static final ActionDefinition ACTION_DEFINITION = action(SET)
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SET)
         .title("Set value")
         .description("Assign value to a variable that can be used in the following steps.")
         .properties(

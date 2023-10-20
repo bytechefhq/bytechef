@@ -18,7 +18,7 @@
 package com.bytechef.component.schedule.trigger;
 
 import com.bytechef.hermes.component.Context.Connection;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.MapValueUtils;
@@ -42,7 +42,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class ScheduleIntervalTrigger {
 
-    public final TriggerDefinition triggerDefinition = trigger("interval")
+    public final ModifiableTriggerDefinition triggerDefinition = trigger("interval")
         .title("Interval")
         .description(
             "Trigger off periodically, for example every minute or day, based on a set interval.")

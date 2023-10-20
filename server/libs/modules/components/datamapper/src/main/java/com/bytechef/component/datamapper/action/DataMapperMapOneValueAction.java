@@ -18,8 +18,8 @@
 package com.bytechef.component.datamapper.action;
 
 import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 
 import java.util.Map;
@@ -48,7 +48,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.time;
  */
 public class DataMapperMapOneValueAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapOneValue")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapOneValue")
         .title("Map one value")
         .description(
             "The action maps a given value by matching it with the defined mappings, and it returns the outcome of the mapping. In case there is no mapping specified for the value, it returns the default value, and if there is no default defined, it returns null.")

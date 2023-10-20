@@ -17,6 +17,7 @@
 
 package com.bytechef.component.webhook.trigger;
 
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestContext;
@@ -45,7 +46,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class WebhookAwaitWorkflowAndRespondTrigger {
 
-    public static final TriggerDefinition TRIGGER_DEFINITION = trigger("awaitWorkflowAndRespond")
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("awaitWorkflowAndRespond")
         .title("Await workflow and respond")
         .description(
             "You have the flexibility to set up your preferred response. After a webhook request is received, the webhook trigger enters a waiting state for the workflow's response.")
