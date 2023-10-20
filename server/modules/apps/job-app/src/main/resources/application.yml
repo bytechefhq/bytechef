@@ -1,4 +1,0 @@
-hermes:
-  storage:
-    provider: file
-    fileStorageDir: /tmp/bytechef/files
