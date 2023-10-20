@@ -9,7 +9,7 @@ type EditNodeDialogProps = {
     onClose?: () => void;
 };
 
-const EditNodeDialog = ({visible = false, onClose}: EditNodeDialogProps) => {
+const EditNodeDialog = ({onClose, visible = false}: EditNodeDialogProps) => {
     const [isOpen, setIsOpen] = useState(visible);
 
     function closeDialog() {

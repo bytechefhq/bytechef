@@ -22,18 +22,15 @@ export const router = createBrowserRouter([
         path: '/callback',
     },
     {
-        path: '/',
-        element: <App />,
-        errorElement: <ErrorPage />,
         children: [
             {
-                path: '',
                 element: <Projects />,
+                path: '',
             },
             {
-                path: 'automation',
                 children: [
                     {
+                        element: <Project />,
                         loader: async ({params}) =>
                             queryClient.ensureQueryData(
                                 ProjectKeys.project(
@@ -45,39 +42,42 @@ export const router = createBrowserRouter([
                                     })
                             ),
                         path: 'projects/:projectId/workflow/:workflowId',
-                        element: <Project />,
                     },
                     {
-                        path: 'projects',
                         element: <Projects />,
+                        path: 'projects',
                     },
                     {
-                        path: 'project-instances',
                         element: <ProjectInstances />,
+                        path: 'project-instances',
                     },
                     {
-                        path: 'connections',
                         element: <Connections />,
+                        path: 'connections',
                     },
                     {
-                        path: 'workflow-executions',
                         element: <WorkflowExecutions />,
+                        path: 'workflow-executions',
                     },
                 ],
+                path: 'automation',
             },
             {
-                path: 'settings',
                 element: <Settings />,
+                path: 'settings',
             },
             {
-                path: 'embedded',
                 children: [
                     {
-                        path: 'integrations',
                         element: <Integrations />,
+                        path: 'integrations',
                     },
                 ],
+                path: 'embedded',
             },
         ],
+        element: <App />,
+        errorElement: <ErrorPage />,
+        path: '/',
     },
 ]);

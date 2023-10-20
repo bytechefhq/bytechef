@@ -15,7 +15,7 @@ type LeftSidebarItemProps = {
 
 const LeftSidebarMenuItem = ({
     icon,
-    item: {id, name, current, onItemClick},
+    item: {current, id, name, onItemClick},
     toLink,
 }: LeftSidebarItemProps) => (
     <Link

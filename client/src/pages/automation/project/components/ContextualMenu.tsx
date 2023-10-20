@@ -21,9 +21,9 @@ interface ContextualMenuProps {
 
 const ContextualMenu = ({
     components,
+    edge,
     flowControls,
     id,
-    edge,
 }: ContextualMenuProps): JSX.Element => {
     const [filter, setFilter] = useState('');
 
@@ -52,8 +52,6 @@ const ContextualMenu = ({
 
             const newWorkflowNode = {
                 data: {
-                    label: clickedItem?.title,
-                    name: getFormattedName(clickedItem.name!, nodes),
                     icon: (
                         <>
                             {clickedItem.icon ? (
@@ -66,13 +64,15 @@ const ContextualMenu = ({
                             )}
                         </>
                     ),
+                    label: clickedItem?.title,
+                    name: getFormattedName(clickedItem.name!, nodes),
                     originNodeName: clickedItem.name,
                 },
+                id: getRandomId(),
                 position: {
                     x: 0,
                     y: 0,
                 },
-                id: getRandomId(),
                 type: 'workflow',
             };
 
@@ -115,16 +115,16 @@ const ContextualMenu = ({
         const childPlaceholderId = getRandomId();
 
         const childPlaceholderNode = {
+            data: {label: '+'},
             id: childPlaceholderId,
             position: {
                 x: placeholderNode.position.x,
                 y: placeholderNode.position.y,
             },
-            type: 'placeholder',
-            data: {label: '+'},
             style: {
                 zIndex: 9999,
             },
+            type: 'placeholder',
         };
 
         const childPlaceholderEdge = {
@@ -175,10 +175,10 @@ const ContextualMenu = ({
                     if (edge.target === id) {
                         return {
                             ...edge,
-                            type: 'workflow',
                             markerEnd: {
                                 type: MarkerType.ArrowClosed,
                             },
+                            type: 'workflow',
                         };
                     }
 

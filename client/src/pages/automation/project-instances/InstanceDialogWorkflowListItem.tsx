@@ -41,12 +41,12 @@ const InstanceDialogWorkflowListItem = ({
 
     const tabs = [
         {
-            name: 'Configuration',
             content: <ConfigurationForm />,
+            name: 'Configuration',
         },
         {
-            name: 'Connections',
             content: <ConnectionForm />,
+            name: 'Connections',
         },
     ];
 

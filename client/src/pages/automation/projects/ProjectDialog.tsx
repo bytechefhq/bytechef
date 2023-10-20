@@ -31,18 +31,18 @@ interface ProjectDialogProps {
 }
 
 const ProjectDialog = ({
+    onClose,
     project,
     showTrigger = true,
     visible = false,
-    onClose,
 }: ProjectDialogProps) => {
     const [isOpen, setIsOpen] = useState(visible);
 
     const {
         control,
         formState: {errors, touchedFields},
-        handleSubmit,
         getValues,
+        handleSubmit,
         register,
         reset,
         setValue,
@@ -65,15 +65,15 @@ const ProjectDialog = ({
     });
 
     const {
-        isLoading: categoriesLoading,
-        error: categoriesError,
         data: categories,
+        error: categoriesError,
+        isLoading: categoriesLoading,
     } = useGetProjectCategoriesQuery();
 
     const {
-        isLoading: tagsLoading,
-        error: tagsError,
         data: tags,
+        error: tagsError,
+        isLoading: tagsLoading,
     } = useGetProjectTagsQuery();
 
     const queryClient = useQueryClient();
@@ -209,8 +209,8 @@ const ProjectDialog = ({
                             onCreateOption={(inputValue: string) => {
                                 setValue('category', {
                                     label: inputValue,
-                                    value: inputValue,
                                     name: inputValue,
+                                    value: inputValue,
                                     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
                                 } as any);
                             }}
@@ -244,8 +244,8 @@ const ProjectDialog = ({
                                     ...getValues().tags!,
                                     {
                                         label: inputValue,
-                                        value: inputValue,
                                         name: inputValue,
+                                        value: inputValue,
                                     },
                                 ] as never[]);
                             }}

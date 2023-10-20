@@ -14,9 +14,9 @@ const ConnectionList = () => {
     const [searchParams] = useSearchParams();
 
     const {
-        isLoading,
-        error,
         data: connections,
+        error,
+        isLoading,
     } = useGetConnectionsQuery({
         componentNames: searchParams.get('componentName')
             ? [searchParams.get('componentName')!]

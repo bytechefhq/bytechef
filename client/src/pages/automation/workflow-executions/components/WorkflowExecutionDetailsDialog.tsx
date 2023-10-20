@@ -9,9 +9,9 @@ import WorkflowTaskListAccordion from './dialog-content/WorkflowTaskListAccordio
 
 const WorkflowExecutionDetailsDialog = () => {
     const {
-        workflowExecutionId,
-        workflowExecutionDetailsDialogOpen,
         setWorkflowExecutionDetailsDialogOpen,
+        workflowExecutionDetailsDialogOpen,
+        workflowExecutionId,
     } = useWorkflowExecutionDetailsDialogStore();
 
     const {data: workflowExecution, isLoading: workflowExecutionLoading} =

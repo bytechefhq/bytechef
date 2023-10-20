@@ -48,19 +48,19 @@ const Workflow = ({components, flowControls}: WorkflowProps): JSX.Element => {
 
     const defaultNodes: Node[] = [
         {
-            id: '1',
             data: {
                 icon: <PlayIcon className="h-9 w-9 text-gray-700" />,
                 label: 'Manual Trigger',
                 name: 'manual',
                 type: 'trigger',
             },
+            id: '1',
             position: {x: 0, y: 0},
             type: 'workflow',
         },
         {
-            id: '2',
             data: {label: '+'},
+            id: '2',
             position: {x: 0, y: 150},
             type: 'placeholder',
         },
@@ -85,8 +85,8 @@ const Workflow = ({components, flowControls}: WorkflowProps): JSX.Element => {
     const {getEdge, getNode, setViewport} = useReactFlow();
 
     const {width} = useStore((store) => ({
-        width: store.width,
         height: store.height,
+        width: store.width,
     }));
 
     const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge] =

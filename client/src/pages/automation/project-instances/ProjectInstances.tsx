@@ -1,5 +1,5 @@
 import {TagIcon} from '@heroicons/react/20/solid';
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 import PageHeader from '../../../components/PageHeader/PageHeader';
@@ -34,10 +34,10 @@ const ProjectInstances = () => {
         defaultCurrentState
     );
 
-    const {isLoading: projectsLoading, data: projects} = useGetProjectsQuery({
+    const {data: projects, isLoading: projectsLoading} = useGetProjectsQuery({
         projectInstances: true,
     });
-    const {isLoading: tagsLoading, data: tags} =
+    const {data: tags, isLoading: tagsLoading} =
         useGetProjectInstanceTagsQuery();
 
     const title =
@@ -74,10 +74,10 @@ const ProjectInstances = () => {
                         <>
                             <LeftSidebarMenuItem
                                 item={{
-                                    name: 'All Projects',
                                     current:
                                         !current?.id &&
                                         current.type === Type.Project,
+                                    name: 'All Projects',
                                     onItemClick: (id?: number | string) => {
                                         setCurrent({
                                             id: id as number,
@@ -93,11 +93,11 @@ const ProjectInstances = () => {
                                     <LeftSidebarMenuItem
                                         key={item.name}
                                         item={{
-                                            id: item.id,
-                                            name: item.name,
                                             current:
                                                 current?.id === item.id &&
                                                 current.type === Type.Project,
+                                            id: item.id,
+                                            name: item.name,
                                             onItemClick: (
                                                 id?: number | string
                                             ) => {
@@ -121,11 +121,11 @@ const ProjectInstances = () => {
                                         <LeftSidebarMenuItem
                                             key={item.id}
                                             item={{
-                                                id: item.id!,
-                                                name: item.name,
                                                 current:
                                                     current?.id === item.id &&
                                                     current.type === Type.Tag,
+                                                id: item.id!,
+                                                name: item.name,
                                                 onItemClick: (
                                                     id?: number | string
                                                 ) => {

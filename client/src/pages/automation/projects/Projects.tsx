@@ -36,9 +36,9 @@ const Projects = () => {
 
     const navigate = useNavigate();
 
-    const {isLoading: categoriesLoading, data: categories} =
+    const {data: categories, isLoading: categoriesLoading} =
         useGetProjectCategoriesQuery();
-    const {isLoading: tagsLoading, data: tags} = useGetProjectTagsQuery();
+    const {data: tags, isLoading: tagsLoading} = useGetProjectTagsQuery();
 
     const title =
         !categoriesLoading &&
@@ -84,10 +84,10 @@ const Projects = () => {
                         <>
                             <LeftSidebarMenuItem
                                 item={{
-                                    name: 'All Categories',
                                     current:
                                         !current?.id &&
                                         current.type === Type.Category,
+                                    name: 'All Categories',
                                     onItemClick: (id?: number | string) => {
                                         setCurrent({
                                             id: id as number,
@@ -103,11 +103,11 @@ const Projects = () => {
                                     <LeftSidebarMenuItem
                                         key={item.name}
                                         item={{
-                                            id: item.id,
-                                            name: item.name,
                                             current:
                                                 current?.id === item.id &&
                                                 current.type === Type.Category,
+                                            id: item.id,
+                                            name: item.name,
                                             onItemClick: (
                                                 id?: number | string
                                             ) => {
@@ -131,11 +131,11 @@ const Projects = () => {
                                         <LeftSidebarMenuItem
                                             key={item.id}
                                             item={{
-                                                id: item.id!,
-                                                name: item.name,
                                                 current:
                                                     current?.id === item.id &&
                                                     current.type === Type.Tag,
+                                                id: item.id!,
+                                                name: item.name,
                                                 onItemClick: (
                                                     id?: number | string
                                                 ) => {

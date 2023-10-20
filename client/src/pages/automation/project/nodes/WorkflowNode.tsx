@@ -15,7 +15,7 @@ import useNodeClickHandler from '../hooks/useNodeClick';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 import styles from './NodeTypes.module.css';
 
-const WorkflowNode = ({id, data}: NodeProps) => {
+const WorkflowNode = ({data, id}: NodeProps) => {
     const [showEditNodeDialog, setShowEditNodeDialog] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
 
@@ -23,7 +23,7 @@ const WorkflowNode = ({id, data}: NodeProps) => {
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
-    const {getEdges, getNode, getNodes, setNodes, setEdges} = useReactFlow();
+    const {getEdges, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 
     const handleDeleteNodeClick = () => {
         const nodes = getNodes();

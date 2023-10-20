@@ -23,7 +23,7 @@ interface TagProps {
     onDeleteTag: (deletedTag: TagModel) => void;
 }
 
-const Tag = ({tag, onDeleteTag}: TagProps) => (
+const Tag = ({onDeleteTag, tag}: TagProps) => (
     <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700">
         {tag.name}
 
@@ -45,11 +45,11 @@ interface TagListProps {
 }
 
 const TagList = ({
-    id,
-    tags,
-    remainingTags,
-    updateTagsMutation,
     getRequest,
+    id,
+    remainingTags,
+    tags,
+    updateTagsMutation,
 }: TagListProps): JSX.Element => {
     const [showAllTags, setShowAllTags] = useState(false);
     const [isNewTagWindowVisible, setIsNewTagWindowVisible] = useState(false);
@@ -107,8 +107,8 @@ const TagList = ({
                     name="newTag"
                     options={remainingTags!.map((tag: TagModel) => ({
                         label: `${tag.name}${tag.name.slice(1)}`,
-                        value: tag.name.toLowerCase().replace(/\W/g, ''),
                         tag,
+                        value: tag.name.toLowerCase().replace(/\W/g, ''),
                     }))}
                     onCreateOption={(inputValue: string) => {
                         handleOnAddTag({

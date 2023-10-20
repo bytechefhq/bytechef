@@ -24,8 +24,8 @@ export const useCreateProjectMutation = (
                 projectModel,
             });
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });
 
 type CreateProjectInstanceMutationProps = {
@@ -45,8 +45,8 @@ export const useCreateProjectInstanceMutation = (
                 projectInstanceModel,
             });
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });
 
 type CreateProjectWorkflowRequestMutationProps = {
@@ -64,8 +64,8 @@ export const useCreateProjectWorkflowRequestMutation = (
         mutationFn: async (request: CreateProjectWorkflowRequest) => {
             return new ProjectsApi().createProjectWorkflow(request);
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });
 };
 
@@ -81,8 +81,8 @@ export const useDeleteProjectMutation = (
         mutationFn: (id: number) => {
             return new ProjectsApi().deleteProject({id: id});
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });
 
 type DeleteProjectInstanceMutationProps = {
@@ -97,8 +97,8 @@ export const useDeleteProjectInstanceMutation = (
         mutationFn: (id: number) => {
             return new ProjectInstancesApi().deleteProjectInstance({id: id});
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });
 
 type DuplicateProjectMutationProps = {
@@ -115,8 +115,8 @@ export const useDuplicateProjectMutation = (
                 id: id,
             });
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });
 
 type UpdateProjectMutationProps = {
@@ -130,12 +130,12 @@ export const useUpdateProjectMutation = (
     useMutation({
         mutationFn: (projectModel: ProjectModel) => {
             return new ProjectsApi().updateProject({
-                projectModel,
                 id: projectModel.id!,
+                projectModel,
             });
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });
 
 type UpdateProjectInstanceMutationProps = {
@@ -152,12 +152,12 @@ export const useUpdateProjectInstanceMutation = (
     useMutation({
         mutationFn: (projectInstanceModel: ProjectInstanceModel) => {
             return new ProjectInstancesApi().updateProjectInstance({
-                projectInstanceModel,
                 id: projectInstanceModel.id!,
+                projectInstanceModel,
             });
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });
 
 type UpdateProjectTagsMutationProps = {
@@ -172,8 +172,8 @@ export const useUpdateProjectTagsMutation = (
         mutationFn: (request: UpdateProjectTagsRequest) => {
             return new ProjectsApi().updateProjectTags(request);
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });
 
 type UpdateProjectInstanceTagsMutationProps = {
@@ -194,6 +194,6 @@ export const useUpdateProjectInstanceTagsMutation = (
         mutationFn: (request: UpdateProjectTagsRequest) => {
             return new ProjectInstancesApi().updateProjectInstanceTags(request);
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });

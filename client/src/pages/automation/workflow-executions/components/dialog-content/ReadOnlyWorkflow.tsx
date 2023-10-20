@@ -3,8 +3,8 @@ import Button from 'components/Button/Button';
 import {WorkflowExecutionModel} from 'middleware/automation/project';
 
 const ReadOnlyWorkflow = ({
-    workflowExecution,
     setWorkflowExecutionDetailsDialogOpen,
+    workflowExecution,
 }: {
     workflowExecution: WorkflowExecutionModel;
     setWorkflowExecutionDetailsDialogOpen: (

@@ -23,7 +23,7 @@ const WorkflowTaskListAccordion = ({
         defaultValue={taskExecutions[0].id || ''}
     >
         {taskExecutions.map((taskExecution) => {
-            const {id, input, startDate, endDate, output, workflowTask} =
+            const {endDate, id, input, output, startDate, workflowTask} =
                 taskExecution;
 
             return (

@@ -11,7 +11,7 @@ interface PopoverMenuProps {
     edge?: boolean;
 }
 
-const PopoverMenu = ({children, id, edge = false}: PopoverMenuProps) => {
+const PopoverMenu = ({children, edge = false, id}: PopoverMenuProps) => {
     const {data: components} = useGetComponentDefinitionsQuery({
         actionDefinitions: true,
     });

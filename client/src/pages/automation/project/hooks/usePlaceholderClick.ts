@@ -4,7 +4,7 @@ import {useGetComponentDefinitionsQuery} from '../../../../queries/componentDefi
 import {useGetTaskDispatcherDefinitionsQuery} from '../../../../queries/taskDispatcherDefinitions.queries';
 
 export default function usePlaceholderClick(id: NodeProps['id']) {
-    const {getNode, setNodes, setEdges} = useReactFlow();
+    const {getNode, setEdges, setNodes} = useReactFlow();
 
     const {data: components} = useGetComponentDefinitionsQuery({
         actionDefinitions: true,
@@ -20,17 +20,17 @@ export default function usePlaceholderClick(id: NodeProps['id']) {
         }
 
         const contextualMenuNode = {
-            id: 'contextualMenu',
-            position: {
-                x: placeholderNode.position.x + 200,
-                y: placeholderNode.position.y,
-            },
             data: {
                 components,
                 flowControls,
                 label: 'contextualMenu',
                 placeholderId: id,
                 setNodes: setNodes,
+            },
+            id: 'contextualMenu',
+            position: {
+                x: placeholderNode.position.x + 200,
+                y: placeholderNode.position.y,
             },
             type: 'contextualMenu',
         };

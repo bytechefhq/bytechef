@@ -31,9 +31,9 @@ const Connections = () => {
     const [current, setCurrent] = useState<{id?: number | string; type: Type}>(
         defaultCurrentState
     );
-    const {isLoading: componentsLoading, data: components} =
+    const {data: components, isLoading: componentsLoading} =
         useGetComponentDefinitionsQuery({connectionInstances: true});
-    const {isLoading: tagsLoading, data: tags} = useGetConnectionTagsQuery();
+    const {data: tags, isLoading: tagsLoading} = useGetConnectionTagsQuery();
 
     const title: string = getTitle();
 
@@ -78,10 +78,10 @@ const Connections = () => {
                         <>
                             <LeftSidebarMenuItem
                                 item={{
-                                    name: 'All Components',
                                     current:
                                         !current?.id &&
                                         current.type === Type.Component,
+                                    name: 'All Components',
                                     onItemClick: (id?: number | string) => {
                                         setCurrent({id, type: Type.Component});
                                     },
@@ -94,11 +94,11 @@ const Connections = () => {
                                     <LeftSidebarMenuItem
                                         key={item.name}
                                         item={{
-                                            id: item.name!,
-                                            name: item.name!,
                                             current:
                                                 current?.id === item.name &&
                                                 current.type === Type.Component,
+                                            id: item.name!,
+                                            name: item.name!,
                                             onItemClick: (
                                                 id?: number | string
                                             ) => {
@@ -124,11 +124,11 @@ const Connections = () => {
                                         <LeftSidebarMenuItem
                                             key={item.id}
                                             item={{
-                                                id: item.id!,
-                                                name: item.name,
                                                 current:
                                                     current?.id === item.id &&
                                                     current.type === Type.Tag,
+                                                id: item.id!,
+                                                name: item.name,
                                                 onItemClick: (
                                                     id?: number | string
                                                 ) => {

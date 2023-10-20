@@ -27,16 +27,16 @@ type Size = 'small' | 'large';
 const displayTypes: Record<DisplayType, string> = {
     danger: 'btn-danger',
     icon: 'btn-icon',
-    primary: 'btn-primary',
-    secondary: 'btn-secondary',
     light: 'btn-light',
     lightBorder: 'btn-light-border',
+    primary: 'btn-primary',
+    secondary: 'btn-secondary',
     unstyled: 'btn-unstyled',
 };
 
 const sizes: Record<Size, string> = {
-    small: 'btn-small',
     large: 'btn-large',
+    small: 'btn-small',
 };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(

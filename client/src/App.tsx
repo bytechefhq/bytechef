@@ -12,10 +12,10 @@ import {MobileSidebar} from './components/Sidebar/MobileSidebar';
 import {MobileTopNavigation} from './components/Sidebar/MobileTopNavigation';
 
 const user = {
-    name: 'Emily Selman',
     email: 'emily.selman@example.com',
     imageUrl:
         'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+    name: 'Emily Selman',
 };
 const navigation: {
     name: string;
@@ -25,20 +25,20 @@ const navigation: {
     >;
 }[] = [
     {
-        name: 'Projects',
         href: '/automation/projects',
         icon: FolderIcon,
+        name: 'Projects',
     },
     {
-        name: 'Project Instances',
         href: '/automation/project-instances',
         icon: RectangleStackIcon,
+        name: 'Project Instances',
     },
-    {name: 'Connections', href: '/automation/connections', icon: LinkIcon},
+    {href: '/automation/connections', icon: LinkIcon, name: 'Connections'},
     {
-        name: 'Workflow Execution History',
         href: '/automation/workflow-executions',
         icon: QueueListIcon,
+        name: 'Workflow Execution History',
     },
 ];
 

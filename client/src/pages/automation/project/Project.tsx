@@ -31,12 +31,12 @@ import useLeftSidebarStore from './stores/useLeftSidebarStore';
 
 const headerToggleItems: IToggleItem[] = [
     {
-        value: 'designer',
         label: 'Designer',
+        value: 'designer',
     },
     {
-        value: 'editor',
         label: 'Editor',
+        value: 'editor',
     },
 ];
 
@@ -60,20 +60,20 @@ const Project: React.FC = () => {
 
     const {
         data: components,
-        isLoading: componentsLoading,
         error: componentsError,
+        isLoading: componentsLoading,
     } = useGetComponentDefinitionsQuery({actionDefinitions: true});
 
     const {
         data: flowControls,
-        isLoading: flowControlsLoading,
         error: flowControlsError,
+        isLoading: flowControlsLoading,
     } = useGetTaskDispatcherDefinitionsQuery();
 
     const {
         data: projectWorkflows,
-        isLoading: projectWorkflowsLoading,
         error: projectWorkflowsError,
+        isLoading: projectWorkflowsLoading,
     } = useGetProjectWorkflowsQuery(project?.id as number);
 
     const createWorkflowMutation = useCreateProjectWorkflowRequestMutation({

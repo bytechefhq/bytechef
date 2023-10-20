@@ -14,9 +14,9 @@ const IntegrationList = () => {
     const [searchParams] = useSearchParams();
 
     const {
-        isLoading,
-        error,
         data: integrations,
+        error,
+        isLoading,
     } = useGetIntegrationsQuery({
         categoryIds: searchParams.get('categoryId')
             ? [parseInt(searchParams.get('categoryId')!)]

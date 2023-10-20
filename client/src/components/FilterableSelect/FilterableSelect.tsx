@@ -42,8 +42,8 @@ const FilterableSelect = <
     error,
     field,
     fieldsetClassName,
-    name,
     label,
+    name,
     ...props
 }: FilterableSelectProps<
     Option,

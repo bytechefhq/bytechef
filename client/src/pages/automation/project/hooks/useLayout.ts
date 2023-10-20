@@ -44,7 +44,7 @@ const nodeCountSelector = (state: ReactFlowState) => state.nodeInternals.size;
 export default function useLayout() {
     const nodeCount = useStore(nodeCountSelector);
 
-    const {getNodes, setNodes, getEdges} = useReactFlow();
+    const {getEdges, getNodes, setNodes} = useReactFlow();
 
     useEffect(() => {
         const nodes = getNodes();

@@ -9,8 +9,8 @@ interface PageFooterProps {
 
 const PageFooter = ({
     children,
-    position = 'sidebar',
     leftSidebar = false,
+    position = 'sidebar',
     right,
 }: PropsWithChildren<PageFooterProps>) => (
     <footer

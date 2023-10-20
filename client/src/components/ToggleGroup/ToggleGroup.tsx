@@ -14,8 +14,8 @@ type ToggleGroupProps = {
 
 const ToggleGroup = ({
     defaultValue,
-    toggleItems,
     onValueChange,
+    toggleItems,
 }: ToggleGroupProps): JSX.Element => (
     <ToggleGroupPrimitive.Root
         aria-label="Items"

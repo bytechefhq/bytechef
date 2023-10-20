@@ -39,9 +39,9 @@ const enhanceAuthorizationUrl = (
     >
 ) => {
     const query = objectToQuery({
-        response_type: responseType,
         client_id: clientId,
         redirect_uri: redirectUri,
+        response_type: responseType,
         scope,
         state,
         ...extraQueryParametersRef.current,
@@ -109,13 +109,13 @@ const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
     const {
         authorizationUrl,
         clientId,
-        redirectUri,
-        scope = '',
-        responseType,
         extraQueryParameters = {},
         onCodeSuccess,
-        onTokenSuccess,
         onError,
+        onTokenSuccess,
+        redirectUri,
+        responseType,
+        scope = '',
     } = props;
 
     const extraQueryParametersRef = useRef(extraQueryParameters);
@@ -123,16 +123,16 @@ const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
     const curStateRef = useRef(undefined);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const intervalRef = useRef<any>();
-    const [{loading, error}, setUI] = useState<{
+    const [{error, loading}, setUI] = useState<{
         loading: boolean;
         error: string | null;
-    }>({loading: false, error: null});
+    }>({error: null, loading: false});
 
     const getAuth = useCallback(() => {
         // 1. Init
         setUI({
-            loading: true,
             error: null,
+            loading: true,
         });
 
         // 2. Generate and save state
@@ -174,8 +174,8 @@ const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
 
                 if (error) {
                     setUI({
-                        loading: false,
                         error: error || 'Unknown Error',
+                        loading: false,
                     });
 
                     if (onError) {
@@ -197,16 +197,16 @@ const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
                     }
 
                     setUI({
-                        loading: false,
                         error: null,
+                        loading: false,
                     });
                 }
             } catch (genericError) {
                 console.error(genericError);
 
                 setUI({
-                    loading: false,
                     error: (genericError as Error).toString(),
+                    loading: false,
                 });
             }
         }
@@ -253,7 +253,7 @@ const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
         setUI,
     ]);
 
-    return {loading, error, getAuth};
+    return {error, getAuth, loading};
 };
 
 export default useOAuth2;

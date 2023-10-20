@@ -14,9 +14,9 @@ const ProjectInstanceList = () => {
     const [searchParams] = useSearchParams();
 
     const {
-        isLoading,
-        error,
         data: projectsInstances,
+        error,
+        isLoading,
     } = useGetProjectInstancesQuery({
         projectIds: searchParams.get('projectId')
             ? [parseInt(searchParams.get('projectId')!)]

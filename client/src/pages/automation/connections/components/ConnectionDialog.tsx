@@ -55,9 +55,9 @@ interface ConnectionDialogProps {
 const ConnectionDialog = ({
     component,
     connection,
+    onClose,
     showTrigger = true,
     visible = false,
-    onClose,
 }: ConnectionDialogProps) => {
     const [authorizationName, setAuthorizationName] = useState<string>();
     const [isOpen, setIsOpen] = useState(visible);
@@ -80,11 +80,11 @@ const ConnectionDialog = ({
     const {
         control,
         formState,
-        handleSubmit,
         getValues,
+        handleSubmit,
         register,
-        setValue,
         reset: formReset,
+        setValue,
     } = useForm<PropertyFormProps>({
         defaultValues: {
             authorizationName: '',
@@ -99,15 +99,15 @@ const ConnectionDialog = ({
     });
 
     const {
-        isLoading: componentDefinitionsLoading,
-        error: componentDefinitionsError,
         data: componentDefinitions,
+        error: componentDefinitionsError,
+        isLoading: componentDefinitionsLoading,
     } = useGetComponentDefinitionsQuery({connectionDefinitions: true});
 
     const {
-        isLoading: connectionDefinitionLoading,
-        error: connectionDefinitionError,
         data: connectionDefinition,
+        error: connectionDefinitionError,
+        isLoading: connectionDefinitionLoading,
     } = useGetConnectionDefinitionQuery(
         componentDefinition
             ? {
@@ -118,24 +118,24 @@ const ConnectionDialog = ({
     );
 
     const {
-        isLoading: oAuth2AuthorizationParametersLoading,
-        error: oAuth2AuthorizationParametersError,
         data: oAuth2AuthorizationParameters,
+        error: oAuth2AuthorizationParametersError,
+        isLoading: oAuth2AuthorizationParametersLoading,
     } = useGetOAuth2AuthorizationParametersQuery(
         getNewOAuth2AuthorizationParameters(),
         wizardStep === 'oauth_step'
     );
 
     const {
-        isLoading: tagsLoading,
-        error: tagsError,
         data: tags,
+        error: tagsError,
+        isLoading: tagsLoading,
     } = useGetConnectionTagsQuery();
 
     const {
-        isLoading: oAuth2PropertiesLoading,
-        error: oAuth2PropertiesError,
         data: oAuth2Properties,
+        error: oAuth2PropertiesError,
+        isLoading: oAuth2PropertiesLoading,
     } = useGetOAuth2PropertiesQuery();
 
     const queryClient = useQueryClient();
@@ -427,10 +427,10 @@ const ConnectionDialog = ({
                                                     )}`;
 
                                                     return {
+                                                        componentDefinition,
+                                                        icon: componentDefinition.icon,
                                                         label: capitalizedName,
                                                         value: name,
-                                                        icon: componentDefinition.icon,
-                                                        componentDefinition,
                                                     };
                                                 }
                                             )}
@@ -510,12 +510,12 @@ const ConnectionDialog = ({
                                     placeholder="Select..."
                                     value={authorizationName}
                                     {...register('authorizationName', {
-                                        required:
-                                            connectionDefinition?.authorizationRequired,
                                         onChange: (event) =>
                                             setAuthorizationName(
                                                 event.target.value
                                             ),
+                                        required:
+                                            connectionDefinition?.authorizationRequired,
                                     })}
                                 />
                             )}
@@ -600,8 +600,8 @@ const ConnectionDialog = ({
                                                     ...getValues().tags!,
                                                     {
                                                         label: inputValue,
-                                                        value: inputValue,
                                                         name: inputValue,
+                                                        value: inputValue,
                                                     },
                                                 ]);
                                             }}

@@ -26,15 +26,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             className,
             description,
             disabled,
+            error,
             fieldsetClassName,
             label,
             labelClassName,
             leadingIcon,
             name,
-            type = 'text',
-            error,
             title,
             trailing,
+            type = 'text',
             ...props
         },
         ref

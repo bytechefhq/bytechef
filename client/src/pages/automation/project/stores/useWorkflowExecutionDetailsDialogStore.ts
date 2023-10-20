@@ -1,3 +1,4 @@
+/* eslint-disable sort-keys */
 import {create} from 'zustand';
 
 interface WorkflowExecutionDetailsState {

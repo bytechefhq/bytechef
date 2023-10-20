@@ -42,23 +42,23 @@ type OAuth2ButtonProps = {
 const OAuth2Button = ({
     authorizationUrl,
     clientId,
+    onClick,
+    onCodeSuccess,
+    onError,
+    onTokenSuccess,
     redirectUri,
     responseType,
     scope,
-    onError,
-    onClick,
-    onCodeSuccess,
-    onTokenSuccess,
 }: OAuth2ButtonProps) => {
-    const {loading, getAuth} = useOAuth2({
+    const {getAuth, loading} = useOAuth2({
         authorizationUrl: authorizationUrl,
         clientId: clientId,
-        redirectUri: redirectUri,
-        scope: scope,
-        responseType: responseType,
         onCodeSuccess: onCodeSuccess,
-        onTokenSuccess: onTokenSuccess,
         onError: onError,
+        onTokenSuccess: onTokenSuccess,
+        redirectUri: redirectUri,
+        responseType: responseType,
+        scope: scope,
     });
 
     if (loading) {

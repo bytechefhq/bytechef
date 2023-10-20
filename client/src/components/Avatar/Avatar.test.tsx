@@ -4,8 +4,8 @@ import Avatar from './Avatar';
 
 describe('<Avatar />', () => {
     const props = {
-        src: 'https://gravatar.com/4405735f6f3129e0286d9d43e7b460d0',
         alt: 'Avatar',
+        src: 'https://gravatar.com/4405735f6f3129e0286d9d43e7b460d0',
     };
 
     it('should render the medium Avatar as default', () => {

@@ -1,5 +1,5 @@
 import {TagIcon} from '@heroicons/react/20/solid';
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 import PageHeader from '../../../components/PageHeader/PageHeader';
@@ -34,9 +34,9 @@ const Integrations = () => {
         defaultCurrentState
     );
 
-    const {isLoading: categoriesLoading, data: categories} =
+    const {data: categories, isLoading: categoriesLoading} =
         useGetIntegrationCategoriesQuery();
-    const {isLoading: tagsLoading, data: tags} = useGetIntegrationTagsQuery();
+    const {data: tags, isLoading: tagsLoading} = useGetIntegrationTagsQuery();
 
     const title =
         !categoriesLoading &&
@@ -71,10 +71,10 @@ const Integrations = () => {
                         <>
                             <LeftSidebarMenuItem
                                 item={{
-                                    name: 'All Categories',
                                     current:
                                         !current?.id &&
                                         current.type === Type.Category,
+                                    name: 'All Categories',
                                     onItemClick: (id?: number | string) => {
                                         setCurrent({
                                             id: id as number,
@@ -90,11 +90,11 @@ const Integrations = () => {
                                     <LeftSidebarMenuItem
                                         key={item.name}
                                         item={{
-                                            id: item.id,
-                                            name: item.name,
                                             current:
                                                 current?.id === item.id &&
                                                 current.type === Type.Category,
+                                            id: item.id,
+                                            name: item.name,
                                             onItemClick: (
                                                 id?: number | string
                                             ) => {
@@ -120,11 +120,11 @@ const Integrations = () => {
                                         <LeftSidebarMenuItem
                                             key={item.id}
                                             item={{
-                                                id: item.id!,
-                                                name: item.name,
                                                 current:
                                                     current?.id === item.id &&
                                                     current.type === Type.Tag,
+                                                id: item.id!,
+                                                name: item.name,
                                                 onItemClick: (
                                                     id?: number | string
                                                 ) => {

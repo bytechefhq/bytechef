@@ -20,8 +20,8 @@ export const useCreateConnectionMutation = (
                 connectionModel,
             });
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });
 
 type DeleteConnectionMutationProps = {
@@ -38,8 +38,8 @@ export const useDeleteConnectionMutation = (
                 id,
             });
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });
 
 type UpdateConnectionMutationProps = {
@@ -57,8 +57,8 @@ export const useUpdateConnectionMutation = (
                 id: connection.id!,
             });
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });
 
 type UpdateConnectionTagsMutationProps = {
@@ -73,6 +73,6 @@ export const useUpdateConnectionTagsMutation = (
         mutationFn: (request: UpdateConnectionTagsRequest) => {
             return new ConnectionsApi().updateConnectionTags(request);
         },
-        onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
     });

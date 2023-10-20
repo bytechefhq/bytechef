@@ -52,8 +52,8 @@ const Select = ({
     fieldsetClassName,
     label,
     leadingIcon,
-    options,
     onValueChange,
+    options,
     triggerClassName,
     value,
 }: SelectProps): JSX.Element => (

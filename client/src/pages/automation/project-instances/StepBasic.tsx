@@ -33,24 +33,24 @@ interface ProjectDialogProps {
 }
 
 const StepBasic = ({
-    projectInstance,
     control,
+    errors,
+    getValues,
+    projectInstance,
     register,
     setValue,
-    getValues,
-    errors,
     touchedFields,
 }: ProjectDialogProps) => {
     const {
-        isLoading: projectsLoading,
-        error: projectsError,
         data: projects,
+        error: projectsError,
+        isLoading: projectsLoading,
     } = useGetProjectsQuery();
 
     const {
-        isLoading: tagsLoading,
-        error: tagsError,
         data: tags,
+        error: tagsError,
+        isLoading: tagsLoading,
     } = useGetProjectTagsQuery();
 
     const tagNames = projectInstance?.tags?.map((tag) => tag.name);
@@ -123,8 +123,8 @@ const StepBasic = ({
                                     ...getValues().tags!,
                                     {
                                         label: inputValue,
-                                        value: inputValue,
                                         name: inputValue,
+                                        value: inputValue,
                                     },
                                 ] as never[]);
                             }}

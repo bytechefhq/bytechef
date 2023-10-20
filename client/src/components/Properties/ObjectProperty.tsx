@@ -74,8 +74,8 @@ const ObjectProperty = ({property}: {property: PropertyType}) => {
                                         options={(
                                             additionalProperties as PropertyType[]
                                         ).map((type) => ({
-                                            value: type.type!,
                                             label: type.type!,
+                                            value: type.type!,
                                         }))}
                                         triggerClassName="w-full"
                                     />

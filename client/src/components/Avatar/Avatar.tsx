@@ -9,9 +9,9 @@ type AvatarProps = {
 };
 
 const sizes: Record<Size, string> = {
-    small: 'w-10 h-10',
-    medium: 'w-12 h-12',
     large: 'w-14 h-14',
+    medium: 'w-12 h-12',
+    small: 'w-10 h-10',
 };
 
 const EmptyAvatar = ({size = 'medium'}: Pick<AvatarProps, 'size'>) => (
@@ -32,7 +32,7 @@ const EmptyAvatar = ({size = 'medium'}: Pick<AvatarProps, 'size'>) => (
     </span>
 );
 
-export default function Avatar({size = 'medium', src, alt}: AvatarProps) {
+export default function Avatar({alt, size = 'medium', src}: AvatarProps) {
     if (!src) {
         return <EmptyAvatar size={size} />;
     }

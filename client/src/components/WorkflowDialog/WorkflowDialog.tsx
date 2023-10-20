@@ -22,9 +22,9 @@ type WorkflowDialogProps = {
 const WorkflowDialog = ({
     createWorkflowRequestMutation,
     id,
+    onClose,
     showTrigger = true,
     visible = false,
-    onClose,
 }: WorkflowDialogProps) => {
     const [isOpen, setIsOpen] = useState(visible);
 
@@ -36,12 +36,12 @@ const WorkflowDialog = ({
         reset,
     } = useForm({
         defaultValues: {
-            label: '',
             description: '',
+            label: '',
         } as WorkflowModel,
     });
 
-    const {mutate, isLoading} = createWorkflowRequestMutation;
+    const {isLoading, mutate} = createWorkflowRequestMutation;
 
     function closeDialog() {
         setIsOpen(false);

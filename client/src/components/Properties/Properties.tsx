@@ -232,21 +232,21 @@ export const Property = ({
                         defaultValue="// Add your custom code here..."
                         language={actionName}
                         options={{
+                            extraEditorClassName: 'code-editor',
+                            folding: false,
+                            glyphMargin: false,
+                            lineDecorationsWidth: 0,
+                            lineNumbers: 'off',
+                            lineNumbersMinChars: 0,
                             minimap: {
                                 enabled: false,
                             },
-                            lineNumbers: 'off',
-                            tabSize: 2,
-                            lineDecorationsWidth: 0,
-                            lineNumbersMinChars: 0,
-                            glyphMargin: false,
-                            folding: false,
                             scrollBeyondLastLine: false,
                             scrollbar: {
                                 horizontalScrollbarSize: 4,
                                 verticalScrollbarSize: 4,
                             },
-                            extraEditorClassName: 'code-editor',
+                            tabSize: 2,
                         }}
                     />
                 </div>
@@ -268,8 +268,8 @@ export const Property = ({
                     label={label}
                     leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
                     options={[
-                        {value: 'true', label: 'True'},
-                        {value: 'false', label: 'False'},
+                        {label: 'True', value: 'true'},
+                        {label: 'False', value: 'false'},
                     ]}
                     triggerClassName="w-full bg-gray-100 border-none"
                 />
