@@ -8,10 +8,10 @@ const PlaceholderNode = ({id, data}: NodeProps) => (
     <PopoverMenu id={id}>
         <div
             // eslint-disable-next-line tailwindcss/no-custom-classname
-            className="mx-[26px] flex h-5 w-5 cursor-pointer items-center justify-center rounded-md bg-gray-300 font-bold text-white shadow-none hover:scale-110 hover:rounded-sm hover:bg-gray-500"
+            className="mx-[24px] flex h-6 w-6 cursor-pointer items-center justify-center rounded-md bg-gray-300 font-bold text-white shadow-none hover:scale-110 hover:rounded-sm hover:bg-gray-500"
             title="Click to add a component"
         >
-            {data.label}
+            <span className="text-lg">{data.label}</span>
 
             <Handle
                 className={styles.handle}
