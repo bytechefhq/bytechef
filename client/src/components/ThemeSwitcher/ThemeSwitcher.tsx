@@ -68,6 +68,7 @@ const ThemeSwitcher: React.FC = () => {
                     <Content
                         align="start"
                         sideOffset={5}
+                        // eslint-disable-next-line tailwindcss/no-custom-classname
                         className="w-48 rounded-lg bg-gray-50 px-1.5 py-1 shadow-md radix-side-bottom:animate-slide-down radix-side-top:animate-slide-up dark:bg-gray-700 md:w-56"
                     >
                         {availableThemes.map((theme) => {

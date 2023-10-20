@@ -5,9 +5,9 @@ import Modal from 'components/Modal/Modal';
 import {SidebarContentLayout} from '../../components/Layouts/SidebarContentLayout';
 import {IntegrationList} from './IntegrationList';
 import React from 'react';
-import {Input} from '../../components/Input/Input';
-import {TextArea} from '../../components/TextArea/TextArea';
-import {MultiSelect} from '../../components/MultiSelect/MultiSelect';
+import Input from '../../components/Input/Input';
+import TextArea from '../../components/TextArea/TextArea';
+import MultiSelect from '../../components/MultiSelect/MultiSelect';
 
 const options = [
     {value: 'chocolate', label: 'Chocolate'},
