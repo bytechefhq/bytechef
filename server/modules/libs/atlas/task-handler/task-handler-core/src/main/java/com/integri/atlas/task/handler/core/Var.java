@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  * @since May 11, 2017
  */
 @Component("core/var")
-class Var implements TaskHandler<Object> {
+public class Var implements TaskHandler<Object> {
 
     @Override
     public Object handle(TaskExecution aTask) {

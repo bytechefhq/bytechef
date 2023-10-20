@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
  * @since Feb, 25 2020
  */
 @Component("core/pass")
-class Pass implements TaskHandler<Object> {
+public class Pass implements TaskHandler<Object> {
 
     @Override
     public Object handle(TaskExecution aTask) {
