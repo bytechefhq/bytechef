@@ -21,6 +21,7 @@ package com.bytechef.atlas.web.rest;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
+import com.bytechef.atlas.web.rest.model.PostWorkflowRequestModel;
 import com.bytechef.atlas.web.rest.model.WorkflowModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -74,9 +75,12 @@ public class WorkflowController implements WorkflowsApi {
 
     @Override
     public Mono<ResponseEntity<WorkflowModel>> postWorkflow(
-        Mono<WorkflowModel> workflowModelMono, ServerWebExchange exchange) {
+        Mono<PostWorkflowRequestModel> workflowModelMono, ServerWebExchange exchange) {
         return workflowModelMono.map(workflowModel -> ResponseEntity.ok(conversionService.convert(
-            workflowService.add(conversionService.convert(workflowModel, Workflow.class)), WorkflowModel.class)));
+            workflowService.create(conversionService.convert(workflowModel, Workflow.class),
+                Workflow.ProviderType.valueOf(workflowModel.getProviderType()
+                    .name())),
+            WorkflowModel.class)));
     }
 
     @Override

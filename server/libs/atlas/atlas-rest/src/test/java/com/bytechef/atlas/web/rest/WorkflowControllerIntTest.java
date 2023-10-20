@@ -25,8 +25,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.web.rest.config.WorkflowRestTestConfiguration;
+import com.bytechef.atlas.web.rest.model.PostWorkflowRequestModel;
 import com.bytechef.atlas.web.rest.model.WorkflowModel;
-import com.bytechef.atlas.workflow.WorkflowFormat;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -117,13 +117,10 @@ public class WorkflowControllerIntTest {
     @SuppressFBWarnings("NP")
     public void testPostWorkflow() {
         Workflow workflow = getWorkflow();
-        WorkflowModel workflowModel = new WorkflowModel()
-            .definition("""
-                {
-                    "tasks": []
-                }
-                """)
-            .format(WorkflowModel.FormatEnum.JSON);
+        PostWorkflowRequestModel workflowModel = new PostWorkflowRequestModel()
+            .definition("\"tasks\": []")
+            .providerType(PostWorkflowRequestModel.ProviderTypeEnum.JDBC)
+            .format(PostWorkflowRequestModel.FormatEnum.JSON);
 
         when(workflowService.create(any(), any())).thenReturn(workflow);
 
