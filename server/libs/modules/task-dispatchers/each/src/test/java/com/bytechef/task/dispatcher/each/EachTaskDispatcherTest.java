@@ -24,46 +24,49 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.atlas.context.domain.MapContext;
+import com.bytechef.atlas.domain.Context;
+import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.service.context.ContextService;
-import com.bytechef.atlas.service.counter.CounterService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
+import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.CounterService;
+import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.atlas.task.execution.evaluator.spel.SpelTaskEvaluator;
+import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 /**
  * @author Arik Cohen
  */
 public class EachTaskDispatcherTest {
 
-    private TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
-    private TaskDispatcher taskDispatcher = mock(TaskDispatcher.class);
-    private MessageBroker messageBroker = mock(MessageBroker.class);
-    private ContextService contextService = mock(ContextService.class);
-    private CounterService counterService = mock(CounterService.class);
+    private final ContextService contextService = mock(ContextService.class);
+    private final CounterService counterService = mock(CounterService.class);
+    private final MessageBroker messageBroker = mock(MessageBroker.class);
+    private final TaskDispatcher taskDispatcher = mock(TaskDispatcher.class);
+    private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
 
     @Test
-    public void test1() {
-        Assertions.assertThrows(IllegalArgumentException.class, new Executable() {
-            @Override
-            public void execute() {
-                EachTaskDispatcher dispatcher =
-                        new EachTaskDispatcher(null, null, null, null, null, SpelTaskEvaluator.create());
-                dispatcher.dispatch(new SimpleTaskExecution());
-            }
+    public void testDispatch1() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            EachTaskDispatcher dispatcher = new EachTaskDispatcher(
+                    taskDispatcher,
+                    taskExecutionService,
+                    messageBroker,
+                    contextService,
+                    counterService,
+                    SpelTaskEvaluator.create());
+            dispatcher.dispatch(new TaskExecution());
         });
     }
 
     @Test
-    public void test2() {
-        when(contextService.peek(any())).thenReturn(new MapContext());
+    public void testDispatch2() {
+        when(contextService.peek(any())).thenReturn(new Context());
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
                 taskDispatcher,
                 taskExecutionService,
@@ -71,16 +74,21 @@ public class EachTaskDispatcherTest {
                 contextService,
                 counterService,
                 SpelTaskEvaluator.create());
-        SimpleTaskExecution task = new SimpleTaskExecution();
-        task.set("list", Arrays.asList(1, 2, 3));
-        task.set("iteratee", Collections.singletonMap("type", "print"));
-        dispatcher.dispatch(task);
+        TaskExecution taskExecution = new TaskExecution(Map.of(
+                "list", Arrays.asList(1, 2, 3),
+                "iteratee", Collections.singletonMap("type", "print")));
+
+        taskExecution.setId("id");
+        taskExecution.setJobId("jobId");
+
+        dispatcher.dispatch(taskExecution);
+
         verify(taskDispatcher, times(3)).dispatch(any());
         verify(messageBroker, times(0)).send(any(), any());
     }
 
     @Test
-    public void test3() {
+    public void testDispatch3() {
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
                 taskDispatcher,
                 taskExecutionService,
@@ -88,10 +96,12 @@ public class EachTaskDispatcherTest {
                 contextService,
                 counterService,
                 SpelTaskEvaluator.create());
-        SimpleTaskExecution task = new SimpleTaskExecution();
-        task.set("list", Arrays.asList());
-        task.set("iteratee", Collections.singletonMap("type", "print"));
-        dispatcher.dispatch(task);
+        TaskExecution taskExecution = new TaskExecution(Map.of(
+                "list", List.of(),
+                "iteratee", Collections.singletonMap("type", "print")));
+
+        dispatcher.dispatch(taskExecution);
+
         verify(taskDispatcher, times(0)).dispatch(any());
         verify(messageBroker, times(1)).send(any(), any());
     }

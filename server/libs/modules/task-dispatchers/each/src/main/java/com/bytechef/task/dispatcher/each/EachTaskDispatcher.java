@@ -18,30 +18,29 @@
 
 package com.bytechef.task.dispatcher.each;
 
-import com.bytechef.atlas.Constants;
-import com.bytechef.atlas.context.domain.MapContext;
+import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+
+import com.bytechef.atlas.domain.Context;
+import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
-import com.bytechef.atlas.service.context.ContextService;
-import com.bytechef.atlas.service.counter.CounterService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
+import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.CounterService;
+import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
+import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
-import com.bytechef.atlas.uuid.UUIDGenerator;
-import java.util.Date;
+import com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import org.springframework.util.Assert;
 
 /**
- * A {@link TaskDispatcher} implementation which implements a parallel for-each construct. The
- * dispatcher works by executing the <code>iteratee</code> function on each item on the <code>list
- * </code>.
+ * A {@link TaskDispatcher} implementation which implements a parallel for-each construct. The dispatcher works by
+ * executing the <code>iteratee</code> function on each item on the <code>list</code>.
  *
  * @author Arik Cohen
  * @since Apr 25, 2017
@@ -72,51 +71,45 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        Map<String, Object> iteratee = taskExecution.getMap("iteratee");
+        WorkflowTask iteratee = taskExecution.getWorkflowTask("iteratee");
         List<Object> list = taskExecution.getList("list", Object.class);
 
         Assert.notNull(iteratee, "'iteratee' property can't be null");
         Assert.notNull(list, "'list' property can't be null");
 
-        SimpleTaskExecution eachTaskExecution = SimpleTaskExecution.of(taskExecution);
+        TaskExecution eachTaskExecution = new TaskExecution(taskExecution);
 
-        eachTaskExecution.setStartTime(new Date());
+        eachTaskExecution.setStartTime(LocalDateTime.now());
         eachTaskExecution.setStatus(TaskStatus.STARTED);
 
-        taskExecutionService.merge(eachTaskExecution);
+        taskExecutionService.update(eachTaskExecution);
 
         if (list.size() > 0) {
             counterService.set(taskExecution.getId(), list.size());
 
             for (int i = 0; i < list.size(); i++) {
                 Object item = list.get(i);
-                SimpleTaskExecution subTaskExecution = SimpleTaskExecution.of(iteratee);
+                TaskExecution iterateeTaskExecution = TaskExecution.of(
+                        iteratee, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), i + 1);
 
-                subTaskExecution.setCreateTime(new Date());
-                subTaskExecution.setId(UUIDGenerator.generate());
-                subTaskExecution.setJobId(taskExecution.getJobId());
-                subTaskExecution.setParentId(taskExecution.getId());
-                subTaskExecution.setPriority(taskExecution.getPriority());
-                subTaskExecution.setStatus(TaskStatus.CREATED);
-                subTaskExecution.setTaskNumber(i + 1);
+                Context context = new Context(contextService.peek(taskExecution.getId()));
 
-                MapContext context = new MapContext(contextService.peek(taskExecution.getId()));
+                context.put(taskExecution.getString("itemVar", "item"), item);
+                context.put(taskExecution.getString("itemIndex", "itemIndex"), i);
 
-                context.set(taskExecution.getString("itemVar", "item"), item);
-                context.set(taskExecution.getString("itemIndex", "itemIndex"), i);
+                contextService.push(iterateeTaskExecution.getId(), context);
 
-                contextService.push(subTaskExecution.getId(), context);
+                TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(iterateeTaskExecution, context);
 
-                TaskExecution evaluatedSubtaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+                evaluatedTaskExecution = taskExecutionService.add(evaluatedTaskExecution);
 
-                taskExecutionService.create(evaluatedSubtaskExecution);
-                taskDispatcher.dispatch(evaluatedSubtaskExecution);
+                taskDispatcher.dispatch(evaluatedTaskExecution);
             }
         } else {
-            SimpleTaskExecution completionTaskExecution = SimpleTaskExecution.of(taskExecution);
+            TaskExecution completionTaskExecution = new TaskExecution(taskExecution);
 
-            completionTaskExecution.setStartTime(new Date());
-            completionTaskExecution.setEndTime(new Date());
+            completionTaskExecution.setStartTime(LocalDateTime.now());
+            completionTaskExecution.setEndTime(LocalDateTime.now());
             completionTaskExecution.setExecutionTime(0);
 
             messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
@@ -124,8 +117,8 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     }
 
     @Override
-    public TaskDispatcher resolve(Task aTask) {
-        if (aTask.getType().equals(Constants.EACH)) {
+    public TaskDispatcher resolve(Task task) {
+        if (task.getType().equals(EachTaskDispatcherConstants.EACH + "/v" + VERSION_1)) {
             return this;
         }
         return null;

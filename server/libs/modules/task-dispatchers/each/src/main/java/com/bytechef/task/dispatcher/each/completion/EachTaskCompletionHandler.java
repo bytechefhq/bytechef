@@ -18,14 +18,16 @@
 
 package com.bytechef.task.dispatcher.each.completion;
 
-import com.bytechef.atlas.Constants;
+import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.EACH;
+
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
-import com.bytechef.atlas.service.counter.CounterService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
+import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.service.CounterService;
+import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import java.util.Date;
+import com.bytechef.commons.date.LocalDateTimeUtils;
+import java.time.LocalDateTime;
 
 /**
  * @author Arik Cohen
@@ -53,7 +55,7 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
         if (parentId != null) {
             TaskExecution parentExecution = taskExecutionService.getTaskExecution(parentId);
 
-            return parentExecution.getType().equals(Constants.EACH);
+            return parentExecution.getType().equals(EACH + "/v" + VERSION_1);
         }
 
         return false;
@@ -61,21 +63,21 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public void handle(TaskExecution taskExecution) {
-        SimpleTaskExecution completedSubtaskExecution = SimpleTaskExecution.of(taskExecution);
+        TaskExecution completedSubtaskExecution = new TaskExecution(taskExecution);
 
         completedSubtaskExecution.setStatus(TaskStatus.COMPLETED);
 
-        taskExecutionService.merge(completedSubtaskExecution);
+        taskExecutionService.update(completedSubtaskExecution);
 
         long subtasksLeft = counterService.decrement(taskExecution.getParentId());
 
         if (subtasksLeft == 0) {
-            SimpleTaskExecution eachTaskExecution =
-                    SimpleTaskExecution.of(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
+            TaskExecution eachTaskExecution =
+                    new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
-            eachTaskExecution.setEndTime(new Date());
-            eachTaskExecution.setExecutionTime(eachTaskExecution.getEndTime().getTime()
-                    - eachTaskExecution.getStartTime().getTime());
+            eachTaskExecution.setEndTime(LocalDateTime.now());
+            eachTaskExecution.setExecutionTime(LocalDateTimeUtils.getTime(eachTaskExecution.getEndTime())
+                    - LocalDateTimeUtils.getTime(eachTaskExecution.getStartTime()));
 
             taskCompletionHandler.handle(eachTaskExecution);
             counterService.delete(taskExecution.getParentId());

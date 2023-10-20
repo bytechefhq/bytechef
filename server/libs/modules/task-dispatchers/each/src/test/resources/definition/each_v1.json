@@ -1,0 +1,35 @@
+{
+  "display": {
+    "description": "Iterates over each item in `list`, in parallel. Note, that since it iterates over each item in parallel, there is no guarantee of completion order.",
+    "label": "Each"
+  },
+  "name": "each",
+    "inputs": [
+      {
+        "description": "List of items to iterate over.",
+        "label": "List of items",
+        "name": "list",
+        "type": "ARRAY",
+        "items": [
+          {
+            "type": "ANY"
+          }
+        ]
+      },
+      {
+        "description": "The name of the item variable.",
+        "label": "Item Var",
+        "name": "itemVar",
+        "type": "STRING",
+        "defaultValue": "item"
+      },
+      {
+        "description": "The name of the index variable.",
+        "label": "Item Index",
+        "name": "itemIndex",
+        "type": "STRING",
+        "defaultValue": "itemIndex"
+      }
+  ],
+  "version": 1
+}
