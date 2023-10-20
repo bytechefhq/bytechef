@@ -20,10 +20,8 @@ package com.bytechef.hermes.coordinator.config;
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.hermes.coordinator.TriggerCoordinator;
 import com.bytechef.hermes.coordinator.config.TriggerCoordinatorProperties.TriggerCoordinatorSubscriptions;
-import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.hermes.execution.message.broker.TriggerMessageRoute;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.context.ApplicationContext;
+import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,23 +30,12 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnEnabled("coordinator")
-public class TriggerCoordinatorMessageBrokerConfiguration {
-
-    private final ApplicationContext applicationContext;
-    private final TriggerCoordinatorProperties triggerCoordinatorProperties;
-
-    @SuppressFBWarnings("EI")
-    public TriggerCoordinatorMessageBrokerConfiguration(
-        ApplicationContext applicationContext, TriggerCoordinatorProperties triggerCoordinatorProperties) {
-
-        this.applicationContext = applicationContext;
-        this.triggerCoordinatorProperties = triggerCoordinatorProperties;
-    }
+public class TriggerCoordinatorMessageBrokerConfigurerConfiguration {
 
     @Bean
-    MessageBrokerConfigurer<?> triggerCoordinatorMessageBrokerConfigurer() {
+    MessageBrokerConfigurer<?> triggerCoordinatorMessageBrokerConfigurer(
+        TriggerCoordinator triggerCoordinator, TriggerCoordinatorProperties triggerCoordinatorProperties) {
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            TriggerCoordinator triggerCoordinator = applicationContext.getBean(TriggerCoordinator.class);
             TriggerCoordinatorSubscriptions subscriptions = triggerCoordinatorProperties.getSubscriptions();
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(

@@ -22,8 +22,6 @@ import com.bytechef.atlas.coordinator.config.TaskCoordinatorProperties.TaskCoord
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,23 +30,13 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnEnabled("coordinator")
-public class TaskCoordinatorMessageBrokerConfiguration {
-
-    private final ApplicationContext applicationContext;
-    private final TaskCoordinatorProperties taskCoordinatorProperties;
-
-    @SuppressFBWarnings("EI2")
-    public TaskCoordinatorMessageBrokerConfiguration(
-        ApplicationContext applicationContext, TaskCoordinatorProperties taskCoordinatorProperties) {
-
-        this.applicationContext = applicationContext;
-        this.taskCoordinatorProperties = taskCoordinatorProperties;
-    }
+public class TaskCoordinatorMessageBrokerConfigurerConfiguration {
 
     @Bean
-    MessageBrokerConfigurer<?> taskCoordinatorMessageBrokerConfigurer() {
+    MessageBrokerConfigurer<?> taskCoordinatorMessageBrokerConfigurer(
+        TaskCoordinator taskCoordinator, TaskCoordinatorProperties taskCoordinatorProperties) {
+
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            TaskCoordinator taskCoordinator = applicationContext.getBean(TaskCoordinator.class);
             TaskCoordinatorSubscriptions subscriptions = taskCoordinatorProperties.getSubscriptions();
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(

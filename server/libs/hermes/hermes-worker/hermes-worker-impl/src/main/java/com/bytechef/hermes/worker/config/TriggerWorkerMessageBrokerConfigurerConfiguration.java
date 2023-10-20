@@ -22,8 +22,6 @@ import com.bytechef.hermes.worker.TriggerWorker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.hermes.execution.message.broker.TriggerMessageRoute;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,20 +30,11 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnEnabled("worker")
-public class TriggerWorkerMessageBrokerConfiguration {
-
-    private final ApplicationContext applicationContext;
-
-    @SuppressFBWarnings("EI")
-    public TriggerWorkerMessageBrokerConfiguration(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
+public class TriggerWorkerMessageBrokerConfigurerConfiguration {
 
     @Bean
-    MessageBrokerConfigurer<?> triggerWorkerMessageBrokerConfigurer() {
+    MessageBrokerConfigurer<?> triggerWorkerMessageBrokerConfigurer(TriggerWorker triggerWorker) {
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            TriggerWorker triggerWorker = applicationContext.getBean(TriggerWorker.class);
-
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, TriggerMessageRoute.TRIGGERS, 1, triggerWorker, "handle");
 

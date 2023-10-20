@@ -21,8 +21,6 @@ import com.bytechef.event.listener.EventListener;
 import com.bytechef.event.listener.config.EventListenerProperties.EventListenerSubscriptions;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,24 +28,13 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-public class EventListenerMessageBrokerConfiguration {
-
-    private final ApplicationContext applicationContext;
-    private final EventListenerProperties eventListenerProperties;
-
-    @SuppressFBWarnings("EI")
-    public EventListenerMessageBrokerConfiguration(
-        ApplicationContext applicationContext, EventListenerProperties eventListenerProperties) {
-
-        this.applicationContext = applicationContext;
-        this.eventListenerProperties = eventListenerProperties;
-    }
+public class EventListenerMessageBrokerConfigurerConfiguration {
 
     @Bean
-    MessageBrokerConfigurer<?> eventListenerMessageBrokerConfigurer() {
-        return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            EventListener eventListener = applicationContext.getBean(EventListener.class);
+    MessageBrokerConfigurer<?> eventListenerMessageBrokerConfigurer(
+        EventListener eventListener, EventListenerProperties eventListenerProperties) {
 
+        return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
             EventListenerSubscriptions eventListenerSubscriptions = eventListenerProperties.getSubscriptions();
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(

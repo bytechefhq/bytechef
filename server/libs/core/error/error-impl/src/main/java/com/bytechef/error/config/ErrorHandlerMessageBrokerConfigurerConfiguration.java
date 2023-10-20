@@ -20,9 +20,7 @@ package com.bytechef.error.config;
 import com.bytechef.error.ErrorHandler;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,24 +29,13 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @EnableConfigurationProperties(ErrorHandlerProperties.class)
-public class ErrorHandlerMessageBrokerConfiguration {
-
-    private final ApplicationContext applicationContext;
-    private final ErrorHandlerProperties errorHandlerProperties;
-
-    @SuppressFBWarnings("EI")
-    public ErrorHandlerMessageBrokerConfiguration(
-        ApplicationContext applicationContext, ErrorHandlerProperties errorHandlerProperties) {
-
-        this.applicationContext = applicationContext;
-        this.errorHandlerProperties = errorHandlerProperties;
-    }
+public class ErrorHandlerMessageBrokerConfigurerConfiguration {
 
     @Bean
-    MessageBrokerConfigurer<?> errorHandlerMessageBrokerConfigurer() {
-        return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            ErrorHandler<?> errorHandler = applicationContext.getBean(ErrorHandler.class);
+    MessageBrokerConfigurer<?> errorHandlerMessageBrokerConfigurer(
+        ErrorHandler<?> errorHandler, ErrorHandlerProperties errorHandlerProperties) {
 
+        return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
             ErrorHandlerProperties.ErrorHandlerSubscriptions subscriptions = errorHandlerProperties.getSubscriptions();
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
