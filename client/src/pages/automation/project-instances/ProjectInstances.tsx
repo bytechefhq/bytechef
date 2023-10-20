@@ -1,19 +1,19 @@
+import EmptyList from '@/components/EmptyList/EmptyList';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {
     useGetProjectInstanceTagsQuery,
     useGetProjectsQuery,
 } from '@/queries/projects.queries';
 import {TagIcon} from '@heroicons/react/20/solid';
+import {FolderPlusIcon} from '@heroicons/react/24/outline';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
+import {twMerge} from 'tailwind-merge';
 
 import LayoutContainer from '../../../layouts/LayoutContainer';
 import PageHeader from '../../../layouts/PageHeader';
 import ProjectInstanceDialog from './ProjectInstanceDialog';
 import ProjectInstanceList from './ProjectInstanceList';
-import EmptyList from "@/components/EmptyList/EmptyList";
-import { FolderPlusIcon } from "@heroicons/react/24/outline";
-import { twMerge } from "tailwind-merge";
 
 export enum Type {
     Project,
@@ -152,10 +152,29 @@ const ProjectInstances = () => {
                 />
             }
         >
-            <div className="w-full">
-                {projects?.map((project) => (
-                    <ProjectInstanceList key={project.id} project={project} />
-                ))}
+            <div
+                className={twMerge(
+                    'w-full px-2 2xl:mx-auto 2xl:w-4/5',
+                    projects?.length === 0 ? 'place-self-center' : ''
+                )}
+            >
+                {!projectsLoading && projects?.length === 0 ? (
+                    <EmptyList
+                        button={<ProjectInstanceDialog />}
+                        icon={
+                            <FolderPlusIcon className="h-12 w-12 text-gray-400" />
+                        }
+                        message="Get started by creating a new project instance."
+                        title="No instances of projects"
+                    />
+                ) : (
+                    projects?.map((project) => (
+                        <ProjectInstanceList
+                            key={project.id}
+                            project={project}
+                        />
+                    ))
+                )}
             </div>
         </LayoutContainer>
     );
