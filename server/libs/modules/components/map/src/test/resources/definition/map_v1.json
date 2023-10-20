@@ -1,35 +1,29 @@
 {
-  "actions": [
-    {
-      "name": "map",
-      "properties": [
-        {
-          "description": "List of items to iterate over.",
-          "label": "List of items",
-          "name": "list",
-          "type": "ARRAY",
-          "controlType": "JSON_BUILDER",
-          "multipleValues": true
-        },
-        {
-          "description": "The name of the item variable.",
-          "label": "Item Var",
-          "name": "itemVar",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT",
-          "defaultValue": "item"
-        },
-        {
-          "description": "The name of the index variable.",
-          "label": "Item Index",
-          "name": "itemIndex",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT",
-          "defaultValue": "itemIndex"
-        }
-      ]
-    }
-  ],
+  "actions": [ {
+    "name": "map",
+    "properties": [ {
+      "description": "List of items to iterate over.",
+      "label": "List of items",
+      "name": "list",
+      "type": "ARRAY",
+      "controlType": "JSON_BUILDER",
+      "multipleValues": true
+    }, {
+      "description": "The name of the item variable.",
+      "label": "Item Var",
+      "name": "itemVar",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT",
+      "defaultValue": "item"
+    }, {
+      "description": "The name of the index variable.",
+      "label": "Item Index",
+      "name": "itemIndex",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT",
+      "defaultValue": "itemIndex"
+    } ]
+  } ],
   "display": {
     "description": "Produces a new collection of values by mapping each value in `list` through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source `list`.",
     "label": "Map"

@@ -1,512 +1,395 @@
 {
-  "actions": [
-    {
-      "display": {
-        "description": "Execute an SQL query.",
-        "label": "Query"
-      },
+  "actions": [ {
+    "display": {
+      "description": "Execute an SQL query.",
+      "label": "Query"
+    },
+    "name": "query",
+    "outputSchema": [ {
+      "type": "ARRAY",
+      "items": [ {
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      } ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    } ],
+    "properties": [ {
+      "description": "The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters.",
+      "label": "Query",
+      "placeholder": "SELECT id, name FROM customer WHERE age > :age AND height <= :height",
+      "required": true,
       "name": "query",
-      "outputSchema": [
-        {
-          "type": "ARRAY",
-          "items": [
-            {
-              "type": "OBJECT",
-              "multipleValues": true,
-              "properties": [
-                {
-                  "type": "INTEGER",
-                  "controlType": "INPUT_INTEGER"
-                }
-              ],
-              "controlType": "JSON_BUILDER"
-            }
-          ],
-          "multipleValues": true,
-          "controlType": "JSON_BUILDER"
-        }
-      ],
-      "properties": [
-        {
-          "description": "The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters.",
-          "label": "Query",
-          "placeholder": "SELECT id, name FROM customer WHERE age > :age AND height <= :height",
-          "required": true,
-          "name": "query",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        },
-        {
-          "description": "The list of properties which should be used as query parameters.",
-          "label": "Parameters",
-          "name": "parameters",
-          "type": "OBJECT",
-          "multipleValues": true,
-          "properties": [
-            {
-              "type": "BOOLEAN",
-              "controlType": "CHECKBOX"
-            },
-            {
-              "type": "DATE_TIME",
-              "controlType": "DATE_TIME"
-            },
-            {
-              "type": "NUMBER",
-              "controlType": "INPUT_NUMBER"
-            },
-            {
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            }
-          ],
-          "controlType": "JSON_BUILDER"
-        }
-      ]
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "description": "The list of properties which should be used as query parameters.",
+      "label": "Parameters",
+      "name": "parameters",
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "type": "NUMBER",
+        "controlType": "INPUT_NUMBER"
+      }, {
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ]
+  }, {
+    "display": {
+      "description": "Insert rows in database.",
+      "label": "Insert"
     },
-    {
-      "display": {
-        "description": "Insert rows in database.",
-        "label": "Insert"
-      },
-      "name": "insert",
-      "outputSchema": [
-        {
-          "type": "OBJECT",
-          "multipleValues": true,
-          "properties": [
-            {
-              "type": "INTEGER",
-              "controlType": "INPUT_INTEGER"
-            }
-          ],
-          "controlType": "JSON_BUILDER"
-        }
-      ],
-      "properties": [
-        {
-          "description": "Name of the schema the table belongs to.",
-          "label": "Schema",
-          "required": true,
-          "name": "schema",
-          "type": "STRING",
-          "defaultValue": "public",
-          "controlType": "INPUT_TEXT"
-        },
-        {
-          "description": "Name of the table in which to insert data to.",
-          "label": "Table",
-          "required": true,
-          "name": "table",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        },
-        {
-          "description": "The list of the properties which should used as columns for the new rows.",
-          "label": "Columns",
-          "name": "columns",
-          "type": "ARRAY",
-          "items": [
-            {
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            }
-          ],
-          "multipleValues": true,
-          "controlType": "JSON_BUILDER"
-        },
-        {
-          "description": "List of rows.",
-          "label": "Rows",
-          "name": "rows",
-          "type": "ARRAY",
-          "items": [
-            {
-              "type": "OBJECT",
-              "additionalProperties": [
-                {
-                  "type": "ONE_OF",
-                  "types": [
-                    {
-                      "type": "ARRAY",
-                      "multipleValues": true,
-                      "controlType": "JSON_BUILDER"
-                    },
-                    {
-                      "type": "BOOLEAN",
-                      "controlType": "CHECKBOX"
-                    },
-                    {
-                      "type": "DATE",
-                      "controlType": "DATE"
-                    },
-                    {
-                      "type": "DATE_TIME",
-                      "controlType": "DATE_TIME"
-                    },
-                    {
-                      "type": "INTEGER",
-                      "controlType": "INPUT_INTEGER"
-                    },
-                    {
-                      "type": "NUMBER",
-                      "controlType": "INPUT_NUMBER"
-                    },
-                    {
-                      "type": "OBJECT",
-                      "multipleValues": true,
-                      "controlType": "JSON_BUILDER"
-                    },
-                    {
-                      "type": "STRING",
-                      "controlType": "INPUT_TEXT"
-                    }
-                  ]
-                }
-              ],
-              "multipleValues": true,
-              "controlType": "JSON_BUILDER"
-            }
-          ],
-          "multipleValues": true,
-          "controlType": "JSON_BUILDER"
-        }
-      ]
+    "name": "insert",
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "properties": [ {
+      "description": "Name of the schema the table belongs to.",
+      "label": "Schema",
+      "required": true,
+      "name": "schema",
+      "type": "STRING",
+      "defaultValue": "public",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "description": "Name of the table in which to insert data to.",
+      "label": "Table",
+      "required": true,
+      "name": "table",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "description": "The list of the properties which should used as columns for the new rows.",
+      "label": "Columns",
+      "name": "columns",
+      "type": "ARRAY",
+      "items": [ {
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    }, {
+      "description": "List of rows.",
+      "label": "Rows",
+      "name": "rows",
+      "type": "ARRAY",
+      "items": [ {
+        "type": "OBJECT",
+        "additionalProperties": [ {
+          "type": "ONE_OF",
+          "types": [ {
+            "type": "ARRAY",
+            "multipleValues": true,
+            "controlType": "JSON_BUILDER"
+          }, {
+            "type": "BOOLEAN",
+            "controlType": "CHECKBOX"
+          }, {
+            "type": "DATE",
+            "controlType": "DATE"
+          }, {
+            "type": "DATE_TIME",
+            "controlType": "DATE_TIME"
+          }, {
+            "type": "INTEGER",
+            "controlType": "INPUT_INTEGER"
+          }, {
+            "type": "NUMBER",
+            "controlType": "INPUT_NUMBER"
+          }, {
+            "type": "OBJECT",
+            "multipleValues": true,
+            "controlType": "JSON_BUILDER"
+          }, {
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          } ]
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      } ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    } ]
+  }, {
+    "display": {
+      "description": "Update rows in database.",
+      "label": "Update"
     },
-    {
-      "display": {
-        "description": "Update rows in database.",
-        "label": "Update"
-      },
-      "name": "update",
-      "outputSchema": [
-        {
-          "type": "OBJECT",
-          "multipleValues": true,
-          "properties": [
-            {
-              "type": "INTEGER",
-              "controlType": "INPUT_INTEGER"
-            }
-          ],
-          "controlType": "JSON_BUILDER"
-        }
-      ],
-      "properties": [
-        {
-          "description": "Name of the schema the table belongs to.",
-          "label": "Schema",
-          "required": true,
-          "name": "schema",
-          "type": "STRING",
-          "defaultValue": "public",
-          "controlType": "INPUT_TEXT"
-        },
-        {
-          "description": "Name of the table in which to update data in.",
-          "label": "Table",
-          "required": true,
-          "name": "table",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        },
-        {
-          "description": "The list of the properties which should used as columns for the updated rows.",
-          "label": "Columns",
-          "name": "columns",
-          "type": "ARRAY",
-          "items": [
-            {
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            }
-          ],
-          "multipleValues": true,
-          "controlType": "JSON_BUILDER"
-        },
-        {
-          "description": "The name of the property which decides which rows in the database should be updated.",
-          "label": "Update Key",
-          "placeholder": "id",
-          "name": "updateKey",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        },
-        {
-          "description": "List of rows.",
-          "label": "Rows",
-          "name": "rows",
-          "type": "ARRAY",
-          "items": [
-            {
-              "type": "OBJECT",
-              "additionalProperties": [
-                {
-                  "type": "ONE_OF",
-                  "types": [
-                    {
-                      "type": "ARRAY",
-                      "multipleValues": true,
-                      "controlType": "JSON_BUILDER"
-                    },
-                    {
-                      "type": "BOOLEAN",
-                      "controlType": "CHECKBOX"
-                    },
-                    {
-                      "type": "DATE",
-                      "controlType": "DATE"
-                    },
-                    {
-                      "type": "DATE_TIME",
-                      "controlType": "DATE_TIME"
-                    },
-                    {
-                      "type": "INTEGER",
-                      "controlType": "INPUT_INTEGER"
-                    },
-                    {
-                      "type": "NUMBER",
-                      "controlType": "INPUT_NUMBER"
-                    },
-                    {
-                      "type": "OBJECT",
-                      "multipleValues": true,
-                      "controlType": "JSON_BUILDER"
-                    },
-                    {
-                      "type": "STRING",
-                      "controlType": "INPUT_TEXT"
-                    }
-                  ]
-                }
-              ],
-              "multipleValues": true,
-              "controlType": "JSON_BUILDER"
-            }
-          ],
-          "multipleValues": true,
-          "controlType": "JSON_BUILDER"
-        }
-      ]
+    "name": "update",
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "properties": [ {
+      "description": "Name of the schema the table belongs to.",
+      "label": "Schema",
+      "required": true,
+      "name": "schema",
+      "type": "STRING",
+      "defaultValue": "public",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "description": "Name of the table in which to update data in.",
+      "label": "Table",
+      "required": true,
+      "name": "table",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "description": "The list of the properties which should used as columns for the updated rows.",
+      "label": "Columns",
+      "name": "columns",
+      "type": "ARRAY",
+      "items": [ {
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    }, {
+      "description": "The name of the property which decides which rows in the database should be updated.",
+      "label": "Update Key",
+      "placeholder": "id",
+      "name": "updateKey",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "description": "List of rows.",
+      "label": "Rows",
+      "name": "rows",
+      "type": "ARRAY",
+      "items": [ {
+        "type": "OBJECT",
+        "additionalProperties": [ {
+          "type": "ONE_OF",
+          "types": [ {
+            "type": "ARRAY",
+            "multipleValues": true,
+            "controlType": "JSON_BUILDER"
+          }, {
+            "type": "BOOLEAN",
+            "controlType": "CHECKBOX"
+          }, {
+            "type": "DATE",
+            "controlType": "DATE"
+          }, {
+            "type": "DATE_TIME",
+            "controlType": "DATE_TIME"
+          }, {
+            "type": "INTEGER",
+            "controlType": "INPUT_INTEGER"
+          }, {
+            "type": "NUMBER",
+            "controlType": "INPUT_NUMBER"
+          }, {
+            "type": "OBJECT",
+            "multipleValues": true,
+            "controlType": "JSON_BUILDER"
+          }, {
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          } ]
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      } ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    } ]
+  }, {
+    "display": {
+      "description": "Delete rows from database.",
+      "label": "Delete"
     },
-    {
-      "display": {
-        "description": "Delete rows from database.",
-        "label": "Delete"
-      },
-      "name": "delete",
-      "outputSchema": [
-        {
-          "type": "OBJECT",
-          "multipleValues": true,
-          "properties": [
-            {
-              "type": "INTEGER",
-              "controlType": "INPUT_INTEGER"
-            }
-          ],
-          "controlType": "JSON_BUILDER"
-        }
-      ],
-      "properties": [
-        {
-          "description": "Name of the schema the table belongs to.",
-          "label": "Schema",
-          "required": true,
-          "name": "schema",
-          "type": "STRING",
-          "defaultValue": "public",
-          "controlType": "INPUT_TEXT"
-        },
-        {
-          "description": "Name of the table in which to update data in.",
-          "label": "Table",
-          "required": true,
-          "name": "table",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        },
-        {
-          "description": "Name of the property which decides which rows in the database should be deleted.",
-          "label": "Update Key",
-          "placeholder": "id",
-          "name": "deleteKey",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        },
-        {
-          "description": "List of rows.",
-          "label": "Rows",
-          "name": "rows",
-          "type": "ARRAY",
-          "items": [
-            {
-              "type": "OBJECT",
-              "additionalProperties": [
-                {
-                  "type": "ONE_OF",
-                  "types": [
-                    {
-                      "type": "ARRAY",
-                      "multipleValues": true,
-                      "controlType": "JSON_BUILDER"
-                    },
-                    {
-                      "type": "BOOLEAN",
-                      "controlType": "CHECKBOX"
-                    },
-                    {
-                      "type": "DATE",
-                      "controlType": "DATE"
-                    },
-                    {
-                      "type": "DATE_TIME",
-                      "controlType": "DATE_TIME"
-                    },
-                    {
-                      "type": "INTEGER",
-                      "controlType": "INPUT_INTEGER"
-                    },
-                    {
-                      "type": "NUMBER",
-                      "controlType": "INPUT_NUMBER"
-                    },
-                    {
-                      "type": "OBJECT",
-                      "multipleValues": true,
-                      "controlType": "JSON_BUILDER"
-                    },
-                    {
-                      "type": "STRING",
-                      "controlType": "INPUT_TEXT"
-                    }
-                  ]
-                }
-              ],
-              "multipleValues": true,
-              "controlType": "JSON_BUILDER"
-            }
-          ],
-          "multipleValues": true,
-          "controlType": "JSON_BUILDER"
-        }
-      ]
+    "name": "delete",
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "properties": [ {
+      "description": "Name of the schema the table belongs to.",
+      "label": "Schema",
+      "required": true,
+      "name": "schema",
+      "type": "STRING",
+      "defaultValue": "public",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "description": "Name of the table in which to update data in.",
+      "label": "Table",
+      "required": true,
+      "name": "table",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "description": "Name of the property which decides which rows in the database should be deleted.",
+      "label": "Update Key",
+      "placeholder": "id",
+      "name": "deleteKey",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "description": "List of rows.",
+      "label": "Rows",
+      "name": "rows",
+      "type": "ARRAY",
+      "items": [ {
+        "type": "OBJECT",
+        "additionalProperties": [ {
+          "type": "ONE_OF",
+          "types": [ {
+            "type": "ARRAY",
+            "multipleValues": true,
+            "controlType": "JSON_BUILDER"
+          }, {
+            "type": "BOOLEAN",
+            "controlType": "CHECKBOX"
+          }, {
+            "type": "DATE",
+            "controlType": "DATE"
+          }, {
+            "type": "DATE_TIME",
+            "controlType": "DATE_TIME"
+          }, {
+            "type": "INTEGER",
+            "controlType": "INPUT_INTEGER"
+          }, {
+            "type": "NUMBER",
+            "controlType": "INPUT_NUMBER"
+          }, {
+            "type": "OBJECT",
+            "multipleValues": true,
+            "controlType": "JSON_BUILDER"
+          }, {
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          } ]
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      } ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    } ]
+  }, {
+    "display": {
+      "description": "Execute an SQL DML or DML statement.",
+      "label": "Execute"
     },
-    {
-      "display": {
-        "description": "Execute an SQL DML or DML statement.",
-        "label": "Execute"
-      },
+    "name": "execute",
+    "outputSchema": [ {
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "properties": [ {
+      "description": "The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters.",
+      "label": "Execute",
+      "placeholder": "UPDATE TABLE product set name = :name WHERE product > :product AND price <= :price",
+      "required": true,
       "name": "execute",
-      "outputSchema": [
-        {
-          "type": "OBJECT",
-          "multipleValues": true,
-          "properties": [
-            {
-              "type": "INTEGER",
-              "controlType": "INPUT_INTEGER"
-            }
-          ],
-          "controlType": "JSON_BUILDER"
-        }
-      ],
-      "properties": [
-        {
-          "description": "The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters.",
-          "label": "Execute",
-          "placeholder": "UPDATE TABLE product set name = :name WHERE product > :product AND price <= :price",
-          "required": true,
-          "name": "execute",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        },
-        {
-          "description": "List of rows.",
-          "label": "Rows",
-          "name": "rows",
-          "type": "ARRAY",
-          "items": [
-            {
-              "type": "OBJECT",
-              "additionalProperties": [
-                {
-                  "type": "ONE_OF",
-                  "types": [
-                    {
-                      "type": "ARRAY",
-                      "multipleValues": true,
-                      "controlType": "JSON_BUILDER"
-                    },
-                    {
-                      "type": "BOOLEAN",
-                      "controlType": "CHECKBOX"
-                    },
-                    {
-                      "type": "DATE",
-                      "controlType": "DATE"
-                    },
-                    {
-                      "type": "DATE_TIME",
-                      "controlType": "DATE_TIME"
-                    },
-                    {
-                      "type": "INTEGER",
-                      "controlType": "INPUT_INTEGER"
-                    },
-                    {
-                      "type": "NUMBER",
-                      "controlType": "INPUT_NUMBER"
-                    },
-                    {
-                      "type": "OBJECT",
-                      "multipleValues": true,
-                      "controlType": "JSON_BUILDER"
-                    },
-                    {
-                      "type": "STRING",
-                      "controlType": "INPUT_TEXT"
-                    }
-                  ]
-                }
-              ],
-              "multipleValues": true,
-              "controlType": "JSON_BUILDER"
-            }
-          ],
-          "multipleValues": true,
-          "controlType": "JSON_BUILDER"
-        },
-        {
-          "description": "The list of properties which should be used as parameters.",
-          "label": "Parameters",
-          "name": "parameters",
-          "type": "OBJECT",
-          "multipleValues": true,
-          "properties": [
-            {
-              "type": "BOOLEAN",
-              "controlType": "CHECKBOX"
-            },
-            {
-              "type": "DATE_TIME",
-              "controlType": "DATE_TIME"
-            },
-            {
-              "type": "NUMBER",
-              "controlType": "INPUT_NUMBER"
-            },
-            {
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            }
-          ],
-          "controlType": "JSON_BUILDER"
-        }
-      ]
-    }
-  ],
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "description": "List of rows.",
+      "label": "Rows",
+      "name": "rows",
+      "type": "ARRAY",
+      "items": [ {
+        "type": "OBJECT",
+        "additionalProperties": [ {
+          "type": "ONE_OF",
+          "types": [ {
+            "type": "ARRAY",
+            "multipleValues": true,
+            "controlType": "JSON_BUILDER"
+          }, {
+            "type": "BOOLEAN",
+            "controlType": "CHECKBOX"
+          }, {
+            "type": "DATE",
+            "controlType": "DATE"
+          }, {
+            "type": "DATE_TIME",
+            "controlType": "DATE_TIME"
+          }, {
+            "type": "INTEGER",
+            "controlType": "INPUT_INTEGER"
+          }, {
+            "type": "NUMBER",
+            "controlType": "INPUT_NUMBER"
+          }, {
+            "type": "OBJECT",
+            "multipleValues": true,
+            "controlType": "JSON_BUILDER"
+          }, {
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          } ]
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      } ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
+    }, {
+      "description": "The list of properties which should be used as parameters.",
+      "label": "Parameters",
+      "name": "parameters",
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "type": "DATE_TIME",
+        "controlType": "DATE_TIME"
+      }, {
+        "type": "NUMBER",
+        "controlType": "INPUT_NUMBER"
+      }, {
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ]
+  } ],
   "connection": {
     "authorizationRequired": false,
     "componentDisplay": {
@@ -514,43 +397,38 @@
       "label": "MySQL"
     },
     "componentName": "mysql",
-    "properties": [
-      {
-        "label": "Host",
-        "required": true,
-        "name": "host",
-        "type": "STRING",
-        "controlType": "INPUT_TEXT"
-      },
-      {
-        "label": "Port",
-        "required": true,
-        "name": "port",
-        "type": "INTEGER",
-        "controlType": "INPUT_INTEGER"
-      },
-      {
-        "label": "Database",
-        "required": true,
-        "name": "database",
-        "type": "STRING",
-        "controlType": "INPUT_TEXT"
-      },
-      {
-        "label": "Username",
-        "required": true,
-        "name": "username",
-        "type": "STRING",
-        "controlType": "INPUT_TEXT"
-      },
-      {
-        "label": "Password",
-        "required": true,
-        "name": "password",
-        "type": "STRING",
-        "controlType": "INPUT_PASSWORD"
-      }
-    ]
+    "connectionVersion": 1,
+    "properties": [ {
+      "label": "Host",
+      "required": true,
+      "name": "host",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "label": "Port",
+      "required": true,
+      "name": "port",
+      "type": "INTEGER",
+      "controlType": "INPUT_INTEGER"
+    }, {
+      "label": "Database",
+      "required": true,
+      "name": "database",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "label": "Username",
+      "required": true,
+      "name": "username",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "label": "Password",
+      "required": true,
+      "name": "password",
+      "type": "STRING",
+      "controlType": "INPUT_PASSWORD"
+    } ]
   },
   "display": {
     "description": "Query, insert nd update data from MySQL.",

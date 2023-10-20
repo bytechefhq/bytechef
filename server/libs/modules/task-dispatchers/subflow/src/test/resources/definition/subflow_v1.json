@@ -4,14 +4,12 @@
     "label": "Subflow"
   },
   "name": "subflow",
-  "properties": [
-    {
-      "description": "The id of sub-workflow to execute.",
-      "label": "Workflow Id",
-      "name": "workflowId",
-      "type": "STRING",
-      "controlType": "INPUT_TEXT"
-    }
-  ],
+  "properties": [ {
+    "description": "The id of sub-workflow to execute.",
+    "label": "Workflow Id",
+    "name": "workflowId",
+    "type": "STRING",
+    "controlType": "INPUT_TEXT"
+  } ],
   "version": 1
 }

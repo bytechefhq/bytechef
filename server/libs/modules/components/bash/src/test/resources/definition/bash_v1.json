@@ -1,29 +1,23 @@
 {
-  "actions": [
-    {
-      "display": {
-        "description": "Executes the script.",
-        "label": "Execute"
-      },
-      "name": "execute",
-      "outputSchema": [
-        {
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        }
-      ],
-      "properties": [
-        {
-          "description": "Script written in bash.",
-          "label": "Script",
-          "required": true,
-          "name": "script",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        }
-      ]
-    }
-  ],
+  "actions": [ {
+    "display": {
+      "description": "Executes the script.",
+      "label": "Execute"
+    },
+    "name": "execute",
+    "outputSchema": [ {
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ],
+    "properties": [ {
+      "description": "Script written in bash.",
+      "label": "Script",
+      "required": true,
+      "name": "script",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ]
+  } ],
   "display": {
     "description": "Allows you to run arbitrary Bash scripts.",
     "label": "Bash"

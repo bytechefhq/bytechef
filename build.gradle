@@ -123,6 +123,10 @@ subprojects {
             target "**/*.yaml"
             jackson()
         }
+        json {
+            target "**/*.json"
+            jackson()
+        }
     }
 
     check.dependsOn 'spotlessCheck'

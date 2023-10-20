@@ -5,30 +5,24 @@
   },
   "name": "fork-join",
   "version": 1,
-  "taskProperties": [
-    {
-      "description": "The list of sequences of tasks to execute in parallel.",
-      "name": "branches",
+  "taskProperties": [ {
+    "description": "The list of sequences of tasks to execute in parallel.",
+    "name": "branches",
+    "type": "ARRAY",
+    "items": [ {
+      "description": "The list of tasks that executes sequentially.",
       "type": "ARRAY",
-      "items": [
-        {
-          "description": "The list of tasks that executes sequentially.",
-          "type": "ARRAY",
-          "items": [
-            {
-              "description": "The task or task dispatcher to use.",
-              "type": "OBJECT",
-              "multipleValues": true,
-              "objectType": "TASK",
-              "controlType": "INPUT_TEXT"
-            }
-          ],
-          "multipleValues": true,
-          "controlType": "JSON_BUILDER"
-        }
-      ],
+      "items": [ {
+        "description": "The task or task dispatcher to use.",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "objectType": "TASK",
+        "controlType": "INPUT_TEXT"
+      } ],
       "multipleValues": true,
       "controlType": "JSON_BUILDER"
-    }
-  ]
+    } ],
+    "multipleValues": true,
+    "controlType": "JSON_BUILDER"
+  } ]
 }

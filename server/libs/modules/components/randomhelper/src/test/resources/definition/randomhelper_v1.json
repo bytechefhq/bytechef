@@ -1,38 +1,32 @@
 {
-  "actions": [
-    {
-      "display": {
-        "description": "Generates a random integer value.",
-        "label": "Int"
-      },
-      "name": "randomInt",
-      "properties": [
-        {
-          "description": "The minimum possible generated value.",
-          "required": true,
-          "name": "startInclusive",
-          "type": "INTEGER",
-          "controlType": "INPUT_INTEGER",
-          "defaultValue": 0
-        },
-        {
-          "description": "The maximum possible generated value.",
-          "required": true,
-          "name": "endInclusive",
-          "type": "INTEGER",
-          "controlType": "INPUT_INTEGER",
-          "defaultValue": 100
-        }
-      ]
+  "actions": [ {
+    "display": {
+      "description": "Generates a random integer value.",
+      "label": "Int"
     },
-    {
-      "display": {
-        "description": "Generates a random float value.",
-        "label": "Float"
-      },
-      "name": "randomFloat"
-    }
-  ],
+    "name": "randomInt",
+    "properties": [ {
+      "description": "The minimum possible generated value.",
+      "required": true,
+      "name": "startInclusive",
+      "type": "INTEGER",
+      "controlType": "INPUT_INTEGER",
+      "defaultValue": 0
+    }, {
+      "description": "The maximum possible generated value.",
+      "required": true,
+      "name": "endInclusive",
+      "type": "INTEGER",
+      "controlType": "INPUT_INTEGER",
+      "defaultValue": 100
+    } ]
+  }, {
+    "display": {
+      "description": "Generates a random float value.",
+      "label": "Float"
+    },
+    "name": "randomFloat"
+  } ],
   "display": {
     "description": "The Random Helper allows you to generate random values.",
     "label": "Random Helper"

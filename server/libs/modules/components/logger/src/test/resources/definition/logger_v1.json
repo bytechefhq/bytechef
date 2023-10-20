@@ -1,58 +1,45 @@
 {
-  "actions": [
-    {
-      "display": {
-        "label": "Debug"
-      },
-      "name": "debug",
-      "properties": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        }
-      ]
+  "actions": [ {
+    "display": {
+      "label": "Debug"
     },
-    {
-      "display": {
-        "label": "Error"
-      },
-      "name": "error",
-      "properties": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        }
-      ]
+    "name": "debug",
+    "properties": [ {
+      "name": "text",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ]
+  }, {
+    "display": {
+      "label": "Error"
     },
-    {
-      "display": {
-        "label": "Info"
-      },
-      "name": "info",
-      "properties": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        }
-      ]
+    "name": "error",
+    "properties": [ {
+      "name": "text",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ]
+  }, {
+    "display": {
+      "label": "Info"
     },
-    {
-      "display": {
-        "label": "Warn"
-      },
-      "name": "warn",
-      "properties": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "controlType": "INPUT_TEXT"
-        }
-      ]
-    }
-  ],
+    "name": "info",
+    "properties": [ {
+      "name": "text",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ]
+  }, {
+    "display": {
+      "label": "Warn"
+    },
+    "name": "warn",
+    "properties": [ {
+      "name": "text",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    } ]
+  } ],
   "display": {
     "description": "Logs a value to the system log.",
     "label": "Logger"

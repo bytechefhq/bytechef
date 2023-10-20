@@ -1,23 +1,19 @@
 {
-  "actions": [
-    {
-      "display": {
-        "label": "Delay"
-      },
-      "name": "delay",
-      "properties": [
-        {
-          "description": "Time in milliseconds.",
-          "label": "Millis",
-          "required": true,
-          "name": "millis",
-          "type": "INTEGER",
-          "controlType": "INPUT_INTEGER",
-          "defaultValue": 1
-        }
-      ]
-    }
-  ],
+  "actions": [ {
+    "display": {
+      "label": "Delay"
+    },
+    "name": "delay",
+    "properties": [ {
+      "description": "Time in milliseconds.",
+      "label": "Millis",
+      "required": true,
+      "name": "millis",
+      "type": "INTEGER",
+      "controlType": "INPUT_INTEGER",
+      "defaultValue": 1
+    } ]
+  } ],
   "display": {
     "description": "Sets a value which can then be referenced in other tasks.",
     "label": "Delay"

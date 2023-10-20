@@ -1,837 +1,711 @@
 {
-  "actions": [
-    {
-      "display": {
-        "description": "Add member to list",
-        "label": "Add a new member to the list."
-      },
-      "exampleOutput": "{ \"id\": \"string\", \"email_address\": \"string\", \"unique_email_id\": \"string\", \"contact_id\": \"string\", \"full_name\": \"string\", \"web_id\": 0, \"email_type\": \"string\", \"status\": \"subscribed\", \"unsubscribe_reason\": \"string\", \"consents_to_one_to_one_messaging\": true, \"merge_fields\": { \"property1\": null, \"property2\": null }, \"interests\": { \"property1\": true, \"property2\": true }, \"stats\": { \"avg_open_rate\": 0, \"avg_click_rate\": 0, \"ecommerce_data\": { \"total_revenue\": 0, \"number_of_orders\": 0, \"currency_code\": \"USD\" } }, \"ip_signup\": \"string\", \"timestamp_signup\": \"2019-08-24T14:15:22Z\", \"ip_opt\": \"string\", \"timestamp_opt\": \"2019-08-24T14:15:22Z\", \"member_rating\": 0, \"last_changed\": \"2019-08-24T14:15:22Z\", \"language\": \"string\", \"vip\": true, \"email_client\": \"string\", \"location\": { \"latitude\": 0, \"longitude\": 0, \"gmtoff\": 0, \"dstoff\": 0, \"country_code\": \"string\", \"timezone\": \"string\", \"region\": \"string\" }, \"marketing_permissions\": [ { \"marketing_permission_id\": \"string\", \"text\": \"string\", \"enabled\": true } ], \"last_note\": { \"note_id\": 0, \"created_at\": \"2019-08-24T14:15:22Z\", \"created_by\": \"string\", \"note\": \"string\" }, \"source\": \"string\", \"tags_count\": 0, \"tags\": [ { \"id\": 0, \"name\": \"string\" } ], \"list_id\": \"string\", \"_links\": [ { \"rel\": \"string\", \"href\": \"string\", \"method\": \"GET\", \"targetSchema\": \"string\", \"schema\": \"string\" } ] }",
+  "actions": [ {
+    "display": {
+      "description": "Add member to list",
+      "label": "Add a new member to the list."
+    },
+    "exampleOutput": "{ \"id\": \"string\", \"email_address\": \"string\", \"unique_email_id\": \"string\", \"contact_id\": \"string\", \"full_name\": \"string\", \"web_id\": 0, \"email_type\": \"string\", \"status\": \"subscribed\", \"unsubscribe_reason\": \"string\", \"consents_to_one_to_one_messaging\": true, \"merge_fields\": { \"property1\": null, \"property2\": null }, \"interests\": { \"property1\": true, \"property2\": true }, \"stats\": { \"avg_open_rate\": 0, \"avg_click_rate\": 0, \"ecommerce_data\": { \"total_revenue\": 0, \"number_of_orders\": 0, \"currency_code\": \"USD\" } }, \"ip_signup\": \"string\", \"timestamp_signup\": \"2019-08-24T14:15:22Z\", \"ip_opt\": \"string\", \"timestamp_opt\": \"2019-08-24T14:15:22Z\", \"member_rating\": 0, \"last_changed\": \"2019-08-24T14:15:22Z\", \"language\": \"string\", \"vip\": true, \"email_client\": \"string\", \"location\": { \"latitude\": 0, \"longitude\": 0, \"gmtoff\": 0, \"dstoff\": 0, \"country_code\": \"string\", \"timezone\": \"string\", \"region\": \"string\" }, \"marketing_permissions\": [ { \"marketing_permission_id\": \"string\", \"text\": \"string\", \"enabled\": true } ], \"last_note\": { \"note_id\": 0, \"created_at\": \"2019-08-24T14:15:22Z\", \"created_by\": \"string\", \"note\": \"string\" }, \"source\": \"string\", \"tags_count\": 0, \"tags\": [ { \"id\": 0, \"name\": \"string\" } ], \"list_id\": \"string\", \"_links\": [ { \"rel\": \"string\", \"href\": \"string\", \"method\": \"GET\", \"targetSchema\": \"string\", \"schema\": \"string\" } ] }",
+    "metadata": {
+      "path": "/lists/{listId}/members",
+      "mimeType": "application/json",
+      "bodyContentType": "JSON",
+      "requestMethod": "POST"
+    },
+    "name": "addMemberToList",
+    "outputSchema": [ {
       "metadata": {
-        "path": "/lists/{listId}/members",
-        "mimeType": "application/json",
-        "bodyContentType": "JSON",
-        "requestMethod": "POST"
+        "responseFormat": "JSON"
       },
-      "name": "addMemberToList",
-      "outputSchema": [
-        {
-          "metadata": {
-            "responseFormat": "JSON"
-          },
-          "type": "OBJECT",
-          "multipleValues": true,
-          "properties": [
-            {
-              "description": "The MD5 hash of the lowercase version of the list member's email address.",
-              "label": "Id",
-              "required": false,
-              "name": "id",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "Email address for a subscriber.",
-              "label": "Email_address",
-              "required": false,
-              "name": "email_address",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "An identifier for the address across all of Mailchimp.",
-              "label": "Unique_email_id",
-              "required": false,
-              "name": "unique_email_id",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "As Mailchimp evolves beyond email, you may eventually have contacts without email addresses. While the id is the MD5 hash of their email address, this contact_id is agnostic of contact’s inclusion of an email address.",
-              "label": "Contact_id",
-              "required": false,
-              "name": "contact_id",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "The contact's full name.",
-              "label": "Full_name",
-              "required": false,
-              "name": "full_name",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "The ID used in the Mailchimp web application. View this member in your Mailchimp account at https://{dc}.admin.mailchimp.com/lists/members/view?id={web_id}.",
-              "label": "Web_id",
-              "required": false,
-              "name": "web_id",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "Type of email this member asked to get ('html' or 'text').",
-              "label": "Email_type",
-              "required": false,
-              "name": "email_type",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "Subscriber's current status.",
-              "label": "Status",
-              "required": false,
-              "name": "status",
-              "type": "STRING",
-              "controlType": "SELECT",
-              "options": [
-                {
-                  "name": "Subscribed",
-                  "value": "subscribed"
-                },
-                {
-                  "name": "Unsubscribed",
-                  "value": "unsubscribed"
-                },
-                {
-                  "name": "Cleaned",
-                  "value": "cleaned"
-                },
-                {
-                  "name": "Pending",
-                  "value": "pending"
-                },
-                {
-                  "name": "Transactional",
-                  "value": "transactional"
-                }
-              ]
-            },
-            {
-              "description": "A subscriber's reason for unsubscribing.",
-              "label": "Unsubscribe_reason",
-              "required": false,
-              "name": "unsubscribe_reason",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "Indicates whether a contact consents to 1:1 messaging.",
-              "label": "Consents_to_one_to_one_messaging",
-              "required": false,
-              "name": "consents_to_one_to_one_messaging",
-              "type": "BOOLEAN",
-              "controlType": "CHECKBOX"
-            },
-            {
-              "description": "A dictionary of merge fields where the keys are the merge tags. See the Merge Fields documentation for more about the structure.",
-              "label": "Merge_fields",
-              "placeholder": "Add",
-              "required": false,
-              "name": "merge_fields",
-              "type": "OBJECT",
-              "additionalProperties": [
-                {
-                  "type": "STRING",
-                  "controlType": "INPUT_TEXT"
-                }
-              ],
-              "multipleValues": true,
-              "controlType": "JSON_BUILDER"
-            },
-            {
-              "description": "The key of this object's properties is the ID of the interest in question.",
-              "label": "Interests",
-              "placeholder": "Add",
-              "required": false,
-              "name": "interests",
-              "type": "OBJECT",
-              "additionalProperties": [
-                {
-                  "type": "STRING",
-                  "controlType": "INPUT_TEXT"
-                }
-              ],
-              "multipleValues": true,
-              "controlType": "JSON_BUILDER"
-            },
-            {
-              "description": "Open and click rates for this subscriber.",
-              "label": "Stats",
-              "required": false,
-              "name": "stats",
-              "type": "OBJECT",
-              "multipleValues": true,
-              "properties": [
-                {
-                  "description": "A subscriber's average open rate.",
-                  "label": "Avg_open_rate",
-                  "required": false,
-                  "name": "avg_open_rate",
-                  "type": "NUMBER",
-                  "controlType": "INPUT_NUMBER"
-                },
-                {
-                  "description": "A subscriber's average clickthrough rate.",
-                  "label": "Avg_click_rate",
-                  "required": false,
-                  "name": "avg_click_rate",
-                  "type": "NUMBER",
-                  "controlType": "INPUT_NUMBER"
-                },
-                {
-                  "description": "Ecommerce stats for the list member if the list is attached to a store.",
-                  "label": "Ecommerce_data",
-                  "required": false,
-                  "name": "ecommerce_data",
-                  "type": "OBJECT",
-                  "multipleValues": true,
-                  "properties": [
-                    {
-                      "description": "The total revenue the list member has brought in.",
-                      "label": "Total_revenue",
-                      "required": false,
-                      "name": "total_revenue",
-                      "type": "NUMBER",
-                      "controlType": "INPUT_NUMBER"
-                    },
-                    {
-                      "description": "The total number of orders placed by the list member.",
-                      "label": "Number_of_orders",
-                      "required": false,
-                      "name": "number_of_orders",
-                      "type": "NUMBER",
-                      "controlType": "INPUT_NUMBER"
-                    },
-                    {
-                      "description": "The three-letter ISO 4217 code for the currency that the store accepts.",
-                      "label": "Currency_code",
-                      "required": false,
-                      "name": "currency_code",
-                      "type": "STRING",
-                      "controlType": "INPUT_TEXT"
-                    }
-                  ],
-                  "controlType": "JSON_BUILDER"
-                }
-              ],
-              "controlType": "JSON_BUILDER"
-            },
-            {
-              "description": "IP address the subscriber signed up from.",
-              "label": "Ip_signup",
-              "required": false,
-              "name": "ip_signup",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "The date and time the subscriber signed up for the list in ISO 8601 format.",
-              "label": "Timestamp_signup",
-              "required": false,
-              "name": "timestamp_signup",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "The IP address the subscriber used to confirm their opt-in status.",
-              "label": "Ip_opt",
-              "required": false,
-              "name": "ip_opt",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "The date and time the subscriber confirmed their opt-in status in ISO 8601 format.",
-              "label": "Timestamp_opt",
-              "required": false,
-              "name": "timestamp_opt",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "Star rating for this member, between 1 and 5.",
-              "label": "Member_rating",
-              "required": false,
-              "name": "member_rating",
-              "type": "INTEGER",
-              "controlType": "INPUT_INTEGER"
-            },
-            {
-              "description": "The date and time the member's info was last changed in ISO 8601 format.",
-              "label": "Last_changed",
-              "required": false,
-              "name": "last_changed",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "If set/detected, the subscriber's language.",
-              "label": "Language",
-              "required": false,
-              "name": "language",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "VIP status for subscriber.",
-              "label": "Vip",
-              "required": false,
-              "name": "vip",
-              "type": "BOOLEAN",
-              "controlType": "CHECKBOX"
-            },
-            {
-              "description": "The list member's email client.",
-              "label": "Email_client",
-              "required": false,
-              "name": "email_client",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "Subscriber location information.",
-              "label": "Location",
-              "required": false,
-              "name": "location",
-              "type": "OBJECT",
-              "multipleValues": true,
-              "properties": [
-                {
-                  "description": "The location latitude.",
-                  "label": "Latitude",
-                  "required": false,
-                  "name": "latitude",
-                  "type": "NUMBER",
-                  "controlType": "INPUT_NUMBER"
-                },
-                {
-                  "description": "The location longitude.",
-                  "label": "Longitude",
-                  "required": false,
-                  "name": "longitude",
-                  "type": "NUMBER",
-                  "controlType": "INPUT_NUMBER"
-                },
-                {
-                  "description": "The time difference in hours from GMT.",
-                  "label": "Gmtoff",
-                  "required": false,
-                  "name": "gmtoff",
-                  "type": "INTEGER",
-                  "controlType": "INPUT_INTEGER"
-                },
-                {
-                  "description": "The offset for timezones where daylight saving time is observed.",
-                  "label": "Dstoff",
-                  "required": false,
-                  "name": "dstoff",
-                  "type": "INTEGER",
-                  "controlType": "INPUT_INTEGER"
-                },
-                {
-                  "description": "The unique code for the location country.",
-                  "label": "Country_code",
-                  "required": false,
-                  "name": "country_code",
-                  "type": "STRING",
-                  "controlType": "INPUT_TEXT"
-                },
-                {
-                  "description": "The timezone for the location.",
-                  "label": "Timezone",
-                  "required": false,
-                  "name": "timezone",
-                  "type": "STRING",
-                  "controlType": "INPUT_TEXT"
-                },
-                {
-                  "description": "The region for the location.",
-                  "label": "Region",
-                  "required": false,
-                  "name": "region",
-                  "type": "STRING",
-                  "controlType": "INPUT_TEXT"
-                }
-              ],
-              "controlType": "JSON_BUILDER"
-            },
-            {
-              "description": "The marketing permissions for the subscriber.",
-              "label": "Marketing_permissions",
-              "placeholder": "Add",
-              "required": false,
-              "name": "marketing_permissions",
-              "type": "ARRAY",
-              "items": [
-                {
-                  "description": "The marketing permissions for the subscriber.",
-                  "type": "OBJECT",
-                  "multipleValues": true,
-                  "properties": [
-                    {
-                      "description": "The id for the marketing permission on the list",
-                      "label": "Marketing_permission_id",
-                      "required": false,
-                      "name": "marketing_permission_id",
-                      "type": "STRING",
-                      "controlType": "INPUT_TEXT"
-                    },
-                    {
-                      "description": "The text of the marketing permission.",
-                      "label": "Text",
-                      "required": false,
-                      "name": "text",
-                      "type": "STRING",
-                      "controlType": "INPUT_TEXT"
-                    },
-                    {
-                      "description": "If the subscriber has opted-in to the marketing permission.",
-                      "label": "Enabled",
-                      "required": false,
-                      "name": "enabled",
-                      "type": "BOOLEAN",
-                      "controlType": "CHECKBOX"
-                    }
-                  ],
-                  "controlType": "JSON_BUILDER"
-                }
-              ],
-              "multipleValues": true,
-              "controlType": "JSON_BUILDER"
-            },
-            {
-              "description": "The most recent Note added about this member.",
-              "label": "Last_note",
-              "required": false,
-              "name": "last_note",
-              "type": "OBJECT",
-              "multipleValues": true,
-              "properties": [
-                {
-                  "description": "The note id.",
-                  "label": "Note_id",
-                  "required": false,
-                  "name": "note_id",
-                  "type": "INTEGER",
-                  "controlType": "INPUT_INTEGER"
-                },
-                {
-                  "description": "The date and time the note was created in ISO 8601 format.",
-                  "label": "Created_at",
-                  "required": false,
-                  "name": "created_at",
-                  "type": "STRING",
-                  "controlType": "INPUT_TEXT"
-                },
-                {
-                  "description": "The author of the note.",
-                  "label": "Created_by",
-                  "required": false,
-                  "name": "created_by",
-                  "type": "STRING",
-                  "controlType": "INPUT_TEXT"
-                },
-                {
-                  "description": "The content of the note.",
-                  "label": "Note",
-                  "required": false,
-                  "name": "note",
-                  "type": "STRING",
-                  "controlType": "INPUT_TEXT"
-                }
-              ],
-              "controlType": "JSON_BUILDER"
-            },
-            {
-              "description": "The source from which the subscriber was added to this list.",
-              "label": "Source",
-              "required": false,
-              "name": "source",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "The number of tags applied to this member.",
-              "label": "Tags_count",
-              "required": false,
-              "name": "tags_count",
-              "type": "INTEGER",
-              "controlType": "INPUT_INTEGER"
-            },
-            {
-              "description": "Returns up to 50 tags applied to this member.",
-              "label": "Tags",
-              "required": false,
-              "name": "tags",
-              "type": "OBJECT",
-              "multipleValues": true,
-              "properties": [
-                {
-                  "description": "The tag id.",
-                  "label": "Id",
-                  "required": false,
-                  "name": "id",
-                  "type": "INTEGER",
-                  "controlType": "INPUT_INTEGER"
-                },
-                {
-                  "description": "The name of the tag.",
-                  "label": "Name",
-                  "required": false,
-                  "name": "name",
-                  "type": "STRING",
-                  "controlType": "INPUT_TEXT"
-                }
-              ],
-              "controlType": "JSON_BUILDER"
-            },
-            {
-              "description": "The list id.",
-              "label": "List_id",
-              "required": false,
-              "name": "list_id",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "A list of link types and descriptions for the API schema documents.",
-              "label": "_links",
-              "placeholder": "Add",
-              "required": false,
-              "name": "_links",
-              "type": "ARRAY",
-              "items": [
-                {
-                  "description": "A list of link types and descriptions for the API schema documents.",
-                  "type": "OBJECT",
-                  "multipleValues": true,
-                  "properties": [
-                    {
-                      "description": "As with an HTML 'rel' attribute, this describes the type of link.",
-                      "label": "Rel",
-                      "required": false,
-                      "name": "rel",
-                      "type": "STRING",
-                      "controlType": "INPUT_TEXT"
-                    },
-                    {
-                      "description": "This property contains a fully-qualified URL that can be called to retrieve the linked resource or perform the linked action.",
-                      "label": "Href",
-                      "required": false,
-                      "name": "href",
-                      "type": "STRING",
-                      "controlType": "INPUT_TEXT"
-                    },
-                    {
-                      "description": "The HTTP method that should be used when accessing the URL defined in 'href'. Possible values: \"GET\", \"POST\", \"PUT\", \"PATCH\", \"DELETE\", \"OPTIONS\", or \"HEAD\".",
-                      "label": "Method",
-                      "required": false,
-                      "name": "method",
-                      "type": "STRING",
-                      "controlType": "INPUT_TEXT"
-                    },
-                    {
-                      "description": "For GETs, this is a URL representing the schema that the response should conform to.",
-                      "label": "TargetSchema",
-                      "required": false,
-                      "name": "targetSchema",
-                      "type": "STRING",
-                      "controlType": "INPUT_TEXT"
-                    },
-                    {
-                      "description": "For HTTP methods that can receive bodies (POST and PUT), this is a URL representing the schema that the body should conform to.",
-                      "label": "Schema",
-                      "required": false,
-                      "name": "schema",
-                      "type": "STRING",
-                      "controlType": "INPUT_TEXT"
-                    }
-                  ],
-                  "controlType": "JSON_BUILDER"
-                }
-              ],
-              "multipleValues": true,
-              "controlType": "JSON_BUILDER"
-            }
-          ],
-          "controlType": "JSON_BUILDER"
-        }
-      ],
-      "properties": [
-        {
-          "description": "The unique ID for the list.",
-          "label": "ListId",
-          "metadata": {
-            "type": "PATH"
-          },
-          "required": true,
-          "name": "listId",
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "description": "The MD5 hash of the lowercase version of the list member's email address.",
+        "label": "Id",
+        "required": false,
+        "name": "id",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "Email address for a subscriber.",
+        "label": "Email_address",
+        "required": false,
+        "name": "email_address",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "An identifier for the address across all of Mailchimp.",
+        "label": "Unique_email_id",
+        "required": false,
+        "name": "unique_email_id",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "As Mailchimp evolves beyond email, you may eventually have contacts without email addresses. While the id is the MD5 hash of their email address, this contact_id is agnostic of contact’s inclusion of an email address.",
+        "label": "Contact_id",
+        "required": false,
+        "name": "contact_id",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "The contact's full name.",
+        "label": "Full_name",
+        "required": false,
+        "name": "full_name",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "The ID used in the Mailchimp web application. View this member in your Mailchimp account at https://{dc}.admin.mailchimp.com/lists/members/view?id={web_id}.",
+        "label": "Web_id",
+        "required": false,
+        "name": "web_id",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "Type of email this member asked to get ('html' or 'text').",
+        "label": "Email_type",
+        "required": false,
+        "name": "email_type",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "Subscriber's current status.",
+        "label": "Status",
+        "required": false,
+        "name": "status",
+        "type": "STRING",
+        "controlType": "SELECT",
+        "options": [ {
+          "name": "Subscribed",
+          "value": "subscribed"
+        }, {
+          "name": "Unsubscribed",
+          "value": "unsubscribed"
+        }, {
+          "name": "Cleaned",
+          "value": "cleaned"
+        }, {
+          "name": "Pending",
+          "value": "pending"
+        }, {
+          "name": "Transactional",
+          "value": "transactional"
+        } ]
+      }, {
+        "description": "A subscriber's reason for unsubscribing.",
+        "label": "Unsubscribe_reason",
+        "required": false,
+        "name": "unsubscribe_reason",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "Indicates whether a contact consents to 1:1 messaging.",
+        "label": "Consents_to_one_to_one_messaging",
+        "required": false,
+        "name": "consents_to_one_to_one_messaging",
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "description": "A dictionary of merge fields where the keys are the merge tags. See the Merge Fields documentation for more about the structure.",
+        "label": "Merge_fields",
+        "placeholder": "Add",
+        "required": false,
+        "name": "merge_fields",
+        "type": "OBJECT",
+        "additionalProperties": [ {
           "type": "STRING",
           "controlType": "INPUT_TEXT"
-        },
-        {
-          "description": "If skip_merge_validation is true, member data will be accepted without merge field values, even if the merge field is usually required. This defaults to false.",
-          "label": "Skip_merge_validation",
-          "metadata": {
-            "type": "QUERY"
-          },
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "description": "The key of this object's properties is the ID of the interest in question.",
+        "label": "Interests",
+        "placeholder": "Add",
+        "required": false,
+        "name": "interests",
+        "type": "OBJECT",
+        "additionalProperties": [ {
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "description": "Open and click rates for this subscriber.",
+        "label": "Stats",
+        "required": false,
+        "name": "stats",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "description": "A subscriber's average open rate.",
+          "label": "Avg_open_rate",
           "required": false,
-          "name": "skip_merge_validation",
-          "type": "BOOLEAN",
-          "controlType": "CHECKBOX"
-        },
-        {
-          "metadata": {
-            "type": "BODY"
-          },
+          "name": "avg_open_rate",
+          "type": "NUMBER",
+          "controlType": "INPUT_NUMBER"
+        }, {
+          "description": "A subscriber's average clickthrough rate.",
+          "label": "Avg_click_rate",
+          "required": false,
+          "name": "avg_click_rate",
+          "type": "NUMBER",
+          "controlType": "INPUT_NUMBER"
+        }, {
+          "description": "Ecommerce stats for the list member if the list is attached to a store.",
+          "label": "Ecommerce_data",
+          "required": false,
+          "name": "ecommerce_data",
           "type": "OBJECT",
           "multipleValues": true,
-          "properties": [
-            {
-              "description": "Email address for a subscriber.",
-              "label": "Email_address",
-              "required": true,
-              "name": "email_address",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "Subscriber's current status.",
-              "label": "Status",
-              "required": true,
-              "name": "status",
-              "type": "STRING",
-              "controlType": "SELECT",
-              "options": [
-                {
-                  "name": "Subscribed",
-                  "value": "subscribed"
-                },
-                {
-                  "name": "Unsubscribed",
-                  "value": "unsubscribed"
-                },
-                {
-                  "name": "Cleaned",
-                  "value": "cleaned"
-                },
-                {
-                  "name": "Pending",
-                  "value": "pending"
-                },
-                {
-                  "name": "Transactional",
-                  "value": "transactional"
-                }
-              ]
-            },
-            {
-              "description": "Type of email this member asked to get ('html' or 'text').",
-              "label": "Email_type",
-              "required": false,
-              "name": "email_type",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "A dictionary of merge fields where the keys are the merge tags.",
-              "label": "Merge_fields",
-              "placeholder": "Add",
-              "required": false,
-              "name": "merge_fields",
-              "type": "OBJECT",
-              "additionalProperties": [
-                {
-                  "type": "STRING",
-                  "controlType": "INPUT_TEXT"
-                }
-              ],
-              "multipleValues": true,
-              "controlType": "JSON_BUILDER"
-            },
-            {
-              "description": "The key of this object's properties is the ID of the interest in question.",
-              "label": "Interests",
-              "placeholder": "Add",
-              "required": false,
-              "name": "interests",
-              "type": "OBJECT",
-              "additionalProperties": [
-                {
-                  "type": "STRING",
-                  "controlType": "INPUT_TEXT"
-                }
-              ],
-              "multipleValues": true,
-              "controlType": "JSON_BUILDER"
-            },
-            {
-              "description": "If set/detected, the subscriber's language.",
-              "label": "Language",
-              "required": false,
-              "name": "language",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "VIP status for subscriber.",
-              "label": "Vip",
-              "required": false,
-              "name": "vip",
-              "type": "BOOLEAN",
-              "controlType": "CHECKBOX"
-            },
-            {
-              "description": "Subscriber location information.",
-              "label": "Location",
-              "required": false,
-              "name": "location",
-              "type": "OBJECT",
-              "multipleValues": true,
-              "properties": [
-                {
-                  "description": "The location latitude.",
-                  "label": "Latitude",
-                  "required": false,
-                  "name": "latitude",
-                  "type": "NUMBER",
-                  "controlType": "INPUT_NUMBER"
-                },
-                {
-                  "description": "The location longitude.",
-                  "label": "Longitude",
-                  "required": false,
-                  "name": "longitude",
-                  "type": "NUMBER",
-                  "controlType": "INPUT_NUMBER"
-                }
-              ],
-              "controlType": "JSON_BUILDER"
-            },
-            {
-              "description": "The marketing permissions for the subscriber.",
-              "label": "Marketing_permissions",
-              "placeholder": "Add",
-              "required": false,
-              "name": "marketing_permissions",
-              "type": "ARRAY",
-              "items": [
-                {
-                  "description": "The marketing permissions for the subscriber.",
-                  "type": "OBJECT",
-                  "multipleValues": true,
-                  "properties": [
-                    {
-                      "description": "The id for the marketing permission on the list.",
-                      "label": "Marketing_permission_id",
-                      "required": false,
-                      "name": "marketing_permission_id",
-                      "type": "STRING",
-                      "controlType": "INPUT_TEXT"
-                    },
-                    {
-                      "description": "If the subscriber has opted-in to the marketing permission.",
-                      "label": "Enabled",
-                      "required": false,
-                      "name": "enabled",
-                      "type": "BOOLEAN",
-                      "controlType": "CHECKBOX"
-                    }
-                  ],
-                  "controlType": "JSON_BUILDER"
-                }
-              ],
-              "multipleValues": true,
-              "controlType": "JSON_BUILDER"
-            },
-            {
-              "description": "IP address the subscriber signed up from.",
-              "label": "Ip_signup",
-              "required": false,
-              "name": "ip_signup",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "The date and time the subscriber signed up for the list in ISO 8601 format.",
-              "label": "Timestamp_signup",
-              "required": false,
-              "name": "timestamp_signup",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "The IP address the subscriber used to confirm their opt-in status.",
-              "label": "Ip_opt",
-              "required": false,
-              "name": "ip_opt",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "The date and time the subscriber confirmed their opt-in status in ISO 8601 format.",
-              "label": "Timestamp_opt",
-              "required": false,
-              "name": "timestamp_opt",
-              "type": "STRING",
-              "controlType": "INPUT_TEXT"
-            },
-            {
-              "description": "The tags that are associated with a member.",
-              "label": "Tags",
-              "placeholder": "Add",
-              "required": false,
-              "name": "tags",
-              "type": "ARRAY",
-              "items": [
-                {
-                  "description": "The tags that are associated with a member.",
-                  "type": "STRING",
-                  "controlType": "INPUT_TEXT"
-                }
-              ],
-              "multipleValues": true,
-              "controlType": "JSON_BUILDER"
-            }
-          ],
+          "properties": [ {
+            "description": "The total revenue the list member has brought in.",
+            "label": "Total_revenue",
+            "required": false,
+            "name": "total_revenue",
+            "type": "NUMBER",
+            "controlType": "INPUT_NUMBER"
+          }, {
+            "description": "The total number of orders placed by the list member.",
+            "label": "Number_of_orders",
+            "required": false,
+            "name": "number_of_orders",
+            "type": "NUMBER",
+            "controlType": "INPUT_NUMBER"
+          }, {
+            "description": "The three-letter ISO 4217 code for the currency that the store accepts.",
+            "label": "Currency_code",
+            "required": false,
+            "name": "currency_code",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          } ],
           "controlType": "JSON_BUILDER"
-        }
-      ]
-    }
-  ],
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "description": "IP address the subscriber signed up from.",
+        "label": "Ip_signup",
+        "required": false,
+        "name": "ip_signup",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "The date and time the subscriber signed up for the list in ISO 8601 format.",
+        "label": "Timestamp_signup",
+        "required": false,
+        "name": "timestamp_signup",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "The IP address the subscriber used to confirm their opt-in status.",
+        "label": "Ip_opt",
+        "required": false,
+        "name": "ip_opt",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "The date and time the subscriber confirmed their opt-in status in ISO 8601 format.",
+        "label": "Timestamp_opt",
+        "required": false,
+        "name": "timestamp_opt",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "Star rating for this member, between 1 and 5.",
+        "label": "Member_rating",
+        "required": false,
+        "name": "member_rating",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "description": "The date and time the member's info was last changed in ISO 8601 format.",
+        "label": "Last_changed",
+        "required": false,
+        "name": "last_changed",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "If set/detected, the subscriber's language.",
+        "label": "Language",
+        "required": false,
+        "name": "language",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "VIP status for subscriber.",
+        "label": "Vip",
+        "required": false,
+        "name": "vip",
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "description": "The list member's email client.",
+        "label": "Email_client",
+        "required": false,
+        "name": "email_client",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "Subscriber location information.",
+        "label": "Location",
+        "required": false,
+        "name": "location",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "description": "The location latitude.",
+          "label": "Latitude",
+          "required": false,
+          "name": "latitude",
+          "type": "NUMBER",
+          "controlType": "INPUT_NUMBER"
+        }, {
+          "description": "The location longitude.",
+          "label": "Longitude",
+          "required": false,
+          "name": "longitude",
+          "type": "NUMBER",
+          "controlType": "INPUT_NUMBER"
+        }, {
+          "description": "The time difference in hours from GMT.",
+          "label": "Gmtoff",
+          "required": false,
+          "name": "gmtoff",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "description": "The offset for timezones where daylight saving time is observed.",
+          "label": "Dstoff",
+          "required": false,
+          "name": "dstoff",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "description": "The unique code for the location country.",
+          "label": "Country_code",
+          "required": false,
+          "name": "country_code",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "description": "The timezone for the location.",
+          "label": "Timezone",
+          "required": false,
+          "name": "timezone",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "description": "The region for the location.",
+          "label": "Region",
+          "required": false,
+          "name": "region",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "description": "The marketing permissions for the subscriber.",
+        "label": "Marketing_permissions",
+        "placeholder": "Add",
+        "required": false,
+        "name": "marketing_permissions",
+        "type": "ARRAY",
+        "items": [ {
+          "description": "The marketing permissions for the subscriber.",
+          "type": "OBJECT",
+          "multipleValues": true,
+          "properties": [ {
+            "description": "The id for the marketing permission on the list",
+            "label": "Marketing_permission_id",
+            "required": false,
+            "name": "marketing_permission_id",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "description": "The text of the marketing permission.",
+            "label": "Text",
+            "required": false,
+            "name": "text",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "description": "If the subscriber has opted-in to the marketing permission.",
+            "label": "Enabled",
+            "required": false,
+            "name": "enabled",
+            "type": "BOOLEAN",
+            "controlType": "CHECKBOX"
+          } ],
+          "controlType": "JSON_BUILDER"
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "description": "The most recent Note added about this member.",
+        "label": "Last_note",
+        "required": false,
+        "name": "last_note",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "description": "The note id.",
+          "label": "Note_id",
+          "required": false,
+          "name": "note_id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "description": "The date and time the note was created in ISO 8601 format.",
+          "label": "Created_at",
+          "required": false,
+          "name": "created_at",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "description": "The author of the note.",
+          "label": "Created_by",
+          "required": false,
+          "name": "created_by",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        }, {
+          "description": "The content of the note.",
+          "label": "Note",
+          "required": false,
+          "name": "note",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "description": "The source from which the subscriber was added to this list.",
+        "label": "Source",
+        "required": false,
+        "name": "source",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "The number of tags applied to this member.",
+        "label": "Tags_count",
+        "required": false,
+        "name": "tags_count",
+        "type": "INTEGER",
+        "controlType": "INPUT_INTEGER"
+      }, {
+        "description": "Returns up to 50 tags applied to this member.",
+        "label": "Tags",
+        "required": false,
+        "name": "tags",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "description": "The tag id.",
+          "label": "Id",
+          "required": false,
+          "name": "id",
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
+        }, {
+          "description": "The name of the tag.",
+          "label": "Name",
+          "required": false,
+          "name": "name",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "description": "The list id.",
+        "label": "List_id",
+        "required": false,
+        "name": "list_id",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "A list of link types and descriptions for the API schema documents.",
+        "label": "_links",
+        "placeholder": "Add",
+        "required": false,
+        "name": "_links",
+        "type": "ARRAY",
+        "items": [ {
+          "description": "A list of link types and descriptions for the API schema documents.",
+          "type": "OBJECT",
+          "multipleValues": true,
+          "properties": [ {
+            "description": "As with an HTML 'rel' attribute, this describes the type of link.",
+            "label": "Rel",
+            "required": false,
+            "name": "rel",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "description": "This property contains a fully-qualified URL that can be called to retrieve the linked resource or perform the linked action.",
+            "label": "Href",
+            "required": false,
+            "name": "href",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "description": "The HTTP method that should be used when accessing the URL defined in 'href'. Possible values: \"GET\", \"POST\", \"PUT\", \"PATCH\", \"DELETE\", \"OPTIONS\", or \"HEAD\".",
+            "label": "Method",
+            "required": false,
+            "name": "method",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "description": "For GETs, this is a URL representing the schema that the response should conform to.",
+            "label": "TargetSchema",
+            "required": false,
+            "name": "targetSchema",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "description": "For HTTP methods that can receive bodies (POST and PUT), this is a URL representing the schema that the body should conform to.",
+            "label": "Schema",
+            "required": false,
+            "name": "schema",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          } ],
+          "controlType": "JSON_BUILDER"
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ],
+    "properties": [ {
+      "description": "The unique ID for the list.",
+      "label": "ListId",
+      "metadata": {
+        "type": "PATH"
+      },
+      "required": true,
+      "name": "listId",
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
+    }, {
+      "description": "If skip_merge_validation is true, member data will be accepted without merge field values, even if the merge field is usually required. This defaults to false.",
+      "label": "Skip_merge_validation",
+      "metadata": {
+        "type": "QUERY"
+      },
+      "required": false,
+      "name": "skip_merge_validation",
+      "type": "BOOLEAN",
+      "controlType": "CHECKBOX"
+    }, {
+      "metadata": {
+        "type": "BODY"
+      },
+      "type": "OBJECT",
+      "multipleValues": true,
+      "properties": [ {
+        "description": "Email address for a subscriber.",
+        "label": "Email_address",
+        "required": true,
+        "name": "email_address",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "Subscriber's current status.",
+        "label": "Status",
+        "required": true,
+        "name": "status",
+        "type": "STRING",
+        "controlType": "SELECT",
+        "options": [ {
+          "name": "Subscribed",
+          "value": "subscribed"
+        }, {
+          "name": "Unsubscribed",
+          "value": "unsubscribed"
+        }, {
+          "name": "Cleaned",
+          "value": "cleaned"
+        }, {
+          "name": "Pending",
+          "value": "pending"
+        }, {
+          "name": "Transactional",
+          "value": "transactional"
+        } ]
+      }, {
+        "description": "Type of email this member asked to get ('html' or 'text').",
+        "label": "Email_type",
+        "required": false,
+        "name": "email_type",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "A dictionary of merge fields where the keys are the merge tags.",
+        "label": "Merge_fields",
+        "placeholder": "Add",
+        "required": false,
+        "name": "merge_fields",
+        "type": "OBJECT",
+        "additionalProperties": [ {
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "description": "The key of this object's properties is the ID of the interest in question.",
+        "label": "Interests",
+        "placeholder": "Add",
+        "required": false,
+        "name": "interests",
+        "type": "OBJECT",
+        "additionalProperties": [ {
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "description": "If set/detected, the subscriber's language.",
+        "label": "Language",
+        "required": false,
+        "name": "language",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "VIP status for subscriber.",
+        "label": "Vip",
+        "required": false,
+        "name": "vip",
+        "type": "BOOLEAN",
+        "controlType": "CHECKBOX"
+      }, {
+        "description": "Subscriber location information.",
+        "label": "Location",
+        "required": false,
+        "name": "location",
+        "type": "OBJECT",
+        "multipleValues": true,
+        "properties": [ {
+          "description": "The location latitude.",
+          "label": "Latitude",
+          "required": false,
+          "name": "latitude",
+          "type": "NUMBER",
+          "controlType": "INPUT_NUMBER"
+        }, {
+          "description": "The location longitude.",
+          "label": "Longitude",
+          "required": false,
+          "name": "longitude",
+          "type": "NUMBER",
+          "controlType": "INPUT_NUMBER"
+        } ],
+        "controlType": "JSON_BUILDER"
+      }, {
+        "description": "The marketing permissions for the subscriber.",
+        "label": "Marketing_permissions",
+        "placeholder": "Add",
+        "required": false,
+        "name": "marketing_permissions",
+        "type": "ARRAY",
+        "items": [ {
+          "description": "The marketing permissions for the subscriber.",
+          "type": "OBJECT",
+          "multipleValues": true,
+          "properties": [ {
+            "description": "The id for the marketing permission on the list.",
+            "label": "Marketing_permission_id",
+            "required": false,
+            "name": "marketing_permission_id",
+            "type": "STRING",
+            "controlType": "INPUT_TEXT"
+          }, {
+            "description": "If the subscriber has opted-in to the marketing permission.",
+            "label": "Enabled",
+            "required": false,
+            "name": "enabled",
+            "type": "BOOLEAN",
+            "controlType": "CHECKBOX"
+          } ],
+          "controlType": "JSON_BUILDER"
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      }, {
+        "description": "IP address the subscriber signed up from.",
+        "label": "Ip_signup",
+        "required": false,
+        "name": "ip_signup",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "The date and time the subscriber signed up for the list in ISO 8601 format.",
+        "label": "Timestamp_signup",
+        "required": false,
+        "name": "timestamp_signup",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "The IP address the subscriber used to confirm their opt-in status.",
+        "label": "Ip_opt",
+        "required": false,
+        "name": "ip_opt",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "The date and time the subscriber confirmed their opt-in status in ISO 8601 format.",
+        "label": "Timestamp_opt",
+        "required": false,
+        "name": "timestamp_opt",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "description": "The tags that are associated with a member.",
+        "label": "Tags",
+        "placeholder": "Add",
+        "required": false,
+        "name": "tags",
+        "type": "ARRAY",
+        "items": [ {
+          "description": "The tags that are associated with a member.",
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
+        } ],
+        "multipleValues": true,
+        "controlType": "JSON_BUILDER"
+      } ],
+      "controlType": "JSON_BUILDER"
+    } ]
+  } ],
   "connection": {
     "authorizationRequired": true,
-    "authorizations": [
-      {
-        "display": {
-          "label": "OAuth2 Authorization Code"
-        },
-        "properties": [
-          {
-            "label": "Client Id",
-            "required": true,
-            "name": "clientId",
-            "type": "STRING",
-            "controlType": "INPUT_TEXT"
-          },
-          {
-            "label": "Client Secret",
-            "required": true,
-            "name": "clientSecret",
-            "type": "STRING",
-            "controlType": "INPUT_TEXT"
-          }
-        ],
-        "name": "oauth2_authorization_code",
-        "type": "OAUTH2_AUTHORIZATION_CODE"
-      }
-    ],
+    "authorizations": [ {
+      "display": {
+        "label": "OAuth2 Authorization Code"
+      },
+      "properties": [ {
+        "label": "Client Id",
+        "required": true,
+        "name": "clientId",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      }, {
+        "label": "Client Secret",
+        "required": true,
+        "name": "clientSecret",
+        "type": "STRING",
+        "controlType": "INPUT_TEXT"
+      } ],
+      "name": "oauth2_authorization_code",
+      "type": "OAUTH2_AUTHORIZATION_CODE"
+    } ],
     "componentDisplay": {
       "description": "Mailchimp REST API documentation",
       "label": "Mailchimp"
     },
-    "componentName": "mailchimp"
+    "componentName": "mailchimp",
+    "connectionVersion": 1
   },
   "display": {
     "description": "Mailchimp REST API documentation",
