@@ -126,7 +126,7 @@ bytechef:
     provider: jdbc
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
-  # When worker is enabled, subscribe to the default "tasks" queue with 5 concurrent consumers.
+  # When worker is enabled, subscribe to the default "tasks" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
   # property on any given task.
   # E.g. node: captions will route to the captions queue which a worker would subscribe to with workflow.worker.subscriptions.captions.
