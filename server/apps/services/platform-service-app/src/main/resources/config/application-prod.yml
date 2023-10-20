@@ -4,9 +4,9 @@ logging:
     com.bytechef: INFO
 
 management:
-  metrics:
-    export:
-      prometheus:
+  prometheus:
+    metrics:
+      export:
         enabled: false
 
 server:
