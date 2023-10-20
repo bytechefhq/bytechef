@@ -19,7 +19,7 @@ package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionModel;
-import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL;
+import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.ModifiableTaskDispatcherDefinition;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
@@ -28,19 +28,21 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = DefinitionMapperSpringConfig.class)
-public interface TaskDispatcherDefinitionMapper
-    extends Converter<TaskDispatcherDefinition, TaskDispatcherDefinitionModel> {
+public class TaskDispatcherDefinitionMapper {
 
-    @Override
-    default TaskDispatcherDefinitionModel convert(TaskDispatcherDefinition taskDispatcherDefinition) {
-        if (taskDispatcherDefinition instanceof TaskDispatcherDSL.ModifiableTaskDispatcherDefinition) {
-            return map((TaskDispatcherDSL.ModifiableTaskDispatcherDefinition) taskDispatcherDefinition);
-        } else {
-            return map(taskDispatcherDefinition);
-        }
+    @Mapper(config = DefinitionMapperSpringConfig.class)
+    public interface TaskDispatcherDefinitionToTaskDispatcherDefinitionModelMapper
+        extends Converter<TaskDispatcherDefinition, TaskDispatcherDefinitionModel> {
+
+        @Override
+        TaskDispatcherDefinitionModel convert(TaskDispatcherDefinition taskDispatcherDefinition);
     }
 
-    TaskDispatcherDefinitionModel map(TaskDispatcherDefinition taskDispatcherDefinition);
+    @Mapper(config = DefinitionMapperSpringConfig.class)
+    public interface ModifiableTaskDispatcherDefinitionToTaskDispatcherDefinitionModelMapper
+        extends Converter<ModifiableTaskDispatcherDefinition, TaskDispatcherDefinitionModel> {
 
-    TaskDispatcherDefinitionModel map(TaskDispatcherDSL.ModifiableTaskDispatcherDefinition taskDispatcherDefinition);
+        @Override
+        TaskDispatcherDefinitionModel convert(ModifiableTaskDispatcherDefinition taskDispatcherDefinition);
+    }
 }

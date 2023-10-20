@@ -17,9 +17,10 @@
 
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
-import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
+import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -28,22 +29,39 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = DefinitionMapperSpringConfig.class)
-public interface ConnectionDefinitionMapper
-    extends Converter<ConnectionDefinition, ConnectionDefinitionModel> {
+public class ConnectionDefinitionMapper {
 
-    @Override
-    default ConnectionDefinitionModel convert(ConnectionDefinition connectionDefinition) {
-        if (connectionDefinition instanceof ComponentDSL.ModifiableConnectionDefinition) {
-            return map((ComponentDSL.ModifiableConnectionDefinition) connectionDefinition);
-        } else {
-            return map(connectionDefinition);
-        }
+    @Mapper(config = DefinitionMapperSpringConfig.class)
+    public interface ConnectionDefinitionToConnectionDefinitionModelMapper
+        extends Converter<ConnectionDefinition, ConnectionDefinitionModel> {
+
+        @Override
+        @Mapping(target = "baseUri", ignore = true)
+        ConnectionDefinitionModel convert(ConnectionDefinition connectionDefinition);
     }
 
-    @Mapping(target = "baseUri", ignore = true)
-    ConnectionDefinitionModel map(ConnectionDefinition connectionDefinition);
+    @Mapper(config = DefinitionMapperSpringConfig.class)
+    public interface ModifiableConnectionDefinitionToConnectionDefinitionModelMapper
+        extends Converter<ModifiableConnectionDefinition, ConnectionDefinitionModel> {
 
-    @Mapping(target = "baseUri", ignore = true)
-    ConnectionDefinitionModel map(ComponentDSL.ModifiableConnectionDefinition modifiableConnectionDefinition);
+        @Override
+        @Mapping(target = "baseUri", ignore = true)
+        ConnectionDefinitionModel convert(ModifiableConnectionDefinition connectionDefinition);
+    }
+
+    @Mapper(config = DefinitionMapperSpringConfig.class)
+    public interface ConnectionDefinitionToConnectionDefinitionBasicModelMapper
+        extends Converter<ConnectionDefinition, ConnectionDefinitionBasicModel> {
+
+        @Override
+        ConnectionDefinitionBasicModel convert(ConnectionDefinition connectionDefinition);
+    }
+
+    @Mapper(config = DefinitionMapperSpringConfig.class)
+    public interface ModifiableConnectionDefinitionToConnectionDefinitionBasicModelMapper
+        extends Converter<ModifiableConnectionDefinition, ConnectionDefinitionBasicModel> {
+
+        @Override
+        ConnectionDefinitionBasicModel convert(ModifiableConnectionDefinition connectionDefinition);
+    }
 }

@@ -18,7 +18,7 @@
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionModel;
 import org.mapstruct.Mapper;
@@ -27,20 +27,21 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = DefinitionMapperSpringConfig.class)
-public interface ActionDefinitionMapper
-    extends Converter<ActionDefinition, ActionDefinitionModel> {
+public class ActionDefinitionMapper {
 
-    @Override
-    default ActionDefinitionModel convert(ActionDefinition actionDefinition) {
-        if (actionDefinition instanceof ComponentDSL.ModifiableActionDefinition) {
-            return map((ComponentDSL.ModifiableActionDefinition) actionDefinition);
-        } else {
-            return map(actionDefinition);
-        }
+    @Mapper(config = DefinitionMapperSpringConfig.class)
+    public interface ActionDefinitionToActionDefinitionModelMapper
+        extends Converter<ActionDefinition, ActionDefinitionModel> {
+
+        @Override
+        ActionDefinitionModel convert(ActionDefinition actionDefinition);
     }
 
-    ActionDefinitionModel map(ActionDefinition actionDefinition);
+    @Mapper(config = DefinitionMapperSpringConfig.class)
+    public interface ModifiableActionDefinitionToActionDefinitionModelMapper
+        extends Converter<ModifiableActionDefinition, ActionDefinitionModel> {
 
-    ActionDefinitionModel map(ComponentDSL.ModifiableActionDefinition modifiableActionDefinition);
+        @Override
+        ActionDefinitionModel convert(ModifiableActionDefinition actionDefinition);
+    }
 }
