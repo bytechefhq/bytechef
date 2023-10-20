@@ -38,6 +38,8 @@ public interface ProjectInstanceModelMapper extends Converter<ProjectInstanceMod
     @Mapping(target = "project", ignore = true)
     ProjectInstanceDTO convert(ProjectInstanceModel projectInstanceModel);
 
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "projectInstanceId", ignore = true)
     ProjectInstanceWorkflow map(ProjectInstanceWorkflowModel projectInstanceWorkflowModel);
 
     ProjectInstanceWorkflowConnection map(ProjectInstanceWorkflowConnectionModel value);
