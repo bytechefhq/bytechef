@@ -40,7 +40,7 @@ public class BashComponentHandlerTest {
 
     @Test
     public void testPerformExecute() {
-        BashComponentHandler bashComponentAccessor = new BashComponentHandler();
+        BashComponentHandler bashComponentHandler = new BashComponentHandler();
 
         ExecutionParameters executionParameters = Mockito.mock(ExecutionParameters.class);
 
@@ -51,7 +51,7 @@ public class BashComponentHandlerTest {
                     .getResource("dependencies/test.txt")
                     .getFile());
 
-        String output = bashComponentAccessor.performExecute(Mockito.mock(Context.class), executionParameters);
+        String output = bashComponentHandler.performExecute(Mockito.mock(Context.class), executionParameters);
 
         Assertions.assertTrue(output.contains("build/resources/test/dependencies/test.txt"));
     }
