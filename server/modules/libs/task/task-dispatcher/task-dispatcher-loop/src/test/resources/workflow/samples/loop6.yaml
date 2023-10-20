@@ -2,6 +2,7 @@ label: Loop 1
 
 tasks:
   - type: loop
+    endlessLoop: true
     iteratee:
       type: sequence
       tasks:
