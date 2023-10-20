@@ -25,6 +25,7 @@ import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -41,8 +42,19 @@ public class TaskDispatcherDefinitionServiceRSocketController {
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
     }
 
+    @MessageMapping("TaskDispatcherDefinitionService.getTaskDispatcherDefinition")
+    public Mono<TaskDispatcherDefinition> getTaskDispatcherDefinitions(Map<String, Object> map) {
+        return taskDispatcherDefinitionService.getTaskDispatcherDefinitionMono(
+            (String) map.get("name"), (Integer) map.get("version"));
+    }
+
     @MessageMapping("TaskDispatcherDefinitionService.getTaskDispatcherDefinitions")
     public Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitions() {
         return taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono();
+    }
+
+    @MessageMapping("TaskDispatcherDefinitionService.getComponentDefinitionsForName")
+    public Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitions(String name) {
+        return taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono(name);
     }
 }

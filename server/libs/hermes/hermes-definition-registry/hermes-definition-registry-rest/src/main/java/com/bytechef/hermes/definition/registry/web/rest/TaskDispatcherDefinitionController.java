@@ -48,11 +48,36 @@ public class TaskDispatcherDefinitionController implements TaskDispatcherDefinit
     }
 
     @Override
+    public Mono<ResponseEntity<TaskDispatcherDefinitionModel>> getTaskDispatcherDefinition(
+        String taskDispatcherName, Integer taskDispatcherVersion, ServerWebExchange exchange) {
+
+        return taskDispatcherDefinitionService.getTaskDispatcherDefinitionMono(
+            taskDispatcherName, taskDispatcherVersion)
+            .mapNotNull(taskDispatcherDefinition -> conversionService.convert(
+                taskDispatcherDefinition, TaskDispatcherDefinitionModel.class))
+            .map(ResponseEntity::ok);
+    }
+
+    @Override
     public Mono<ResponseEntity<Flux<TaskDispatcherDefinitionModel>>> getTaskDispatcherDefinitions(
         @Parameter(hidden = true) ServerWebExchange exchange) {
         return Mono.just(
             ResponseEntity.ok(
                 taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono()
+                    .mapNotNull(taskDispatcherDefinitions -> taskDispatcherDefinitions.stream()
+                        .map(taskDispatcherDefinition -> conversionService.convert(
+                            taskDispatcherDefinition, TaskDispatcherDefinitionModel.class))
+                        .toList())
+                    .flatMapMany(Flux::fromIterable)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<Flux<TaskDispatcherDefinitionModel>>> getTaskDispatcherDefinitionVersions(
+        String taskDispatcherName, ServerWebExchange exchange) {
+
+        return Mono.just(
+            ResponseEntity.ok(
+                taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono(taskDispatcherName)
                     .mapNotNull(taskDispatcherDefinitions -> taskDispatcherDefinitions.stream()
                         .map(taskDispatcherDefinition -> conversionService.convert(
                             taskDispatcherDefinition, TaskDispatcherDefinitionModel.class))
