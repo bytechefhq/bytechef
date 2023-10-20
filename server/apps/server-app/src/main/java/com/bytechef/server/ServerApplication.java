@@ -22,10 +22,8 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Optional;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.Environment;
@@ -38,13 +36,6 @@ import org.springframework.util.StringUtils;
 public class ServerApplication {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerApplication.class);
-
-    private static String gitCommitId;
-
-    @SuppressFBWarnings("ST")
-    public ServerApplication(@Value("${git.commit.id}") String gitCommitId) {
-        this.gitCommitId = gitCommitId;
-    }
 
     /**
      * Main method, used to run the application.
@@ -86,7 +77,6 @@ public class ServerApplication {
                 \tExternal: \t{}://{}:{}{}
                 \tSwaggerUI: \t{}
                 \tProfile(s): \t{}
-                \tGit Commit Id: \t{}
                 ----------------------------------------------------------""",
             environment.getProperty("spring.application.name"),
             protocol,
@@ -100,7 +90,6 @@ public class ServerApplication {
                 .contains("api-docs")
                     ? "%s://127.0.0.1:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
                     : "",
-            environment.getActiveProfiles(),
-            gitCommitId);
+            environment.getActiveProfiles());
     }
 }
