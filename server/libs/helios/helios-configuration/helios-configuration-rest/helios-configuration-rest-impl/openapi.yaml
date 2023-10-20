@@ -956,7 +956,7 @@ components:
           type: "integer"
         workflowId:
           description: "The id of a workflow."
-          type: "integer"
+          type: "string"
         __version:
           type: "integer"
     ProjectInstanceWorkflowConnection:
