@@ -31,10 +31,13 @@ const WorkflowTaskListAccordion = ({
                     <AccordionItem key={id} value={id || ''}>
                         <AccordionTrigger className="flex w-full items-center justify-between border-gray-100 bg-white px-2 py-3 data-[state=closed]:border-b">
                             <div className="flex items-center text-sm">
-                                {taskExecution?.component?.icon && (
+                                {taskExecution?.componentDefinition?.icon && (
                                     <InlineSVG
                                         className="mr-1 h-6 w-6"
-                                        src={taskExecution?.component?.icon}
+                                        src={
+                                            taskExecution?.componentDefinition
+                                                ?.icon
+                                        }
                                     />
                                 )}
 
