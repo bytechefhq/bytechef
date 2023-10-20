@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator;
+package com.integri.atlas.engine.coordinator.data;
 
 import java.util.List;
 

@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.coordinator.job.repository;
 
-import com.integri.atlas.engine.coordinator.Page;
+import com.integri.atlas.engine.coordinator.data.Page;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobSummary;
 import java.util.Optional;
