@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2021 <your company/name>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,18 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.repository.resource.workflow;
+package com.bytechef.atlas.repository.classpath;
 
-import com.bytechef.atlas.repository.workflow.WorkflowRepository;
+import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
 import com.bytechef.atlas.workflow.WorkflowFormat;
 import com.bytechef.atlas.workflow.WorkflowResource;
-import com.bytechef.atlas.workflow.domain.Workflow;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -33,21 +32,17 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 /**
- * @author Arik Cohen
+ * @author Ivica Cardic
  */
-public class ResourceBasedWorkflowRepository implements WorkflowRepository {
+public abstract class AbstractResourceWorkflowRepository implements WorkflowRepository {
 
-    private String locationPattern = "classpath:workflow/**/*.{json|yaml}";
+    private String locationPattern;
     private WorkflowMapper workflowMapper;
 
-    private static final String PREFIX = "workflow/";
+    private static final String PREFIX = "workflows/";
 
-    public ResourceBasedWorkflowRepository(WorkflowMapper workflowMapper) {
-        this.workflowMapper = workflowMapper;
-    }
-
-    public ResourceBasedWorkflowRepository(String aLocationPattern, WorkflowMapper workflowMapper) {
-        locationPattern = aLocationPattern;
+    public AbstractResourceWorkflowRepository(String locationPattern, WorkflowMapper workflowMapper) {
+        this.locationPattern = locationPattern;
         this.workflowMapper = workflowMapper;
     }
 
@@ -56,30 +51,31 @@ public class ResourceBasedWorkflowRepository implements WorkflowRepository {
         try {
             ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
             Resource[] resources = resolver.getResources(locationPattern);
-            return Arrays.asList(resources).stream().map(r -> read(r)).collect(Collectors.toList());
+
+            return Arrays.stream(resources).map(this::read).collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private Workflow read(Resource aResource) {
+    private Workflow read(Resource resource) {
         try {
-            String uri = aResource.getURI().toString();
-            String id = uri.substring(uri.lastIndexOf(PREFIX) + PREFIX.length());
-            return workflowMapper.readValue(new WorkflowResource(id, aResource, WorkflowFormat.parse(uri)));
+            URI resourceURI = resource.getURI();
+            String uri = resourceURI.toString();
+            String id = uri.substring(uri.lastIndexOf(PREFIX) + PREFIX.length(), uri.lastIndexOf('.'));
+
+            return workflowMapper.readValue(new WorkflowResource(id, resource, WorkflowFormat.parse(uri)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Workflow findOne(String id) {
+    public Optional<Workflow> findById(String id) {
         List<Workflow> workflows = findAll();
-        Optional<Workflow> findFirst =
-                workflows.stream().filter(p -> p.getId().equals(id)).findFirst();
-        if (findFirst.isPresent()) {
-            return findFirst.get();
-        }
-        throw new IllegalArgumentException("Unknown workflow: " + id);
+
+        return workflows.stream()
+                .filter(workflow -> workflow.getId().equals(id))
+                .findFirst();
     }
 }
