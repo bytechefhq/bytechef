@@ -33,9 +33,6 @@ import java.util.List;
 public interface ProjectRepository
     extends PagingAndSortingRepository<Project, Long>, CrudRepository<Project, Long> {
 
-    @Query("SELECT project.* FROM project ORDER BY name")
-    Iterable<Project> findAllOrderByName();
-
     Iterable<Project> findByCategoryIdInOrderByName(List<Long> categoryIds);
 
     @Query("""

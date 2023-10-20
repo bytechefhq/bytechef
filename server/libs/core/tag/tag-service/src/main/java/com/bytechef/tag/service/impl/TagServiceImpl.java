@@ -21,11 +21,14 @@ import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,7 +70,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public List<Tag> getTags() {
         return StreamSupport.stream(
-            tagRepository.findAll()
+            tagRepository.findAll(Sort.by("name"))
                 .spliterator(),
             false)
             .toList();
@@ -75,11 +78,18 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public List<Tag> getTags(@NonNull List<Long> ids) {
-        return StreamSupport.stream(
-            tagRepository.findAllById(ids)
-                .spliterator(),
-            false)
-            .toList();
+        Assert.notNull(ids, "'ids' must not be null");
+
+        if (ids.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            return StreamSupport.stream(
+                tagRepository.findAllById(ids)
+                    .spliterator(),
+                false)
+                .sorted(Comparator.comparing(Tag::getName))
+                .toList();
+        }
     }
 
     @Override

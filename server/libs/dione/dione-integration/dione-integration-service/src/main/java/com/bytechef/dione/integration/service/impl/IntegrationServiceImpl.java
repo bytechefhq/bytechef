@@ -26,6 +26,7 @@ import java.util.stream.StreamSupport;
 import com.bytechef.dione.integration.service.IntegrationService;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -81,7 +82,7 @@ public class IntegrationServiceImpl implements IntegrationService {
         Iterable<Integration> integrationIterable;
 
         if (CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
-            integrationIterable = integrationRepository.findAllOrderByName();
+            integrationIterable = integrationRepository.findAll(Sort.by("name"));
         } else if (!CollectionUtils.isEmpty(categoryIds) && CollectionUtils.isEmpty(tagIds)) {
             integrationIterable = integrationRepository.findByCategoryIdInOrderByName(categoryIds);
         } else if (CollectionUtils.isEmpty(categoryIds)) {
