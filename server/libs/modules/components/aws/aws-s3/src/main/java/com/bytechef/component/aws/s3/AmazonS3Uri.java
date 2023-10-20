@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.task.handler.s3;
+package com.bytechef.component.aws.s3;
 
 /*
  * Copyright 2014-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -33,6 +33,7 @@ package com.bytechef.task.handler.s3;
  * permissions and limitations under the License.
  */
 
+import com.bytechef.hermes.component.exception.ActionExecutionException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -46,7 +47,7 @@ import java.util.regex.Pattern;
  *
  * @author Arik Cohen
  */
-class AmazonS3URI {
+public class AmazonS3Uri {
 
     private static final Pattern ENDPOINT_PATTERN = Pattern.compile("^(.+\\.)?s3[.-]([a-z0-9-]+)\\.");
 
@@ -66,7 +67,7 @@ class AmazonS3URI {
      *
      * @param str the URI to parse.
      */
-    public AmazonS3URI(final String str) {
+    public AmazonS3Uri(final String str) throws ActionExecutionException {
         this(str, true);
     }
 
@@ -79,7 +80,7 @@ class AmazonS3URI {
      * @param str the URI to parse.
      * @param urlEncode true if string should be URL encoded
      */
-    public AmazonS3URI(final String str, final boolean urlEncode) {
+    public AmazonS3Uri(final String str, final boolean urlEncode) throws ActionExecutionException {
         this(URI.create(preprocessUrlStr(str, urlEncode)), urlEncode);
     }
 
@@ -88,11 +89,11 @@ class AmazonS3URI {
      *
      * @param uri the URI to wrap
      */
-    public AmazonS3URI(final URI uri) {
+    public AmazonS3Uri(final URI uri) {
         this(uri, false);
     }
 
-    private AmazonS3URI(final URI uri, final boolean urlEncode) {
+    private AmazonS3Uri(final URI uri, final boolean urlEncode) {
         if (uri == null) {
             throw new IllegalArgumentException("uri cannot be null");
         }
@@ -261,7 +262,7 @@ class AmazonS3URI {
      * @param str the string to encode
      * @return the encoded string
      */
-    private static String preprocessUrlStr(final String str, final boolean encode) {
+    private static String preprocessUrlStr(final String str, final boolean encode) throws ActionExecutionException {
         if (encode) {
             try {
                 return (URLEncoder.encode(str, "UTF-8")
@@ -271,7 +272,7 @@ class AmazonS3URI {
             } catch (UnsupportedEncodingException e) {
                 // This should never happen unless there is something
                 // fundamentally broken with the running JVM.
-                throw new RuntimeException(e);
+                throw new ActionExecutionException(e.getMessage());
             }
         }
         return str;
@@ -382,7 +383,7 @@ class AmazonS3URI {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        AmazonS3URI that = (AmazonS3URI) o;
+        AmazonS3Uri that = (AmazonS3Uri) o;
 
         if (isPathStyle != that.isPathStyle) return false;
         if (!uri.equals(that.uri)) return false;

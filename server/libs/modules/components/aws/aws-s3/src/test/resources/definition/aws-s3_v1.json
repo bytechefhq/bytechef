@@ -1,0 +1,206 @@
+{
+  "display": {
+    "description": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
+    "label": "AWS S3"
+  },
+  "name": "aws-s3",
+  "actions": [
+    {
+      "display": {
+        "description": "Get the AWS S3 object.",
+        "label": "Get Object"
+      },
+      "name": "getObject",
+      "inputs": [
+        {
+          "description": "The AWS S3 uri.",
+          "label": "URI",
+          "name": "uri",
+          "type": "STRING",
+          "required": true
+        },
+        {
+          "description": "Filename to set for binary data.",
+          "label": "Filename",
+          "name": "filename",
+          "type": "STRING",
+          "required": true,
+          "defaultValue": "file.xml"
+        }
+      ],
+      "outputSchema": [
+        {
+          "type": "OBJECT",
+          "properties": [
+            {
+              "name": "extension",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "mimeType",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "name",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "url",
+              "type": "STRING",
+              "required": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Get the url of an AWS S3 object.",
+        "label": "Get URL"
+      },
+      "name": "getUrl",
+      "inputs": [
+        {
+          "description": "The AWS S3 uri.",
+          "label": "URI",
+          "name": "uri",
+          "type": "STRING",
+          "required": true
+        }
+      ],
+      "outputSchema": [
+        {
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Get the list AWS S3 objects.",
+        "label": "List Objects"
+      },
+      "name": "listObjects",
+      "inputs": [
+        {
+          "description": "The bucket to list AWS S3 objects from.",
+          "label": "Bucket",
+          "name": "bucket",
+          "type": "STRING",
+          "required": true
+        },
+        {
+          "description": "The prefix of an AWS S3 objects.",
+          "label": "Prefix",
+          "name": "prefix",
+          "type": "STRING",
+          "required": true
+        }
+      ],
+      "outputSchema": [
+        {
+          "type": "ARRAY",
+          "items": [
+            {
+              "type": "OBJECT",
+              "properties": [
+                {
+                  "name": "key",
+                  "type": "STRING"
+                },
+                {
+                  "name": "suffix",
+                  "type": "STRING"
+                },
+                {
+                  "name": "uri",
+                  "type": "STRING"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Get the url of an pre-signed AWS S3 object.",
+        "label": "Get Pre-signed Object"
+      },
+      "name": "presignGetObject",
+      "inputs": [
+        {
+          "description": "The AWS S3 uri.",
+          "label": "URI",
+          "name": "uri",
+          "type": "STRING",
+          "required": true
+        }
+      ],
+      "outputSchema": [
+        {
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Store an object to AWS S3.",
+        "label": "Put Object"
+      },
+      "name": "putObject",
+      "inputs": [
+        {
+          "description": "The AWS S3 uri.",
+          "label": "URI",
+          "name": "uri",
+          "type": "STRING",
+          "required": true
+        },
+        {
+          "description": "The object property which contains a reference to the file that needs to be written to AWS S3.",
+          "label": "File",
+          "name": "fileEntry",
+          "type": "OBJECT",
+          "required": true,
+          "properties": [
+            {
+              "name": "extension",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "mimeType",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "name",
+              "type": "STRING",
+              "required": true
+            },
+            {
+              "name": "url",
+              "type": "STRING",
+              "required": true
+            }
+          ]
+        },
+        {
+          "description": "The canned ACL to apply to the object.",
+          "label": "ACL",
+          "name": "acl",
+          "type": "STRING"
+        }
+      ],
+      "outputSchema": [
+        {
+          "type": "STRING"
+        }
+      ]
+    }
+  ],
+  "version": 1
+}
