@@ -108,7 +108,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
             forkJoinTaskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
-            .map(curList -> CollectionUtils.map(curList, WorkflowTask::new))
+            .map(curList -> CollectionUtils.map(curList, WorkflowTask::of))
             .toList();
 
         List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks.get(
@@ -119,13 +119,11 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
             WorkflowTask branchWorkflowTask = branchWorkflowTasks.get(taskExecution.getTaskNumber());
 
-            branchWorkflowTask.put(BRANCH, branch);
-
             Assert.notNull(taskExecution.getJobId(), "'taskExecution.jobId' must not be null");
 
             TaskExecution branchTaskExecution = TaskExecution.of(
                 taskExecution.getJobId(), taskExecution.getParentId(), taskExecution.getPriority(),
-                taskExecution.getTaskNumber() + 1, branchWorkflowTask);
+                taskExecution.getTaskNumber() + 1, branchWorkflowTask.putParameter(BRANCH, branch));
 
             Map<String, Object> context = contextService.peek(
                 taskExecution.getParentId(), branch, Context.Classname.TASK_EXECUTION);

@@ -151,7 +151,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         this.tasks = MapValueUtils
             .getList(source, WorkflowConstants.TASKS, new ParameterizedTypeReference<Map<String, Object>>() {})
             .stream()
-            .map(WorkflowTask::new)
+            .map(WorkflowTask::of)
             .toList();
     }
 

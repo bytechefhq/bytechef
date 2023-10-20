@@ -37,8 +37,8 @@ public class WorkflowTaskToStringConverter implements Converter<WorkflowTask, St
     }
 
     @Override
-    public String convert(WorkflowTask source) {
-        return write(objectMapper, source);
+    public String convert(WorkflowTask workflowTask) {
+        return write(objectMapper, workflowTask);
     }
 
     private String write(ObjectMapper objectMapper, Object object) {

@@ -101,7 +101,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         if (loopForever || taskExecution.getTaskNumber() < list.size()) {
             TaskExecution subTaskExecution = TaskExecution.of(
                 loopTaskExecution.getJobId(), loopTaskExecution.getId(), loopTaskExecution.getPriority(),
-                taskExecution.getTaskNumber() + 1, new WorkflowTask(iteratee));
+                taskExecution.getTaskNumber() + 1, WorkflowTask.of(iteratee));
 
             Map<String, Object> newContext = new HashMap<>(
                 contextService.peek(loopTaskExecution.getId(), Context.Classname.TASK_EXECUTION));

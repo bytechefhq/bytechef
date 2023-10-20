@@ -79,7 +79,7 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
         List<WorkflowTask> workflowTasks = MapValueUtils
             .getList(taskExecution.getParameters(), TASKS, Map.class, Collections.emptyList())
             .stream()
-            .map(WorkflowTask::new)
+            .map(WorkflowTask::of)
             .toList();
 
         Assert.notNull(workflowTasks, "'tasks' property can't be null");

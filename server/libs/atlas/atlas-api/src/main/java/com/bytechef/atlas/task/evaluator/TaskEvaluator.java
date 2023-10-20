@@ -107,7 +107,7 @@ public class TaskEvaluator {
 
         Map<String, Object> map = evaluateInternal(workflowTask.toMap(), context);
 
-        workflowTask.putAll(map);
+        taskExecution.setWorkflowTask(WorkflowTask.of(map));
 
         return taskExecution;
     }

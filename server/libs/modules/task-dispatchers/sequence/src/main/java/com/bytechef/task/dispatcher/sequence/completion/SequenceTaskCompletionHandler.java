@@ -102,7 +102,7 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
         List<WorkflowTask> subWorkflowTasks = MapValueUtils
             .getList(sequenceTaskExecution.getParameters(), TASKS, Map.class, Collections.emptyList())
             .stream()
-            .map(WorkflowTask::new)
+            .map(WorkflowTask::of)
             .toList();
 
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {

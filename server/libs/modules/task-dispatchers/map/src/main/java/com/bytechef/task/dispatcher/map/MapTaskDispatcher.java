@@ -95,7 +95,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
                 Object item = list.get(i);
                 TaskExecution iterateeTaskExecution = TaskExecution.of(
                     taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), i + 1,
-                    new WorkflowTask(iteratee));
+                    WorkflowTask.of(iteratee));
 
                 Map<String, Object> newContext = new HashMap<>(
                     contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));

@@ -37,8 +37,8 @@ public class ExecutionErrorToStringConverter implements Converter<ExecutionError
     }
 
     @Override
-    public String convert(ExecutionError source) {
-        return write(objectMapper, source);
+    public String convert(ExecutionError executionError) {
+        return write(objectMapper, executionError);
     }
 
     private String write(ObjectMapper objectMapper, Object object) {

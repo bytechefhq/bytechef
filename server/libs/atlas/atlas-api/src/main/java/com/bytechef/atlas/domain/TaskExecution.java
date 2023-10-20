@@ -137,7 +137,7 @@ public final class TaskExecution
     private int taskNumber = DEFAULT_TASK_NUMBER;
 
     @Column("workflow_task")
-    private WorkflowTask workflowTask = WorkflowTask.EMPTY_WORKFLOW_TASK;
+    private WorkflowTask workflowTask;
 
     public TaskExecution() {
     }
@@ -316,6 +316,8 @@ public final class TaskExecution
 
     @JsonIgnore
     public Map<String, Object> getParameters() {
+        Objects.requireNonNull(workflowTask);
+
         return workflowTask.getParameters();
     }
 

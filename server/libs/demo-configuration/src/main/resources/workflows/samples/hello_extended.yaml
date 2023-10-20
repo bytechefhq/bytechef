@@ -11,21 +11,21 @@ outputs:
     value: ${randomNumber}
 
 tasks:
-  - name: randomNumber
-    label: Generate a random number
-    type: randomHelper/v1/randomInt
-    parameters:
-      startInclusive: 0
-      endInclusive: 5000
-  - name: map
-    type: var/v1/set
-    parameters:
-      value: "${T(java.util.Map).of('name', 'My name')}"
-  - name: mapInfo
-    label: Print map
-    type: logger/v1/info
-    parameters:
-      text: "Map: ${map}"
+#  - name: randomNumber
+#    label: Generate a random number
+#    type: randomHelper/v1/randomInt
+#    parameters:
+#      startInclusive: 0
+#      endInclusive: 5000
+#  - name: map
+#    type: var/v1/set
+#    parameters:
+#      value: "${T(java.util.Map).of('name', 'My name')}"
+#  - name: mapInfo
+#    label: Print map
+#    type: logger/v1/info
+#    parameters:
+#      text: "Map: ${map}"
   - name: tempDirOperation
     label: Do something with temp dir
     type: logger/v1/info

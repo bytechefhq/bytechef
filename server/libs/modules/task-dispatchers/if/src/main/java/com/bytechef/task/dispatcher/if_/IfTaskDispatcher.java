@@ -83,13 +83,13 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
             subWorkflowTasks = MapValueUtils
                 .getList(taskExecution.getParameters(), CASE_TRUE, Map.class, Collections.emptyList())
                 .stream()
-                .map(WorkflowTask::new)
+                .map(WorkflowTask::of)
                 .toList();
         } else {
             subWorkflowTasks = MapValueUtils
                 .getList(taskExecution.getParameters(), CASE_FALSE, Map.class, Collections.emptyList())
                 .stream()
-                .map(WorkflowTask::new)
+                .map(WorkflowTask::of)
                 .toList();
         }
 

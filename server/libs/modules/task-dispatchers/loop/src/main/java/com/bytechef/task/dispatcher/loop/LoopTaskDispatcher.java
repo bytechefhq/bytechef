@@ -91,7 +91,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         if (loopForever || !list.isEmpty()) {
             TaskExecution subTaskExecution = TaskExecution.of(
                 taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1,
-                new WorkflowTask(iteratee));
+                WorkflowTask.of(iteratee));
 
             Map<String, Object> newContext = new HashMap<>(
                 contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
