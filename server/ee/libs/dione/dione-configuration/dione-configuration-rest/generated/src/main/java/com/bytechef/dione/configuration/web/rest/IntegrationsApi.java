@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T16:22:17.202030+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-13T07:59:51.110362+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "integrations", description = "The Embedded Integrations API")
 public interface IntegrationsApi {
@@ -86,7 +86,7 @@ public interface IntegrationsApi {
 
 
     /**
-     * POST /integrations/{id}/integration-workflows : Create new workflow and adds it to an existing integration
+     * POST /integrations/{id}/workflows : Create new workflow and adds it to an existing integration
      * Create new workflow and adds it to an existing integration.
      *
      * @param id The id of an integration. (required)
@@ -106,7 +106,7 @@ public interface IntegrationsApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/integrations/{id}/integration-workflows",
+        value = "/integrations/{id}/workflows",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
@@ -197,14 +197,14 @@ public interface IntegrationsApi {
 
 
     /**
-     * GET /integrations/{id}/integration-workflows : Get integration workflows for particular integration
+     * GET /integrations/{id}/workflows : Get integration workflows for particular integration
      * Get integration workflows for particular integration.
      *
      * @param id The id of an integration. (required)
      * @return The updated integration object. (status code 200)
      */
     @Operation(
-        operationId = "getIntegrationIntegrationWorkflows",
+        operationId = "getIntegrationWorkflows",
         summary = "Get integration workflows for particular integration",
         description = "Get integration workflows for particular integration.",
         tags = { "integration-workflows" },
@@ -216,10 +216,10 @@ public interface IntegrationsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/integrations/{id}/integration-workflows",
+        value = "/integrations/{id}/workflows",
         produces = { "application/json" }
     )
-    default ResponseEntity<List<WorkflowModel>> getIntegrationIntegrationWorkflows(
+    default ResponseEntity<List<WorkflowModel>> getIntegrationWorkflows(
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         getRequest().ifPresent(request -> {

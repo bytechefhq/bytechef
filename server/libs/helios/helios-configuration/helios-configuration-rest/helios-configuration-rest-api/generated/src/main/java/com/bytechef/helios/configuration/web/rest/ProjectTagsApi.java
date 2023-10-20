@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T17:48:51.717386+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-13T08:20:03.882558+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "project-tags", description = "The Automation Project Tags API")
 public interface ProjectTagsApi {
