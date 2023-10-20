@@ -102,7 +102,8 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
                 subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-                Context context = contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION);
+                Map<String, Object> context = contextService.peek(
+                    taskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
                 contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
 

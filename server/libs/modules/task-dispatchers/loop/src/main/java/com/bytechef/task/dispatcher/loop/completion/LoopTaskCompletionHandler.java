@@ -41,6 +41,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -104,21 +105,22 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-            Context context = contextService.peek(loopTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
+            Map<String, Object> newContext = new HashMap<>(
+                contextService.peek(loopTaskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
             if (!list.isEmpty()) {
-                context.put(
+                newContext.put(
                     MapUtils.getString(loopTaskExecution.getParameters(), ITEM_VAR, ITEM),
                     list.get(taskExecution.getTaskNumber()));
             }
 
-            context.put(
+            newContext.put(
                 MapUtils.getString(loopTaskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX),
                 taskExecution.getTaskNumber());
 
-            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
+            contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext);
 
-            subTaskExecution.evaluate(taskEvaluator, context);
+            subTaskExecution.evaluate(taskEvaluator, newContext);
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {

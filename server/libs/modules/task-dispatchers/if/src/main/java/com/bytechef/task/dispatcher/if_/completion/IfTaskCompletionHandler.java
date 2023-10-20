@@ -38,6 +38,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -88,7 +89,8 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
         TaskExecution ifTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
         if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
-            Context newContext = contextService.peek(ifTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
+            Map<String, Object> newContext = new HashMap<>(
+                contextService.peek(ifTaskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
             newContext.put(taskExecution.getName(), taskExecution.getOutput());
 
@@ -112,7 +114,8 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-            Context context = contextService.peek(ifTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
+            Map<String, Object> context = contextService.peek(
+                ifTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
             contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
 

@@ -26,7 +26,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
@@ -67,7 +66,7 @@ public class EachTaskDispatcherTest {
 
     @Test
     public void testDispatch2() {
-        when(contextService.peek(anyLong(), any())).thenReturn(new Context());
+        when(contextService.peek(anyLong(), any())).thenReturn(Collections.emptyMap());
         when(taskExecutionService.create(any())).thenReturn(new TaskExecution(1L));
 
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(

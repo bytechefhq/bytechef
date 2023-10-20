@@ -21,7 +21,6 @@ package com.bytechef.task.dispatcher.subflow.event;
 
 import com.bytechef.atlas.coordinator.CoordinatorManager;
 import com.bytechef.atlas.coordinator.event.EventListener;
-import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.error.ExecutionError;
@@ -32,6 +31,7 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -108,7 +108,7 @@ public class SubflowJobStatusEventListener implements EventListener {
                     } else {
                         // TODO check, it seems wrong
                         completionTaskExecution.evaluate(
-                            taskEvaluator, Context.of("execution", Context.of("output", output)));
+                            taskEvaluator, Map.of("execution", Map.of("output", output)));
                     }
 
                     coordinatorManager.complete(completionTaskExecution);
