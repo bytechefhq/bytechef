@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionModel;
 import org.mapstruct.Mapper;
@@ -27,8 +27,9 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = DefinitionMapperSpringConfig.class)
-public interface ConnectionDefinitionMapper extends Converter<ConnectionDefinition, ConnectionDefinitionModel> {
+public interface ConnectionDefinitionMapper
+    extends Converter<ComponentDSL.ModifiableConnectionDefinition, ConnectionDefinitionModel> {
 
     @Override
-    ConnectionDefinitionModel convert(ConnectionDefinition connectionDefinition);
+    ConnectionDefinitionModel convert(ComponentDSL.ModifiableConnectionDefinition connectionDefinition);
 }

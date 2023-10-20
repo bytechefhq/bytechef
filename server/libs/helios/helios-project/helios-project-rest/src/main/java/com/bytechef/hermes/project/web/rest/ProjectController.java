@@ -108,7 +108,7 @@ public class ProjectController implements ProjectsApi {
         return Mono.just(
             ResponseEntity.ok(
                 Flux.fromIterable(
-                    projectFacade.getProjects(categoryIds, tagIds)
+                    projectFacade.searchProjects(categoryIds, tagIds)
                         .stream()
                         .map(project -> conversionService.convert(project, ProjectModel.class))
                         .toList())));

@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
-import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionBasicModel;
 import org.mapstruct.Mapper;
@@ -28,7 +28,8 @@ import org.springframework.core.convert.converter.Converter;
  */
 @Mapper(config = DefinitionMapperSpringConfig.class)
 public interface ComponentDefinitionToComponentDefinitionBasicModelMapper
-    extends Converter<ComponentDefinition, ComponentDefinitionBasicModel> {
+    extends Converter<ComponentDSL.ModifiableComponentDefinition, ComponentDefinitionBasicModel> {
 
-    ComponentDefinitionBasicModel convert(ComponentDefinition componentDefinition);
+    @Override
+    ComponentDefinitionBasicModel convert(ComponentDSL.ModifiableComponentDefinition componentDefinition);
 }

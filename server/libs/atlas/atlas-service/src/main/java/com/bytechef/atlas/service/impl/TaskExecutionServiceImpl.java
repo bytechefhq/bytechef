@@ -63,6 +63,11 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     }
 
     @Override
+    public List<TaskExecution> getJobsTaskExecutions(List<Long> jobIds) {
+        return taskExecutionRepository.findAllByJobIdInOrderByCreatedDate(jobIds);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<TaskExecution> getParentTaskExecutions(long parentId) {
         return taskExecutionRepository.findAllByParentId(parentId);

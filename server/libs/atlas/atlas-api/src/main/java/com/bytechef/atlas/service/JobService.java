@@ -19,6 +19,8 @@ package com.bytechef.atlas.service;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.dto.JobParameters;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,17 +33,20 @@ public interface JobService {
 
     Job create(JobParameters jobParameters);
 
+    Optional<Job> fetchLatestJob();
+
     List<Job> getJobs();
 
     Page<Job> getJobs(int pageNumber);
 
     Job getJob(long id);
 
-    Optional<Job> fetchLatestJob();
-
     Job getTaskExecutionJob(long taskExecutionId);
 
     Job resume(long id);
+
+    Page<Job> searchJobs(
+        String status, LocalDateTime startTime, LocalDateTime endTime, Long workflowId, Integer pageNumber);
 
     Job start(long id);
 

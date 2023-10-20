@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.category.domain.Category;
-import com.bytechef.category.web.rest.model.CategoryModel;
 import com.bytechef.hermes.project.domain.Project;
 import com.bytechef.hermes.project.facade.ProjectFacade;
 import com.bytechef.category.service.CategoryService;
@@ -135,54 +134,10 @@ public class ProjectControllerIntTest {
     }
 
     @Test
-    public void testGetProjectCategories() {
-        try {
-            when(projectFacade.getProjectCategories()).thenReturn(List.of(new Category(1, "name")));
-
-            this.webTestClient
-                .get()
-                .uri("/projects/categories")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBodyList(CategoryModel.class)
-                .hasSize(1);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
-    }
-
-    @Test
-    public void testGetProjectTags() {
-        when(projectFacade.getProjectTags()).thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
-
-        try {
-            this.webTestClient
-                .get()
-                .uri("/projects/tags")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.[0].id")
-                .isEqualTo(1)
-                .jsonPath("$.[1].id")
-                .isEqualTo(2)
-                .jsonPath("$.[0].name")
-                .isEqualTo("tag1")
-                .jsonPath("$.[1].name")
-                .isEqualTo("tag2");
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
-    }
-
-    @Test
     public void testGetProjects() {
         Project project = getProject();
 
-        when(projectFacade.getProjects(null, null)).thenReturn(List.of(project));
+        when(projectFacade.searchProjects(null, null)).thenReturn(List.of(project));
 
         this.webTestClient
             .get()
@@ -195,7 +150,7 @@ public class ProjectControllerIntTest {
             .contains(projectMapper.convert(project))
             .hasSize(1);
 
-        when(projectFacade.getProjects(List.of(1L), null)).thenReturn(List.of(project));
+        when(projectFacade.searchProjects(List.of(1L), null)).thenReturn(List.of(project));
 
         this.webTestClient
             .get()
@@ -207,7 +162,7 @@ public class ProjectControllerIntTest {
             .expectBodyList(ProjectModel.class)
             .hasSize(1);
 
-        when(projectFacade.getProjects(null, List.of(1L))).thenReturn(List.of(project));
+        when(projectFacade.searchProjects(null, List.of(1L))).thenReturn(List.of(project));
 
         this.webTestClient
             .get()
@@ -219,7 +174,7 @@ public class ProjectControllerIntTest {
             .expectBodyList(ProjectModel.class)
             .hasSize(1);
 
-        when(projectFacade.getProjects(List.of(1L), List.of(1L))).thenReturn(List.of(project));
+        when(projectFacade.searchProjects(List.of(1L), List.of(1L))).thenReturn(List.of(project));
 
         this.webTestClient
             .get()

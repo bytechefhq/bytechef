@@ -23,6 +23,8 @@ import com.bytechef.atlas.repository.JobRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -77,6 +79,13 @@ public class InMemoryJobRepository implements JobRepository {
 
     @Override
     public Page<Job> findAll(Pageable pageable) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Page<Job> findAll(
+        String status, LocalDateTime startTime, LocalDateTime endTime, Long workflowId, Pageable pageable) {
+
         throw new UnsupportedOperationException();
     }
 

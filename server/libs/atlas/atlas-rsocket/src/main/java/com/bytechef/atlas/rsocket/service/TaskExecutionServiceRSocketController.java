@@ -44,6 +44,16 @@ public class TaskExecutionServiceRSocketController {
         return Mono.create(sink -> sink.success(taskExecutionService.create(taskExecution)));
     }
 
+    @MessageMapping("getJobTaskExecutions")
+    public Mono<List<TaskExecution>> getJobTaskExecutions(Long jobId) {
+        return Mono.create(sink -> sink.success(taskExecutionService.getJobTaskExecutions(jobId)));
+    }
+
+    @MessageMapping("getJobsTaskExecutions")
+    public Mono<List<TaskExecution>> getParentTaskExecutions(List<Long> jobIds) {
+        return Mono.create(sink -> sink.success(taskExecutionService.getJobsTaskExecutions(jobIds)));
+    }
+
     @MessageMapping("getTaskExecution")
     public Mono<TaskExecution> getTaskExecution(Long id) {
         return Mono.create(sink -> sink.success(taskExecutionService.getTaskExecution(id)));

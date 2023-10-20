@@ -20,6 +20,8 @@ package com.bytechef.atlas.rsocket.client.service;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.service.JobService;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -98,6 +100,13 @@ public class JobServiceRSocketClient implements JobService {
             .data(jobId)
             .retrieveMono(Job.class)
             .block();
+    }
+
+    @Override
+    public Page<Job> searchJobs(
+        String status, LocalDateTime startTime, LocalDateTime endTime, Long workflowId, Integer pageNumber) {
+
+        return null;
     }
 
     @Override

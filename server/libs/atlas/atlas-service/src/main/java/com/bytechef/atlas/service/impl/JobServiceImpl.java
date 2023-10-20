@@ -27,6 +27,8 @@ import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.commons.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -57,33 +59,6 @@ public class JobServiceImpl implements JobService {
     public JobServiceImpl(JobRepository jobRepository, List<WorkflowRepository> workflowRepositories) {
         this.jobRepository = jobRepository;
         this.workflowRepositories = workflowRepositories;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Job> getJobs() {
-        return StreamSupport.stream(jobRepository.findAll()
-            .spliterator(), false)
-            .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Job getJob(@NonNull long id) {
-        return jobRepository.findById(id)
-            .orElseThrow();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<Job> getJobs(int pageNumber) {
-        return jobRepository.findAll(PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Job> fetchLatestJob() {
-        return jobRepository.findLatestJob();
     }
 
     @Override
@@ -128,6 +103,33 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<Job> fetchLatestJob() {
+        return jobRepository.findLatestJob();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Job> getJobs() {
+        return StreamSupport.stream(jobRepository.findAll()
+            .spliterator(), false)
+            .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Job getJob(@NonNull long id) {
+        return jobRepository.findById(id)
+            .orElseThrow();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Job> getJobs(int pageNumber) {
+        return jobRepository.findAll(PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Job getTaskExecutionJob(long taskExecutionId) {
         return jobRepository.findByTaskExecutionId(taskExecutionId);
     }
@@ -146,6 +148,16 @@ public class JobServiceImpl implements JobService {
         jobRepository.save(job);
 
         return job;
+    }
+
+    @Override
+    public Page<Job> searchJobs(
+        String status, LocalDateTime startTime, LocalDateTime endTime, Long workflowId, Integer pageNumber) {
+
+// TODO
+//        return jobRepository.findAll(
+//            status, startTime, endTime, workflowId, PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
+        return jobRepository.findAll(PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
     }
 
     @Override

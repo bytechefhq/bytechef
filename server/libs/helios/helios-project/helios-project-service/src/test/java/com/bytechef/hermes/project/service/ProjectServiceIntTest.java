@@ -44,7 +44,9 @@ import static org.assertj.core.api.Assertions.assertThatException;
  * @author Ivica Cardic
  */
 @EmbeddedSql
-@SpringBootTest(classes = ProjectIntTestConfiguration.class)
+@SpringBootTest(classes = ProjectIntTestConfiguration.class, properties = {
+    "bytechef.workflow.context-repository.provider=jdbc", "bytechef.workflow.persistence.provider=jdbc"
+})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ProjectServiceIntTest {
 
@@ -128,7 +130,7 @@ public class ProjectServiceIntTest {
     public void testGetProjects() {
         Project project = projectRepository.save(getProject());
 
-        assertThat(projectService.getProjects(null, null)).hasSize(1);
+        assertThat(projectService.searchProjects(null, null)).hasSize(1);
 
         Category category = new Category("category1");
 
@@ -138,9 +140,9 @@ public class ProjectServiceIntTest {
 
         project = projectRepository.save(project);
 
-        assertThat(projectService.getProjects(List.of(category.getId()), null)).hasSize(1);
+        assertThat(projectService.searchProjects(List.of(category.getId()), null)).hasSize(1);
 
-        assertThat(projectService.getProjects(List.of(Long.MAX_VALUE), null)).hasSize(0);
+        assertThat(projectService.searchProjects(List.of(Long.MAX_VALUE), null)).hasSize(0);
 
         Tag tag = new Tag("tag1");
 
@@ -150,12 +152,12 @@ public class ProjectServiceIntTest {
 
         projectRepository.save(project);
 
-        assertThat(projectService.getProjects(null, List.of(tag.getId()))).hasSize(1);
+        assertThat(projectService.searchProjects(null, List.of(tag.getId()))).hasSize(1);
 
-        assertThat(projectService.getProjects(null, List.of(Long.MAX_VALUE))).hasSize(0);
+        assertThat(projectService.searchProjects(null, List.of(Long.MAX_VALUE))).hasSize(0);
 
         assertThatException()
-            .isThrownBy(() -> projectService.getProjects(List.of(Long.MAX_VALUE), List.of(Long.MAX_VALUE)));
+            .isThrownBy(() -> projectService.searchProjects(List.of(Long.MAX_VALUE), List.of(Long.MAX_VALUE)));
     }
 
     @Test

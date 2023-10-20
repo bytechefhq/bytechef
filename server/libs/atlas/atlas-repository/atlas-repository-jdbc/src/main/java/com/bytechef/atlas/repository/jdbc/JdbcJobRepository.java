@@ -32,7 +32,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @ConditionalOnProperty(prefix = "bytechef.workflow", name = "persistence.provider", havingValue = "jdbc")
-public interface JdbcJobRepository extends PagingAndSortingRepository<Job, Long>, JobRepository {
+public interface JdbcJobRepository extends PagingAndSortingRepository<Job, Long>, JobRepository, CustomJobRepository {
 
     @Override
     @Query("SELECT COUNT(*) FROM job WHERE status='COMPLETED' AND end_time >= current_date-1 AND end_time < current_date")

@@ -44,7 +44,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @EmbeddedSql
 @SpringBootTest(
     classes = ProjectIntTestConfiguration.class,
-    properties = "bytechef.workflow.workflow-repository.jdbc.enabled=true")
+    properties = {
+        "bytechef.workflow.context-repository.provider=jdbc", "bytechef.workflow.persistence.provider=jdbc",
+        "bytechef.workflow.workflow-repository.jdbc.enabled=true"
+    })
 public class ProjectFacadeIntTest {
 
     @Autowired
@@ -198,7 +201,7 @@ public class ProjectFacadeIntTest {
 
         project = projectRepository.save(project);
 
-        List<Project> projects = projectFacade.getProjects(null, null);
+        List<Project> projects = projectFacade.searchProjects(null, null);
 
         assertThat(projects).isEqualTo(List.of(project));
 

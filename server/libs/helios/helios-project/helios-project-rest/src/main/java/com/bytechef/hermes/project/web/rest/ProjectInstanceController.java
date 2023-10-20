@@ -15,26 +15,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.service;
+package com.bytechef.hermes.project.web.rest;
 
-import com.bytechef.atlas.domain.TaskExecution;
-
-import java.util.List;
+import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Ivica Cardic
  */
-public interface TaskExecutionService {
-
-    TaskExecution create(TaskExecution taskExecution);
-
-    TaskExecution getTaskExecution(long id);
-
-    List<TaskExecution> getJobTaskExecutions(long jobId);
-
-    List<TaskExecution> getJobsTaskExecutions(List<Long> jobIds);
-
-    List<TaskExecution> getParentTaskExecutions(long parentId);
-
-    TaskExecution update(TaskExecution taskExecution);
+@RestController
+@ConditionalOnApi
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+public class ProjectInstanceController implements ProjectInstancesApi {
 }

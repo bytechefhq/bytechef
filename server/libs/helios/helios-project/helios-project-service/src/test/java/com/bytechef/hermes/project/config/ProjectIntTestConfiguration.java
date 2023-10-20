@@ -17,21 +17,17 @@
 
 package com.bytechef.hermes.project.config;
 
-import com.bytechef.atlas.repository.WorkflowCrudRepository;
-import com.bytechef.atlas.repository.WorkflowRepository;
+import com.bytechef.atlas.config.WorkflowConfiguration;
+import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
-import com.bytechef.atlas.service.WorkflowService;
-import com.bytechef.atlas.service.impl.WorkflowServiceImpl;
-
-import java.util.List;
 
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.cache.CacheManager;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
@@ -45,18 +41,17 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
     })
 @EnableAutoConfiguration
 @Import({
+    WorkflowConfiguration.class,
     WorkflowMapperConfiguration.class
 })
 @SpringBootConfiguration
 public class ProjectIntTestConfiguration {
 
-    @Bean
-    public WorkflowService workflowService(
-        CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
-        List<WorkflowRepository> workflowRepositories) {
+    @MockBean
+    private EventPublisher eventPublisher;
 
-        return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
-    }
+    @MockBean
+    private MessageBroker messageBroker;
 
     @EnableCaching
     @TestConfiguration
