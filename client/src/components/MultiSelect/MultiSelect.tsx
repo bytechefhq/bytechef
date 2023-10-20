@@ -3,23 +3,17 @@ import cx from 'classnames';
 import React, {forwardRef} from 'react';
 import CreatableSelect from 'react-select/creatable';
 import {Props} from 'react-select/dist/declarations/src';
-import {GroupBase} from 'react-select/dist/declarations/src/types';
 import './MultiSelect.css';
 
-type MultiSelectProps<
-    Option = unknown,
-    IsMulti extends boolean = true,
-    Group extends GroupBase<Option> = GroupBase<Option>
-> = {
+type MultiSelectProps = {
     label: string;
     name: string;
     options: {label: string; value: string}[];
-    value: {label: string; value: string}[];
     error?: boolean;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     onChange?: (value: any) => void;
     onCreateOption?: (value: string) => void;
-} & Props<Option, IsMulti, Group>;
+} & Props;
 
 const MultiSelect = forwardRef<CreatableSelect, MultiSelectProps>(
     ({error, label, name, ...props}) => (

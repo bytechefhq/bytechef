@@ -1,11 +1,30 @@
 import {useQuery} from '@tanstack/react-query';
-import {Integration, IntegrationsApi} from 'data-access/integration';
+import {
+    CategoryModel,
+    IntegrationModel,
+    IntegrationsApi,
+    TagModel,
+} from 'data-access/integration';
 
 export enum ServerStateKeysEnum {
+    IntegrationCategories = 'integrationCategories',
+    IntegrationTags = 'integrationTags',
     Integrations = 'integrations',
 }
 
-export const useGetIntegrations = () =>
-    useQuery<Integration[], Error>([ServerStateKeysEnum.Integrations], () =>
-        new IntegrationsApi().getIntegrations()
+export const useGetIntegrationCategoriesQuery = () =>
+    useQuery<CategoryModel[], Error>(
+        [ServerStateKeysEnum.IntegrationCategories],
+        () => new IntegrationsApi().getIntegrationCategories()
+    );
+
+export const useGetIntegrationTagsQuery = () =>
+    useQuery<TagModel[], Error>([ServerStateKeysEnum.IntegrationTags], () =>
+        new IntegrationsApi().getIntegrationTags()
+    );
+
+export const useGetIntegrationsQuery = () =>
+    useQuery<IntegrationModel[], Error>(
+        [ServerStateKeysEnum.Integrations],
+        () => new IntegrationsApi().getIntegrations()
     );

@@ -1,16 +1,17 @@
 import React from 'react';
 import Footer from './Footer';
 import Header from './Header';
+import {CategoryModel, TagModel} from '../../data-access/integration';
 
 export const IntegrationItem: React.FC<{
     button: string;
     name: string;
     status: boolean;
-    category?: string;
+    category?: CategoryModel;
     date?: Date;
     id?: number;
     description?: string;
-    tags?: string[];
+    tags?: TagModel[];
     workflowIds?: string[];
 }> = ({id, name, status, category, tags, date}) => {
     return (
