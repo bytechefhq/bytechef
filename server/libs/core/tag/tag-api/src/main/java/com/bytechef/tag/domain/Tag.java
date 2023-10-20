@@ -69,6 +69,11 @@ public class Tag implements Persistable<Long>, Serializable {
         this.name = name;
     }
 
+    public Tag(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public String getCreatedBy() {
         return createdBy;
     }
@@ -99,7 +104,7 @@ public class Tag implements Persistable<Long>, Serializable {
 
     @Override
     public boolean isNew() {
-        return id == null;
+        return id == null || id < 0;
     }
 
     public void setId(Long id) {
@@ -108,6 +113,10 @@ public class Tag implements Persistable<Long>, Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 
     @Override
@@ -134,8 +143,13 @@ public class Tag implements Persistable<Long>, Serializable {
     @Override
     public String toString() {
         return "Tag{" +
-            "id=" + getId() +
-            ", name='" + getName() + "'" +
-            "}";
+            "createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
+            ", id=" + id +
+            ", lastModifiedBy='" + lastModifiedBy + '\'' +
+            ", lastModifiedDate=" + lastModifiedDate +
+            ", name='" + name + '\'' +
+            ", version=" + version +
+            '}';
     }
 }
