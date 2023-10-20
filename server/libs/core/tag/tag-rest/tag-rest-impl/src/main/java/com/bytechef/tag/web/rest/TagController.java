@@ -26,7 +26,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -47,35 +46,9 @@ public class TagController implements TagsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> deleteTag(Long id, ServerWebExchange exchange) {
-        tagService.delete(id);
-
-        return Mono.empty();
-    }
-
-    @Override
     public Mono<ResponseEntity<TagModel>> getTag(Long id, ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(
             conversionService.convert(tagService.getTag(id), TagModel.class)));
-    }
-
-    @Override
-    public Mono<ResponseEntity<Flux<TagModel>>> getTags(ServerWebExchange exchange) {
-        return Mono.just(
-            Flux.fromIterable(tagService.getTags()
-                .stream()
-                .map(tag -> conversionService.convert(tag, TagModel.class))
-                .toList()))
-            .map(ResponseEntity::ok);
-    }
-
-    @Override
-    public Mono<ResponseEntity<TagModel>> createTag(Mono<TagModel> tagModelMono, ServerWebExchange exchange) {
-        return tagModelMono.map(
-            tagModel -> conversionService.convert(
-                tagService.create(conversionService.convert(tagModel, Tag.class)),
-                TagModel.class))
-            .map(ResponseEntity::ok);
     }
 
     @Override
