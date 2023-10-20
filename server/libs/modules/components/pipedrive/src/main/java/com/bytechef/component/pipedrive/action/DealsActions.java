@@ -17,6 +17,7 @@
 
 package com.bytechef.component.pipedrive.action;
 
+import static com.bytechef.hermes.component.RestComponentHandler.PropertyType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
@@ -27,6 +28,8 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.utils.HttpClientUtils.BodyContentType;
+import static com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
@@ -53,7 +56,7 @@ public class DealsActions {
             .required(true)
             .metadata(
                 Map.of(
-                    "type", "QUERY")))
+                    "type", PropertyType.QUERY)))
         .output(object(null).properties(bool("success").label("Success")
             .description("If the response is successful or not")
             .required(false),
@@ -66,7 +69,7 @@ public class DealsActions {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseFormat", "JSON")))
+                    "responseFormat", ResponseFormat.JSON)))
         .exampleOutput("{\"success\":true,\"data\":{\"id\":[123,456]}}"),
         action("getDeals")
             .display(
@@ -85,19 +88,19 @@ public class DealsActions {
                 .required(false)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
                 integer("filter_id").label("Filter_id")
                     .description("The ID of the filter to use")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("stage_id").label("Stage_id")
                     .description("If supplied, only deals within the given stage will be returned")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 string("status").label("Status")
                     .description(
                         "Only fetch deals with a specific status. If omitted, all not deleted deals are returned. If set to deleted, deals that have been deleted up to 30 days ago will be included.")
@@ -106,26 +109,26 @@ public class DealsActions {
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("start").label("Start")
                     .description("Pagination start")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("limit").label("Limit")
                     .description("Items shown per page")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 string("sort").label("Sort")
                     .description(
                         "The field names and sorting mode separated by a comma (`field_name_1 ASC`, `field_name_2 DESC`). Only first-level field keys are supported (no nested keys).")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 number("owned_by_you").label("Owned_by_you")
                     .description(
                         "When supplied, only deals owned by you are returned. However, `filter_id` takes precedence over `owned_by_you` when both are supplied.")
@@ -133,7 +136,7 @@ public class DealsActions {
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")))
+                            "type", PropertyType.QUERY)))
             .output(object(null).properties(bool("success").label("Success")
                 .description("If the response is successful or not")
                 .required(false),
@@ -509,7 +512,7 @@ public class DealsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", "JSON")))
+                        "responseFormat", ResponseFormat.JSON)))
             .exampleOutput(
                 "{\"success\":true,\"data\":[{\"id\":1,\"creator_user_id\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true,\"value\":8877},\"user_id\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true,\"value\":8877},\"person_id\":{\"active_flag\":true,\"name\":\"Person\",\"email\":[{\"label\":\"work\",\"value\":\"person@pipedrive.com\",\"primary\":true}],\"phone\":[{\"label\":\"work\",\"value\":\"37244499911\",\"primary\":true}],\"value\":1101},\"org_id\":{\"name\":\"Organization\",\"people_count\":2,\"owner_id\":8877,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\",\"value\":5},\"stage_id\":2,\"title\":\"Deal One\",\"value\":5000,\"currency\":\"EUR\",\"add_time\":\"2019-05-29 04:21:51\",\"update_time\":\"2019-11-28 16:19:50\",\"stage_change_time\":\"2019-11-28 15:41:22\",\"active\":true,\"deleted\":false,\"status\":\"open\",\"probability\":null,\"next_activity_date\":\"2019-11-29\",\"next_activity_time\":\"11:30:00\",\"next_activity_id\":128,\"last_activity_id\":null,\"last_activity_date\":null,\"lost_reason\":null,\"visible_to\":\"1\",\"close_time\":null,\"pipeline_id\":1,\"won_time\":\"2019-11-27 11:40:36\",\"first_won_time\":\"2019-11-27 11:40:36\",\"lost_time\":\"2019-11-27 11:40:36\",\"products_count\":0,\"files_count\":0,\"notes_count\":2,\"followers_count\":0,\"email_messages_count\":4,\"activities_count\":1,\"done_activities_count\":0,\"undone_activities_count\":1,\"participants_count\":1,\"expected_close_date\":\"2019-06-29\",\"last_incoming_mail_time\":\"2019-05-29 18:21:42\",\"last_outgoing_mail_time\":\"2019-05-30 03:45:35\",\"label\":11,\"stage_order_nr\":2,\"person_name\":\"Person\",\"org_name\":\"Organization\",\"next_activity_subject\":\"Call\",\"next_activity_type\":\"call\",\"next_activity_duration\":\"00:30:00\",\"next_activity_note\":\"Note content\",\"formatted_value\":\"€5,000\",\"weighted_value\":5000,\"formatted_weighted_value\":\"€5,000\",\"weighted_value_currency\":\"EUR\",\"rotten_time\":null,\"owner_name\":\"Creator\",\"cc_email\":\"company+deal1@pipedrivemail.com\",\"org_hidden\":false,\"person_hidden\":false}],\"related_objects\":{\"user\":{\"8877\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true}},\"organization\":{\"5\":{\"id\":5,\"name\":\"Organization\",\"people_count\":2,\"owner_id\":8877,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\"}},\"person\":{\"1101\":{\"active_flag\":true,\"id\":1101,\"name\":\"Person\",\"email\":[{\"label\":\"work\",\"value\":\"person@pipedrive.com\",\"primary\":true}],\"phone\":[{\"label\":\"work\",\"value\":\"3421787767\",\"primary\":true}],\"owner_id\":8877}},\"stage\":{\"2\":{\"id\":2,\"company_id\":123,\"order_nr\":1,\"name\":\"Stage Name\",\"active_flag\":true,\"deal_probability\":100,\"pipeline_id\":1,\"rotten_flag\":false,\"rotten_days\":null,\"add_time\":\"2015-12-08 13:54:06\",\"update_time\":\"2015-12-08 13:54:06\",\"pipeline_name\":\"Pipeline\",\"pipeline_deal_probability\":true}},\"pipeline\":{\"1\":{\"id\":1,\"name\":\"Pipeline\",\"url_title\":\"Pipeline\",\"order_nr\":0,\"active\":true,\"deal_probability\":true,\"add_time\":\"2015-12-08 10:00:24\",\"update_time\":\"2015-12-08 10:00:24\"}}},\"additional_data\":{\"pagination\":{\"start\":0,\"limit\":100,\"more_items_in_collection\":false,\"next_start\":1}}}"),
         action("addDeal")
@@ -520,7 +523,7 @@ public class DealsActions {
             .metadata(
                 Map.of(
                     "requestMethod", "POST",
-                    "path", "/deals", "bodyContentType", "JSON"
+                    "path", "/deals", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
                 ))
             .properties(object(null).properties(date("expected_close_date").label("Expected_close_date")
@@ -580,7 +583,7 @@ public class DealsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "type", "BODY")))
+                        "type", PropertyType.BODY)))
             .output(object(null).properties(bool("success").label("Success")
                 .description("If the response is successful or not")
                 .required(false),
@@ -938,7 +941,7 @@ public class DealsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", "JSON")))
+                        "responseFormat", ResponseFormat.JSON)))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"id\":1,\"creator_user_id\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true,\"value\":8877},\"user_id\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true,\"value\":8877},\"person_id\":{\"active_flag\":true,\"name\":\"Person\",\"email\":[{\"label\":\"work\",\"value\":\"person@pipedrive.com\",\"primary\":true}],\"phone\":[{\"label\":\"work\",\"value\":\"37244499911\",\"primary\":true}],\"value\":1101},\"org_id\":{\"name\":\"Organization\",\"people_count\":2,\"owner_id\":8877,\"address\":\"\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\",\"value\":5},\"stage_id\":2,\"title\":\"Deal One\",\"value\":5000,\"currency\":\"EUR\",\"add_time\":\"2019-05-29 04:21:51\",\"update_time\":\"2019-11-28 16:19:50\",\"stage_change_time\":\"2019-11-28 15:41:22\",\"active\":true,\"deleted\":false,\"status\":\"open\",\"probability\":null,\"next_activity_date\":\"2019-11-29\",\"next_activity_time\":\"11:30:00\",\"next_activity_id\":128,\"last_activity_id\":null,\"last_activity_date\":null,\"lost_reason\":null,\"visible_to\":\"1\",\"close_time\":null,\"pipeline_id\":1,\"won_time\":\"2019-11-27 11:40:36\",\"first_won_time\":\"2019-11-27 11:40:36\",\"lost_time\":\"\",\"products_count\":0,\"files_count\":0,\"notes_count\":2,\"followers_count\":0,\"email_messages_count\":4,\"activities_count\":1,\"done_activities_count\":0,\"undone_activities_count\":1,\"participants_count\":1,\"expected_close_date\":\"2019-06-29\",\"last_incoming_mail_time\":\"2019-05-29 18:21:42\",\"last_outgoing_mail_time\":\"2019-05-30 03:45:35\",\"label\":11,\"stage_order_nr\":2,\"person_name\":\"Person\",\"org_name\":\"Organization\",\"next_activity_subject\":\"Call\",\"next_activity_type\":\"call\",\"next_activity_duration\":\"00:30:00\",\"next_activity_note\":\"Note content\",\"formatted_value\":\"€5,000\",\"weighted_value\":5000,\"formatted_weighted_value\":\"€5,000\",\"weighted_value_currency\":\"EUR\",\"rotten_time\":null,\"owner_name\":\"Creator\",\"cc_email\":\"company+deal1@pipedrivemail.com\",\"org_hidden\":false,\"person_hidden\":false},\"related_objects\":{\"user\":{\"8877\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true}},\"organization\":{\"2\":{\"id\":2,\"name\":\"Organization\",\"people_count\":2,\"owner_id\":8877,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\"}},\"person\":{\"1101\":{\"active_flag\":true,\"id\":1101,\"name\":\"Person\",\"email\":[{\"label\":\"work\",\"value\":\"person@pipedrive.com\",\"primary\":true}],\"phone\":[{\"label\":\"work\",\"value\":\"3421787767\",\"primary\":true}],\"owner_id\":8877}},\"stage\":{\"2\":{\"id\":2,\"company_id\":123,\"order_nr\":1,\"name\":\"Stage Name\",\"active_flag\":true,\"deal_probability\":100,\"pipeline_id\":1,\"rotten_flag\":false,\"rotten_days\":null,\"add_time\":\"2015-12-08 13:54:06\",\"update_time\":\"2015-12-08 13:54:06\",\"pipeline_name\":\"Pipeline\",\"pipeline_deal_probability\":true}},\"pipeline\":{\"1\":{\"id\":1,\"name\":\"Pipeline\",\"url_title\":\"Pipeline\",\"order_nr\":0,\"active\":true,\"deal_probability\":true,\"add_time\":\"2015-12-08 10:00:24\",\"update_time\":\"2015-12-08 10:00:24\"}}}}"),
         action("searchDeals")
@@ -958,7 +961,7 @@ public class DealsActions {
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
                 string("fields").label("Fields")
                     .description(
                         "A comma-separated string array. The fields to perform the search from. Defaults to all of them.")
@@ -967,7 +970,7 @@ public class DealsActions {
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 bool("exact_match").label("Exact_match")
                     .description(
                         "When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive.")
@@ -975,21 +978,21 @@ public class DealsActions {
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("person_id").label("Person_id")
                     .description(
                         "Will filter deals by the provided person ID. The upper limit of found deals associated with the person is 2000.")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("organization_id").label("Organization_id")
                     .description(
                         "Will filter deals by the provided organization ID. The upper limit of found deals associated with the organization is 2000.")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 string("status").label("Status")
                     .description(
                         "Will filter deals by the provided specific status. open = Open, won = Won, lost = Lost. The upper limit of found deals associated with the status is 2000.")
@@ -997,27 +1000,27 @@ public class DealsActions {
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 string("include_fields").label("Include_fields")
                     .description("Supports including optional fields in the results which are not provided by default")
                     .options(option("Deal.cc_email", "deal.cc_email"))
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("start").label("Start")
                     .description(
                         "Pagination start. Note that the pagination is based on main results and does not include related items when using `search_for_related_items` parameter.")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("limit").label("Limit")
                     .description("Items shown per page")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")))
+                            "type", PropertyType.QUERY)))
             .output(
                 object(
                     null)
@@ -1123,7 +1126,7 @@ public class DealsActions {
                                 .required(false))
                         .metadata(
                             Map.of(
-                                "responseFormat", "JSON")))
+                                "responseFormat", ResponseFormat.JSON)))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"items\":[{\"result_score\":1.22,\"item\":{\"id\":1,\"type\":\"deal\",\"title\":\"Jane Doe deal\",\"value\":100,\"currency\":\"USD\",\"status\":\"open\",\"visible_to\":3,\"owner\":{\"id\":1},\"stage\":{\"id\":1,\"name\":\"Lead In\"},\"person\":{\"id\":1,\"name\":\"Jane Doe\"},\"organization\":null,\"custom_fields\":[],\"notes\":[]}}]},\"additional_data\":{\"description\":\"The additional data of the list\",\"type\":\"object\",\"properties\":{\"start\":{\"type\":\"integer\",\"description\":\"Pagination start\"},\"limit\":{\"type\":\"integer\",\"description\":\"Items shown per page\"},\"more_items_in_collection\":{\"type\":\"boolean\",\"description\":\"If there are more list items in the collection than displayed or not\"}}}}"),
         action("getDealsTimeline")
@@ -1142,7 +1145,7 @@ public class DealsActions {
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
                 string("interval").label("Interval")
                     .description(
                         "The type of the interval<table><tr><th>Value</th><th>Description</th></tr><tr><td>`day`</td><td>Day</td></tr><tr><td>`week`</td><td>A full week (7 days) starting from `start_date`</td></tr><tr><td>`month`</td><td>A full month (depending on the number of days in given month) starting from `start_date`</td></tr><tr><td>`quarter`</td><td>A full quarter (3 months) starting from `start_date`</td></tr></table>")
@@ -1151,38 +1154,38 @@ public class DealsActions {
                     .required(true)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("amount").label("Amount")
                     .description(
                         "The number of given intervals, starting from `start_date`, to fetch. E.g. 3 (months).")
                     .required(true)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 string("field_key").label("Field_key")
                     .description("The date field key which deals will be retrieved from")
                     .required(true)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("user_id").label("User_id")
                     .description("If supplied, only deals matching the given user will be returned")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("pipeline_id").label("Pipeline_id")
                     .description("If supplied, only deals matching the given pipeline will be returned")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("filter_id").label("Filter_id")
                     .description("If supplied, only deals matching the given filter will be returned")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 number("exclude_deals").label("Exclude_deals")
                     .description(
                         "Whether to exclude deals list (1) or not (0). Note that when deals are excluded, the timeline summary (counts and values) is still returned.")
@@ -1190,14 +1193,14 @@ public class DealsActions {
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 string("totals_convert_currency").label("Totals_convert_currency")
                     .description(
                         "The 3-letter currency code of any of the supported currencies. When supplied, `totals_converted` is returned per each interval which contains the currency-converted total amounts in the given currency. You may also set this parameter to `default_currency` in which case the user's default currency is used.")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")))
+                            "type", PropertyType.QUERY)))
             .output(object(null).properties(bool("success").label("Success")
                 .description("If the response is successful or not")
                 .required(false),
@@ -1418,7 +1421,7 @@ public class DealsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", "JSON")))
+                        "responseFormat", ResponseFormat.JSON)))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"period_start\":\"2019-12-01 00:00:00\",\"period_end\":\"2019-12-31 23:59:59\",\"deals\":[{\"id\":1,\"creator_user_id\":8877,\"user_id\":8877,\"person_id\":1101,\"org_id\":5,\"stage_id\":2,\"title\":\"Deal One\",\"value\":5000,\"currency\":\"EUR\",\"add_time\":\"2019-05-29 04:21:51\",\"update_time\":\"2019-11-28 16:19:50\",\"stage_change_time\":\"2019-11-28 15:41:22\",\"active\":true,\"deleted\":false,\"status\":\"open\",\"probability\":null,\"next_activity_date\":\"2019-11-29\",\"next_activity_time\":\"11:30:00\",\"next_activity_id\":128,\"last_activity_id\":null,\"last_activity_date\":null,\"lost_reason\":null,\"visible_to\":\"1\",\"close_time\":null,\"pipeline_id\":1,\"won_time\":\"2019-11-27 11:40:36\",\"first_won_time\":\"2019-11-27 11:40:36\",\"lost_time\":\"\",\"products_count\":0,\"files_count\":0,\"notes_count\":2,\"followers_count\":0,\"email_messages_count\":4,\"activities_count\":1,\"done_activities_count\":0,\"undone_activities_count\":1,\"participants_count\":1,\"expected_close_date\":\"2019-06-29\",\"last_incoming_mail_time\":\"2019-05-29 18:21:42\",\"last_outgoing_mail_time\":\"2019-05-30 03:45:35\",\"label\":11,\"stage_order_nr\":2,\"person_name\":\"Person\",\"org_name\":\"Organization\",\"next_activity_subject\":\"Call\",\"next_activity_type\":\"call\",\"next_activity_duration\":\"00:30:00\",\"next_activity_note\":\"Note content\",\"formatted_value\":\"€5,000\",\"weighted_value\":5000,\"formatted_weighted_value\":\"€5,000\",\"weighted_value_currency\":\"EUR\",\"rotten_time\":null,\"owner_name\":\"Creator\",\"cc_email\":\"company+deal1@pipedrivemail.com\",\"org_hidden\":false,\"person_hidden\":false}],\"totals\":{\"count\":2,\"values\":{\"EUR\":100,\"USD\":220},\"weighted_values\":{\"EUR\":100,\"USD\":2200},\"open_count\":1,\"open_values\":{\"EUR\":100},\"weighted_open_values\":{\"EUR\":100},\"won_count\":1,\"won_values\":{\"USD\":2200}}}}"),
         action("deleteDeal")
@@ -1436,7 +1439,7 @@ public class DealsActions {
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", "PATH")))
+                        "type", PropertyType.PATH)))
             .output(object(null).properties(bool("success").label("Success")
                 .description("If the request was successful or not")
                 .required(false),
@@ -1447,7 +1450,7 @@ public class DealsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", "JSON")))
+                        "responseFormat", ResponseFormat.JSON)))
             .exampleOutput("{\"success\":true,\"data\":{\"id\":123}}"),
         action("getDeal")
             .display(
@@ -1465,7 +1468,7 @@ public class DealsActions {
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", "PATH")))
+                        "type", PropertyType.PATH)))
             .output(object(null).properties(bool("success").label("Success")
                 .description("If the response is successful or not")
                 .required(false),
@@ -1898,7 +1901,7 @@ public class DealsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", "JSON")))
+                        "responseFormat", ResponseFormat.JSON)))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"id\":1,\"creator_user_id\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true,\"value\":8877},\"user_id\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true,\"value\":8877},\"person_id\":{\"active_flag\":true,\"name\":\"Person\",\"email\":[{\"label\":\"work\",\"value\":\"person@pipedrive.com\",\"primary\":true}],\"phone\":[{\"label\":\"work\",\"value\":\"37244499911\",\"primary\":true}],\"value\":1101},\"org_id\":{\"name\":\"Organization\",\"people_count\":2,\"owner_id\":8877,\"address\":\"\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\",\"value\":5},\"stage_id\":2,\"title\":\"Deal One\",\"value\":5000,\"currency\":\"EUR\",\"add_time\":\"2019-05-29 04:21:51\",\"update_time\":\"2019-11-28 16:19:50\",\"stage_change_time\":\"2019-11-28 15:41:22\",\"active\":true,\"deleted\":false,\"status\":\"open\",\"probability\":null,\"next_activity_date\":\"2019-11-29\",\"next_activity_time\":\"11:30:00\",\"next_activity_id\":128,\"last_activity_id\":null,\"last_activity_date\":null,\"lost_reason\":null,\"visible_to\":\"1\",\"close_time\":null,\"pipeline_id\":1,\"won_time\":\"2019-11-27 11:40:36\",\"first_won_time\":\"2019-11-27 11:40:36\",\"lost_time\":\"\",\"products_count\":0,\"files_count\":0,\"notes_count\":2,\"followers_count\":0,\"email_messages_count\":4,\"activities_count\":1,\"done_activities_count\":0,\"undone_activities_count\":1,\"participants_count\":1,\"expected_close_date\":\"2019-06-29\",\"last_incoming_mail_time\":\"2019-05-29 18:21:42\",\"last_outgoing_mail_time\":\"2019-05-30 03:45:35\",\"label\":11,\"stage_order_nr\":2,\"person_name\":\"Person\",\"org_name\":\"Organization\",\"next_activity_subject\":\"Call\",\"next_activity_type\":\"call\",\"next_activity_duration\":\"00:30:00\",\"next_activity_note\":\"Note content\",\"formatted_value\":\"€5,000\",\"weighted_value\":5000,\"formatted_weighted_value\":\"€5,000\",\"weighted_value_currency\":\"EUR\",\"rotten_time\":null,\"owner_name\":\"Creator\",\"cc_email\":\"company+deal1@pipedrivemail.com\",\"org_hidden\":false,\"person_hidden\":false,\"average_time_to_won\":{\"y\":0,\"m\":0,\"d\":0,\"h\":0,\"i\":20,\"s\":49,\"total_seconds\":1249},\"average_stage_progress\":4.99,\"age\":{\"y\":0,\"m\":6,\"d\":14,\"h\":8,\"i\":57,\"s\":26,\"total_seconds\":17139446},\"stay_in_pipeline_stages\":{\"times_in_stages\":{\"1\":15721267,\"2\":1288449,\"3\":4368,\"4\":3315,\"5\":26460},\"order_of_stages\":[1,2,3,4,5]},\"last_activity\":null,\"next_activity\":null},\"additional_data\":{\"dropbox_email\":\"company+deal1@pipedrivemail.com\"},\"related_objects\":{\"user\":{\"8877\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true}},\"organization\":{\"2\":{\"id\":2,\"name\":\"Organization\",\"people_count\":2,\"owner_id\":8877,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\"}},\"person\":{\"1101\":{\"active_flag\":true,\"id\":1101,\"name\":\"Person\",\"email\":[{\"label\":\"work\",\"value\":\"person@pipedrive.com\",\"primary\":true}],\"phone\":[{\"label\":\"work\",\"value\":\"3421787767\",\"primary\":true}],\"owner_id\":8877}},\"stage\":{\"2\":{\"id\":2,\"company_id\":123,\"order_nr\":1,\"name\":\"Stage Name\",\"active_flag\":true,\"deal_probability\":100,\"pipeline_id\":1,\"rotten_flag\":false,\"rotten_days\":null,\"add_time\":\"2015-12-08 13:54:06\",\"update_time\":\"2015-12-08 13:54:06\",\"pipeline_name\":\"Pipeline\",\"pipeline_deal_probability\":true}},\"pipeline\":{\"1\":{\"id\":1,\"name\":\"Pipeline\",\"url_title\":\"Pipeline\",\"order_nr\":0,\"active\":true,\"deal_probability\":true,\"add_time\":\"2015-12-08 10:00:24\",\"update_time\":\"2015-12-08 10:00:24\"}}}}"),
         action("updateDeal")
@@ -1909,7 +1912,7 @@ public class DealsActions {
             .metadata(
                 Map.of(
                     "requestMethod", "PUT",
-                    "path", "/deals/{id}", "bodyContentType", "JSON"
+                    "path", "/deals/{id}", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
                 ))
             .properties(integer("id").label("Id")
@@ -1917,7 +1920,7 @@ public class DealsActions {
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", "PATH")),
+                        "type", PropertyType.PATH)),
                 object(null).properties(date("expected_close_date").label("Expected_close_date")
                     .description("The expected close date of the deal. In ISO 8601 format: YYYY-MM-DD.")
                     .required(false),
@@ -1971,7 +1974,7 @@ public class DealsActions {
                         .required(false))
                     .metadata(
                         Map.of(
-                            "type", "BODY")))
+                            "type", PropertyType.BODY)))
             .output(object(null).properties(bool("success").label("Success")
                 .description("If the response is successful or not")
                 .required(false),
@@ -2329,7 +2332,7 @@ public class DealsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", "JSON")))
+                        "responseFormat", ResponseFormat.JSON)))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"id\":1,\"creator_user_id\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true,\"value\":8877},\"user_id\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true,\"value\":8877},\"person_id\":{\"active_flag\":true,\"name\":\"Person\",\"email\":[{\"label\":\"work\",\"value\":\"person@pipedrive.com\",\"primary\":true}],\"phone\":[{\"label\":\"work\",\"value\":\"37244499911\",\"primary\":true}],\"value\":1101},\"org_id\":{\"name\":\"Organization\",\"people_count\":2,\"owner_id\":8877,\"address\":\"\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\",\"value\":5},\"stage_id\":2,\"title\":\"Deal One\",\"value\":5000,\"currency\":\"EUR\",\"add_time\":\"2019-05-29 04:21:51\",\"update_time\":\"2019-11-28 16:19:50\",\"stage_change_time\":\"2019-11-28 15:41:22\",\"active\":true,\"deleted\":false,\"status\":\"open\",\"probability\":null,\"next_activity_date\":\"2019-11-29\",\"next_activity_time\":\"11:30:00\",\"next_activity_id\":128,\"last_activity_id\":null,\"last_activity_date\":null,\"lost_reason\":null,\"visible_to\":\"1\",\"close_time\":null,\"pipeline_id\":1,\"won_time\":\"2019-11-27 11:40:36\",\"first_won_time\":\"2019-11-27 11:40:36\",\"lost_time\":\"\",\"products_count\":0,\"files_count\":0,\"notes_count\":2,\"followers_count\":0,\"email_messages_count\":4,\"activities_count\":1,\"done_activities_count\":0,\"undone_activities_count\":1,\"participants_count\":1,\"expected_close_date\":\"2019-06-29\",\"last_incoming_mail_time\":\"2019-05-29 18:21:42\",\"last_outgoing_mail_time\":\"2019-05-30 03:45:35\",\"label\":11,\"stage_order_nr\":2,\"person_name\":\"Person\",\"org_name\":\"Organization\",\"next_activity_subject\":\"Call\",\"next_activity_type\":\"call\",\"next_activity_duration\":\"00:30:00\",\"next_activity_note\":\"Note content\",\"formatted_value\":\"€5,000\",\"weighted_value\":5000,\"formatted_weighted_value\":\"€5,000\",\"weighted_value_currency\":\"EUR\",\"rotten_time\":null,\"owner_name\":\"Creator\",\"cc_email\":\"company+deal1@pipedrivemail.com\",\"org_hidden\":false,\"person_hidden\":false},\"related_objects\":{\"user\":{\"8877\":{\"id\":8877,\"name\":\"Creator\",\"email\":\"john.doe@pipedrive.com\",\"has_pic\":false,\"pic_hash\":null,\"active_flag\":true}},\"organization\":{\"2\":{\"id\":2,\"name\":\"Organization\",\"people_count\":2,\"owner_id\":8877,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\"}},\"person\":{\"1101\":{\"active_flag\":true,\"id\":1101,\"name\":\"Person\",\"email\":[{\"label\":\"work\",\"value\":\"person@pipedrive.com\",\"primary\":true}],\"phone\":[{\"label\":\"work\",\"value\":\"3421787767\",\"primary\":true}],\"owner_id\":8877}},\"stage\":{\"2\":{\"id\":2,\"company_id\":123,\"order_nr\":1,\"name\":\"Stage Name\",\"active_flag\":true,\"deal_probability\":100,\"pipeline_id\":1,\"rotten_flag\":false,\"rotten_days\":null,\"add_time\":\"2015-12-08 13:54:06\",\"update_time\":\"2015-12-08 13:54:06\",\"pipeline_name\":\"Pipeline\",\"pipeline_deal_probability\":true}},\"pipeline\":{\"1\":{\"id\":1,\"name\":\"Pipeline\",\"url_title\":\"Pipeline\",\"order_nr\":0,\"active\":true,\"deal_probability\":true,\"add_time\":\"2015-12-08 10:00:24\",\"update_time\":\"2015-12-08 10:00:24\"}}}}"),
         action("mergeDeals")
@@ -2340,7 +2343,7 @@ public class DealsActions {
             .metadata(
                 Map.of(
                     "requestMethod", "PUT",
-                    "path", "/deals/{id}/merge", "bodyContentType", "JSON"
+                    "path", "/deals/{id}/merge", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
                 ))
             .properties(integer("id").label("Id")
@@ -2348,13 +2351,13 @@ public class DealsActions {
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", "PATH")),
+                        "type", PropertyType.PATH)),
                 object(null).properties(integer("merge_with_id").label("Merge_with_id")
                     .description("The ID of the deal that the deal will be merged with")
                     .required(true))
                     .metadata(
                         Map.of(
-                            "type", "BODY")))
+                            "type", PropertyType.BODY)))
             .output(object(null).properties(bool("success").label("Success")
                 .description("If the response is successful or not")
                 .required(false),
@@ -2535,7 +2538,7 @@ public class DealsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", "JSON")))
+                        "responseFormat", ResponseFormat.JSON)))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"id\":1,\"creator_user_id\":123,\"user_id\":456,\"person_id\":1,\"org_id\":2,\"stage_id\":2,\"title\":\"Deal One\",\"value\":5000,\"currency\":\"EUR\",\"add_time\":\"2019-05-29 04:21:51\",\"update_time\":\"2019-06-29 05:20:31\",\"stage_change_time\":\"2019-11-28 15:41:22\",\"active\":true,\"deleted\":false,\"status\":\"open\",\"probability\":null,\"next_activity_date\":\"2019-11-29\",\"next_activity_time\":\"11:30:00\",\"next_activity_id\":128,\"last_activity_id\":null,\"last_activity_date\":null,\"lost_reason\":null,\"visible_to\":\"1\",\"close_time\":null,\"pipeline_id\":1,\"won_time\":\"2019-11-27 11:40:36\",\"first_won_time\":\"2019-11-27 11:40:36\",\"lost_time\":\"\",\"products_count\":0,\"files_count\":0,\"notes_count\":2,\"followers_count\":0,\"email_messages_count\":4,\"activities_count\":1,\"done_activities_count\":0,\"undone_activities_count\":1,\"participants_count\":1,\"expected_close_date\":\"2019-06-29\",\"last_incoming_mail_time\":\"2019-05-29 18:21:42\",\"last_outgoing_mail_time\":\"2019-05-30 03:45:35\",\"label\":11,\"stage_order_nr\":2,\"person_name\":\"Person\",\"org_name\":\"Organization\",\"next_activity_subject\":\"Call\",\"next_activity_type\":\"call\",\"next_activity_duration\":\"00:30:00\",\"next_activity_note\":\"Note content\",\"formatted_value\":\"€5,000\",\"weighted_value\":5000,\"formatted_weighted_value\":\"€5,000\",\"weighted_value_currency\":\"EUR\",\"rotten_time\":null,\"owner_name\":\"Creator\",\"cc_email\":\"company+deal1@pipedrivemail.com\",\"org_hidden\":false,\"person_hidden\":false,\"merge_what_id\":2}}"),
         action("getDealUsers")
@@ -2553,7 +2556,7 @@ public class DealsActions {
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", "PATH")))
+                        "type", PropertyType.PATH)))
             .output(object(null)
                 .properties(
                     object("data")
@@ -2569,7 +2572,7 @@ public class DealsActions {
                         .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", "JSON")))
+                        "responseFormat", ResponseFormat.JSON)))
             .exampleOutput("{\"success\":true,\"data\":{\"id\":[123,456]}}"),
         action("getDealPersons")
             .display(
@@ -2587,19 +2590,19 @@ public class DealsActions {
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", "PATH")),
+                        "type", PropertyType.PATH)),
                 integer("start").label("Start")
                     .description("Pagination start")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("limit").label("Limit")
                     .description("Items shown per page")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")))
+                            "type", PropertyType.QUERY)))
             .output(object(null).properties(object("additional_data").properties(integer("start").label("Start")
                 .description("Pagination start")
                 .required(false),
@@ -2888,7 +2891,7 @@ public class DealsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", "JSON")))
+                        "responseFormat", ResponseFormat.JSON)))
             .exampleOutput(
                 "{\"success\":true,\"data\":[{\"id\":1,\"company_id\":12,\"owner_id\":{\"id\":123,\"name\":\"Jane Doe\",\"email\":\"jane@pipedrive.com\",\"has_pic\":1,\"pic_hash\":\"2611ace8ac6a3afe2f69ed56f9e08c6b\",\"active_flag\":true,\"value\":123},\"org_id\":{\"name\":\"Org Name\",\"people_count\":1,\"owner_id\":123,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\",\"value\":1234},\"name\":\"Will Smith\",\"first_name\":\"Will\",\"last_name\":\"Smith\",\"open_deals_count\":2,\"related_open_deals_count\":2,\"closed_deals_count\":3,\"related_closed_deals_count\":3,\"participant_open_deals_count\":1,\"participant_closed_deals_count\":1,\"email_messages_count\":1,\"activities_count\":1,\"done_activities_count\":1,\"undone_activities_count\":2,\"files_count\":2,\"notes_count\":2,\"followers_count\":3,\"won_deals_count\":3,\"related_won_deals_count\":3,\"lost_deals_count\":1,\"related_lost_deals_count\":1,\"active_flag\":true,\"phone\":[{\"value\":\"12345\",\"primary\":true,\"label\":\"work\"}],\"email\":[{\"value\":\"12345@email.com\",\"primary\":true,\"label\":\"work\"}],\"primary_email\":\"12345@email.com\",\"first_char\":\"w\",\"update_time\":\"2020-05-08 05:30:20\",\"add_time\":\"2017-10-18 13:23:07\",\"visible_to\":\"3\",\"marketing_status\":\"no_consent\",\"picture_id\":{\"item_type\":\"person\",\"item_id\":25,\"active_flag\":true,\"add_time\":\"2020-09-08 08:17:52\",\"update_time\":\"0000-00-00 00:00:00\",\"added_by_user_id\":967055,\"pictures\":{\"128\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_128.jpg\",\"512\":\"https://pipedrive-profile-pics.s3.example.com/f8893852574273f2747bf6ef09d11cfb4ac8f269_512.jpg\"},\"value\":4},\"next_activity_date\":\"2019-11-29\",\"next_activity_time\":\"11:30:00\",\"next_activity_id\":128,\"last_activity_id\":34,\"last_activity_date\":\"2019-11-28\",\"last_incoming_mail_time\":\"2019-05-29 18:21:42\",\"last_outgoing_mail_time\":\"2019-05-30 03:45:35\",\"label\":1,\"org_name\":\"Organization name\",\"owner_name\":\"Jane Doe\",\"cc_email\":\"org@pipedrivemail.com\"}],\"additional_data\":{\"pagination\":{\"start\":0,\"limit\":100,\"more_items_in_collection\":true}},\"related_objects\":{\"allOf\":[{\"organization\":{\"1\":{\"id\":1,\"name\":\"Org Name\",\"people_count\":1,\"owner_id\":123,\"address\":\"Mustamäe tee 3a, 10615 Tallinn\",\"active_flag\":true,\"cc_email\":\"org@pipedrivemail.com\"}}},{\"user\":{\"123\":{\"id\":123,\"name\":\"Jane Doe\",\"email\":\"jane@pipedrive.com\",\"has_pic\":1,\"pic_hash\":\"2611ace8ac6a3afe2f69ed56f9e08c6b\",\"active_flag\":true}}}]}}"));
 }

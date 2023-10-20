@@ -17,6 +17,7 @@
 
 package com.bytechef.component.pipedrive.action;
 
+import static com.bytechef.hermes.component.RestComponentHandler.PropertyType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
@@ -24,6 +25,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
@@ -84,7 +86,7 @@ public class PipelinesActions {
                     .required(false))
             .metadata(
                 Map.of(
-                    "responseFormat", "JSON")))
+                    "responseFormat", ResponseFormat.JSON)))
         .exampleOutput(
             "{\"success\":true,\"data\":[{\"id\":1,\"name\":\"Pipeline Name\",\"url_title\":\"Pipeline-Name\",\"order_nr\":1,\"active\":true,\"deal_probability\":true,\"add_time\":\"2017-08-03 12:51:18\",\"update_time\":\"2020-03-23 13:15:25\",\"selected\":true}]}"),
         action("getPipeline")
@@ -103,14 +105,14 @@ public class PipelinesActions {
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", "PATH")),
+                        "type", PropertyType.PATH)),
                 string("totals_convert_currency").label("Totals_convert_currency")
                     .description(
                         "The 3-letter currency code of any of the supported currencies. When supplied, `per_stages_converted` is returned in `deals_summary` which contains the currency-converted total amounts in the given currency per each stage. You may also set this parameter to `default_currency` in which case users default currency is used.")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")))
+                            "type", PropertyType.QUERY)))
             .output(object(null).properties(string("update_time").label("Update_time")
                 .description("The pipeline update time. Format: YYYY-MM-DD HH:MM:SS.")
                 .required(false),
@@ -200,7 +202,7 @@ public class PipelinesActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", "JSON")))
+                        "responseFormat", ResponseFormat.JSON)))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"id\":1,\"name\":\"Pipeline\",\"url_title\":\"Pipeline\",\"order_nr\":1,\"active\":true,\"deal_probability\":true,\"add_time\":\"2017-08-03 12:51:18\",\"update_time\":\"2020-03-23 13:15:25\",\"selected\":true,\"deals_summary\":{\"per_stages\":{\"1\":{\"EUR\":{\"count\":1,\"value\":10,\"value_formatted\":\"10 €\",\"weighted_value\":10,\"weighted_value_formatted\":\"10€\"}}},\"per_currency\":{\"EUR\":1},\"total_count\":1,\"per_currency_full\":{\"EUR\":{\"count\":1,\"value\":10}}}}}"));
 }

@@ -25,6 +25,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
@@ -104,7 +105,7 @@ public class ActivityTypesActions {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseFormat", "JSON")))
+                    "responseFormat", ResponseFormat.JSON)))
         .exampleOutput(
             "{\"success\":true,\"data\":[{\"id\":4,\"order_nr\":1,\"name\":\"Deadline\",\"key_string\":\"deadline\",\"icon_key\":\"deadline\",\"active_flag\":true,\"color\":\"FFFFFF\",\"is_custom_flag\":false,\"add_time\":\"2019-10-04 16:24:55\",\"update_time\":\"2020-03-11 13:53:01\"},{\"id\":5,\"order_nr\":2,\"name\":\"Call\",\"key_string\":\"call\",\"icon_key\":\"call\",\"active_flag\":true,\"color\":\"FFFFFF\",\"is_custom_flag\":false,\"add_time\":\"2019-12-21 19:44:01\",\"update_time\":\"2019-12-21 19:44:01\"}]}"));
 }

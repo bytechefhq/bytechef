@@ -17,6 +17,7 @@
 
 package com.bytechef.component.pipedrive.action;
 
+import static com.bytechef.hermes.component.RestComponentHandler.PropertyType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
@@ -26,6 +27,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
@@ -122,7 +124,7 @@ public class UsersActions {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseFormat", "JSON")))
+                    "responseFormat", ResponseFormat.JSON)))
         .exampleOutput(
             "{\"success\":true,\"data\":[{\"id\":1,\"name\":\"John Doe\",\"default_currency\":\"EUR\",\"locale\":\"et_EE\",\"lang\":1,\"email\":\"john@pipedrive.com\",\"phone\":\"0000-0001\",\"activated\":true,\"last_login\":\"2019-11-21 08:45:56\",\"created\":\"2018-11-13 09:16:26\",\"modified\":\"2019-11-21 08:45:56\",\"has_created_company\":true,\"access\":[{\"app\":\"sales\",\"admin\":true,\"permission_set_id\":\"62cc4d7f-4038-4352-abf3-a8c1c822b631\"},{\"app\":\"global\",\"admin\":true,\"permission_set_id\":\"233b7976-39bd-43a9-b305-ef3a2b0998e5\"},{\"app\":\"account_settings\",\"admin\":true,\"permission_set_id\":\"982c5ce5-b8ba-4b47-b102-9da024f4b990\"}],\"active_flag\":true,\"timezone_name\":\"Europe/Berlin\",\"timezone_offset\":\"+03:00\",\"role_id\":1,\"icon_url\":\"https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/WPVG_icon_2016.svg/1024px-WPVG_icon_2016.svg.png\",\"is_you\":true},{\"id\":2,\"name\":\"Jane Doe\",\"default_currency\":\"EUR\",\"locale\":\"et_EE\",\"lang\":1,\"email\":\"jane@pipedrive.com\",\"phone\":\"0000-0002\",\"activated\":true,\"last_login\":\"2019-09-11 11:43:54\",\"created\":\"2019-01-22 10:43:47\",\"modified\":\"2019-11-21 09:49:50\",\"has_created_company\":false,\"access\":[{\"app\":\"sales\",\"admin\":false,\"permission_set_id\":\"f07d229d-088a-4144-a40f-1fe64295d180\"},{\"app\":\"global\",\"admin\":true,\"permission_set_id\":\"233b7976-39bd-43a9-b305-ef3a2b0998e5\"}],\"active_flag\":true,\"timezone_name\":\"Europe/Berlin\",\"timezone_offset\":\"+03:00\",\"role_id\":1,\"icon_url\":null,\"is_you\":false}]}"),
         action("findUsersByName")
@@ -140,7 +142,7 @@ public class UsersActions {
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
                 number("search_by_email").label("Search_by_email")
                     .description(
                         "When enabled, the term will only be matched against email addresses of users. Default: `false`")
@@ -148,7 +150,7 @@ public class UsersActions {
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")))
+                            "type", PropertyType.QUERY)))
             .output(object(null).properties(array("data").items(object(null).properties(integer("id").label("Id")
                 .description("The user ID")
                 .required(false),
@@ -223,7 +225,7 @@ public class UsersActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", "JSON")))
+                        "responseFormat", ResponseFormat.JSON)))
             .exampleOutput(
                 "{\"success\":true,\"data\":[{\"id\":1,\"name\":\"John Doe\",\"default_currency\":\"EUR\",\"locale\":\"et_EE\",\"lang\":1,\"email\":\"john@pipedrive.com\",\"phone\":\"0000-0001\",\"activated\":true,\"last_login\":\"2019-11-21 08:45:56\",\"created\":\"2018-11-13 09:16:26\",\"modified\":\"2019-11-21 08:45:56\",\"has_created_company\":true,\"access\":[{\"app\":\"sales\",\"admin\":true,\"permission_set_id\":\"62cc4d7f-4038-4352-abf3-a8c1c822b631\"},{\"app\":\"global\",\"admin\":true,\"permission_set_id\":\"233b7976-39bd-43a9-b305-ef3a2b0998e5\"},{\"app\":\"account_settings\",\"admin\":true,\"permission_set_id\":\"982c5ce5-b8ba-4b47-b102-9da024f4b990\"}],\"active_flag\":true,\"timezone_name\":\"Europe/Berlin\",\"timezone_offset\":\"+03:00\",\"role_id\":1,\"icon_url\":\"https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/WPVG_icon_2016.svg/1024px-WPVG_icon_2016.svg.png\",\"is_you\":true},{\"id\":2,\"name\":\"Jane Doe\",\"default_currency\":\"EUR\",\"locale\":\"et_EE\",\"lang\":1,\"email\":\"jane@pipedrive.com\",\"phone\":\"0000-0002\",\"activated\":true,\"last_login\":\"2019-09-11 11:43:54\",\"created\":\"2019-01-22 10:43:47\",\"modified\":\"2019-11-21 09:49:50\",\"has_created_company\":false,\"access\":[{\"app\":\"sales\",\"admin\":false,\"permission_set_id\":\"f07d229d-088a-4144-a40f-1fe64295d180\"},{\"app\":\"global\",\"admin\":true,\"permission_set_id\":\"233b7976-39bd-43a9-b305-ef3a2b0998e5\"}],\"active_flag\":true,\"timezone_name\":\"Europe/Berlin\",\"timezone_offset\":\"+03:00\",\"role_id\":1,\"icon_url\":null,\"is_you\":false}]}"),
         action("getUser")
@@ -241,7 +243,7 @@ public class UsersActions {
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", "PATH")))
+                        "type", PropertyType.PATH)))
             .output(object(null).properties(object("data").properties(integer("id").label("Id")
                 .description("The user ID")
                 .required(false),
@@ -315,7 +317,7 @@ public class UsersActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", "JSON")))
+                        "responseFormat", ResponseFormat.JSON)))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"id\":2,\"name\":\"Jane Doe\",\"default_currency\":\"EUR\",\"locale\":\"et_EE\",\"lang\":1,\"email\":\"jane@pipedrive.com\",\"phone\":\"0000-0002\",\"activated\":true,\"last_login\":\"2019-09-11 11:43:54\",\"created\":\"2019-01-22 10:43:47\",\"modified\":\"2019-11-21 09:49:50\",\"has_created_company\":false,\"access\":[{\"app\":\"sales\",\"admin\":false,\"permission_set_id\":\"f07d229d-088a-4144-a40f-1fe64295d180\"},{\"app\":\"global\",\"admin\":true,\"permission_set_id\":\"233b7976-39bd-43a9-b305-ef3a2b0998e5\"}],\"active_flag\":true,\"timezone_name\":\"Europe/Berlin\",\"timezone_offset\":\"+03:00\",\"role_id\":1,\"icon_url\":null,\"is_you\":false}}"));
 }

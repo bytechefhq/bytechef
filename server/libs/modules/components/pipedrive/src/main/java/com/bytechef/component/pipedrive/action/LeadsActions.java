@@ -17,6 +17,7 @@
 
 package com.bytechef.component.pipedrive.action;
 
+import static com.bytechef.hermes.component.RestComponentHandler.PropertyType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
@@ -28,6 +29,8 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.utils.HttpClientUtils.BodyContentType;
+import static com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
@@ -57,21 +60,21 @@ public class LeadsActions {
             .exampleValue(100)
             .metadata(
                 Map.of(
-                    "type", "QUERY")),
+                    "type", PropertyType.QUERY)),
             integer("start").label("Start")
                 .description("For pagination, the position that represents the first result for the page")
                 .required(false)
                 .exampleValue(0)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
             string("archived_status").label("Archived_status")
                 .description("Filtering based on the archived status of a lead. If not provided, `All` is used.")
                 .options(option("Archived", "archived"), option("Not_archived", "not_archived"), option("All", "all"))
                 .required(false)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
             integer("owner_id").label("Owner_id")
                 .description(
                     "If supplied, only leads matching the given user will be returned. However, `filter_id` takes precedence over `owner_id` when supplied.")
@@ -79,7 +82,7 @@ public class LeadsActions {
                 .exampleValue(1)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
             integer("person_id").label("Person_id")
                 .description(
                     "If supplied, only leads matching the given person will be returned. However, `filter_id` takes precedence over `person_id` when supplied.")
@@ -87,7 +90,7 @@ public class LeadsActions {
                 .exampleValue(1)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
             integer("organization_id").label("Organization_id")
                 .description(
                     "If supplied, only leads matching the given organization will be returned. However, `filter_id` takes precedence over `organization_id` when supplied.")
@@ -95,14 +98,14 @@ public class LeadsActions {
                 .exampleValue(1)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
             integer("filter_id").label("Filter_id")
                 .description("The ID of the filter to use")
                 .required(false)
                 .exampleValue(1)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
             string("sort").label("Sort")
                 .description(
                     "The field names and sorting mode separated by a comma (`field_name_1 ASC`, `field_name_2 DESC`). Only first-level field keys are supported (no nested keys).")
@@ -114,7 +117,7 @@ public class LeadsActions {
                 .required(false)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")))
+                        "type", PropertyType.QUERY)))
         .output(object(null).properties(bool("success").label("Success")
             .required(false),
             array("data").items(object(null).properties(string("id").label("Id")
@@ -198,7 +201,7 @@ public class LeadsActions {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseFormat", "JSON")))
+                    "responseFormat", ResponseFormat.JSON)))
         .exampleOutput(
             "{\"success\":true,\"data\":[{\"id\":\"adf21080-0e10-11eb-879b-05d71fb426ec\",\"title\":\"Jane Doe Lead\",\"owner_id\":1,\"creator_id\":1,\"label_ids\":[\"f08b42a0-4e75-11ea-9643-03698ef1cfd6\",\"f08b42a1-4e75-11ea-9643-03698ef1cfd6\"],\"person_id\":1092,\"organization_id\":null,\"source_name\":\"API\",\"is_archived\":false,\"was_seen\":false,\"value\":{\"amount\":999,\"currency\":\"USD\"},\"expected_close_date\":null,\"next_activity_id\":1,\"add_time\":\"2020-10-14T11:30:36.551Z\",\"update_time\":\"2020-10-14T11:30:36.551Z\",\"visible_to\":\"3\",\"cc_email\":\"company+1+leadntPaYKA5QRxXkh6WMNHiGh@dev.pipedrivemail.com\"}]}"),
         action("addLead")
@@ -209,7 +212,7 @@ public class LeadsActions {
             .metadata(
                 Map.of(
                     "requestMethod", "POST",
-                    "path", "/leads", "bodyContentType", "JSON"
+                    "path", "/leads", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
                 ))
             .properties(object(null).properties(string("title").label("Title")
@@ -256,7 +259,7 @@ public class LeadsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "type", "BODY")))
+                        "type", PropertyType.BODY)))
             .output(object(null).properties(bool("success").label("Success")
                 .required(false),
                 object("data").properties(string("id").label("Id")
@@ -328,7 +331,7 @@ public class LeadsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", "JSON")))
+                        "responseFormat", ResponseFormat.JSON)))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"id\":\"adf21080-0e10-11eb-879b-05d71fb426ec\",\"title\":\"Jane Doe Lead\",\"owner_id\":1,\"creator_id\":1,\"label_ids\":[\"f08b42a0-4e75-11ea-9643-03698ef1cfd6\",\"f08b42a1-4e75-11ea-9643-03698ef1cfd6\"],\"person_id\":1092,\"organization_id\":null,\"source_name\":\"API\",\"is_archived\":false,\"was_seen\":false,\"value\":{\"amount\":999,\"currency\":\"USD\"},\"expected_close_date\":null,\"next_activity_id\":1,\"add_time\":\"2020-10-14T11:30:36.551Z\",\"update_time\":\"2020-10-14T11:30:36.551Z\",\"visible_to\":\"3\",\"cc_email\":\"company+1+leadntPaYKA5QRxXkh6WMNHiGh@dev.pipedrivemail.com\"}}"),
         action("deleteLead")
@@ -346,7 +349,7 @@ public class LeadsActions {
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", "PATH")))
+                        "type", PropertyType.PATH)))
             .output(object(null).properties(bool("success").label("Success")
                 .required(false),
                 object("data").properties(string("id").label("Id")
@@ -355,7 +358,7 @@ public class LeadsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", "JSON")))
+                        "responseFormat", ResponseFormat.JSON)))
             .exampleOutput("{\"success\":true,\"data\":{\"id\":\"adf21080-0e10-11eb-879b-05d71fb426ec\"}}"),
         action("getLead")
             .display(
@@ -373,7 +376,7 @@ public class LeadsActions {
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", "PATH")))
+                        "type", PropertyType.PATH)))
             .output(object(null).properties(bool("success").label("Success")
                 .required(false),
                 object("data").properties(string("id").label("Id")
@@ -445,7 +448,7 @@ public class LeadsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", "JSON")))
+                        "responseFormat", ResponseFormat.JSON)))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"id\":\"adf21080-0e10-11eb-879b-05d71fb426ec\",\"title\":\"Jane Doe Lead\",\"owner_id\":1,\"creator_id\":1,\"label_ids\":[\"f08b42a0-4e75-11ea-9643-03698ef1cfd6\",\"f08b42a1-4e75-11ea-9643-03698ef1cfd6\"],\"person_id\":1092,\"organization_id\":null,\"source_name\":\"API\",\"is_archived\":false,\"was_seen\":false,\"value\":{\"amount\":999,\"currency\":\"USD\"},\"expected_close_date\":null,\"next_activity_id\":1,\"add_time\":\"2020-10-14T11:30:36.551Z\",\"update_time\":\"2020-10-14T11:30:36.551Z\",\"visible_to\":\"3\",\"cc_email\":\"company+1+leadntPaYKA5QRxXkh6WMNHiGh@dev.pipedrivemail.com\"}}"),
         action("updateLead")
@@ -456,7 +459,7 @@ public class LeadsActions {
             .metadata(
                 Map.of(
                     "requestMethod", "PATCH",
-                    "path", "/leads/{id}", "bodyContentType", "JSON"
+                    "path", "/leads/{id}", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
                 ))
             .properties(string("id").label("Id")
@@ -464,7 +467,7 @@ public class LeadsActions {
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", "PATH")),
+                        "type", PropertyType.PATH)),
                 object(null).properties(string("title").label("Title")
                     .description("The name of the lead")
                     .required(false),
@@ -512,7 +515,7 @@ public class LeadsActions {
                         .required(false))
                     .metadata(
                         Map.of(
-                            "type", "BODY")))
+                            "type", PropertyType.BODY)))
             .output(object(null).properties(bool("success").label("Success")
                 .required(false),
                 object("data").properties(string("id").label("Id")
@@ -584,7 +587,7 @@ public class LeadsActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", "JSON")))
+                        "responseFormat", ResponseFormat.JSON)))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"id\":\"adf21080-0e10-11eb-879b-05d71fb426ec\",\"title\":\"Jane Doe Lead\",\"owner_id\":1,\"creator_id\":1,\"label_ids\":[\"f08b42a0-4e75-11ea-9643-03698ef1cfd6\",\"f08b42a1-4e75-11ea-9643-03698ef1cfd6\"],\"person_id\":1092,\"organization_id\":null,\"source_name\":\"API\",\"is_archived\":false,\"was_seen\":false,\"value\":{\"amount\":999,\"currency\":\"USD\"},\"expected_close_date\":null,\"next_activity_id\":1,\"add_time\":\"2020-10-14T11:30:36.551Z\",\"update_time\":\"2020-10-14T11:30:36.551Z\",\"visible_to\":\"3\",\"cc_email\":\"company+1+leadntPaYKA5QRxXkh6WMNHiGh@dev.pipedrivemail.com\"}}"),
         action("searchLeads")
@@ -604,7 +607,7 @@ public class LeadsActions {
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
                 string("fields").label("Fields")
                     .description(
                         "A comma-separated string array. The fields to perform the search from. Defaults to all of them.")
@@ -613,7 +616,7 @@ public class LeadsActions {
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 bool("exact_match").label("Exact_match")
                     .description(
                         "When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive.")
@@ -621,41 +624,41 @@ public class LeadsActions {
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("person_id").label("Person_id")
                     .description(
                         "Will filter leads by the provided person ID. The upper limit of found leads associated with the person is 2000.")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("organization_id").label("Organization_id")
                     .description(
                         "Will filter leads by the provided organization ID. The upper limit of found leads associated with the organization is 2000.")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 string("include_fields").label("Include_fields")
                     .description("Supports including optional fields in the results which are not provided by default")
                     .options(option("Lead.was_seen", "lead.was_seen"))
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("start").label("Start")
                     .description(
                         "Pagination start. Note that the pagination is based on main results and does not include related items when using `search_for_related_items` parameter.")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("limit").label("Limit")
                     .description("Items shown per page")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")))
+                            "type", PropertyType.QUERY)))
             .output(
                 object(
                     null)
@@ -762,7 +765,7 @@ public class LeadsActions {
                                 .required(false))
                         .metadata(
                             Map.of(
-                                "responseFormat", "JSON")))
+                                "responseFormat", ResponseFormat.JSON)))
             .exampleOutput(
                 "{\"success\":true,\"data\":{\"items\":[{\"result_score\":0.29,\"item\":{\"id\":\"39c433f0-8a4c-11ec-8728-09968f0a1ca0\",\"type\":\"lead\",\"title\":\"John Doe lead\",\"owner\":{\"id\":1},\"person\":{\"id\":1,\"name\":\"John Doe\"},\"organization\":{\"id\":1,\"name\":\"John company\"},\"phones\":[],\"emails\":[\"john@doe.com\"],\"custom_fields\":[],\"notes\":[],\"value\":100,\"currency\":\"USD\",\"visible_to\":3,\"is_archived\":false}}]},\"additional_data\":{\"description\":\"The additional data of the list\",\"type\":\"object\",\"properties\":{\"start\":{\"type\":\"integer\",\"description\":\"Pagination start\"},\"limit\":{\"type\":\"integer\",\"description\":\"Items shown per page\"},\"more_items_in_collection\":{\"type\":\"boolean\",\"description\":\"If there are more list items in the collection than displayed or not\"}}}}"));
 }

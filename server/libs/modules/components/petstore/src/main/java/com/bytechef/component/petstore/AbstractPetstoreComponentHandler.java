@@ -17,6 +17,7 @@
 
 package com.bytechef.component.petstore;
 
+import static com.bytechef.hermes.component.RestComponentHandler.PropertyType;
 import static com.bytechef.hermes.component.constants.ComponentConstants.ADD_TO;
 import static com.bytechef.hermes.component.constants.ComponentConstants.CLIENT_ID;
 import static com.bytechef.hermes.component.constants.ComponentConstants.CLIENT_SECRET;
@@ -30,10 +31,13 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.authorizatio
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.utils.HttpClientUtils.BodyContentType;
+import static com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.component.petstore.schema.ApiResponseSchema;
 import com.bytechef.component.petstore.schema.OrderSchema;
@@ -50,37 +54,39 @@ import java.util.Map;
  * @generated
  */
 public abstract class AbstractPetstoreComponentHandler implements RestComponentHandler {
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("petstore")
+    private final ComponentDefinition componentDefinition = component("petstore")
         .display(
-            display("Petstore")
-                .description(
-                    "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.  You can find out more about\n"
-                        + "Swagger at [https://swagger.io](https://swagger.io). In the third iteration of the pet store, we've switched to the design first approach!\n"
-                        + "You can now help us improve the API whether it's by making changes to the definition itself or to the code.\n"
-                        + "That way, with time, we can improve the API in general, and expose some of the new features in OAS3.\n"
-                        + "\n"
-                        + "Some useful links:\n"
-                        + "- [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)\n"
-                        + "- [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)"))
-        .actions(action("addPet")
+            modifyDisplay(
+                display("Petstore")
+                    .description(
+                        "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.  You can find out more about\n"
+                            + "Swagger at [https://swagger.io](https://swagger.io). In the third iteration of the pet store, we've switched to the design first approach!\n"
+                            + "You can now help us improve the API whether it's by making changes to the definition itself or to the code.\n"
+                            + "That way, with time, we can improve the API in general, and expose some of the new features in OAS3.\n"
+                            + "\n"
+                            + "Some useful links:\n"
+                            + "- [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)\n"
+                            + "- [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)")))
+        .actions(modifyActions(action("addPet")
             .display(
                 display("Add a new pet to the store")
                     .description("Add a new pet to the store"))
             .metadata(
                 Map.of(
                     "requestMethod", "POST",
-                    "path", "/pet", "bodyContentType", "JSON"
+                    "path", "/pet", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
                 ))
-            .properties(object(null).properties(PetSchema.COMPONENT_SCHEMA)
+            .properties(object("pet").properties(PetSchema.COMPONENT_SCHEMA)
+                .label("Pet")
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", "BODY")))
+                        "type", PropertyType.BODY)))
             .output(object(null).properties(PetSchema.COMPONENT_SCHEMA)
                 .metadata(
                     Map.of(
-                        "responseFormat", "JSON"))),
+                        "responseFormat", ResponseFormat.JSON))),
             action("updatePet")
                 .display(
                     display("Update an existing pet")
@@ -88,18 +94,19 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                 .metadata(
                     Map.of(
                         "requestMethod", "PUT",
-                        "path", "/pet", "bodyContentType", "JSON"
+                        "path", "/pet", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
                     ))
-                .properties(object(null).properties(PetSchema.COMPONENT_SCHEMA)
+                .properties(object("pet").properties(PetSchema.COMPONENT_SCHEMA)
+                    .label("Pet")
                     .required(true)
                     .metadata(
                         Map.of(
-                            "type", "BODY")))
+                            "type", PropertyType.BODY)))
                 .output(object(null).properties(PetSchema.COMPONENT_SCHEMA)
                     .metadata(
                         Map.of(
-                            "responseFormat", "JSON"))),
+                            "responseFormat", ResponseFormat.JSON))),
             action("findPetsByStatus")
                 .display(
                     display("Finds Pets by status")
@@ -116,11 +123,11 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")))
-                .output(array(null).items(object(null).properties(PetSchema.COMPONENT_SCHEMA))
+                            "type", PropertyType.QUERY)))
+                .output(array("array").items(object(null).properties(PetSchema.COMPONENT_SCHEMA))
                     .metadata(
                         Map.of(
-                            "responseFormat", "JSON"))),
+                            "responseFormat", ResponseFormat.JSON))),
             action("findPetsByTags")
                 .display(
                     display("Finds Pets by tags")
@@ -139,11 +146,11 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")))
-                .output(array(null).items(object(null).properties(PetSchema.COMPONENT_SCHEMA))
+                            "type", PropertyType.QUERY)))
+                .output(array("array").items(object(null).properties(PetSchema.COMPONENT_SCHEMA))
                     .metadata(
                         Map.of(
-                            "responseFormat", "JSON"))),
+                            "responseFormat", ResponseFormat.JSON))),
             action("deletePet")
                 .display(
                     display("Deletes a pet")
@@ -159,13 +166,13 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "HEADER")),
+                            "type", PropertyType.HEADER)),
                     integer("petId").label("PetId")
                         .description("Pet id to delete")
                         .required(true)
                         .metadata(
                             Map.of(
-                                "type", "PATH"))),
+                                "type", PropertyType.PATH))),
             action("getPetById")
                 .display(
                     display("Find pet by ID")
@@ -181,11 +188,11 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                     .required(true)
                     .metadata(
                         Map.of(
-                            "type", "PATH")))
+                            "type", PropertyType.PATH)))
                 .output(object(null).properties(PetSchema.COMPONENT_SCHEMA)
                     .metadata(
                         Map.of(
-                            "responseFormat", "JSON"))),
+                            "responseFormat", ResponseFormat.JSON))),
             action("updatePetWithForm")
                 .display(
                     display("Updates a pet in the store with form data")
@@ -201,19 +208,19 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                     .required(true)
                     .metadata(
                         Map.of(
-                            "type", "PATH")),
+                            "type", PropertyType.PATH)),
                     string("name").label("Name")
                         .description("Name of pet that needs to be updated")
                         .required(false)
                         .metadata(
                             Map.of(
-                                "type", "QUERY")),
+                                "type", PropertyType.QUERY)),
                     string("status").label("Status")
                         .description("Status of pet that needs to be updated")
                         .required(false)
                         .metadata(
                             Map.of(
-                                "type", "QUERY"))),
+                                "type", PropertyType.QUERY))),
             action("uploadFile")
                 .display(
                     display("uploads an image")
@@ -221,7 +228,8 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                 .metadata(
                     Map.of(
                         "requestMethod", "POST",
-                        "path", "/pet/{petId}/uploadImage", "bodyContentType", "BINARY"
+                        "path", "/pet/{petId}/uploadImage", "bodyContentType", BodyContentType.BINARY, "mimeType",
+                        "application/octet-stream"
 
                     ))
                 .properties(integer("petId").label("PetId")
@@ -229,20 +237,20 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                     .required(true)
                     .metadata(
                         Map.of(
-                            "type", "PATH")),
+                            "type", PropertyType.PATH)),
                     string("additionalMetadata").label("AdditionalMetadata")
                         .description("Additional Metadata")
                         .required(false)
                         .metadata(
                             Map.of(
-                                "type", "QUERY")),
-                    string(null).metadata(
+                                "type", PropertyType.QUERY)),
+                    fileEntry("fileEntry").metadata(
                         Map.of(
-                            "type", "BODY")))
+                            "type", PropertyType.BODY)))
                 .output(object(null).properties(ApiResponseSchema.COMPONENT_SCHEMA)
                     .metadata(
                         Map.of(
-                            "responseFormat", "JSON"))),
+                            "responseFormat", ResponseFormat.JSON))),
             action("getInventory")
                 .display(
                     display("Returns pet inventories by status")
@@ -257,7 +265,7 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                 .output(object(null).additionalProperties(integer())
                     .metadata(
                         Map.of(
-                            "responseFormat", "JSON"))),
+                            "responseFormat", ResponseFormat.JSON))),
             action("placeOrder")
                 .display(
                     display("Place an order for a pet")
@@ -265,17 +273,18 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                 .metadata(
                     Map.of(
                         "requestMethod", "POST",
-                        "path", "/store/order", "bodyContentType", "JSON"
+                        "path", "/store/order", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
                     ))
-                .properties(object(null).properties(OrderSchema.COMPONENT_SCHEMA)
+                .properties(object("order").properties(OrderSchema.COMPONENT_SCHEMA)
+                    .label("Order")
                     .metadata(
                         Map.of(
-                            "type", "BODY")))
+                            "type", PropertyType.BODY)))
                 .output(object(null).properties(OrderSchema.COMPONENT_SCHEMA)
                     .metadata(
                         Map.of(
-                            "responseFormat", "JSON"))),
+                            "responseFormat", ResponseFormat.JSON))),
             action("deleteOrder")
                 .display(
                     display("Delete purchase order by ID")
@@ -292,7 +301,7 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                     .required(true)
                     .metadata(
                         Map.of(
-                            "type", "PATH"))),
+                            "type", PropertyType.PATH))),
             action("getOrderById")
                 .display(
                     display("Find purchase order by ID")
@@ -309,11 +318,11 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                     .required(true)
                     .metadata(
                         Map.of(
-                            "type", "PATH")))
+                            "type", PropertyType.PATH)))
                 .output(object(null).properties(OrderSchema.COMPONENT_SCHEMA)
                     .metadata(
                         Map.of(
-                            "responseFormat", "JSON"))),
+                            "responseFormat", ResponseFormat.JSON))),
             action("createUser")
                 .display(
                     display("Create user")
@@ -321,13 +330,18 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                 .metadata(
                     Map.of(
                         "requestMethod", "POST",
-                        "path", "/user", "bodyContentType", "JSON"
+                        "path", "/user", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
                     ))
-                .properties(object(null).properties(UserSchema.COMPONENT_SCHEMA)
+                .properties(object("user").properties(UserSchema.COMPONENT_SCHEMA)
+                    .label("User")
                     .metadata(
                         Map.of(
-                            "type", "BODY"))),
+                            "type", PropertyType.BODY)))
+                .output(object(null).properties(UserSchema.COMPONENT_SCHEMA)
+                    .metadata(
+                        Map.of(
+                            "responseFormat", ResponseFormat.JSON))),
             action("createUsersWithListInput")
                 .display(
                     display("Creates list of users with given input array")
@@ -335,18 +349,19 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                 .metadata(
                     Map.of(
                         "requestMethod", "POST",
-                        "path", "/user/createWithList", "bodyContentType", "JSON"
+                        "path", "/user/createWithList", "bodyContentType", BodyContentType.JSON, "mimeType",
+                        "application/json"
 
                     ))
-                .properties(array(null).items(object(null).properties(UserSchema.COMPONENT_SCHEMA))
+                .properties(array("array").items(object(null).properties(UserSchema.COMPONENT_SCHEMA))
                     .placeholder("Add")
                     .metadata(
                         Map.of(
-                            "type", "BODY")))
-                .output(object(null).properties(UserSchema.COMPONENT_SCHEMA)
+                            "type", PropertyType.BODY)))
+                .output(array("array").items(object(null).properties(UserSchema.COMPONENT_SCHEMA))
                     .metadata(
                         Map.of(
-                            "responseFormat", "JSON"))),
+                            "responseFormat", ResponseFormat.JSON))),
             action("loginUser")
                 .display(
                     display("Logs user into the system")
@@ -362,16 +377,16 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                     string("password").label("Password")
                         .description("The password for login in clear text")
                         .required(false)
                         .metadata(
                             Map.of(
-                                "type", "QUERY")))
+                                "type", PropertyType.QUERY)))
                 .output(string(null).metadata(
                     Map.of(
-                        "responseFormat", "XML"))),
+                        "responseFormat", ResponseFormat.TEXT))),
             action("logoutUser")
                 .display(
                     display("Logs out current logged in user session")
@@ -398,7 +413,7 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                     .required(true)
                     .metadata(
                         Map.of(
-                            "type", "PATH"))),
+                            "type", PropertyType.PATH))),
             action("getUserByName")
                 .display(
                     display("Get user by user name")
@@ -414,11 +429,11 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                     .required(true)
                     .metadata(
                         Map.of(
-                            "type", "PATH")))
+                            "type", PropertyType.PATH)))
                 .output(object(null).properties(UserSchema.COMPONENT_SCHEMA)
                     .metadata(
                         Map.of(
-                            "responseFormat", "JSON"))),
+                            "responseFormat", ResponseFormat.JSON))),
             action("updateUser")
                 .display(
                     display("Update user")
@@ -426,7 +441,8 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                 .metadata(
                     Map.of(
                         "requestMethod", "PUT",
-                        "path", "/user/{username}", "bodyContentType", "JSON"
+                        "path", "/user/{username}", "bodyContentType", BodyContentType.JSON, "mimeType",
+                        "application/json"
 
                     ))
                 .properties(string("username").label("Username")
@@ -434,52 +450,58 @@ public abstract class AbstractPetstoreComponentHandler implements RestComponentH
                     .required(true)
                     .metadata(
                         Map.of(
-                            "type", "PATH")),
-                    object(null).properties(UserSchema.COMPONENT_SCHEMA)
+                            "type", PropertyType.PATH)),
+                    object("user").properties(UserSchema.COMPONENT_SCHEMA)
+                        .label("User")
                         .metadata(
                             Map.of(
-                                "type", "BODY"))))
-        .connection(connection()
-            .baseUri(connection -> "https://petstore3.swagger.io/api/v3")
-            .authorizations(authorization(
-                AuthorizationType.OAUTH2_IMPLICIT_CODE.name()
-                    .toLowerCase(),
-                AuthorizationType.OAUTH2_IMPLICIT_CODE)
-                    .display(
-                        display("OAuth2 Implicit"))
-                    .properties(
-                        string(CLIENT_ID)
-                            .label("Client Id")
-                            .required(true),
-                        string(CLIENT_SECRET)
-                            .label("Client Secret")
-                            .required(true))
-                    .authorizationUrl(connection -> "https://petstore3.swagger.io/oauth/authorize")
-                    .refreshUrl(connection -> null)
-                    .scopes(connection -> List.of("write:pets", "read:pets")),
-                authorization(
-                    AuthorizationType.API_KEY.name()
+                                "type", PropertyType.BODY)))
+                .output(object(null).properties(UserSchema.COMPONENT_SCHEMA)
+                    .metadata(
+                        Map.of(
+                            "responseFormat", ResponseFormat.JSON)))))
+        .connection(modifyConnection(
+            connection()
+                .baseUri(connection -> "https://petstore3.swagger.io/api/v3")
+                .authorizations(authorization(
+                    AuthorizationType.OAUTH2_IMPLICIT_CODE.name()
                         .toLowerCase(),
-                    AuthorizationType.API_KEY)
+                    AuthorizationType.OAUTH2_IMPLICIT_CODE)
                         .display(
-                            display("API Key"))
+                            display("OAuth2 Implicit"))
                         .properties(
-                            string(KEY)
-                                .label("Key")
-                                .required(true)
-                                .defaultValue("api_key")
-                                .hidden(true),
-                            string(VALUE)
-                                .label("Value")
+                            string(CLIENT_ID)
+                                .label("Client Id")
                                 .required(true),
-                            string(ADD_TO)
-                                .label("Add to")
-                                .required(true)
-                                .defaultValue(ApiTokenLocation.HEADER.name())
-                                .hidden(true))));
+                            string(CLIENT_SECRET)
+                                .label("Client Secret")
+                                .required(true))
+                        .authorizationUrl(connection -> "https://petstore3.swagger.io/oauth/authorize")
+                        .refreshUrl(connection -> null)
+                        .scopes(connection -> List.of("write:pets", "read:pets")),
+                    authorization(
+                        AuthorizationType.API_KEY.name()
+                            .toLowerCase(),
+                        AuthorizationType.API_KEY)
+                            .display(
+                                display("API Key"))
+                            .properties(
+                                string(KEY)
+                                    .label("Key")
+                                    .required(true)
+                                    .defaultValue("api_key")
+                                    .hidden(true),
+                                string(VALUE)
+                                    .label("Value")
+                                    .required(true),
+                                string(ADD_TO)
+                                    .label("Add to")
+                                    .required(true)
+                                    .defaultValue(ApiTokenLocation.HEADER.name())
+                                    .hidden(true)))));
 
     @Override
     public ComponentDefinition getDefinition() {
-        return COMPONENT_DEFINITION;
+        return componentDefinition;
     }
 }

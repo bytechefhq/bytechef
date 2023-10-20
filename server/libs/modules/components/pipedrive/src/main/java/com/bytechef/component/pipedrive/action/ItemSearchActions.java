@@ -17,6 +17,7 @@
 
 package com.bytechef.component.pipedrive.action;
 
+import static com.bytechef.hermes.component.RestComponentHandler.PropertyType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
@@ -26,6 +27,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
@@ -53,7 +55,7 @@ public class ItemSearchActions {
             .required(true)
             .metadata(
                 Map.of(
-                    "type", "QUERY")),
+                    "type", PropertyType.QUERY)),
             string("item_types").label("Item_types")
                 .description(
                     "A comma-separated string array. The type of items to perform the search from. Defaults to all.")
@@ -63,7 +65,7 @@ public class ItemSearchActions {
                 .required(false)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
             string("fields").label("Fields")
                 .description(
                     "A comma-separated string array. The fields to perform the search from. Defaults to all. Relevant for each item type are:<br> <table> <tr><th><b>Item type</b></th><th><b>Field</b></th></tr> <tr><td>Deal</td><td>`custom_fields`, `notes`, `title`</td></tr> <tr><td>Person</td><td>`custom_fields`, `email`, `name`, `notes`, `phone`</td></tr> <tr><td>Organization</td><td>`address`, `custom_fields`, `name`, `notes`</td></tr> <tr><td>Product</td><td>`code`, `custom_fields`, `name`</td></tr> <tr><td>Lead</td><td>`custom_fields`, `notes`, `email`, `organization_name`, `person_name`, `phone`, `title`</td></tr> <tr><td>File</td><td>`name`</td></tr> <tr><td>Mail attachment</td><td>`name`</td></tr> <tr><td>Project</td><td> `custom_fields`, `notes`, `title`, `description` </td></tr> </table> <br> When searching for leads, the email, organization_name, person_name, and phone fields will return results only for leads not linked to contacts. For searching leads by person or organization values, please use `search_for_related_items`.")
@@ -74,7 +76,7 @@ public class ItemSearchActions {
                 .required(false)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
             bool("search_for_related_items").label("Search_for_related_items")
                 .description(
                     "When enabled, the response will include up to 100 newest related leads and 100 newest related deals for each found person and organization and up to 100 newest related persons for each found organization.")
@@ -82,7 +84,7 @@ public class ItemSearchActions {
                 .required(false)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
             bool("exact_match").label("Exact_match")
                 .description(
                     "When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive.")
@@ -90,7 +92,7 @@ public class ItemSearchActions {
                 .required(false)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
             string("include_fields").label("Include_fields")
                 .description(
                     "A comma-separated string array. Supports including optional fields in the results which are not provided by default.")
@@ -99,20 +101,20 @@ public class ItemSearchActions {
                 .required(false)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
             integer("start").label("Start")
                 .description(
                     "Pagination start. Note that the pagination is based on main results and does not include related items when using `search_for_related_items` parameter.")
                 .required(false)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
             integer("limit").label("Limit")
                 .description("Items shown per page")
                 .required(false)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")))
+                        "type", PropertyType.QUERY)))
         .output(object(null)
             .properties(
                 object("data")
@@ -164,7 +166,7 @@ public class ItemSearchActions {
                     .required(false))
             .metadata(
                 Map.of(
-                    "responseFormat", "JSON")))
+                    "responseFormat", ResponseFormat.JSON)))
         .exampleOutput(
             "{\"success\":true,\"data\":{\"items\":[{\"result_score\":1.22724,\"item\":{\"id\":42,\"type\":\"deal\",\"title\":\"Sample Deal\",\"value\":53883,\"currency\":\"USD\",\"status\":\"open\",\"visible_to\":3,\"owner\":{\"id\":69},\"stage\":{\"id\":3,\"name\":\"Demo Scheduled\"},\"person\":{\"id\":6,\"name\":\"Sample Person\"},\"organization\":{\"id\":9,\"name\":\"Sample Organization\",\"address\":\"Dabas, Hungary\"},\"custom_fields\":[\"Sample text\"],\"notes\":[\"Sample note\"]}},{\"result_score\":0.31335002,\"item\":{\"id\":9,\"type\":\"organization\",\"name\":\"Sample Organization\",\"address\":\"Dabas, Hungary\",\"visible_to\":3,\"owner\":{\"id\":69},\"custom_fields\":[],\"notes\":[]}},{\"result_score\":0.29955,\"item\":{\"id\":6,\"type\":\"person\",\"name\":\"Sample Person\",\"phones\":[\"555123123\",\"+372 (55) 123468\",\"0231632772\"],\"emails\":[\"primary@email.com\",\"secondary@email.com\"],\"visible_to\":1,\"owner\":{\"id\":69},\"organization\":{\"id\":9,\"name\":\"Sample Organization\",\"address\":\"Dabas, Hungary\"},\"custom_fields\":[\"Custom Field Text\"],\"notes\":[\"Person note\"]}},{\"result_score\":0.0093,\"item\":{\"id\":4,\"type\":\"mail_attachment\",\"name\":\"Sample mail attachment.txt\",\"url\":\"/files/4/download\"}},{\"result_score\":0.0093,\"item\":{\"id\":3,\"type\":\"file\",\"name\":\"Sample file attachment.txt\",\"url\":\"/files/3/download\",\"deal\":{\"id\":42,\"title\":\"Sample Deal\"},\"person\":{\"id\":6,\"name\":\"Sample Person\"},\"organization\":{\"id\":9,\"name\":\"Sample Organization\",\"address\":\"Dabas, Hungary\"}}},{\"result_score\":0.0011999999,\"item\":{\"id\":1,\"type\":\"product\",\"name\":\"Sample Product\",\"code\":\"product-code\",\"visible_to\":3,\"owner\":{\"id\":69},\"custom_fields\":[]}}],\"related_items\":[{\"result_score\":0,\"item\":{\"id\":2,\"type\":\"deal\",\"title\":\"Other deal\",\"value\":100,\"currency\":\"USD\",\"status\":\"open\",\"visible_to\":3,\"owner\":{\"id\":1},\"stage\":{\"id\":1,\"name\":\"Lead In\"},\"person\":{\"id\":1,\"name\":\"Sample Person\"}}}]},\"additional_data\":{\"pagination\":{\"start\":0,\"limit\":100,\"more_items_in_collection\":false}}}"),
         action("searchItemByField")
@@ -184,7 +186,7 @@ public class ItemSearchActions {
                 .required(true)
                 .metadata(
                     Map.of(
-                        "type", "QUERY")),
+                        "type", PropertyType.QUERY)),
                 string("field_type").label("Field_type")
                     .description("The type of the field to perform the search from")
                     .options(option("DealField", "dealField"), option("LeadField", "leadField"),
@@ -193,7 +195,7 @@ public class ItemSearchActions {
                     .required(true)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 bool("exact_match").label("Exact_match")
                     .description(
                         "When enabled, only full exact matches against the given term are returned. The search <b>is</b> case sensitive.")
@@ -201,14 +203,14 @@ public class ItemSearchActions {
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 string("field_key").label("Field_key")
                     .description(
                         "The key of the field to search from. The field key can be obtained by fetching the list of the fields using any of the fields' API GET methods (dealFields, personFields, etc.).")
                     .required(true)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 bool("return_item_ids").label("Return_item_ids")
                     .description(
                         "Whether to return the IDs of the matching items or not. When not set or set to `0` or `false`, only distinct values of the searched field are returned. When set to `1` or `true`, the ID of each found item is returned.")
@@ -216,19 +218,19 @@ public class ItemSearchActions {
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("start").label("Start")
                     .description("Pagination start")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")),
+                            "type", PropertyType.QUERY)),
                 integer("limit").label("Limit")
                     .description("Items shown per page")
                     .required(false)
                     .metadata(
                         Map.of(
-                            "type", "QUERY")))
+                            "type", PropertyType.QUERY)))
             .output(object(null).properties(array("data").items(object(null).properties(integer("id").label("Id")
                 .description("The ID of the item")
                 .required(false),
@@ -262,7 +264,7 @@ public class ItemSearchActions {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", "TEXT")))
+                        "responseFormat", ResponseFormat.JSON)))
             .exampleOutput(
                 "{\"success\":true,\"data\":[{\"id\":1,\"name\":\"Jane Doe\"},{\"id\":2,\"name\":\"John Doe\"}],\"additional_data\":{\"pagination\":{\"start\":0,\"limit\":100,\"more_items_in_collection\":false}}}"));
 }

@@ -28,6 +28,6 @@ import org.junit.jupiter.api.Test;
 public abstract class AbstractShopifyComponentHandlerTest {
     @Test
     public void testGetDefinition() {
-        JsonFileAssert.assertEquals("definition/pipedrive_v1.json", new ShopifyComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/shopify_v1.json", new ShopifyComponentHandler().getDefinition());
     }
 }

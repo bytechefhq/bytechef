@@ -28,6 +28,6 @@ import org.junit.jupiter.api.Test;
 public abstract class AbstractPetstoreComponentHandlerTest {
     @Test
     public void testGetDefinition() {
-        JsonFileAssert.assertEquals("definition/pipedrive_v1.json", new PetstoreComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/petstore_v1.json", new PetstoreComponentHandler().getDefinition());
     }
 }
