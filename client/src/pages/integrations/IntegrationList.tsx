@@ -19,6 +19,7 @@ export const IntegrationList: React.FC = () => {
                     items &&
                     items.map((integration) => (
                         <IntegrationItem
+                            key={integration.id}
                             category={integration.category}
                             id={integration.id}
                             name={integration.name}
