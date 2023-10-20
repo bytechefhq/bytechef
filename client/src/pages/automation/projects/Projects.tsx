@@ -61,9 +61,7 @@ const Projects = () => {
                             onClose={(project) => {
                                 if (project) {
                                     navigate(
-                                        `/automation/projects/${
-                                            project?.id
-                                        }/workflow/${project?.workflowIds![0]}`
+                                        `/automation/projects/${project?.id}/workflow/${project?.workflowIds![0]}`
                                     );
                                 }
                             }}

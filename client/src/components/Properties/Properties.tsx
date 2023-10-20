@@ -92,7 +92,7 @@ export const Property = ({
             ({
                 label: name,
                 value: name,
-            } as ISelectOption)
+            }) as ISelectOption
     );
 
     return (
