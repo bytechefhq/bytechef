@@ -78,33 +78,33 @@ const IntegrationDialog = ({
 
     const queryClient = useQueryClient();
 
+    const createIntegrationMutation = useCreateIntegrationMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries(
+                IntegrationKeys.integrationCategories
+            );
+            queryClient.invalidateQueries(IntegrationKeys.integrations);
+            queryClient.invalidateQueries(IntegrationKeys.integrationTags);
+
+            closeDialog();
+        },
+    });
+
+    const updateIntegrationMutation = useUpdateIntegrationMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries(
+                IntegrationKeys.integrationCategories
+            );
+            queryClient.invalidateQueries(IntegrationKeys.integrations);
+            queryClient.invalidateQueries(IntegrationKeys.integrationTags);
+
+            closeDialog();
+        },
+    });
+
     const tagNames = integration?.tags?.map((tag) => tag.name);
 
     const remainingTags = tags?.filter((tag) => !tagNames?.includes(tag.name));
-
-    const createMutation = useCreateIntegrationMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries(
-                IntegrationKeys.integrationCategories
-            );
-            queryClient.invalidateQueries(IntegrationKeys.integrations);
-            queryClient.invalidateQueries(IntegrationKeys.integrationTags);
-
-            closeDialog();
-        },
-    });
-
-    const updateMutation = useUpdateIntegrationMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries(
-                IntegrationKeys.integrationCategories
-            );
-            queryClient.invalidateQueries(IntegrationKeys.integrations);
-            queryClient.invalidateQueries(IntegrationKeys.integrationTags);
-
-            closeDialog();
-        },
-    });
 
     function closeDialog() {
         reset();
@@ -132,13 +132,13 @@ const IntegrationDialog = ({
             : undefined;
 
         if (integration?.id) {
-            updateMutation.mutate({
+            updateIntegrationMutation.mutate({
                 ...integration,
                 ...formData,
                 category,
             } as IntegrationModel);
         } else {
-            createMutation.mutate({
+            createIntegrationMutation.mutate({
                 ...formData,
                 category,
                 tags: tagValues,

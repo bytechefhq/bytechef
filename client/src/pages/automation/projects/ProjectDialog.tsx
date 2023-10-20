@@ -78,10 +78,6 @@ const ProjectDialog = ({
 
     const queryClient = useQueryClient();
 
-    const tagNames = project?.tags?.map((tag) => tag.name);
-
-    const remainingTags = tags?.filter((tag) => !tagNames?.includes(tag.name));
-
     const createProjectMutation = useCreateProjectMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(ProjectKeys.projectCategories);
@@ -101,6 +97,10 @@ const ProjectDialog = ({
             closeDialog();
         },
     });
+
+    const tagNames = project?.tags?.map((tag) => tag.name);
+
+    const remainingTags = tags?.filter((tag) => !tagNames?.includes(tag.name));
 
     function closeDialog() {
         reset();
