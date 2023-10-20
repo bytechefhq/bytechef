@@ -9,7 +9,6 @@ import {
 } from '../../../middleware/integration';
 import {
     useDeleteIntegrationMutation,
-    useCreateIntegrationMutation,
     useUpdateIntegrationTagsMutation,
 } from '../../../mutations/integrations.mutations';
 import {IntegrationKeys} from '../../../queries/integrations.queries';
@@ -17,7 +16,6 @@ import {useQueryClient} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
 import {Link} from 'react-router-dom';
 import IntegrationDialog from './IntegrationDialog';
-import duplicate from './utils/duplicate';
 import Name from './components/Name';
 import AlertDialog from '../../../components/AlertDialog/AlertDialog';
 import WorkflowDialog from './WorkflowDialog';
@@ -25,14 +23,12 @@ import TagList from '../../../components/TagList/TagList';
 
 interface IntegrationItemProps {
     integration: IntegrationModel;
-    integrationNames: string[];
     remainingTags?: TagModel[];
 }
 
 const IntegrationItem = ({
     integration,
     remainingTags,
-    integrationNames,
 }: IntegrationItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -43,16 +39,6 @@ const IntegrationItem = ({
             label: 'Edit',
             onClick: () => {
                 setShowEditDialog(true);
-            },
-        },
-        {
-            label: 'Duplicate',
-            onClick: () => {
-                duplicate(
-                    integration!,
-                    integrationNames,
-                    createIntegrationMutation
-                );
             },
         },
         {
@@ -72,16 +58,6 @@ const IntegrationItem = ({
     ];
 
     const queryClient = useQueryClient();
-
-    const createIntegrationMutation = useCreateIntegrationMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries(IntegrationKeys.integrations);
-            queryClient.invalidateQueries(
-                IntegrationKeys.integrationCategories
-            );
-            queryClient.invalidateQueries(IntegrationKeys.integrationTags);
-        },
-    });
 
     const deleteIntegrationMutation = useDeleteIntegrationMutation({
         onSuccess: () => {
