@@ -17,7 +17,9 @@
 
 package com.bytechef.worker.config;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,5 +32,10 @@ public class JacksonConfiguration {
     @Bean
     JavaTimeModule javaTimeModule() {
         return new JavaTimeModule();
+    }
+
+    @Bean
+    public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer() {
+        return builder -> builder.featuresToDisable(SerializationFeature.INDENT_OUTPUT);
     }
 }
