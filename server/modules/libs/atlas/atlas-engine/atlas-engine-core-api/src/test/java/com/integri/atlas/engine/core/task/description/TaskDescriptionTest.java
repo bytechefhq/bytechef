@@ -19,7 +19,6 @@ package com.integri.atlas.engine.core.task.description;
 import static com.integri.atlas.engine.core.task.description.DisplayOption.displayOption;
 import static com.integri.atlas.engine.core.task.description.TaskAuthentication.authentication;
 import static com.integri.atlas.engine.core.task.description.TaskCredential.credential;
-import static com.integri.atlas.engine.core.task.description.TaskSpecification.task;
 import static com.integri.atlas.engine.core.task.description.TaskParameter.parameter;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValue;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValues;
@@ -27,6 +26,7 @@ import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOptionValue.optionValue;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyTypeOption.propertyTypeOption;
+import static com.integri.atlas.engine.core.task.description.TaskSpecification.task;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.dispatcher.if_;
+package com.integri.atlas.task.dispatcher.if_.util;
 
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.task.TaskExecution;
@@ -25,9 +25,9 @@ import java.util.List;
 /**
  * @author Matija Petanjek
  */
-public class IfTaskHelper {
+public class IfTaskUtil {
 
-    public boolean resolveCase(TaskEvaluator taskEvaluator, TaskExecution aIfTask) {
+    public static boolean resolveCase(TaskEvaluator taskEvaluator, TaskExecution aIfTask) {
         List<MapObject> conditions = aIfTask.getList("conditions", MapObject.class);
         String combineOperation = aIfTask.getRequiredString("combineOperation");
 
@@ -37,7 +37,7 @@ public class IfTaskHelper {
         );
     }
 
-    private List<String> getConditions(List<MapObject> aConditions) {
+    private static List<String> getConditions(List<MapObject> aConditions) {
         List<String> conditions = new ArrayList<>();
 
         for (MapObject condition : aConditions) {
@@ -55,7 +55,7 @@ public class IfTaskHelper {
         return conditions;
     }
 
-    private String getBooleanOperator(String combineOperation) {
+    private static String getBooleanOperator(String combineOperation) {
         if (combineOperation.equals("any")) {
             return "||";
         } else if (combineOperation.equals("all")) {

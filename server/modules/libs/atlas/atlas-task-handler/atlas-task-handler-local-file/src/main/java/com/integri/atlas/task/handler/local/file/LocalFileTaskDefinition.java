@@ -16,12 +16,12 @@
 
 package com.integri.atlas.task.handler.local.file;
 
-import static com.integri.atlas.engine.core.task.description.TaskSpecification.task;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.JSON_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
+import static com.integri.atlas.engine.core.task.description.TaskSpecification.task;
 
 import com.integri.atlas.engine.core.task.TaskDefinition;
 import com.integri.atlas.engine.core.task.description.TaskSpecification;

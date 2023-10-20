@@ -16,7 +16,6 @@
 
 package com.integri.atlas.task.dispatcher.if_;
 
-import static com.integri.atlas.engine.core.task.description.TaskSpecification.task;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.DATE_TIME_PROPERTY;
@@ -28,6 +27,7 @@ import static com.integri.atlas.engine.core.task.description.TaskProperty.hide;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.multipleValues;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
+import static com.integri.atlas.engine.core.task.description.TaskSpecification.task;
 
 import com.integri.atlas.engine.core.task.TaskDefinition;
 import com.integri.atlas.engine.core.task.description.TaskSpecification;

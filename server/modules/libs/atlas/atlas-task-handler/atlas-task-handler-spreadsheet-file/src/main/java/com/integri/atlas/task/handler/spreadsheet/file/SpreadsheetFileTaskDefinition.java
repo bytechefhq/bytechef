@@ -16,7 +16,6 @@
 
 package com.integri.atlas.task.handler.spreadsheet.file;
 
-import static com.integri.atlas.engine.core.task.description.TaskSpecification.task;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValues;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
@@ -27,6 +26,7 @@ import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT
 import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
+import static com.integri.atlas.engine.core.task.description.TaskSpecification.task;
 
 import com.integri.atlas.engine.core.task.TaskDefinition;
 import com.integri.atlas.engine.core.task.description.TaskSpecification;

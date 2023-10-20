@@ -29,8 +29,7 @@ import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
-import com.integri.atlas.task.dispatcher.if_.IfTaskHelper;
-import java.util.ArrayList;
+import com.integri.atlas.task.dispatcher.if_.util.IfTaskUtil;
 import java.util.Date;
 import java.util.List;
 
@@ -44,7 +43,7 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskDispatcher taskDispatcher;
     private final ContextRepository contextRepository;
     private final TaskEvaluator taskEvaluator;
-    private final IfTaskHelper ifTaskHelper;
+    private final IfTaskUtil ifTaskHelper;
 
     public IfTaskCompletionHandler(
         TaskExecutionRepository aTaskExecutionRepo,
@@ -52,7 +51,7 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
         TaskDispatcher aTaskDispatcher,
         ContextRepository aContextRepository,
         TaskEvaluator aTaskEvaluator,
-        IfTaskHelper aIfTaskHelper
+        IfTaskUtil aIfTaskHelper
     ) {
         taskExecutionRepo = aTaskExecutionRepo;
         taskCompletionHandler = aTaskCompletionHandler;

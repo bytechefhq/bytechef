@@ -18,7 +18,6 @@ package com.integri.atlas.task.handler.http.client;
 
 import static com.integri.atlas.engine.core.task.description.TaskAuthentication.authentication;
 import static com.integri.atlas.engine.core.task.description.TaskAuthentication.credential;
-import static com.integri.atlas.engine.core.task.description.TaskSpecification.task;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValues;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
@@ -31,6 +30,7 @@ import static com.integri.atlas.engine.core.task.description.TaskProperty.minVal
 import static com.integri.atlas.engine.core.task.description.TaskProperty.multipleValues;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
+import static com.integri.atlas.engine.core.task.description.TaskSpecification.task;
 
 import com.integri.atlas.engine.core.task.TaskDefinition;
 import com.integri.atlas.engine.core.task.description.TaskSpecification;

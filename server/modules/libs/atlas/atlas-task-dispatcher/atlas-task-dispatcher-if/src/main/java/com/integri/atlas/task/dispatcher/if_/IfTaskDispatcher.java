@@ -29,42 +29,36 @@ import com.integri.atlas.engine.core.task.TaskStatus;
 import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcherResolver;
 import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
-import java.util.ArrayList;
+import com.integri.atlas.task.dispatcher.if_.util.IfTaskUtil;
 import java.util.Date;
 import java.util.List;
 
 /**
  * @author Ivica Cardic
+ * @author Matija Petanjek
  */
 public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
     private final ContextRepository contextRepository;
-    private final CounterRepository counterRepository;
     private final MessageBroker messageBroker;
     private final TaskDispatcher taskDispatcher;
     private final TaskExecutionRepository taskExecutionRepo;
     private final TaskEvaluator taskEvaluator;
-    private final IfTaskHelper ifTaskHelper;
 
     public IfTaskDispatcher(
-        ContextRepository aContextRepository,
-        CounterRepository aCounterRepository,
-        MessageBroker aMessageBroker,
-        TaskDispatcher aTaskDispatcher,
-        TaskExecutionRepository aTaskExecutionRepository,
-        TaskEvaluator aTaskEvaluator,
-        IfTaskHelper aIfTaskHelper
+        ContextRepository contextRepository,
+        MessageBroker messageBroker,
+        TaskDispatcher taskDispatcher,
+        TaskExecutionRepository taskExecutionRepository,
+        TaskEvaluator taskEvaluator
     ) {
-        contextRepository = aContextRepository;
-        counterRepository = aCounterRepository;
-        messageBroker = aMessageBroker;
-        taskDispatcher = aTaskDispatcher;
-        taskExecutionRepo = aTaskExecutionRepository;
-        taskEvaluator = aTaskEvaluator;
-        ifTaskHelper = aIfTaskHelper;
+        this.contextRepository = contextRepository;
+        this.messageBroker = messageBroker;
+        this.taskDispatcher = taskDispatcher;
+        taskExecutionRepo = taskExecutionRepository;
+        this.taskEvaluator = taskEvaluator;
     }
 
     @Override
@@ -76,7 +70,7 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
 
         List<MapObject> tasks;
 
-        if (ifTaskHelper.resolveCase(taskEvaluator, ifTask)) {
+        if (IfTaskUtil.resolveCase(taskEvaluator, ifTask)) {
             tasks = ifTask.getList("caseTrue", MapObject.class);
         } else {
             tasks = ifTask.getList("caseFalse", MapObject.class);
