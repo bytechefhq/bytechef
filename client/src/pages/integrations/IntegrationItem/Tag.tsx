@@ -7,13 +7,15 @@ export const Tag: React.FC<{
     onDeleteTag: (deletedTag: TagModel) => void;
 }> = ({tag, onDeleteTag}) => {
     return (
-        <span className="inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-xs text-gray-700">
-            {tag.name}
+        <>
+            <span className="inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-xs text-gray-700">
+                {tag.name}
 
-            <Cross1Icon
-                className="ml-1.5 h-3 w-3 rounded-full hover:bg-gray-400"
-                onClick={() => onDeleteTag(tag)}
-            />
-        </span>
+                <Cross1Icon
+                    className="ml-1.5 h-3 w-3 rounded-full hover:bg-gray-400"
+                    onClick={() => onDeleteTag(tag)}
+                />
+            </span>
+        </>
     );
 };
