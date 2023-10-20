@@ -25,12 +25,12 @@ import {
     ProjectBasicModelFromJSONTyped,
     ProjectBasicModelToJSON,
 } from './ProjectBasicModel';
-import type { ProjectInstanceModel } from './ProjectInstanceModel';
+import type { ProjectInstanceBasicModel } from './ProjectInstanceBasicModel';
 import {
-    ProjectInstanceModelFromJSON,
-    ProjectInstanceModelFromJSONTyped,
-    ProjectInstanceModelToJSON,
-} from './ProjectInstanceModel';
+    ProjectInstanceBasicModelFromJSON,
+    ProjectInstanceBasicModelFromJSONTyped,
+    ProjectInstanceBasicModelToJSON,
+} from './ProjectInstanceBasicModel';
 import type { WorkflowBasicModel } from './WorkflowBasicModel';
 import {
     WorkflowBasicModelFromJSON,
@@ -52,10 +52,10 @@ export interface ProjectExecutionBasicModel {
     readonly id?: number;
     /**
      * 
-     * @type {ProjectInstanceModel}
+     * @type {ProjectInstanceBasicModel}
      * @memberof ProjectExecutionBasicModel
      */
-    instance?: ProjectInstanceModel;
+    instance?: ProjectInstanceBasicModel;
     /**
      * 
      * @type {JobBasicModel}
@@ -96,7 +96,7 @@ export function ProjectExecutionBasicModelFromJSONTyped(json: any, ignoreDiscrim
     return {
         
         'id': !exists(json, 'id') ? undefined : json['id'],
-        'instance': !exists(json, 'instance') ? undefined : ProjectInstanceModelFromJSON(json['instance']),
+        'instance': !exists(json, 'instance') ? undefined : ProjectInstanceBasicModelFromJSON(json['instance']),
         'job': !exists(json, 'job') ? undefined : JobBasicModelFromJSON(json['job']),
         'project': !exists(json, 'project') ? undefined : ProjectBasicModelFromJSON(json['project']),
         'workflow': !exists(json, 'workflow') ? undefined : WorkflowBasicModelFromJSON(json['workflow']),
@@ -112,7 +112,7 @@ export function ProjectExecutionBasicModelToJSON(value?: ProjectExecutionBasicMo
     }
     return {
         
-        'instance': ProjectInstanceModelToJSON(value.instance),
+        'instance': ProjectInstanceBasicModelToJSON(value.instance),
         'job': JobBasicModelToJSON(value.job),
         'project': ProjectBasicModelToJSON(value.project),
         'workflow': WorkflowBasicModelToJSON(value.workflow),
