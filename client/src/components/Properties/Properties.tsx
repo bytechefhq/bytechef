@@ -13,6 +13,7 @@ import {twMerge} from 'tailwind-merge';
 import {PropertyType} from 'types/projectTypes';
 
 import Input from '../Input/Input';
+import ObjectProperty from './ObjectProperty';
 
 export interface PropertyFormProps {
     authorizationName: string;
@@ -36,7 +37,7 @@ interface PropertyProps {
     register?: UseFormRegister<PropertyFormProps>;
 }
 
-const Property = ({
+export const Property = ({
     actionName,
     customClassName,
     formState,
@@ -47,6 +48,7 @@ const Property = ({
     const [integerValue, setIntegerValue] = useState('');
 
     const {
+        additionalProperties,
         controlType,
         defaultValue = '',
         description,
@@ -201,6 +203,21 @@ const Property = ({
                 />
             )}
 
+            {controlType === 'DATE_TIME' && (
+                <Input
+                    description={description}
+                    defaultValue={defaultValue as string}
+                    error={hasError(name!)}
+                    fieldsetClassName="w-full mb-0"
+                    key={name}
+                    label={label || name}
+                    leadingIcon={TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
+                    name={name!}
+                    title={type}
+                    type={hidden ? 'hidden' : 'datetime-local'}
+                />
+            )}
+
             {controlType === 'SELECT' && (
                 <Select
                     description={description}
@@ -258,10 +275,10 @@ const Property = ({
 
             {type === 'ARRAY' && (
                 <ul className="w-full">
-                    {items?.map((item) => (
+                    {items?.map((item, index) => (
                         <Property
                             customClassName="border-l ml-2 pl-2 last-of-type:mb-0"
-                            key={item.name}
+                            key={`${item.name}_${index}`}
                             property={item}
                         />
                     ))}
@@ -282,15 +299,11 @@ const Property = ({
             )}
 
             {type === 'OBJECT' && (
-                <ul className="w-full">
-                    {properties?.map((subProperty) => (
-                        <Property
-                            customClassName="last-of-type:mb-0"
-                            key={subProperty.name}
-                            property={subProperty}
-                        />
-                    ))}
-                </ul>
+                <ObjectProperty
+                    additionalProperties={additionalProperties}
+                    properties={properties!}
+                    label={label}
+                />
             )}
         </li>
     );

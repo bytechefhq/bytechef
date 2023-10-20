@@ -94,7 +94,7 @@ const Select = ({
                         </div>
                     )}
 
-                    <Value />
+                    <Value placeholder="Select..." />
 
                     <Icon className="ml-auto pl-2">
                         <ChevronDownIcon />

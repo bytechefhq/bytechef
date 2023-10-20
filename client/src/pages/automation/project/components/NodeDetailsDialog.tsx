@@ -1,4 +1,3 @@
-import {ArrowPathIcon} from '@heroicons/react/24/outline';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
@@ -173,45 +172,30 @@ const NodeDetailsDialog = () => {
                             </Dialog.Title>
 
                             <div className="flex h-full flex-col">
-                                {currentComponent.actions &&
-                                    !!currentComponent.description && (
-                                        <CurrentActionSelect
-                                            actions={currentComponent.actions}
-                                            description={
-                                                currentComponent.description
-                                            }
-                                            handleValueChange={
-                                                setCurrentActionName
-                                            }
-                                        />
-                                    )}
+                                <CurrentActionSelect
+                                    actions={currentComponent.actions!}
+                                    description={currentAction?.description}
+                                    handleValueChange={setCurrentActionName}
+                                    loading={currentActionLoading}
+                                />
 
                                 {componentTabs.length > 1 && (
                                     <div className="flex justify-center pt-4">
-                                        {currentActionLoading ? (
-                                            <ArrowPathIcon className="my-2 ml-4 mr-2 h-6 w-6 animate-spin" />
-                                        ) : (
-                                            <>
-                                                {componentTabs.map((tab) => (
-                                                    <Button
-                                                        className={twMerge(
-                                                            'grow justify-center whitespace-nowrap rounded-none border-0 border-b-2 border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
-                                                            activeTab ===
-                                                                tab.name &&
-                                                                'border-blue-500 text-blue-500 hover:text-blue-500'
-                                                        )}
-                                                        key={tab.name}
-                                                        label={tab.label}
-                                                        name={tab.name}
-                                                        onClick={() =>
-                                                            setActiveTab(
-                                                                tab.name
-                                                            )
-                                                        }
-                                                    />
-                                                ))}
-                                            </>
-                                        )}
+                                        {componentTabs.map((tab) => (
+                                            <Button
+                                                className={twMerge(
+                                                    'grow justify-center whitespace-nowrap rounded-none border-0 border-b-2 border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
+                                                    activeTab === tab.name &&
+                                                        'border-blue-500 text-blue-500 hover:text-blue-500'
+                                                )}
+                                                key={tab.name}
+                                                label={tab.label}
+                                                name={tab.name}
+                                                onClick={() =>
+                                                    setActiveTab(tab.name)
+                                                }
+                                            />
+                                        ))}
                                     </div>
                                 )}
 
