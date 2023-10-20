@@ -1,5 +1,6 @@
+import {CalendarIcon} from '@heroicons/react/24/outline';
 import {useQueryClient} from '@tanstack/react-query';
-import {useState} from 'react';
+import React, {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 
 import AlertDialog from '../../../components/AlertDialog/AlertDialog';
@@ -182,9 +183,20 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
                             <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
                                 {project.status ===
-                                ProjectModelStatusEnum.Published
-                                    ? `${project.publishedDate?.toLocaleDateString()}`
-                                    : '-'}
+                                ProjectModelStatusEnum.Published ? (
+                                    <>
+                                        <CalendarIcon
+                                            className="mr-1 h-5 w-5 shrink-0 text-gray-400"
+                                            aria-hidden="true"
+                                        />
+
+                                        <span>
+                                            {project.publishedDate?.toLocaleDateString()}
+                                        </span>
+                                    </>
+                                ) : (
+                                    '-'
+                                )}
                             </div>
                         </div>
                     </Link>
