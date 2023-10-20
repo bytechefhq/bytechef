@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS project (
     description              TEXT         NULL,
     project_version          INT          NOT NULL,
     status                   VARCHAR(256) NOT NULL,
-    last_published_date      TIMESTAMP    NULL,
+    published_date           TIMESTAMP    NULL,
     category_id              BIGINT       NULL,
     created_date             TIMESTAMP    NOT NULL,
     created_by               TEXT         NOT NULL,
