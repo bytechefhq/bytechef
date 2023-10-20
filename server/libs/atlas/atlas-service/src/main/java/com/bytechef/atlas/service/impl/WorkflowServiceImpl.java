@@ -33,6 +33,7 @@ import java.util.stream.StreamSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.lang.NonNull;
@@ -55,7 +56,8 @@ public class WorkflowServiceImpl implements WorkflowService {
     private final List<WorkflowRepository> workflowRepositories;
 
     @SuppressFBWarnings("EI2")
-    public WorkflowServiceImpl(CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
+    public WorkflowServiceImpl(@Qualifier("workflowRepositoryCacheManager") CacheManager cacheManager,
+        List<WorkflowCrudRepository> workflowCrudRepositories,
         List<WorkflowRepository> workflowRepositories) {
         Assert.notNull(cacheManager, "'cacheManager' can not be null");
         Assert.notNull(workflowCrudRepositories, "'workflowCrudRepositories' can not be null");
