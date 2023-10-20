@@ -17,13 +17,12 @@
 
 package com.bytechef.hermes.project.facade;
 
-import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.category.domain.Category;
 import com.bytechef.hermes.project.domain.Project;
+import com.bytechef.hermes.project.domain.ProjectInstance;
+import com.bytechef.hermes.project.dto.ProjectExecution;
 import com.bytechef.tag.domain.Tag;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
@@ -36,13 +35,19 @@ public interface ProjectFacade {
 
     Project addWorkflow(long id, String name, String description, String definition);
 
-    Project create(Project project);
+    Project createProject(Project project);
 
-    void delete(Long id);
+    ProjectInstance createProjectInstance(ProjectInstance projectInstance);
 
-    Project duplicate(long id);
+    void deleteProject(Long projectId);
 
-    Project getProject(Long id);
+    void deleteProjectInstance(Long projectInstanceId);
+
+    Project duplicateProject(long projectId);
+
+    Project getProject(Long projectId);
+
+    ProjectInstance getProjectInstance(Long projectInstanceId);
 
     List<Category> getProjectCategories();
 
@@ -53,18 +58,19 @@ public interface ProjectFacade {
     List<Workflow> getProjectWorkflows(Long id);
 
     Page<ProjectExecution> searchProjectExecutions(
-        String jobStatus, LocalDateTime jobStartTime, LocalDateTime jobEndTime, Long projectId, Long projectInstanceId,
+        String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber);
 
-    List<Project> searchProjects(List<Long> categoryIds, List<Long> tagIds);
+    List<ProjectInstance> searchProjectInstances(List<Long> projectIds, List<Long> tagIds);
 
-    Project update(Long id, List<Tag> tags);
+    List<Project> searchProjects(List<Long> categoryIds, boolean projectInstances, List<Long> tagIds);
 
     Project update(Project project);
 
-    @SuppressFBWarnings("EI")
-    record ProjectExecution(
-        /* ProjectInstance instance, */ Job job, Project project, List<TaskExecution> taskExecutions,
-        Workflow workflow) {
-    }
+    ProjectInstance update(ProjectInstance projectInstance);
+
+    ProjectInstance updateProjectInstanceTags(Long projectInstanceId, List<Tag> tags);
+
+    Project updateProjectTags(Long projectId, List<Tag> tags);
+
 }

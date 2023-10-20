@@ -23,6 +23,7 @@ import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;

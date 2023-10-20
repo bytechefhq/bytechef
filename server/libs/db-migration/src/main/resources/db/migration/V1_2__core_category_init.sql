@@ -3,9 +3,9 @@ CREATE TABLE IF NOT EXISTS category (
     name                     VARCHAR(256) NOT NULL,
     description              TEXT         NULL,
     created_date             TIMESTAMP    NOT NULL,
-    created_by               TEXT         NOT NULL,
+    created_by               VARCHAR(256) NOT NULL,
     last_modified_date       TIMESTAMP    NOT NULL,
-    last_modified_by         TEXT         NOT NULL,
+    last_modified_by         VARCHAR(256) NOT NULL,
     version                  BIGINT       NOT NULL
 );
 

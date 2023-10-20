@@ -83,9 +83,6 @@ public final class Project implements Persistable<Long> {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
-    @Column("published_date")
-    private LocalDateTime publishedDate;
-
     @MappedCollection(idColumn = "project_id")
     private Set<ProjectTag> projectTags = new HashSet<>();
 
@@ -94,6 +91,9 @@ public final class Project implements Persistable<Long> {
 
     @MappedCollection(idColumn = "project_id")
     private Set<ProjectWorkflow> projectWorkflows = new HashSet<>();
+
+    @Column("published_date")
+    private LocalDateTime publishedDate;
 
     @Column
     private Status status;
@@ -109,13 +109,20 @@ public final class Project implements Persistable<Long> {
 
     @PersistenceCreator
     public Project(
-        String name, String description, Set<ProjectTag> projectTags,
-        Set<ProjectWorkflow> projectWorkflows) {
+        AggregateReference<Category, Long> categoryId, String description, Long id, String name,
+        Set<ProjectTag> projectTags, int projectVersion, Set<ProjectWorkflow> projectWorkflows,
+        LocalDateTime publishedDate, Status status, int version) {
 
-        this.name = name;
+        this.categoryId = categoryId;
         this.description = description;
+        this.id = id;
+        this.name = name;
         this.projectTags.addAll(projectTags);
+        this.projectVersion = projectVersion;
         this.projectWorkflows.addAll(projectWorkflows);
+        this.publishedDate = publishedDate;
+        this.status = status;
+        this.version = version;
     }
 
     public void addTag(Tag tag) {
@@ -176,10 +183,6 @@ public final class Project implements Persistable<Long> {
         return id;
     }
 
-    public LocalDateTime getPublishedDate() {
-        return publishedDate;
-    }
-
     public String getName() {
         return name;
     }
@@ -194,6 +197,10 @@ public final class Project implements Persistable<Long> {
 
     public int getProjectVersion() {
         return projectVersion;
+    }
+
+    public LocalDateTime getPublishedDate() {
+        return publishedDate;
     }
 
     public Status getStatus() {
@@ -256,16 +263,16 @@ public final class Project implements Persistable<Long> {
         this.id = id;
     }
 
-    public void setPublishedDate(LocalDateTime publishedDate) {
-        this.publishedDate = publishedDate;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
 
     public void setProjectVersion(int projectVersion) {
         this.projectVersion = projectVersion;
+    }
+
+    public void setPublishedDate(LocalDateTime publishedDate) {
+        this.publishedDate = publishedDate;
     }
 
     public void setStatus(Status status) {
@@ -316,14 +323,12 @@ public final class Project implements Persistable<Long> {
     }
 
     public Project update(Project project) {
-        this.category = project.category;
         this.categoryId = project.categoryId;
         this.description = project.description;
         this.id = project.id;
         this.name = project.name;
         this.projectTags = project.projectTags;
         this.projectWorkflows = project.projectWorkflows;
-        this.tags = project.tags;
 
         return this;
     }

@@ -20,7 +20,7 @@ package com.bytechef.hermes.definition.registry.service;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParameters;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -49,7 +49,4 @@ public interface ConnectionDefinitionService {
 
     OAuth2AuthorizationParameters getOAuth2Parameters(Connection connection);
 
-    @SuppressFBWarnings("EI")
-    record OAuth2AuthorizationParameters(String authorizationUrl, String clientId, List<String> scopes) {
-    }
 }

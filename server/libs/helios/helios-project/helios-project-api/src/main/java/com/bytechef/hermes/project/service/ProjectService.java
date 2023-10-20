@@ -30,17 +30,19 @@ public interface ProjectService {
 
     Project addWorkflow(long id, String workflowId);
 
-    Optional<Project> fetchProject(String name);
-
     Project create(Project project);
 
     void delete(long id);
+
+    Optional<Project> fetchProject(String name);
 
     Project getProject(long id);
 
     List<Project> getProjects();
 
-    List<Project> searchProjects(List<Long> categoryIds, List<Long> tagIds);
+    List<Project> getProjects(List<Long> ids);
+
+    List<Project> searchProjects(List<Long> categoryIds, List<Long> ids, List<Long> tagIds);
 
     Project update(long id, List<Tag> tags);
 

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -71,6 +72,18 @@ public final class CollectionUtils {
 
     public static <T> boolean contains(List<T> list, T item) {
         return org.springframework.util.CollectionUtils.contains(list.iterator(), item);
+    }
+
+    public static <T> List<T> filter(List<T> list, Predicate<? super T> predicate) {
+        return list.stream()
+            .filter(predicate)
+            .toList();
+    }
+
+    public static <T> T findFirst(List<T> list, Predicate<? super T> predicate) {
+        return OptionalUtils.get(list.stream()
+            .filter(predicate)
+            .findFirst());
     }
 
     public static <T, R> List<R> map(List<T> list, Function<? super T, R> mapper) {

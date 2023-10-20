@@ -23,7 +23,7 @@ import com.bytechef.hermes.project.domain.Project;
 import com.bytechef.hermes.project.facade.ProjectFacade;
 import com.bytechef.hermes.project.web.rest.model.CreateProjectWorkflowRequestModel;
 import com.bytechef.hermes.project.web.rest.model.ProjectModel;
-import com.bytechef.hermes.project.web.rest.model.UpdateProjectTagsRequestModel;
+import com.bytechef.hermes.project.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -62,7 +62,7 @@ public class ProjectController implements ProjectsApi {
 
         return projectModelMono.map(projectModel -> ResponseEntity.ok(
             conversionService.convert(
-                projectFacade.create(conversionService.convert(projectModel, Project.class)),
+                projectFacade.createProject(conversionService.convert(projectModel, Project.class)),
                 ProjectModel.class)));
     }
 
@@ -80,7 +80,7 @@ public class ProjectController implements ProjectsApi {
 
     @Override
     public Mono<ResponseEntity<Void>> deleteProject(Long id, ServerWebExchange exchange) {
-        projectFacade.delete(id);
+        projectFacade.deleteProject(id);
 
         return Mono.just(
             ResponseEntity.ok()
@@ -91,7 +91,7 @@ public class ProjectController implements ProjectsApi {
     public Mono<ResponseEntity<ProjectModel>> duplicateProject(Long id, ServerWebExchange exchange) {
         return Mono.just(
             ResponseEntity.ok(
-                conversionService.convert(projectFacade.duplicate(id), ProjectModel.class)));
+                conversionService.convert(projectFacade.duplicateProject(id), ProjectModel.class)));
     }
 
     @Override
@@ -103,12 +103,12 @@ public class ProjectController implements ProjectsApi {
 
     @Override
     public Mono<ResponseEntity<Flux<ProjectModel>>> getProjects(
-        List<Long> categoryIds, List<Long> tagIds, ServerWebExchange exchange) {
+        List<Long> categoryIds, Boolean projectInstances, List<Long> tagIds, ServerWebExchange exchange) {
 
         return Mono.just(
             ResponseEntity.ok(
                 Flux.fromIterable(
-                    projectFacade.searchProjects(categoryIds, tagIds)
+                    projectFacade.searchProjects(categoryIds, projectInstances != null, tagIds)
                         .stream()
                         .map(project -> conversionService.convert(project, ProjectModel.class))
                         .toList())));
@@ -137,12 +137,12 @@ public class ProjectController implements ProjectsApi {
 
     @Override
     public Mono<ResponseEntity<Void>> updateProjectTags(
-        Long id, Mono<UpdateProjectTagsRequestModel> updateProjectTagsRequestModelMono, ServerWebExchange exchange) {
+        Long id, Mono<UpdateTagsRequestModel> updateTagsRequestModelMono, ServerWebExchange exchange) {
 
-        return updateProjectTagsRequestModelMono.map(putProjectTagsRequestModel -> {
-            List<TagModel> tagModels = putProjectTagsRequestModel.getTags();
+        return updateTagsRequestModelMono.map(updateTagsRequestModel -> {
+            List<TagModel> tagModels = updateTagsRequestModel.getTags();
 
-            projectFacade.update(
+            projectFacade.updateProjectTags(
                 id,
                 tagModels.stream()
                     .map(tagModel -> conversionService.convert(tagModel, Tag.class))

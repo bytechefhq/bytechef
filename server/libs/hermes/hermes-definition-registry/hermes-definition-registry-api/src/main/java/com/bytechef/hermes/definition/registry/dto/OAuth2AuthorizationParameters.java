@@ -15,24 +15,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.commons.util;
+package com.bytechef.hermes.definition.registry.dto;
 
-import java.util.Optional;
-import java.util.function.Consumer;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-/**
- * @author Ivica Cardic
- */
-public final class OptionalUtils {
+import java.util.List;
 
-    private OptionalUtils() {
-    }
-
-    public static <T> T get(Optional<T> optional) {
-        return optional.orElseThrow(IllegalArgumentException::new);
-    }
-
-    public static <T> void ifPresent(Optional<T> optional, Consumer<? super T> action) {
-        optional.ifPresent(action);
-    }
+@SuppressFBWarnings("EI")
+public record OAuth2AuthorizationParameters(String authorizationUrl, String clientId, List<String> scopes) {
 }
