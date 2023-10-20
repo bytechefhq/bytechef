@@ -1,6 +1,4 @@
-drop table if exists job cascade;
-
-create table job (
+create table if not exists job (
   id                       varchar(256) not null primary key,
   status                   varchar(256) not null,
   current_task             int          not null,
@@ -16,12 +14,10 @@ create table job (
   parent_task_execution_id varchar(256)
 );
 
-create index idx_job_create_time on job (create_time);
-create index idx_job_status on job (status);
+create index if not exists idx_job_create_time on job (create_time);
+create index if not exists idx_job_status on job (status);
 
-drop table if exists task_execution cascade;
-
-create table task_execution (
+create table if not exists task_execution (
   id                   varchar(256) not null primary key,
   parent_id            varchar(256)     null,
   status               varchar(256) not null,
@@ -35,22 +31,18 @@ create table task_execution (
   task_number          int          not null
 );
 
-create index idx_task_execution_job_id on task_execution (job_id);
+create index if not exists idx_task_execution_job_id on task_execution (job_id);
 
-drop table if exists context cascade;
-
-create table context (
+create table if not exists context (
   id                 varchar(256) not null primary key,
   stack_id           varchar(256) not null,
   create_time        timestamp    not null,
   serialized_context text        not null
 );
 
-create index idx_context_stack_id on context (stack_id);
+create index if not exists idx_context_stack_id on context (stack_id);
 
-drop table if exists counter cascade;
-
-create table counter (
+create table if not exists counter (
   id          varchar(256) not null primary key,
   create_time timestamp    not null,
   value       bigint       not null
