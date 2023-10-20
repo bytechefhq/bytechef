@@ -22,6 +22,7 @@ export const PropertyTypeModel = {
     Boolean: 'BOOLEAN',
     Date: 'DATE',
     DateTime: 'DATE_TIME',
+    DynamicProperties: 'DYNAMIC_PROPERTIES',
     Integer: 'INTEGER',
     Null: 'NULL',
     Number: 'NUMBER',

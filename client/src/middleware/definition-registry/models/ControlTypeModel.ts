@@ -18,8 +18,21 @@
  * @export
  */
 export const ControlTypeModel = {
-    Code: 'CODE',
-    Password: 'PASSWORD'
+    Checkbox: 'CHECKBOX',
+    CodeEditor: 'CODE_EDITOR',
+    Date: 'DATE',
+    DateTime: 'DATE_TIME',
+    InputEmail: 'INPUT_EMAIL',
+    InputInteger: 'INPUT_INTEGER',
+    InputNumber: 'INPUT_NUMBER',
+    InputPassword: 'INPUT_PASSWORD',
+    InputPhone: 'INPUT_PHONE',
+    InputText: 'INPUT_TEXT',
+    InputUrl: 'INPUT_URL',
+    JsonBuilder: 'JSON_BUILDER',
+    MultiSelect: 'MULTI_SELECT',
+    Select: 'SELECT',
+    TextArea: 'TEXT_AREA'
 } as const;
 export type ControlTypeModel = typeof ControlTypeModel[keyof typeof ControlTypeModel];
 

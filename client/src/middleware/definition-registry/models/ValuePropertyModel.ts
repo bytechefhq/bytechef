@@ -13,24 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { DisplayOptionModel } from './DisplayOptionModel';
+import type { ControlTypeModel } from './ControlTypeModel';
 import {
-    DisplayOptionModelFromJSON,
-    DisplayOptionModelFromJSONTyped,
-    DisplayOptionModelToJSON,
-} from './DisplayOptionModel';
+    ControlTypeModelFromJSON,
+    ControlTypeModelFromJSONTyped,
+    ControlTypeModelToJSON,
+} from './ControlTypeModel';
 import type { PropertyModel } from './PropertyModel';
 import {
     PropertyModelFromJSON,
     PropertyModelFromJSONTyped,
     PropertyModelToJSON,
 } from './PropertyModel';
-import type { PropertyOptionModel } from './PropertyOptionModel';
-import {
-    PropertyOptionModelFromJSON,
-    PropertyOptionModelFromJSONTyped,
-    PropertyOptionModelToJSON,
-} from './PropertyOptionModel';
 import type { PropertyTypeModel } from './PropertyTypeModel';
 import {
     PropertyTypeModelFromJSON,
@@ -45,23 +39,23 @@ import {
  */
 export interface ValuePropertyModel extends PropertyModel {
     /**
+     * 
+     * @type {ControlTypeModel}
+     * @memberof ValuePropertyModel
+     */
+    controlType?: ControlTypeModel;
+    /**
      * The property default value.
      * @type {object}
      * @memberof ValuePropertyModel
      */
     defaultValue?: object;
     /**
-     * The property example value.
+     * The property sample value.
      * @type {object}
      * @memberof ValuePropertyModel
      */
-    exampleValue?: object;
-    /**
-     * The list of valid property options.
-     * @type {Array<PropertyOptionModel>}
-     * @memberof ValuePropertyModel
-     */
-    options?: Array<PropertyOptionModel>;
+    sampleValue?: object;
 }
 
 /**
@@ -83,9 +77,9 @@ export function ValuePropertyModelFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         ...PropertyModelFromJSONTyped(json, ignoreDiscriminator),
+        'controlType': !exists(json, 'controlType') ? undefined : ControlTypeModelFromJSON(json['controlType']),
         'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
-        'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
-        'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(PropertyOptionModelFromJSON)),
+        'sampleValue': !exists(json, 'sampleValue') ? undefined : json['sampleValue'],
     };
 }
 
@@ -98,9 +92,9 @@ export function ValuePropertyModelToJSON(value?: ValuePropertyModel | null): any
     }
     return {
         ...PropertyModelToJSON(value),
+        'controlType': ControlTypeModelToJSON(value.controlType),
         'defaultValue': value.defaultValue,
-        'exampleValue': value.exampleValue,
-        'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(PropertyOptionModelToJSON)),
+        'sampleValue': value.sampleValue,
     };
 }
 

@@ -13,18 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { DisplayOptionModel } from './DisplayOptionModel';
+import type { ControlTypeModel } from './ControlTypeModel';
 import {
-    DisplayOptionModelFromJSON,
-    DisplayOptionModelFromJSONTyped,
-    DisplayOptionModelToJSON,
-} from './DisplayOptionModel';
-import type { PropertyOptionModel } from './PropertyOptionModel';
-import {
-    PropertyOptionModelFromJSON,
-    PropertyOptionModelFromJSONTyped,
-    PropertyOptionModelToJSON,
-} from './PropertyOptionModel';
+    ControlTypeModelFromJSON,
+    ControlTypeModelFromJSONTyped,
+    ControlTypeModelToJSON,
+} from './ControlTypeModel';
 import type { PropertyTypeModel } from './PropertyTypeModel';
 import {
     PropertyTypeModelFromJSON,

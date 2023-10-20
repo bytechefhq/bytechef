@@ -13,18 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { DisplayOptionModel } from './DisplayOptionModel';
+import type { ControlTypeModel } from './ControlTypeModel';
 import {
-    DisplayOptionModelFromJSON,
-    DisplayOptionModelFromJSONTyped,
-    DisplayOptionModelToJSON,
-} from './DisplayOptionModel';
-import type { PropertyOptionModel } from './PropertyOptionModel';
+    ControlTypeModelFromJSON,
+    ControlTypeModelFromJSONTyped,
+    ControlTypeModelToJSON,
+} from './ControlTypeModel';
+import type { OptionModel } from './OptionModel';
 import {
-    PropertyOptionModelFromJSON,
-    PropertyOptionModelFromJSONTyped,
-    PropertyOptionModelToJSON,
-} from './PropertyOptionModel';
+    OptionModelFromJSON,
+    OptionModelFromJSONTyped,
+    OptionModelToJSON,
+} from './OptionModel';
 import type { PropertyTypeModel } from './PropertyTypeModel';
 import {
     PropertyTypeModelFromJSON,
@@ -44,6 +44,18 @@ import {
  * @interface DatePropertyModel
  */
 export interface DatePropertyModel extends ValuePropertyModel {
+    /**
+     * The list of valid property options.
+     * @type {Array<OptionModel>}
+     * @memberof DatePropertyModel
+     */
+    options?: Array<OptionModel>;
+    /**
+     * 
+     * @type {any}
+     * @memberof DatePropertyModel
+     */
+    optionsDataSource?: any | null;
 }
 
 /**
@@ -60,10 +72,27 @@ export function DatePropertyModelFromJSON(json: any): DatePropertyModel {
 }
 
 export function DatePropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): DatePropertyModel {
-    return json;
+    if ((json === undefined) || (json === null)) {
+        return json;
+    }
+    return {
+        ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
+        'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
+        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : json['optionsDataSource'],
+    };
 }
 
 export function DatePropertyModelToJSON(value?: DatePropertyModel | null): any {
-    return value;
+    if (value === undefined) {
+        return undefined;
+    }
+    if (value === null) {
+        return null;
+    }
+    return {
+        ...ValuePropertyModelToJSON(value),
+        'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
+        'optionsDataSource': value.optionsDataSource,
+    };
 }
 

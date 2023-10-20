@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { OptionModel } from './OptionModel';
+import {
+    OptionModelFromJSON,
+    OptionModelFromJSONTyped,
+    OptionModelToJSON,
+} from './OptionModel';
+
 /**
  * 
  * @export
@@ -37,6 +44,18 @@ export interface NumberPropertyAllOfModel {
      * @memberof NumberPropertyAllOfModel
      */
     numberPrecision?: number;
+    /**
+     * The list of valid property options.
+     * @type {Array<OptionModel>}
+     * @memberof NumberPropertyAllOfModel
+     */
+    options?: Array<OptionModel>;
+    /**
+     * 
+     * @type {any}
+     * @memberof NumberPropertyAllOfModel
+     */
+    optionsDataSource?: any | null;
 }
 
 /**
@@ -61,6 +80,8 @@ export function NumberPropertyAllOfModelFromJSONTyped(json: any, ignoreDiscrimin
         'maxValue': !exists(json, 'maxValue') ? undefined : json['maxValue'],
         'minValue': !exists(json, 'minValue') ? undefined : json['minValue'],
         'numberPrecision': !exists(json, 'numberPrecision') ? undefined : json['numberPrecision'],
+        'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
+        'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : json['optionsDataSource'],
     };
 }
 
@@ -76,6 +97,8 @@ export function NumberPropertyAllOfModelToJSON(value?: NumberPropertyAllOfModel 
         'maxValue': value.maxValue,
         'minValue': value.minValue,
         'numberPrecision': value.numberPrecision,
+        'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
+        'optionsDataSource': value.optionsDataSource,
     };
 }
 
