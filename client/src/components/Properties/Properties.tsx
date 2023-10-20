@@ -1,6 +1,6 @@
 /// <reference types="vite-plugin-svgr/client" />
 
-import Checkbox from 'components/Checkbox/Checkbox';
+import Editor from '@monaco-editor/react';
 import Select, {ISelectOption} from 'components/Select/Select';
 import {TagModel} from 'middleware/core/tag/models/TagModel';
 import {FieldValues} from 'react-hook-form/dist/types';
@@ -50,15 +50,17 @@ export interface PropertyFormProps {
 }
 
 interface PropertyProps {
-    path?: string;
-    formState?: FormState<FieldValues>;
-    register?: UseFormRegister<PropertyFormProps>;
     property: PropertyType;
+    actionName?: string;
+    formState?: FormState<FieldValues>;
+    path?: string;
+    register?: UseFormRegister<PropertyFormProps>;
 }
 
 const Property = ({
-    path = 'parameters',
+    actionName,
     formState,
+    path = 'parameters',
     property,
     register,
 }: PropertyProps) => {
@@ -72,6 +74,7 @@ const Property = ({
         options,
         required,
         type,
+        types,
     } = property;
 
     const hasError = (propertyName: string) =>
@@ -90,7 +93,9 @@ const Property = ({
 
     return (
         <li className="flex w-full items-center space-x-2">
-            <span>{TYPE_ICONS[type as keyof typeof TYPE_ICONS]}</span>
+            <span title={type}>
+                {TYPE_ICONS[type as keyof typeof TYPE_ICONS]}
+            </span>
 
             {register && controlType === 'INPUT_TEXT' && (
                 <Input
@@ -154,21 +159,56 @@ const Property = ({
             )}
 
             {controlType === 'CHECKBOX' && (
-                <Checkbox description={description} id={name!} label={label} />
+                <Select
+                    description={description}
+                    label={label}
+                    options={[
+                        {value: 'true', label: 'True'},
+                        {value: 'false', label: 'False'},
+                    ]}
+                    triggerClassName="w-full bg-gray-100 border-none"
+                />
             )}
 
-            {controlType === 'JSON_BUILDER' && <span>json builder</span>}
+            {controlType === 'JSON_BUILDER' && <span>JSON builder</span>}
+
+            {controlType === 'CODE_EDITOR' && (
+                <Editor
+                    language={actionName}
+                    height="40vh"
+                    defaultValue="// Add your custom code here..."
+                />
+            )}
+
+            {!controlType && type === 'ONE_OF' && (
+                <ul className="space-y-2">
+                    {(types as Array<PropertyType>).map(
+                        ({controlType, type}, index) => (
+                            <li
+                                className="space-y-2 rounded-md bg-gray-100 p-2"
+                                key={`${controlType}_${type}_${index}`}
+                            >
+                                <span>
+                                    {controlType} - {type}
+                                </span>
+                            </li>
+                        )
+                    )}
+                </ul>
+            )}
         </li>
     );
 };
 
 interface PropertiesProps {
     properties: Array<PropertyType>;
+    actionName?: string;
     formState?: FormState<FieldValues>;
     register?: UseFormRegister<PropertyFormProps>;
 }
 
 const Properties = ({
+    actionName,
     formState,
     properties,
     register,
@@ -176,6 +216,7 @@ const Properties = ({
     <ul className="mb-4 space-y-2">
         {properties.map((property, index) => (
             <Property
+                actionName={actionName}
                 formState={formState}
                 key={`${property.name}_${index}`}
                 property={property}
