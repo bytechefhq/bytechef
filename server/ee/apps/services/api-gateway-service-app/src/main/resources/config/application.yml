@@ -72,15 +72,15 @@ spring:
         - id: configuration-service
           uri: lb://configuration-service-app
           predicates:
-            - Path=/api/automation/projects/**
+          - Path=/api/automation/project-categories/**,/api/automation/project-tags/**,/api/automation/project-workflows/**,/api/automation/projects/**,/api/automation/project-instances/**,/api/automation/project-instance-tags/**,/api/core/action-definitions/**,/api/core/component-definitions/**,/api/core/connection-definitions/**,/api/core/task-dispatcher-definitions/**,/api/core/workflow-tests/**,/api/embedded/integration-categories/**,/api/embedded/integration-tags/**,/api/embedded/integration-workflows/**,/api/embedded/integrations/**
         - id: connection-service
           uri: lb://connection-service-app
           predicates:
-            - Path=/api/automation/connections/**
+            - Path=/api/automation/connection-tags/**,/api/automation/connections/**,/api/core/connection-oauth2-properties/**
         - id: execution-service
           uri: lb://execution-service-app
           predicates:
-            - Path=/api/automation/project-workflow-executions/**
+            - Path=/api/automation/jobs/**,/api/automation/project-workflow-executions/**
 #        - id: openapi
 #          uri: http://localhost:${server.port}
 #          predicates:
