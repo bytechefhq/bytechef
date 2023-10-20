@@ -81,28 +81,38 @@ public class SpreadsheetFileTaskDescriptor implements TaskDescriptor {
                 .options(
                     BOOLEAN_PROPERTY("compression")
                         .displayName("Compression")
+                        .description("Weather compression will be applied or not.")
                         .displayOption(
                             show("operation", parameterValues("WRITE"), "fileFormat", parameterValues("XLSX", "ODS"))
                         )
-                        .description("Weather compression will be applied or not.")
                         .defaultValue(false),
                     STRING_PROPERTY("fileName")
                         .displayName("File Name")
-                        .displayOption(show("operation", "WRITE"))
                         .description(
                             "File name to set in binary data. By default will \"spreadsheet.<fileFormat>\" be used."
                         )
+                        .displayOption(show("operation", "WRITE"))
                         .defaultValue(""),
                     BOOLEAN_PROPERTY("headerRow")
                         .displayName("Header Row")
-                        .displayOption(show("operation", "READ"))
                         .description("The first row of the file contains the header names.")
+                        .displayOption(show("operation", "READ"))
                         .defaultValue(true),
                     BOOLEAN_PROPERTY("includeEmptyCells")
                         .displayName("Include Empty Cells")
-                        .displayOption(show("operation", "READ"))
                         .description("When reading from file the empty cells will be filled with an empty string.")
+                        .displayOption(show("operation", "READ"))
                         .defaultValue(false),
+                    GROUP_PROPERTY("range")
+                        .displayName("Range")
+                        .description(
+                            "The range to read from the table. If set to a number it will be the starting row."
+                        )
+                        .displayOption(show("operation", "READ"))
+                        .fields(
+                            NUMBER_PROPERTY("startRow").displayName("Start Row index"),
+                            NUMBER_PROPERTY("endRow").displayName("End Row index")
+                        ),
                     BOOLEAN_PROPERTY("rawData")
                         .displayName("RAW Data")
                         .displayOption(show("operation", "READ"))
@@ -110,30 +120,28 @@ public class SpreadsheetFileTaskDescriptor implements TaskDescriptor {
                         .defaultValue(false),
                     BOOLEAN_PROPERTY("readAsString")
                         .displayName("Read As String")
-                        .displayOption(show("operation", "READ"))
                         .description(
                             "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way."
                         )
-                        .defaultValue(false),
-                    GROUP_PROPERTY("range")
-                        .displayName("Range")
-                        .displayOption(show("operation", "READ"))
-                        .description(
-                            "The range to read from the table. If set to a number it will be the starting row."
+                        .displayOption(
+                            show(
+                                "operation",
+                                parameterValues("READ"),
+                                "fileFormat",
+                                parameterValues("ODS", "XLS", "XLSX")
+                            )
                         )
-                        .fields(
-                            NUMBER_PROPERTY("startRow").displayName("Start Row index"),
-                            NUMBER_PROPERTY("endRow").displayName("End Row index")
-                        ),
+                        .defaultValue(false),
                     STRING_PROPERTY("sheetName")
                         .displayName("Sheet Name")
-                        .displayOption(show("operation", "READ"))
                         .description(
                             "The name of the sheet to read from in the spreadsheet (if supported). If not set, the first one gets chosen."
                         )
+                        .displayOption(show("operation", "READ"))
                         .defaultValue("Sheet"),
                     STRING_PROPERTY("sheetName")
                         .displayName("Sheet Name")
+                        .description("The name of the sheet to create in the spreadsheet.")
                         .displayOption(
                             show(
                                 "operation",
@@ -142,7 +150,6 @@ public class SpreadsheetFileTaskDescriptor implements TaskDescriptor {
                                 parameterValues("ODS", "XLS", "XLSX")
                             )
                         )
-                        .description("The name of the sheet to create in the spreadsheet.")
                         .defaultValue("Sheet")
                 )
         );

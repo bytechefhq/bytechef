@@ -111,8 +111,8 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                         .defaultValue(false),
                     SELECT_PROPERTY("bodyContentType")
                         .displayName("Body Content Type")
-                        .displayOption(show("requestMethod", "PATCH", "POST", "PUT"))
                         .description("Content-Type to use when sending body parameters.")
+                        .displayOption(show("requestMethod", "PATCH", "POST", "PUT"))
                         .options(
                             option("JSON", "JSON"),
                             option("Form-Data", "FORM_DATA"),
@@ -153,13 +153,13 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
 
             STRING_PROPERTY("headerParametersRaw")
                 .displayName("Header Parameters")
-                .displayOption(show("rawParameters", true))
                 .description("Header parameters as RAW.")
+                .displayOption(show("rawParameters", true))
                 .defaultValue(""),
             COLLECTION_PROPERTY("headerParametersKeyValue")
                 .displayName("Header Parameters")
-                .displayOption(show("rawParameters", parameterValues(false)))
                 .description("Header parameters to send.")
+                .displayOption(show("rawParameters", parameterValues(false)))
                 .defaultValue("")
                 .placeholder("Add Parameter")
                 .typeOption(multipleValues(true))
@@ -183,13 +183,13 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
 
             STRING_PROPERTY("queryParametersRaw")
                 .displayName("Query Parameters")
-                .displayOption(show("rawParameters", true))
                 .description("Query parameters as RAW.")
+                .displayOption(show("rawParameters", true))
                 .defaultValue(""),
             COLLECTION_PROPERTY("queryParametersKeyValue")
                 .displayName("Header Parameters")
-                .displayOption(show("rawParameters", parameterValues(false)))
                 .description("Query parameters to send.")
+                .displayOption(show("rawParameters", parameterValues(false)))
                 .defaultValue("")
                 .placeholder("Add Parameter")
                 .typeOption(multipleValues(true))
@@ -213,6 +213,7 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
 
             STRING_PROPERTY("bodyParametersRaw")
                 .displayName("Body Parameters")
+                .description("Body parameters as RAW.")
                 .displayOption(
                     show(
                         "rawParameters",
@@ -223,10 +224,10 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                         parameterValues("PATCH", "POST", "PUT")
                     )
                 )
-                .description("Body parameters as RAW.")
                 .defaultValue(""),
             COLLECTION_PROPERTY("bodyParametersKeyValue")
                 .displayName("Body Parameters")
+                .description("Body parameters to send.")
                 .displayOption(
                     show(
                         "rawParameters",
@@ -237,7 +238,6 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                         parameterValues("PATCH", "POST", "PUT")
                     )
                 )
-                .description("Body parameters to send.")
                 .defaultValue("")
                 .placeholder("Add Parameter")
                 .typeOption(multipleValues(true))
