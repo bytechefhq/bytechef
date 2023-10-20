@@ -25,7 +25,6 @@ import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -257,25 +256,15 @@ public class WorkflowServiceImpl implements WorkflowService, RemoteWorkflowServi
 
             int index = workflows.indexOf(workflow);
 
-            if (index != -1) {
+            if (index == -1) {
+                workflows.add(workflow);
+            } else {
                 workflows.remove(index);
 
                 workflows.add(index, workflow);
-
-                cacheAll.put(CACHE_ALL, workflows);
             }
 
-            Iterator<Workflow> iterator = workflows.iterator();
-
-            while (iterator.hasNext()) {
-                Workflow curWorkflow = iterator.next();
-
-                if (Objects.equals(curWorkflow, workflow)) {
-                    iterator.remove();
-
-                    break;
-                }
-            }
+            cacheAll.put(CACHE_ALL, workflows);
         }
 
         return workflow;
