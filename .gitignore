@@ -63,6 +63,7 @@ local.properties
 classes/
 **/out/
 **/dist/
+**/generated/generated
 
 ######################
 # Visual Studio Code
