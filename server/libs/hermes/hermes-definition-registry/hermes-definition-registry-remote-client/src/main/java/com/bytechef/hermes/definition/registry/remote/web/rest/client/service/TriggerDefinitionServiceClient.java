@@ -79,7 +79,7 @@ public class TriggerDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
-        String componentName, int componentVersion, String triggerName, DynamicWebhookEnableOutput output) {
+        String triggerName, String componentName, int componentVersion, DynamicWebhookEnableOutput output) {
 
         return WORKER_WEB_CLIENT
             .post()

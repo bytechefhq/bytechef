@@ -57,7 +57,7 @@ public class ScheduledTriggerExecutor {
             triggerLifecycleService.fetchValue(workflowExecutionId.getInstanceId(), workflowExecutionId.toString()));
 
         output = triggerDefinitionService.executeDynamicWebhookRefresh(
-            workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(), workflowTrigger.getTriggerName(),
+            workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
             output);
 
         if (output != null) {
