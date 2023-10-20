@@ -9,7 +9,7 @@ const Integrations = () => (
     <SidebarContentLayout
         header={
             <PageHeader
-                className="flex place-self-center sm:w-full 2xl:w-4/5"
+                position={'main'}
                 right={<IntegrationModal />}
                 title="All Integrations"
             />
