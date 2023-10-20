@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-06T20:36:52.146752+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-08T22:26:46.976326+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "project", description = "The Project API")
 public interface ProjectApi {
@@ -242,6 +242,7 @@ public interface ProjectApi {
      * @param categoryId The category id used for filtering projects. (optional)
      * @param projectInstances Use for filtering projects for which project instances exist. (optional)
      * @param tagId The tag id of used for filtering projects. (optional)
+     * @param published Use for filtering published projects. (optional)
      * @return A list of projects. (status code 200)
      */
     @Operation(
@@ -263,7 +264,8 @@ public interface ProjectApi {
     default ResponseEntity<List<ProjectModel>> getProjects(
         @Parameter(name = "categoryId", description = "The category id used for filtering projects.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "categoryId", required = false) Long categoryId,
         @Parameter(name = "projectInstances", description = "Use for filtering projects for which project instances exist.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "projectInstances", required = false) Boolean projectInstances,
-        @Parameter(name = "tagId", description = "The tag id of used for filtering projects.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId
+        @Parameter(name = "tagId", description = "The tag id of used for filtering projects.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId,
+        @Parameter(name = "published", description = "Use for filtering published projects.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "published", required = false) Boolean published
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
