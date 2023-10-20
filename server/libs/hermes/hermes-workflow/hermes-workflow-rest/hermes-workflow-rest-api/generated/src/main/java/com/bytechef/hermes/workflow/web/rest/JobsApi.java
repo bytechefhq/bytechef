@@ -9,12 +9,15 @@ import com.bytechef.hermes.workflow.web.rest.model.CreateJob200ResponseModel;
 import com.bytechef.hermes.workflow.web.rest.model.JobModel;
 import com.bytechef.hermes.workflow.web.rest.model.JobParametersModel;
 import com.bytechef.hermes.workflow.web.rest.model.TaskExecutionModel;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.http.HttpStatus;
@@ -22,14 +25,20 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import org.springframework.http.codec.multipart.Part;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:18:30.644746+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T14:11:10.397866+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "jobs", description = "the jobs API")
 public interface JobsApi {

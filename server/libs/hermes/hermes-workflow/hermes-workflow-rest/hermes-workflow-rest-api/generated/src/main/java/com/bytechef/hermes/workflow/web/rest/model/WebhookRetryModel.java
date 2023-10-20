@@ -1,11 +1,18 @@
 package com.bytechef.hermes.workflow.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -13,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Webhook_retry")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:18:30.644746+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T14:11:10.397866+02:00[Europe/Zagreb]")
 public class WebhookRetryModel {
 
   @JsonProperty("initialInterval")
@@ -37,7 +44,7 @@ public class WebhookRetryModel {
    * Get initialInterval
    * @return initialInterval
   */
-
+  
   @Schema(name = "initialInterval", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getInitialInterval() {
     return initialInterval;
@@ -56,7 +63,7 @@ public class WebhookRetryModel {
    * Get maxInterval
    * @return maxInterval
   */
-
+  
   @Schema(name = "maxInterval", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getMaxInterval() {
     return maxInterval;
@@ -75,7 +82,7 @@ public class WebhookRetryModel {
    * Get maxAttempts
    * @return maxAttempts
   */
-
+  
   @Schema(name = "maxAttempts", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getMaxAttempts() {
     return maxAttempts;
@@ -94,7 +101,7 @@ public class WebhookRetryModel {
    * Get multiplier
    * @return multiplier
   */
-
+  
   @Schema(name = "multiplier", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getMultiplier() {
     return multiplier;

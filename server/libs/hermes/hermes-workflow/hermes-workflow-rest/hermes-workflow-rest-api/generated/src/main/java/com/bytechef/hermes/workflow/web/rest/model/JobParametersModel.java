@@ -1,19 +1,23 @@
 package com.bytechef.hermes.workflow.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.hermes.workflow.web.rest.model.WebhookModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -22,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobParameters", description = "Defines parameters used to execute a job.")
 @JsonTypeName("JobParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:18:30.644746+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T14:11:10.397866+02:00[Europe/Zagreb]")
 public class JobParametersModel {
 
   @JsonProperty("inputs")
@@ -62,7 +66,7 @@ public class JobParametersModel {
    * The inputs expected by the workflow
    * @return inputs
   */
-
+  
   @Schema(name = "inputs", description = "The inputs expected by the workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Map<String, Object> getInputs() {
     return inputs;
@@ -81,7 +85,7 @@ public class JobParametersModel {
    * The job's human-readable name
    * @return label
   */
-
+  
   @Schema(name = "label", description = "The job's human-readable name", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLabel() {
     return label;
@@ -100,7 +104,7 @@ public class JobParametersModel {
    * The id of the parent task that created this job. Used for sub-flows.
    * @return parentTaskExecutionId
   */
-
+  
   @Schema(name = "parentTaskExecutionId", description = "The id of the parent task that created this job. Used for sub-flows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getParentTaskExecutionId() {
     return parentTaskExecutionId;
@@ -119,7 +123,7 @@ public class JobParametersModel {
    * The priority value used during execution of individual tasks.
    * @return priority
   */
-
+  
   @Schema(name = "priority", description = "The priority value used during execution of individual tasks.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getPriority() {
     return priority;
@@ -138,7 +142,7 @@ public class JobParametersModel {
    * Id of the workflow to execute.
    * @return workflowId
   */
-  @NotNull
+  @NotNull 
   @Schema(name = "workflowId", description = "Id of the workflow to execute.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getWorkflowId() {
     return workflowId;
@@ -165,7 +169,7 @@ public class JobParametersModel {
    * The list of webhooks to register to receive notifications for certain events.
    * @return webhooks
   */
-  @Valid
+  @Valid 
   @Schema(name = "webhooks", description = "The list of webhooks to register to receive notifications for certain events.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<WebhookModel> getWebhooks() {
     return webhooks;

@@ -1,13 +1,19 @@
 package com.bytechef.hermes.workflow.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
+import com.bytechef.hermes.workflow.web.rest.model.WebhookRetryModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -16,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Webhook", description = "Used to register to receive notifications for certain events.")
 @JsonTypeName("Webhook")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:18:30.644746+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T14:11:10.397866+02:00[Europe/Zagreb]")
 public class WebhookModel {
 
   @JsonProperty("type")
@@ -37,7 +43,7 @@ public class WebhookModel {
    * Get type
    * @return type
   */
-
+  
   @Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getType() {
     return type;
@@ -56,7 +62,7 @@ public class WebhookModel {
    * Get url
    * @return url
   */
-
+  
   @Schema(name = "url", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getUrl() {
     return url;
@@ -75,7 +81,7 @@ public class WebhookModel {
    * Get retry
    * @return retry
   */
-  @Valid
+  @Valid 
   @Schema(name = "retry", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public WebhookRetryModel getRetry() {
     return retry;

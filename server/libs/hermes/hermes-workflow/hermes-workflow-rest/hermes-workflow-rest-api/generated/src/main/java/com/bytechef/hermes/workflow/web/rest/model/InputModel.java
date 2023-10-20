@@ -1,12 +1,18 @@
 package com.bytechef.hermes.workflow.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -14,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Input")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:18:30.644746+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T14:11:10.397866+02:00[Europe/Zagreb]")
 public class InputModel {
 
   @JsonProperty("label")
@@ -38,7 +44,7 @@ public class InputModel {
    * The string of an input
    * @return label
   */
-
+  
   @Schema(name = "label", description = "The string of an input", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLabel() {
     return label;
@@ -57,7 +63,7 @@ public class InputModel {
    * The name of an output
    * @return name
   */
-  @NotNull
+  @NotNull 
   @Schema(name = "name", description = "The name of an output", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getName() {
     return name;
@@ -76,7 +82,7 @@ public class InputModel {
    * If an input is required, or not
    * @return required
   */
-
+  
   @Schema(name = "required", description = "If an input is required, or not", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Boolean getRequired() {
     return required;
@@ -95,7 +101,7 @@ public class InputModel {
    * The type of an input, for example \\\"string\\\"
    * @return type
   */
-
+  
   @Schema(name = "type", description = "The type of an input, for example \\\"string\\\"", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getType() {
     return type;
