@@ -6,13 +6,55 @@ info:
 servers:
 - url: "http://localhost:5173/api/automation"
 tags:
+- name: "project-categories"
+  description: "The Automation Project Categories API"
+- name: "project-instance-jobs"
+  description: "The Automation Project Instance Jobs API"
+- name: "project-instance-tags"
+  description: "The Automation Project Instance Tags API"
 - name: "project-instances"
   description: "The Automation Project Instances API"
 - name: "projects"
   description: "The Automation Projects API"
-- name: "workflows"
-  description: "The Automation Workflows API"
+- name: "project-tags"
+  description: "The Automation Project Tags API"
+- name: "project-workflows"
+  description: "The Automation Project Workflows API"
 paths:
+  /project-categories:
+    get:
+      description: "Get categories."
+      summary: "Get categories"
+      tags:
+      - "project-categories"
+      operationId: "getProjectCategories"
+      responses:
+        "200":
+          description: "A list of categories."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of categories."
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Category"
+  /project-instance-tags:
+    get:
+      description: "Get project instance tags."
+      summary: "Get project instance tags"
+      tags:
+      - "project-instance-tags"
+      operationId: "getProjectInstanceTags"
+      responses:
+        "200":
+          description: "A list of project tags."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of tags."
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Tag"
   /project-instances:
     get:
       description: "Get project instances."
@@ -63,40 +105,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProjectInstance"
-  /projects/categories:
-    get:
-      description: "Get categories."
-      summary: "Get categories"
-      tags:
-      - "projects"
-      operationId: "getProjectCategories"
-      responses:
-        "200":
-          description: "A list of categories."
-          content:
-            application/json:
-              schema:
-                description: "The response object that contains the array of categories."
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Category"
-  /project-instances/tags:
-    get:
-      description: "Get project instance tags."
-      summary: "Get project instance tags"
-      tags:
-      - "project-instances"
-      operationId: "getProjectInstanceTags"
-      responses:
-        "200":
-          description: "A list of project tags."
-          content:
-            application/json:
-              schema:
-                description: "The response object that contains the array of tags."
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Tag"
   /project-instances/{id}:
     delete:
       description: "Delete a project instance."
@@ -187,12 +195,12 @@ paths:
       responses:
         "200":
           description: "Successful operation."
-  /project-instances/{id}/tags:
+  /project-instances/{id}/project-instance-tags:
     put:
       description: "Updates tags of an existing project instance."
       summary: "Updates tags of an existing project instance"
       tags:
-      - "project-instances"
+      - "project-instance-tags"
       operationId: "updateProjectInstanceTags"
       parameters:
       - name: "id"
@@ -211,6 +219,102 @@ paths:
       responses:
         "200":
           description: "Successful operation."
+  /project-instances/{id}/workflows/{workflowId}/enable/{enable}:
+    post:
+      description: "Enable/disable a workflow of a project instance."
+      summary: "Enable/disable a workflow of a project instance"
+      tags:
+      - "project-instances"
+      operationId: "enableProjectInstanceWorkflow"
+      parameters:
+      - name: "id"
+        description: "The id of a project instance."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "workflowId"
+        description: "The id of a project workflow."
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      - name: "enable"
+        description: "Enable/disable the workflow of a project instance."
+        in: "path"
+        required: true
+        schema:
+          type: "boolean"
+      responses:
+        "200":
+          description: "Successful operation."
+  /project-instances/{id}/workflows/{workflowId}/jobs:
+    post:
+      description: "Create a request for running a new job."
+      summary: "Create a request for running a new job"
+      tags:
+      - "project-instance-jobs"
+      operationId: "createProjectInstanceWorkflowJob"
+      parameters:
+      - name: "id"
+        description: "The id of a project instance."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "workflowId"
+        description: "The id of the workflow to execute."
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "The id of a created job."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  jobId:
+                    description: "The id of an executed job."
+                    type: "integer"
+                    format: "int64"
+  /project-tags:
+    get:
+      description: "Get project tags."
+      summary: "Get project tags."
+      tags:
+      - "project-tags"
+      operationId: "getProjectTags"
+      responses:
+        "200":
+          description: "A list of project tags."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of tags."
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Tag"
+  /project-workflows:
+    get:
+      description: "Get workflow definitions."
+      summary: "Get workflow definitions"
+      tags:
+      - "project-workflows"
+      operationId: "getProjectWorkflows"
+      responses:
+        "200":
+          description: "A list of workflows."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Workflow"
   /projects:
     get:
       description: "Get projects."
@@ -267,23 +371,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Project"
-  /projects/tags:
-    get:
-      description: "Get project tags."
-      summary: "Get project tags."
-      tags:
-      - "projects"
-      operationId: "getProjectTags"
-      responses:
-        "200":
-          description: "A list of project tags."
-          content:
-            application/json:
-              schema:
-                description: "The response object that contains the array of tags."
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Tag"
   /projects/{id}:
     delete:
       description: "Delete a project."
@@ -372,13 +459,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Project"
-  /projects/{id}/workflows:
+  /projects/{id}/project-workflows:
     get:
       description: "Get workflows for particular project."
       summary: "Get workflows for particular project."
       tags:
-      - "projects"
-      operationId: "getProjectWorkflows"
+      - "project-workflows"
+      operationId: "getProjectProjectWorkflows"
       parameters:
       - name: "id"
         description: "The id of a project."
@@ -435,75 +522,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
-  /project-instances/{id}/workflows/{workflowId}/enable/{enable}:
-    post:
-      description: "Enable/disable a workflow of a project instance."
-      summary: "Enable/disable a workflow of a project instance"
-      tags:
-      - "project-instances"
-      operationId: "enableProjectInstanceWorkflow"
-      parameters:
-      - name: "id"
-        description: "The id of a project instance."
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      - name: "workflowId"
-        description: "The id of a project workflow."
-        in: "path"
-        required: true
-        schema:
-          type: "string"
-      - name: "enable"
-        description: "Enable/disable the workflow of a project instance."
-        in: "path"
-        required: true
-        schema:
-          type: "boolean"
-      responses:
-        "200":
-          description: "Successful operation."
-  /project-instances/{id}/workflows/{workflowId}/jobs:
-    post:
-      description: "Create a request for running a new job."
-      summary: "Create a request for running a new job"
-      tags:
-      - "project-instances"
-      operationId: "createProjectInstanceWorkflowJob"
-      parameters:
-      - name: "id"
-        description: "The id of a project instance."
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      - name: "workflowId"
-        description: "The id of the workflow to execute."
-        in: "path"
-        required: true
-        schema:
-          type: "string"
-      responses:
-        "200":
-          description: "The id of a created job."
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  jobId:
-                    description: "The id of an executed job."
-                    type: "integer"
-                    format: "int64"
-  /projects/{id}/tags:
+  /projects/{id}/project-tags:
     put:
       description: "Updates tags of an existing project."
       summary: "Updates tags of an existing project."
       tags:
-      - "projects"
+      - "project-tags"
       operationId: "updateProjectTags"
       parameters:
       - name: "id"
@@ -522,29 +546,13 @@ paths:
       responses:
         "200":
           description: "Successful operation."
-  /workflows:
-    get:
-      description: "Get workflow definitions."
-      summary: "Get workflow definitions"
-      tags:
-      - "workflows"
-      operationId: "getWorkflows"
-      responses:
-        "200":
-          description: "A list of workflows."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Workflow"
-  /workflows/{id}:
+  /project-workflows/{id}:
     delete:
       description: "Delete a workflow."
       summary: "Delete a workflow"
       tags:
-      - "workflows"
-      operationId: "deleteWorkflow"
+      - "project-workflows"
+      operationId: "deleteProjectWorkflow"
       parameters:
       - name: "id"
         description: "The id of the workflow to delete."
@@ -559,8 +567,8 @@ paths:
       description: "Get a workflow by id."
       summary: "Get a workflow by id"
       tags:
-      - "workflows"
-      operationId: "getWorkflow"
+      - "project-workflows"
+      operationId: "getProjectWorkflow"
       parameters:
       - name: "id"
         description: "The id of the workflow to get."
@@ -579,8 +587,8 @@ paths:
       description: "Update an existing workflow."
       summary: "Update an existing workflow"
       tags:
-      - "workflows"
-      operationId: "updateWorkflow"
+      - "project-workflows"
+      operationId: "updateProjectWorkflow"
       parameters:
       - name: "id"
         description: "The id of the workflow to update."

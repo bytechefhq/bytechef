@@ -6,7 +6,7 @@ info:
 servers:
 - url: "http://localhost:5173/api/core"
 tags:
-- name: "connection-oauth2-properties"
+- name: "connection-oauth2"
   description: "The Core Connection OAuth2 API"
 paths:
   /connection-oauth2-properties:
@@ -14,7 +14,7 @@ paths:
       description: "Get OAuth2 properties."
       summary: "Get OAuth2 properties"
       tags:
-      - "connection-oauth2-properties"
+      - "connection-oauth2"
       operationId: "getOAuth2Properties"
       responses:
         "200":

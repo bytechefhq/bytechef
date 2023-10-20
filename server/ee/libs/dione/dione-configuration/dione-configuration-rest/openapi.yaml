@@ -6,11 +6,32 @@ info:
 servers:
 - url: "http://localhost:5173/api/embedded"
 tags:
+- name: "integration-categories"
+  description: "The Embedded Integration Categories API"
+- name: "integration-tags"
+  description: "The Embedded Integration Tags API"
+- name: "integration-workflows"
+  description: "The Embedded Integration Workflows API"
 - name: "integrations"
   description: "The Embedded Integrations API"
-- name: "workflows"
-  description: "The Embedded Workflows API"
 paths:
+  /integration-categories:
+    get:
+      description: "Get integration categories."
+      summary: "Get integration categories"
+      tags:
+      - "integration-categories"
+      operationId: "getIntegrationCategories"
+      responses:
+        "200":
+          description: "A list of categories."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of categories."
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Category"
   /integrations:
     get:
       description: "Get integrations."
@@ -61,40 +82,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Integration"
-  /integrations/categories:
-    get:
-      description: "Get categories."
-      summary: "Get categories"
-      tags:
-      - "integrations"
-      operationId: "getIntegrationCategories"
-      responses:
-        "200":
-          description: "A list of categories."
-          content:
-            application/json:
-              schema:
-                description: "The response object that contains the array of categories."
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Category"
-  /integrations/tags:
-    get:
-      description: "Get integration tags."
-      summary: "Get integration tags"
-      tags:
-      - "integrations"
-      operationId: "getIntegrationTags"
-      responses:
-        "200":
-          description: "A list of integration tags."
-          content:
-            application/json:
-              schema:
-                description: "The response object that contains the array of tags."
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Tag"
   /integrations/{id}:
     delete:
       description: "Delete an integration."
@@ -161,13 +148,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Integration"
-  /integrations/{id}/workflows:
+  /integrations/{id}/integration-workflows:
     get:
-      description: "Get workflows for particular integration."
-      summary: "Get workflows for particular integration"
+      description: "Get integration workflows for particular integration."
+      summary: "Get integration workflows for particular integration"
       tags:
-      - "integrations"
-      operationId: "getIntegrationWorkflows"
+      - "integration-workflows"
+      operationId: "getIntegrationIntegrationWorkflows"
       parameters:
       - name: "id"
         description: "The id of an integration."
@@ -224,12 +211,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
-  /integrations/{id}/tags:
+  /integrations/{id}/integration-tags:
     put:
       description: "Updates tags of an existing integration."
       summary: "Updates tags of an existing integration"
       tags:
-      - "integrations"
+      - "integration-tags"
       operationId: "updateIntegrationTags"
       parameters:
       - name: "id"
@@ -248,13 +235,30 @@ paths:
       responses:
         "200":
           description: "Successful operation."
-  /workflows:
+  /integration-tags:
     get:
-      description: "Get workflow definitions."
-      summary: "Get workflow definitions"
+      description: "Get integration tags."
+      summary: "Get integration tags"
       tags:
-      - "workflows"
-      operationId: "getWorkflows"
+      - "integration-tags"
+      operationId: "getIntegrationTags"
+      responses:
+        "200":
+          description: "A list of integration tags."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of tags."
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Tag"
+  /integration-workflows:
+    get:
+      description: "Get integration workflow definitions."
+      summary: "Get integration workflow definitions"
+      tags:
+      - "integration-workflows"
+      operationId: "getIntegrationWorkflows"
       responses:
         "200":
           description: "A list of workflows."
@@ -264,13 +268,13 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Workflow"
-  /workflows/{id}:
+  /integration-workflows/{id}:
     delete:
       description: "Delete a workflow."
       summary: "Delete a workflow"
       tags:
-      - "workflows"
-      operationId: "deleteWorkflow"
+      - "integration-workflows"
+      operationId: "deleteIntegrationWorkflow"
       parameters:
       - name: "id"
         description: "The id of the workflow to delete."
@@ -285,8 +289,8 @@ paths:
       description: "Get a workflow by id."
       summary: "Get a workflow by id"
       tags:
-      - "workflows"
-      operationId: "getWorkflow"
+      - "integration-workflows"
+      operationId: "getIntegrationWorkflow"
       parameters:
       - name: "id"
         description: "The id of the workflow to get."
@@ -305,8 +309,8 @@ paths:
       description: "Update an existing workflow."
       summary: "Update an existing workflow"
       tags:
-      - "workflows"
-      operationId: "updateWorkflow"
+      - "integration-workflows"
+      operationId: "updateIntegrationWorkflow"
       parameters:
       - name: "id"
         description: "The id of the workflow to update."
