@@ -208,7 +208,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private boolean containsConnection(WorkflowConnection workflowConnection, long id) {
         return workflowConnection.getConnectionId()
             .map(connectionId -> id == connectionId)
-            .orElseGet(() -> getConnection(workflowConnection.getKey(), workflowConnection.getOperationName()) != null);
+            .orElseGet(() -> getConnection(workflowConnection.getOperationName(), workflowConnection.getKey()) != null);
     }
 
     private boolean containsConnection(WorkflowTask workflowTask, long id) {
@@ -232,9 +232,10 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             .toList();
     }
 
-    private Connection getConnection(String workflowConnectionKey, String operationName) {
+    private Connection getConnection(String workflowConnectionOperationName, String workflowConnectionKey) {
         ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection =
-            projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(workflowConnectionKey, operationName);
+            projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(
+                workflowConnectionOperationName, workflowConnectionKey);
 
         return connectionService.getConnection(projectInstanceWorkflowConnection.getConnectionId());
     }

@@ -99,8 +99,8 @@ public class ContextImpl implements ActionContext, TriggerContext {
     }
 
     @Override
-    public Connection getConnection(String taskConnectionKey) {
-        return toContextConnection(connectionService.getConnection(connectionIdMap.get(taskConnectionKey)));
+    public Connection getConnection(String workflowConnectionKey) {
+        return toContextConnection(connectionService.getConnection(connectionIdMap.get(workflowConnectionKey)));
     }
 
     @Override

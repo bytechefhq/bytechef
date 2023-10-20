@@ -42,7 +42,7 @@ public class WorkflowConnection {
     private final Integer componentVersion;
     private final String key;
     private final String name;
-    private final String operationName;
+    private final String operationName; // action/trigger name
 
     private WorkflowConnection(
         String componentName, Integer componentVersion, String key, String name, String operationName,
