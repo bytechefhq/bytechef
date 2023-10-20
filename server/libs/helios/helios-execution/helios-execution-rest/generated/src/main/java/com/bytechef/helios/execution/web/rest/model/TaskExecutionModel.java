@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-28T08:16:45.262230+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-08-20T07:29:02.603415+02:00[Europe/Zagreb]")
 public class TaskExecutionModel {
 
   private ComponentDefinitionModel componentDefinition;
@@ -127,11 +127,6 @@ public class TaskExecutionModel {
 
   private String type;
 
-  /**
-   * Default constructor
-   * @deprecated Use {@link TaskExecutionModel#TaskExecutionModel(String, Integer, LocalDateTime, StatusEnum)}
-   */
-  @Deprecated
   public TaskExecutionModel() {
     super();
   }

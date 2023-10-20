@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-26T20:31:17.117022+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-08-20T08:21:10.828259+02:00[Europe/Zagreb]")
 public class TriggerDefinitionModel {
 
   private String description;
@@ -47,11 +47,6 @@ public class TriggerDefinitionModel {
 
   private TriggerTypeModel type;
 
-  /**
-   * Default constructor
-   * @deprecated Use {@link TriggerDefinitionModel#TriggerDefinitionModel(String, TriggerTypeModel)}
-   */
-  @Deprecated
   public TriggerDefinitionModel() {
     super();
   }

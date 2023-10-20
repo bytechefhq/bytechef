@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createProjectWorkflow_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-25T10:27:48.489413+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-08-20T07:29:12.149855+02:00[Europe/Zagreb]")
 public class CreateProjectWorkflowRequestModel {
 
   private String label;
@@ -29,11 +29,6 @@ public class CreateProjectWorkflowRequestModel {
 
   private String definition;
 
-  /**
-   * Default constructor
-   * @deprecated Use {@link CreateProjectWorkflowRequestModel#CreateProjectWorkflowRequestModel(String)}
-   */
-  @Deprecated
   public CreateProjectWorkflowRequestModel() {
     super();
   }

@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ComponentOperationRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-26T20:31:17.117022+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-08-20T08:21:10.828259+02:00[Europe/Zagreb]")
 public class ComponentOperationRequestModel {
 
   private Long connectionId;
@@ -30,11 +30,6 @@ public class ComponentOperationRequestModel {
   @Valid
   private Map<String, Object> parameters = new HashMap<>();
 
-  /**
-   * Default constructor
-   * @deprecated Use {@link ComponentOperationRequestModel#ComponentOperationRequestModel(Long, Map<String, Object>)}
-   */
-  @Deprecated
   public ComponentOperationRequestModel() {
     super();
   }

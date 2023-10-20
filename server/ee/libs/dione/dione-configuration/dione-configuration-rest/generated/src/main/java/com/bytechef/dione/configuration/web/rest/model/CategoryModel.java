@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Category", description = "A category.")
 @JsonTypeName("Category")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-26T07:05:52.364071+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-08-20T07:29:10.906224+02:00[Europe/Zagreb]")
 public class CategoryModel {
 
   private String createdBy;
@@ -42,11 +42,6 @@ public class CategoryModel {
 
   private Integer version;
 
-  /**
-   * Default constructor
-   * @deprecated Use {@link CategoryModel#CategoryModel(String)}
-   */
-  @Deprecated
   public CategoryModel() {
     super();
   }

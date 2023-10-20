@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinitionBasic", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-26T20:31:17.117022+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-08-20T08:21:10.828259+02:00[Europe/Zagreb]")
 public class TaskDispatcherDefinitionBasicModel {
 
   private String description;
@@ -35,11 +35,6 @@ public class TaskDispatcherDefinitionBasicModel {
 
   private String title;
 
-  /**
-   * Default constructor
-   * @deprecated Use {@link TaskDispatcherDefinitionBasicModel#TaskDispatcherDefinitionBasicModel(String)}
-   */
-  @Deprecated
   public TaskDispatcherDefinitionBasicModel() {
     super();
   }
