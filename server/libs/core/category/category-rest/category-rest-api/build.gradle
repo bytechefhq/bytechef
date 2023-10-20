@@ -12,7 +12,6 @@ dependencies {
     implementation "jakarta.validation:jakarta.validation-api"
     implementation libs.org.mapstruct
     implementation libs.org.mapstruct.extensions.spring.mapstruct.spring.annotations
-    implementation libs.org.mapstruct.extensions.spring.mapstruct.spring.annotations
     implementation "org.springframework:spring-webflux"
     implementation libs.io.swagger.core.v3.swagger.annotations
 }
