@@ -32,6 +32,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             labelClassName,
             leadingIcon,
             name,
+            required,
             title,
             trailing,
             type = 'text',
@@ -54,6 +55,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     >
                         {label}
                     </label>
+
+                    {required && <span className="pr-1 text-red-500">*</span>}
 
                     {description && (
                         <Tooltip text={description}>
@@ -103,6 +106,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         name={name}
                         ref={ref}
                         type={type}
+                        required={required}
                         {...props}
                     />
 
