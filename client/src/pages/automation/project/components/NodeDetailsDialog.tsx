@@ -192,7 +192,7 @@ const NodeDetailsDialog = () => {
                                     })}
                                 </div>
 
-                                <div className="h-full flex-[1_1_1px] overflow-scroll px-4 py-2">
+                                <div className="h-full flex-[1_1_1px] overflow-auto px-4 py-2">
                                     {activeTab === 'description' && (
                                         <DescriptionTab
                                             component={currentComponent}
