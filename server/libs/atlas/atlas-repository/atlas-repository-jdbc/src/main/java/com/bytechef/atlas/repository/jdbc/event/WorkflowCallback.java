@@ -18,7 +18,7 @@ package com.bytechef.atlas.repository.jdbc.event;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
-import com.bytechef.atlas.workflow.WorkflowResource;
+import com.bytechef.atlas.repository.workflow.mapper.WorkflowResource;
 import com.bytechef.commons.uuid.UUIDGenerator;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -43,7 +43,7 @@ public class WorkflowCallback implements AfterConvertCallback<Workflow>, BeforeC
 
     @Override
     public Workflow onAfterConvert(Workflow workflow) {
-        workflow = readWorkflowContent(workflow);
+        workflow = readWorkflowDefinition(workflow);
 
         return workflow;
     }
@@ -63,10 +63,10 @@ public class WorkflowCallback implements AfterConvertCallback<Workflow>, BeforeC
         return workflow;
     }
 
-    private Workflow readWorkflowContent(Workflow workflow) {
+    private Workflow readWorkflowDefinition(Workflow workflow) {
         return workflowMapper.readValue(new WorkflowResource(
                 workflow.getId(),
-                new ByteArrayResource(workflow.getContent().getBytes(StandardCharsets.UTF_8)),
+                new ByteArrayResource(workflow.getDefinition().getBytes(StandardCharsets.UTF_8)),
                 workflow.getFormat()));
     }
 }

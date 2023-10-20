@@ -32,7 +32,7 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
-@ConditionalOnProperty(name = "workflow.persistence.provider", havingValue = "jdbc")
+@ConditionalOnProperty(prefix = "bytechef.workflow", name = "persistence.provider", havingValue = "jdbc")
 public interface JdbcTaskExecutionRepository
         extends PagingAndSortingRepository<TaskExecution, String>, TaskExecutionRepository {
 
