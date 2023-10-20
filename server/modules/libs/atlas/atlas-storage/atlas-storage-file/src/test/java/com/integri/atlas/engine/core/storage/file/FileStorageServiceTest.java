@@ -35,22 +35,27 @@ public class FileStorageServiceTest {
     private static final FileStorageService fileStorageService = new FileStorageService("/tmp/integri");
 
     @Test
-    public void testWrite() {
-        Assertions
-            .assertThat(fileStorageService.write("binary", "file.txt", new ByteArrayInputStream(string.getBytes())))
-            .isEqualTo("/tmp/integri/binary/file.txt");
+    public void testOpenInputStream() throws IOException {
+        String fileName = fileStorageService.write("binary", new ByteArrayInputStream(string.getBytes()));
 
-        Assertions
-            .assertThat(Files.contentOf(new File("/tmp/integri/binary/file.txt"), Charset.defaultCharset()))
-            .isEqualTo(string);
+        InputStream inputStream = fileStorageService.openInputStream("binary", fileName);
+
+        Assertions.assertThat(new String(inputStream.readAllBytes())).isEqualTo(string);
     }
 
     @Test
-    public void testOpenInputStream() throws IOException {
-        fileStorageService.write("binary", "file.txt", new ByteArrayInputStream(string.getBytes()));
+    public void testRead() {
+        String fileName = fileStorageService.write("binary", new ByteArrayInputStream(string.getBytes()));
 
-        InputStream inputStream = fileStorageService.openInputStream("binary", "file.txt");
+        Assertions.assertThat(fileStorageService.read("binary", fileName)).isEqualTo(string);
+    }
 
-        Assertions.assertThat(new String(inputStream.readAllBytes())).isEqualTo(string);
+    @Test
+    public void testWrite() {
+        String fileName = fileStorageService.write("binary", new ByteArrayInputStream(string.getBytes()));
+
+        Assertions.assertThat(fileName).startsWith("/tmp/integri/binary/");
+
+        Assertions.assertThat(Files.contentOf(new File(fileName), Charset.defaultCharset())).isEqualTo(string);
     }
 }

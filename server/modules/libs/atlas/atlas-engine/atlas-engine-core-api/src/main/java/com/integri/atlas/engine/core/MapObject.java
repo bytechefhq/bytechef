@@ -18,7 +18,7 @@
 
 package com.integri.atlas.engine.core;
 
-import com.google.common.base.Throwables;
+import com.integri.atlas.engine.core.binary.converter.BinaryConverter;
 import com.integri.atlas.engine.core.task.SimpleWorkflowTask;
 import com.integri.atlas.engine.core.task.WorkflowTask;
 import java.lang.reflect.Array;
@@ -47,7 +47,11 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
 
     private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
-    private static final ConversionService conversionService = DefaultConversionService.getSharedInstance();
+    private static final ConversionService conversionService = new DefaultConversionService() {
+        {
+            addConverter(new BinaryConverter());
+        }
+    };
 
     public MapObject() {
         map = new HashMap<>();
@@ -233,7 +237,7 @@ public class MapObject implements Map<String, Object>, Accessor, Mutator {
             try {
                 return DateUtils.parseDate((String) value, TIMESTAMP_FORMAT);
             } catch (ParseException e) {
-                throw Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         }
         return (Date) value;

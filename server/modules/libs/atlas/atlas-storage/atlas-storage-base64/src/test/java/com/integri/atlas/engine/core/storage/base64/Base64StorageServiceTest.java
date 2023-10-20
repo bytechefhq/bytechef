@@ -33,13 +33,6 @@ public class Base64StorageServiceTest {
     private static final Base64StorageService base64StorageService = new Base64StorageService();
 
     @Test
-    public void testWrite() {
-        Assertions
-            .assertThat(base64StorageService.write("binary", "file.txt", new ByteArrayInputStream(string.getBytes())))
-            .isEqualTo(Base64.getEncoder().encodeToString(string.getBytes()));
-    }
-
-    @Test
     public void testOpenInputStream() throws IOException {
         InputStream inputStream = base64StorageService.openInputStream(
             "binary",
@@ -47,5 +40,19 @@ public class Base64StorageServiceTest {
         );
 
         Assertions.assertThat(new String(inputStream.readAllBytes())).isEqualTo(string);
+    }
+
+    @Test
+    public void testRead() {
+        Assertions
+            .assertThat(base64StorageService.read("binary", Base64.getEncoder().encodeToString(string.getBytes())))
+            .isEqualTo(string);
+    }
+
+    @Test
+    public void testWrite() {
+        Assertions
+            .assertThat(base64StorageService.write("binary", new ByteArrayInputStream(string.getBytes())))
+            .isEqualTo(Base64.getEncoder().encodeToString(string.getBytes()));
     }
 }

@@ -14,24 +14,20 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.config;
+package com.integri.atlas.engine.core.binary.converter;
 
-import com.integri.atlas.engine.core.storage.StorageService;
-import com.integri.atlas.json.item.BinaryItemHelper;
-import com.integri.atlas.json.item.JSONItemHelper;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import com.integri.atlas.engine.core.binary.Binary;
+import java.util.Map;
+import org.springframework.core.convert.converter.Converter;
 
-@Configuration
-public class ItemConfiguration {
+/**
+ * @author Ivica Cardic
+ */
+public class BinaryConverter implements Converter<Map<?, ?>, Binary> {
 
-    @Bean
-    BinaryItemHelper binaryNodeHelper(StorageService storageService) {
-        return new BinaryItemHelper(storageService);
-    }
-
-    @Bean
-    JSONItemHelper jsonItemHelper() {
-        return new JSONItemHelper();
+    @Override
+    @SuppressWarnings("unchecked")
+    public Binary convert(Map<?, ?> source) {
+        return Binary.of((Map<String, Object>) source);
     }
 }

@@ -23,7 +23,11 @@ import java.io.InputStream;
  * @author Ivica Cardic
  */
 public interface StorageService {
-    String write(String bucketName, String fileName, InputStream inputStream) throws StorageException;
+    String write(String bucketName, String data) throws StorageException;
+
+    String write(String bucketName, InputStream inputStream) throws StorageException;
 
     InputStream openInputStream(String bucketName, String fileName) throws StorageException;
+
+    String read(String bucketName, String fileName) throws StorageException;
 }

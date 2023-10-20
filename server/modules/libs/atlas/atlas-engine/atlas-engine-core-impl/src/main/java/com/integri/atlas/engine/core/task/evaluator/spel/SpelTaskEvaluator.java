@@ -18,6 +18,7 @@
 
 package com.integri.atlas.engine.core.task.evaluator.spel;
 
+import com.integri.atlas.engine.core.binary.BinaryHelper;
 import com.integri.atlas.engine.core.context.Context;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
@@ -63,6 +65,12 @@ public class SpelTaskEvaluator implements TaskEvaluator {
 
     private SpelTaskEvaluator(Builder aBuilder) {
         Map<String, MethodExecutor> map = new HashMap<>();
+        map.put(
+            "binary",
+            new Binary(
+                aBuilder.applicationContext == null ? null : aBuilder.applicationContext.getBean(BinaryHelper.class)
+            )
+        );
         map.put("boolean", new Cast<>(Boolean.class));
         map.put("byte", new Cast<>(Byte.class));
         map.put("char", new Cast<>(Character.class));
@@ -169,8 +177,15 @@ public class SpelTaskEvaluator implements TaskEvaluator {
 
     public static class Builder {
 
+        private ApplicationContext applicationContext;
         private final Map<String, MethodExecutor> methodExecutors = new HashMap<>();
         private Environment environment = new EmptyEnvironment();
+
+        public Builder applicationContext(ApplicationContext applicationContext) {
+            this.applicationContext = applicationContext;
+
+            return this;
+        }
 
         public Builder methodExecutor(String aMethodName, MethodExecutor aMethodExecutor) {
             methodExecutors.put(aMethodName, aMethodExecutor);
