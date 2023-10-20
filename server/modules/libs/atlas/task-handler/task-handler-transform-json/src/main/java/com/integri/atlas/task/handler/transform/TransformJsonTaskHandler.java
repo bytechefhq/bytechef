@@ -47,7 +47,6 @@ public class TransformJsonTaskHandler implements TaskHandler<Object> {
 
         if (taskExecution.containsKey("mapKeys")) {
             Map<String, String> map = taskExecution.get("mapKeys", Map.class);
-
         }
 
         return null;

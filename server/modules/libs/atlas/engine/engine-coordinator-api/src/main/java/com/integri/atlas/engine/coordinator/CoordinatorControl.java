@@ -21,6 +21,9 @@ import com.integri.atlas.engine.core.error.Errorable;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import java.util.Map;
 
+/**
+ * @author Ivica Cardic
+ */
 public interface CoordinatorControl {
     void complete(TaskExecution completion);
 
