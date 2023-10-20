@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class TaskSpecification {
 
-    private List<TaskCredential> credentials;
+    private TaskAuthentication authentication;
     private String description;
     private String displayName;
     private String name;
@@ -38,10 +38,14 @@ public class TaskSpecification {
         return new TaskSpecification().name(name);
     }
 
-    public TaskSpecification credentials(TaskCredential... credentials) {
-        this.credentials = List.of(credentials);
+    public TaskSpecification authentication(TaskAuthentication authentication) {
+        this.authentication = authentication;
 
         return this;
+    }
+
+    public static TaskAuthentication credentials(TaskCredential... credentials) {
+        return TaskAuthentication.authentication().credentials(credentials);
     }
 
     public TaskSpecification description(String description) {
@@ -86,8 +90,8 @@ public class TaskSpecification {
         return this;
     }
 
-    public List<TaskCredential> getCredentials() {
-        return credentials;
+    public TaskAuthentication getAuthentication() {
+        return authentication;
     }
 
     public String getDescription() {

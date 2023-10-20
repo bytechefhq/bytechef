@@ -71,39 +71,40 @@ import org.springframework.stereotype.Component;
 @Component
 public class HttpClientTaskDeclaration implements TaskDeclaration {
 
-    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
-        .create(TASK_HTTP_CLIENT)
+    public static final TaskSpecification TASK_SPECIFICATION = create(TASK_HTTP_CLIENT)
         .displayName("HTTP Client")
         .description("Makes an HTTP request and returns the response data.")
-        .credentials(
-            credential(PROPERTY_HTTP_BASIC_AUTH)
-                .required(true)
-                .displayOption(show(PROPERTY_AUTHENTICATION_TYPE, AuthenticationType.BASIC.name())),
-            credential(PROPERTY_HTTP_DIGEST_AUTH)
-                .required(true)
-                .displayOption(show(PROPERTY_AUTHENTICATION_TYPE, AuthenticationType.DIGEST.name())),
-            credential(PROPERTY_HTTP_HEADER_AUTH)
-                .required(true)
-                .displayOption(show(PROPERTY_AUTHENTICATION_TYPE, AuthenticationType.HEADER.name())),
-            credential(PROPERTY_O_AUTH_2_AUTH)
-                .required(true)
-                .displayOption(show(PROPERTY_AUTHENTICATION_TYPE, AuthenticationType.OAUTH_2.name()))
+        .authentication(
+            credentials(
+                credential(PROPERTY_HTTP_BASIC_AUTH)
+                    .displayOption(show(PROPERTY_AUTHENTICATION_TYPE, AuthenticationType.HTTP_BASIC_AUTH.name())),
+                credential(PROPERTY_HTTP_HEADER_AUTH)
+                    .displayOption(show(PROPERTY_AUTHENTICATION_TYPE, AuthenticationType.HTTP_HEADER_AUTH.name())),
+                credential(PROPERTY_HTTP_QUERY_AUTH)
+                    .displayOption(show(PROPERTY_AUTHENTICATION_TYPE, AuthenticationType.HTTP_QUERY_AUTH.name())),
+                credential(PROPERTY_HTTP_DIGEST_AUTH)
+                    .displayOption(show(PROPERTY_AUTHENTICATION_TYPE, AuthenticationType.HTTP_DIGEST_AUTH.name())),
+                credential(PROPERTY_O_AUTH_2_AUTH)
+                    .displayOption(show(PROPERTY_AUTHENTICATION_TYPE, AuthenticationType.OAUTH2.name()))
+            )
+                .properties(
+                    SELECT_PROPERTY(PROPERTY_AUTHENTICATION_TYPE)
+                        .displayName("Authentication Type")
+                        .options(
+                            option("Basic Auth", AuthenticationType.HTTP_BASIC_AUTH.name()),
+                            option("Digest Auth", AuthenticationType.HTTP_DIGEST_AUTH.name()),
+                            option("Header Auth", AuthenticationType.HTTP_HEADER_AUTH.name()),
+                            option("Query Auth", AuthenticationType.HTTP_QUERY_AUTH.name()),
+                            option("OAuth2", AuthenticationType.OAUTH2.name()),
+                            option("None", "")
+                        )
+                )
         )
         .properties(
             //
             // General properties
             //
 
-            SELECT_PROPERTY(PROPERTY_AUTHENTICATION_TYPE)
-                .displayName("Authentication Type")
-                .options(
-                    option("Basic Auth", AuthenticationType.BASIC.name()),
-                    option("Digest Auth", AuthenticationType.DIGEST.name()),
-                    option("Header Auth", AuthenticationType.HEADER.name()),
-                    option("Query Auth", AuthenticationType.QUERY.name()),
-                    option("OAuth2", AuthenticationType.OAUTH_2.name()),
-                    option("None", "")
-                ),
             SELECT_PROPERTY(PROPERTY_REQUEST_METHOD)
                 .displayName("Request Method")
                 .options(

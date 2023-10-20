@@ -16,39 +16,39 @@
 
 package com.integri.atlas.task.definition.dsl;
 
+import java.util.List;
+
 /**
  * @author Ivica Cardic
+ *
+ * Used for specifying an authentification.
  */
-public class TaskCredential {
+public class TaskAuthentication {
 
-    private String name;
-    private DisplayOption displayOption;
+    private List<TaskCredential> credentials;
+    private List<TaskProperty<?>> properties;
 
-    public static TaskCredential credential() {
-        return new TaskCredential();
+    public static TaskAuthentication authentication() {
+        return new TaskAuthentication();
     }
 
-    public static TaskCredential credential(String name) {
-        return TaskCredential.credential().name(name);
-    }
-
-    public TaskCredential name(String name) {
-        this.name = name;
+    public TaskAuthentication credentials(TaskCredential... credentials) {
+        this.credentials = List.of(credentials);
 
         return this;
     }
 
-    public TaskCredential displayOption(DisplayOption displayOption) {
-        this.displayOption = displayOption;
+    public TaskAuthentication properties(TaskProperty... properties) {
+        this.properties = List.of(properties);
 
         return this;
     }
 
-    public String getName() {
-        return name;
+    public List<TaskCredential> getCredentials() {
+        return credentials;
     }
 
-    public DisplayOption getDisplayOption() {
-        return displayOption;
+    public List<TaskProperty<?>> getProperties() {
+        return properties;
     }
 }
