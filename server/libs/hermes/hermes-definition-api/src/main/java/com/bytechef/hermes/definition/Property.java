@@ -75,6 +75,8 @@ public sealed interface Property<P extends Property<P>>
     enum ControlType {
         CHECKBOX,
         CODE_EDITOR,
+        EMAIL,
+        EXPRESSION,
         DATE,
         DATE_TIME,
         JSON_BUILDER,
@@ -86,10 +88,13 @@ public sealed interface Property<P extends Property<P>>
         INPUT_TEXT,
         INPUT_URL,
         MULTI_SELECT,
+        PHONE,
         SCHEMA_DESIGNER,
         SELECT,
+        SUBDOMAIN,
         TEXT_AREA,
         TIME,
+        URL
     }
 
     /**
@@ -129,7 +134,7 @@ public sealed interface Property<P extends Property<P>>
     /**
      *
      */
-    Optional<Boolean> getExpressionDisabled();
+    Optional<Boolean> getExpressionEnabled();
 
     /**
      *
@@ -247,7 +252,7 @@ public sealed interface Property<P extends Property<P>>
      */
     @JsonDeserialize(as = ModifiableArrayProperty.class)
     sealed interface ArrayProperty
-        extends ValueProperty<Object[], ArrayProperty>, OptionsProperty permits ModifiableArrayProperty {
+        extends ValueProperty<Object[], ArrayProperty>, DynamicOptionsProperty permits ModifiableArrayProperty {
 
         /**
          *
@@ -275,7 +280,7 @@ public sealed interface Property<P extends Property<P>>
      */
     @JsonDeserialize(as = ModifiableBooleanProperty.class)
     sealed interface BooleanProperty extends
-        ValueProperty<Boolean, BooleanProperty> permits ModifiableBooleanProperty {
+        ValueProperty<Boolean, BooleanProperty>, OptionsProperty permits ModifiableBooleanProperty {
     }
 
     /**
@@ -319,7 +324,7 @@ public sealed interface Property<P extends Property<P>>
      */
     @JsonDeserialize(as = ModifiableIntegerProperty.class)
     sealed interface IntegerProperty extends
-        ValueProperty<Integer, IntegerProperty>, OptionsProperty permits ModifiableIntegerProperty {
+        ValueProperty<Integer, IntegerProperty>, DynamicOptionsProperty permits ModifiableIntegerProperty {
 
         /**
          *
@@ -354,7 +359,7 @@ public sealed interface Property<P extends Property<P>>
      */
     @JsonDeserialize(as = ModifiableNumberProperty.class)
     sealed interface NumberProperty
-        extends ValueProperty<Double, NumberProperty>, OptionsProperty permits ModifiableNumberProperty {
+        extends ValueProperty<Double, NumberProperty>, DynamicOptionsProperty permits ModifiableNumberProperty {
 
         /**
          *
@@ -387,7 +392,7 @@ public sealed interface Property<P extends Property<P>>
      */
     @JsonDeserialize(as = ModifiableObjectProperty.class)
     sealed interface ObjectProperty
-        extends ValueProperty<Object, ObjectProperty>, OptionsProperty permits ModifiableObjectProperty {
+        extends ValueProperty<Object, ObjectProperty>, DynamicOptionsProperty permits ModifiableObjectProperty {
 
         /**
          *
@@ -425,7 +430,7 @@ public sealed interface Property<P extends Property<P>>
      */
     @JsonDeserialize(as = ModifiableStringProperty.class)
     sealed interface StringProperty
-        extends ValueProperty<String, StringProperty>, OptionsProperty permits ModifiableStringProperty {
+        extends ValueProperty<String, StringProperty>, DynamicOptionsProperty permits ModifiableStringProperty {
 
         /**
          *

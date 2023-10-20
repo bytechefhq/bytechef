@@ -17,17 +17,16 @@
 
 package com.bytechef.hermes.definition;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public interface OptionsProperty {
+public interface DynamicOptionsProperty extends OptionsProperty {
 
     /**
      *
      * @return
      */
-    Optional<List<Option<?>>> getOptions();
+    Optional<OptionsDataSource> getOptionsDataSource();
 }
