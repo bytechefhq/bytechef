@@ -1,6 +1,9 @@
 CREATE TABLE IF NOT EXISTS trigger_execution (
     id                       BIGSERIAL    NOT NULL PRIMARY KEY,
     status                   VARCHAR(256) NOT NULL,
+    instance_id              BIGSERIAL    NOT NULL,
+    instance_type            VARCHAR(256) NOT NULL,
+    workflow_id              VARCHAR(256) NOT NULL,
     workflow_execution_id    VARCHAR(256) NOT NULL,
     priority                 INT          NOT NULL,
     start_date               TIMESTAMP        NULL,

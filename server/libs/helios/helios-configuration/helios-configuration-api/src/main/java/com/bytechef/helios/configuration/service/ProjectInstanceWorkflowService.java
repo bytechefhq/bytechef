@@ -29,19 +29,15 @@ public interface ProjectInstanceWorkflowService {
 
     List<ProjectInstanceWorkflow> create(List<ProjectInstanceWorkflow> projectInstanceWorkflows);
 
-    ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(String key, String taskName);
+    ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(String key, String operationName);
 
-    long getProjectInstanceWorkflowConnectionId(String key, String taskName);
+    long getProjectInstanceWorkflowConnectionId(String key, String operationName);
 
     ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId);
 
     List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(long projectInstanceId);
 
     List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(List<Long> projectInstanceIds);
-
-    void linkJob(long projectInstanceWorkflowId, long jobId);
-
-    void linkTriggerExecution(long projectInstanceWorkflowId, long triggerExecutionId);
 
     List<ProjectInstanceWorkflow> update(List<ProjectInstanceWorkflow> projectInstanceWorkflows);
 

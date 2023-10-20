@@ -29,5 +29,5 @@ import java.util.Optional;
 public interface ProjectInstanceWorkflowConnectionRepository
     extends org.springframework.data.repository.Repository<ProjectInstanceWorkflowConnection, Long> {
 
-    Optional<ProjectInstanceWorkflowConnection> findByKeyAndTaskName(String key, String taskName);
+    Optional<ProjectInstanceWorkflowConnection> findByKeyAndOperationName(String key, String operationName);
 }

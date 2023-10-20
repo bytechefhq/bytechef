@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.facade;
 
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 
@@ -28,23 +29,39 @@ import java.util.Map;
  */
 public interface TriggerDefinitionFacade {
 
+    List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
+        String componentName, int componentVersion, String triggerName, String propertyName,
+        Map<String, Object> triggerParameters, Long connectionId);
+
+    void executeDynamicWebhookDisable(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String workflowExecutionId, DynamicWebhookEnableOutput output, Long connectionId);
+
+    DynamicWebhookEnableOutput executeDynamicWebhookEnable(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String workflowExecutionId, Long connectionId);
+
     String executeEditorDescription(
-        String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
-        long connectionId);
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Long connectionId);
+
+    void executeListenerDisable(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String workflowExecutionId, Long connectionId);
+
+    void executeListenerEnable(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        String workflowExecutionId, Long connectionId);
 
     List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, Object> triggerParameters, long connectionId, String searchText);
+        Map<String, ?> triggerParameters, Long connectionId, String searchText);
 
     List<? extends ValuePropertyDTO<?>> executeOutputSchema(
-        String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
-        long connectionId);
-
-    List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, Object> triggerParameters, long connectionId);
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Long connectionId);
 
     Object executeSampleOutput(
-        String componentName, int componentVersion, String triggerName, Map<String, Object> triggerParameters,
-        long connectionId);
+        String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
+        Long connectionId);
 }

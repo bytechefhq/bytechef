@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -48,17 +49,23 @@ public class ConnectionServiceClient implements ConnectionService {
     }
 
     @Override
+    public Optional<Connection> fetchConnection(long id) {
+        return Optional.ofNullable(
+            loadBalancedWebClientBuilder
+                .build()
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                    .host("platform-service-app")
+                    .path("/api/internal/connection-service/fetch-connection/{id}")
+                    .build(id))
+                .retrieve()
+                .bodyToMono(Connection.class)
+                .block());
+    }
+
+    @Override
     public Connection getConnection(long id) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .get()
-            .uri(uriBuilder -> uriBuilder
-                .host("platform-service-app")
-                .path("/api/internal/connection-service/get-connection/{id}")
-                .build(id))
-            .retrieve()
-            .bodyToMono(Connection.class)
-            .block();
+        return fetchConnection(id).orElseThrow();
     }
 
     @Override

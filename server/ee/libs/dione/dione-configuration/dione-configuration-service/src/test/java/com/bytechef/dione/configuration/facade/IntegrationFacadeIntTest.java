@@ -202,7 +202,7 @@ public class IntegrationFacadeIntTest {
 
         integration = integrationRepository.save(integration);
 
-        List<IntegrationDTO> integrationDTOs = integrationFacade.searchIntegrations(null, null);
+        List<IntegrationDTO> integrationDTOs = integrationFacade.getIntegrations(null, null);
 
         assertThat(CollectionUtils.map(integrationDTOs, IntegrationDTO::toIntegration)).isEqualTo(List.of(integration));
 

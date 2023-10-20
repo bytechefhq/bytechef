@@ -80,7 +80,7 @@ public class ProjectInstanceServiceClient implements ProjectInstanceService {
     }
 
     @Override
-    public List<ProjectInstance> searchProjectInstances(List<Long> projectIds, List<Long> tagIds) {
+    public List<ProjectInstance> getProjectInstances(List<Long> projectIds, List<Long> tagIds) {
         throw new UnsupportedOperationException();
     }
 

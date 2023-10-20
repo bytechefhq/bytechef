@@ -22,6 +22,7 @@ import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,11 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     public void delete(long id) {
         connectionRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<Connection> fetchConnection(long id) {
+        return connectionRepository.findById(id);
     }
 
     @Override

@@ -20,10 +20,8 @@ package com.bytechef.helios.connection.facade;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowTriggerExecutionRepository;
 import com.bytechef.helios.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowConnectionRepository;
-import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowJobRepository;
 import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowRepository;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowServiceImpl;
@@ -277,13 +275,10 @@ public class ConnectionFacadeIntTest {
         @Bean
         ProjectInstanceWorkflowService projectInstanceWorkflowService(
             ProjectInstanceWorkflowConnectionRepository projectInstanceWorkflowConnectionRepository,
-            ProjectInstanceWorkflowJobRepository projectInstanceWorkflowJobRepository,
-            ProjectInstanceWorkflowTriggerExecutionRepository projectInstanceWorkflowTriggerExecutionRepository,
             ProjectInstanceWorkflowRepository projectInstanceWorkflowRepository) {
 
             return new ProjectInstanceWorkflowServiceImpl(
-                projectInstanceWorkflowConnectionRepository, projectInstanceWorkflowJobRepository,
-                projectInstanceWorkflowTriggerExecutionRepository, projectInstanceWorkflowRepository);
+                projectInstanceWorkflowConnectionRepository, projectInstanceWorkflowRepository);
         }
     }
 }

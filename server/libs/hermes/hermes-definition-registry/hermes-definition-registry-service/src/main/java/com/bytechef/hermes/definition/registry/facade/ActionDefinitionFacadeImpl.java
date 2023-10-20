@@ -52,90 +52,90 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     @Override
     public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, Object> actionParameters, long connectionId) {
-
-        ActionContext context = contextFactory.createActionContext(Map.of(componentName, connectionId));
+        Map<String, Object> actionParameters, Long connectionId) {
 
         return ComponentContextSupplier.get(
-            context,
+            getActionContext(componentName, connectionId),
             () -> {
-                Connection connection = connectionService.getConnection(connectionId);
+                Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
                 return actionDefinitionService.executeDynamicProperties(
                     componentVersion, componentName, actionName, propertyName, actionParameters,
-                    connection.getAuthorizationName(), connection.getParameters());
+                    connection == null ? null : connection.getAuthorizationName(),
+                    connection == null ? null : connection.getParameters());
             });
     }
 
     @Override
     public String executeEditorDescription(
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
-        long connectionId) {
-
-        ActionContext context = contextFactory.createActionContext(Map.of(componentName, connectionId));
+        Long connectionId) {
 
         return ComponentContextSupplier.get(
-            context,
+            getActionContext(componentName, connectionId),
             () -> {
-                Connection connection = connectionService.getConnection(connectionId);
+                Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
                 return actionDefinitionService.executeEditorDescription(
-                    componentName, componentVersion, actionName, actionParameters, connection.getAuthorizationName(),
-                    connection.getParameters());
+                    componentName, componentVersion, actionName, actionParameters,
+                    connection == null ? null : connection.getAuthorizationName(),
+                    connection == null ? null : connection.getParameters());
             });
     }
 
     @Override
     public List<OptionDTO> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, Object> actionParameters, long connectionId, String searchText) {
-
-        ActionContext context = contextFactory.createActionContext(Map.of(componentName, connectionId));
+        Map<String, Object> actionParameters, Long connectionId, String searchText) {
 
         return ComponentContextSupplier.get(
-            context,
+            getActionContext(componentName, connectionId),
             () -> {
-                Connection connection = connectionService.getConnection(connectionId);
+                Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
                 return actionDefinitionService.executeOptions(
                     componentName, componentVersion, actionName, propertyName, actionParameters,
-                    connection.getAuthorizationName(), connection.getParameters(), searchText);
+                    connection == null ? null : connection.getAuthorizationName(),
+                    connection == null ? null : connection.getParameters(), searchText);
             });
     }
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
-        long connectionId) {
-
-        ActionContext context = contextFactory.createActionContext(Map.of(componentName, connectionId));
+        Long connectionId) {
 
         return ComponentContextSupplier.get(
-            context,
+            getActionContext(componentName, connectionId),
             () -> {
-                Connection connection = connectionService.getConnection(connectionId);
+                Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
                 return actionDefinitionService.executeOutputSchema(
-                    componentName, componentVersion, actionName, actionParameters, connection.getAuthorizationName(),
-                    connection.getParameters());
+                    componentName, componentVersion, actionName, actionParameters,
+                    connection == null ? null : connection.getAuthorizationName(),
+                    connection == null ? null : connection.getParameters());
             });
     }
 
     @Override
     public Object executeSampleOutput(
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
-        long connectionId) {
-
-        ActionContext context = contextFactory.createActionContext(Map.of(actionName, connectionId));
+        Long connectionId) {
 
         return ComponentContextSupplier.get(
-            context,
+            getActionContext(componentName, connectionId),
             () -> {
-                Connection connection = connectionService.getConnection(connectionId);
+                Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
                 return actionDefinitionService.executeSampleOutput(
-                    componentName, componentVersion, actionName, actionParameters, connection.getAuthorizationName(),
-                    connection.getParameters());
+                    componentName, componentVersion, actionName, actionParameters,
+                    connection == null ? null : connection.getAuthorizationName(),
+                    connection == null ? null : connection.getParameters());
             });
+    }
+
+    private ActionContext getActionContext(String componentName, Long connectionId) {
+        return contextFactory.createActionContext(
+            connectionId == null ? Map.of() : Map.of(componentName, connectionId));
     }
 }

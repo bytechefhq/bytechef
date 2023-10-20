@@ -15,15 +15,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.configuration.repository;
-
-import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowJob;
-import org.springframework.data.repository.ListCrudRepository;
-import org.springframework.stereotype.Repository;
+package com.bytechef.hermes.definition.registry.dto;
 
 /**
  * @author Ivica Cardic
+ *
+ * @param componentName          The component name
+ * @param componentVersion       The component version
+ * @param componentOperationName The component action or trigger name
  */
-@Repository
-public interface ProjectInstanceWorkflowJobRepository extends ListCrudRepository<ProjectInstanceWorkflowJob, Long> {
+public record ComponentOperation(String componentName, int componentVersion, String componentOperationName) {
 }

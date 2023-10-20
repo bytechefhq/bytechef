@@ -17,14 +17,24 @@
 
 package com.bytechef.helios.configuration.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.facade.JobFactoryFacade;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.domain.ProjectInstance;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
+import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectService;
+import com.bytechef.hermes.configuration.connection.WorkflowConnection;
+import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
+import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,20 +52,28 @@ import java.util.Objects;
 @Transactional
 public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
+    private final JobFactoryFacade jobFactoryFacade;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final ProjectService projectService;
     private final TagService tagService;
+    private final TriggerLifecycleFacade triggerLifecycleFacade;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceFacadeImpl(
-        ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        ProjectService projectService, TagService tagService) {
+        JobFactoryFacade jobFactoryFacade, ProjectInstanceService projectInstanceService,
+        ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
+        TagService tagService, TriggerLifecycleFacade triggerLifecycleFacade,
+        WorkflowService workflowService) {
 
+        this.jobFactoryFacade = jobFactoryFacade;
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.projectService = projectService;
         this.tagService = tagService;
+        this.triggerLifecycleFacade = triggerLifecycleFacade;
+        this.workflowService = workflowService;
     }
 
     @Override
@@ -81,6 +99,14 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
+    public void createProjectInstanceWorkflowJob(Long id, String workflowId) {
+        ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
+            id, workflowId);
+
+        jobFactoryFacade.createJob(new JobParameters(workflowId, projectInstanceWorkflow.getInputs()));
+    }
+
+    @Override
     public void deleteProjectInstance(long id) {
         projectInstanceService.delete(id);
 
@@ -100,12 +126,42 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
-    public void enableProjectInstance(long id, boolean enabled) {
-        projectInstanceService.updateEnabled(id, enabled);
+    public void enableProjectInstance(long projectInstanceId, boolean enable) {
+        List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
+            .getProjectInstanceWorkflows(projectInstanceId);
+
+        for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
+            if (!projectInstanceWorkflow.isEnabled()) {
+                continue;
+            }
+
+            if (enable) {
+                enableWorkflowTrigger(projectInstanceWorkflow);
+            } else {
+                disableWorkflowTrigger(projectInstanceWorkflow);
+            }
+        }
+
+        projectInstanceService.updateEnabled(projectInstanceId, enable);
+    }
+
+    @Override
+    public void enableProjectInstanceWorkflow(long projectInstanceId, String workflowId, boolean enable) {
+        ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
+            projectInstanceId, workflowId);
+
+        if (enable) {
+            enableWorkflowTrigger(projectInstanceWorkflow);
+        } else {
+            disableWorkflowTrigger(projectInstanceWorkflow);
+        }
+
+        projectInstanceWorkflowService.updateEnabled(projectInstanceWorkflow.getId(), enable);
     }
 
     @Override
     @SuppressFBWarnings("NP")
+    @Transactional(readOnly = true)
     public ProjectInstanceDTO getProjectInstance(long id) {
         ProjectInstance projectInstance = projectInstanceService.getProjectInstance(id);
 
@@ -116,6 +172,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Tag> getProjectInstanceTags() {
         List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances();
 
@@ -127,8 +184,9 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
-    public List<ProjectInstanceDTO> searchProjectInstances(List<Long> projectIds, List<Long> tagIds) {
-        List<ProjectInstance> projectInstances = projectInstanceService.searchProjectInstances(projectIds, tagIds);
+    @Transactional(readOnly = true)
+    public List<ProjectInstanceDTO> getProjectInstances(List<Long> projectIds, List<Long> tagIds) {
+        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(projectIds, tagIds);
 
         List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
             .getProjectInstanceWorkflows(CollectionUtils.map(projectInstances, ProjectInstance::getId));
@@ -224,5 +282,58 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                 .flatMap(projectInstance -> CollectionUtils.stream(projectInstance.getTagIds()))
                 .filter(Objects::nonNull)
                 .toList());
+    }
+
+    //
+
+    private void disableWorkflowTrigger(ProjectInstanceWorkflow projectInstanceWorkflow) {
+        Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
+
+        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+
+        for (WorkflowTrigger workflowTrigger : workflowTriggers) {
+            triggerLifecycleFacade.executeTriggerDisable(
+                workflowTrigger,
+                WorkflowExecutionId.of(
+                    workflow.getId(), projectInstanceWorkflow.getProjectInstanceId(), ProjectConstants.PROJECT,
+                    workflowTrigger),
+                getConnectionId(workflowTrigger));
+        }
+    }
+
+    private void enableWorkflowTrigger(ProjectInstanceWorkflow projectInstanceWorkflow) {
+        Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
+
+        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+
+        for (WorkflowTrigger workflowTrigger : workflowTriggers) {
+            triggerLifecycleFacade.executeTriggerEnable(
+                workflowTrigger,
+                WorkflowExecutionId.of(
+                    workflow.getId(), projectInstanceWorkflow.getProjectInstanceId(), ProjectConstants.PROJECT,
+                    workflowTrigger),
+                getConnectionId(workflowTrigger));
+        }
+    }
+
+    private Long getConnectionId(WorkflowConnection workflowConnection) {
+        return workflowConnection.getConnectionId()
+            .orElseGet(() -> getConnectionId(workflowConnection.getKey(), workflowConnection.getOperationName()));
+    }
+
+    private Long getConnectionId(WorkflowTrigger workflowTrigger) {
+        return WorkflowConnection.of(workflowTrigger)
+            .values()
+            .stream()
+            .findFirst()
+            .map(this::getConnectionId)
+            .orElse(null);
+    }
+
+    private Long getConnectionId(String workflowConnectionKey, String triggerName) {
+        ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection =
+            projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(workflowConnectionKey, triggerName);
+
+        return projectInstanceWorkflowConnection.getConnectionId();
     }
 }

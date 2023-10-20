@@ -127,7 +127,7 @@ public class IntegrationServiceIntTest {
     public void testGetIntegrations() {
         Integration integration = integrationRepository.save(getIntegration());
 
-        assertThat(integrationService.searchIntegrations(null, null)).hasSize(1);
+        assertThat(integrationService.getIntegrations(null, null)).hasSize(1);
 
         Category category = new Category("category1");
 
@@ -137,9 +137,9 @@ public class IntegrationServiceIntTest {
 
         integration = integrationRepository.save(integration);
 
-        assertThat(integrationService.searchIntegrations(List.of(category.getId()), null)).hasSize(1);
+        assertThat(integrationService.getIntegrations(List.of(category.getId()), null)).hasSize(1);
 
-        assertThat(integrationService.searchIntegrations(List.of(Long.MAX_VALUE), null)).hasSize(0);
+        assertThat(integrationService.getIntegrations(List.of(Long.MAX_VALUE), null)).hasSize(0);
 
         Tag tag = new Tag("tag1");
 
@@ -149,12 +149,12 @@ public class IntegrationServiceIntTest {
 
         integrationRepository.save(integration);
 
-        assertThat(integrationService.searchIntegrations(null, List.of(tag.getId()))).hasSize(1);
+        assertThat(integrationService.getIntegrations(null, List.of(tag.getId()))).hasSize(1);
 
-        assertThat(integrationService.searchIntegrations(null, List.of(Long.MAX_VALUE))).hasSize(0);
+        assertThat(integrationService.getIntegrations(null, List.of(Long.MAX_VALUE))).hasSize(0);
 
         assertThatException()
-            .isThrownBy(() -> integrationService.searchIntegrations(List.of(Long.MAX_VALUE), List.of(Long.MAX_VALUE)));
+            .isThrownBy(() -> integrationService.getIntegrations(List.of(Long.MAX_VALUE), List.of(Long.MAX_VALUE)));
     }
 
     @Test

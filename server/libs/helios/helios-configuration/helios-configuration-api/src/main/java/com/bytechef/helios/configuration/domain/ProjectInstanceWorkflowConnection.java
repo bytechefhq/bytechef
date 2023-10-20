@@ -42,18 +42,18 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
     @Column
     private String key;
 
-    @Column("task_name")
-    private String taskName;
+    @Column("operation_name")
+    private String operationName;
 
     public ProjectInstanceWorkflowConnection() {
     }
 
     @Default
     @SuppressFBWarnings("NP")
-    public ProjectInstanceWorkflowConnection(Long connectionId, String key, String taskName) {
+    public ProjectInstanceWorkflowConnection(Long connectionId, String key, String operationName) {
         this.connectionId = connectionId == null ? null : AggregateReference.to(connectionId);
         this.key = key;
-        this.taskName = taskName;
+        this.operationName = operationName;
     }
 
     @Override
@@ -68,7 +68,7 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
         ProjectInstanceWorkflowConnection that = (ProjectInstanceWorkflowConnection) o;
 
         return Objects.equals(id, that.id) && Objects.equals(connectionId, that.connectionId)
-            && Objects.equals(key, that.key) && Objects.equals(taskName, that.taskName);
+            && Objects.equals(key, that.key) && Objects.equals(operationName, that.operationName);
     }
 
     @Override
@@ -89,8 +89,8 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
         return key;
     }
 
-    public String getTaskName() {
-        return taskName;
+    public String getOperationName() {
+        return operationName;
     }
 
     @Override
@@ -104,7 +104,7 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
             "id=" + id +
             ", connectionId=" + connectionId +
             ", key='" + key + '\'' +
-            ", taskName='" + taskName + '\'' +
+            ", taskName='" + operationName + '\'' +
             '}';
     }
 

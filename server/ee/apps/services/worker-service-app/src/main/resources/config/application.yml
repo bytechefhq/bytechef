@@ -114,6 +114,7 @@ bytechef:
     provider: jdbc
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+  webhookUrl: http://127.0.0.1:9555
   worker:
     task:
       subscriptions:

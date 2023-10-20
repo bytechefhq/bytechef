@@ -121,26 +121,26 @@ public class ActionDefinitionFacadeController {
 
     private record EditorDescriptionRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        Map<String, Object> actionParameters, long connectionId) {
+        Map<String, Object> actionParameters, Long connectionId) {
     }
 
     private record OptionsRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName, @NotNull String propertyName,
-        Map<String, Object> actionParameters, long connectionId, String searchText) {
+        Map<String, Object> actionParameters, Long connectionId, String searchText) {
     }
 
     private record OutputSchemaRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        Map<String, Object> actionParameters, long connectionId) {
+        Map<String, Object> actionParameters, Long connectionId) {
     }
 
     private record PropertiesRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        @NotNull String propertyName, Map<String, Object> actionParameters, long connectionId) {
+        @NotNull String propertyName, Map<String, Object> actionParameters, Long connectionId) {
     }
 
     private record SampleOutputRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        Map<String, Object> actionParameters, long connectionId) {
+        Map<String, Object> actionParameters, Long connectionId) {
     }
 }
