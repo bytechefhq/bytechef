@@ -23,7 +23,6 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.definition.registry.component.ComponentOperation;
 import com.bytechef.hermes.definition.registry.component.trigger.WebhookRequest;
-import com.bytechef.hermes.definition.registry.component.util.ComponentUtils;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
@@ -50,7 +49,7 @@ public class WorkerHandlerConfiguration {
     @Bean
     TaskHandlerRegistry taskHandlerRegistry() {
         return type -> (TaskHandler<?>) taskExecution -> {
-            ComponentOperation componentOperation = ComponentUtils.getComponentOperation(type);
+            ComponentOperation componentOperation = ComponentOperation.ofType(type);
 
             return actionDefinitionService.executePerform(
                 componentOperation.componentName(), componentOperation.componentVersion(),
@@ -62,7 +61,7 @@ public class WorkerHandlerConfiguration {
     @Bean
     TriggerHandlerRegistry triggerHandlerRegistry() {
         return type -> (TriggerHandler) triggerExecution -> {
-            ComponentOperation componentOperation = ComponentUtils.getComponentOperation(type);
+            ComponentOperation componentOperation = ComponentOperation.ofType(type);
 
             return triggerDefinitionService.executeTrigger(
                 componentOperation.componentName(), componentOperation.componentVersion(),

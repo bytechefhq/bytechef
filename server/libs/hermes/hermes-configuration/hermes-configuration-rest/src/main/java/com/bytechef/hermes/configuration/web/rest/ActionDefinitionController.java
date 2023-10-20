@@ -19,8 +19,8 @@ package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionModel;
+import com.bytechef.hermes.definition.registry.component.ComponentOperation;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
-import com.bytechef.hermes.definition.registry.component.util.ComponentUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -53,7 +53,7 @@ public class ActionDefinitionController implements ActionDefinitionsApi {
         return ResponseEntity.ok(
             actionDefinitionService.getActionDefinitions(
                 taskTypes.stream()
-                    .map(ComponentUtils::getComponentOperation)
+                    .map(ComponentOperation::ofType)
                     .toList())
                 .stream()
                 .map(action -> conversionService.convert(action, ActionDefinitionModel.class))
