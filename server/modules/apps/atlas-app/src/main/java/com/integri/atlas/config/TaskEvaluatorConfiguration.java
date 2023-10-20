@@ -22,8 +22,8 @@ import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.core.task.evaluator.spel.TempDir;
 import com.integri.atlas.engine.core.xml.XMLHelper;
 import com.integri.atlas.file.storage.FileStorageService;
-import com.integri.atlas.file.storage.task.evaluator.spel.ReadFile;
-import com.integri.atlas.file.storage.task.evaluator.spel.StoreFile;
+import com.integri.atlas.file.storage.task.evaluator.spel.ReadFileContent;
+import com.integri.atlas.file.storage.task.evaluator.spel.StoreFileContent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -45,8 +45,8 @@ public class TaskEvaluatorConfiguration {
             .builder()
             .environment(environment)
             .jsonHelper(jsonHelper)
-            .methodExecutor("readFile", new ReadFile(fileStorageService))
-            .methodExecutor("storeFile", new StoreFile(fileStorageService))
+            .methodExecutor("readFileContent", new ReadFileContent(fileStorageService))
+            .methodExecutor("storeFileContent", new StoreFileContent(fileStorageService))
             .methodExecutor("tempDir", new TempDir())
             .xmlHelper(xmlHelper)
             .build();

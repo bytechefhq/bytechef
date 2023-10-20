@@ -39,14 +39,14 @@ public class Base64FileStorageService implements FileStorageService {
     }
 
     @Override
-    public FileEntry storeFile(String fileName, String data) throws FileStorageException {
+    public FileEntry storeFileContent(String fileName, String data) throws FileStorageException {
         Base64.Encoder encoder = Base64.getEncoder();
 
         return FileEntry.of(fileName, "base64:" + encoder.encodeToString(data.getBytes()));
     }
 
     @Override
-    public FileEntry storeFile(String fileName, InputStream inputStream) {
+    public FileEntry storeFileContent(String fileName, InputStream inputStream) {
         Base64.Encoder encoder = Base64.getEncoder();
 
         try {

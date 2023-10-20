@@ -24,8 +24,8 @@ import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.file.storage.base64.Base64FileStorageService;
 import java.util.Base64;
 
-import com.integri.atlas.file.storage.task.evaluator.spel.ReadFile;
-import com.integri.atlas.file.storage.task.evaluator.spel.StoreFile;
+import com.integri.atlas.file.storage.task.evaluator.spel.ReadFileContent;
+import com.integri.atlas.file.storage.task.evaluator.spel.StoreFileContent;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +40,7 @@ public class FileStorageServiceSpelTaskEvaluatorTest {
 
         SpelTaskEvaluator evaluator = SpelTaskEvaluator
             .builder()
-            .methodExecutor("readFile", new ReadFile(base64FileStorageService))
+            .methodExecutor("readFileContent", new ReadFileContent(base64FileStorageService))
             .build();
 
         MapContext mapContext = new MapContext();
@@ -48,7 +48,7 @@ public class FileStorageServiceSpelTaskEvaluatorTest {
         mapContext.put("fileURL", "base64:" + Base64.getEncoder().encodeToString("data".getBytes()));
 
         TaskExecution taskExecution = evaluator.evaluate(
-            SimpleTaskExecution.of("fileContent", "${readFile(fileURL)}"),
+            SimpleTaskExecution.of("fileContent", "${readFileContent(fileURL)}"),
             mapContext
         );
 
@@ -59,11 +59,11 @@ public class FileStorageServiceSpelTaskEvaluatorTest {
     public void testStoreFile() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator
             .builder()
-            .methodExecutor("storeFile", new StoreFile(new Base64FileStorageService()))
+            .methodExecutor("storeFileContent", new StoreFileContent(new Base64FileStorageService()))
             .build();
 
         TaskExecution taskExecution = evaluator.evaluate(
-            SimpleTaskExecution.of("fileEntry", "${storeFile('sample.txt', 'data')}"),
+            SimpleTaskExecution.of("fileEntry", "${storeFileContent('sample.txt', 'data')}"),
             new MapContext()
         );
 

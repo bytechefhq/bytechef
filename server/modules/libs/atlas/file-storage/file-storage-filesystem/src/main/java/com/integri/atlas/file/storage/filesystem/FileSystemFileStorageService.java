@@ -62,12 +62,12 @@ public class FileSystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public FileEntry storeFile(String fileName, String data) throws FileStorageException {
-        return storeFile(fileName, new ByteArrayInputStream(data.getBytes()));
+    public FileEntry storeFileContent(String fileName, String data) throws FileStorageException {
+        return storeFileContent(fileName, new ByteArrayInputStream(data.getBytes()));
     }
 
     @Override
-    public FileEntry storeFile(String fileName, InputStream inputStream) throws FileStorageException {
+    public FileEntry storeFileContent(String fileName, InputStream inputStream) throws FileStorageException {
         Path path = resolveDirectory();
 
         path = path.resolve(UUIDGenerator.generate());

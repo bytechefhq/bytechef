@@ -120,7 +120,7 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
 
             SpreadsheetProcessor spreadsheetProcessor = getSpreadsheetProcessor(fileFormat);
 
-            return fileStorageService.storeFile(
+            return fileStorageService.storeFileContent(
                 fileName,
                 new ByteArrayInputStream(
                     spreadsheetProcessor.write(items, new SpreadsheetProcessor.WriteConfiguration(fileName, sheetName))

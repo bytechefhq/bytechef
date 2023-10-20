@@ -49,7 +49,7 @@ public class LocalFileTaskHandlerIntTest extends BaseTaskIntTest {
 
         Accessor outputs = job.getOutputs();
 
-        FileEntry fileEntry = fileStorageService.storeFile(
+        FileEntry fileEntry = fileStorageService.storeFileContent(
             "sample.txt",
             Files.contentOf(getFile(), Charset.defaultCharset())
         );
@@ -70,7 +70,7 @@ public class LocalFileTaskHandlerIntTest extends BaseTaskIntTest {
             "samples/localFile_WRITE.json",
             Map.of(
                 "fileEntry",
-                fileStorageService.storeFile(
+                fileStorageService.storeFileContent(
                     sampleFile.getAbsolutePath(),
                     Files.contentOf(getFile(), Charset.defaultCharset())
                 ),

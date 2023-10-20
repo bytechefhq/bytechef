@@ -26,11 +26,11 @@ import org.springframework.expression.TypedValue;
  *
  * @author Ivica Cardic
  */
-public class ReadFile implements MethodExecutor {
+public class ReadFileContent implements MethodExecutor {
 
     private final FileStorageService fileStorageService;
 
-    public ReadFile(FileStorageService fileStorageService) {
+    public ReadFileContent(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
     }
 

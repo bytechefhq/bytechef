@@ -282,7 +282,7 @@ public class SpreadsheetFileTaskHandlerTest {
             includeEmptyCells,
             range,
             readAsString,
-            file == null ? null : fileStorageService.storeFile(file.getName(), new FileInputStream(file))
+            file == null ? null : fileStorageService.storeFileContent(file.getName(), new FileInputStream(file))
         );
     }
 
