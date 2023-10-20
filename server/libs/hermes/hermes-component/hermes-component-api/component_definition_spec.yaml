@@ -4,7 +4,7 @@ info:
   version: v1
 schemas:
   ActionDefinition:
-    description: An action is a a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.
+    description: An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.
     type: object
     properties:
       display:
@@ -12,11 +12,11 @@ schemas:
       exampleOutput:
         description: The example of the action's output.
         type: object
-      metadata:
-        description: Additional data that can be used during processing.
-        type: object
-        additionalProperties:
-          type: object
+#      metadata:
+#        description: The additional data that can be used during processing.
+#        type: object
+#        additionalProperties:
+#          type: object
       name:
         description: The action name.
         type: string
@@ -60,8 +60,10 @@ schemas:
       - DIGEST_AUTH
       - OAUTH2_AUTHORIZATION_CODE
       - OAUTH2_CLIENT_CREDENTIALS
+      - OAUTH2_IMPLICIT_CODE
+      - OAUTH2_RESOURCE_OWNER_PASSWORD
   ComponentDefinition:
-    description: A component contains a set of reusable code(actions) that accomplish specific tasks, triggers(TODO) and connections if there is a need for a connection to an outside service.
+    description: A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.
     type: object
     properties:
       actions:
@@ -73,21 +75,22 @@ schemas:
         $ref: '#/schemas/ConnectionDefinition'
       display:
         $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
-      metadata:
-        description: Additional data that can be used during processing.
-        type: object
-        additionalProperties:
-          type: object
+#      metadata:
+#        description: The additional data that can be used during processing.
+#        type: object
+#        additionalProperties:
+#          type: object
       name:
         description: The component name.
         type: string
       resources:
         $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Resources'
       version:
+        description: The component version.
         type: number
         format: double
   ConnectionDefinition:
-    description: A connection to an outside service.
+    description: Definition of a connection to an outside service.
     type: object
     properties:
       authorizations:
@@ -97,24 +100,22 @@ schemas:
       componentName:
         description: The name of a component this connection can be used for.
         type: string
-      componentVersion:
-        description: The version of a component this connection can be used for.
-        type: string
+#      componentVersion:
+#        description: The version of a component this connection can be used for.
+#        type: string
       display:
         $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
       properties:
-        description: Properties of the connection.
+        description: The properties of the connection.
         type: array
         items:
           $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/ValueProperty'
       resources:
         $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Resources'
-      subtitle:
-        description: Additional explanation.
-        type: string
       version:
-        type: integer
-        format: int32
+        description: The connection version.
+        type: number
+        format: double
   JdbcComponentDefinition:
     description: A definition of component used for building JDBC based components. The definition is transformed into fully component definition.
     type: object

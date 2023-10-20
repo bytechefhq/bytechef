@@ -72,7 +72,7 @@ schemas:
         description: The type of the task. Type strings are mapped to "TaskHandler" implementations designed to handle that type of task.
         type: string
       additionalProperties:
-        description: Additional properties defined by particular task.
+        description: The additional properties defined by particular task.
         type: object
   TaskDispatcher:
     description: Represents a strategy for dispatching tasks to be executed.
@@ -84,5 +84,5 @@ schemas:
         description:
         type: string
       additionalProperties:
-        description: Additional properties defined by particular task dispatcher.
+        description: The additional properties defined by particular task dispatcher.
         type: object

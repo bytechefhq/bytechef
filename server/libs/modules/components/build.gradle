@@ -10,7 +10,7 @@ subprojects {
         implementation "org.slf4j:slf4j-api"
 
         testImplementation project(":server:libs:hermes:hermes-component:hermes-component-registrar")
-        testImplementation project(":server:libs:hermes:hermes-component:hermes-component-test:hermes-component-test-int-support")
+        testImplementation project(":server:libs:hermes:hermes-component:hermes-component-test-int-support")
         testImplementation project(":server:libs:test:test-support")
     }
 }

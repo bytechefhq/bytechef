@@ -72,11 +72,11 @@ schemas:
           type:
             type: string
   Display:
-    description: Display information.
+    description: A display information.
     type: object
     properties:
       category:
-        description: The category of the component.
+        description: The category.
         type: string
       description:
         description: The description.
@@ -88,10 +88,10 @@ schemas:
         description: The label.
         type: string
       subtitle:
-        description: Additional explanation.
+        description: The additional explanation.
         type: string
       tags:
-        description: Tags for the component.
+        description: Tags for categorization.
         type: array
         items:
           type: string
@@ -212,18 +212,21 @@ schemas:
       displayOption:
         $ref: '#/schemas/DisplayOption'
       hidden:
-        description: If the property should be hidden or not.
+        description: If the property should be visible or not."
         type: boolean
       label:
         description: The property label.
         type: string
       metadata:
-        description: Additional data that can be used during processing.
+        description: The additional data that can be used during processing.
         type: object
         additionalProperties:
           type: object
       name:
         description: The property name.
+        type: string
+      placeholder:
+        description: The property placeholder.
         type: string
       required:
         description: If the property is required or not.
@@ -251,10 +254,10 @@ schemas:
       displayOption:
         $ref: '#/schemas/DisplayOption'
       name:
-        description: Name of the option.
+        description: The name of an option.
         type: string
       value:
-        description: Value of the option.
+        description: The value of an option.
         type: object
   PropertyOptionDataSource:
     description: Defines function that should dynamically load options for the property.

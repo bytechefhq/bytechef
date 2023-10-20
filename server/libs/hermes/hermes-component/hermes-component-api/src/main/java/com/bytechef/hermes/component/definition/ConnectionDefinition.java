@@ -21,8 +21,6 @@ import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -33,29 +31,21 @@ import java.util.function.Function;
  *
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = ComponentDSL.ModifiableConnectionDefinition.class)
-@Schema(name = "ConnectionDefinition", description = "Definition of a connection to an outside service.")
 public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConnectionDefinition {
 
     List<? extends Authorization> getAuthorizations();
 
     Function<Connection, String> getBaseUriFunction();
 
-    @Schema(name = "componentName", description = "The name of a component this connection can be used for.")
     String getComponentName();
-
-    @Schema(name = "componentVersion", description = "The version of a component this connection can be used for.")
-    int getComponentVersion();
 
     Display getDisplay();
 
-    @Schema(name = "properties", description = "Properties of the connection.")
     List<? extends Property<?>> getProperties();
 
     Resources getResources();
 
-    @Schema(name = "subtitle", description = "Additional explanation.")
-    String getSubtitle();
-
     Optional<Consumer<Connection>> getTestConsumer();
+
+    int getVersion();
 }

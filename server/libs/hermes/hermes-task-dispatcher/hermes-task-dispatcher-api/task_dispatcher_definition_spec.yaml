@@ -10,7 +10,7 @@ schemas:
       display:
         $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
       name:
-        description: The connection name.
+        description: The task dispatcher name..
         type: string
       output:
         description: The output schema of a task dispatching result.

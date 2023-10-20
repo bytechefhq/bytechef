@@ -1,4 +1,0 @@
-dependencies {
-    api "io.projectreactor:reactor-core"
-    api project(":server:libs:hermes:hermes-component:hermes-component-api")
-}

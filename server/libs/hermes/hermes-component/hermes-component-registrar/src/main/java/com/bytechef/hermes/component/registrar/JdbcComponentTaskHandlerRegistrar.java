@@ -40,10 +40,9 @@ public class JdbcComponentTaskHandlerRegistrar extends DefaultComponentTaskHandl
 
     @SuppressFBWarnings("EI2")
     public JdbcComponentTaskHandlerRegistrar(
-        ConnectionService connectionService,
-        DataSourceFactory dataSourceFactory,
-        EventPublisher eventPublisher,
+        ConnectionService connectionService, DataSourceFactory dataSourceFactory, EventPublisher eventPublisher,
         FileStorageService fileStorageService) {
+
         super(connectionService, eventPublisher, fileStorageService);
 
         this.dataSourceFactory = dataSourceFactory;

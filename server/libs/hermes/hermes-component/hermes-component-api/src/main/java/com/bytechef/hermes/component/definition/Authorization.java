@@ -31,8 +31,6 @@ import com.bytechef.hermes.component.AuthorizationContext;
 import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,8 +41,6 @@ import java.util.function.Function;
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = ComponentDSL.ModifiableAuthorization.class)
-@Schema(name = "Authorization", description = "Contains information required for a connection's authorization.")
 public sealed interface Authorization permits ComponentDSL.ModifiableAuthorization {
 
     enum AuthorizationType {
@@ -107,7 +103,7 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
     BiConsumer<AuthorizationContext, Connection> getApplyConsumer();
 
-    Optional<BiFunction<Connection, String, String>> getAuthorizationCallbackFunction();
+    Optional<BiFunction<Connection, String, Object>> getAuthorizationCallbackFunction();
 
     Function<Connection, String> getAuthorizationUrlFunction();
 
@@ -117,12 +113,10 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
     Display getDisplay();
 
-    @Schema(name = "name", description = "The authorization name.")
     String getName();
 
     List<Object> getOnRefresh();
 
-    @Schema(name = "properties", description = "Properties of the connection.")
     List<Property<?>> getProperties();
 
     Optional<Function<Connection, String>> getRefreshFunction();
@@ -133,6 +127,5 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
     Function<Connection, String> getTokenUrlFunction();
 
-    @Schema(name = "type", description = "Authorization type.")
     AuthorizationType getType();
 }

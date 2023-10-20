@@ -31,15 +31,12 @@ dependencies {
     implementation project(":server:libs:core:config-post-processor")
     implementation project(":server:libs:core:discovery:discovery-redis")
     implementation project(":server:libs:db-migration")
-    implementation project(":server:libs:hermes:hermes-component:hermes-component-rest")
-    implementation project(":server:libs:hermes:hermes-component:hermes-component-service:hermes-component-service-remote")
+    implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-rest")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rest")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rsocket")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
     implementation project(":server:libs:hermes:hermes-integration:hermes-integration-rest")
     implementation project(":server:libs:hermes:hermes-integration:hermes-integration-service")
-    implementation project(":server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-rest")
-    implementation project(":server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-service:hermes-task-dispatcher-service-remote")
 
     testImplementation project(":server:libs:test:test-int-support")
 }

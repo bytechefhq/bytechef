@@ -195,7 +195,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private BiConsumer<AuthorizationContext, Connection> applyConsumer;
 
         @JsonIgnore
-        private BiFunction<Connection, String, String> authorizationCallbackFunction;
+        private BiFunction<Connection, String, Object> authorizationCallbackFunction;
 
         @JsonIgnore
         private Function<Connection, String> authorizationUrlFunction = connectionParameters -> connectionParameters
@@ -252,7 +252,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public ModifiableAuthorization authorizationCallback(
-            BiFunction<Connection, String, String> authorizationCallbackFunction) {
+            BiFunction<Connection, String, Object> authorizationCallbackFunction) {
             this.authorizationCallbackFunction = authorizationCallbackFunction;
 
             return this;
@@ -340,7 +340,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<BiFunction<Connection, String, String>> getAuthorizationCallbackFunction() {
+        public Optional<BiFunction<Connection, String, Object>> getAuthorizationCallbackFunction() {
             return Optional.ofNullable(authorizationCallbackFunction);
         }
 
@@ -444,7 +444,6 @@ public final class ComponentDSL extends DefinitionDSL {
         public ModifiableComponentDefinition connection(ModifiableConnectionDefinition connectionDefinition) {
             this.connection = connectionDefinition
                 .componentName(name)
-                .componentVersion(version)
                 .display(display);
 
             return this;
@@ -483,6 +482,26 @@ public final class ComponentDSL extends DefinitionDSL {
             this.version = version;
 
             return this;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            ModifiableComponentDefinition that = (ModifiableComponentDefinition) o;
+
+            return version == that.version && name.equals(that.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, version);
         }
 
         @SuppressWarnings("unchecked")
@@ -525,9 +544,8 @@ public final class ComponentDSL extends DefinitionDSL {
 
     public static final class ModifiableConnectionDefinition implements ConnectionDefinition {
 
-        private String componentName;
-        private int componentVersion;
         private List<? extends Authorization> authorizations = Collections.emptyList();
+        private String componentName;
 
         @JsonIgnore
         private Function<Connection, String> baseUriFunction = (
@@ -537,7 +555,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private Display display;
         private List<? extends Property<?>> properties;
         private Resources resources;
-        private String subtitle;
+        private int version = ComponentConstants.Versions.VERSION_1;
 
         @JsonIgnore
         private Consumer<Connection> testConsumer;
@@ -581,8 +599,8 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableConnectionDefinition subtitle(String subtitle) {
-            this.subtitle = subtitle;
+        public ModifiableConnectionDefinition version(int version) {
+            this.version = version;
 
             return this;
         }
@@ -593,16 +611,30 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        private ModifiableConnectionDefinition componentVersion(int componentVersion) {
-            this.componentVersion = componentVersion;
-
-            return this;
-        }
-
         private ModifiableConnectionDefinition display(Display display) {
             this.display = display;
 
             return this;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            ModifiableConnectionDefinition that = (ModifiableConnectionDefinition) o;
+
+            return version == that.version && componentName.equals(that.componentName);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(componentName, version);
         }
 
         @Override
@@ -621,11 +653,6 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public int getComponentVersion() {
-            return componentVersion;
-        }
-
-        @Override
         public Display getDisplay() {
             return display;
         }
@@ -641,8 +668,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public String getSubtitle() {
-            return subtitle;
+        public int getVersion() {
+            return version;
         }
 
         @Override

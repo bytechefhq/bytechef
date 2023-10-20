@@ -19,18 +19,16 @@ package com.bytechef.worker.config;
 
 import com.bytechef.discovery.metadata.ServiceMetadataRegistry;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
-import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
@@ -41,44 +39,25 @@ import java.util.Map;
 public class DiscoveryClientConfiguration implements InitializingBean {
 
     private final List<ComponentDefinitionFactory> componentDefinitionFactories;
-    private final ObjectMapper objectMapper;
     private final ServiceMetadataRegistry serviceMetadataRegistry;
 
     @SuppressFBWarnings("EI2")
     public DiscoveryClientConfiguration(
         List<ComponentDefinitionFactory> componentDefinitionFactories,
-        ObjectMapper objectMapper, ServiceMetadataRegistry serviceMetadataRegistry) {
+        ServiceMetadataRegistry serviceMetadataRegistry) {
 
         this.componentDefinitionFactories = componentDefinitionFactories;
-        this.objectMapper = objectMapper;
         this.serviceMetadataRegistry = serviceMetadataRegistry;
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         serviceMetadataRegistry.registerMetadata(
             Map.of(
-                "components",
-                objectMapper.writeValueAsString(componentDefinitionFactories.stream()
+                "componentNames",
+                componentDefinitionFactories.stream()
                     .map(ComponentDefinitionFactory::getDefinition)
-                    .map(componentDefinition -> {
-                        Map<String, Object> map = new HashMap<>();
-
-                        map.put("name", componentDefinition.getName());
-
-                        if (componentDefinition.getConnection() != null) {
-                            ConnectionDefinition connectionDefinition = componentDefinition.getConnection();
-
-                            List<? extends Authorization> authorizations = connectionDefinition.getAuthorizations();
-
-                            map.put("connection", Map.of("authorizations", authorizations.stream()
-                                .map(authorization -> Map.of("name", authorization.getName(), "type",
-                                    authorization.getType()))
-                                .toList()));
-                        }
-
-                        return map;
-                    })
-                    .toList())));
+                    .map(ComponentDefinition::getName)
+                    .collect(Collectors.joining(","))));
     }
 }
