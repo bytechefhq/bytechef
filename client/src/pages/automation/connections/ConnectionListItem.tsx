@@ -104,7 +104,7 @@ const ConnectionListItem = ({
                                     }
                                     getRequest={(id, tags) => ({
                                         id: id!,
-                                        updateConnectionTagsRequestModel: {
+                                        updateTagsRequestModel: {
                                             tags: tags || [],
                                         },
                                     })}
