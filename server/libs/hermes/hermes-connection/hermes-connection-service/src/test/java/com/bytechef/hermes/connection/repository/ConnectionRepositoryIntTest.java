@@ -18,19 +18,18 @@ package com.bytechef.hermes.connection.repository;
 
 import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.test.extension.PostgresTestContainerExtension;
+import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Map;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(PostgresTestContainerExtension.class)
+@EmbeddedSql
 @SpringBootTest(classes = ConnectionIntTestConfiguration.class)
 public class ConnectionRepositoryIntTest {
 

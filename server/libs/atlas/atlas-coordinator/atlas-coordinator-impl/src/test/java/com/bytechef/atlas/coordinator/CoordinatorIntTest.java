@@ -41,7 +41,7 @@ import com.bytechef.atlas.worker.Worker;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
-import com.bytechef.test.extension.PostgresTestContainerExtension;
+import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +49,6 @@ import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +61,7 @@ import org.springframework.context.annotation.Import;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-@ExtendWith(PostgresTestContainerExtension.class)
+@EmbeddedSql
 @SpringBootTest(
         classes = CoordinatorIntTestConfiguration.class,
         properties = {

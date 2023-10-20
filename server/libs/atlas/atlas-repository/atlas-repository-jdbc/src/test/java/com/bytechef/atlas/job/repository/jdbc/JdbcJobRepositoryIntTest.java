@@ -24,13 +24,12 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.job.repository.jdbc.config.WorkflowRepositoryIntTestConfiguration;
 import com.bytechef.atlas.repository.JobRepository;
-import com.bytechef.test.extension.PostgresTestContainerExtension;
+import com.bytechef.test.annotation.EmbeddedSql;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -40,7 +39,7 @@ import org.springframework.data.domain.PageRequest;
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-@ExtendWith(PostgresTestContainerExtension.class)
+@EmbeddedSql
 @SpringBootTest(
         classes = WorkflowRepositoryIntTestConfiguration.class,
         properties = "bytechef.workflow.persistence.provider=jdbc")

@@ -18,17 +18,16 @@ package com.bytechef.hermes.integration.facade;
 
 import com.bytechef.hermes.integration.config.IntegrationIntTestConfiguration;
 import com.bytechef.hermes.integration.domain.Integration;
-import com.bytechef.test.extension.PostgresTestContainerExtension;
+import com.bytechef.test.annotation.EmbeddedSql;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(PostgresTestContainerExtension.class)
+@EmbeddedSql
 @SpringBootTest(
         classes = IntegrationIntTestConfiguration.class,
         properties = "bytechef.workflow.workflow-repository.jdbc.enabled=true")

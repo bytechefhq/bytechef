@@ -16,15 +16,14 @@
 
 package com.bytechef.api.gateway;
 
-import com.bytechef.test.extension.RedisTestContainerExtension;
+import com.bytechef.test.annotation.EmbeddedRedis;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(RedisTestContainerExtension.class)
+@EmbeddedRedis
 @SpringBootTest
 public class ApiGatewayApplicationIntTest {
 

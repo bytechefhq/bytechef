@@ -20,17 +20,16 @@ import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.job.repository.jdbc.config.WorkflowRepositoryIntTestConfiguration;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.workflow.WorkflowFormat;
-import com.bytechef.test.extension.PostgresTestContainerExtension;
+import com.bytechef.test.annotation.EmbeddedSql;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(PostgresTestContainerExtension.class)
+@EmbeddedSql
 @SpringBootTest(
         classes = WorkflowRepositoryIntTestConfiguration.class,
         properties = "bytechef.workflow.workflow-repository.jdbc.enabled=true")

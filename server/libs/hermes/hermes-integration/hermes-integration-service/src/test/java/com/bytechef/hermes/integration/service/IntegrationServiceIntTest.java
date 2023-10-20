@@ -20,19 +20,18 @@ import com.bytechef.hermes.integration.config.IntegrationIntTestConfiguration;
 import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.domain.IntegrationWorkflow;
 import com.bytechef.hermes.integration.repository.IntegrationRepository;
-import com.bytechef.test.extension.PostgresTestContainerExtension;
+import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(PostgresTestContainerExtension.class)
+@EmbeddedSql
 @SpringBootTest(classes = IntegrationIntTestConfiguration.class)
 public class IntegrationServiceIntTest {
 

@@ -19,9 +19,8 @@ package com.bytechef.atlas.coordinator.config;
 import com.bytechef.atlas.config.WorkflowConfiguration;
 import com.bytechef.atlas.repository.config.WorkflowRepositoryConfig;
 import com.bytechef.atlas.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
-import com.bytechef.test.extension.PostgresTestContainerExtension;
+import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Optional;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -38,7 +37,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(PostgresTestContainerExtension.class)
+@EmbeddedSql
 @ComponentScan(basePackages = {"com.bytechef.atlas.repository.jdbc"})
 @EnableAutoConfiguration
 @Import({ResourceWorkflowRepositoryConfiguration.class, WorkflowConfiguration.class, WorkflowRepositoryConfig.class})
