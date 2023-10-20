@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.rsocket.client;
+package com.bytechef.hermes.connection.rsocket.client.service;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class ConnectionRSocketClientTest {
+public class ConnectionServiceRSocketClientTest {
 
     @Disabled
     @Test
