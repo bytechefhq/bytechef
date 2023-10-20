@@ -76,8 +76,12 @@ public class AuthenticationControllerTest {
     private AuthenticationRepository authenticationRepository;
 
     @Test
-    public void testDeleteAuthentication() throws Exception {
-        this.mockMvc.perform(delete("/authentications/1")).andExpect(status().isOk());
+    public void testDeleteAuthentication() {
+        try {
+            this.mockMvc.perform(delete("/authentications/1")).andExpect(status().isOk());
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
 
         ArgumentCaptor<String> argument = forClass(String.class);
 
@@ -87,67 +91,83 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    public void testGetAuthentication() throws Exception {
-        Authentication authentication = getSimpleAuthentication();
+    public void testGetAuthentication() {
+        try {
+            Authentication authentication = getSimpleAuthentication();
 
-        doReturn(authentication).when(authenticationService).fetchAuthentication(anyString());
+            doReturn(authentication).when(authenticationService).fetchAuthentication(anyString());
 
-        this.mockMvc
-                .perform(get("/authentications/1"))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(authentication)));
+            this.mockMvc
+                    .perform(get("/authentications/1"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().json(objectMapper.writeValueAsString(authentication)));
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
     }
 
     @Test
-    public void testGetAuthentications() throws Exception {
+    public void testGetAuthentications() {
         Authentication authentication = getSimpleAuthentication();
 
         doReturn(List.of(authentication)).when(authenticationService).getAuthentications();
 
-        this.mockMvc
-                .perform(get("/authentications"))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(List.of(authentication))));
+        try {
+            this.mockMvc
+                    .perform(get("/authentications"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().json(objectMapper.writeValueAsString(List.of(authentication))));
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
     }
 
     @Test
-    public void testPostAuthentication() throws Exception {
+    public void testPostAuthentication() {
         Authentication authentication = getSimpleAuthentication();
 
         doReturn(authentication).when(authenticationService).add(anyString(), anyString(), any());
 
-        this.mockMvc
-                .perform(post("/authentications")
-                        .content(objectMapper.writeValueAsString(authentication))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(authentication.getId())))
-                .andExpect(jsonPath("$.name", is(authentication.getName())))
-                .andExpect(jsonPath("$.properties", is(authentication.getProperties())))
-                .andExpect(jsonPath("$.type", is(authentication.getType())));
+        try {
+            this.mockMvc
+                    .perform(post("/authentications")
+                            .content(objectMapper.writeValueAsString(authentication))
+                            .contentType(MediaType.APPLICATION_JSON_VALUE))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id", is(authentication.getId())))
+                    .andExpect(jsonPath("$.name", is(authentication.getName())))
+                    .andExpect(jsonPath("$.properties", is(authentication.getProperties())))
+                    .andExpect(jsonPath("$.type", is(authentication.getType())));
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
     }
 
     @Test
-    public void putAuthentication() throws Exception {
+    public void putAuthentication() {
         Authentication authentication = getSimpleAuthentication();
 
         authentication.setName("name2");
 
         doReturn(authentication).when(authenticationService).update(anyString(), anyString());
 
-        this.mockMvc
-                .perform(put("/authentications")
-                        .content(
-                                """
+        try {
+            this.mockMvc
+                    .perform(put("/authentications")
+                            .content(
+                                    """
                   {
                     "id": "1",
                     "name": "name2"
                   }
                     """)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(authentication.getId())))
-                .andExpect(jsonPath("$.name", is("name2")));
+                            .contentType(MediaType.APPLICATION_JSON_VALUE))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id", is(authentication.getId())))
+                    .andExpect(jsonPath("$.name", is("name2")));
+        } catch (Exception exception) {
+            Assertions.fail(exception);
+        }
     }
 
     private static Authentication getSimpleAuthentication() {

@@ -40,8 +40,8 @@ public class FileSystemFileStorageServiceTest {
 
     @Test
     public void testDeleteFile() {
-        FileEntry fileEntry =
-                fileStorageService.storeFileContent("fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes()));
+        FileEntry fileEntry = fileStorageService.storeFileContent(
+                "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(Charset.defaultCharset())));
 
         Assertions.assertThat(fileStorageService.readFileContent(fileEntry.getUrl()))
                 .isEqualTo(TEST_STRING);
@@ -53,8 +53,8 @@ public class FileSystemFileStorageServiceTest {
 
     @Test
     public void testDeleteFiles() throws InterruptedException {
-        FileEntry fileEntry =
-                fileStorageService.storeFileContent("fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes()));
+        FileEntry fileEntry = fileStorageService.storeFileContent(
+                "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(Charset.defaultCharset())));
 
         Assertions.assertThat(fileStorageService.readFileContent(fileEntry.getUrl()))
                 .isEqualTo(TEST_STRING);
@@ -68,18 +68,19 @@ public class FileSystemFileStorageServiceTest {
 
     @Test
     public void testOpenInputStream() throws IOException {
-        FileEntry fileEntry =
-                fileStorageService.storeFileContent("fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes()));
+        FileEntry fileEntry = fileStorageService.storeFileContent(
+                "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(Charset.defaultCharset())));
 
         InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl());
 
-        Assertions.assertThat(new String(inputStream.readAllBytes())).isEqualTo(TEST_STRING);
+        Assertions.assertThat(new String(inputStream.readAllBytes(), Charset.defaultCharset()))
+                .isEqualTo(TEST_STRING);
     }
 
     @Test
     public void testRead() {
-        FileEntry fileEntry =
-                fileStorageService.storeFileContent("fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes()));
+        FileEntry fileEntry = fileStorageService.storeFileContent(
+                "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(Charset.defaultCharset())));
 
         Assertions.assertThat(fileStorageService.readFileContent(fileEntry.getUrl()))
                 .isEqualTo(TEST_STRING);
@@ -87,8 +88,8 @@ public class FileSystemFileStorageServiceTest {
 
     @Test
     public void testWrite() {
-        FileEntry fileEntry =
-                fileStorageService.storeFileContent("fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes()));
+        FileEntry fileEntry = fileStorageService.storeFileContent(
+                "fileName.txt", new ByteArrayInputStream(TEST_STRING.getBytes(Charset.defaultCharset())));
 
         String path = fileEntry.getUrl();
 

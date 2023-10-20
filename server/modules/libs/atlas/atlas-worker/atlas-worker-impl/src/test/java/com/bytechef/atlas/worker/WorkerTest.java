@@ -174,7 +174,7 @@ public class WorkerTest {
                     } else if ("rogue".equals(type)) {
                         Assertions.assertTrue(new File(tempDir).exists());
                         return t2 -> {
-                            throw new RuntimeException("rogue");
+                            throw new TaskExecutionException("Unexpected task type: rogue");
                         };
                     } else {
                         throw new IllegalArgumentException("unknown type: " + type);
