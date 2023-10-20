@@ -77,7 +77,7 @@ public class TriggerSyncExecutor {
             .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
             .build();
 
-        triggerExecution = triggerExecutionService.create(triggerExecution.evaluate(getInputs(workflowExecutionId)));
+        triggerExecution = triggerExecutionService.create(triggerExecution.evaluate(getInputMap(workflowExecutionId)));
 
         triggerExecution.setState(OptionalUtils.orElse(triggerStateService.fetchValue(workflowExecutionId), null));
 
@@ -116,7 +116,7 @@ public class TriggerSyncExecutor {
             .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
             .build();
 
-        triggerExecution = preProcess(triggerExecution.evaluate(getInputs(workflowExecutionId)));
+        triggerExecution = preProcess(triggerExecution.evaluate(getInputMap(workflowExecutionId)));
 
         ComponentOperation componentOperation = getComponentOperation(workflowExecutionId);
 
@@ -138,7 +138,7 @@ public class TriggerSyncExecutor {
         return ComponentOperation.ofType(workflowTrigger.getType());
     }
 
-    private Map<String, ?> getInputs(WorkflowExecutionId workflowExecutionId) {
+    private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
         InstanceWorkflowAccessor instanceWorkflowAccessor = instanceWorkflowAccessorRegistry
             .getInstanceWorkflowAccessor(workflowExecutionId.getInstanceType());
 

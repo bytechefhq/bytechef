@@ -22,8 +22,9 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.FileCopyUtils;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.LocalDateTimeUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
@@ -80,7 +81,7 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
     }
 
     @Override
-    public Map<String, Object> readWorkflowMap(WorkflowResource workflowResource, int type) {
+    public Map<String, Object> readWorkflowMap(WorkflowResource workflowResource) {
         return readWorkflowMap(workflowResource, objectMapper);
     }
 
@@ -105,18 +106,13 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
     }
 
     protected Map<String, Object> readWorkflowMap(WorkflowResource workflowResource, ObjectMapper objectMapper) {
-        try {
-            String definition = readDefinition(workflowResource);
+        String definition = readDefinition(workflowResource);
 
-            return parse(definition, objectMapper);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return parse(definition, objectMapper);
     }
 
-    private Map<String, Object> parse(String workflow, ObjectMapper objectMapper) throws JsonProcessingException {
-        @SuppressWarnings("unchecked")
-        Map<String, Object> workflowMap = objectMapper.readValue(workflow, Map.class);
+    private Map<String, Object> parse(String workflow, ObjectMapper objectMapper) {
+        Map<String, Object> workflowMap = JsonUtils.read(workflow, new TypeReference<>() {}, objectMapper);
 
         validate(workflowMap);
 
@@ -142,9 +138,11 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
         return workflowMap;
     }
 
-    private String readDefinition(Resource resource) throws IOException {
+    private String readDefinition(Resource resource) {
         try (InputStream in = resource.getInputStream()) {
             return FileCopyUtils.copyToString(new InputStreamReader(in, StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

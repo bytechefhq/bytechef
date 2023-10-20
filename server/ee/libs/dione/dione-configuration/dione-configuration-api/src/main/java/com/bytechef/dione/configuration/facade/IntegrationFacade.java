@@ -30,7 +30,7 @@ import java.util.List;
  */
 public interface IntegrationFacade {
 
-    Workflow addWorkflow(long id, String label, String description, String definition);
+    Workflow addWorkflow(long id, String definition);
 
     IntegrationDTO create(IntegrationDTO integrationDTO);
 

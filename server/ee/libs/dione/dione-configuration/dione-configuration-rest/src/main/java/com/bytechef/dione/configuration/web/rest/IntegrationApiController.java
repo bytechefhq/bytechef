@@ -85,8 +85,7 @@ public class IntegrationApiController implements IntegrationApi {
         return ResponseEntity.ok(
             conversionService.convert(
                 integrationFacade.addWorkflow(
-                    id, createIntegrationWorkflowRequestModel.getLabel(),
-                    createIntegrationWorkflowRequestModel.getDescription(),
+                    id,
                     createIntegrationWorkflowRequestModel.getDefinition()),
                 WorkflowModel.class));
     }

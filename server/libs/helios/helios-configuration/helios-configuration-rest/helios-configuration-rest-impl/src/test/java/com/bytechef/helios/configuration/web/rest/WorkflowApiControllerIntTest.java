@@ -130,7 +130,7 @@ public class WorkflowApiControllerIntTest {
         WorkflowModel workflowModel = new WorkflowModel()
             .definition(DEFINITION);
 
-        when(workflowService.update("1", DEFINITION)).thenReturn(workflow);
+        when(workflowService.update("1", , DEFINITION, )).thenReturn(workflow);
 
         Workflow.Format format = workflow.getFormat();
 

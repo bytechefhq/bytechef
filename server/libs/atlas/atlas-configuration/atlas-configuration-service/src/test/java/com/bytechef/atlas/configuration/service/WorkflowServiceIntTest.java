@@ -87,13 +87,13 @@ public class WorkflowServiceIntTest {
         String definition = "{\"label\": \"Label\",\"tasks\": []}";
         Workflow workflow = workflowCrudRepository.save(getWorkflow());
 
-        Workflow updatedWorkflow = workflowService.update(workflow.getId(), definition);
+        Workflow updatedWorkflow = workflowService.update(workflow.getId(), definition, );
 
         Assertions.assertEquals(definition, updatedWorkflow.getDefinition());
     }
 
     private static Workflow getWorkflow() {
-        Workflow workflow = new Workflow("{\"tasks\": []}", Workflow.Format.JSON);
+        Workflow workflow = new Workflow("{\"tasks\": []}", Workflow.Format.JSON, 0);
 
         workflow.setNew(true);
 

@@ -46,6 +46,13 @@ public class RemoteJobServiceClient implements JobService {
     }
 
     @Override
+    public long countJobs(
+        String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, List<String> projectWorkflowIds) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Job create(JobParameters jobParameters, Workflow workflow) {
         return loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
@@ -71,7 +78,7 @@ public class RemoteJobServiceClient implements JobService {
     }
 
     @Override
-    public Page<Job> getJobs(int pageNumber) {
+    public Page<Job> getJobsPage(int pageNumber) {
         throw new UnsupportedOperationException();
     }
 
@@ -86,9 +93,17 @@ public class RemoteJobServiceClient implements JobService {
     }
 
     @Override
-    public Page<Job> getJobs(
-        String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
+    public List<Job> getJobs(
+        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Page<Job> getJobsPage(
+        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds,
         Integer pageNumber) {
+
         throw new UnsupportedOperationException();
     }
 

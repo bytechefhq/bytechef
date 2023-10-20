@@ -35,10 +35,10 @@ public class WorkflowReader {
         return workflowMapper.readWorkflow(workflowResource, type);
     }
 
-    public static Map<String, Object> readWorkflowMap(WorkflowResource workflowResource, int type) throws Exception {
+    public static Map<String, Object> readWorkflowMap(WorkflowResource workflowResource) throws Exception {
         WorkflowMapper workflowMapper = getWorkflowMapper(workflowResource);
 
-        return workflowMapper.readWorkflowMap(workflowResource, type);
+        return workflowMapper.readWorkflowMap(workflowResource);
     }
 
     private static WorkflowMapper getWorkflowMapper(WorkflowResource workflowResource) {

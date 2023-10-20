@@ -28,7 +28,7 @@ interface WorkflowMapper {
 
     Workflow readWorkflow(WorkflowResource workflowResource, int type) throws Exception;
 
-    Map<String, Object> readWorkflowMap(WorkflowResource workflowResource, int type) throws Exception;
+    Map<String, Object> readWorkflowMap(WorkflowResource workflowResource) throws Exception;
 
     WorkflowMapper resolve(WorkflowResource resource);
 }

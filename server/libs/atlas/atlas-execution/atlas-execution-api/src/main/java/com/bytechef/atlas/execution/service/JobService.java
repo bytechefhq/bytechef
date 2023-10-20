@@ -31,19 +31,27 @@ import java.util.Optional;
  */
 public interface JobService {
 
+    int DEFAULT_PAGE_SIZE = 20;
+
+    long countJobs(
+        String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, List<String> projectWorkflowIds);
+
     Job create(JobParameters jobParameters, Workflow workflow);
 
     Optional<Job> fetchLatestJob();
 
     Job getJob(long id);
 
-    Page<Job> getJobs(int pageNumber);
+    Page<Job> getJobsPage(int pageNumber);
+
+    List<Job> getJobs(
+        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds);
+
+    Page<Job> getJobsPage(
+        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds,
+        Integer pageNumber);
 
     Job getTaskExecutionJob(long taskExecutionId);
-
-    Page<Job> getJobs(
-        String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
-        Integer pageNumber);
 
     Job resumeToStatusStarted(long id);
 
@@ -52,4 +60,5 @@ public interface JobService {
     Job setStatusToStopped(long id);
 
     Job update(Job job);
+
 }

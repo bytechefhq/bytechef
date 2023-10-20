@@ -293,6 +293,12 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
         return Collections.unmodifiableMap(metadata.getMap());
     }
 
+    public Object getMetadata(String key) {
+        Map<String, ?> map = metadata.getMap();
+
+        return map.get(key);
+    }
+
     /**
      * Get the key-value map of outputs returned by the job.
      *

@@ -72,7 +72,7 @@ public class JobApiController implements JobApi {
     @SuppressWarnings("rawtypes")
     public ResponseEntity<Page> getJobs(Integer pageNumber) {
         return ResponseEntity.ok(
-            jobService.getJobs(pageNumber)
+            jobService.getJobsPage(pageNumber)
                 .map(job -> conversionService.convert(job, JobBasicModel.class)));
     }
 
