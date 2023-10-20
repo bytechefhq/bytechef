@@ -39,7 +39,7 @@ public class ObjectHelperParseActionTest {
     private static final Context context = Mockito.mock(Context.class);
 
     @Test
-    public void testExecuteParse() {
+    public void testPerformParse() {
         try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class);
             MockedStatic<JsonUtils> jsonUtilsMockedStatic = Mockito.mockStatic(JsonUtils.class)) {
 

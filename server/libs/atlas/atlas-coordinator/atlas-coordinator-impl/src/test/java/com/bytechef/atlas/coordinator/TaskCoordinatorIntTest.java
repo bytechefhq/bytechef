@@ -101,14 +101,14 @@ public class TaskCoordinatorIntTest {
     private WorkflowService workflowService;
 
     @Test
-    public void testExecuteWorkflowJson() {
+    public void testPerformWorkflowJson() {
         Job completedJob = executeWorkflow("aGVsbG8x");
 
         Assertions.assertEquals(Job.Status.COMPLETED, completedJob.getStatus());
     }
 
     @Test
-    public void testExecuteWorkflowYaml() {
+    public void testPerformWorkflowYaml() {
         Job completedJob = executeWorkflow("aGVsbG8y");
 
         Assertions.assertEquals(Job.Status.COMPLETED, completedJob.getStatus());

@@ -38,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class FilesystemReadFileActionTest {
 
     @Test
-    public void testExecuteReadFile() {
+    public void testPerformReadFile() {
         Context context = Mockito.mock(Context.class);
         File file = getSampleFile();
 

@@ -27,13 +27,13 @@ public class ScheduledTriggerExecutorTest {
 
     @Disabled
     @Test
-    public void testExecuteTriggerDynamicWebhookRefresh() {
+    public void testPerformTriggerDynamicWebhookRefresh() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteTriggerPoll() {
+    public void testPerformTriggerPoll() {
         // TODO
     }
 }

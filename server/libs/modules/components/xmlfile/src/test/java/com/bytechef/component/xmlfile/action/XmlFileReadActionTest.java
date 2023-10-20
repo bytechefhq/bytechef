@@ -57,7 +57,7 @@ public class XmlFileReadActionTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testExecuteRead() throws IOException {
+    public void testPerformRead() throws IOException {
         File file = getFile(SAMPLE_XML);
 
         try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
@@ -86,7 +86,7 @@ public class XmlFileReadActionTest {
 
     @Test
     @SuppressFBWarnings("OBL")
-    public void testExecuteReadArray() throws FileNotFoundException {
+    public void testPerformReadArray() throws FileNotFoundException {
         File file = getFile(SAMPLE_ARRAY_XML);
 
         try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class)) {

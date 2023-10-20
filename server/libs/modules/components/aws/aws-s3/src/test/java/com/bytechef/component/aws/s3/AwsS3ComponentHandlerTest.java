@@ -33,31 +33,31 @@ public class AwsS3ComponentHandlerTest {
 
     @Disabled
     @Test
-    public void testExecuteGetObject() {
+    public void testPerformGetObject() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteGGetUrl() {
+    public void testPerformGGetUrl() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteListObjects() {
+    public void testPerformListObjects() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteGetPresignedObject() {
+    public void testPerformGetPresignedObject() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteGPutObject() {
+    public void testPerformGPutObject() {
         // TODO
     }
 }

@@ -37,7 +37,7 @@ public class FileStorageReadActionTest {
     private static final Context context = Mockito.mock(Context.class);
 
     @Test
-    public void testExecuteRead() {
+    public void testPerformRead() {
         try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
             Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
 

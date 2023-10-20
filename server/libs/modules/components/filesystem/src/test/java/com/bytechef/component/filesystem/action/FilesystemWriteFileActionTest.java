@@ -41,7 +41,7 @@ public class FilesystemWriteFileActionTest {
 
     @Test
     @SuppressFBWarnings("OBL")
-    public void testExecuteWriteFile() throws IOException {
+    public void testPerformWriteFile() throws IOException {
         Context context = Mockito.mock(Context.class);
         File file = getSampleFile();
 

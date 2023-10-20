@@ -52,7 +52,7 @@ public class XmlFileWriteActionTest {
     }
 
     @Test
-    public void testExecuteWrite() {
+    public void testPerformWrite() {
         Map<String, Object> source = Map.of(
             "Flower",
             new LinkedHashMap<>() {
@@ -120,7 +120,7 @@ public class XmlFileWriteActionTest {
     }
 
     @Test
-    public void testExecuteWriteArray() {
+    public void testPerformWriteArray() {
         List<Map<String, Object>> source = List.of(
             new LinkedHashMap<>() {
                 {

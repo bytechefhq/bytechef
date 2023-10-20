@@ -51,12 +51,12 @@ public class XlsxFileReadActionTest {
     private static final Context context = Mockito.mock(Context.class);
 
     @Test
-    public void testExecuteReadXLS() throws IOException, JSONException {
+    public void testPerformReadXLS() throws IOException, JSONException {
         readFile("xls");
     }
 
     @Test
-    public void testExecuteReadXLSX() throws IOException, JSONException {
+    public void testPerformReadXLSX() throws IOException, JSONException {
         readFile("xlsx");
     }
 

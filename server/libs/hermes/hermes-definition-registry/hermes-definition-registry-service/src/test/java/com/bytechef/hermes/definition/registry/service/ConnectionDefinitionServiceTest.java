@@ -33,13 +33,13 @@ public class ConnectionDefinitionServiceTest {
 
     @Disabled
     @Test
-    public void testExecuteAuthorizationApply() {
+    public void testPerformAuthorizationApply() {
 // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteAuthorizationCallback() {
+    public void testPerformAuthorizationCallback() {
 // TODO
     }
 

@@ -50,7 +50,7 @@ public class CsvFileWriteActionTest {
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
-    public void testExecuteWriteCSV() throws IOException {
+    public void testPerformWriteCSV() throws IOException {
         try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
             String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
 

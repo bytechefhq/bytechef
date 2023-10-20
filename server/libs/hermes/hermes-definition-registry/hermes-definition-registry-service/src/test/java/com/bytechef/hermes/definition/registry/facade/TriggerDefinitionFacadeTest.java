@@ -27,31 +27,31 @@ public class TriggerDefinitionFacadeTest {
 
     @Disabled
     @Test
-    public void testExecuteDynamicWebhookDisable() {
+    public void testPerformDynamicWebhookDisable() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteDynamicWebhookEnable() {
+    public void testPerformDynamicWebhookEnable() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteDynamicWebhookRefresh() {
+    public void testPerformDynamicWebhookRefresh() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteListenerDisable() {
+    public void testPerformListenerDisable() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteListenerEnable() {
+    public void testPerformListenerEnable() {
         // TODO
     }
 }

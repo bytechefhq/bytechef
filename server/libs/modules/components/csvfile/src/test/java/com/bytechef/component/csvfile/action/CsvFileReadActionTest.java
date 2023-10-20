@@ -51,7 +51,7 @@ public class CsvFileReadActionTest {
     private static final Context context = Mockito.mock(Context.class);
 
     @Test
-    public void testExecuteReadCSV() throws Exception {
+    public void testPerformReadCSV() throws Exception {
         // headerRow: true, includeEmptyCells: false, readAsString: false
 
         try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {

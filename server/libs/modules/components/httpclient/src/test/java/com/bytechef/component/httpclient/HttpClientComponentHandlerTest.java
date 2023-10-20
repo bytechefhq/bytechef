@@ -33,37 +33,37 @@ public class HttpClientComponentHandlerTest {
 
     @Disabled
     @Test
-    public void testExecuteDelete() {
+    public void testPerformDelete() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteGet() {
+    public void testPerformGet() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteHead() {
+    public void testPerformHead() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecutePatch() {
+    public void testPerformPatch() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecutePost() {
+    public void testPerformPost() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecutePut() {
+    public void testPerformPut() {
         // TODO
     }
 }

@@ -27,13 +27,13 @@ public class TriggerLifecycleExecutorTest {
 
     @Disabled
     @Test
-    public void testExecuteTriggerDisable() {
+    public void testPerformTriggerDisable() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testExecuteTriggerEnable() {
+    public void testPerformTriggerEnable() {
         // TODO
     }
 }

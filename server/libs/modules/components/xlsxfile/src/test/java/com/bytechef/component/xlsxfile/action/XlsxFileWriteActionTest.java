@@ -52,7 +52,7 @@ public class XlsxFileWriteActionTest {
     private static final Context context = Mockito.mock(Context.class);
 
     @Test
-    public void testExecuteWriteXLSX() throws IOException, JSONException {
+    public void testPerformWriteXLSX() throws IOException, JSONException {
         String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
 
         try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
