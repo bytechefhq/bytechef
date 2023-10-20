@@ -33,7 +33,7 @@ public class WorkflowExecutionId implements Serializable {
     private final String triggerName;
     private final String workflowId;
 
-    private WorkflowExecutionId(long instanceId, String instanceType, String triggerName, String workflowId) {
+    private WorkflowExecutionId(String workflowId, long instanceId, String instanceType, String triggerName) {
         this.instanceId = instanceId;
         this.instanceType = instanceType;
         this.triggerName = triggerName;
@@ -45,7 +45,7 @@ public class WorkflowExecutionId implements Serializable {
         Assert.notNull(instanceType, "'instanceType' must not be null");
         Assert.hasText(triggerName, "'triggerName' must not be null");
 
-        return new WorkflowExecutionId(instanceId, instanceType, triggerName, workflowId);
+        return new WorkflowExecutionId(workflowId, instanceId, instanceType, triggerName);
     }
 
     public static WorkflowExecutionId parse(String id) {
