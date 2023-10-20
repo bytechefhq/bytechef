@@ -33,7 +33,6 @@ import reactor.core.publisher.Mono;
  * @author Ivica Cardic
  */
 @RestController
-
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
 public class TaskDispatcherDefinitionController implements TaskDispatcherDefinitionsApi {
 
