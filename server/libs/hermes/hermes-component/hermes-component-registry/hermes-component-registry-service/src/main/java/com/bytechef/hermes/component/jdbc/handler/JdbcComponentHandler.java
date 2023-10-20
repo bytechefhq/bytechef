@@ -33,6 +33,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.time;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.ComponentHandler;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
@@ -85,27 +86,31 @@ public class JdbcComponentHandler implements ComponentHandler {
         return componentDefinition;
     }
 
-    protected Map<String, Integer> performDelete(Map<String, ?> inputParameters, Map<String, ?> connectionParameters) {
+    protected Map<String, Integer> performDelete(
+        Map<String, ?> inputParameters, Map<String, ?> connectionParameters, ActionContext context) {
         return deleteJdbcOperation.execute(inputParameters, connectionParameters);
     }
 
-    protected Map<String, Integer> performExecute(Map<String, ?> inputParameters, Map<String, ?> connectionParameters) {
+    protected Map<String, Integer> performExecute(
+        Map<String, ?> inputParameters, Map<String, ?> connectionParameters, ActionContext context) {
         return executeJdbcOperation.execute(inputParameters, connectionParameters);
     }
 
     protected Map<String, Integer> performInsert(
-        Map<String, ?> inputParameters, Map<String, ?> connectionParameters) {
+        Map<String, ?> inputParameters, Map<String, ?> connectionParameters, ActionContext context) {
 
         return insertJdbcOperation.execute(inputParameters, connectionParameters);
     }
 
     protected List<Map<String, Object>> performQuery(
-        Map<String, ?> inputParameters, Map<String, ?> connectionParameters) {
+        Map<String, ?> inputParameters, Map<String, ?> connectionParameters, ActionContext context) {
 
         return queryJdbcOperation.execute(inputParameters, connectionParameters);
     }
 
-    protected Map<String, Integer> performUpdate(Map<String, ?> inputParameters, Map<String, ?> connectionParameters) {
+    protected Map<String, Integer> performUpdate(
+        Map<String, ?> inputParameters, Map<String, ?> connectionParameters, ActionContext context) {
+
         return updateJdbcOperation.execute(inputParameters, connectionParameters);
     }
 
@@ -152,8 +157,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                                 "The list of properties which should be used as query parameters.")
                             .additionalProperties(bool(), dateTime(), number(), string()))
                     .outputSchema(getOutputSchemaFunction())
-                    .perform((inputParameters, connectionParameters, context) -> performQuery(
-                        inputParameters, connectionParameters)),
+                    .perform(this::performQuery),
                 action(JdbcConstants.INSERT)
                     .title("Insert")
                     .description("Insert rows in database.")
@@ -179,8 +183,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                                 array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
                                 string(), time())))
                     .outputSchema(object().properties(integer("rows")))
-                    .perform((inputParameters, connectionParameters, context) -> performInsert(
-                        inputParameters, connectionParameters)),
+                    .perform(this::performInsert),
                 action(JdbcConstants.UPDATE)
                     .title("Update")
                     .description("Update rows in database.")
@@ -211,8 +214,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                                 array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
                                 string(), time())))
                     .outputSchema(object().properties(integer("rows")))
-                    .perform((inputParameters, connectionParameters, context) -> performInsert(
-                        inputParameters, connectionParameters)),
+                    .perform(this::performUpdate),
                 action(JdbcConstants.DELETE)
                     .title("Delete")
                     .description("Delete rows from database.")
@@ -238,8 +240,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                                 array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
                                 string(), time())))
                     .outputSchema(object().properties(integer("rows")))
-                    .perform((inputParameters, connectionParameters, context) -> performInsert(
-                        inputParameters, connectionParameters)),
+                    .perform(this::performDelete),
                 action(JdbcConstants.EXECUTE)
                     .title("Execute")
                     .description("Execute an SQL DML or DML statement.")
@@ -262,7 +263,6 @@ public class JdbcComponentHandler implements ComponentHandler {
                             .description("The list of properties which should be used as parameters.")
                             .additionalProperties(bool(), dateTime(), number(), string()))
                     .outputSchema(object().properties(integer("rows")))
-                    .perform((inputParameters, connectionParameters, context) -> performInsert(
-                        inputParameters, connectionParameters)));
+                    .perform(this::performExecute));
     }
 }
