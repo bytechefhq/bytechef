@@ -1,5 +1,5 @@
 import {
-    FolderPlusIcon,
+    FolderIcon,
     LinkIcon,
     QueueListIcon,
     RectangleStackIcon,
@@ -27,7 +27,7 @@ const navigation: {
     {
         name: 'Projects',
         href: '/automation/projects',
-        icon: FolderPlusIcon,
+        icon: FolderIcon,
     },
     {
         name: 'Project Instances',
