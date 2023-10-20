@@ -28,7 +28,6 @@ import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.facade.IntegrationFacade;
 import com.bytechef.hermes.integration.service.CategoryService;
 import com.bytechef.hermes.integration.service.IntegrationService;
-import com.bytechef.hermes.integration.web.rest.config.IntegrationRestTestConfiguration;
 import com.bytechef.hermes.integration.web.rest.model.CategoryModel;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
 import com.bytechef.hermes.integration.web.rest.model.PostIntegrationWorkflowRequestModel;
@@ -40,8 +39,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -52,7 +53,7 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-@ContextConfiguration(classes = IntegrationRestTestConfiguration.class)
+@ContextConfiguration
 @WebFluxTest(value = IntegrationController.class)
 public class IntegrationControllerIntTest {
 
@@ -93,7 +94,7 @@ public class IntegrationControllerIntTest {
         try {
             Integration integration = getIntegration();
 
-            when(integrationService.getIntegration(anyLong())).thenReturn(integration);
+            when(integrationService.getIntegration(1L)).thenReturn(integration);
 
             this.webTestClient
                 .get()
@@ -144,6 +145,57 @@ public class IntegrationControllerIntTest {
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
+    }
+
+    @Test
+    public void testGetIntegrations() {
+        Integration integration = getIntegration();
+
+        when(integrationService.getIntegrations(null, null)).thenReturn(List.of(integration));
+
+        this.webTestClient
+            .get()
+            .uri("/integrations")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBodyList(IntegrationModel.class)
+            .hasSize(1);
+
+        when(integrationService.getIntegrations(1L, null)).thenReturn(List.of(integration));
+
+        this.webTestClient
+            .get()
+            .uri("/integrations?categoryId=1")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBodyList(IntegrationModel.class)
+            .hasSize(1);
+
+        when(integrationService.getIntegrations(null, 1L)).thenReturn(List.of(integration));
+
+        this.webTestClient
+            .get()
+            .uri("/integrations?tagId=1")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBodyList(IntegrationModel.class)
+            .hasSize(1);
+
+        when(integrationService.getIntegrations(1L, 1L)).thenThrow(new RuntimeException());
+
+        this.webTestClient
+            .get()
+            .uri("/integrations?categoryId=1&tagId=1")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .is5xxServerError();
     }
 
     @Test
@@ -325,6 +377,14 @@ public class IntegrationControllerIntTest {
         Tag capturedTag = tagIterator.next();
 
         Assertions.assertEquals("tag1", capturedTag.getName());
+    }
+
+    @ComponentScan(basePackages = {
+        "com.bytechef.hermes.integration.web.rest",
+        "com.bytechef.atlas.web.rest.mapper"
+    })
+    @SpringBootConfiguration
+    public static class IntegrationRestTestConfiguration {
     }
 
     private static Integration getIntegration() {
