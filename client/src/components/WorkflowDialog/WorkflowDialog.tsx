@@ -6,18 +6,21 @@ import Button from 'components/Button/Button';
 import {UseMutationResult} from '@tanstack/react-query';
 import TextArea from 'components/TextArea/TextArea';
 import {Close} from '@radix-ui/react-dialog';
+import {PlusIcon} from '@heroicons/react/24/outline';
 
-interface WorkflowDialogProps {
+type WorkflowDialogProps = {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     createWorkflowRequestMutation: UseMutationResult<any, object, any, unknown>;
     id: string | number;
     visible?: boolean;
-}
+    onClose?: () => void;
+};
 
 const WorkflowDialog = ({
     createWorkflowRequestMutation,
     id,
     visible = false,
+    onClose,
 }: WorkflowDialogProps) => {
     const [isOpen, setIsOpen] = useState(visible);
 
@@ -26,6 +29,7 @@ const WorkflowDialog = ({
         getValues,
         handleSubmit,
         register,
+        reset,
     } = useForm({
         defaultValues: {
             name: '',
@@ -35,6 +39,16 @@ const WorkflowDialog = ({
 
     const {mutate, isLoading} = createWorkflowRequestMutation;
 
+    function closeDialog() {
+        setIsOpen(false);
+
+        if (onClose) {
+            onClose();
+        }
+
+        reset();
+    }
+
     function createWorkflow() {
         const formData = getValues();
 
@@ -43,14 +57,28 @@ const WorkflowDialog = ({
             id,
         });
 
-        setIsOpen(false);
+        closeDialog();
     }
 
     return (
         <Dialog
+            description="Use this to create a workflow. Creating a workflow will redirect you to the page where you can edit it."
             isOpen={isOpen}
-            onOpenChange={setIsOpen}
+            onOpenChange={(isOpen) => {
+                if (isOpen) {
+                    setIsOpen(isOpen);
+                } else {
+                    closeDialog();
+                }
+            }}
             title="Create Workflow"
+            customTrigger={
+                <Button
+                    displayType="light"
+                    icon={<PlusIcon className="h-5 w-5" />}
+                    size="small"
+                />
+            }
         >
             <Input
                 error={touchedFields.name && !!errors.name}

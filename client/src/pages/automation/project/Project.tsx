@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
 import Button from 'components/Button/Button';
-import {PlusIcon} from '@radix-ui/react-icons';
 import LeftSidebar from './components/LeftSidebar';
 import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
 import ToggleGroup, {
@@ -44,7 +43,6 @@ const Project: React.FC = () => {
     const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowModel>({});
     const [view, setView] = useState('designer');
     const [filter, setFilter] = useState('');
-    const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
     const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
 
@@ -92,8 +90,6 @@ const Project: React.FC = () => {
                     setCurrentWorkflow(createdWorkflow);
                 }
             }
-
-            setShowWorkflowDialog(false);
         },
     });
 
@@ -160,24 +156,16 @@ const Project: React.FC = () => {
                             )}
 
                             <div className="flex border-l border-gray-100 align-middle">
-                                <Button
-                                    displayType="light"
-                                    icon={<PlusIcon className="h-5 w-5" />}
-                                    size="small"
-                                    onClick={() => setShowWorkflowDialog(true)}
-                                />
+                                {!!projectId && (
+                                    <WorkflowDialog
+                                        createWorkflowRequestMutation={
+                                            createWorkflowMutation
+                                        }
+                                        id={projectId}
+                                    />
+                                )}
                             </div>
                         </div>
-
-                        {showWorkflowDialog && !!projectId && (
-                            <WorkflowDialog
-                                createWorkflowRequestMutation={
-                                    createWorkflowMutation
-                                }
-                                id={projectId}
-                                visible
-                            />
-                        )}
 
                         <div>
                             <ToggleGroup

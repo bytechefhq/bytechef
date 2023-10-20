@@ -11,19 +11,21 @@ import {
 } from '@radix-ui/react-dialog';
 import {Cross1Icon} from '@radix-ui/react-icons';
 import Button from '../Button/Button';
-import {Dispatch, Fragment, SetStateAction} from 'react';
+import {Dispatch, Fragment, ReactNode, SetStateAction} from 'react';
 
-interface DialogProps {
-    children: React.ReactNode;
-    description?: string;
+type DialogProps = {
+    children: ReactNode;
     isOpen: boolean;
     title: string;
-    triggerLabel?: string;
     onOpenChange: Dispatch<SetStateAction<boolean>>;
-}
+    customTrigger?: ReactNode;
+    description?: string;
+    triggerLabel?: string;
+};
 
 const Dialog = ({
     children,
+    customTrigger,
     description,
     isOpen,
     onOpenChange,
@@ -31,7 +33,9 @@ const Dialog = ({
     triggerLabel,
 }: DialogProps): JSX.Element => (
     <Root open={isOpen} onOpenChange={onOpenChange}>
-        {triggerLabel && (
+        {customTrigger && <Trigger asChild>{customTrigger}</Trigger>}
+
+        {!customTrigger && !!triggerLabel && (
             <Trigger asChild>
                 <Button label={triggerLabel} />
             </Trigger>
