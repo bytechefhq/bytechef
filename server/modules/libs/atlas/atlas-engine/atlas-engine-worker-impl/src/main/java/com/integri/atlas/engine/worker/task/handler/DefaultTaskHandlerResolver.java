@@ -16,29 +16,32 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.worker.task;
+package com.integri.atlas.engine.worker.task.handler;
 
 import com.integri.atlas.engine.core.task.Task;
-import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolver;
-import com.integri.atlas.engine.worker.task.map.MapTaskHandlerAdapter;
+import java.util.HashMap;
 import java.util.Map;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Arik Cohen
- * @since Feb, 21 2020
  */
-public class TaskDispatcherAdapterTaskHandlerResolver implements TaskHandlerResolver {
+@Component
+@Order(Ordered.LOWEST_PRECEDENCE)
+public class DefaultTaskHandlerResolver implements TaskHandlerResolver {
 
-    private final Map<String, TaskHandler<?>> taskHandlers;
+    private Map<String, TaskHandler<?>> taskHandlers = new HashMap<String, TaskHandler<?>>();
 
-    public TaskDispatcherAdapterTaskHandlerResolver(TaskHandlerResolver aResolver, TaskEvaluator aTaskEvaluator) {
-        taskHandlers = Map.of("map", new MapTaskHandlerAdapter(aResolver, aTaskEvaluator));
+    public DefaultTaskHandlerResolver(Map<String, TaskHandler<?>> aTaskHandlers) {
+        taskHandlers = aTaskHandlers;
     }
 
     @Override
-    public TaskHandler<?> resolve(Task aTask) {
-        return taskHandlers.get(aTask.getType());
+    public TaskHandler<?> resolve(Task aJobTask) {
+        return taskHandlers.get(aJobTask.getType());
     }
 }
