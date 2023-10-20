@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 
 import Input from 'components/Input/Input';
 import Modal from 'components/Modal/Modal';
@@ -18,26 +18,25 @@ import {
     TagModel,
 } from '../../middleware/integration';
 import {
-    useIntegrationMutation,
-    useIntegrationPutMutation,
+    useCreateIntegrationMutation,
+    useUpdateIntegrationMutation,
 } from '../../mutations/integrations.mutations';
+import {Close} from '@radix-ui/react-dialog';
 
 interface IntegrationModalProps {
-    id?: number;
-    integrationItem: IntegrationModel | undefined;
+    integration: IntegrationModel | undefined;
+    showTrigger?: boolean;
     visible?: boolean;
+    onClose?: () => void;
 }
 
 const IntegrationModal = ({
-    id,
-    integrationItem,
+    integration,
+    showTrigger = true,
     visible = false,
+    onClose,
 }: IntegrationModalProps) => {
     const [isOpen, setIsOpen] = useState(visible);
-
-    useEffect(() => {
-        setIsOpen(visible);
-    }, [visible]);
 
     const {
         control,
@@ -47,21 +46,22 @@ const IntegrationModal = ({
         register,
         reset,
         setValue,
-    } = useForm({
+    } = useForm<IntegrationModel>({
         defaultValues: {
-            name: integrationItem?.name || '',
-            description: integrationItem?.description || '',
-            category:
-                {
-                    label: integrationItem?.category?.name,
-                    ...integrationItem?.category,
-                } || undefined,
+            category: integration?.category
+                ? {
+                      label: integration?.category?.name,
+                      ...integration?.category,
+                  }
+                : undefined,
+            description: integration?.description || '',
+            name: integration?.name || '',
             tags:
-                integrationItem?.tags?.map((tag) => ({
+                integration?.tags?.map((tag) => ({
                     ...tag,
                     label: tag.name,
                 })) || [],
-        },
+        } as IntegrationModel,
     });
 
     const {
@@ -78,11 +78,11 @@ const IntegrationModal = ({
 
     const queryClient = useQueryClient();
 
-    const tagNames = integrationItem?.tags?.map((tag) => tag.name);
+    const tagNames = integration?.tags?.map((tag) => tag.name);
 
     const remainingTags = tags?.filter((tag) => !tagNames?.includes(tag.name));
 
-    const mutation = useIntegrationMutation({
+    const createMutation = useCreateIntegrationMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(
                 IntegrationKeys.integrationCategories
@@ -90,13 +90,11 @@ const IntegrationModal = ({
             queryClient.invalidateQueries(IntegrationKeys.integrations);
             queryClient.invalidateQueries(IntegrationKeys.integrationTags);
 
-            setIsOpen(false);
-
-            reset();
+            closeModal();
         },
     });
 
-    const putMutation = useIntegrationPutMutation({
+    const updateMutation = useUpdateIntegrationMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(
                 IntegrationKeys.integrationCategories
@@ -106,11 +104,18 @@ const IntegrationModal = ({
 
             queryClient.invalidateQueries(IntegrationKeys.integrationTags);
 
-            setIsOpen(false);
-
-            reset();
+            closeModal();
         },
     });
+
+    function closeModal() {
+        reset();
+        setIsOpen(false);
+
+        if (onClose) {
+            onClose();
+        }
+    }
 
     function createIntegration() {
         const formData = getValues();
@@ -119,30 +124,44 @@ const IntegrationModal = ({
             return {id: tag.id, name: tag.name, version: tag.version};
         });
 
-        if (!id) {
-            putMutation.mutate({
-                ...integrationItem,
+        const category = formData?.category?.name
+            ? formData?.category
+            : undefined;
+
+        if (integration?.id) {
+            updateMutation.mutate({
+                ...integration,
                 ...formData,
-                createdDate: integrationItem?.createdDate,
+                category,
             } as IntegrationModel);
         } else {
-            mutation.mutate({...formData, tags: tagValues} as IntegrationModel);
+            createMutation.mutate({
+                ...formData,
+                category,
+                tags: tagValues,
+            } as IntegrationModel);
         }
     }
 
     return (
         <Modal
-            confirmButtonLabel={id ? 'Edit' : 'Create'}
             description={`Use this to ${
-                id ? 'edit' : 'create'
+                integration?.id ? 'edit' : 'create'
             } your integration which will contain related workflows`}
-            form
             isOpen={isOpen}
-            onCloseClick={reset}
-            onConfirmButtonClick={handleSubmit(createIntegration)}
-            setIsOpen={setIsOpen}
-            title={`${id ? 'Edit' : 'Create'} Integration`}
-            triggerLabel={`${id ? 'Edit' : 'Create'} Integration`}
+            setIsOpen={(isOpen) => {
+                if (isOpen) {
+                    setIsOpen(isOpen);
+                } else {
+                    closeModal();
+                }
+            }}
+            title={`${integration?.id ? 'Edit' : 'Create'} Integration`}
+            triggerLabel={
+                showTrigger
+                    ? `${integration?.id ? 'Edit' : 'Create'} Integration`
+                    : undefined
+            }
         >
             {categoriesError &&
                 !categoriesIsLoading &&
@@ -174,7 +193,6 @@ const IntegrationModal = ({
                             field={field}
                             isMulti={false}
                             label="Category"
-                            name="category"
                             options={categories!.map(
                                 (category: CategoryModel) => ({
                                     label: `${category.name
@@ -197,9 +215,6 @@ const IntegrationModal = ({
                                     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
                                 } as any);
                             }}
-                            value={field.value}
-                            onBlur={field.onBlur}
-                            onChange={field.onChange}
                         />
                     )}
                 />
@@ -235,31 +250,24 @@ const IntegrationModal = ({
                                     },
                                 ] as never[]);
                             }}
-                            name={field.name}
-                            value={field.value}
-                            onBlur={field.onBlur}
-                            onChange={field.onChange}
                         />
                     )}
                 />
             )}
 
             <div className="mt-4 flex justify-end space-x-1">
-                <Button
-                    displayType="lightBorder"
-                    label="Cancel"
-                    type="button"
-                    onClick={() => {
-                        setIsOpen(false);
-
-                        reset();
-                    }}
-                />
+                <Close asChild={true}>
+                    <Button
+                        displayType="lightBorder"
+                        label="Cancel"
+                        type="button"
+                    />
+                </Close>
 
                 <Button
-                    label={(id && 'Edit') || 'Create'}
-                    onClick={handleSubmit(createIntegration)}
+                    label="Save"
                     type="submit"
+                    onClick={handleSubmit(createIntegration)}
                 />
             </div>
         </Modal>

@@ -57,7 +57,7 @@ const Integrations = () => {
             header={
                 <PageHeader
                     position="main"
-                    right={<IntegrationModal integrationItem={undefined} />}
+                    right={<IntegrationModal integration={undefined} />}
                     title={title}
                 />
             }
