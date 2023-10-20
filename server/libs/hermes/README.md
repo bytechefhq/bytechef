@@ -1,2 +1,2 @@
 # ByteChef Hermes
-The set of modules containing additional logic e.g. connection, users, file storage, encryption etc.
+Set of modules which define core infrastructure required by the API integration & workflow automation e.g. connections, triggers, scheduler etc.
