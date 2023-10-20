@@ -18,7 +18,10 @@
 
 package com.integri.atlas.engine.coordinator.messagebroker;
 
+/**
+ * @author Arik Cohen
+ */
 public interface Exchanges {
-    static final String TASKS = "atlas.tasks";
-    static final String CONTROL = "atlas.control";
+    String TASKS = "atlas.tasks";
+    String CONTROL = "atlas.control";
 }

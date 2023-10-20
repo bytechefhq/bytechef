@@ -20,6 +20,9 @@ package com.integri.atlas.engine.core.uuid;
 
 import java.util.UUID;
 
+/**
+ * @author Arik Cohen
+ */
 public final class UUIDGenerator {
 
     private UUIDGenerator() {}

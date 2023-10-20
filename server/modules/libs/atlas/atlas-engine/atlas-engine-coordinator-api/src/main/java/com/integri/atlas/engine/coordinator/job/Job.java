@@ -18,10 +18,10 @@
 
 package com.integri.atlas.engine.coordinator.job;
 
+import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import com.integri.atlas.engine.core.Accessor;
 import com.integri.atlas.engine.core.error.Errorable;
 import com.integri.atlas.engine.core.error.Prioritizable;
-import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import java.util.Date;
 import java.util.List;

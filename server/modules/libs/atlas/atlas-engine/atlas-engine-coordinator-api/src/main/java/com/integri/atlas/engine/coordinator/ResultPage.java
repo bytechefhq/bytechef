@@ -19,10 +19,12 @@
 package com.integri.atlas.engine.coordinator;
 
 import com.integri.atlas.engine.core.MapObject;
-
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @author Arik Cohen
+ */
 public class ResultPage<T> extends MapObject implements Page<T> {
 
     private final Class<T> elementType;

@@ -18,12 +18,11 @@
 
 package com.integri.atlas.engine.worker.task;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.integri.atlas.engine.core.task.Task;
 import com.integri.atlas.engine.worker.task.TaskHandler;
 import com.integri.atlas.engine.worker.task.TaskHandlerResolver;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;

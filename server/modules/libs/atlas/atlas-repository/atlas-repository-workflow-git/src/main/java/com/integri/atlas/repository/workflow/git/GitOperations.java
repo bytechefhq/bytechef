@@ -21,6 +21,9 @@ package com.integri.atlas.repository.workflow.git;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowResource;
 import java.util.List;
 
+/**
+ * @author Arik Cohen
+ */
 public interface GitOperations {
     List<WorkflowResource> getHeadFiles();
 

@@ -19,9 +19,11 @@
 package com.integri.atlas.engine.core.task.repository;
 
 import com.integri.atlas.engine.core.task.TaskExecution;
-
 import java.util.List;
 
+/**
+ * @author Arik Cohen
+ */
 public interface TaskExecutionRepository {
     /**
      * Find a single {@link TaskExecution} instance by its id.

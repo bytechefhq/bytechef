@@ -19,12 +19,14 @@
 package com.integri.atlas.messagebroker.jms;
 
 import com.integri.atlas.engine.core.error.Retryable;
-import java.util.concurrent.TimeUnit;
-
 import com.integri.atlas.engine.core.messagebroker.MessageBroker;
+import java.util.concurrent.TimeUnit;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.util.Assert;
 
+/**
+ * @author Arik Cohen
+ */
 public class JmsMessageBroker implements MessageBroker {
 
     private JmsTemplate jmsTemplate;

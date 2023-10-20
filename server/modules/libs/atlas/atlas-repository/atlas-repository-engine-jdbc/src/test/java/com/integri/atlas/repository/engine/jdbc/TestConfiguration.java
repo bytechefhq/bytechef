@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 <your company/name>.
+ * Copyright 2016-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
 
 package com.integri.atlas.repository.engine.jdbc;
@@ -66,25 +68,31 @@ public class TestConfiguration {
             ObjectMapper aObjectMapper
         ) {
             MysqlJdbcTaskExecutionRepository jdbcJobTaskRepository = new MysqlJdbcTaskExecutionRepository();
+
             jdbcJobTaskRepository.setJdbcOperations(aJdbcTemplate);
             jdbcJobTaskRepository.setObjectMapper(aObjectMapper);
+
             return jdbcJobTaskRepository;
         }
 
         @Bean
         JobRepository jdbcJobRepository(NamedParameterJdbcTemplate aJdbcTemplate, ObjectMapper aObjectMapper) {
             MysqlJdbcJobRepository jdbcJobRepository = new MysqlJdbcJobRepository();
+
             jdbcJobRepository.setJdbcOperations(aJdbcTemplate);
             jdbcJobRepository.setJobTaskRepository(jdbcJobTaskRepository(aJdbcTemplate, aObjectMapper));
+
             return jdbcJobRepository;
         }
 
         @Bean
         ContextRepository jdbcContextRepository(JdbcTemplate aJdbcTemplate, ObjectMapper aObjectMapper) {
-            MysqlJdbcContextRepository repo = new MysqlJdbcContextRepository();
-            repo.setJdbcTemplate(aJdbcTemplate);
-            repo.setObjectMapper(aObjectMapper);
-            return repo;
+            MysqlJdbcContextRepository jdbcContextRepository = new MysqlJdbcContextRepository();
+
+            jdbcContextRepository.setJdbcTemplate(aJdbcTemplate);
+            jdbcContextRepository.setObjectMapper(aObjectMapper);
+
+            return jdbcContextRepository;
         }
     }
 
@@ -93,26 +101,35 @@ public class TestConfiguration {
     public static class PostgresJdbcPersistenceConfiguration {
 
         @Bean
-        TaskExecutionRepository jdbcJobTaskRepository(NamedParameterJdbcTemplate aJdbcTemplate, ObjectMapper aObjectMapper) {
+        TaskExecutionRepository jdbcJobTaskRepository(
+            NamedParameterJdbcTemplate aJdbcTemplate,
+            ObjectMapper aObjectMapper
+        ) {
             PostgresJdbcTaskExecutionRepository jdbcJobTaskRepository = new PostgresJdbcTaskExecutionRepository();
+
             jdbcJobTaskRepository.setJdbcOperations(aJdbcTemplate);
             jdbcJobTaskRepository.setObjectMapper(aObjectMapper);
+
             return jdbcJobTaskRepository;
         }
 
         @Bean
         JobRepository jdbcJobRepository(NamedParameterJdbcTemplate aJdbcTemplate, ObjectMapper aObjectMapper) {
             PostgresJdbcJobRepository jdbcJobRepository = new PostgresJdbcJobRepository();
+
             jdbcJobRepository.setJdbcOperations(aJdbcTemplate);
             jdbcJobRepository.setJobTaskRepository(jdbcJobTaskRepository(aJdbcTemplate, aObjectMapper));
+
             return jdbcJobRepository;
         }
 
         @Bean
         ContextRepository jdbcContextRepository(JdbcTemplate aJdbcTemplate, ObjectMapper aObjectMapper) {
             PostgresJdbcContextRepository repo = new PostgresJdbcContextRepository();
+
             repo.setJdbcTemplate(aJdbcTemplate);
             repo.setObjectMapper(aObjectMapper);
+
             return repo;
         }
     }

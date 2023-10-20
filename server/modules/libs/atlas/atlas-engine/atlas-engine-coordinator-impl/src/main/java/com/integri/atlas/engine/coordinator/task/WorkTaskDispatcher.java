@@ -20,14 +20,16 @@ package com.integri.atlas.engine.coordinator.task;
 
 import com.integri.atlas.engine.core.messagebroker.MessageBroker;
 import com.integri.atlas.engine.core.messagebroker.Queues;
-import java.util.Objects;
-
 import com.integri.atlas.engine.core.task.Task;
 import com.integri.atlas.engine.core.task.TaskDispatcher;
 import com.integri.atlas.engine.core.task.TaskDispatcherResolver;
 import com.integri.atlas.engine.core.task.TaskExecution;
+import java.util.Objects;
 import org.springframework.util.Assert;
 
+/**
+ * @author Arik Cohen
+ */
 public class WorkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
     private final MessageBroker messageBroker;

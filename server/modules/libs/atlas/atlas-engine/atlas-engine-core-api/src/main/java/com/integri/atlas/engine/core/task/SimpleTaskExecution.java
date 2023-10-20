@@ -27,6 +27,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
+/**
+ * @author Arik Cohen
+ */
 public class SimpleTaskExecution extends SimpleWorkflowTask implements TaskExecution {
 
     public SimpleTaskExecution() {

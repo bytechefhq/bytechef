@@ -23,6 +23,9 @@ import com.integri.atlas.engine.core.MapObject;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Arik Cohen
+ */
 public class SimpleWorkflowTask extends MapObject implements WorkflowTask {
 
     public SimpleWorkflowTask(Task aSource) {

@@ -19,14 +19,16 @@
 package com.integri.atlas.messagebroker.kafka;
 
 import com.integri.atlas.engine.core.error.Retryable;
-import java.util.concurrent.TimeUnit;
-
 import com.integri.atlas.engine.core.messagebroker.MessageBroker;
+import java.util.concurrent.TimeUnit;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.Assert;
 
+/**
+ * @author Arik Cohen
+ */
 public class KafkaMessageBroker implements MessageBroker {
 
     private KafkaTemplate<Integer, Object> kafkaTemplate;

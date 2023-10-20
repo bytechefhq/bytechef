@@ -7,4 +7,3 @@ dependencies {
     implementation "org.springframework:spring-context"
     implementation "software.amazon.awssdk:s3"
 }
-

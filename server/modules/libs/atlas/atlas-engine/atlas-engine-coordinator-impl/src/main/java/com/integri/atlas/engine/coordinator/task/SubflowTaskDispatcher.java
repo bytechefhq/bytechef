@@ -25,7 +25,6 @@ import com.integri.atlas.engine.core.task.Task;
 import com.integri.atlas.engine.core.task.TaskDispatcher;
 import com.integri.atlas.engine.core.task.TaskDispatcherResolver;
 import com.integri.atlas.engine.core.task.TaskExecution;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

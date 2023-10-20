@@ -22,6 +22,7 @@ package com.integri.atlas.engine.core.error;
  * An interface which denotes an object (typically a {@link com.integri.atlas.engine.core.task.Task} able to
  * report its progress.
  *
+ * @author Arik Cohen
  * @since Sep 06, 2018
  */
 public interface Progressable {

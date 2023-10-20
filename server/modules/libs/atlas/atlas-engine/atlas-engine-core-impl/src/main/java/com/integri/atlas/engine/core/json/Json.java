@@ -21,6 +21,9 @@ package com.integri.atlas.engine.core.json;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 
+/**
+ * @author Arik Cohen
+ */
 public class Json {
 
     private static final ObjectMapper defaultObjectMapper = new ObjectMapper();

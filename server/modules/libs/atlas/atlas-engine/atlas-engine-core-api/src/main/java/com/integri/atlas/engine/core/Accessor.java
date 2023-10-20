@@ -23,6 +23,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Arik Cohen
+ */
 public interface Accessor {
     /**
      * Return the value associated with the given key.

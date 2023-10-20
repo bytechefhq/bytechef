@@ -20,10 +20,9 @@ package com.integri.atlas.engine.worker.task;
 
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.spel.SpelTaskEvaluator;
+import com.integri.atlas.engine.worker.task.map.MapTaskHandlerAdapter;
 import java.util.List;
 import java.util.Map;
-
-import com.integri.atlas.engine.worker.task.map.MapTaskHandlerAdapter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

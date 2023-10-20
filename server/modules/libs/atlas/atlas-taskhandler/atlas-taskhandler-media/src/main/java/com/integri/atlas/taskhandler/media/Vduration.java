@@ -27,6 +27,9 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Arik Cohen
+ */
 @Component("media/vduration")
 class Vduration implements TaskHandler<Double> {
 

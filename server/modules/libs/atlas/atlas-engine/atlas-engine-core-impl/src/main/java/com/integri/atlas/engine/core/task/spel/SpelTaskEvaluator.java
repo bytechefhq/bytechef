@@ -19,16 +19,15 @@
 package com.integri.atlas.engine.core.task.spel;
 
 import com.integri.atlas.engine.core.context.Context;
+import com.integri.atlas.engine.core.task.SimpleTaskExecution;
+import com.integri.atlas.engine.core.task.TaskEvaluator;
+import com.integri.atlas.engine.core.task.TaskExecution;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import com.integri.atlas.engine.core.task.SimpleTaskExecution;
-import com.integri.atlas.engine.core.task.TaskEvaluator;
-import com.integri.atlas.engine.core.task.TaskExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;

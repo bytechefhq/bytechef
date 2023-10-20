@@ -18,15 +18,18 @@
 
 package com.integri.atlas.engine.coordinator.error;
 
-import com.integri.atlas.engine.core.error.ErrorHandler;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.SimpleJob;
+import com.integri.atlas.engine.core.error.ErrorHandler;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import java.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+/**
+ * @author Arik Cohen
+ */
 public class ErrorHandlerChainTest {
 
     @Test

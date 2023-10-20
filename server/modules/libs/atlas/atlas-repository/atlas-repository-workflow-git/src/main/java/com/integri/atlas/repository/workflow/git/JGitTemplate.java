@@ -44,6 +44,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.util.Assert;
 
+/**
+ * @author Arik Cohen
+ */
 public class JGitTemplate implements GitOperations {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -155,7 +158,10 @@ public class JGitTemplate implements GitOperations {
             byte[] data = reader.open(objectId).getBytes();
             AbbreviatedObjectId abbreviated = reader.abbreviate(objectId);
             return new WorkflowResource(
-                aPath + ":" + abbreviated.name(), new ByteArrayResource(data), WorkflowFormatType.parse(aPath));
+                aPath + ":" + abbreviated.name(),
+                new ByteArrayResource(data),
+                WorkflowFormatType.parse(aPath)
+            );
         }
     }
 

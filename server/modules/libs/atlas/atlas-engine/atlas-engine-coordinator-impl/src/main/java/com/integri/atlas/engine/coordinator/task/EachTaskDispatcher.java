@@ -19,19 +19,19 @@
 package com.integri.atlas.engine.coordinator.task;
 
 import com.integri.atlas.engine.core.DSL;
-import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.context.MapContext;
+import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.messagebroker.MessageBroker;
 import com.integri.atlas.engine.core.messagebroker.Queues;
-import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.Task;
 import com.integri.atlas.engine.core.task.TaskDispatcher;
 import com.integri.atlas.engine.core.task.TaskDispatcherResolver;
 import com.integri.atlas.engine.core.task.TaskEvaluator;
 import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.core.task.TaskStatus;
+import com.integri.atlas.engine.core.task.repository.CounterRepository;
+import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
 import java.util.Date;
 import java.util.List;

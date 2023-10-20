@@ -21,6 +21,9 @@ package com.integri.atlas.engine.config;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author Arik Cohen
+ */
 public class WorkerProperties {
 
     private boolean enabled = false;

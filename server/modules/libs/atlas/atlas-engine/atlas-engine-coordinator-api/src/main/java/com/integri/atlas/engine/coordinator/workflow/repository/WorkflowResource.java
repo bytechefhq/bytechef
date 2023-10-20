@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-
 import org.springframework.core.io.Resource;
 
 /**
@@ -36,9 +35,9 @@ public class WorkflowResource implements Resource {
     private final Resource resource;
     private final WorkflowFormatType formatType;
 
-    public WorkflowResource(String aId, Resource aResource, WorkflowFormatType formatType) {
-        id = aId;
-        resource = aResource;
+    public WorkflowResource(String id, Resource resource, WorkflowFormatType formatType) {
+        this.id = id;
+        this.resource = resource;
         this.formatType = formatType;
     }
 

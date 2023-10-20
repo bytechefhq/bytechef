@@ -22,8 +22,8 @@ import com.integri.atlas.engine.coordinator.Coordinator;
 import com.integri.atlas.engine.coordinator.Page;
 import com.integri.atlas.engine.coordinator.annotation.ConditionalOnCoordinator;
 import com.integri.atlas.engine.coordinator.job.Job;
-import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.coordinator.job.JobSummary;
+import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
@@ -40,6 +40,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * @author Arik Cohen
+ */
 @RestController
 @ConditionalOnCoordinator
 public class JobsController {

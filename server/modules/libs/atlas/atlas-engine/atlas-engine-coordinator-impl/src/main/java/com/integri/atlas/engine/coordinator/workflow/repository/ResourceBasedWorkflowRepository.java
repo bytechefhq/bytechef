@@ -19,17 +19,19 @@
 package com.integri.atlas.engine.coordinator.workflow.repository;
 
 import com.google.common.base.Throwables;
+import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
+/**
+ * @author Arik Cohen
+ */
 public class ResourceBasedWorkflowRepository implements WorkflowRepository {
 
     private String locationPattern = "classpath:workflows/**/*.yaml";

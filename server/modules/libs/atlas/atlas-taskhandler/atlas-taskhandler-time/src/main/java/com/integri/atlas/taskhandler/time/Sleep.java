@@ -23,6 +23,9 @@ import com.integri.atlas.engine.worker.task.TaskHandler;
 import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Arik Cohen
+ */
 @Component("time/sleep")
 public class Sleep implements TaskHandler<Object> {
 

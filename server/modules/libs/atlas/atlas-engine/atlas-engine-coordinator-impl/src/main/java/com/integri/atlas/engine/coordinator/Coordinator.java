@@ -18,12 +18,17 @@
 
 package com.integri.atlas.engine.coordinator;
 
+import com.integri.atlas.engine.coordinator.job.Job;
+import com.integri.atlas.engine.coordinator.job.JobStatus;
+import com.integri.atlas.engine.coordinator.job.SimpleJob;
+import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.coordinator.workflow.Workflow;
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
 import com.integri.atlas.engine.core.Accessor;
 import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.MapObject;
-import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.context.MapContext;
+import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.error.ErrorHandler;
 import com.integri.atlas.engine.core.error.ErrorObject;
 import com.integri.atlas.engine.core.error.Errorable;
@@ -31,19 +36,14 @@ import com.integri.atlas.engine.core.error.Prioritizable;
 import com.integri.atlas.engine.core.event.EventPublisher;
 import com.integri.atlas.engine.core.event.Events;
 import com.integri.atlas.engine.core.event.WorkflowEvent;
-import com.integri.atlas.engine.coordinator.job.Job;
-import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
-import com.integri.atlas.engine.coordinator.job.JobStatus;
-import com.integri.atlas.engine.coordinator.job.SimpleJob;
 import com.integri.atlas.engine.core.messagebroker.MessageBroker;
 import com.integri.atlas.engine.core.messagebroker.Queues;
-import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
 import com.integri.atlas.engine.core.task.CancelTask;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskDispatcher;
 import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.core.task.TaskStatus;
+import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
 import java.util.Collections;
 import java.util.Date;
@@ -123,7 +123,9 @@ public class Coordinator {
         MapContext context = new MapContext(jobParams.getMap(INPUTS, Collections.EMPTY_MAP));
         contextRepository.push(job.getId(), context);
 
-        eventPublisher.publishEvent(WorkflowEvent.of(Events.JOB_STATUS, "jobId", job.getId(), "status", job.getStatus()));
+        eventPublisher.publishEvent(
+            WorkflowEvent.of(Events.JOB_STATUS, "jobId", job.getId(), "status", job.getStatus())
+        );
 
         messageBroker.send(Queues.JOBS, job);
 
@@ -137,7 +139,9 @@ public class Coordinator {
         job.setCurrentTask(0);
         jobRepository.merge(job);
         jobExecutor.execute(job);
-        eventPublisher.publishEvent(WorkflowEvent.of(Events.JOB_STATUS, "jobId", aJob.getId(), "status", job.getStatus()));
+        eventPublisher.publishEvent(
+            WorkflowEvent.of(Events.JOB_STATUS, "jobId", aJob.getId(), "status", job.getStatus())
+        );
     }
 
     private void validate(MapObject aCreateJobParams, Workflow aWorkflow) {
@@ -175,7 +179,9 @@ public class Coordinator {
         SimpleJob mjob = new SimpleJob(job);
         mjob.setStatus(JobStatus.STOPPED);
         jobRepository.merge(mjob);
-        eventPublisher.publishEvent(WorkflowEvent.of(Events.JOB_STATUS, "jobId", job.getId(), "status", job.getStatus()));
+        eventPublisher.publishEvent(
+            WorkflowEvent.of(Events.JOB_STATUS, "jobId", job.getId(), "status", job.getStatus())
+        );
         if (mjob.getExecution().size() > 0) {
             SimpleTaskExecution currentTask = SimpleTaskExecution.of(
                 job.getExecution().get(job.getExecution().size() - 1)

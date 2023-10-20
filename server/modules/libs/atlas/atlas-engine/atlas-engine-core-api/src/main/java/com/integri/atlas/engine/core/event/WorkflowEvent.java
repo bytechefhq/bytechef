@@ -32,6 +32,7 @@ import org.springframework.util.Assert;
 /**
  *
  * @author Arik Cohen
+ * @author Ivica Cardic
  * @since Apr 8, 2017
  */
 public class WorkflowEvent extends MapObject implements Accessor {

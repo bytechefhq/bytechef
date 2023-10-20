@@ -18,15 +18,14 @@
 
 package com.integri.atlas.engine.coordinator.event;
 
+import com.integri.atlas.engine.coordinator.job.Job;
+import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.core.Accessor;
 import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.MapObject;
-import com.integri.atlas.engine.coordinator.job.Job;
-import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
-import java.util.List;
-
 import com.integri.atlas.engine.core.event.Events;
 import com.integri.atlas.engine.core.event.WorkflowEvent;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;

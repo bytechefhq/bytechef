@@ -12,6 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
 
 package com.integri.atlas.repository.engine.jdbc.context;
@@ -22,15 +24,15 @@ import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.json.Json;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Map;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
+ * @author Arik Cohe
  * @author Ivica Cardic
  */
 public abstract class AbstractJdbcContextRepository implements ContextRepository {
@@ -40,7 +42,13 @@ public abstract class AbstractJdbcContextRepository implements ContextRepository
 
     @Override
     public void push(String aStackId, Context aContext) {
-        jdbc.update(getPushSql(), UUIDGenerator.generate(), aStackId, Json.serialize(objectMapper, aContext), new Date());
+        jdbc.update(
+            getPushSql(),
+            UUIDGenerator.generate(),
+            aStackId,
+            Json.serialize(objectMapper, aContext),
+            new Date()
+        );
     }
 
     @Override

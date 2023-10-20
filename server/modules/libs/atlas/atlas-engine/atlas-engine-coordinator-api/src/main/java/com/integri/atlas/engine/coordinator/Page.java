@@ -20,6 +20,9 @@ package com.integri.atlas.engine.coordinator;
 
 import java.util.List;
 
+/**
+ * @author Arik Cohen
+ */
 public interface Page<T> {
     List<T> getItems();
 

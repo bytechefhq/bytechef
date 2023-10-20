@@ -28,6 +28,9 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+/**
+ * @author Arik Cohen
+ */
 @Component("media/vsplit")
 class Vsplit implements TaskHandler<List<Map<String, Object>>> {
 

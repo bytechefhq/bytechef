@@ -19,8 +19,8 @@
 package com.integri.atlas.engine.core.task;
 
 import com.integri.atlas.engine.core.DSL;
-import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.context.MapContext;
+import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.messagebroker.MessageBroker;
 import com.integri.atlas.engine.core.messagebroker.Queues;
 import com.integri.atlas.engine.core.task.repository.CounterRepository;

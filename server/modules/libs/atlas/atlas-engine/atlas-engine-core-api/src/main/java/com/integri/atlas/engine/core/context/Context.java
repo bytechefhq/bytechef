@@ -20,4 +20,7 @@ package com.integri.atlas.engine.core.context;
 
 import com.integri.atlas.engine.core.Accessor;
 
+/**
+ * @author Arik Cohen
+ */
 public interface Context extends Accessor {}

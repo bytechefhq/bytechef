@@ -18,6 +18,9 @@
 
 package com.integri.atlas.engine.config;
 
+/**
+ * @author Arik Cohen
+ */
 public class WorkflowRepositoryProperties {
 
     private GitProperties git;

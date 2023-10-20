@@ -19,12 +19,12 @@
 package com.integri.atlas.engine.coordinator.workflow.repository;
 
 import com.integri.atlas.engine.coordinator.workflow.Workflow;
-
 import java.util.List;
 
 /**
  *
  * @author Arik Cohen
+ * @author Ivica Cardic
  * @since Jun 18, 2016
  */
 public interface WorkflowRepository {

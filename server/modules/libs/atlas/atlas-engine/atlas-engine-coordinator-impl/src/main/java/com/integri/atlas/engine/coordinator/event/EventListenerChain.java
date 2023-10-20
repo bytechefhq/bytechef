@@ -19,7 +19,6 @@
 package com.integri.atlas.engine.coordinator.event;
 
 import com.integri.atlas.engine.core.event.WorkflowEvent;
-
 import java.util.List;
 
 /**
