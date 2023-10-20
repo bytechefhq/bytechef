@@ -1018,10 +1018,6 @@ components:
       description: "The blueprint that describe the execution of a job."
       type: "object"
       properties:
-        connections:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/WorkflowConnection"
         createdBy:
           description: "The created by."
           type: "string"
@@ -1089,6 +1085,12 @@ components:
           items:
             $ref: "#/components/schemas/WorkflowTask"
           readOnly: true
+        triggers:
+          description: "The steps that make up the workflow."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTrigger"
+          readOnly: true
         __version:
           type: "integer"
     WorkflowConnection:
@@ -1097,7 +1099,6 @@ components:
       - "componentName"
       - "componentVersion"
       - "key"
-      - "operationName"
       properties:
         componentName:
           type: "string"
@@ -1105,20 +1106,22 @@ components:
           type: "integer"
         key:
           type: "string"
-        operationName:
-          type: "string"
     WorkflowFormat:
       type: "string"
       enum:
       - "JSON"
       - "YAML"
     WorkflowTask:
-      description: "Represents a definition of the task."
+      description: "Represents a definition of a workflow task."
       type: "object"
       required:
       - "name"
       - "type"
       properties:
+        connections:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowConnection"
         finalize:
           description: "The (optional) list of tasks that are to be executed after\
             \ execution of a task -- regardless of whether it had failed or not."
@@ -1160,5 +1163,35 @@ components:
             \ be deemed as timed-out."
           type: "string"
         type:
-          description: "Type of the task."
+          description: "The type of a task."
+          type: "string"
+    WorkflowTrigger:
+      description: "Represents a definition of a workflow trigger."
+      type: "object"
+      required:
+      - "name"
+      - "type"
+      properties:
+        connections:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowConnection"
+        label:
+          description: "The human-readable description of the task."
+          type: "string"
+        name:
+          description: "The identifier name of the task. Task names are used for assigning\
+            \ the output of one task so it can be later used by subsequent tasks."
+          type: "string"
+        parameters:
+          description: "Key-value map of task parameters."
+          type: "object"
+          additionalProperties:
+            type: "object"
+        timeout:
+          description: "The timeout expression which describes when a trigger should\
+            \ be deemed as timed-out."
+          type: "string"
+        type:
+          description: "The type of a trigger."
           type: "string"
