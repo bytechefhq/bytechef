@@ -18,6 +18,7 @@
 package com.bytechef.helios.configuration.remote.web.rest.service;
 
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,7 @@ public class ProjectInstanceWorkflowServiceController {
 
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
 
+    @SuppressFBWarnings("EI")
     public ProjectInstanceWorkflowServiceController(ProjectInstanceWorkflowService projectInstanceWorkflowService) {
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
     }

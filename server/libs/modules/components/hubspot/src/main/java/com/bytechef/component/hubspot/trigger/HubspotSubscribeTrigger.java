@@ -27,6 +27,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhook
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.MapValueUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Map;
 
@@ -157,6 +158,7 @@ public class HubspotSubscribeTrigger {
             .execute();
     }
 
+    @SuppressFBWarnings("RV")
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(DynamicWebhookEnableContext context) {
         Context.Connection connection = context.connection();
 

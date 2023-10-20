@@ -60,6 +60,7 @@ public class ProjectInstanceWorkflowServiceClient implements ProjectInstanceWork
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public long getProjectInstanceWorkflowConnectionId(String key, String taskName) {
         return loadBalancedWebClientBuilder
             .build()
