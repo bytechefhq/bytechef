@@ -19,6 +19,7 @@ package com.bytechef.helios.project.facade;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.WorkflowCrudRepository;
+import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
@@ -321,13 +322,13 @@ public class ProjectFacadeIntTest {
 
         @Bean
         ProjectFacade projectFacade(
-            CategoryService categoryService, JobService jobService, ProjectInstanceService projectInstanceService,
-            ProjectService projectService, TaskExecutionService taskExecutionService, TagService tagService,
-            WorkflowService workflowService) {
+            CategoryService categoryService, ContextService contextService, JobService jobService,
+            ProjectInstanceService projectInstanceService, ProjectService projectService,
+            TaskExecutionService taskExecutionService, TagService tagService, WorkflowService workflowService) {
 
             return new ProjectFacadeImpl(
-                categoryService, jobService, projectInstanceService, projectService, taskExecutionService, tagService,
-                workflowService);
+                categoryService, contextService, jobService, projectInstanceService, projectService,
+                taskExecutionService, tagService, workflowService);
         }
     }
 }
