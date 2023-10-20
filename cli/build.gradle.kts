@@ -2,8 +2,6 @@ import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
-    id("com.bytechef.java-application-conventions")
-    id("com.bytechef.java-library-conventions")
     alias(libs.plugins.org.sonarqube)
 }
 

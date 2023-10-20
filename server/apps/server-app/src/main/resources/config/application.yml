@@ -97,6 +97,10 @@ spring:
     listener:
       direct:
         prefetch: 1
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: always
   task:
     execution:
       thread-name-prefix: server-app-task-
