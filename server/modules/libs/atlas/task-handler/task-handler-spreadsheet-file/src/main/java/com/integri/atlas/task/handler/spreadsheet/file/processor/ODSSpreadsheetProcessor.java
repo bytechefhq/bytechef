@@ -19,7 +19,7 @@ package com.integri.atlas.task.handler.spreadsheet.file.processor;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
 import com.github.miachm.sods.SpreadSheet;
-import com.integri.atlas.engine.core.util.MapUtil;
+import com.integri.atlas.task.handler.spreadsheet.file.util.MapUtil;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;

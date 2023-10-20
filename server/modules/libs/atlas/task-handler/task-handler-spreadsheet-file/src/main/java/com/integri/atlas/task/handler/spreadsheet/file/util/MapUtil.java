@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.core.util;
+package com.integri.atlas.task.handler.spreadsheet.file.util;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * @author Ivica Cardic
+ */
 public class MapUtil {
 
     public static <T> Map<String, ?> of(Map<String, T> map, Function<T, ?> valueProcessor) {
