@@ -17,7 +17,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.task.dispatcher.fork.completion;
+package com.bytechef.task.dispatcher.forkjoin.completion;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.domain.Context;
@@ -39,8 +39,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.bytechef.task.dispatcher.fork.constants.ForkJoinTaskDispatcherConstants.BRANCH;
-import static com.bytechef.task.dispatcher.fork.constants.ForkJoinTaskDispatcherConstants.BRANCHES;
+import static com.bytechef.task.dispatcher.forkjoin.constants.ForkJoinTaskDispatcherConstants.BRANCH;
+import static com.bytechef.task.dispatcher.forkjoin.constants.ForkJoinTaskDispatcherConstants.BRANCHES;
 
 /**
  * Handles {@link TaskExecution} completions which are the child execution tasks of a parent <code>

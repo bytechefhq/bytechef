@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.dispatcher.fork;
+package com.bytechef.task.dispatcher.forkjoin;
 
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
-import com.bytechef.task.dispatcher.fork.completion.ForkJoinTaskCompletionHandler;
+import com.bytechef.task.dispatcher.forkjoin.completion.ForkJoinTaskCompletionHandler;
 import java.util.List;
 import java.util.Map;
 

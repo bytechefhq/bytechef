@@ -27,6 +27,7 @@ public class SubflowTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals("definition/subflow_v1.json", new SubflowTaskDispatcherDefinitionFactory().getDefinition());
+        JsonFileAssert.assertEquals("definition/subflow_v1.json",
+            new SubflowTaskDispatcherDefinitionFactory().getDefinition());
     }
 }

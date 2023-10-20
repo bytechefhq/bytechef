@@ -27,6 +27,7 @@ public class EachTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals("definition/each_v1.json", new EachTaskDispatcherDefinitionFactory().getDefinition());
+        JsonFileAssert.assertEquals("definition/each_v1.json",
+            new EachTaskDispatcherDefinitionFactory().getDefinition());
     }
 }

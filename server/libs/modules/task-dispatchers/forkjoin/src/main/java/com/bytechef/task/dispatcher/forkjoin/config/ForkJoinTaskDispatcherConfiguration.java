@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.dispatcher.fork.config;
+package com.bytechef.task.dispatcher.forkjoin.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.message.broker.MessageBroker;
@@ -24,8 +24,8 @@ import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
-import com.bytechef.task.dispatcher.fork.ForkJoinTaskDispatcher;
-import com.bytechef.task.dispatcher.fork.completion.ForkJoinTaskCompletionHandler;
+import com.bytechef.task.dispatcher.forkjoin.ForkJoinTaskDispatcher;
+import com.bytechef.task.dispatcher.forkjoin.completion.ForkJoinTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

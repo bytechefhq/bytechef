@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.dispatcher.fork.constants;
+package com.bytechef.task.dispatcher.forkjoin.constants;
 
 /**
  * @author Ivica Cardic

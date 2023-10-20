@@ -67,8 +67,8 @@
             <Class name="com.bytechef.task.dispatcher.switch_.completion.SwitchTaskCompletionHandler" />
             <Class name="com.bytechef.task.dispatcher.if_.IfTaskDispatcher" />
             <Class name="com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler" />
-            <Class name="com.bytechef.task.dispatcher.fork.completion.ForkJoinTaskCompletionHandler" />
-            <Class name="com.bytechef.task.dispatcher.fork.ForkJoinTaskDispatcher" />
+            <Class name="com.bytechef.task.dispatcher.forkjoin.completion.ForkJoinTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.forkjoin.ForkJoinTaskDispatcher" />
             <Class name="com.bytechef.task.dispatcher.each.EachTaskDispatcher" />
             <Class name="com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler" />
             <Class name="com.bytechef.task.dispatcher.loop.LoopTaskDispatcher" />
