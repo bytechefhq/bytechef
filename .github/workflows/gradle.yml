@@ -23,6 +23,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Set up Node 16
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
+        cache: 'npm'
+        cache-dependency-path: client/package-lock.json
+    - name: run npm commands
+      working-directory: client
+      run: |
+        npm ci
+        npm run check
     - name: Set up GraalVM 22.3
       uses: graalvm/setup-graalvm@v1
       with:
