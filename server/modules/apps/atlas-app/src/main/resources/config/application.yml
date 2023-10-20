@@ -16,8 +16,8 @@ management:
         include: livenessState
       readiness:
         include: readinessState,db
-#    rabbit:
-#      enabled: false
+    rabbit:
+      enabled: false
   metrics:
 #    export:
 #      prometheus:
