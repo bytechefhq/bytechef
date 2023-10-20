@@ -51,6 +51,33 @@ export interface PutWorkflowOperationRequest {
 export class WorkflowsApi extends runtime.BaseAPI {
 
     /**
+     * Clear workflows cache.
+     * Clear workflows cache.
+     */
+    async clearCacheRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/workflows/clear-cache`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Clear workflows cache.
+     * Clear workflows cache.
+     */
+    async clearCache(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.clearCacheRaw(initOverrides);
+    }
+
+    /**
      * Delete a workflow.
      * Delete a workflow.
      */
