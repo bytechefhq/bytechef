@@ -96,6 +96,10 @@ public final class XmlUtils {
         return read(parse(path, documentBuilder -> parse(inputStream, documentBuilder)), clazz);
     }
 
+    public static <T> T read(InputStream inputStream, String path) {
+        return read(parse(path, documentBuilder -> parse(inputStream, documentBuilder)), new TypeReference<T>() {});
+    }
+
     public static <T> T read(InputStream inputStream, String path, TypeReference<T> typeReference) {
         return read(parse(path, documentBuilder -> parse(inputStream, documentBuilder)), typeReference);
     }

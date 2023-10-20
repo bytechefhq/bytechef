@@ -2,7 +2,6 @@ version="1.0"
 
 dependencies {
     api project(":server:libs:hermes:hermes-definition-api")
-    api project(":server:libs:core:commons:commons-util")
 
     implementation "com.fasterxml.jackson.core:jackson-annotations"
     implementation "com.fasterxml.jackson.core:jackson-databind"

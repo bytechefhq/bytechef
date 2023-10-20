@@ -17,7 +17,7 @@
 
 package com.bytechef.component.jsonfile.action;
 
-import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants;
+import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.FileType;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
@@ -64,9 +64,9 @@ public class JsonFileReadAction {
                 .label("File Type")
                 .description("The file type to choose.")
                 .options(
-                    option("JSON", JsonFileTaskConstants.FileType.JSON.name()),
-                    option("JSON Line", JsonFileTaskConstants.FileType.JSONL.name()))
-                .defaultValue(JsonFileTaskConstants.FileType.JSON.name())
+                    option("JSON", FileType.JSON.name()),
+                    option("JSON Line", FileType.JSONL.name()))
+                .defaultValue(FileType.JSON.name())
                 .required(true),
             fileEntry(FILE_ENTRY)
                 .label("File")
@@ -102,7 +102,7 @@ public class JsonFileReadAction {
     protected static Object executeRead(Context context, InputParameters inputParameters)
         throws ComponentExecutionException {
 
-        JsonFileTaskConstants.FileType fileType = getFileType(inputParameters);
+        FileType fileType = getFileType(inputParameters);
         Context.FileEntry fileEntry = inputParameters.getRequired(FILE_ENTRY, Context.FileEntry.class);
         boolean isArray = inputParameters.getBoolean(IS_ARRAY, true);
         Object result;
@@ -112,7 +112,7 @@ public class JsonFileReadAction {
             InputStream inputStream = context.getFileStream(fileEntry);
             List<Map<String, ?>> items;
 
-            if (fileType == JsonFileTaskConstants.FileType.JSON) {
+            if (fileType == FileType.JSON) {
                 if (path == null) {
                     try (Stream<Map<String, ?>> stream = JsonUtils.stream(inputStream)) {
                         items = stream.toList();
@@ -125,7 +125,7 @@ public class JsonFileReadAction {
                     new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
                     items = bufferedReader
                         .lines()
-                        .map(line -> (Map<String, ?>) JsonUtils.read(line, Map.class))
+                        .map(line -> (Map<String, ?>) JsonUtils.read(line))
                         .collect(Collectors.toList());
                 } catch (IOException ioException) {
                     throw new ComponentExecutionException("Unable to open json file " + inputParameters, ioException);
@@ -150,15 +150,15 @@ public class JsonFileReadAction {
 
             result = items;
         } else {
-            result = JsonUtils.read(context.readFileToString(fileEntry), Map.class);
+            result = JsonUtils.read(context.readFileToString(fileEntry));
         }
 
         return result;
     }
 
-    protected static JsonFileTaskConstants.FileType getFileType(InputParameters inputParameters) {
-        String fileType = inputParameters.getString(FILE_TYPE, JsonFileTaskConstants.FileType.JSON.name());
+    protected static FileType getFileType(InputParameters inputParameters) {
+        String fileType = inputParameters.getString(FILE_TYPE, FileType.JSON.name());
 
-        return JsonFileTaskConstants.FileType.valueOf(fileType.toUpperCase());
+        return FileType.valueOf(fileType.toUpperCase());
     }
 }

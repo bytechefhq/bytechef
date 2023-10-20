@@ -5,7 +5,8 @@ dependencies {
     api project(":server:libs:helios:helios-project:helios-project-api")
     api project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
 
-    implementation project(":server:libs:hermes:hermes-api")
+//    implementation project(":server:libs:hermes:hermes-api")
+    implementation project(":server:libs:core:commons:commons-util")
 
     testImplementation project(":server:libs:core:commons:commons-data")
     testImplementation project(":server:libs:core:encryption:encryption-api")

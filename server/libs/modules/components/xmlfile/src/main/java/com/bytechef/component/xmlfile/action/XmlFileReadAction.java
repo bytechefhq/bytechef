@@ -21,7 +21,6 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.util.XmlUtils;
-import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.io.InputStream;
 import java.util.List;
@@ -97,7 +96,7 @@ public class XmlFileReadAction {
                     items = stream.toList();
                 }
             } else {
-                items = XmlUtils.read(inputStream, path, new TypeReference<>() {});
+                items = XmlUtils.read(inputStream, path);
             }
 
             Integer pageSize = inputParameters.getInteger(PAGE_SIZE);
