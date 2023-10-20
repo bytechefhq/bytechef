@@ -17,9 +17,9 @@
 package com.bytechef.atlas.rsocket.client;
 
 import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.dto.JobParametersDTO;
 import com.bytechef.atlas.service.JobService;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
@@ -39,10 +39,10 @@ public class JobRSocketClient implements JobService {
     }
 
     @Override
-    public Job add(Map<String, Object> jobParams) {
+    public Job add(JobParametersDTO jobParametersDTO) {
         return rSocketRequester
                 .route("createJob")
-                .data(jobParams)
+                .data(jobParametersDTO)
                 .retrieveMono(Job.class)
                 .block();
     }
