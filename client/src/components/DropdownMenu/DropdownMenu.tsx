@@ -10,7 +10,7 @@ import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-export interface DropdownMenuItemType {
+export interface DropdownMenuItem {
     icon?: ReactNode;
     integrationId?: number;
     label?: string;
@@ -20,10 +20,12 @@ export interface DropdownMenuItemType {
     danger?: boolean;
 }
 
-export const Dropdown: React.FC<{
-    menuItems: DropdownMenuItemType[];
+interface DropdownMenuProps {
+    menuItems: DropdownMenuItem[];
     id?: number;
-}> = ({id = 0, menuItems}) => {
+}
+
+const DropdownMenu = ({id = 0, menuItems}: DropdownMenuProps): JSX.Element => {
     return (
         <div>
             <Root>
@@ -58,7 +60,7 @@ export const Dropdown: React.FC<{
                                             className={twMerge([
                                                 'flex cursor-default select-none items-center rounded-md px-4 py-2 text-xs text-gray-700 outline-none hover:cursor-pointer dark:text-gray-300',
                                                 danger &&
-                                                    'bg-red-600 text-white hover:bg-red-800 hover:text-white',
+                                                    'text-red-600 hover:bg-red-600 hover:text-white',
                                             ])}
                                             onClick={(event) => {
                                                 if (onClick) {
@@ -80,3 +82,7 @@ export const Dropdown: React.FC<{
         </div>
     );
 };
+
+DropdownMenu.displayName = 'DropdownMenu';
+
+export default DropdownMenu;
