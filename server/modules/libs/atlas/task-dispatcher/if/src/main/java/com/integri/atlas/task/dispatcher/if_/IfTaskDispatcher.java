@@ -81,23 +81,24 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
         if (subtaskDefinitions.size() > 0) {
             MapObject taskDefinition = subtaskDefinitions.get(0);
 
-            SimpleTaskExecution subtaskExecution = SimpleTaskExecution.of(taskDefinition);
+            SimpleTaskExecution subTaskExecution = SimpleTaskExecution.of(taskDefinition);
 
-            subtaskExecution.setId(UUIDGenerator.generate());
-            subtaskExecution.setStatus(TaskStatus.CREATED);
-            subtaskExecution.setCreateTime(new Date());
-            subtaskExecution.setTaskNumber(1);
-            subtaskExecution.setJobId(ifTaskExecution.getJobId());
-            subtaskExecution.setParentId(ifTaskExecution.getId());
-            subtaskExecution.setPriority(ifTaskExecution.getPriority());
+            subTaskExecution.setId(UUIDGenerator.generate());
+            subTaskExecution.setStatus(TaskStatus.CREATED);
+            subTaskExecution.setCreateTime(new Date());
+            subTaskExecution.setTaskNumber(1);
+            subTaskExecution.setJobId(ifTaskExecution.getJobId());
+            subTaskExecution.setParentId(ifTaskExecution.getId());
+            subTaskExecution.setPriority(ifTaskExecution.getPriority());
 
             MapContext context = new MapContext(contextRepository.peek(ifTaskExecution.getId()));
 
-            contextRepository.push(subtaskExecution.getId(), context);
+            contextRepository.push(subTaskExecution.getId(), context);
 
-            taskExecutionRepository.create(subtaskExecution);
+            TaskExecution evaluatedSubTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-            taskDispatcher.dispatch(subtaskExecution);
+            taskExecutionRepository.create(evaluatedSubTaskExecution);
+            taskDispatcher.dispatch(evaluatedSubTaskExecution);
         } else {
             SimpleTaskExecution completion = SimpleTaskExecution.of(taskExecution);
 

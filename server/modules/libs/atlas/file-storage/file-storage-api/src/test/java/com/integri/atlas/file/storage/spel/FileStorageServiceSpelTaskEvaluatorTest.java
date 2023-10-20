@@ -22,10 +22,9 @@ import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.file.storage.base64.Base64FileStorageService;
-import java.util.Base64;
-
 import com.integri.atlas.file.storage.task.evaluator.spel.ReadFileContent;
 import com.integri.atlas.file.storage.task.evaluator.spel.StoreFileContent;
+import java.util.Base64;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 

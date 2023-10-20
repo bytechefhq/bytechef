@@ -52,7 +52,10 @@ public class Base64StorageServiceTest {
 
     @Test
     public void testWrite() {
-        FileEntry fileEntry = base64StorageService.storeFileContent("fileEntry", new ByteArrayInputStream(string.getBytes()));
+        FileEntry fileEntry = base64StorageService.storeFileContent(
+            "fileEntry",
+            new ByteArrayInputStream(string.getBytes())
+        );
 
         Assertions
             .assertThat(fileEntry.getUrl())
