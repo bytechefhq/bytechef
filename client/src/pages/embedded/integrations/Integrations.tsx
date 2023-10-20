@@ -34,19 +34,19 @@ const Integrations = () => {
         defaultCurrentState
     );
 
-    const {isLoading: categoriesIsLoading, data: categories} =
+    const {isLoading: categoriesLoading, data: categories} =
         useGetIntegrationCategoriesQuery();
-    const {isLoading: tagsIsLoading, data: tags} = useGetIntegrationTagsQuery();
+    const {isLoading: tagsLoading, data: tags} = useGetIntegrationTagsQuery();
 
     const title =
-        !categoriesIsLoading &&
+        !categoriesLoading &&
         current.type === Type.Category &&
         current.id &&
         categories &&
         categories.length > 0
             ? categories.filter((category) => category.id === current.id)[0]
                   .name!
-            : !tagsIsLoading &&
+            : !tagsLoading &&
               current.type === Type.Tag &&
               tags &&
               tags.length > 0
@@ -85,7 +85,7 @@ const Integrations = () => {
                                 toLink={''}
                             />
 
-                            {!categoriesIsLoading &&
+                            {!categoriesLoading &&
                                 categories?.map((item) => (
                                     <LeftSidebarMenuItem
                                         key={item.name}
@@ -112,7 +112,7 @@ const Integrations = () => {
                     bottomTitle="Tags"
                     bottomBody={
                         <>
-                            {!tagsIsLoading &&
+                            {!tagsLoading &&
                                 (!tags?.length ? (
                                     <p className="px-3 text-xs">No tags.</p>
                                 ) : (

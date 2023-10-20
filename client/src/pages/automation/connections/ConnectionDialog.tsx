@@ -97,13 +97,13 @@ const ConnectionDialog = ({
     });
 
     const {
-        isLoading: componentDefinitionsIsLoading,
+        isLoading: componentDefinitionsLoading,
         error: componentDefinitionsError,
         data: componentDefinitions,
     } = useGetComponentDefinitionsQuery({connectionDefinitions: true});
 
     const {
-        isLoading: connectionDefinitionIsLoading,
+        isLoading: connectionDefinitionLoading,
         error: connectionDefinitionError,
         data: connectionDefinition,
     } = useGetConnectionDefinitionQuery(
@@ -116,7 +116,7 @@ const ConnectionDialog = ({
     );
 
     const {
-        isLoading: oAuth2AuthorizationParametersIsLoading,
+        isLoading: oAuth2AuthorizationParametersLoading,
         error: oAuth2AuthorizationParametersError,
         data: oAuth2AuthorizationParameters,
     } = useGetConnectionOAuth2AuthorizationParametersQuery(
@@ -125,13 +125,13 @@ const ConnectionDialog = ({
     );
 
     const {
-        isLoading: tagsIsLoading,
+        isLoading: tagsLoading,
         error: tagsError,
         data: tags,
     } = useGetConnectionTagsQuery();
 
     const {
-        isLoading: oAuth2PropertiesIsLoading,
+        isLoading: oAuth2PropertiesLoading,
         error: oAuth2PropertiesError,
         data: oAuth2Properties,
     } = useGetOAuth2PropertiesQuery();
@@ -216,7 +216,7 @@ const ConnectionDialog = ({
 
     const showOAuth2AppPredefined =
         (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) &&
-        !oAuth2PropertiesIsLoading &&
+        !oAuth2PropertiesLoading &&
         oAuth2Properties?.predefinedApps?.includes(
             connectionDefinition?.componentName || ''
         );
@@ -227,7 +227,7 @@ const ConnectionDialog = ({
         !usePredefinedOAuthApp;
 
     const showConnectionProperties =
-        !connectionDefinitionIsLoading &&
+        !connectionDefinitionLoading &&
         connectionDefinition &&
         connectionDefinition?.properties &&
         connectionDefinition.properties.length > 0;
@@ -322,11 +322,11 @@ const ConnectionDialog = ({
     function getErrors(): string[] {
         const errors: string[] = [];
 
-        if (componentDefinitionsError && !componentDefinitionsIsLoading) {
+        if (componentDefinitionsError && !componentDefinitionsLoading) {
             errors.push(componentDefinitionsError.message);
         }
 
-        if (connectionDefinitionError && !connectionDefinitionIsLoading) {
+        if (connectionDefinitionError && !connectionDefinitionLoading) {
             errors.push(connectionDefinitionError.message);
         }
 
@@ -337,13 +337,13 @@ const ConnectionDialog = ({
             errors.push(createConnectionMutation.error?.message);
         }
 
-        if (tagsError && !tagsIsLoading) {
+        if (tagsError && !tagsLoading) {
             errors.push(tagsError.message);
         }
 
         if (
             oAuth2AuthorizationParametersError &&
-            !oAuth2AuthorizationParametersIsLoading
+            !oAuth2AuthorizationParametersLoading
         ) {
             errors.push(oAuth2AuthorizationParametersError.message);
         }
@@ -352,7 +352,7 @@ const ConnectionDialog = ({
             errors.push(oAuth2Error);
         }
 
-        if (oAuth2PropertiesError && !oAuth2PropertiesIsLoading) {
+        if (oAuth2PropertiesError && !oAuth2PropertiesLoading) {
             errors.push(oAuth2PropertiesError.message);
         }
 
@@ -396,12 +396,12 @@ const ConnectionDialog = ({
                     : undefined
             }
         >
-            {!componentDefinitionsIsLoading && (
+            {!componentDefinitionsLoading && (
                 <>
                     <Errors errors={errors} />
 
                     {(wizardStep === 'configuration_step' ||
-                        oAuth2AuthorizationParametersIsLoading) && (
+                        oAuth2AuthorizationParametersLoading) && (
                         <>
                             {!connection?.id && (
                                 <Controller
@@ -550,7 +550,7 @@ const ConnectionDialog = ({
                                 </div>
                             )}
 
-                            {!tagsIsLoading && (
+                            {!tagsLoading && (
                                 <Controller
                                     control={control}
                                     name="tags"
@@ -591,7 +591,7 @@ const ConnectionDialog = ({
                         </>
                     )}
 
-                    {!oAuth2AuthorizationParametersIsLoading &&
+                    {!oAuth2AuthorizationParametersLoading &&
                         wizardStep === 'oauth_step' && (
                             <>
                                 <Alert
