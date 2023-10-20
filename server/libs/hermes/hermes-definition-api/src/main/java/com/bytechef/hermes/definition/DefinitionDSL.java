@@ -16,7 +16,6 @@
 
 package com.bytechef.hermes.definition;
 
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableAnyProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableArrayProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableBooleanProperty;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableDateProperty;
@@ -43,14 +42,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 public abstract class DefinitionDSL {
-
-    public static ModifiableAnyProperty any() {
-        return new ModifiableAnyProperty();
-    }
-
-    public static ModifiableAnyProperty any(String name) {
-        return new ModifiableAnyProperty(name);
-    }
 
     public static ModifiableArrayProperty array() {
         return new ModifiableArrayProperty();
@@ -377,24 +368,6 @@ public abstract class DefinitionDSL {
         @Override
         public Type getType() {
             return type;
-        }
-
-        public static final class ModifiableAnyProperty
-            extends ModifiableValueProperty<Object, ModifiableAnyProperty>
-            implements ModifiableOutputProperty<Object>, Property.AnyProperty {
-
-            private ModifiableAnyProperty() {
-                this(null);
-            }
-
-            public ModifiableAnyProperty(String name) {
-                super(name, Type.ANY);
-            }
-
-            @Override
-            public ControlType getControlType() {
-                return null;
-            }
         }
 
         public static final class ModifiableArrayProperty
@@ -1237,7 +1210,7 @@ public abstract class DefinitionDSL {
         }
 
         public sealed interface ModifiableOutputProperty<V> extends Property.OutputProperty<V>
-            permits ModifiableAnyProperty, ModifiableArrayProperty, ModifiableBooleanProperty, ModifiableDateProperty,
+            permits ModifiableArrayProperty, ModifiableBooleanProperty, ModifiableDateProperty,
             ModifiableDateTimeProperty, ModifiableIntegerProperty, ModifiableNullProperty, ModifiableNumberProperty,
             ModifiableObjectProperty, ModifiableStringProperty, ModifiableTimeProperty {
         }
@@ -1418,7 +1391,7 @@ public abstract class DefinitionDSL {
         public abstract static sealed class ModifiableValueProperty<V, P extends ModifiableValueProperty<V, P>>
             extends ModifiableProperty<P>
             implements
-            Property.ValueProperty<V> permits ModifiableAnyProperty, ModifiableArrayProperty, ModifiableBooleanProperty,
+            Property.ValueProperty<V> permits ModifiableArrayProperty, ModifiableBooleanProperty,
             ModifiableDateProperty, ModifiableDateTimeProperty, ModifiableIntegerProperty, ModifiableNullProperty,
             ModifiableNumberProperty, ModifiableObjectProperty, ModifiableStringProperty, ModifiableTimeProperty {
 

@@ -16,8 +16,10 @@
 
 package com.bytechef.hermes.configuration.web.rest;
 
+import com.bytechef.hermes.configuration.web.rest.model.PropertyModel;
 import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherDefinitionModel;
+import com.bytechef.hermes.configuration.web.rest.model.TaskDispatcherOperationRequestModel;
 import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -74,6 +76,20 @@ public class TaskDispatcherDefinitionController implements TaskDispatcherDefinit
                 .stream()
                 .map(taskDispatcherDefinition -> conversionService.convert(
                     taskDispatcherDefinition, TaskDispatcherDefinitionBasicModel.class))
+                .toList());
+    }
+
+    @Override
+    public ResponseEntity<List<PropertyModel>> getTaskDispatcherOutputSchema(
+        String taskDispatcherName, Integer taskDispatcherVersion,
+        TaskDispatcherOperationRequestModel taskDispatcherOperationRequestModel) {
+
+        return ResponseEntity.ok(
+            taskDispatcherDefinitionService.executeOutputSchema(
+                taskDispatcherName, taskDispatcherVersion, taskDispatcherOperationRequestModel.getParameters())
+                .stream()
+                .map(property -> conversionService.convert(
+                    property, PropertyModel.class))
                 .toList());
     }
 }

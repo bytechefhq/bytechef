@@ -18,7 +18,6 @@ package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.configuration.web.rest.model.AnyPropertyModel;
 import com.bytechef.hermes.configuration.web.rest.model.ArrayPropertyModel;
 import com.bytechef.hermes.configuration.web.rest.model.BooleanPropertyModel;
 import com.bytechef.hermes.configuration.web.rest.model.DatePropertyModel;
@@ -32,7 +31,6 @@ import com.bytechef.hermes.configuration.web.rest.model.OptionsDataSourceModel;
 import com.bytechef.hermes.configuration.web.rest.model.PropertyModel;
 import com.bytechef.hermes.configuration.web.rest.model.StringPropertyModel;
 import com.bytechef.hermes.configuration.web.rest.model.TimePropertyModel;
-import com.bytechef.hermes.registry.domain.AnyProperty;
 import com.bytechef.hermes.registry.domain.ArrayProperty;
 import com.bytechef.hermes.registry.domain.BooleanProperty;
 import com.bytechef.hermes.registry.domain.DateProperty;
@@ -63,11 +61,6 @@ public interface PropertyMapper extends Converter<Property, PropertyModel>, Prop
     @Override
     default PropertyModel convert(Property property) {
         return (PropertyModel) property.accept(this);
-    }
-
-    @Override
-    default AnyPropertyModel visit(AnyProperty anyProperty) {
-        return map(anyProperty);
     }
 
     @Override
@@ -124,8 +117,6 @@ public interface PropertyMapper extends Converter<Property, PropertyModel>, Prop
     default TimePropertyModel visit(TimeProperty timeProperty) {
         return map(timeProperty);
     }
-
-    AnyPropertyModel map(AnyProperty anyPropertyDTO);
 
     ArrayPropertyModel map(ArrayProperty arrayProperty);
 

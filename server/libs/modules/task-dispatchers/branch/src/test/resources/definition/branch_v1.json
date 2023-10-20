@@ -164,5 +164,6 @@
   } ],
   "title": "Branch",
   "version": 1,
-  "outputSchema": null
+  "outputSchema": null,
+  "outputSchemaDataSource": null
 }

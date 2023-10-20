@@ -61,10 +61,6 @@ public class PropertyUtils {
 
     private static void checkAnyAsInputProperty(List<? extends ValueProperty<?>> properties) {
         for (Property property : properties) {
-            if (property instanceof Property.AnyProperty) {
-                throw new IllegalStateException("Any type is not allowed as input property");
-            }
-
             if (property instanceof ArrayProperty) {
                 List<? extends ValueProperty<?>> items = ((ArrayProperty) property)
                     .getItems()

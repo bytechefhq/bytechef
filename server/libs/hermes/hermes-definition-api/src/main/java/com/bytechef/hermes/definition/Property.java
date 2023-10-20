@@ -57,7 +57,6 @@ public interface Property {
      *
      */
     enum Type {
-        ANY,
         ARRAY,
         BOOLEAN,
         DATE,
@@ -156,12 +155,6 @@ public interface Property {
          *
          */
         Optional<V> getExampleValue();
-    }
-
-    /**
-     *
-     */
-    interface AnyProperty extends OutputProperty<Object>, ValueProperty<Object> {
     }
 
     /**

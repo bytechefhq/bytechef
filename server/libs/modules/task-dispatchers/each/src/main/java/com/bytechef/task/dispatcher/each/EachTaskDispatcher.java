@@ -52,9 +52,6 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private static final String ITEM_INDEX = "itemIndex";
-    private static final String ITEM = "item";
-
     private final ApplicationEventPublisher eventPublisher;
     private final ContextService contextService;
     private final CounterService counterService;
@@ -112,7 +109,8 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
                 WorkflowTask workflowTask = taskExecution.getWorkflowTask();
 
-                newContext.put(workflowTask.getName(), Map.of(ITEM, item, ITEM_INDEX, i));
+                newContext.put(workflowTask.getName(),
+                    Map.of(EachTaskDispatcherConstants.ITEM, item, EachTaskDispatcherConstants.ITEM_INDEX, i));
 
                 iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution.evaluate(newContext));
 

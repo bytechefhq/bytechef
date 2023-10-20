@@ -16,7 +16,6 @@
 
 package com.bytechef.task.dispatcher.each;
 
-import static com.bytechef.hermes.definition.DefinitionDSL.any;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.date;
 import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
@@ -34,6 +33,7 @@ import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConst
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.LIST;
 
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.hermes.task.dispatcher.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.springframework.stereotype.Component;
 
@@ -54,14 +54,19 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
                 .description("List of items to iterate over.")
                 .items(
                     array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()))
-        .outputSchema(
-            object()
-                .properties(
-                    any("item"), integer("itemIndex")))
+        .outputSchema(getOutputSchemaFunction())
         .taskProperties(task(ITERATEE));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
         return TASK_DISPATCHER_DEFINITION;
+    }
+
+    protected static OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (inputParameters) -> null;
+//        object()
+//            .properties(
+//                any(ITEM), integer(ITEM_INDEX))
     }
 }

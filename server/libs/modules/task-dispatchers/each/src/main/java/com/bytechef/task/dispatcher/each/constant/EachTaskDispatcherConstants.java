@@ -23,5 +23,7 @@ public class EachTaskDispatcherConstants {
 
     public static final String EACH = "each";
     public static final String LIST = "list";
+    public static final String ITEM = "item";
+    public static final String ITEM_INDEX = "itemIndex";
     public static final String ITERATEE = "iteratee";
 }

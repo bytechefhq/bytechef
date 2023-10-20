@@ -29,7 +29,6 @@ import java.util.Optional;
     property = "type",
     visible = true)
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = AnyProperty.class, name = "ANY"),
     @JsonSubTypes.Type(value = ArrayProperty.class, name = "ARRAY"),
     @JsonSubTypes.Type(value = BooleanProperty.class, name = "BOOLEAN"),
     @JsonSubTypes.Type(value = DateProperty.class, name = "DATE"),
@@ -75,7 +74,6 @@ public abstract class Property {
     @SuppressWarnings("unchecked")
     public static <P extends Property> P toProperty(com.bytechef.hermes.definition.Property property) {
         return switch (property.getType()) {
-            case ANY -> (P) toAnyProperty((com.bytechef.hermes.definition.Property.AnyProperty) property);
             case ARRAY -> (P) toArrayProperty((com.bytechef.hermes.definition.Property.ArrayProperty) property);
             case BOOLEAN -> (P) toBooleanProperty((com.bytechef.hermes.definition.Property.BooleanProperty) property);
             case DATE -> (P) toDateProperty((com.bytechef.hermes.definition.Property.DateProperty) property);
@@ -168,10 +166,6 @@ public abstract class Property {
             '}';
     }
 
-    private static AnyProperty toAnyProperty(com.bytechef.hermes.definition.Property.AnyProperty anyProperty) {
-        return new AnyProperty(anyProperty);
-    }
-
     private static ArrayProperty toArrayProperty(com.bytechef.hermes.definition.Property.ArrayProperty arrayProperty) {
         return new ArrayProperty(arrayProperty);
     }
@@ -225,8 +219,6 @@ public abstract class Property {
     }
 
     public interface PropertyVisitor {
-
-        Object visit(AnyProperty anyProperty);
 
         Object visit(ArrayProperty arrayProperty);
 

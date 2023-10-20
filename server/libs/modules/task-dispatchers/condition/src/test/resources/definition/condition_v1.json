@@ -3,7 +3,6 @@
   "help": null,
   "icon": "path:assets/condition.svg",
   "name": "condition",
-  "outputSchema": null,
   "properties": [ {
     "advancedOption": null,
     "description": "Set condition as raw expression or list of conditions.",
@@ -610,5 +609,7 @@
     "controlType": "OBJECT_BUILDER"
   } ],
   "title": "Condition",
-  "version": 1
+  "version": 1,
+  "outputSchema": null,
+  "outputSchemaDataSource": null
 }
