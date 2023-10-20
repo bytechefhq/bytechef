@@ -21,6 +21,7 @@ package com.bytechef.component.delay.constant;
  * @author Ivica Cardic
  */
 public class DelayConstants {
-    public static final String MILLIS = "millis";
     public static final String DELAY = "delay";
+    public static final String SLEEP = "sleep";
+    public static final String MILLIS = "millis";
 }

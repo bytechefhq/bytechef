@@ -19,7 +19,7 @@ package com.bytechef.component.delay;
 
 import static com.bytechef.component.delay.constant.DelayConstants.DELAY;
 
-import com.bytechef.component.delay.action.DelayDelayAction;
+import com.bytechef.component.delay.action.DelaySleepAction;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
@@ -35,7 +35,7 @@ public class DelayComponentHandler implements ComponentHandler {
         .title("Delay")
         .description("Sets a value which can then be referenced in other tasks.")
         .icon("path:assets/delay.svg")
-        .actions(DelayDelayAction.ACTION_DEFINITION);
+        .actions(DelaySleepAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

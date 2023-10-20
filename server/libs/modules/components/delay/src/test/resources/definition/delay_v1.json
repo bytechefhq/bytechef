@@ -4,7 +4,7 @@
     "description": "Delay action execution.",
     "exampleOutput": null,
     "help": null,
-    "name": "delay",
+    "name": "sleep",
     "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
@@ -26,7 +26,7 @@
       "expressionDisabled": null
     } ],
     "outputSchemaDataSource": null,
-    "title": "Delay"
+    "title": "Sleep"
   } ],
   "category": null,
   "connection": null,

@@ -11,7 +11,7 @@ tasks:
   parameters:
     text: "Hello ${yourName}"
 - label: "Sleep a lot"
-  type: "delay/v1/delay"
+  type: "delay/v1/sleep"
   parameters:
     timeout: "5s"
     millis: 60000
