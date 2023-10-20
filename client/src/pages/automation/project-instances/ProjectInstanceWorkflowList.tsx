@@ -130,29 +130,25 @@ const ProjectInstanceWorkflowList = ({
                                     <Switch disabled={projectInstanceEnabled} />
                                 </div>
 
-                                <DropdownMenu
-                                    id={projectId}
-                                    menuItems={[
-                                        {
-                                            label: 'Edit',
-                                            onClick: () => {
-                                                setSelectedWorkflow(workflow);
+                                <div className="flex w-1/12 justify-end">
+                                    <DropdownMenu
+                                        id={projectId}
+                                        menuItems={[
+                                            {
+                                                label: 'Edit',
+                                                onClick: () => {
+                                                    setSelectedWorkflow(
+                                                        workflow
+                                                    );
 
-                                                setShowEditWorkflowDialog(true);
+                                                    setShowEditWorkflowDialog(
+                                                        true
+                                                    );
+                                                },
                                             },
-                                        },
-                                        {
-                                            separator: true,
-                                        },
-                                        {
-                                            danger: true,
-                                            label: 'Delete',
-                                            onClick: () => {
-                                                console.log('TODO');
-                                            },
-                                        },
-                                    ]}
-                                />
+                                        ]}
+                                    />
+                                </div>
 
                                 {showEditWorkflowDialog && (
                                     <ProjectInstanceEditWorkflowDialog
