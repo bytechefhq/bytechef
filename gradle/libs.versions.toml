@@ -22,7 +22,7 @@ ch-qos-logback-logback-classic = { module = "ch.qos.logback:logback-classic", ve
 ch-qos-logback-logback-core = { module = "ch.qos.logback:logback-core", version.ref = "ch-qos-logback" }
 com-github-miachm-sods-sods = "com.github.miachm.sods:SODS:1.6.4"
 com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.7.0"
-com-github-spotbugs-spotbugs-annotations = "com.github.spotbugs:spotbugs-annotations:4.7.3"
+com-github-spotbugs-spotbugs-annotations = "com.github.spotbugs:spotbugs-annotations:4.8.0"
 com-github-tomakehurst-wiremock = "com.github.tomakehurst:wiremock:3.0.1"
 com-google-auto-service-auto-service = { module = "com.google.auto.service:auto-service", version.ref = "com-google-auto-service" }
 com-google-auto-service-auto-service-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "com-google-auto-service" }
@@ -45,10 +45,10 @@ org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-
 org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "org-springdoc" }
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.157"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.162"
 
 [plugins]
-com-github-ben-manes-versions = "com.github.ben-manes.versions:0.48.0"
+com-github-ben-manes-versions = "com.github.ben-manes.versions:0.49.0"
 nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.1"
 org-openapi-generator = "org.openapi.generator:7.0.1"
 org-sonarqube = "org.sonarqube:4.2.1.3168"
