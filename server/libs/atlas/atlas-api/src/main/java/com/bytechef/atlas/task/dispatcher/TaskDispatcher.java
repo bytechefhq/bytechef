@@ -20,6 +20,7 @@
 package com.bytechef.atlas.task.dispatcher;
 
 import com.bytechef.atlas.task.Task;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A strategy interface for dispatching {@link Task} instances to be executed.
@@ -33,5 +34,6 @@ public interface TaskDispatcher<T extends Task> {
      *
      * @param task The task to dispatch
      */
+    @Transactional
     void dispatch(T task);
 }
