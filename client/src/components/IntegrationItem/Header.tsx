@@ -31,11 +31,11 @@ const Header: React.FC<{
     id?: number;
 }> = ({id, name, status, description = 'Description not available'}) => {
     return (
-        <div className="mb-3 flex items-center justify-between">
+        <div className="relative mb-3 flex items-center justify-between">
             <div className="">
-                <Name name={name} description={description} />
-
                 <Status status={status} />
+
+                <Name name={name} description={description} />
             </div>
 
             <Dropdown id={id} menuItems={menuItems} />

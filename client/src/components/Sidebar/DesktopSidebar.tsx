@@ -1,5 +1,4 @@
 import reactLogo from '../../assets/logo.svg';
-import {SVGProps} from 'react';
 import {Link} from 'react-router-dom';
 import Avatar from '../Avatar/Avatar';
 
@@ -9,13 +8,13 @@ export function DesktopSidebar({
     navigation: {
         name: string;
         href: string;
-        icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
+        icon: React.ForwardRefExoticComponent<React.SVGProps<SVGSVGElement>>;
     }[];
 }) {
     return (
         <div className="hidden lg:flex lg:shrink-0">
             <div className="flex w-[64px]">
-                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-gray-50 dark:bg-gray-800">
+                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-gray-100 dark:bg-gray-800">
                     <div className="flex-1">
                         <Link to={''}>
                             <div className="flex items-center justify-center py-4">

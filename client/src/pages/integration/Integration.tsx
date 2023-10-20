@@ -109,7 +109,7 @@ const Integration: React.FC = () => {
             !flowControlsError &&
             !integrationWorkflowsError ? (
                 <SidebarContentLayout
-                    className="border-l border-gray-100 bg-gray-50"
+                    className="border-l border-gray-200 bg-gray-100"
                     header={
                         <header className="flex items-center">
                             <Button

@@ -104,7 +104,7 @@ const SidebarContentLayout: React.FC<
 
             {leftSidebarOpen && (
                 <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col">
-                    <nav className="flex h-full flex-col border-l border-gray-100 bg-gray-50 dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
+                    <nav className="flex h-full flex-col border-l border-gray-200 bg-gray-100 dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
                         {leftSidebarHeader}
 
                         <div className="overflow-y-auto">
@@ -128,7 +128,7 @@ const SidebarContentLayout: React.FC<
 
                             {rightToolbarOpen && rightToolbarBody && (
                                 <aside className="flex">
-                                    <nav className="flex h-full flex-col border-l border-gray-100 bg-gray-50 dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
+                                    <nav className="flex h-full flex-col border-l border-gray-100 bg-gray-100 dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
                                         <div className="overflow-y-auto">
                                             <div>{rightToolbarBody}</div>
                                         </div>

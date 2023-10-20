@@ -145,7 +145,7 @@ const WorkflowEditor = ({data}: WorkflowEditorProps): JSX.Element => {
     );
 
     return (
-        <div className="flex h-full flex-1 flex-col bg-white">
+        <div className="flex h-full flex-1 flex-col">
             <ReactFlowProvider>
                 <div className="h-full flex-1" ref={reactFlowWrapper}>
                     <ReactFlow

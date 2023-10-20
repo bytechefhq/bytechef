@@ -27,7 +27,7 @@ const Item = ({description, label}: DisplayModel): JSX.Element => {
 
     return (
         <li
-            className="my-1 flex h-[72px] items-center rounded-md bg-white p-2 hover:cursor-pointer hover:bg-gray-100"
+            className="my-2 flex h-[72px] items-center rounded-md bg-white p-2 hover:cursor-pointer hover:bg-gray-50"
             draggable
             id={label}
             onDragStart={(event) => onDragStart(event, label!)}

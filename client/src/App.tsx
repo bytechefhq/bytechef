@@ -11,8 +11,16 @@ const user = {
     imageUrl:
         'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
 };
-const navigation = [
-    {name: 'Integrations', href: '/integrations', icon: Square3Stack3DIcon},
+const navigation: {
+    name: string;
+    href: string;
+    icon: React.ForwardRefExoticComponent<React.SVGProps<SVGSVGElement>>;
+}[] = [
+    {
+        name: 'Integrations',
+        href: '/integrations',
+        icon: Square3Stack3DIcon,
+    },
     {name: 'Connections', href: '/connections', icon: LinkIcon},
 ];
 
