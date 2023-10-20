@@ -1,14 +1,3 @@
----
-# Conditionally disable springdoc on missing api-docs profile
-spring:
-  config:
-    activate:
-      on-profile: '!api-docs'
-springdoc:
-  api-docs:
-    enabled: false
----
-
 management:
   endpoints:
     web:
@@ -82,7 +71,6 @@ spring:
     group:
       dev:
         - dev
-        - api-docs
   jmx:
     enabled: false
 #  main:

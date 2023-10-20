@@ -21,8 +21,7 @@ import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionS
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,7 +29,6 @@ import java.util.stream.Collectors;
 /**
  * @author Ivica Cardic
  */
-@Component
 public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefinitionService {
 
     private final List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories;
@@ -38,12 +36,13 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     @SuppressFBWarnings("EI2")
     public TaskDispatcherDefinitionServiceImpl(
         List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories) {
+
         this.taskDispatcherDefinitionFactories = taskDispatcherDefinitionFactories;
     }
 
     @Override
-    public Flux<TaskDispatcherDefinition> getTaskDispatcherDefinitions() {
-        return Flux.fromIterable(taskDispatcherDefinitionFactories.stream()
+    public Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitions() {
+        return Mono.just(taskDispatcherDefinitionFactories.stream()
             .map(TaskDispatcherDefinitionFactory::getDefinition)
             .collect(Collectors.toList()));
     }

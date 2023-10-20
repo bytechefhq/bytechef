@@ -31,6 +31,8 @@ import com.bytechef.hermes.component.AuthorizationContext;
 import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,6 +43,7 @@ import java.util.function.Function;
 /**
  * @author Ivica Cardic
  */
+@JsonDeserialize(as = ComponentDSL.ModifiableAuthorization.class)
 public sealed interface Authorization permits ComponentDSL.ModifiableAuthorization {
 
     enum AuthorizationType {

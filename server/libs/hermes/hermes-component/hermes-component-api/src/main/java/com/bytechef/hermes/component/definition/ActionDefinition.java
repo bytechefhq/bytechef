@@ -21,6 +21,8 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,6 +31,7 @@ import java.util.function.BiFunction;
 /**
  * @author Ivica Cardic
  */
+@JsonDeserialize(as = ComponentDSL.ModifiableActionDefinition.class)
 public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDefinition {
 
     Display getDisplay();

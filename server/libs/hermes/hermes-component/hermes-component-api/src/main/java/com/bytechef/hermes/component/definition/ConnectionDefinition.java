@@ -21,6 +21,8 @@ import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -31,6 +33,7 @@ import java.util.function.Function;
  *
  * @author Ivica Cardic
  */
+@JsonDeserialize(as = ComponentDSL.ModifiableConnectionDefinition.class)
 public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConnectionDefinition {
 
     List<? extends Authorization> getAuthorizations();

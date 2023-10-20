@@ -18,12 +18,13 @@
 package com.bytechef.hermes.definition.registry.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
+import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionModel;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import io.swagger.v3.oas.annotations.Parameter;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -33,26 +34,29 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 @ConditionalOnApi
-@ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "platform-service-app")
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
-public class RemoteTaskDispatcherDefinitionController implements TaskDispatcherDefinitionsApi {
+public class TaskDispatcherDefinitionController implements TaskDispatcherDefinitionsApi {
 
-    private final WebClient.Builder builder;
+    private final ConversionService conversionService;
+    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
 
-    public RemoteTaskDispatcherDefinitionController(WebClient.Builder builder) {
-        this.builder = builder;
+    public TaskDispatcherDefinitionController(
+        ConversionService conversionService, TaskDispatcherDefinitionService taskDispatcherDefinitionService) {
+
+        this.conversionService = conversionService;
+        this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
     }
 
     @Override
     public Mono<ResponseEntity<Flux<TaskDispatcherDefinitionModel>>> getTaskDispatcherDefinitions(
-        ServerWebExchange exchange) {
+        @Parameter(hidden = true) ServerWebExchange exchange) {
         return Mono.just(
             ResponseEntity.ok(
-                builder.build()
-                    .get()
-                    .uri("http://coordinator-service-app/api/task-dispatcher-definitions")
-                    .header("Content-Type", "application/json")
-                    .retrieve()
-                    .bodyToFlux(TaskDispatcherDefinitionModel.class)));
+                taskDispatcherDefinitionService.getTaskDispatcherDefinitions()
+                    .mapNotNull(taskDispatcherDefinitions -> taskDispatcherDefinitions.stream()
+                        .map(taskDispatcherDefinition -> conversionService.convert(
+                            taskDispatcherDefinition, TaskDispatcherDefinitionModel.class))
+                        .toList())
+                    .flatMapMany(Flux::fromIterable)));
     }
 }

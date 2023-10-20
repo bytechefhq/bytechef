@@ -23,17 +23,14 @@ import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
  */
-@Component
 public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade {
 
     private final ConnectionService connectionService;
@@ -48,39 +45,37 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
     }
 
     @Override
-    public Flux<ComponentDefinition> getComponentDefinitions(
+    public Mono<List<ComponentDefinition>> getComponentDefinitions(
         Boolean connectionDefinitions, Boolean connectionInstances) {
 
         List<Connection> connections = connectionService.getConnections(null, null);
 
         return componentDefinitionService.getComponentDefinitions()
-            .collectList()
-            .flatMapMany(Flux::fromIterable)
-            .filter(componentDefinition -> {
-                if (connectionDefinitions == null && connectionInstances == null) {
-                    return true;
-                }
-                if (connectionDefinitions != null && connectionDefinitions &&
-                    connectionInstances != null && connectionInstances) {
+            .map(componentDefinitions -> componentDefinitions.stream()
+                .filter(componentDefinition -> {
+                    if (connectionDefinitions == null && connectionInstances == null) {
+                        return true;
+                    }
+                    if (connectionDefinitions != null && connectionDefinitions &&
+                        connectionInstances != null && connectionInstances) {
 
-                    if (componentDefinition.getConnection() == null) {
-                        return false;
-                    } else {
+                        if (componentDefinition.getConnection() == null) {
+                            return false;
+                        } else {
+                            return connections.stream()
+                                .anyMatch(connection -> Objects.equals(connection.getComponentName(),
+                                    componentDefinition.getName()));
+                        }
+                    } else if (connectionDefinitions != null && connectionDefinitions) {
+                        return componentDefinition.getConnection() != null;
+                    } else if (connectionInstances != null && connectionInstances) {
                         return connections.stream()
                             .anyMatch(connection -> Objects.equals(connection.getComponentName(),
                                 componentDefinition.getName()));
+                    } else {
+                        return false;
                     }
-                } else if (connectionDefinitions != null && connectionDefinitions) {
-                    return componentDefinition.getConnection() != null;
-                } else if (connectionInstances != null && connectionInstances) {
-                    return connections.stream()
-                        .anyMatch(connection -> Objects.equals(connection.getComponentName(),
-                            componentDefinition.getName()));
-                } else {
-                    return false;
-                }
-            })
-            .collect(Collectors.toList())
-            .flatMapMany(Flux::fromIterable);
+                })
+                .toList());
     }
 }

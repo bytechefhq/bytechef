@@ -18,12 +18,14 @@
 package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
 public interface TaskDispatcherDefinitionService {
 
-    Flux<TaskDispatcherDefinition> getTaskDispatcherDefinitions();
+    Mono<List<TaskDispatcherDefinition>> getTaskDispatcherDefinitions();
 }

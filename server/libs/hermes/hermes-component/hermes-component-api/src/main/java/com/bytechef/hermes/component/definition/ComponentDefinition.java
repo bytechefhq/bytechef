@@ -19,6 +19,7 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Resources;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import java.util.Map;
  *
  * @author Ivica Cardic
  */
+@JsonDeserialize(as = ComponentDSL.ModifiableComponentDefinition.class)
 public sealed interface ComponentDefinition permits ComponentDSL.ModifiableComponentDefinition {
 
     List<? extends ActionDefinition> getActions();

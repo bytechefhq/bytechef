@@ -20,22 +20,25 @@ package com.bytechef.hermes.definition.registry.service;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
 public interface ComponentDefinitionService {
 
-    Flux<ComponentDefinition> getComponentDefinitions(String name);
-
-    Flux<ComponentDefinition> getComponentDefinitions();
-
     Mono<ComponentDefinition> getComponentDefinition(String name, Integer version);
+
+    Mono<List<ComponentDefinition>> getComponentDefinitions();
+
+    Mono<List<ComponentDefinition>> getComponentDefinitions(String name);
 
     Mono<ActionDefinition> getComponentDefinitionAction(
         String componentName, int componentVersion, String actionName);
 
-    Flux<ConnectionDefinition> getConnectionDefinitions();
+    Mono<ConnectionDefinition> getConnectionDefinition(String componentName, Integer componentVersion);
+
+    Mono<List<ConnectionDefinition>> getConnectionDefinitions();
 }

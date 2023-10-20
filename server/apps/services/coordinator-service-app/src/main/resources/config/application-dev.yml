@@ -23,3 +23,7 @@ spring:
   jackson:
     serialization:
       indent-output: true
+  rsocket:
+    server:
+      mapping-path: /rsocket
+      transport: websocket

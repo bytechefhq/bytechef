@@ -19,10 +19,8 @@ package com.bytechef.coordinator;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.Optional;
 
-import com.bytechef.hermes.connection.config.ConnectionConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +28,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.ApplicationPidFileWriter;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
@@ -40,12 +36,6 @@ import org.springframework.util.StringUtils;
  */
 @SpringBootApplication(
     scanBasePackages = "com.bytechef")
-@ComponentScan(
-    excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = {
-            ConnectionConfiguration.class
-        })
-    })
 public class CoordinatorApplication {
 
     private static final Logger log = LoggerFactory.getLogger(CoordinatorApplication.class);
@@ -74,9 +64,7 @@ public class CoordinatorApplication {
     }
 
     private static void logApplicationStartup(Environment environment) {
-        String protocol = Optional.ofNullable(environment.getProperty("server.ssl.key-store"))
-            .map(key -> "https")
-            .orElse("http");
+        String protocol = "ws";
         String serverPort = environment.getProperty("server.port");
         String contextPath = Optional.ofNullable(environment.getProperty("server.servlet.context-path"))
             .filter(StringUtils::hasText)
@@ -97,7 +85,6 @@ public class CoordinatorApplication {
                 \tApplication '{}' is running! Access URLs:
                 \tLocal: \t\t{}://localhost:{}{}
                 \tExternal: \t{}://{}:{}{}
-                \tSwaggerUI: \t{}
                 \tProfile(s): \t{}
                 \tGit Commit Id: \t{}
                 ----------------------------------------------------------""",
@@ -109,10 +96,6 @@ public class CoordinatorApplication {
             hostAddress,
             serverPort,
             contextPath,
-            Arrays.asList(environment.getActiveProfiles())
-                .contains("api-docs")
-                    ? "%s://localhost:%s%s".formatted(protocol, serverPort, contextPath + "swagger-ui.html")
-                    : "",
             environment.getActiveProfiles(),
             gitCommitId);
     }
