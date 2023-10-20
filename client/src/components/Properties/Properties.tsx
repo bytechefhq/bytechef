@@ -101,7 +101,7 @@ export const Property = ({
                 </div>
             )}
 
-            {register && controlType === 'INPUT_TEXT' && (
+            {register && controlType === 'TEXT' && (
                 <Input
                     description={description}
                     defaultValue={defaultValue as string}
@@ -117,7 +117,7 @@ export const Property = ({
                 />
             )}
 
-            {!register && controlType === 'INPUT_TEXT' && (
+            {!register && controlType === 'TEXT' && (
                 <Input
                     description={description}
                     defaultValue={defaultValue as string}
@@ -132,7 +132,7 @@ export const Property = ({
                 />
             )}
 
-            {controlType === 'INPUT_INTEGER' && (
+            {controlType === 'INTEGER' && (
                 <Input
                     description={description}
                     error={hasError(name!)}
@@ -156,7 +156,7 @@ export const Property = ({
                 />
             )}
 
-            {controlType === 'INPUT_NUMBER' && (
+            {controlType === 'NUMBER' && (
                 <Input
                     description={description}
                     defaultValue={defaultValue as string}
@@ -171,7 +171,7 @@ export const Property = ({
                 />
             )}
 
-            {controlType === 'INPUT_PASSWORD' && (
+            {controlType === 'PASSWORD' && (
                 <Input
                     description={description}
                     defaultValue={defaultValue as string}
