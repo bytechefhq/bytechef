@@ -81,8 +81,8 @@ spring:
     time-zone: UTC
   jmx:
     enabled: false
-  main:
-    allow-bean-definition-overriding: true
+#  main:
+#    allow-bean-definition-overriding: true
   output:
     ansi:
       console-available: true
