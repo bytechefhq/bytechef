@@ -28,11 +28,11 @@ import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.core.task.evaluator.spel.TempDir;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-
 import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -312,8 +312,11 @@ public class SpelTaskEvaluatorTest {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.builder().methodExecutor("tempDir", new TempDir()).build();
         TaskExecution jt = SimpleTaskExecution.of("tempDir", "${tempDir()}");
         TaskExecution evaluated = evaluator.evaluate(jt, new MapContext(Collections.emptyMap()));
-        Assertions.assertEquals(
-            FilenameUtils.getFullPathNoEndSeparator(System.getProperty("java.io.tmpdir")), evaluated.get("tempDir"));
+        String tmpDir = System.getProperty("java.io.tmpdir");
+        if (tmpDir.endsWith(File.separator)) {
+            tmpDir = FilenameUtils.getFullPathNoEndSeparator(tmpDir);
+        }
+        Assertions.assertEquals(tmpDir, evaluated.get("tempDir"));
     }
 
     @Test
