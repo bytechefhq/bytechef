@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.file.storage;
+package com.bytechef.component.filestorage;
 
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.test.MockContext;
-import com.bytechef.hermes.component.test.MockExecutionParameters;
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.hermes.component.test.mock.MockContext;
+import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -43,7 +43,7 @@ public class FileStorageComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        DefinitionAssert.assertEquals("definition/file-storage_v1.json", fileStorageComponentHandler.getDefinition());
+        AssertUtils.assertEquals("definition/filestorage_v1.json", fileStorageComponentHandler.getDefinition());
     }
 
     @Test

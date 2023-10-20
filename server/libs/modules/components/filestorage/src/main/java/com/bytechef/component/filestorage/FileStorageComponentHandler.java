@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.file.storage;
+package com.bytechef.component.filestorage;
 
-import static com.bytechef.component.file.storage.constants.FileStorageConstants.CONTENT;
-import static com.bytechef.component.file.storage.constants.FileStorageConstants.DOWNLOAD;
-import static com.bytechef.component.file.storage.constants.FileStorageConstants.FILE_STORAGE;
-import static com.bytechef.component.file.storage.constants.FileStorageConstants.READ;
-import static com.bytechef.component.file.storage.constants.FileStorageConstants.WRITE;
+import static com.bytechef.component.filestorage.constants.FileStorageConstants.CONTENT;
+import static com.bytechef.component.filestorage.constants.FileStorageConstants.DOWNLOAD;
+import static com.bytechef.component.filestorage.constants.FileStorageConstants.FILE_STORAGE;
+import static com.bytechef.component.filestorage.constants.FileStorageConstants.READ;
+import static com.bytechef.component.filestorage.constants.FileStorageConstants.WRITE;
 import static com.bytechef.hermes.component.ComponentDSL.action;
 import static com.bytechef.hermes.component.ComponentDSL.createComponent;
 import static com.bytechef.hermes.component.ComponentDSL.display;
@@ -30,7 +30,7 @@ import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAM
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
 import static org.apache.commons.io.IOUtils.copy;
 
-import com.bytechef.component.file.storage.constants.FileStorageConstants;
+import com.bytechef.component.filestorage.constants.FileStorageConstants;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
@@ -57,16 +57,16 @@ public class FileStorageComponentHandler implements ComponentHandler {
             .actions(
                     action(READ)
                             .display(display("Read from file").description("Reads data from the file."))
-                            .inputs(fileEntry(FILE_ENTRY)
+                            .properties(fileEntry(FILE_ENTRY)
                                     .label("File")
                                     .description(
                                             "The object property which contains a reference to the file to read from.")
                                     .required(true))
-                            .outputSchema(string())
+                            .output(string())
                             .performFunction(this::performRead),
                     action(WRITE)
                             .display(display("Write to file").description("Writes the data to the file."))
-                            .inputs(
+                            .properties(
                                     string(CONTENT)
                                             .label("Content")
                                             .description("String to write to the file.")
@@ -76,11 +76,11 @@ public class FileStorageComponentHandler implements ComponentHandler {
                                             .description(
                                                     "Filename to set for data. By default, \"file.txt\" will be used.")
                                             .defaultValue("file.txt"))
-                            .outputSchema(fileEntry())
+                            .output(fileEntry())
                             .performFunction(this::performWrite),
                     action(DOWNLOAD)
                             .display(display("Download file").description("Download thr file from the URL."))
-                            .inputs(
+                            .properties(
                                     string(FileStorageConstants.URL)
                                             .label("URL")
                                             .description("The URL to download the file from.")
@@ -90,7 +90,7 @@ public class FileStorageComponentHandler implements ComponentHandler {
                                             .description(
                                                     "Filename to set for data. By default, \"file.txt\" will be used.")
                                             .defaultValue("file.txt"))
-                            .outputSchema(fileEntry())
+                            .output(fileEntry())
                             .performFunction(this::performDownload));
 
     @Override
