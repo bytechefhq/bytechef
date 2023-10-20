@@ -18,7 +18,6 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.InputParameters;
-import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -168,9 +167,9 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
     ClientSecretFunction getClientSecret();
 
-    List<Object> getDetectOn();
+    Optional<List<Object>> getDetectOn();
 
-    Display getDisplay();
+    Optional<String> getDescription();
 
     String getName();
 
@@ -180,11 +179,13 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
     Optional<RefreshFunction> getRefresh();
 
-    List<Object> getRefreshOn();
+    Optional<List<Object>> getRefreshOn();
 
     RefreshUrlFunction getRefreshUrl();
 
     ScopesFunction getScopes();
+
+    String getTitle();
 
     TokenUrlFunction getTokenUrl();
 

@@ -17,13 +17,11 @@
 
 package com.bytechef.hermes.component.definition;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
-
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Property;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,18 +38,19 @@ public class ComponentDefinitionTest {
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
             registerModule(new JavaTimeModule());
-            setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            registerModule(new Jdk8Module());
         }
     };
 
     @Test
     public void testActionDefinition() throws JSONException, JsonProcessingException {
         ActionDefinition action = ComponentDSL.action("name")
-            .display(display("title").description("description"));
+            .title("title")
+            .description("description");
 
         jsonAssertEquals(
             """
-                {"batch":false,"display":{"description":"description","title":"title"},"name":"name"}
+                {"batch":null,"description":"description","exampleOutput":null,"help":null,"name":"name","outputSchema":null,"properties":null,"outputSchemaDataSource":null,"title":"title"}
                 """,
             action);
     }
@@ -68,18 +67,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {
-                    "controlType": "JSON_BUILDER",
-                    "defaultValue":[1,2],
-                    "description":"description",
-                    "label":"label",
-                    "items":[{"controlType":"INPUT_TEXT","type":"STRING"}],
-                     "multipleValues": true,
-                    "name":"name",
-                    "placeholder":"placeholder",
-                    "required":true,
-                    "type":"ARRAY"
-                }
+                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","metadata":null,"placeholder":"placeholder","required":true,"name":"name","type":"ARRAY","defaultValue":[1,2],"exampleValue":null,"items":[{"advancedOption":null,"description":null,"displayCondition":null,"hidden":null,"label":null,"metadata":null,"placeholder":null,"required":null,"name":null,"type":"STRING","defaultValue":null,"exampleValue":null,"controlType":"INPUT_TEXT","options":null,"optionsDataSource":null,"expressionDisabled":null}],"multipleValues":true,"options":null,"optionsDataSource":null,"controlType":"JSON_BUILDER","expressionDisabled":null}
                 """,
             property);
     }
@@ -95,16 +83,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {
-                    "controlType": "CHECKBOX",
-                    "defaultValue":true,
-                    "description":"description",
-                    "label":"label",
-                    "name":"name",
-                    "placeholder":"placeholder",
-                    "required":true,
-                    "type":"BOOLEAN"
-                }
+                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","metadata":null,"placeholder":"placeholder","required":true,"name":"name","type":"BOOLEAN","defaultValue":true,"exampleValue":null,"controlType":"CHECKBOX","expressionDisabled":null}
                 """,
             property);
     }
@@ -120,16 +99,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {
-                    "controlType": "DATE",
-                    "defaultValue":[-999999999,1,1],
-                    "description":"description",
-                    "label":"label",
-                    "name":"name",
-                    "placeholder":"placeholder",
-                    "required":true,
-                    "type":"DATE"
-                }
+                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","metadata":null,"placeholder":"placeholder","required":true,"name":"name","type":"DATE","defaultValue":[-999999999,1,1],"exampleValue":null,"options":null,"optionsDataSource":null,"controlType":"DATE","expressionDisabled":null}
                 """,
             property);
     }
@@ -145,17 +115,8 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {
-                    "controlType": "DATE_TIME",
-                    "defaultValue":[-999999999,1,1,0,0],
-                    "description":"description",
-                    "label":"label",
-                    "name":"name",
-                    "placeholder":"placeholder",
-                    "required":true,
-                    "type":"DATE_TIME"
-                }
-                """,
+                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","metadata":null,"placeholder":"placeholder","required":true,"name":"name","type":"DATE_TIME","defaultValue":[-999999999,1,1,0,0],"exampleValue":null,"options":null,"optionsDataSource":null,"controlType":"DATE_TIME","expressionDisabled":null}
+                 """,
             property);
     }
 
@@ -170,16 +131,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {
-                    "controlType": "INPUT_INTEGER",
-                    "defaultValue":2,
-                    "description":"description",
-                    "label":"label",
-                    "name":"name",
-                    "placeholder":"placeholder",
-                    "required":true,
-                    "type":"INTEGER"
-                }
+                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","metadata":null,"placeholder":"placeholder","required":true,"name":"name","type":"INTEGER","defaultValue":2,"exampleValue":null,"maxValue":null,"minValue":null,"options":null,"optionsDataSource":null,"controlType":"INPUT_INTEGER","expressionDisabled":null}
                 """,
             property);
     }
@@ -196,26 +148,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {
-                    "controlType": "SELECT",
-                    "defaultValue":2,
-                    "description":"description",
-                    "label":"label",
-                    "name":"name",
-                    "options":[
-                        {
-                            "name":"option1",
-                            "value":1
-                        },
-                        {
-                            "name":"option2",
-                            "value":2
-                        }
-                    ],
-                    "placeholder":"placeholder",
-                    "required":true,
-                    "type":"NUMBER"
-                }
+                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","metadata":null,"placeholder":"placeholder","required":true,"name":"name","type":"NUMBER","defaultValue":2.0,"exampleValue":null,"maxValue":null,"minValue":null,"numberPrecision":null,"options":[{"description":null,"displayCondition":null,"name":"option1","value":1},{"description":null,"displayCondition":null,"name":"option2","value":2}],"optionsDataSource":null,"controlType":"SELECT","expressionDisabled":null}
                 """,
             property);
     }
@@ -231,17 +164,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {
-                    "controlType": "JSON_BUILDER",
-                    "defaultValue":{"key":{"key1":"value1"}},
-                    "description":"description",
-                    "label":"label",
-                    "multipleValues": true,
-                    "name":"name",
-                    "placeholder":"placeholder",
-                    "required":true,
-                    "type":"OBJECT"
-                }
+                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","metadata":null,"placeholder":"placeholder","required":true,"name":"name","type":"OBJECT","defaultValue":{"key":{"key1":"value1"}},"exampleValue":null,"additionalProperties":null,"multipleValues":true,"objectType":null,"options":null,"optionsDataSource":null,"properties":null,"controlType":"JSON_BUILDER","expressionDisabled":null}
                 """,
             property);
     }
@@ -257,15 +180,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {
-                    "description":"description",
-                    "label":"label",
-                    "name":"name",
-                    "placeholder":"placeholder",
-                    "required":true,
-                    "types":[{"controlType":"INPUT_TEXT","type":"STRING"}],
-                    "type": "ONE_OF"
-                }
+                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","metadata":null,"placeholder":"placeholder","required":true,"name":"name","type":"ONE_OF","types":[{"advancedOption":null,"description":null,"displayCondition":null,"hidden":null,"label":null,"metadata":null,"placeholder":null,"required":null,"name":null,"type":"STRING","defaultValue":null,"exampleValue":null,"controlType":"INPUT_TEXT","options":null,"optionsDataSource":null,"expressionDisabled":null}],"expressionDisabled":null}
                 """,
             property);
     }
@@ -281,16 +196,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {
-                    "controlType": "INPUT_TEXT",
-                    "defaultValue":"defaultValue",
-                    "description":"description",
-                    "label":"label",
-                    "name":"name",
-                    "placeholder":"placeholder",
-                    "required":true,
-                    "type":"STRING"
-                }
+                {"advancedOption":null,"description":"description","displayCondition":null,"hidden":null,"label":"label","metadata":null,"placeholder":"placeholder","required":true,"name":"name","type":"STRING","defaultValue":"defaultValue","exampleValue":null,"controlType":"INPUT_TEXT","options":null,"optionsDataSource":null,"expressionDisabled":null}
                 """,
             property);
     }
@@ -299,24 +205,14 @@ public class ComponentDefinitionTest {
     public void testTaskHandlerDescription() throws JSONException, JsonProcessingException {
         ComponentDefinition componentDefinition;
         componentDefinition = ComponentDSL.component("name")
-            .display(display("title")
-                .description("description")
-                .subtitle("subtitle")
-                .icon("icon"))
+            .title("title")
+            .description("description")
+            .icon("icon")
             .version(1);
 
         jsonAssertEquals(
             """
-                {
-                    "display":{
-                        "description":"description",
-                        "icon":"icon",
-                        "title":"title",
-                        "subtitle":"subtitle"
-                    },
-                    "name":"name",
-                    "version":1.0
-                }
+                {"actions":null,"category":null,"connection":null,"description":"description","icon":"icon","tags":null,"name":"name","resources":null,"version":1,"title":"title","triggers":null}
                 """,
             componentDefinition);
     }
@@ -327,10 +223,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {
-                    "name":"name",
-                    "value":1
-                }
+                {"description":null,"displayCondition":null,"name":"name","value":1}
                 """,
             option);
 
@@ -338,10 +231,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {
-                    "name":"name",
-                    "value":"value"
-                }
+                {"description":null,"displayCondition":null,"name":"name","value":"value"}
                 """,
             option);
 
@@ -349,11 +239,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {
-                    "name":"name",
-                    "value":1,
-                    "description":"description"
-                }
+                {"description":"description","displayCondition":null,"name":"name","value":1}
                 """,
             option);
 
@@ -361,11 +247,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {
-                    "name":"name",
-                    "value":"value",
-                    "description":"description"
-                }
+                {"description":"description","displayCondition":null,"name":"name","value":"value"}
                 """,
             option);
     }

@@ -17,8 +17,9 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property;
 
 import java.util.List;
@@ -27,8 +28,7 @@ import java.util.List;
  * @author Ivica Cardic
  */
 public sealed interface ComponentPropertiesDataSource
-    extends
-    com.bytechef.hermes.definition.PropertiesDataSource permits ComponentDSL.ModifiableComponentPropertiesDataSource {
+    extends PropertiesDataSource permits ComponentDSL.ModifiableComponentPropertiesDataSource {
 
     /**
      * The function that returns a list of properties.
@@ -49,6 +49,6 @@ public sealed interface ComponentPropertiesDataSource
          * @param inputParameters
          * @return
          */
-        List<? extends Property<?>> apply(Context.Connection connection, InputParameters inputParameters);
+        List<? extends Property<?>> apply(Connection connection, InputParameters inputParameters);
     }
 }

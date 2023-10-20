@@ -357,7 +357,9 @@ public final class HttpClientUtils {
                     connection -> connection.applyAuthorization(
                         new AuthorizationContext(headers, queryParameters, new HashMap<>())));
         } else {
-            ConnectionDefinition connectionDefinition = componentDefinition.getConnection();
+            ConnectionDefinition connectionDefinition = componentDefinition
+                .getConnection()
+                .orElse(null);
 
             if (connectionDefinition != null && connectionDefinition.isAuthorizationRequired()) {
                 Context.Connection connection = context.getConnection();
@@ -725,12 +727,11 @@ public final class HttpClientUtils {
     public static class Body {
 
         private final BodyContentType contentType;
-        private String mimeType;
+        private final String mimeType;
         private final Object content;
 
         private Body(Object content, BodyContentType contentType) {
-            this.content = content;
-            this.contentType = contentType;
+            this(content, contentType, null);
         }
 
         private Body(Object content, BodyContentType contentType, String mimeType) {

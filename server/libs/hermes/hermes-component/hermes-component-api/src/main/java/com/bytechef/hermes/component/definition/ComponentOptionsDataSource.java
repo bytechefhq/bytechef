@@ -20,6 +20,7 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.definition.Option;
+import com.bytechef.hermes.definition.OptionsDataSource;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ import java.util.List;
  * @author Ivica Cardic
  */
 public sealed interface ComponentOptionsDataSource
-    extends com.bytechef.hermes.definition.OptionsDataSource permits ComponentDSL.ModifiableComponentOptionsDataSource {
+    extends OptionsDataSource permits ComponentDSL.ModifiableComponentOptionsDataSource {
 
     /**
      * The function that returns options.
@@ -48,6 +49,6 @@ public sealed interface ComponentOptionsDataSource
          * @param inputParameters
          * @return
          */
-        List<Option> apply(Connection connection, InputParameters inputParameters);
+        List<Option<?>> apply(Connection connection, InputParameters inputParameters);
     }
 }

@@ -18,9 +18,7 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.InputParameters;
-import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
-import com.bytechef.hermes.definition.Resources;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
@@ -41,21 +39,21 @@ public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConn
 
     Authorization getAuthorization(String authorizationName);
 
-    List<? extends Authorization> getAuthorizations();
+    Optional<List<? extends Authorization>> getAuthorizations();
 
     BaseUriFunction getBaseUri();
 
     String getComponentName();
 
-    Display getDisplay();
+    Optional<String> getDescription();
 
     String getName();
 
-    List<? extends Property<?>> getProperties();
-
-    Resources getResources();
+    Optional<List<? extends Property<?>>> getProperties();
 
     Optional<TestConsumer> getTest();
+
+    String getTitle();
 
     int getVersion();
 

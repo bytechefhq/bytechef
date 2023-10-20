@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
 
 /**
@@ -44,6 +44,6 @@ public sealed interface ExampleOutputDataSource permits ComponentDSL.ModifiableE
          * @param inputParameters
          * @return
          */
-        Object apply(Context.Connection connection, InputParameters inputParameters);
+        Object apply(Connection connection, InputParameters inputParameters);
     }
 }

@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Ivica Cardic
@@ -174,6 +175,8 @@ public interface InputParameters {
      */
     int getInteger(String key, int defaultValue);
 
+    Set<String> getKeys();
+
     /**
      * Return the {@link List} of items associated with the given key.
      *
@@ -219,8 +222,6 @@ public interface InputParameters {
      * @return The {@link Long} value associated with the given key -- converting as needed.
      */
     long getLong(String key, long defaultValue);
-
-    Map<String, Object> getMap();
 
     /**
      * Return the {@link Map} value associated with the given key.
