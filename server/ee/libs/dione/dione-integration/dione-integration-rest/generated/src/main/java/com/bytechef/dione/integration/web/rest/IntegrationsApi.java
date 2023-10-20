@@ -8,15 +8,13 @@ package com.bytechef.dione.integration.web.rest;
 import com.bytechef.dione.integration.web.rest.model.CreateIntegrationWorkflowRequestModel;
 import com.bytechef.dione.integration.web.rest.model.IntegrationModel;
 import com.bytechef.dione.integration.web.rest.model.UpdateTagsRequestModel;
-import io.swagger.v3.oas.annotations.ExternalDocumentation;
+import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.http.HttpStatus;
@@ -24,17 +22,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import org.springframework.http.codec.multipart.Part;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+
 import jakarta.annotation.Generated;
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-27T18:32:20.850700+02:00[Europe/Zagreb]")
@@ -99,7 +94,7 @@ public interface IntegrationsApi {
         tags = { "integrations" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated integration object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.atlas.web.rest.model.WorkflowModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
             })
         }
     )
@@ -109,7 +104,7 @@ public interface IntegrationsApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default Mono<ResponseEntity<com.bytechef.atlas.web.rest.model.WorkflowModel>> createIntegrationWorkflow(
+    default Mono<ResponseEntity<WorkflowModel>> createIntegrationWorkflow(
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "CreateIntegrationWorkflowRequestModel", description = "", required = true) @Valid @RequestBody Mono<CreateIntegrationWorkflowRequestModel> createIntegrationWorkflowRequestModel,
         @Parameter(hidden = true) final ServerWebExchange exchange
@@ -214,7 +209,7 @@ public interface IntegrationsApi {
         tags = { "integrations" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated integration object.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.atlas.web.rest.model.WorkflowModel.class)))
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
             })
         }
     )
@@ -223,7 +218,7 @@ public interface IntegrationsApi {
         value = "/integrations/{id}/workflows",
         produces = { "application/json" }
     )
-    default Mono<ResponseEntity<Flux<com.bytechef.atlas.web.rest.model.WorkflowModel>>> getIntegrationWorkflows(
+    default Mono<ResponseEntity<Flux<WorkflowModel>>> getIntegrationWorkflows(
         @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {

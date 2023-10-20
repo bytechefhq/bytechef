@@ -21,7 +21,7 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
 @ComponentScan(basePackages = {
-    "com.bytechef.atlas.web.rest",
+    "com.bytechef.hermes.workflow.web.rest",
     "com.bytechef.category.web.rest",
     "com.bytechef.helios.project.web.rest",
     "com.bytechef.tag.web.rest"

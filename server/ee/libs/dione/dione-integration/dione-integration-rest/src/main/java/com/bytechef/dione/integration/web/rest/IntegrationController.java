@@ -17,7 +17,7 @@
 
 package com.bytechef.dione.integration.web.rest;
 
-import com.bytechef.atlas.web.rest.model.WorkflowModel;
+import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.dione.integration.dto.IntegrationDTO;
 import com.bytechef.dione.integration.facade.IntegrationFacade;

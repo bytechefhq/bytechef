@@ -8,15 +8,13 @@ package com.bytechef.helios.project.web.rest;
 import com.bytechef.helios.project.web.rest.model.CreateProjectWorkflowRequestModel;
 import com.bytechef.helios.project.web.rest.model.ProjectModel;
 import com.bytechef.helios.project.web.rest.model.UpdateTagsRequestModel;
-import io.swagger.v3.oas.annotations.ExternalDocumentation;
+import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.http.HttpStatus;
@@ -24,17 +22,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import org.springframework.http.codec.multipart.Part;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+
 import jakarta.annotation.Generated;
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:22:37.259464+02:00[Europe/Zagreb]")
@@ -99,7 +94,7 @@ public interface ProjectsApi {
         tags = { "projects" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated project object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.atlas.web.rest.model.WorkflowModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
             })
         }
     )
@@ -109,7 +104,7 @@ public interface ProjectsApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default Mono<ResponseEntity<com.bytechef.atlas.web.rest.model.WorkflowModel>> createProjectWorkflow(
+    default Mono<ResponseEntity<WorkflowModel>> createProjectWorkflow(
         @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "CreateProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody Mono<CreateProjectWorkflowRequestModel> createProjectWorkflowRequestModel,
         @Parameter(hidden = true) final ServerWebExchange exchange
@@ -255,7 +250,7 @@ public interface ProjectsApi {
         tags = { "projects" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated project object.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.atlas.web.rest.model.WorkflowModel.class)))
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
             })
         }
     )
@@ -264,7 +259,7 @@ public interface ProjectsApi {
         value = "/projects/{id}/workflows",
         produces = { "application/json" }
     )
-    default Mono<ResponseEntity<Flux<com.bytechef.atlas.web.rest.model.WorkflowModel>>> getProjectWorkflows(
+    default Mono<ResponseEntity<Flux<WorkflowModel>>> getProjectWorkflows(
         @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {

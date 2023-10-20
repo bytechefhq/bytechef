@@ -18,14 +18,14 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     schemaMappings = [
         Category: "com.bytechef.category.web.rest.model.CategoryModel",
         Connection: "com.bytechef.hermes.connection.web.rest.model.ConnectionModel",
-        ExecutionError: "com.bytechef.atlas.web.rest.model.ExecutionErrorModel",
-        Job: "com.bytechef.atlas.web.rest.model.JobModel",
+        ExecutionError: "com.bytechef.hermes.workflow.web.rest.model.ExecutionErrorModel",
+        Job: "com.bytechef.hermes.workflow.web.rest.model.JobModel",
         Page: "org.springframework.data.domain.Page",
         Tag: "com.bytechef.tag.web.rest.model.TagModel",
-        TaskExecution: "com.bytechef.atlas.web.rest.model.TaskExecutionModel",
-        Workflow: "com.bytechef.atlas.web.rest.model.WorkflowModel",
-        WorkflowFormat: "com.bytechef.atlas.web.rest.model.WorkflowFormatModel",
-        WorkflowTask: "com.bytechef.atlas.web.rest.model.WorkflowTaskModel"
+        TaskExecution: "com.bytechef.hermes.workflow.web.rest.model.TaskExecutionModel",
+        Workflow: "com.bytechef.hermes.workflow.web.rest.model.WorkflowModel",
+        WorkflowFormat: "com.bytechef.hermes.workflow.web.rest.model.WorkflowFormatModel",
+        WorkflowTask: "com.bytechef.hermes.workflow.web.rest.model.WorkflowTaskModel"
     ]
 }
 
@@ -49,7 +49,7 @@ dependencies {
     annotationProcessor libs.org.mapstruct.mapstruct.processor
     annotationProcessor libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions
 
-    api project(":server:libs:atlas:atlas-rest:atlas-rest-api")
+    api project(":server:libs:hermes:hermes-workflow:hermes-workflow-rest:hermes-workflow-rest-api")
     api project(":server:libs:core:category:category-rest:category-rest-api")
     api project(":server:libs:core:tag:tag-rest:tag-rest-api")
     api project(":server:libs:hermes:hermes-connection:hermes-connection-rest:hermes-connection-rest-api")

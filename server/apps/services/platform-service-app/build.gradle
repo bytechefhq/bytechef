@@ -24,7 +24,7 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-git")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-jdbc")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-resource")
-    implementation project(":server:libs:atlas:atlas-rest:atlas-rest-impl")
+    implementation project(":server:libs:hermes:hermes-workflow:hermes-workflow-rest:hermes-workflow-rest-impl")
 //    implementation project(":server:libs:atlas:atlas-rsocket")
     implementation project(":server:libs:core:category:category-rest:category-rest-impl")
     implementation project(":server:libs:core:category:category-service")
