@@ -115,9 +115,6 @@ const InstanceDialogBasicStep = ({
                         {...register('name', {
                             required: true,
                         })}
-                        onChange={(e) => {
-                            setValue('name', e.target.value);
-                        }}
                     />
 
                     <TextArea
