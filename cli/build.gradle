@@ -1,7 +1,7 @@
 plugins {
     id "com.bytechef.java-application-conventions"
     id "com.bytechef.java-library-conventions"
-    id "org.sonarqube"
+    alias(libs.plugins.org.sonarqube)
 }
 
 file("${projectDir}/sonar-project.properties").withReader {

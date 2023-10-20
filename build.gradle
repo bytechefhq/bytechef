@@ -1,14 +1,11 @@
 plugins {
     id "checkstyle"
-    id "com.diffplug.spotless"
-    id "com.github.ben-manes.versions"
-    id "com.github.spotbugs"
+    alias(libs.plugins.com.diffplug.spotless)
+    alias(libs.plugins.com.github.ben.manes.versions)
+    alias(libs.plugins.com.github.spotbugs)
     id "com.bytechef.java-common-conventions"
+    alias(libs.plugins.nl.littlerobots.version.catalog.update)
     id "pmd"
-}
-
-allprojects {
-    apply plugin: "com.github.ben-manes.versions"
 }
 
 subprojects {
@@ -25,18 +22,18 @@ subprojects {
     }
 
     checkstyle {
-        toolVersion "${checkstyleVersion}"
+        toolVersion "${libs.versions.checkstyle.get()}"
         configFile file("${rootDir}/config/checkstyle/checkstyle.xml")
     }
 
     pmd {
-        toolVersion = "${pmdVersion}"
+        toolVersion = "${libs.versions.pmd.get()}"
         ruleSetFiles = files("${rootDir}/config/pmd/pmd-ruleset.xml")
         ruleSets = []
     }
 
     spotbugs {
-        toolVersion = "${spotbugsVersion}"
+        toolVersion = "${libs.versions.spotbugs.get()}"
         reportsDir = file("$buildDir/reports/spotbugs")
         excludeFilter = file("${rootDir}/config/spotbugs/spotbugs-exclude.xml")
     }
@@ -201,7 +198,7 @@ subprojects {
     }
 
     dependencies {
-        compileOnly "org.graalvm.sdk:graal-sdk:${graalSDKVersion}"
+        compileOnly libs.org.graalvm.sdk.graal.sdk
 
         implementation libs.spotbugs.annotations
     }
