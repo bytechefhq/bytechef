@@ -52,7 +52,7 @@ export class ConnectionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get connection definition for a component.
-     * Get connection definition for a component.
+     * Get connection definition for a component
      */
     async getComponentConnectionDefinitionRaw(requestParameters: GetComponentConnectionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConnectionDefinitionModel>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -79,7 +79,7 @@ export class ConnectionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get connection definition for a component.
-     * Get connection definition for a component.
+     * Get connection definition for a component
      */
     async getComponentConnectionDefinition(requestParameters: GetComponentConnectionDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConnectionDefinitionModel> {
         const response = await this.getComponentConnectionDefinitionRaw(requestParameters, initOverrides);
@@ -88,7 +88,7 @@ export class ConnectionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get all compatible connection definitions for a component.
-     * Get all compatible connection definitions for a component.
+     * Get all compatible connection definitions for a component
      */
     async getComponentConnectionDefinitionsRaw(requestParameters: GetComponentConnectionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ConnectionDefinitionBasicModel>>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -115,7 +115,7 @@ export class ConnectionDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get all compatible connection definitions for a component.
-     * Get all compatible connection definitions for a component.
+     * Get all compatible connection definitions for a component
      */
     async getComponentConnectionDefinitions(requestParameters: GetComponentConnectionDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ConnectionDefinitionBasicModel>> {
         const response = await this.getComponentConnectionDefinitionsRaw(requestParameters, initOverrides);

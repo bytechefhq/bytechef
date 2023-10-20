@@ -13,12 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { ControlTypeModel } from './ControlTypeModel';
-import {
-    ControlTypeModelFromJSON,
-    ControlTypeModelFromJSONTyped,
-    ControlTypeModelToJSON,
-} from './ControlTypeModel';
 import type { OptionModel } from './OptionModel';
 import {
     OptionModelFromJSON,
@@ -31,25 +25,25 @@ import {
     OptionsDataSourceModelFromJSONTyped,
     OptionsDataSourceModelToJSON,
 } from './OptionsDataSourceModel';
+import type { PropertyModel } from './PropertyModel';
+import {
+    PropertyModelFromJSON,
+    PropertyModelFromJSONTyped,
+    PropertyModelToJSON,
+} from './PropertyModel';
 import type { PropertyTypeModel } from './PropertyTypeModel';
 import {
     PropertyTypeModelFromJSON,
     PropertyTypeModelFromJSONTyped,
     PropertyTypeModelToJSON,
 } from './PropertyTypeModel';
-import type { ValuePropertyModel } from './ValuePropertyModel';
-import {
-    ValuePropertyModelFromJSON,
-    ValuePropertyModelFromJSONTyped,
-    ValuePropertyModelToJSON,
-} from './ValuePropertyModel';
 
 /**
  * A number property type.
  * @export
  * @interface NumberPropertyModel
  */
-export interface NumberPropertyModel extends ValuePropertyModel {
+export interface NumberPropertyModel extends PropertyModel {
     /**
      * The maximum property value.
      * @type {number}
@@ -100,7 +94,7 @@ export function NumberPropertyModelFromJSONTyped(json: any, ignoreDiscriminator:
         return json;
     }
     return {
-        ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
+        ...PropertyModelFromJSONTyped(json, ignoreDiscriminator),
         'maxValue': !exists(json, 'maxValue') ? undefined : json['maxValue'],
         'minValue': !exists(json, 'minValue') ? undefined : json['minValue'],
         'numberPrecision': !exists(json, 'numberPrecision') ? undefined : json['numberPrecision'],
@@ -117,7 +111,7 @@ export function NumberPropertyModelToJSON(value?: NumberPropertyModel | null): a
         return null;
     }
     return {
-        ...ValuePropertyModelToJSON(value),
+        ...PropertyModelToJSON(value),
         'maxValue': value.maxValue,
         'minValue': value.minValue,
         'numberPrecision': value.numberPrecision,

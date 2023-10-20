@@ -7,6 +7,7 @@ apis/index.ts
 index.ts
 models/ActionDefinitionBasicModel.ts
 models/ActionDefinitionModel.ts
+models/AnyPropertyModel.ts
 models/ArrayPropertyAllOfModel.ts
 models/ArrayPropertyModel.ts
 models/AuthorizationModel.ts
@@ -33,8 +34,6 @@ models/NumberPropertyModel.ts
 models/OAuth2AuthorizationParametersModel.ts
 models/ObjectPropertyAllOfModel.ts
 models/ObjectPropertyModel.ts
-models/OneOfPropertyAllOfModel.ts
-models/OneOfPropertyModel.ts
 models/OptionModel.ts
 models/OptionsDataSourceModel.ts
 models/PropertiesDataSourceModel.ts

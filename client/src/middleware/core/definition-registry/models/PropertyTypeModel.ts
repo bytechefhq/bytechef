@@ -18,6 +18,7 @@
  * @export
  */
 export const PropertyTypeModel = {
+    Any: 'ANY',
     Array: 'ARRAY',
     Boolean: 'BOOLEAN',
     Date: 'DATE',
@@ -28,7 +29,6 @@ export const PropertyTypeModel = {
     Number: 'NUMBER',
     String: 'STRING',
     Object: 'OBJECT',
-    OneOf: 'ONE_OF',
     Time: 'TIME'
 } as const;
 export type PropertyTypeModel = typeof PropertyTypeModel[keyof typeof PropertyTypeModel];

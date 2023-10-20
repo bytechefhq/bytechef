@@ -81,7 +81,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Create a new project instance.
-     * Create a new project instance.
+     * Create a new project instance
      */
     async createProjectInstanceRaw(requestParameters: CreateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstanceModel>> {
         if (requestParameters.projectInstanceModel === null || requestParameters.projectInstanceModel === undefined) {
@@ -107,7 +107,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Create a new project instance.
-     * Create a new project instance.
+     * Create a new project instance
      */
     async createProjectInstance(requestParameters: CreateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstanceModel> {
         const response = await this.createProjectInstanceRaw(requestParameters, initOverrides);
@@ -116,7 +116,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Create a request for running a new job.
-     * Create a request for running a new job.
+     * Create a request for running a new job
      */
     async createProjectInstanceJobRaw(requestParameters: CreateProjectInstanceJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateProjectInstanceJob200ResponseModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -146,7 +146,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Create a request for running a new job.
-     * Create a request for running a new job.
+     * Create a request for running a new job
      */
     async createProjectInstanceJob(requestParameters: CreateProjectInstanceJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateProjectInstanceJob200ResponseModel> {
         const response = await this.createProjectInstanceJobRaw(requestParameters, initOverrides);
@@ -155,7 +155,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Delete a project instance.
-     * Delete a project instance.
+     * Delete a project instance
      */
     async deleteProjectInstanceRaw(requestParameters: DeleteProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -178,7 +178,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Delete a project instance.
-     * Delete a project instance.
+     * Delete a project instance
      */
     async deleteProjectInstance(requestParameters: DeleteProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteProjectInstanceRaw(requestParameters, initOverrides);
@@ -186,7 +186,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Enable/disable a project instance.
-     * Enable/disable a project instance.
+     * Enable/disable a project instance
      */
     async enableProjectInstanceRaw(requestParameters: EnableProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -213,7 +213,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Enable/disable a project instance.
-     * Enable/disable a project instance.
+     * Enable/disable a project instance
      */
     async enableProjectInstance(requestParameters: EnableProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.enableProjectInstanceRaw(requestParameters, initOverrides);
@@ -221,7 +221,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Enable/disable a workflow of a project instance.
-     * Enable/disable a workflow of a project instance.
+     * Enable/disable a workflow of a project instance
      */
     async enableProjectInstanceWorkflowRaw(requestParameters: EnableProjectInstanceWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -252,7 +252,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Enable/disable a workflow of a project instance.
-     * Enable/disable a workflow of a project instance.
+     * Enable/disable a workflow of a project instance
      */
     async enableProjectInstanceWorkflow(requestParameters: EnableProjectInstanceWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.enableProjectInstanceWorkflowRaw(requestParameters, initOverrides);
@@ -260,7 +260,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Get a project instance by id.
-     * Get a project instance by id.
+     * Get a project instance by id
      */
     async getProjectInstanceRaw(requestParameters: GetProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstanceModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -283,7 +283,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Get a project instance by id.
-     * Get a project instance by id.
+     * Get a project instance by id
      */
     async getProjectInstance(requestParameters: GetProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstanceModel> {
         const response = await this.getProjectInstanceRaw(requestParameters, initOverrides);
@@ -292,7 +292,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Get project instances.
-     * Get project instances.
+     * Get project instances
      */
     async getProjectInstancesRaw(requestParameters: GetProjectInstancesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ProjectInstanceModel>>> {
         const queryParameters: any = {};
@@ -319,7 +319,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Get project instances.
-     * Get project instances.
+     * Get project instances
      */
     async getProjectInstances(requestParameters: GetProjectInstancesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ProjectInstanceModel>> {
         const response = await this.getProjectInstancesRaw(requestParameters, initOverrides);
@@ -328,7 +328,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Update an existing project instance.
-     * Update an existing project instance.
+     * Update an existing project instance
      */
     async updateProjectInstanceRaw(requestParameters: UpdateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProjectInstanceModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -358,7 +358,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Update an existing project instance.
-     * Update an existing project instance.
+     * Update an existing project instance
      */
     async updateProjectInstance(requestParameters: UpdateProjectInstanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProjectInstanceModel> {
         const response = await this.updateProjectInstanceRaw(requestParameters, initOverrides);
@@ -367,7 +367,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Updates tags of an existing project instance.
-     * Updates tags of an existing project instance.
+     * Updates tags of an existing project instance
      */
     async updateProjectInstanceTagsRaw(requestParameters: UpdateProjectInstanceTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -397,7 +397,7 @@ export class ProjectInstancesApi extends runtime.BaseAPI {
 
     /**
      * Updates tags of an existing project instance.
-     * Updates tags of an existing project instance.
+     * Updates tags of an existing project instance
      */
     async updateProjectInstanceTags(requestParameters: UpdateProjectInstanceTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.updateProjectInstanceTagsRaw(requestParameters, initOverrides);

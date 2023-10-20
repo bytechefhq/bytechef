@@ -46,7 +46,7 @@ export class WorkflowExecutionsApi extends runtime.BaseAPI {
 
     /**
      * Get workflow execution by id.
-     * Get workflow executions by id.
+     * Get workflow executions by id
      */
     async getWorkflowExecutionRaw(requestParameters: GetWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowExecutionModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
@@ -69,7 +69,7 @@ export class WorkflowExecutionsApi extends runtime.BaseAPI {
 
     /**
      * Get workflow execution by id.
-     * Get workflow executions by id.
+     * Get workflow executions by id
      */
     async getWorkflowExecution(requestParameters: GetWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowExecutionModel> {
         const response = await this.getWorkflowExecutionRaw(requestParameters, initOverrides);
@@ -78,7 +78,7 @@ export class WorkflowExecutionsApi extends runtime.BaseAPI {
 
     /**
      * Get workflow executions.
-     * Get workflow executions.
+     * Get workflow executions
      */
     async getWorkflowExecutionsRaw(requestParameters: GetWorkflowExecutionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageModel>> {
         const queryParameters: any = {};
@@ -125,7 +125,7 @@ export class WorkflowExecutionsApi extends runtime.BaseAPI {
 
     /**
      * Get workflow executions.
-     * Get workflow executions.
+     * Get workflow executions
      */
     async getWorkflowExecutions(requestParameters: GetWorkflowExecutionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PageModel> {
         const response = await this.getWorkflowExecutionsRaw(requestParameters, initOverrides);

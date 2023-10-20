@@ -29,7 +29,7 @@ export class ProjectCategoriesApi extends runtime.BaseAPI {
 
     /**
      * Get categories.
-     * Get categories.
+     * Get categories
      */
     async getProjectCategoriesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<CategoryModel>>> {
         const queryParameters: any = {};
@@ -48,7 +48,7 @@ export class ProjectCategoriesApi extends runtime.BaseAPI {
 
     /**
      * Get categories.
-     * Get categories.
+     * Get categories
      */
     async getProjectCategories(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<CategoryModel>> {
         const response = await this.getProjectCategoriesRaw(initOverrides);

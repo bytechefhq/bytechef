@@ -48,7 +48,7 @@ export class ComponentDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get a component definition.
-     * Get a component definition.
+     * Get a component definition
      */
     async getComponentDefinitionRaw(requestParameters: GetComponentDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ComponentDefinitionModel>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
@@ -75,7 +75,7 @@ export class ComponentDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get a component definition.
-     * Get a component definition.
+     * Get a component definition
      */
     async getComponentDefinition(requestParameters: GetComponentDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ComponentDefinitionModel> {
         const response = await this.getComponentDefinitionRaw(requestParameters, initOverrides);
@@ -116,7 +116,7 @@ export class ComponentDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get all component definitions.
-     * Get all component definitions.
+     * Get all component definitions
      */
     async getComponentDefinitionsRaw(requestParameters: GetComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasicModel>>> {
         const queryParameters: any = {};
@@ -151,7 +151,7 @@ export class ComponentDefinitionsApi extends runtime.BaseAPI {
 
     /**
      * Get all component definitions.
-     * Get all component definitions.
+     * Get all component definitions
      */
     async getComponentDefinitions(requestParameters: GetComponentDefinitionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasicModel>> {
         const response = await this.getComponentDefinitionsRaw(requestParameters, initOverrides);

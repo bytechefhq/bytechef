@@ -2,6 +2,7 @@
 /* eslint-disable */
 export * from './ActionDefinitionBasicModel';
 export * from './ActionDefinitionModel';
+export * from './AnyPropertyModel';
 export * from './ArrayPropertyAllOfModel';
 export * from './ArrayPropertyModel';
 export * from './AuthorizationModel';
@@ -28,8 +29,6 @@ export * from './NumberPropertyModel';
 export * from './OAuth2AuthorizationParametersModel';
 export * from './ObjectPropertyAllOfModel';
 export * from './ObjectPropertyModel';
-export * from './OneOfPropertyAllOfModel';
-export * from './OneOfPropertyModel';
 export * from './OptionModel';
 export * from './OptionsDataSourceModel';
 export * from './PropertiesDataSourceModel';

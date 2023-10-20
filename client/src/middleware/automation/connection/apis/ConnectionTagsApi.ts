@@ -29,7 +29,7 @@ export class ConnectionTagsApi extends runtime.BaseAPI {
 
     /**
      * Get connection tags.
-     * Get connection tags.
+     * Get connection tags
      */
     async getConnectionTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TagModel>>> {
         const queryParameters: any = {};
@@ -48,7 +48,7 @@ export class ConnectionTagsApi extends runtime.BaseAPI {
 
     /**
      * Get connection tags.
-     * Get connection tags.
+     * Get connection tags
      */
     async getConnectionTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TagModel>> {
         const response = await this.getConnectionTagsRaw(initOverrides);
