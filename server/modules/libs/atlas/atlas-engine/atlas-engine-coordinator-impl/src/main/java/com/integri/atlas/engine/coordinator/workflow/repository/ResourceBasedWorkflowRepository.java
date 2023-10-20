@@ -34,7 +34,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
  */
 public class ResourceBasedWorkflowRepository implements WorkflowRepository {
 
-    private String locationPattern = "classpath:workflow/**/*.yaml";
+    private String locationPattern = "classpath:workflow/**/*.{json|yaml}";
     private WorkflowMapper workflowMapper;
 
     private static final String PREFIX = "workflow/";
@@ -62,7 +62,7 @@ public class ResourceBasedWorkflowRepository implements WorkflowRepository {
     private Workflow read(Resource aResource) {
         try {
             String uri = aResource.getURI().toString();
-            String id = uri.substring(uri.lastIndexOf(PREFIX) + PREFIX.length(), uri.lastIndexOf('.'));
+            String id = uri.substring(uri.lastIndexOf(PREFIX) + PREFIX.length());
             return workflowMapper.readValue(new WorkflowResource(id, aResource, WorkflowFormatType.parse(uri)));
         } catch (IOException e) {
             throw Throwables.propagate(e);
