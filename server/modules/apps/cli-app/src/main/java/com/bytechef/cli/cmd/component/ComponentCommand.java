@@ -19,10 +19,10 @@ package com.bytechef.cli.cmd.component;
 import static org.apache.commons.lang3.StringUtils.deleteWhitespace;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.replaceChars;
-import static picocli.CommandLine.*;
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Model.CommandSpec;
 import static picocli.CommandLine.Option;
+import static picocli.CommandLine.Parameters;
 import static picocli.CommandLine.Spec;
 
 import java.io.File;
@@ -88,14 +88,14 @@ public class ComponentCommand implements Callable<Integer> {
     private transient String componentName;
 
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
         if (isNotEmpty(openAPIPath)) {
             OpenAPIComponentGenerator openAPIComponentGenerator = new OpenAPIComponentGenerator();
 
             openAPIComponentGenerator.generate();
         }
 
-        return 0;
+        throw new UnsupportedOperationException("Unable to process empty path " + openAPIPath);
     }
 
     private String getPackageName(String subPackage) {
