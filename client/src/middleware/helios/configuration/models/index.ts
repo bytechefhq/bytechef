@@ -2,7 +2,6 @@
 /* eslint-disable */
 export * from './CategoryModel';
 export * from './CreateProjectInstanceWorkflowJob200ResponseModel';
-export * from './CreateProjectWorkflowRequestModel';
 export * from './InputModel';
 export * from './OutputModel';
 export * from './PageModel';
@@ -18,5 +17,6 @@ export * from './UpdateTagsRequestModel';
 export * from './WorkflowConnectionModel';
 export * from './WorkflowFormatModel';
 export * from './WorkflowModel';
+export * from './WorkflowRequestModel';
 export * from './WorkflowTaskModel';
 export * from './WorkflowTriggerModel';
