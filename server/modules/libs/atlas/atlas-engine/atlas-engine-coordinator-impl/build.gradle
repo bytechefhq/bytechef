@@ -1,0 +1,29 @@
+dependencies {
+    api project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
+    api project(":modules:libs:atlas:atlas-engine:atlas-engine-coordinator-api")
+
+    implementation "com.fasterxml.jackson.core:jackson-databind"
+    implementation "com.google.guava:guava"
+    implementation "org.apache.commons:commons-lang3"
+    implementation "org.slf4j:slf4j-api"
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework:spring-core"
+    implementation "org.springframework:spring-jdbc"
+    implementation "org.springframework:spring-webmvc"
+    implementation "org.springframework.retry:spring-retry"
+    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-impl")
+
+    testImplementation "commons-io:commons-io"
+    testImplementation "mysql:mysql-connector-java"
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testImplementation "org.springframework:spring-jdbc"
+    testImplementation "org.springframework.security:spring-security-core"
+    testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.springframework.boot:spring-boot-test"
+    testImplementation project(":modules:libs:atlas:atlas-repository:atlas-repository-yaml")
+    testImplementation project(":modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-io")
+    testImplementation project(":modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-random")
+    testImplementation project(":modules:libs:atlas:atlas-taskhandler:atlas-taskhandler-time")
+    testImplementation project(":modules:libs:atlas:atlas-engine:atlas-engine-worker-impl")
+}

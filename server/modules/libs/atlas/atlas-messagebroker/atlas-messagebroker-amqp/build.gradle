@@ -1,0 +1,5 @@
+dependencies {
+    implementation "org.springframework.amqp:spring-amqp"
+    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-coordinator-api")
+    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
+}
