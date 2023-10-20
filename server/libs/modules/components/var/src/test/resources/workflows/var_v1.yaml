@@ -9,8 +9,10 @@ outputs:
 tasks:
   - name: stringNumber
     type: var/v1/set
-    value: "1234"
+    parameters:
+      value: "1234"
 
   - name: intNumber
     type: var/v1/set
-    value: ${int(stringNumber)}
+    parameters:
+      value: ${int(stringNumber)}

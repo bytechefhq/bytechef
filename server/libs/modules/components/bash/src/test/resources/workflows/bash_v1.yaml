@@ -11,8 +11,9 @@ tasks:
   - label: List files in ${path}
     name: listOfFiles
     type: bash/v1/execute
-    script: |
-          for f in ${path}
-          do
-            echo "$f"
-          done
+    parameters:
+      script: |
+            for f in ${path}
+            do
+              echo "$f"
+            done

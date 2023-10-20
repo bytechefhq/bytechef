@@ -7,10 +7,12 @@ outputs:
 tasks:
   - name: subflowOutput
     type: subflow/v1
-    workflowId: demo/random_int
+    parameters:
+      workflowId: demo/random_int
 
   - name: output
     type: var
-    value: ${subflowOutput.randomNumber}
+    parameters:
+      value: ${subflowOutput.randomNumber}
 
 

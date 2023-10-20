@@ -19,7 +19,9 @@
       "name": "writeOdsFile",
       "label": "Write to the ODS file",
       "type": "odsFile/v1/write",
-      "rows": "${rows}"
+      "parameters": {
+        "rows": "${rows}"
+      }
     }
   ]
 }

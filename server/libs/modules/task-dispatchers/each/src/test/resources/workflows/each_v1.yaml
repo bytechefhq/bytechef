@@ -2,13 +2,16 @@ label: Hello for-each
 
 tasks:
   - type: each/v1
-    list: "${range(1,25)}"
-    itemVar: item1
-    iteratee:
-      type: each/v1
+    parameters:
       list: "${range(1,25)}"
-      itemVar: item2
+      itemVar: item1
       iteratee:
-        name: var1
-        type: var
-        value: ${item1 + '_' + item2}
+        type: each/v1
+        parameters:
+          list: "${range(1,25)}"
+          itemVar: item2
+          iteratee:
+            name: var1
+            type: var
+            parameters:
+              value: ${item1 + '_' + item2}

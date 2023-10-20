@@ -22,12 +22,14 @@ tasks:
   - type: logger/v1/info
     name: loggInputs
     description: Print received input arguments in log with INFO log level
-    text: Received ${apiEndpointUrl} to post payload in ${sourceFileUrl}
+    parameters:
+      text: Received ${apiEndpointUrl} to post payload in ${sourceFileUrl}
 
   - type: filesystem/v1/readFile
     name: csvFileEntry
     description: Read file at `filename` location on local file system and create `csvFileEntry` object in memory
-    filename: ${sourceFileUrl}
+    parameters:
+      filename: ${sourceFileUrl}
 
   - type: httpClient/v1/post
     name: liferayApiPost
@@ -36,15 +38,17 @@ tasks:
       set to `csvFileEntry` to tell processor to seek content bytes in fileEntry `csvFileEntry`
       and bodyContentType `TXT` creates request's `ContentType` header value application/text
     label: Post content to Liferay REST endpoint
-    uri: ${apiEndpointUrl}
-    responseFormat: JSON
-    headerParameters:
-      Authorization:
-        - Basic ${apiToken}
-    bodyContentType: BINARY
-    bodyContent: ${csvFileEntry}
+    parameters:
+      uri: ${apiEndpointUrl}
+      responseFormat: JSON
+      headerParameters:
+        Authorization:
+          - Basic ${apiToken}
+      bodyContentType: BINARY
+      bodyContent: ${csvFileEntry}
 
   - type: logger/v1/info
     name: loggEndpointResponse
     description: Print received response content in log with INFO log level
-    text: Result ${liferayApiPost}
+    parameters:
+      text: Result ${liferayApiPost}

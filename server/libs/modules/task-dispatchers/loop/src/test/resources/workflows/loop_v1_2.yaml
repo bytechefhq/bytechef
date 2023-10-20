@@ -6,13 +6,16 @@ outputs:
 
 tasks:
   - type: loop/v1
-    list: ${range(1,10)}
-    itemVar: item1
-    iteratee:
-      type: loop/v1
-      list: ${range(1,item1)}
-      itemVar: item2
+    parameters:
+      list: ${range(1,10)}
+      itemVar: item1
       iteratee:
-        name: var1
-        type: var
-        value: ${item1 + '_' + item2}
+        type: loop/v1
+        parameters:
+          list: ${range(1,item1)}
+          itemVar: item2
+          iteratee:
+            name: var1
+            type: var
+            parameters:
+              value: ${item1 + '_' + item2}

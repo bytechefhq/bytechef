@@ -23,12 +23,15 @@ import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
+
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Base64Utils;
 
 /**
  * @author Ivica Cardic
@@ -55,7 +58,7 @@ public class SequenceTaskDispatcherIntTest {
     @Test
     public void testDispatch() {
         workflowExecutor.execute(
-            "sequence_v1",
+            Base64Utils.encodeToString("sequence_v1".getBytes(StandardCharsets.UTF_8)),
             (
                 counterService, taskCompletionHandler, taskDispatcher, taskEvaluator,
                 taskExecutionService) -> List.of(new SequenceTaskCompletionHandler(

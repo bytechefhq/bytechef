@@ -19,8 +19,10 @@
       "name": "readXlsxFile",
       "label": "Read from the XLSX file",
       "type": "xlsxFile/v1/read",
-      "fileEntry": "${fileEntry}",
-      "includeEmptyCells": true
+      "parameters": {
+        "fileEntry": "${fileEntry}",
+        "includeEmptyCells": true
+      }
     }
   ]
 }

@@ -19,7 +19,9 @@
       "name": "writeCsvFile",
       "label": "Write to the csv file",
       "type": "csvFile/v1/write",
-      "rows": "${rows}"
+      "parameters": {
+        "rows": "${rows}"
+      }
     }
   ]
 }

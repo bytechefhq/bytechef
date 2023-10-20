@@ -9,12 +9,15 @@ inputs:
 tasks:
   - label: Print a greeting
     type: io/print
-    text: Hello ${yourName}
+    parameters:
+      text: Hello ${yourName}
 
   - label: Sleep a lot
     type: delay/v1/delay
-    millis: 60000
+    parameters:
+      millis: 60000
 
   - label: Print a farewell
     type: io/print
-    text: Goodbye ${yourName}
+    parameters:
+      text: Goodbye ${yourName}
