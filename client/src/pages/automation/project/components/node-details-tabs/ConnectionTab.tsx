@@ -24,7 +24,7 @@ const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
         useConnectionNoteStore();
 
     return (
-        <>
+        <div className="h-full flex-[1_1_1px] overflow-auto p-4">
             {connections?.length ? (
                 <div className="flex space-x-2">
                     <Select
@@ -92,7 +92,7 @@ const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
                     onClose={() => setShowEditConnectionDialog(false)}
                 />
             )}
-        </>
+        </div>
     );
 };
 

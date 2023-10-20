@@ -240,39 +240,37 @@ const NodeDetailsDialog = () => {
                                     </div>
                                 )}
 
-                                <div className="h-full flex-[1_1_1px] overflow-auto p-4">
-                                    {activeTab === 'description' && (
-                                        <DescriptionTab
+                                {activeTab === 'description' && (
+                                    <DescriptionTab
+                                        component={currentComponent}
+                                    />
+                                )}
+
+                                {activeTab === 'properties' &&
+                                    !!currentAction?.properties?.length && (
+                                        <Properties
+                                            actionName={currentActionName}
+                                            properties={
+                                                currentAction.properties
+                                            }
+                                        />
+                                    )}
+
+                                {activeTab === 'connection' &&
+                                    currentComponent.connection && (
+                                        <ConnectionTab
                                             component={currentComponent}
                                         />
                                     )}
 
-                                    {activeTab === 'properties' &&
-                                        !!currentAction?.properties?.length && (
-                                            <Properties
-                                                actionName={currentActionName}
-                                                properties={
-                                                    currentAction.properties
-                                                }
-                                            />
-                                        )}
-
-                                    {activeTab === 'connection' &&
-                                        currentComponent.connection && (
-                                            <ConnectionTab
-                                                component={currentComponent}
-                                            />
-                                        )}
-
-                                    {activeTab === 'output' &&
-                                        currentAction?.outputSchema && (
-                                            <OutputTab
-                                                outputSchema={
-                                                    currentAction.outputSchema
-                                                }
-                                            />
-                                        )}
-                                </div>
+                                {activeTab === 'output' &&
+                                    currentAction?.outputSchema && (
+                                        <OutputTab
+                                            outputSchema={
+                                                currentAction.outputSchema
+                                            }
+                                        />
+                                    )}
                             </div>
 
                             <div className="mt-auto flex p-4">
