@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.config;
+package com.bytechef.platform.config;
 
-import org.springframework.boot.autoconfigure.cache.CacheProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cache.annotation.EnableCaching;
-// import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-// import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.context.annotation.Profile;
+import org.springframework.web.reactive.config.CorsRegistry;
+import org.springframework.web.reactive.config.WebFluxConfigurer;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
-@EnableCaching
-@EnableConfigurationProperties(CacheProperties.class)
-public class CacheConfiguration {
+@Profile("dev")
+public class CorsConfiguration implements WebFluxConfigurer {
 
-    //    @Bean
-    //    public LettuceConnectionFactory redisConnectionFactory() {
-    //        return new LettuceConnectionFactory();
-    //    }
+    @Override
+    public void addCorsMappings(CorsRegistry corsRegistry) {
+        corsRegistry.addMapping("/**");
+    }
 }

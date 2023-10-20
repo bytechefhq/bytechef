@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.config;
+package com.bytechef.platform.config;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.web.reactive.config.CorsRegistry;
-import org.springframework.web.reactive.config.WebFluxConfigurer;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
-@Profile("dev")
-public class CorsConfiguration implements WebFluxConfigurer {
+public class JacksonConfiguration {
 
-    @Override
-    public void addCorsMappings(CorsRegistry corsRegistry) {
-        corsRegistry.addMapping("/**");
+    @Bean
+    JavaTimeModule javaTimeModule() {
+        return new JavaTimeModule();
     }
 }
