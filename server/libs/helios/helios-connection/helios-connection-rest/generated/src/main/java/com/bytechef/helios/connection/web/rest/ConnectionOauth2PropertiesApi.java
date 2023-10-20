@@ -3,9 +3,9 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.oauth2.web.rest;
+package com.bytechef.helios.connection.web.rest;
 
-import com.bytechef.oauth2.web.rest.model.OAuth2PropertiesModel;
+import com.bytechef.helios.connection.web.rest.model.OAuth2PropertiesModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,17 +32,17 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-07T12:23:11.686921+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-08T12:06:03.369320+02:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "oauth2", description = "The Core OAuth2 API")
-public interface Oauth2PropertiesApi {
+@Tag(name = "connection-oauth2-properties", description = "the connection-oauth2-properties API")
+public interface ConnectionOauth2PropertiesApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * GET /oauth2-properties : Get OAuth2 properties
+     * GET /connection-oauth2-properties : Get OAuth2 properties
      * Get OAuth2 properties.
      *
      * @return The OAuth2Properties object. (status code 200)
@@ -51,7 +51,7 @@ public interface Oauth2PropertiesApi {
         operationId = "getOAuth2Properties",
         summary = "Get OAuth2 properties",
         description = "Get OAuth2 properties.",
-        tags = { "oauth2" },
+        tags = { "connection-oauth2-properties" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The OAuth2Properties object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = OAuth2PropertiesModel.class))
@@ -60,7 +60,7 @@ public interface Oauth2PropertiesApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/oauth2-properties",
+        value = "/connection-oauth2-properties",
         produces = { "application/json" }
     )
     default ResponseEntity<OAuth2PropertiesModel> getOAuth2Properties(
