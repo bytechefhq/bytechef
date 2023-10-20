@@ -33,39 +33,39 @@ public class CoordinatorSubscriptions {
         return completions;
     }
 
-    public void setCompletions(int aCompletions) {
-        completions = aCompletions;
+    public void setCompletions(int completions) {
+        this.completions = completions;
     }
 
     public int getErrors() {
         return errors;
     }
 
-    public void setErrors(int aErrors) {
-        errors = aErrors;
+    public void setErrors(int errors) {
+        this.errors = errors;
     }
 
     public int getEvents() {
         return events;
     }
 
-    public void setEvents(int aEvents) {
-        events = aEvents;
+    public void setEvents(int events) {
+        this.events = events;
     }
 
     public int getJobs() {
         return jobs;
     }
 
-    public void setJobs(int aJobs) {
-        jobs = aJobs;
+    public void setJobs(int jobs) {
+        this.jobs = jobs;
     }
 
     public int getSubflows() {
         return subflows;
     }
 
-    public void setSubflows(int aSubflows) {
-        subflows = aSubflows;
+    public void setSubflows(int subflows) {
+        this.subflows = subflows;
     }
 }

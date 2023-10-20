@@ -1,8 +1,8 @@
 label: Loop 1
 
 outputs:
-    - name: sumResult
-      value: ${sumResult}
+  - name: sumResult
+    value: ${sumResult}
 
 tasks:
   - type: loop

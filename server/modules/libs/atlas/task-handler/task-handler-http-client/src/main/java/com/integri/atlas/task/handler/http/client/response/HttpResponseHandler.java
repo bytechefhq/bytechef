@@ -20,10 +20,8 @@ import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RESPONSE_FORMAT;
 
 import com.integri.atlas.engine.task.execution.TaskExecution;
-import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.file.storage.service.FileStorageService;
 import com.integri.atlas.task.handler.http.client.HttpClientTaskConstants;
-import com.integri.atlas.task.handler.http.client.header.ContentType;
 import com.integri.atlas.task.handler.json.helper.JsonHelper;
 import java.io.InputStream;
 import java.net.http.HttpResponse;
@@ -44,7 +42,7 @@ public class HttpResponseHandler {
         this.jsonHelper = jsonHelper;
     }
 
-    public Object handle(TaskExecution taskExecution, HttpResponse httpResponse) {
+    public Object handle(TaskExecution taskExecution, HttpResponse<?> httpResponse) {
         if (taskExecution.getString(PROPERTY_RESPONSE_FORMAT) == null) {
             return null;
         }

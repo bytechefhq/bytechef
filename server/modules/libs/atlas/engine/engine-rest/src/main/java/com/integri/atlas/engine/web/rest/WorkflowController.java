@@ -23,7 +23,6 @@ import com.integri.atlas.engine.workflow.Workflow;
 import com.integri.atlas.engine.workflow.repository.WorkflowRepository;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,18 +42,24 @@ import org.springframework.web.servlet.HandlerMapping;
 @ConditionalOnCoordinator
 public class WorkflowController {
 
-    @Autowired
-    private WorkflowRepository workflowRepository;
+    private final WorkflowRepository workflowRepository;
+
+    public WorkflowController(WorkflowRepository workflowRepository) {
+        this.workflowRepository = workflowRepository;
+    }
 
     @PostMapping(path = "/workflows", consumes = { "application/json", "application/yaml" })
-    public ResponseEntity create(@RequestBody String content, @RequestHeader("Content-Type") String contentType) {
+    public ResponseEntity<Workflow> create(
+        @RequestBody String content,
+        @RequestHeader("Content-Type") String contentType
+    ) {
         Workflow workflow = workflowRepository.create(content, contentType.substring(contentType.lastIndexOf('/') + 1));
 
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(workflow);
     }
 
     @PutMapping(path = "/workflows/{id}", consumes = { "application/json", "application/yaml" })
-    public ResponseEntity update(
+    public ResponseEntity<Workflow> update(
         @PathVariable String id,
         @RequestBody String content,
         @RequestHeader("Content-Type") String contentType
@@ -77,6 +82,7 @@ public class WorkflowController {
     public Workflow get(HttpServletRequest aRequest) {
         String path = (String) aRequest.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         String workflowId = path.replaceFirst("/workflows/", "");
+
         return workflowRepository.findOne(workflowId);
     }
 }

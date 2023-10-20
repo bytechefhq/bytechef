@@ -25,22 +25,22 @@ import java.util.Map;
  */
 public class HttpResponseEntry {
 
-    private Object body;
-    private Map<String, List<String>> headers;
-    private int statusCode;
+    private final Object body;
+    private final Map<String, List<String>> headers;
+    private final int statusCode;
 
-    public HttpResponseEntry(Object body, HttpResponse httpResponse) {
+    public HttpResponseEntry(Object body, HttpResponse<?> httpResponse) {
         this.body = body;
         this.headers = httpResponse.headers().map();
         this.statusCode = httpResponse.statusCode();
     }
 
-    public Map<String, List<String>> getHeaders() {
-        return headers;
-    }
-
     public Object getBody() {
         return body;
+    }
+
+    public Map<String, List<String>> getHeaders() {
+        return headers;
     }
 
     public int getStatusCode() {
