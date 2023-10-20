@@ -42,10 +42,10 @@ org-apache-logging-log4j-log4j-core = "org.apache.logging.log4j:log4j-core:2.17.
 org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.2.3"
 org-apache-tika-tika-core = "org.apache.tika:tika-core:2.7.0"
 org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:6.5.0.202303070854-r"
-org-flywaydb-flyway-core = "org.flywaydb:flyway-core:9.16.3"
+org-flywaydb-flyway-core = "org.flywaydb:flyway-core:9.17.0"
 org-graalvm-sdk-graal-sdk = "org.graalvm.sdk:graal-sdk:22.3.2"
 org-json = "org.json:json:20230227"
-org-junit-jupiter-junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.9.2"
+org-junit-jupiter-junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.9.3"
 org-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct" }
 org-mapstruct-extensions-spring-mapstruct-spring-annotations = { module = "org.mapstruct.extensions.spring:mapstruct-spring-annotations", version.ref = "org-mapstruct-extensions-spring" }
 org-mapstruct-extensions-spring-mapstruct-spring-extensions = { module = "org.mapstruct.extensions.spring:mapstruct-spring-extensions", version.ref = "org-mapstruct-extensions-spring" }
@@ -74,7 +74,7 @@ org-springframework-retry-spring-retry = "org.springframework.retry:spring-retry
 org-testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "org-testcontainers" }
 org-testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "org-testcontainers" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.52"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.56"
 
 [plugins]
 com-diffplug-spotless = "com.diffplug.spotless:6.18.0"
