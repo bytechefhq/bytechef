@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.Assert;
 
 /**
@@ -42,23 +42,19 @@ import org.springframework.util.Assert;
  */
 public class JdbcJobRepository implements JobRepository {
 
-    protected NamedParameterJdbcOperations jdbcOperations;
+    protected NamedParameterJdbcTemplate jdbcTemplate;
     protected ObjectMapper objectMapper;
 
     public static final int DEFAULT_PAGE_SIZE = 20;
 
     @Override
     public int countRunningJobs() {
-        return jdbcOperations.queryForObject(
-            "select count(*) from job where status='STARTED'",
-            Map.of(),
-            Integer.class
-        );
+        return jdbcTemplate.queryForObject("select count(*) from job where status='STARTED'", Map.of(), Integer.class);
     }
 
     @Override
     public int countCompletedJobsToday() {
-        return jdbcOperations.queryForObject(
+        return jdbcTemplate.queryForObject(
             "select count(*) from job where status='COMPLETED' and end_time >= current_date",
             Map.of(),
             Integer.class
@@ -67,7 +63,7 @@ public class JdbcJobRepository implements JobRepository {
 
     @Override
     public int countCompletedJobsYesterday() {
-        return jdbcOperations.queryForObject(
+        return jdbcTemplate.queryForObject(
             "select count(*) from job where status='COMPLETED' and end_time >= current_date-1 and end_time < current_date",
             Map.of(),
             Integer.class
@@ -78,7 +74,7 @@ public class JdbcJobRepository implements JobRepository {
     public void create(Job aJob) {
         MapSqlParameterSource sqlParameterSource = createSqlParameterSource(aJob);
 
-        jdbcOperations.update(
+        jdbcTemplate.update(
             "insert into job (id,create_time,start_time,status,current_task,workflow_id,label,priority,inputs,webhooks,outputs,parent_task_execution_id) values (:id,:createTime,:startTime,:status,:currentTask,:workflowId,:label,:priority,:inputs,:webhooks,:outputs,:parentTaskExecutionId)",
             sqlParameterSource
         );
@@ -86,20 +82,20 @@ public class JdbcJobRepository implements JobRepository {
 
     @Override
     public void delete(String id) {
-        jdbcOperations.update("delete from job where id = :id", Map.of("id", id));
+        jdbcTemplate.update("delete from job where id = :id", Map.of("id", id));
     }
 
     @Override
     public List<Job> findAll() {
-        return jdbcOperations.query("select * from job", this::jobRowMappper);
+        return jdbcTemplate.query("select * from job", this::jobRowMapper);
     }
 
     @Override
     public Job findById(String aId) {
-        List<Job> query = jdbcOperations.query(
+        List<Job> query = jdbcTemplate.query(
             "select * from job where id = :id",
             Collections.singletonMap("id", aId),
-            this::jobRowMappper
+            this::jobRowMapper
         );
 
         Assert.isTrue(query.size() == 1, "expected 1 result. got " + query.size());
@@ -109,10 +105,7 @@ public class JdbcJobRepository implements JobRepository {
 
     @Override
     public Optional<Job> findLatestJob() {
-        List<Job> query = jdbcOperations.query(
-            "select * from job order by create_time desc limit 1",
-            this::jobRowMappper
-        );
+        List<Job> query = jdbcTemplate.query("select * from job order by create_time desc limit 1", this::jobRowMapper);
 
         if (query.size() == 0) {
             return Optional.empty();
@@ -125,10 +118,10 @@ public class JdbcJobRepository implements JobRepository {
     public Job findByTaskExecutionId(String taskExecutionId) {
         Map<String, String> params = Collections.singletonMap("id", taskExecutionId);
 
-        List<Job> list = jdbcOperations.query(
+        List<Job> list = jdbcTemplate.query(
             "select * from job j where j.id = (select job_id from task_execution jt where jt.id=:id)",
             params,
-            this::jobRowMappper
+            this::jobRowMapper
         );
 
         Assert.isTrue(list.size() < 2, "expecting 1 result, got: " + list.size());
@@ -138,14 +131,12 @@ public class JdbcJobRepository implements JobRepository {
 
     @Override
     public Page<JobSummary> findAllJobSummaries(int pageNumber) {
-        Integer totalItems = jdbcOperations
-            .getJdbcOperations()
-            .queryForObject("select count(*) from job", Integer.class);
+        Integer totalItems = jdbcTemplate.getJdbcOperations().queryForObject("select count(*) from job", Integer.class);
         int offset = (pageNumber - 1) * DEFAULT_PAGE_SIZE;
         int limit = DEFAULT_PAGE_SIZE;
-        List<JobSummary> items = jdbcOperations.query(
+        List<JobSummary> items = jdbcTemplate.query(
             String.format("select * from job order by create_time desc limit %s offset %s", limit, offset),
-            this::jobSummaryRowMappper
+            this::jobSummaryRowMapper
         );
         ResultPage<JobSummary> resultPage = new ResultPage<>(JobSummary.class);
 
@@ -161,7 +152,7 @@ public class JdbcJobRepository implements JobRepository {
     public Job merge(Job job) {
         MapSqlParameterSource sqlParameterSource = createSqlParameterSource(job);
 
-        jdbcOperations.update(
+        jdbcTemplate.update(
             "update job set status=:status,start_time=:startTime,end_time=:endTime,current_task=:currentTask,workflow_id=:workflowId,label=:label,outputs=:outputs where id = :id ",
             sqlParameterSource
         );
@@ -169,8 +160,8 @@ public class JdbcJobRepository implements JobRepository {
         return job;
     }
 
-    public void setJdbcOperations(NamedParameterJdbcOperations jdbcOperations) {
-        this.jdbcOperations = jdbcOperations;
+    public void setJdbcTemplate(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public void setObjectMapper(ObjectMapper objectMapper) {
@@ -181,7 +172,7 @@ public class JdbcJobRepository implements JobRepository {
         SimpleJob simpleJob = new SimpleJob(job);
 
         Assert.notNull(job, "job must not be null");
-        Assert.notNull(job.getId(), "job status must not be null");
+        Assert.notNull(job.getId(), "job id must not be null");
         Assert.notNull(job.getCreateTime(), "job createTime must not be null");
         Assert.notNull(job.getStatus(), "job status must not be null");
 
@@ -204,7 +195,7 @@ public class JdbcJobRepository implements JobRepository {
         return sqlParameterSource;
     }
 
-    protected Job jobRowMappper(ResultSet resultSet, int index) throws SQLException {
+    protected Job jobRowMapper(ResultSet resultSet, int index) throws SQLException {
         Map<String, Object> map = new HashMap<>();
 
         map.put("id", resultSet.getString("id"));
@@ -224,7 +215,7 @@ public class JdbcJobRepository implements JobRepository {
         return new SimpleJob(map);
     }
 
-    protected JobSummary jobSummaryRowMappper(ResultSet resultSet, int index) throws SQLException {
+    protected JobSummary jobSummaryRowMapper(ResultSet resultSet, int index) throws SQLException {
         Map<String, Object> map = new HashMap<>();
 
         map.put("id", resultSet.getString("id"));

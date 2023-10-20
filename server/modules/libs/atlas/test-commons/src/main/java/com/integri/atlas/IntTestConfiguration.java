@@ -92,7 +92,7 @@ public class IntTestConfiguration {
     ) {
         JdbcTaskExecutionRepository jdbcJobTaskRepository = new JdbcTaskExecutionRepository();
 
-        jdbcJobTaskRepository.setJdbcOperations(namedParameterJdbcTemplate);
+        jdbcJobTaskRepository.setJdbcTemplate(namedParameterJdbcTemplate);
         jdbcJobTaskRepository.setObjectMapper(objectMapper);
 
         return jdbcJobTaskRepository;
@@ -102,7 +102,7 @@ public class IntTestConfiguration {
     JobRepository jdbcJobRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate, ObjectMapper objectMapper) {
         JdbcJobRepository jdbcJobRepository = new JdbcJobRepository();
 
-        jdbcJobRepository.setJdbcOperations(namedParameterJdbcTemplate);
+        jdbcJobRepository.setJdbcTemplate(namedParameterJdbcTemplate);
         jdbcJobRepository.setObjectMapper(objectMapper);
 
         return jdbcJobRepository;

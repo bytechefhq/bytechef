@@ -35,17 +35,17 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 public class JdbcContextRepository implements ContextRepository {
 
-    private JdbcTemplate jdbc;
+    private JdbcTemplate jdbcTemplate;
     private ObjectMapper objectMapper;
 
     @Override
     public void delete(String stackId) {
-        jdbc.update("delete from context where stack_id = ?", stackId);
+        jdbcTemplate.update("delete from context where stack_id = ?", stackId);
     }
 
     @Override
     public void push(String stackId, Context context) {
-        jdbc.update(
+        jdbcTemplate.update(
             "insert into context (id,stack_id,serialized_context,create_time) values (?,?,?,?)",
             UUIDGenerator.generate(),
             stackId,
@@ -59,7 +59,7 @@ public class JdbcContextRepository implements ContextRepository {
         try {
             String sql =
                 "select id,serialized_context from context where stack_id = ? order by create_time desc limit 1";
-            return jdbc.queryForObject(sql, new Object[] { stackId }, this::contextRowMapper);
+            return jdbcTemplate.queryForObject(sql, new Object[] { stackId }, this::contextRowMapper);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
@@ -72,8 +72,8 @@ public class JdbcContextRepository implements ContextRepository {
         return new MapContext(Json.deserialize(objectMapper, serialized, Map.class));
     }
 
-    public void setJdbcTemplate(JdbcTemplate aJdbcTemplate) {
-        jdbc = aJdbcTemplate;
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public void setObjectMapper(ObjectMapper objectMapper) {

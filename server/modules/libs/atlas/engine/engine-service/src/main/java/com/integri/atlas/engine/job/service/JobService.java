@@ -39,14 +39,14 @@ import java.util.Objects;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
  */
-@Component
+@Service
 @Transactional
 public class JobService {
 
@@ -67,10 +67,6 @@ public class JobService {
         this.jobRepository = jobRepository;
         this.taskExecutionRepository = taskExecutionRepository;
         this.workflowRepository = workflowRepository;
-    }
-
-    public void create(Job job) {
-        jobRepository.create(job);
     }
 
     public Job create(MapObject jobParams) {

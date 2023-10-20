@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,14 +38,14 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
 
-    private NamedParameterJdbcOperations namedParameterJdbcOperations;
+    private NamedParameterJdbcTemplate jdbcTemplate;
     private ObjectMapper objectMapper;
 
     @Override
     public void create(TaskExecution taskExecution) {
         SqlParameterSource sqlParameterSource = createSqlParameterSource(taskExecution);
 
-        namedParameterJdbcOperations.update(
+        jdbcTemplate.update(
             "insert into task_execution " +
             "  (id,parent_id,job_id,serialized_execution,status,progress,create_time,priority,task_number) " +
             "values " +
@@ -56,7 +56,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
 
     @Override
     public TaskExecution findOne(String id) {
-        List<TaskExecution> taskExecutions = namedParameterJdbcOperations.query(
+        List<TaskExecution> taskExecutions = jdbcTemplate.query(
             "select * from task_execution where id = :id",
             Collections.singletonMap("id", id),
             this::jobTaskRowMapper
@@ -69,7 +69,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
 
     @Override
     public List<TaskExecution> findAllByJobIdOrderByTaskNumber(String jobId) {
-        return namedParameterJdbcOperations.query(
+        return jdbcTemplate.query(
             "select * from task_execution where job_id = :jobId order by task_number",
             Collections.singletonMap("jobId", jobId),
             this::jobTaskRowMapper
@@ -78,7 +78,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
 
     @Override
     public List<TaskExecution> findAllByParentId(String parentId) {
-        return namedParameterJdbcOperations.query(
+        return jdbcTemplate.query(
             "select * from task_execution where parent_id = :parentId order by task_number",
             Collections.singletonMap("parentId", parentId),
             this::jobTaskRowMapper
@@ -87,7 +87,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
 
     @Override
     public List<TaskExecution> findAllByJobIdOrderByCreateTime(String jobId) {
-        return namedParameterJdbcOperations.query(
+        return jdbcTemplate.query(
             "select * from task_execution where job_id = :jobId order by create_time asc",
             Collections.singletonMap("jobId", jobId),
             this::jobTaskRowMapper
@@ -96,7 +96,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
 
     @Override
     public List<TaskExecution> findAllByJobIdsOrderByCreateTime(List<String> jobIds) {
-        return namedParameterJdbcOperations.query(
+        return jdbcTemplate.query(
             "select * from task_execution where job_id in(:jobId) order by create_time asc",
             Collections.singletonMap("jobIds", jobIds),
             this::jobTaskRowMapper
@@ -106,7 +106,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
     @Override
     @Transactional
     public TaskExecution merge(TaskExecution taskExecution) {
-        TaskExecution currentTaskExecution = namedParameterJdbcOperations.queryForObject(
+        TaskExecution currentTaskExecution = jdbcTemplate.queryForObject(
             "select * from task_execution where id = :id for update",
             Collections.singletonMap("id", taskExecution.getId()),
             this::jobTaskRowMapper
@@ -123,7 +123,7 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
 
         SqlParameterSource sqlParameterSource = createSqlParameterSource(merged);
 
-        namedParameterJdbcOperations.update(
+        jdbcTemplate.update(
             "update task_execution set " +
             "  serialized_execution=:serializedExecution,status=:status,progress=:progress,start_time=:startTime,end_time=:endTime where id = :id ",
             sqlParameterSource
@@ -132,8 +132,8 @@ public class JdbcTaskExecutionRepository implements TaskExecutionRepository {
         return merged;
     }
 
-    public void setJdbcOperations(NamedParameterJdbcOperations aJdbcOperations) {
-        namedParameterJdbcOperations = aJdbcOperations;
+    public void setJdbcTemplate(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public void setObjectMapper(ObjectMapper objectMapper) {
