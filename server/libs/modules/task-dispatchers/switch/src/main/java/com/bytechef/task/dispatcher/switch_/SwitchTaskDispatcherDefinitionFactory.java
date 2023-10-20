@@ -43,7 +43,6 @@ public class SwitchTaskDispatcherDefinitionFactory implements TaskDispatcherDefi
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(SWITCH)
         .display(display("Switch")
             .description("Executes one and only one branch of execution based on the `expression` value."))
-        .display(display("Branch"))
         .properties(string(EXPRESSION)
             .label("Expression")
             .description("Defines expression upon which evaluation the proper branch continues execution."))

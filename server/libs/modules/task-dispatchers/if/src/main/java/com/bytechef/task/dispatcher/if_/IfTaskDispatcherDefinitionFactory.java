@@ -58,8 +58,8 @@ import org.springframework.stereotype.Component;
 public class IfTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(IF)
-        .display(display("If").description("Directs a stream based on true/false results of comparisons."))
-        .display(display("Boolean Condition"))
+        .display(
+            display("Boolean Condition").description("Directs a stream based on true/false results of comparisons."))
         .properties(
             bool(RAW_EXPRESSION)
                 .label("Raw expression")

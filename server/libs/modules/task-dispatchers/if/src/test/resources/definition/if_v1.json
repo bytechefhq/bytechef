@@ -1,6 +1,7 @@
 {
   "display": {
-    "label": "Boolean Condition"
+    "label": "Boolean Condition",
+    "description": "Directs a stream based on true/false results of comparisons."
   },
   "name": "if",
   "properties": [

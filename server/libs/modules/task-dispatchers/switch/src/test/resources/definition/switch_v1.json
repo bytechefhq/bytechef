@@ -1,6 +1,7 @@
 {
   "display": {
-    "label": "Branch"
+    "label": "Switch",
+    "description": "Executes one and only one branch of execution based on the `expression` value."
   },
   "name": "switch",
   "properties": [
