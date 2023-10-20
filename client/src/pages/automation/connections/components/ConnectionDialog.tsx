@@ -1,59 +1,47 @@
 import {ClipboardIcon} from '@heroicons/react/24/outline';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
+import Alert from 'components/Alert/Alert';
 import Button from 'components/Button/Button';
+import Checkbox from 'components/Checkbox/Checkbox';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import Dialog from 'components/Dialog/Dialog';
-import Input from 'components/Input/Input';
-import React, {useEffect, useMemo, useState} from 'react';
-import {Controller, useForm} from 'react-hook-form';
-import {OnChangeValue} from 'react-select';
-
-import Alert from '../../../../components/Alert/Alert';
-import Checkbox from '../../../../components/Checkbox/Checkbox';
 import FilterableSelect, {
     ISelectOption,
-} from '../../../../components/FilterableSelect/FilterableSelect';
-import Label from '../../../../components/Label/Label';
-import NativeSelect from '../../../../components/NativeSelect/NativeSelect';
-import Properties from '../../../../components/Properties/Properties';
-import Tooltip from '../../../../components/Tooltip/Tooltip';
-import useCopyToClipboard from '../../../../hooks/useCopyToClipboard';
-import {ConnectionModel, TagModel} from '../../../../middleware/connection';
+} from 'components/FilterableSelect/FilterableSelect';
+import Input from 'components/Input/Input';
+import Label from 'components/Label/Label';
+import NativeSelect from 'components/NativeSelect/NativeSelect';
+import Properties, {PropertyFormProps} from 'components/Properties/Properties';
+import Tooltip from 'components/Tooltip/Tooltip';
+import useCopyToClipboard from 'hooks/useCopyToClipboard';
+import {ConnectionModel, TagModel} from 'middleware/connection';
 import {
     AuthorizationModel,
     ComponentDefinitionBasicModel,
     ComponentDefinitionModel,
-} from '../../../../middleware/definition-registry';
+} from 'middleware/definition-registry';
 import {
     useCreateConnectionMutation,
     useUpdateConnectionMutation,
-} from '../../../../mutations/connections.mutations';
+} from 'mutations/connections.mutations';
 import {
     ComponentDefinitionKeys,
     useGetComponentDefinitionsQuery,
-} from '../../../../queries/componentDefinitions.queries';
-import {useGetConnectionDefinitionQuery} from '../../../../queries/connectionDefinitions.queries';
+} from 'queries/componentDefinitions.queries';
+import {useGetConnectionDefinitionQuery} from 'queries/connectionDefinitions.queries';
 import {
     ConnectionKeys,
     useGetConnectionOAuth2AuthorizationParametersQuery,
     useGetConnectionTagsQuery,
-} from '../../../../queries/connections.queries';
-import {useGetOAuth2PropertiesQuery} from '../../../../queries/oauth2Properties.queries';
+} from 'queries/connections.queries';
+import {useGetOAuth2PropertiesQuery} from 'queries/oauth2Properties.queries';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Controller, useForm} from 'react-hook-form';
+import {OnChangeValue} from 'react-select';
+
 import {AuthTokenPayload} from '../oauth2/useOAuth2';
 import OAuth2Button from './OAuth2Button';
-
-type Tag = TagModel | {label: string; value: string};
-
-interface FormProps {
-    authorizationName: string;
-    componentName: ISelectOption;
-    name: string;
-    parameters: {[key: string]: object};
-    tags: Tag[];
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    [key: string]: any;
-}
 
 interface ConnectionDialogProps {
     component?: ComponentDefinitionModel;
@@ -71,19 +59,17 @@ const ConnectionDialog = ({
     onClose,
 }: ConnectionDialogProps) => {
     const [authorizationName, setAuthorizationName] = useState<string>();
+    const [isOpen, setIsOpen] = useState(visible);
+    const [oAuth2Error, setOAuth2Error] = useState<string>();
+    const [wizardStep, setWizardStep] = useState<
+        'configuration_step' | 'oauth_step'
+    >('configuration_step');
 
     const [componentDefinition, setComponentDefinition] =
         useState<ComponentDefinitionBasicModel>();
 
-    const [isOpen, setIsOpen] = useState(visible);
-    const [oAuth2Error, setOAuth2Error] = useState<string>();
-
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] =
         useState<boolean>(true);
-
-    const [wizardStep, setWizardStep] = useState<
-        'configuration_step' | 'oauth_step'
-    >('configuration_step');
 
     const {
         control,
@@ -93,7 +79,7 @@ const ConnectionDialog = ({
         register,
         setValue,
         reset: formReset,
-    } = useForm<FormProps>({
+    } = useForm<PropertyFormProps>({
         defaultValues: {
             authorizationName: '',
             componentName: undefined,
@@ -177,9 +163,7 @@ const ConnectionDialog = ({
     });
 
     const authorizationsExists =
-        connectionDefinition &&
-        connectionDefinition?.authorizations &&
-        connectionDefinition.authorizations.length > 0;
+        connectionDefinition && !!connectionDefinition?.authorizations?.length;
 
     const authorizationOptions: ISelectOption[] = useMemo(
         () =>
@@ -215,11 +199,7 @@ const ConnectionDialog = ({
     const isOAuth2ImplicitCodeType =
         'OAUTH2_IMPLICIT_CODE' === getAuthorizationType();
 
-    const scopes =
-        oAuth2AuthorizationParameters &&
-        oAuth2AuthorizationParameters.scopes &&
-        oAuth2AuthorizationParameters.scopes.length > 0 &&
-        oAuth2AuthorizationParameters.scopes;
+    const scopes = oAuth2AuthorizationParameters?.scopes;
 
     const showAuthorizations =
         authorizationsExists && authorizationOptions.length > 1;
@@ -238,9 +218,7 @@ const ConnectionDialog = ({
 
     const showConnectionProperties =
         !connectionDefinitionLoading &&
-        connectionDefinition &&
-        connectionDefinition?.properties &&
-        connectionDefinition.properties.length > 0;
+        !!connectionDefinition?.properties?.length;
 
     const showOAuth2Step =
         (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) &&
@@ -285,14 +263,14 @@ const ConnectionDialog = ({
 
     async function handleOnCodeSuccess(code: string) {
         if (code) {
-            await saveConnection({code: code} as any);
+            await saveConnection({code: code});
         }
     }
 
     function getAuthorizationType(): string {
         let authorizationType = '';
 
-        if (connectionDefinition && connectionDefinition.authorizations) {
+        if (connectionDefinition?.authorizations) {
             const authorization: AuthorizationModel =
                 connectionDefinition.authorizations.filter(
                     (authorization) => authorization.name === authorizationName
@@ -306,9 +284,7 @@ const ConnectionDialog = ({
         return authorizationType;
     }
 
-    function getNewConnection(
-        additionalParameters?: Record<string, object>
-    ): ConnectionModel {
+    function getNewConnection(additionalParameters?: object): ConnectionModel {
         const {componentName, name, parameters, tags} = getValues();
 
         return {
@@ -365,7 +341,7 @@ const ConnectionDialog = ({
     }
 
     function saveConnection(
-        additionalParameters?: Record<string, object>
+        additionalParameters?: object
     ): Promise<ConnectionModel> | undefined {
         if (connection?.id) {
             const {name, tags} = getValues();
@@ -402,8 +378,8 @@ const ConnectionDialog = ({
             }
         >
             {!componentDefinitionsLoading && (
-                <>
-                    <Errors errors={errors} />
+                <div>
+                    {errors && <Errors errors={errors} />}
 
                     {(wizardStep === 'configuration_step' ||
                         oAuth2AuthorizationParametersLoading) && (
@@ -421,15 +397,22 @@ const ConnectionDialog = ({
                                             options={componentDefinitions!.map(
                                                 (
                                                     componentDefinition: ComponentDefinitionBasicModel
-                                                ) => ({
-                                                    label: `${componentDefinition.name
+                                                ) => {
+                                                    const {name} =
+                                                        componentDefinition;
+
+                                                    const capitalizedName = `${name
                                                         .charAt(0)
-                                                        .toUpperCase()}${componentDefinition.name.slice(
+                                                        .toUpperCase()}${name.slice(
                                                         1
-                                                    )}`,
-                                                    value: componentDefinition.name,
-                                                    componentDefinition,
-                                                })
+                                                    )}`;
+
+                                                    return {
+                                                        label: capitalizedName,
+                                                        value: name,
+                                                        componentDefinition,
+                                                    };
+                                                }
                                             )}
                                             onChange={(
                                                 value: OnChangeValue<
@@ -484,15 +467,16 @@ const ConnectionDialog = ({
                                 {...register('name', {required: true})}
                             />
 
-                            {showConnectionProperties && (
-                                <Properties
-                                    formState={formState}
-                                    properties={
-                                        connectionDefinition?.properties
-                                    }
-                                    register={register}
-                                />
-                            )}
+                            {showConnectionProperties &&
+                                !!connectionDefinition.properties && (
+                                    <Properties
+                                        formState={formState}
+                                        properties={
+                                            connectionDefinition?.properties
+                                        }
+                                        register={register}
+                                    />
+                                )}
 
                             {showAuthorizations && (
                                 <NativeSelect
@@ -504,18 +488,15 @@ const ConnectionDialog = ({
                                     label="Authorization"
                                     options={authorizationOptions}
                                     placeholder="Select..."
+                                    value={authorizationName}
                                     {...register('authorizationName', {
                                         required:
-                                            connectionDefinition?.authorizationRequired ===
-                                                true ||
-                                            connectionDefinition?.authorizationRequired ===
-                                                undefined,
+                                            connectionDefinition?.authorizationRequired,
                                         onChange: (event) =>
                                             setAuthorizationName(
                                                 event.target.value
                                             ),
                                     })}
-                                    value={authorizationName}
                                 />
                             )}
 
@@ -528,16 +509,17 @@ const ConnectionDialog = ({
                                     />
                                 )}
 
-                            {showAuthorizationProperties && (
-                                <Properties
-                                    formState={formState}
-                                    properties={
-                                        authorizations &&
-                                        authorizations[0]?.properties
-                                    }
-                                    register={register}
-                                />
-                            )}
+                            {showAuthorizationProperties &&
+                                !!authorizations?.length &&
+                                authorizations[0]?.properties && (
+                                    <Properties
+                                        formState={formState}
+                                        properties={
+                                            authorizations[0]?.properties
+                                        }
+                                        register={register}
+                                    />
+                                )}
 
                             {showOAuth2AppPredefined && (
                                 <div className="mb-3">
@@ -612,25 +594,26 @@ const ConnectionDialog = ({
 
                     {!oAuth2AuthorizationParametersLoading &&
                         wizardStep === 'oauth_step' && (
-                            <>
+                            <div>
                                 <Alert
                                     text={
-                                        <>
-                                            {`Excellent! You can connect and create the `}
+                                        <p>
+                                            Excellent! You can connect and
+                                            create the
                                             <span className="font-semibold">
                                                 {componentDefinition?.title}
                                             </span>
-                                            {` connection under name `}
-                                            <span className="font-semibold">
-                                                {`'${getValues()?.name}'`}
-                                            </span>
+                                            connection under name
+                                            <span className="font-semibold">{`'${
+                                                getValues()?.name
+                                            }'`}</span>
                                             .
-                                        </>
+                                        </p>
                                     }
                                 />
 
                                 {scopes && <Scopes scopes={scopes} />}
-                            </>
+                            </div>
                         )}
 
                     <div className="mt-8 flex justify-end space-x-1">
@@ -701,7 +684,7 @@ const ConnectionDialog = ({
                                             ) => {
                                                 if (payload.access_token) {
                                                     return saveConnection(
-                                                        payload as any
+                                                        payload
                                                     );
                                                 }
                                             }}
@@ -721,23 +704,23 @@ const ConnectionDialog = ({
                             />
                         )}
                     </div>
-                </>
+                </div>
             )}
         </Dialog>
     );
 };
 
 const Errors = ({errors}: {errors: string[]}) => (
-    <>
+    <ul>
         {errors.map((error, index) => (
-            <div
+            <li
                 key={`error_${index}`}
                 className="my-4 rounded-md bg-red-50 p-4 text-sm text-red-700"
             >
                 An error has occurred: {error}
-            </div>
+            </li>
         ))}
-    </>
+    </ul>
 );
 
 const RedirectUriInput = ({redirectUri}: {redirectUri: string}) => {
@@ -748,7 +731,7 @@ const RedirectUriInput = ({redirectUri}: {redirectUri: string}) => {
         <Input
             label="Redirect URI"
             name="redirectUri"
-            readOnly={true}
+            readOnly
             value={redirectUri}
             trailing={
                 <Button
@@ -767,30 +750,26 @@ const RedirectUriInput = ({redirectUri}: {redirectUri: string}) => {
     );
 };
 
-const Scopes = ({scopes}: {scopes: string[]}) => {
-    return (
-        <div className="py-2">
-            <div className="flex">
-                <span className="mb-2 mr-1 text-sm font-semibold">Scopes</span>
+const Scopes = ({scopes}: {scopes: string[]}) => (
+    <div className="py-2">
+        <div className="flex">
+            <span className="mb-2 mr-1 text-sm font-semibold">Scopes</span>
 
-                <Tooltip
-                    text={'OAuth permission scopes used for this connection.'}
-                >
-                    <QuestionMarkCircledIcon />
-                </Tooltip>
-            </div>
-
-            <div className="space-y-1">
-                {scopes.map((scope) => (
-                    <div className="flex items-center" key={scope}>
-                        <Checkbox id={scope} disabled />
-
-                        <Label htmlFor={scope} value={scope} />
-                    </div>
-                ))}
-            </div>
+            <Tooltip text={'OAuth permission scopes used for this connection.'}>
+                <QuestionMarkCircledIcon />
+            </Tooltip>
         </div>
-    );
-};
+
+        <div className="space-y-1">
+            {scopes.map((scope) => (
+                <div className="flex items-center" key={scope}>
+                    <Checkbox id={scope} disabled />
+
+                    <Label htmlFor={scope} value={scope} />
+                </div>
+            ))}
+        </div>
+    </div>
+);
 
 export default ConnectionDialog;
