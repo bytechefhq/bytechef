@@ -1,11 +1,11 @@
 import {useQuery} from '@tanstack/react-query';
 import {
     CategoryModel,
-    IntegrationCategoriesApi,
+    EmbeddedIntegrationCategoriesApi,
+    EmbeddedIntegrationTagsApi,
+    EmbeddedIntegrationsApi,
+    EmbeddedWorkflowsApi,
     IntegrationModel,
-    IntegrationTagsApi,
-    IntegrationWorkflowsApi,
-    IntegrationsApi,
     TagModel,
     WorkflowModel,
 } from 'middleware/dione/configuration';
@@ -29,12 +29,12 @@ export const IntegrationKeys = {
 export const useGetIntegrationCategoriesQuery = () =>
     useQuery<CategoryModel[], Error>(
         IntegrationKeys.integrationCategories,
-        () => new IntegrationCategoriesApi().getIntegrationCategories()
+        () => new EmbeddedIntegrationCategoriesApi().getIntegrationCategories()
     );
 
 export const useGetIntegrationTagsQuery = () =>
     useQuery<TagModel[], Error>(IntegrationKeys.integrationTags, () =>
-        new IntegrationTagsApi().getIntegrationTags()
+        new EmbeddedIntegrationTagsApi().getIntegrationTags()
     );
 
 export const useGetIntegrationQuery = (
@@ -43,7 +43,7 @@ export const useGetIntegrationQuery = (
 ) =>
     useQuery<IntegrationModel, Error>(
         IntegrationKeys.integration(id),
-        () => new IntegrationsApi().getIntegration({id}),
+        () => new EmbeddedIntegrationsApi().getIntegration({id}),
         {
             initialData,
         }
@@ -55,14 +55,14 @@ export const useGetIntegrationsQuery = (filters: {
 }) =>
     useQuery<IntegrationModel[], Error>(
         IntegrationKeys.integrationList(filters),
-        () => new IntegrationsApi().getIntegrations(filters)
+        () => new EmbeddedIntegrationsApi().getIntegrations(filters)
     );
 
 export const useGetIntegrationWorkflowsQuery = (id: number) =>
     useQuery<WorkflowModel[], Error>(
         IntegrationKeys.integrationWorkflows(id),
         () =>
-            new IntegrationWorkflowsApi().getIntegrationWorkflows({
+            new EmbeddedWorkflowsApi().getIntegrationWorkflows({
                 id,
             })
     );
