@@ -19,12 +19,13 @@ package com.bytechef.hermes.connection.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.hermes.connection.config.OAuth2Properties;
+import com.bytechef.hermes.connection.web.rest.model.OAuth2PropertiesModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -32,25 +33,20 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 @ConditionalOnApi
-@RequestMapping
-public class OAuth2AppsController implements Oauth2AppsApi {
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+public class OAuth2PropertiesController implements Oauth2PropertiesApi {
 
+    private final ConversionService conversionService;
     private final OAuth2Properties oAuth2Properties;
 
     @SuppressFBWarnings("EI")
-    public OAuth2AppsController(OAuth2Properties oAuth2Properties) {
+    public OAuth2PropertiesController(ConversionService conversionService, OAuth2Properties oAuth2Properties) {
+        this.conversionService = conversionService;
         this.oAuth2Properties = oAuth2Properties;
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<String>>> getOAuth2Apps(ServerWebExchange exchange) {
-        return Mono.just(
-            ResponseEntity.ok(
-                Flux.fromIterable(
-                    oAuth2Properties.getApps()
-                        .stream()
-                        .flatMap(map -> map.keySet()
-                            .stream())
-                        .toList())));
+    public Mono<ResponseEntity<OAuth2PropertiesModel>> getOAuth2Properties(ServerWebExchange exchange) {
+        return Mono.just(ResponseEntity.ok(conversionService.convert(oAuth2Properties, OAuth2PropertiesModel.class)));
     }
 }

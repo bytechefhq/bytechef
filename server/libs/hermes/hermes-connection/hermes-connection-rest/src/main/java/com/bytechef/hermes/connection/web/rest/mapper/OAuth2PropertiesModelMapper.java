@@ -15,21 +15,29 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.web.rest.mapper;
+package com.bytechef.hermes.connection.web.rest.mapper;
 
-import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.web.rest.model.ComponentDefinitionBasicModel;
+import com.bytechef.hermes.connection.config.OAuth2Properties;
+import com.bytechef.hermes.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
+import com.bytechef.hermes.connection.web.rest.model.OAuth2PropertiesModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = DefinitionMapperSpringConfig.class)
-public interface ModifiableComponentDefinitionToComponentDefinitionBasicModelMapper
-    extends Converter<ComponentDSL.ModifiableComponentDefinition, ComponentDefinitionBasicModel> {
+@Mapper(config = ConnectionMapperSpringConfig.class)
+public interface OAuth2PropertiesModelMapper extends Converter<OAuth2Properties, OAuth2PropertiesModel> {
 
     @Override
-    ComponentDefinitionBasicModel convert(ComponentDSL.ModifiableComponentDefinition componentDefinition);
+    OAuth2PropertiesModel convert(OAuth2Properties oAuth2Properties);
+
+    default List<String> convert(Map<String, OAuth2Properties.OAuth2App> maps) {
+        return maps.keySet()
+            .stream()
+            .toList();
+    }
 }

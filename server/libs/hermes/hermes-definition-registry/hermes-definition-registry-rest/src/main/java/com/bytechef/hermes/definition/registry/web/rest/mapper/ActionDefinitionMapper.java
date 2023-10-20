@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
+import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionModel;
@@ -28,8 +29,18 @@ import org.springframework.core.convert.converter.Converter;
  */
 @Mapper(config = DefinitionMapperSpringConfig.class)
 public interface ActionDefinitionMapper
-    extends Converter<ComponentDSL.ModifiableActionDefinition, ActionDefinitionModel> {
+    extends Converter<ActionDefinition, ActionDefinitionModel> {
 
     @Override
-    ActionDefinitionModel convert(ComponentDSL.ModifiableActionDefinition actionDefinition);
+    default ActionDefinitionModel convert(ActionDefinition actionDefinition) {
+        if (actionDefinition instanceof ComponentDSL.ModifiableActionDefinition) {
+            return map((ComponentDSL.ModifiableActionDefinition) actionDefinition);
+        } else {
+            return map(actionDefinition);
+        }
+    }
+
+    ActionDefinitionModel map(ActionDefinition actionDefinition);
+
+    ActionDefinitionModel map(ComponentDSL.ModifiableActionDefinition modifiableActionDefinition);
 }

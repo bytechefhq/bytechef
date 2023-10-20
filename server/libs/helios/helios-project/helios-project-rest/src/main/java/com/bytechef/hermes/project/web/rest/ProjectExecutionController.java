@@ -51,13 +51,12 @@ public class ProjectExecutionController implements ProjectExecutionsApi {
     @Override
     public Mono<ResponseEntity<Page>> getProjectExecutions(
         String jobStatus, LocalDateTime jobStartTime, LocalDateTime jobEndTime, Long projectId, Long projectInstanceId,
-        Long workflowId, Integer pageNumber, ServerWebExchange exchange) {
+        String workflowId, Integer pageNumber, ServerWebExchange exchange) {
         return Mono.just(
             ResponseEntity.ok(
                 projectFacade
-                    .searchProjectExecutions(jobStatus, jobStartTime, jobEndTime, projectId, projectInstanceId,
-                        workflowId,
-                        pageNumber)
+                    .searchProjectExecutions(
+                        jobStatus, jobStartTime, jobEndTime, projectId, projectInstanceId, workflowId, pageNumber)
                     .map(
                         projectExecution -> conversionService.convert(projectExecution, ProjectExecutionModel.class))));
     }

@@ -18,10 +18,13 @@
 package com.bytechef.hermes.connection.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
+import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.facade.ConnectionFacade;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
+import com.bytechef.hermes.connection.web.rest.model.OAuth2AuthorizationParametersModel;
 import com.bytechef.hermes.connection.web.rest.model.UpdateConnectionTagsRequestModel;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.web.rest.model.TagModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -43,12 +46,19 @@ import java.util.List;
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
 public class ConnectionController implements ConnectionsApi {
 
-    private final ConversionService conversionService;
+    private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionFacade connectionFacade;
+    private final ConversionService conversionService;
+    private final OAuth2Properties oAuth2Properties;
 
-    public ConnectionController(ConversionService conversionService, ConnectionFacade connectionFacade) {
-        this.conversionService = conversionService;
+    public ConnectionController(
+        ConnectionDefinitionService connectionDefinitionService, ConnectionFacade connectionFacade,
+        ConversionService conversionService, OAuth2Properties oAuth2Properties) {
+
+        this.connectionDefinitionService = connectionDefinitionService;
         this.connectionFacade = connectionFacade;
+        this.conversionService = conversionService;
+        this.oAuth2Properties = oAuth2Properties;
     }
 
     @Override
@@ -98,6 +108,18 @@ public class ConnectionController implements ConnectionsApi {
                         .stream()
                         .map(tag -> conversionService.convert(tag, TagModel.class))
                         .toList())));
+    }
+
+    @Override
+    public Mono<ResponseEntity<OAuth2AuthorizationParametersModel>> getConnectionOAuth2AuthorizationParameters(
+        Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
+
+        return connectionModelMono.map(connectionModel -> ResponseEntity.ok(
+            conversionService.convert(
+                connectionDefinitionService.getOAuth2Parameters(
+                    oAuth2Properties.checkPredefinedApp(
+                        conversionService.convert(connectionModel, Connection.class))),
+                OAuth2AuthorizationParametersModel.class)));
     }
 
     @Override

@@ -15,22 +15,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.web.rest.mapper;
+package com.bytechef.hermes.connection.web.rest.mapper;
 
-import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionModel;
-import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL;
+import com.bytechef.hermes.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
+import com.bytechef.hermes.connection.web.rest.model.OAuth2AuthorizationParametersModel;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = DefinitionMapperSpringConfig.class)
-public interface ModifiableTaskDispatcherDefinitionMapper
-    extends Converter<TaskDispatcherDSL.ModifiableTaskDispatcherDefinition, TaskDispatcherDefinitionModel> {
+@Mapper(config = ConnectionMapperSpringConfig.class)
+public interface OAuth2AuthorizationParametersMapper
+    extends Converter<ConnectionDefinitionService.OAuth2AuthorizationParameters, OAuth2AuthorizationParametersModel> {
 
     @Override
-    TaskDispatcherDefinitionModel convert(
-        TaskDispatcherDSL.ModifiableTaskDispatcherDefinition taskDispatcherDefinition);
+    OAuth2AuthorizationParametersModel convert(ConnectionDefinitionService.OAuth2AuthorizationParameters source);
 }

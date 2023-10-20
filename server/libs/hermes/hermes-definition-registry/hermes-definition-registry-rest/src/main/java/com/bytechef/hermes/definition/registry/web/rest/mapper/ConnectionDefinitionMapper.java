@@ -17,10 +17,12 @@
 
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.web.rest.model.ConnectionDefinitionModel;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -31,5 +33,17 @@ public interface ConnectionDefinitionMapper
     extends Converter<ConnectionDefinition, ConnectionDefinitionModel> {
 
     @Override
-    ConnectionDefinitionModel convert(ConnectionDefinition connectionDefinition);
+    default ConnectionDefinitionModel convert(ConnectionDefinition connectionDefinition) {
+        if (connectionDefinition instanceof ComponentDSL.ModifiableConnectionDefinition) {
+            return map((ComponentDSL.ModifiableConnectionDefinition) connectionDefinition);
+        } else {
+            return map(connectionDefinition);
+        }
+    }
+
+    @Mapping(target = "baseUri", ignore = true)
+    ConnectionDefinitionModel map(ConnectionDefinition connectionDefinition);
+
+    @Mapping(target = "baseUri", ignore = true)
+    ConnectionDefinitionModel map(ComponentDSL.ModifiableConnectionDefinition modifiableConnectionDefinition);
 }
