@@ -34,15 +34,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class OdsFileTaskHandler {
 
@@ -223,49 +226,53 @@ public class OdsFileTaskHandler {
             }
         }
 
-        private byte[] write(List<Map<String, ?>> rows, WriteConfiguration configuration) throws IOException {
-            boolean headerRow = false;
+        private Object[] getHeaderValues(Set<String> names) {
+            Objects.requireNonNull(names);
 
-            int columnCount;
-            Sheet sheet = null;
-            SpreadSheet spreadSheet = new SpreadSheet();
-            Object[][] values = null;
+            if (names.isEmpty()) {
+                throw new IllegalArgumentException("Unable to create header values with empty names collection");
+            }
+
+            Object[] values = new Object[names.size()];
+
+            int idx = 0;
+
+            for (Object value : values) {
+                values[idx++] = value;
+            }
+
+            return values;
+        }
+
+        private byte[] write(List<Map<String, ?>> rows, WriteConfiguration configuration) throws IOException {
+            Map<String, ?> rowMap = rows.get(0);
+
+            Object[] headerValues = getHeaderValues(rowMap.keySet());
+            Object[][] values = new Object[rows.size() + 1][headerValues.length];
+
+            values[0] = headerValues;
 
             for (int i = 0; i < rows.size(); i++) {
-                Map<String, ?> item = rows.get(i);
+                Map<String, ?> row = rows.get(i);
 
-                Set<String> fieldNames = item.keySet();
-
-                if (!headerRow) {
-                    headerRow = true;
-
-                    columnCount = fieldNames.size();
-
-                    sheet = new Sheet(configuration.sheetName(), rows.size() + 1, columnCount);
-
-                    spreadSheet.appendSheet(sheet);
-
-                    values = new Object[rows.size() + 1][columnCount];
-
-                    int column = 0;
-
-                    for (String fieldName : fieldNames) {
-                        values[0][column++] = fieldName;
-                    }
-                }
+                Collection<?> rowValues = row.values();
 
                 int column = 0;
 
-                for (String fieldName : fieldNames) {
-                    values[i + 1][column++] = item.get(fieldName);
+                for (Object rowValue : rowValues) {
+                    values[i + 1][column++] = rowValue;
                 }
             }
 
-            if (sheet != null) {
-                Range range = sheet.getDataRange();
+            Sheet sheet = new Sheet(configuration.sheetName(), rows.size() + 1, headerValues.length);
 
-                range.setValues(values);
-            }
+            SpreadSheet spreadSheet = new SpreadSheet();
+
+            spreadSheet.appendSheet(sheet);
+
+            Range range = sheet.getDataRange();
+
+            range.setValues(values);
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
