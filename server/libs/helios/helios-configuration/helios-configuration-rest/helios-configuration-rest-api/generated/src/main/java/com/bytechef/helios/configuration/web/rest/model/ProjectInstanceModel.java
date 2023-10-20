@@ -8,7 +8,6 @@ import com.bytechef.tag.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstance", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-18T12:57:16.891651+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-18T22:39:21.980039+02:00[Europe/Zagreb]")
 public class ProjectInstanceModel {
 
   private String description;
@@ -58,42 +57,7 @@ public class ProjectInstanceModel {
   @Valid
   private List<@Valid ProjectInstanceWorkflowModel> projectInstanceWorkflows;
 
-  /**
-   * The status of a project instance.
-   */
-  public enum StatusEnum {
-    DISABLED("DISABLED"),
-    
-    ENABLED("ENABLED");
-
-    private String value;
-
-    StatusEnum(String value) {
-      this.value = value;
-    }
-
-    @JsonValue
-    public String getValue() {
-      return value;
-    }
-
-    @Override
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static StatusEnum fromValue(String value) {
-      for (StatusEnum b : StatusEnum.values()) {
-        if (b.value.equals(value)) {
-          return b;
-        }
-      }
-      throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-  }
-
-  private StatusEnum status;
+  private Boolean enabled;
 
   @Valid
   private List<@Valid TagModel> tags;
@@ -344,24 +308,24 @@ public class ProjectInstanceModel {
     this.projectInstanceWorkflows = projectInstanceWorkflows;
   }
 
-  public ProjectInstanceModel status(StatusEnum status) {
-    this.status = status;
+  public ProjectInstanceModel enabled(Boolean enabled) {
+    this.enabled = enabled;
     return this;
   }
 
   /**
-   * The status of a project instance.
-   * @return status
+   * If a workflow is enabled or not in the project instance.
+   * @return enabled
   */
   
-  @Schema(name = "status", description = "The status of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("status")
-  public StatusEnum getStatus() {
-    return status;
+  @Schema(name = "enabled", description = "If a workflow is enabled or not in the project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("enabled")
+  public Boolean getEnabled() {
+    return enabled;
   }
 
-  public void setStatus(StatusEnum status) {
-    this.status = status;
+  public void setEnabled(Boolean enabled) {
+    this.enabled = enabled;
   }
 
   public ProjectInstanceModel tags(List<@Valid TagModel> tags) {
@@ -432,14 +396,14 @@ public class ProjectInstanceModel {
         Objects.equals(this.project, projectInstance.project) &&
         Objects.equals(this.projectId, projectInstance.projectId) &&
         Objects.equals(this.projectInstanceWorkflows, projectInstance.projectInstanceWorkflows) &&
-        Objects.equals(this.status, projectInstance.status) &&
+        Objects.equals(this.enabled, projectInstance.enabled) &&
         Objects.equals(this.tags, projectInstance.tags) &&
         Objects.equals(this.version, projectInstance.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, createdBy, createdDate, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, project, projectId, projectInstanceWorkflows, status, tags, version);
+    return Objects.hash(description, createdBy, createdDate, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, project, projectId, projectInstanceWorkflows, enabled, tags, version);
   }
 
   @Override
@@ -457,7 +421,7 @@ public class ProjectInstanceModel {
     sb.append("    project: ").append(toIndentedString(project)).append("\n");
     sb.append("    projectId: ").append(toIndentedString(projectId)).append("\n");
     sb.append("    projectInstanceWorkflows: ").append(toIndentedString(projectInstanceWorkflows)).append("\n");
-    sb.append("    status: ").append(toIndentedString(status)).append("\n");
+    sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
