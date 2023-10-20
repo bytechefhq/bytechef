@@ -81,6 +81,9 @@ public final class Connection implements Persistable<Long> {
     @Column("parameters")
     private EncryptedMapWrapper parameters;
 
+    @Column
+    private int type;
+
     @Version
     private int version;
 
@@ -196,6 +199,10 @@ public final class Connection implements Persistable<Long> {
             .toList();
     }
 
+    public int getType() {
+        return type;
+    }
+
     public int getVersion() {
         return version;
     }
@@ -235,6 +242,10 @@ public final class Connection implements Persistable<Long> {
         }
     }
 
+    public void setType(int type) {
+        this.type = type;
+    }
+
     public void setTagIds(List<Long> tagIds) {
         this.connectionTags = new HashSet<>();
 
@@ -261,7 +272,8 @@ public final class Connection implements Persistable<Long> {
             + id + ", name='"
             + name + '\'' + "authorizationName='"
             + authorizationName + '\'' + ", componentName='"
-            + componentName + ", connectionVersion='"
+            + componentName + ", type='"
+            + type + ", connectionVersion='"
             + connectionVersion + ", connectionTags="
             + connectionTags + ", queryParameters="
             + parameters + ", version="
@@ -281,6 +293,7 @@ public final class Connection implements Persistable<Long> {
         private String name;
         private Map<String, Object> parameters;
         private List<Long> tagIds;
+        private int type;
         private int version;
 
         private Builder() {
@@ -288,41 +301,55 @@ public final class Connection implements Persistable<Long> {
 
         public Builder authorizationName(String authorizationName) {
             this.authorizationName = authorizationName;
+
             return this;
         }
 
         public Builder componentName(String componentName) {
             this.componentName = componentName;
+
             return this;
         }
 
         public Builder connectionVersion(int connectionVersion) {
             this.connectionVersion = connectionVersion;
+
             return this;
         }
 
         public Builder id(Long id) {
             this.id = id;
+
             return this;
         }
 
         public Builder name(String name) {
             this.name = name;
+
             return this;
         }
 
         public Builder parameters(Map<String, Object> parameters) {
             this.parameters = parameters;
+
             return this;
         }
 
         public Builder tagIds(List<Long> tagIds) {
             this.tagIds = tagIds;
+
+            return this;
+        }
+
+        public Builder type(int type) {
+            this.type = type;
+
             return this;
         }
 
         public Builder version(int version) {
             this.version = version;
+
             return this;
         }
 
@@ -335,8 +362,9 @@ public final class Connection implements Persistable<Long> {
             connection.setId(id);
             connection.setName(name);
             connection.setParameters(parameters);
-            connection.setVersion(version);
             connection.setTagIds(tagIds);
+            connection.setType(type);
+            connection.setVersion(version);
 
             return connection;
         }

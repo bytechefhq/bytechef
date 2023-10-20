@@ -114,6 +114,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             connection.setTags(tags);
         }
 
+        connection.setType(ProjectConstants.PROJECT_TYPE);
+
         connection = connectionService.create(connection);
 
         return new ConnectionDTO(isConnectionUsed(Validate.notNull(connection.getId(), "id")), connection, tags);
