@@ -6,11 +6,11 @@ outputs:
 
 tasks:
   - type: loop
-    list: "${range(1,10)}"
+    list: ${range(1,10)}
     itemVar: item1
     iteratee:
       type: loop
-      list: "${range(1,item1)}"
+      list: ${range(1,item1)}
       itemVar: item2
       iteratee:
         name: sumVar1

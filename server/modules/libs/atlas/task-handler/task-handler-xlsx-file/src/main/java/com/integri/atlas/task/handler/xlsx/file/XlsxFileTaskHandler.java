@@ -123,7 +123,7 @@ public class XlsxFileTaskHandler implements TaskHandler<Object> {
                     );
             }
         } else {
-            String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, getaDefaultFileName(FileFormat.XLSX));
+            String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, getaDefaultFileName());
             List<Map<String, ?>> rows = jsonHelper.checkArray(
                 taskExecution.getRequired(PROPERTY_ROWS),
                 new TypeReference<>() {}
@@ -133,19 +133,19 @@ public class XlsxFileTaskHandler implements TaskHandler<Object> {
 
             return fileStorageService.storeFileContent(
                 fileName,
-                new ByteArrayInputStream(write(FileFormat.XLSX, rows, new WriteConfiguration(fileName, sheetName)))
+                new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName)))
             );
         }
 
         return result;
     }
 
-    private String getaDefaultFileName(FileFormat fileFormat) {
-        return "file." + StringUtils.lowerCase(fileFormat.name());
+    private String getaDefaultFileName() {
+        return "file." + StringUtils.lowerCase(FileFormat.XLSX.name());
     }
 
-    private Workbook getWorkbook(FileFormat fileFormat) {
-        return fileFormat == FileFormat.XLS ? new HSSFWorkbook() : new XSSFWorkbook();
+    private Workbook getWorkbook() {
+        return new XSSFWorkbook();
     }
 
     private Workbook getWorkbook(FileFormat fileFormat, InputStream inputStream) throws IOException {
@@ -236,7 +236,7 @@ public class XlsxFileTaskHandler implements TaskHandler<Object> {
             }
 
             if (count >= configuration.rangeStartRow() && count < configuration.rangeEndRow()) {
-                if (configuration.headerRow()) {
+                if (headers != null && configuration.headerRow()) {
                     Map<String, Object> map = new HashMap<>();
 
                     for (int i = 0; i < lastColumn; i++) {
@@ -272,10 +272,9 @@ public class XlsxFileTaskHandler implements TaskHandler<Object> {
         return rows;
     }
 
-    private byte[] write(FileFormat fileFormat, List<Map<String, ?>> rows, WriteConfiguration configuration)
-        throws IOException {
+    private byte[] write(List<Map<String, ?>> rows, WriteConfiguration configuration) throws IOException {
         boolean headerRow = false;
-        Workbook workbook = getWorkbook(fileFormat);
+        Workbook workbook = getWorkbook();
 
         Sheet sheet = workbook.createSheet(configuration.sheetName());
 

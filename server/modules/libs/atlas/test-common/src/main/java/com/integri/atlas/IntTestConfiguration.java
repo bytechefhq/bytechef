@@ -100,7 +100,9 @@ public class IntTestConfiguration {
         JdbcJobRepository jdbcJobRepository = new JdbcJobRepository();
 
         jdbcJobRepository.setJdbcOperations(namedParameterJdbcTemplate);
-        jdbcJobRepository.setJobTaskExecutionRepository(jdbcJobTaskExecutionRepository(namedParameterJdbcTemplate, objectMapper));
+        jdbcJobRepository.setJobTaskExecutionRepository(
+            jdbcJobTaskExecutionRepository(namedParameterJdbcTemplate, objectMapper)
+        );
         jdbcJobRepository.setObjectMapper(objectMapper);
 
         return jdbcJobRepository;
