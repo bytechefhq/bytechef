@@ -35,9 +35,9 @@ import java.util.Map;
  */
 public class WorkflowFileStorageFacadeImpl implements WorkflowFileStorageFacade {
 
-    private static final String CONTEXTS = "workflow_outputs/contexts";
-    private static final String JOBS = "workflow_outputs/jobs";
-    private static final String TASK_EXECUTIONS = "workflow_outputs/task_executions";
+    private static final String CONTEXTS_DIR = "workflow_outputs_contexts";
+    private static final String JOBS_DIR = "workflow_outputs_jobs";
+    private static final String TASK_EXECUTIONS_DIR = "workflow_outputs_task_executions";
 
     private final FileStorageService fileStorageService;
     private final ObjectMapper objectMapper;
@@ -51,7 +51,7 @@ public class WorkflowFileStorageFacadeImpl implements WorkflowFileStorageFacade 
     @Override
     public Map<String, ?> readContextValue(@NonNull FileEntry fileEntry) {
         return JsonUtils.read(
-            CompressionUtils.decompressToString(fileStorageService.readFileToBytes(CONTEXTS, fileEntry)),
+            CompressionUtils.decompressToString(fileStorageService.readFileToBytes(CONTEXTS_DIR, fileEntry)),
             new TypeReference<>() {}, objectMapper);
     }
 
@@ -60,7 +60,7 @@ public class WorkflowFileStorageFacadeImpl implements WorkflowFileStorageFacade 
         Assert.notNull(fileEntry, "'fileEntry' must not be null");
 
         return JsonUtils.read(
-            CompressionUtils.decompressToString(fileStorageService.readFileToBytes(JOBS, fileEntry)),
+            CompressionUtils.decompressToString(fileStorageService.readFileToBytes(JOBS_DIR, fileEntry)),
             new TypeReference<>() {}, objectMapper);
     }
 
@@ -69,7 +69,7 @@ public class WorkflowFileStorageFacadeImpl implements WorkflowFileStorageFacade 
         Assert.notNull(fileEntry, "'fileEntry' must not be null");
 
         return JsonUtils.read(
-            CompressionUtils.decompressToString(fileStorageService.readFileToBytes(TASK_EXECUTIONS, fileEntry)),
+            CompressionUtils.decompressToString(fileStorageService.readFileToBytes(TASK_EXECUTIONS_DIR, fileEntry)),
             Object.class, objectMapper);
     }
 
@@ -81,7 +81,7 @@ public class WorkflowFileStorageFacadeImpl implements WorkflowFileStorageFacade 
         Assert.notNull(value, "'value' must not be null");
 
         return fileStorageService.storeFileContent(
-            CONTEXTS, classname + "_" + stackId + ".json",
+            CONTEXTS_DIR, classname + "_" + stackId + ".json",
             CompressionUtils.compress(JsonUtils.write(value, objectMapper)));
     }
 
@@ -93,7 +93,7 @@ public class WorkflowFileStorageFacadeImpl implements WorkflowFileStorageFacade 
         Assert.notNull(value, "'value' must not be null");
 
         return fileStorageService.storeFileContent(
-            CONTEXTS, classname + "_" + stackId + "_" + subStackId + ".json",
+            CONTEXTS_DIR, classname + "_" + stackId + "_" + subStackId + ".json",
             CompressionUtils.compress(JsonUtils.write(value, objectMapper)));
     }
 
@@ -102,7 +102,7 @@ public class WorkflowFileStorageFacadeImpl implements WorkflowFileStorageFacade 
         Assert.notNull(outputs, "'outputs' must not be null");
 
         return fileStorageService.storeFileContent(
-            JOBS, jobId + ".json", CompressionUtils.compress(JsonUtils.write(outputs, objectMapper)));
+            JOBS_DIR, jobId + ".json", CompressionUtils.compress(JsonUtils.write(outputs, objectMapper)));
     }
 
     @Override
@@ -110,7 +110,7 @@ public class WorkflowFileStorageFacadeImpl implements WorkflowFileStorageFacade 
         Assert.notNull(output, "'output' must not be null");
 
         return fileStorageService.storeFileContent(
-            TASK_EXECUTIONS, taskExecutionId + ".json",
+            TASK_EXECUTIONS_DIR, taskExecutionId + ".json",
             CompressionUtils.compress(JsonUtils.write(output, objectMapper)));
     }
 }
