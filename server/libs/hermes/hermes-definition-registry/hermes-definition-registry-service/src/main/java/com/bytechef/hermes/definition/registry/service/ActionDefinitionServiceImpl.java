@@ -78,7 +78,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             actionDefinition.getEditorDescriptionDataSource(),
             EditorDescriptionDataSource::getEditorDescription,
             (Context.Connection connection, Map<String, ?> inputParameters) -> ComponentDefinitionDTO.getTitle(
-                componentDefinition) + ": " + ActionDefinitionDTO.getTitle(actionDefinition));
+                componentDefinition.getName(), OptionalUtils.orElse(componentDefinition.getTitle(), null)) + ": " +
+                ActionDefinitionDTO.getTitle(actionDefinition));
 
         return editorDescriptionFunction.apply(
             contextConnectionFactory.createConnection(

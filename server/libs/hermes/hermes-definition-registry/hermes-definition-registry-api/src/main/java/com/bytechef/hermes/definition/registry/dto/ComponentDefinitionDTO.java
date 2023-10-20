@@ -56,27 +56,24 @@ public record ComponentDefinitionDTO(
             OptionalUtils.mapOrElse(
                 componentDefinition.getTriggers(),
                 triggerDefinitions -> CollectionUtils.map(
-                    triggerDefinitions,
-                    triggerDefinition -> ComponentDefinitionDTO.toTriggerDefinitionBasicDTO(
-                        triggerDefinition, componentDefinition)),
+                    triggerDefinitions, ComponentDefinitionDTO::toTriggerDefinitionBasicDTO),
                 Collections.emptyList()),
-            getTitle(componentDefinition), componentDefinition.getVersion());
+            getTitle(componentDefinition.getName(), OptionalUtils.orElse(componentDefinition.getTitle(), null)),
+            componentDefinition.getVersion());
     }
 
     private static List<ActionDefinitionBasicDTO> getActions(ComponentDefinition componentDefinition) {
         List<ActionDefinitionBasicDTO> actionDefinitionBasicDTOs = OptionalUtils.mapOrElse(
             componentDefinition.getActions(),
             actionDefinitions -> CollectionUtils.map(
-                actionDefinitions,
-                actionDefinition -> toActionDefinitionBasicDTO(actionDefinition, componentDefinition)),
+                actionDefinitions, ComponentDefinitionDTO::toActionDefinitionBasicDTO),
             Collections.emptyList());
 
         if (OptionalUtils.orElse(componentDefinition.getCustomAction(), false)) {
             actionDefinitionBasicDTOs = new ArrayList<>(actionDefinitionBasicDTOs);
 
             actionDefinitionBasicDTOs.add(
-                toActionDefinitionBasicDTO(
-                    CustomAction.getCustomActionDefinition(componentDefinition), componentDefinition));
+                toActionDefinitionBasicDTO(CustomAction.getCustomActionDefinition(componentDefinition)));
         }
 
         return actionDefinitionBasicDTOs;
@@ -97,14 +94,14 @@ public record ComponentDefinitionDTO(
             .map(ResourcesDTO::new);
     }
 
-    public static String getTitle(ComponentDefinition componentDefinition) {
-        return OptionalUtils.orElse(componentDefinition.getTitle(), componentDefinition.getName());
+    public static String getTitle(String componentName, String componentTitle) {
+        return componentTitle == null ? componentName : componentTitle;
     }
 
     private static ActionDefinitionBasicDTO toActionDefinitionBasicDTO(
-        ActionDefinition actionDefinition, ComponentDefinition componentDefinition) {
+        ActionDefinition actionDefinition) {
 
-        return new ActionDefinitionBasicDTO(actionDefinition, componentDefinition);
+        return new ActionDefinitionBasicDTO(actionDefinition);
     }
 
     private static ConnectionDefinitionBasicDTO toConnectionDefinitionDTO(
@@ -114,8 +111,8 @@ public record ComponentDefinitionDTO(
     }
 
     private static TriggerDefinitionBasicDTO toTriggerDefinitionBasicDTO(
-        TriggerDefinition triggerDefinition, ComponentDefinition componentDefinition) {
+        TriggerDefinition triggerDefinition) {
 
-        return new TriggerDefinitionBasicDTO(triggerDefinition, componentDefinition);
+        return new TriggerDefinitionBasicDTO(triggerDefinition);
     }
 }

@@ -75,6 +75,12 @@ public final class OptionalUtils {
             .orElseThrow(IllegalArgumentException::new);
     }
 
+    public static <T, U> Optional<U> mapOptional(Optional<T> optional, Function<? super T, ? extends U> mapper) {
+        Objects.requireNonNull(optional, "'optional' must not be null");
+
+        return optional.map(mapper);
+    }
+
     public static <T, U> U mapOrElse(Optional<T> optional, Function<? super T, ? extends U> mapper, U other) {
         Objects.requireNonNull(optional, "'optional' must not be null");
 
