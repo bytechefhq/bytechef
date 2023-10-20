@@ -20,8 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
-import com.bytechef.atlas.test.workflow.WorkflowExecutor;
-import com.bytechef.hermes.component.test.MockFileEntry;
+import com.bytechef.atlas.sync.executor.WorkflowExecutor;
+import com.bytechef.commons.collection.MapUtils;
+import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
+import com.bytechef.hermes.file.storage.domain.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
 import java.io.IOException;
@@ -30,13 +32,12 @@ import java.util.Map;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@ComponentIntTest
 public class FilesystemComponentHandlerIntTest {
 
     @Autowired
@@ -55,10 +56,10 @@ public class FilesystemComponentHandlerIntTest {
 
         Map<String, Object> outputs = job.getOutputs();
 
-        com.bytechef.hermes.file.storage.domain.FileEntry fileEntry =
+        FileEntry fileEntry =
                 fileStorageService.storeFileContent("sample.txt", Files.contentOf(getFile(), Charset.defaultCharset()));
 
-        assertThat(new MockFileEntry(outputs, "readLocalFile"))
+        assertThat(MapUtils.getMap(outputs, "readLocalFile"))
                 .hasFieldOrPropertyWithValue("extension", "txt")
                 .hasFieldOrPropertyWithValue("mimeType", "text/plain")
                 .hasFieldOrPropertyWithValue("name", "sample.txt")

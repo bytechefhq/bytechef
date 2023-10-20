@@ -67,16 +67,16 @@ public class FilesystemComponentHandler implements ComponentHandler {
             .actions(
                     action(READ_FILE)
                             .display(display("Read to file"))
-                            .inputs(string(FILENAME)
+                            .properties(string(FILENAME)
                                     .label("Filename")
                                     .description("The path of the file to read.")
                                     .placeholder("/data/your_file.pdf")
                                     .required(true))
-                            .outputSchema(ComponentDSL.fileEntry())
+                            .output(ComponentDSL.fileEntry())
                             .performFunction(this::performReadFile),
                     action(WRITE_FILE)
                             .display(display("Write from file"))
-                            .inputs(
+                            .properties(
                                     fileEntry(FILE_ENTRY)
                                             .label("File")
                                             .description(
@@ -87,7 +87,7 @@ public class FilesystemComponentHandler implements ComponentHandler {
                                             .description("The path to which the file should be written.")
                                             .placeholder("/data/your_file.pdf")
                                             .required(true))
-                            .outputSchema(object().properties(integer("bytes")))
+                            .output(object().properties(integer("bytes")))
                             .performFunction(this::performWriteFile),
                     action(CREATE_TEMP_DIR)
                             .display(display("Create Temp Directory")
@@ -98,13 +98,13 @@ public class FilesystemComponentHandler implements ComponentHandler {
                                     display("File Path")
                                             .description(
                                                     "Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator."))
-                            .inputs(string(FILENAME)
+                            .properties(string(FILENAME)
                                     .label("Filename")
                                     .description("The path to full filename.")
                                     .placeholder("/data/your_file.pdf")
                                     .required(true))
                             .performFunction(this::performGetFilePath)
-                            .outputSchema(string())
+                            .output(string())
                             .exampleOutput("/data"),
                     action(LS)
                             .display(display("Lists a content of directory for the given path.")

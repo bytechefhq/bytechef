@@ -10,41 +10,42 @@
         "label": "Read to file"
       },
       "name": "readFile",
-      "inputs": [
+      "output": [
+        {
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
+          "properties": [
+            {
+              "name": "extension",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "mimeType",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "name",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "url",
+              "required": true,
+              "type": "STRING"
+            }
+          ]
+        }
+      ],
+      "properties": [
         {
           "description": "The path of the file to read.",
           "label": "Filename",
           "name": "filename",
           "placeholder": "/data/your_file.pdf",
-          "type": "STRING",
-          "required": true
-        }
-      ],
-      "outputSchema": [
-        {
-          "type": "OBJECT",
-          "properties": [
-            {
-              "name": "extension",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "mimeType",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "name",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "url",
-              "type": "STRING",
-              "required": true
-            }
-          ]
+          "required": true,
+          "type": "STRING"
         }
       ]
     },
@@ -53,46 +54,7 @@
         "label": "Write from file"
       },
       "name": "writeFile",
-      "inputs": [
-        {
-          "description": "The object property which contains a reference to the file to be written.",
-          "label": "File",
-          "name": "fileEntry",
-          "type": "OBJECT",
-          "required": true,
-          "properties": [
-            {
-              "name": "extension",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "mimeType",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "name",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "url",
-              "type": "STRING",
-              "required": true
-            }
-          ]
-        },
-        {
-          "description": "The path to which the file should be written.",
-          "label": "Filename",
-          "name": "filename",
-          "placeholder": "/data/your_file.pdf",
-          "type": "STRING",
-          "required": true
-        }
-      ],
-      "outputSchema": [
+      "output": [
         {
           "type": "OBJECT",
           "properties": [
@@ -101,6 +63,46 @@
               "type": "INTEGER"
             }
           ]
+        }
+      ],
+      "properties": [
+        {
+          "description": "The object property which contains a reference to the file to be written.",
+          "label": "File",
+          "name": "fileEntry",
+          "required": true,
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
+          "properties": [
+            {
+              "name": "extension",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "mimeType",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "name",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "url",
+              "required": true,
+              "type": "STRING"
+            }
+          ]
+        },
+        {
+          "description": "The path to which the file should be written.",
+          "label": "Filename",
+          "name": "filename",
+          "placeholder": "/data/your_file.pdf",
+          "required": true,
+          "type": "STRING"
         }
       ]
     },
@@ -116,20 +118,20 @@
         "description": "Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator.",
         "label": "File Path"
       },
+      "exampleOutput": "/data",
       "name": "getFilePath",
-      "inputs": [
+      "output": [
+        {
+          "type": "STRING"
+        }
+      ],
+      "properties": [
         {
           "description": "The path to full filename.",
           "label": "Filename",
           "name": "filename",
           "placeholder": "/data/your_file.pdf",
-          "type": "STRING",
-          "required": true
-        }
-      ],
-      "exampleOutput": "/data",
-      "outputSchema": [
-        {
+          "required": true,
           "type": "STRING"
         }
       ]
