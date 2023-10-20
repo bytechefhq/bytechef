@@ -48,7 +48,7 @@ public class SpreadsheetFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
 
         Job job = startJob(
             "samples/spreadsheetFile_READ.json",
-            Map.of("spreadsheetFile", new SpreadsheetFileTaskHandler(fileStorageService, jsonHelper)),
+            Map.of("spreadsheetFile", new SpreadsheetFileTaskHandler(fileStorageService)),
             Map.of(
                 "fileEntry",
                 fileStorageService.storeFile(
@@ -73,7 +73,7 @@ public class SpreadsheetFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
     public void testWrite() throws IOException {
         Job job = startJob(
             "samples/spreadsheetFile_WRITE.json",
-            Map.of("spreadsheetFile", new SpreadsheetFileTaskHandler(fileStorageService, jsonHelper)),
+            Map.of("spreadsheetFile", new SpreadsheetFileTaskHandler(fileStorageService)),
             Map.of("items", JSONArrayUtil.toList(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())))
         );
 
@@ -87,7 +87,7 @@ public class SpreadsheetFileTaskHandlerIntTest extends BaseTaskHandlerIntTest {
         job =
             startJob(
                 "samples/spreadsheetFile_READ.json",
-                Map.of("spreadsheetFile", new SpreadsheetFileTaskHandler(fileStorageService, jsonHelper)),
+                Map.of("spreadsheetFile", new SpreadsheetFileTaskHandler(fileStorageService)),
                 Map.of(
                     "fileEntry",
                     fileStorageService.storeFile(
