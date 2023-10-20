@@ -38,7 +38,7 @@ const Select: React.FC<SelectProps> = ({
                 </SelectPrimitive.ScrollUpButton>
                 <SelectPrimitive.Viewport className="rounded-lg bg-white p-2 shadow-lg dark:bg-gray-800">
                     <SelectPrimitive.Group>
-                        {selectItems.map((selectItem, i) => (
+                        {selectItems.map((selectItem) => (
                             <SelectPrimitive.Item
                                 key={selectItem.value}
                                 value={selectItem.value}
