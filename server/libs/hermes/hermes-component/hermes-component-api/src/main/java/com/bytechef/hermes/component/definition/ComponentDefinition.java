@@ -17,14 +17,12 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.constants.Versions;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Resources;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Used for specifying a component.
@@ -34,51 +32,25 @@ import java.util.Objects;
 @Schema(
     name = "ComponentDefinition",
     description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers(TODO) and connections if there is a need for a connection to an outside service.")
-public sealed class ComponentDefinition permits ComponentDSL.ModifiableComponentDefinition {
-
-    protected List<? extends ActionDefinition> actions;
-    protected ConnectionDefinition connection;
-    protected Display display;
-    protected Map<String, Object> metadata;
-    protected String name;
-    protected Resources resources;
-    protected int version = Versions.VERSION_1;
-
-    protected ComponentDefinition(String name) {
-        this.name = Objects.requireNonNull(name);
-    }
+public sealed interface ComponentDefinition permits ComponentDSL.ModifiableComponentDefinition {
 
     @SuppressWarnings("unchecked")
     @Schema(name = "actions", description = "The list of all available actions the component can perform.")
-    public List<? extends ActionDefinition> getActions() {
-        return actions;
-    }
+    List<? extends ActionDefinition> getActions();
 
     @SuppressWarnings("unchecked")
     @Schema(name = "connection", description = "Definition of connection to an outside service.")
-    public ConnectionDefinition getConnection() {
-        return connection;
-    }
+    ConnectionDefinition getConnection();
 
-    public Display getDisplay() {
-        return display;
-    }
+    Display getDisplay();
 
     @Schema(name = "metadata", description = "Additional data that can be used during processing.")
-    public Map<String, Object> getMetadata() {
-        return metadata == null ? null : new HashMap<>(metadata);
-    }
+    Map<String, Object> getMetadata();
 
     @Schema(name = "name", description = "The connection name.")
-    public String getName() {
-        return name;
-    }
+    String getName();
 
-    public Resources getResources() {
-        return resources;
-    }
+    Resources getResources();
 
-    public int getVersion() {
-        return version;
-    }
+    int getVersion();
 }

@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.utils;
 
-import com.bytechef.hermes.component.exception.ProcessingException;
+import com.bytechef.hermes.component.exception.ActionExecutionException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.io.InputStream;
@@ -57,7 +57,7 @@ public class XmlUtils {
             return XML_MAPPER.convertValue(XML_MAPPER.readTree(xml), new TypeReference<>() {
             });
         } catch (Exception exception) {
-            throw new ProcessingException("Unable to convert xml value", exception);
+            throw new ActionExecutionException("Unable to convert xml value", exception);
         }
     }
 
@@ -65,7 +65,7 @@ public class XmlUtils {
         try {
             return XML_MAPPER.readValue(inputStream, clazz);
         } catch (Exception exception) {
-            throw new ProcessingException("Unable to read xml value", exception);
+            throw new ActionExecutionException("Unable to read xml value", exception);
         }
     }
 
@@ -73,7 +73,7 @@ public class XmlUtils {
         try {
             return XML_MAPPER.readValue(xml, clazz);
         } catch (Exception exception) {
-            throw new ProcessingException("Unable to read xml value", exception);
+            throw new ActionExecutionException("Unable to read xml value", exception);
         }
     }
 
@@ -81,7 +81,7 @@ public class XmlUtils {
         try {
             return XML_MAPPER.readValue(inputStream, typeReference);
         } catch (Exception exception) {
-            throw new ProcessingException("Unable to read xml", exception);
+            throw new ActionExecutionException("Unable to read xml", exception);
         }
     }
 
@@ -89,7 +89,7 @@ public class XmlUtils {
         try {
             return XML_MAPPER.readValue(xml, typeReference);
         } catch (Exception exception) {
-            throw new ProcessingException("Unable to read xml", exception);
+            throw new ActionExecutionException("Unable to read xml", exception);
         }
     }
 
@@ -115,7 +115,7 @@ public class XmlUtils {
         try {
             return new XmlStreamReaderStream(inputStream, XML_MAPPER);
         } catch (Exception exception) {
-            throw new ProcessingException("Unable to stream xml", exception);
+            throw new ActionExecutionException("Unable to stream xml", exception);
         }
     }
 
@@ -129,7 +129,7 @@ public class XmlUtils {
                 .withRootName(rootName)
                 .writeValueAsString(object);
         } catch (Exception exception) {
-            throw new ProcessingException("Unable to write xml", exception);
+            throw new ActionExecutionException("Unable to write xml", exception);
         }
     }
 
@@ -137,7 +137,7 @@ public class XmlUtils {
         try {
             return documentBuilder.parse(inputStream);
         } catch (Exception exception) {
-            throw new ProcessingException("Unable to parse xml", exception);
+            throw new ActionExecutionException("Unable to parse xml", exception);
         }
     }
 
@@ -145,7 +145,7 @@ public class XmlUtils {
         try {
             return documentBuilder.parse(new InputSource(new StringReader(xml)));
         } catch (Exception exception) {
-            throw new ProcessingException("Unable to parse xml", exception);
+            throw new ActionExecutionException("Unable to parse xml", exception);
         }
     }
 
@@ -168,7 +168,7 @@ public class XmlUtils {
 
             sb.append("</root>");
         } catch (Exception exception) {
-            throw new ProcessingException("Unable to parse xml", exception);
+            throw new ActionExecutionException("Unable to parse xml", exception);
         }
 
         return sb.toString();
@@ -184,7 +184,7 @@ public class XmlUtils {
 
             return stringWriter.toString();
         } catch (Exception exception) {
-            throw new ProcessingException("Unable to transform xml node", exception);
+            throw new ActionExecutionException("Unable to transform xml node", exception);
         }
     }
 }

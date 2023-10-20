@@ -17,15 +17,11 @@
 
 package com.bytechef.hermes.component.definition;
 
-import static com.bytechef.hermes.component.constants.ComponentConstants.BASE_URI;
-
 import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -37,65 +33,27 @@ import java.util.function.Function;
  * @author Ivica Cardic
  */
 @Schema(name = "ConnectionDefinition", description = "A connection to an outside service.")
-public sealed class ConnectionDefinition permits ComponentDSL.ModifiableConnectionDefinition {
+public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConnectionDefinition {
 
-    protected String componentName;
-    protected int componentVersion;
-    protected List<? extends Authorization> authorizations = Collections.emptyList();
+    List<? extends Authorization> getAuthorizations();
 
-    @JsonIgnore
-    protected Function<Connection, String> baseUriFunction = (
-        connectionParameters) -> connectionParameters.containsKey(BASE_URI)
-            ? connectionParameters.getParameter(BASE_URI) : null;
-
-    protected Display display;
-    protected List<? extends Property<?>> properties;
-    protected Resources resources;
-    protected String subtitle;
-
-    @JsonIgnore
-    protected Consumer<Connection> testConsumer;
-
-    protected ConnectionDefinition() {
-    }
-
-    public List<? extends Authorization> getAuthorizations() {
-        return authorizations;
-    }
-
-    public Function<Connection, String> getBaseUriFunction() {
-        return baseUriFunction;
-    }
+    Function<Connection, String> getBaseUriFunction();
 
     @Schema(name = "componentName", description = "The name of a component this connection can be used for.")
-    public String getComponentName() {
-        return componentName;
-    }
+    String getComponentName();
 
     @Schema(name = "componentVersion", description = "The version of a component this connection can be used for.")
-    public int getComponentVersion() {
-        return componentVersion;
-    }
+    int getComponentVersion();
 
-    public Display getDisplay() {
-        return display;
-    }
+    Display getDisplay();
 
     @Schema(name = "properties", description = "Properties of the connection.")
-    public List<? extends Property<?>> getProperties() {
-        return properties;
-    }
+    List<? extends Property<?>> getProperties();
 
-    public Resources getResources() {
-        return resources;
-    }
+    Resources getResources();
 
     @Schema(name = "subtitle", description = "Additional explanation.")
-    public String getSubtitle() {
-        return subtitle;
-    }
+    String getSubtitle();
 
-    public Optional<Consumer<Connection>> getTestConsumer() {
-        return Optional.ofNullable(testConsumer);
-    }
+    Optional<Consumer<Connection>> getTestConsumer();
 }

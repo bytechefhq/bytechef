@@ -29,14 +29,11 @@ import static com.bytechef.hermes.component.constants.ComponentConstants.VALUE;
 
 import com.bytechef.hermes.component.AuthorizationContext;
 import com.bytechef.hermes.component.Connection;
-import com.bytechef.hermes.component.constants.ComponentConstants;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -47,9 +44,9 @@ import org.apache.commons.lang3.StringUtils;
  * @author Ivica Cardic
  */
 @Schema(name = "Authorization", description = "Contains information required for a connection's authorization.")
-public sealed class Authorization permits ComponentDSL.ModifiableAuthorization {
+public sealed interface Authorization permits ComponentDSL.ModifiableAuthorization {
 
-    public enum AuthorizationType {
+    enum AuthorizationType {
         API_KEY((AuthorizationContext authorizationContext, Connection connection) -> {
             if (ApiTokenLocation.valueOf(
                 StringUtils.upperCase(
@@ -97,116 +94,39 @@ public sealed class Authorization permits ComponentDSL.ModifiableAuthorization {
         }
     }
 
-    public enum ApiTokenLocation {
+    enum ApiTokenLocation {
         HEADER,
         QUERY_PARAMETERS,
     }
 
-    @JsonIgnore
-    protected BiConsumer<AuthorizationContext, Connection> applyConsumer;
+    BiConsumer<AuthorizationContext, Connection> getApplyConsumer();
 
-    @JsonIgnore
-    protected BiFunction<Connection, String, String> authorizationCallbackFunction;
+    Optional<BiFunction<Connection, String, String>> getAuthorizationCallbackFunction();
 
-    @JsonIgnore
-    protected Function<Connection, String> authorizationUrlFunction = connectionParameters -> connectionParameters
-        .getParameter(ComponentConstants.AUTHORIZATION_URL);
+    Function<Connection, String> getAuthorizationUrlFunction();
 
-    @JsonIgnore
-    protected Function<Connection, String> clientIdFunction = connectionParameters -> connectionParameters
-        .getParameter(ComponentConstants.CLIENT_ID);
+    Function<Connection, String> getClientIdFunction();
 
-    @JsonIgnore
-    protected Function<Connection, String> clientSecretFunction = connectionParameters -> connectionParameters
-        .getParameter(ComponentConstants.CLIENT_SECRET);
+    Function<Connection, String> getClientSecretFunction();
 
-    protected Display display;
-
-    @JsonIgnore
-    protected List<Object> onRefresh;
-
-    protected List<Property<?>> properties;
-
-    @JsonIgnore
-    protected Function<Connection, String> refreshFunction;
-
-    @JsonIgnore
-    protected Function<Connection, String> refreshUrlFunction = connectionParameters -> connectionParameters
-        .getParameter(ComponentConstants.REFRESH_URL);
-
-    @JsonIgnore
-    protected Function<Connection, List<String>> scopesFunction = connectionParameters -> connectionParameters
-        .getParameter(ComponentConstants.SCOPES);
-
-    @JsonIgnore
-    protected Function<Connection, String> tokenUrlFunction = connectionParameters -> connectionParameters
-        .getParameter(ComponentConstants.TOKEN_URL);
-
-    private final String name;
-    private final AuthorizationType type;
-
-    protected Authorization(String name, AuthorizationType type) {
-        this.name = Objects.requireNonNull(name);
-        this.type = Objects.requireNonNull(type);
-        this.applyConsumer = type.getDefaultApplyConsumer();
-    }
-
-    public BiConsumer<AuthorizationContext, Connection> getApplyConsumer() {
-        return applyConsumer;
-    }
-
-    public Optional<BiFunction<Connection, String, String>> getAuthorizationCallbackFunction() {
-        return Optional.ofNullable(authorizationCallbackFunction);
-    }
-
-    public Function<Connection, String> getAuthorizationUrlFunction() {
-        return authorizationUrlFunction;
-    }
-
-    public Function<Connection, String> getClientIdFunction() {
-        return clientIdFunction;
-    }
-
-    public Function<Connection, String> getClientSecretFunction() {
-        return clientSecretFunction;
-    }
-
-    public Display getDisplay() {
-        return display;
-    }
+    Display getDisplay();
 
     @Schema(name = "name", description = "The authorization name.")
-    public String getName() {
-        return name;
-    }
+    String getName();
 
-    public List<Object> getOnRefresh() {
-        return onRefresh;
-    }
+    List<Object> getOnRefresh();
 
     @Schema(name = "properties", description = "Properties of the connection.")
-    public List<Property<?>> getProperties() {
-        return properties;
-    }
+    List<Property<?>> getProperties();
 
-    public Optional<Function<Connection, String>> getRefreshFunction() {
-        return Optional.ofNullable(refreshFunction);
-    }
+    Optional<Function<Connection, String>> getRefreshFunction();
 
-    public Function<Connection, String> getRefreshUrlFunction() {
-        return refreshUrlFunction;
-    }
+    Function<Connection, String> getRefreshUrlFunction();
 
-    public Function<Connection, List<String>> getScopesFunction() {
-        return scopesFunction;
-    }
+    Function<Connection, List<String>> getScopesFunction();
 
-    public Function<Connection, String> getTokenUrlFunction() {
-        return tokenUrlFunction;
-    }
+    Function<Connection, String> getTokenUrlFunction();
 
     @Schema(name = "type", description = "Authorization type.")
-    public AuthorizationType getType() {
-        return type;
-    }
+    AuthorizationType getType();
 }

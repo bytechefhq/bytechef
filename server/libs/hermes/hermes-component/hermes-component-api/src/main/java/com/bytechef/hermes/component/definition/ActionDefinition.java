@@ -21,12 +21,9 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
@@ -36,57 +33,29 @@ import java.util.function.BiFunction;
 @Schema(
     name = "ActionDefinition",
     description = "An action is a a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
-public sealed class ActionDefinition permits ComponentDSL.ModifiableActionDefinition {
+public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDefinition {
 
-    protected Display display;
-    protected Object exampleOutput;
-    protected Map<String, Object> metadata;
-    protected String name;
-    protected List<Property<? extends Property<?>>> output;
-    protected List<Property<?>> properties;
-
-    @JsonIgnore
-    protected BiFunction<Context, ExecutionParameters, Object> performFunction;
-
-    protected ActionDefinition(String name) {
-        this.name = Objects.requireNonNull(name);
-    }
-
-    public Display getDisplay() {
-        return display;
-    }
+    Display getDisplay();
 
     @Schema(name = "exampleOutput", description = "The example of the action's output.")
-    public Object getExampleOutput() {
-        return exampleOutput;
-    }
+    Object getExampleOutput();
 
     @Schema(name = "metadata", description = "Additional data that can be used during processing.")
-    public Map<String, Object> getMetadata() {
-        return metadata == null ? null : new HashMap<>(metadata);
-    }
+    Map<String, Object> getMetadata();
 
     @Schema(name = "name", description = "The action name.")
-    public String getName() {
-        return name;
-    }
+    String getName();
 
     @Schema(name = "output", description = "The output schema of an execution result.")
-    public List<Property<? extends Property<?>>> getOutput() {
-        return output;
-    }
+    List<Property<? extends Property<?>>> getOutput();
 
     @Schema(name = "properties", description = "The list of action properties.")
-    public List<Property<?>> getProperties() {
-        return properties;
-    }
+    List<Property<?>> getProperties();
 
     /**
      * The code that should be performed when the action is executed as a task whe running inside the workflow engine.
      *
      * @return an optional perform function implementation
      */
-    public Optional<BiFunction<Context, ExecutionParameters, Object>> getPerformFunction() {
-        return Optional.ofNullable(performFunction);
-    }
+    Optional<BiFunction<Context, ExecutionParameters, Object>> getPerformFunction();
 }
