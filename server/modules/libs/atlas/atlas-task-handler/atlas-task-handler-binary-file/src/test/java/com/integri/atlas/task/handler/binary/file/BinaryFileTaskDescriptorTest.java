@@ -93,8 +93,8 @@ public class BinaryFileTaskDescriptorTest {
                         "placeholder":"/data/your_file.pdf"
                     },
                    {
-                        "description":"The Binary Item property which contains the data for the file to be written.",
-                        "displayName":"Binary Item",
+                        "description":"The Binary property which contains the data for the file to be written.",
+                        "displayName":"Binary",
                         "displayOption":{
                             "show":{
                                 "operation":["WRITE"]
