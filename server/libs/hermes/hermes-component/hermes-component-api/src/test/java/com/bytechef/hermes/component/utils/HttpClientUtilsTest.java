@@ -94,9 +94,7 @@ public class HttpClientUtilsTest {
         MultipartBodyPublisher multipartBodyPublisher = (MultipartBodyPublisher) httpClient.createBodyPublisher(
             context,
             HttpClientUtils.Payload.of(
-                Map.of("key1", "value1", "key2", fileEntry), HttpClientUtils.BodyContentType.FORM_DATA),
-            HttpClientUtils.Configuration.builder()
-                .build());
+                Map.of("key1", "value1", "key2", fileEntry), HttpClientUtils.BodyContentType.FORM_DATA));
 
         Assertions.assertTrue(multipartBodyPublisher.mediaType()
             .toString()
@@ -116,9 +114,7 @@ public class HttpClientUtilsTest {
         FormBodyPublisher formBodyPublisher = (FormBodyPublisher) httpClient.createBodyPublisher(
             context,
             HttpClientUtils.Payload.of(
-                Map.of("key1", "value1", "key2", "value2"), HttpClientUtils.BodyContentType.FORM_URLENCODED),
-            HttpClientUtils.Configuration.builder()
-                .build());
+                Map.of("key1", "value1", "key2", "value2"), HttpClientUtils.BodyContentType.FORM_URLENCODED));
 
         Assertions.assertEquals(MediaType.APPLICATION_FORM_URLENCODED, formBodyPublisher.mediaType());
 
@@ -131,9 +127,7 @@ public class HttpClientUtilsTest {
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClient.createBodyPublisher(
             context,
-            HttpClientUtils.Payload.of(Map.of("key1", "value1"), HttpClientUtils.BodyContentType.JSON),
-            HttpClientUtils.Configuration.builder()
-                .build());
+            HttpClientUtils.Payload.of(Map.of("key1", "value1"), HttpClientUtils.BodyContentType.JSON));
 
         Assertions.assertEquals(MediaType.APPLICATION_JSON, mimeBodyPublisherAdapter.mediaType());
 
@@ -141,28 +135,18 @@ public class HttpClientUtilsTest {
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClient.createBodyPublisher(
             context,
-            HttpClientUtils.Payload.of(Map.of("key1", "value1"), HttpClientUtils.BodyContentType.XML),
-            HttpClientUtils.Configuration.builder()
-                .build());
+            HttpClientUtils.Payload.of(Map.of("key1", "value1"), HttpClientUtils.BodyContentType.XML));
 
         Assertions.assertEquals(MediaType.APPLICATION_XML, mimeBodyPublisherAdapter.mediaType());
 
         //
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClient.createBodyPublisher(
-            context,
-            HttpClientUtils.Payload.of("text"),
-            HttpClientUtils.Configuration.builder()
-                .build());
+            context, HttpClientUtils.Payload.of("text"));
 
         Assertions.assertEquals(MediaType.TEXT_PLAIN, mimeBodyPublisherAdapter.mediaType());
 
-        HttpRequest.BodyPublisher emptyBodyPublisher = httpClient.createBodyPublisher(
-            context,
-            null,
-            HttpClientUtils.Configuration.builder()
-                .mimeType("text/html")
-                .build());
+        HttpRequest.BodyPublisher emptyBodyPublisher = httpClient.createBodyPublisher(context, null);
 
         Assertions.assertEquals(0, emptyBodyPublisher.contentLength());
 
@@ -170,24 +154,21 @@ public class HttpClientUtilsTest {
 
         fileEntry = Mockito.mock(FileEntry.class);
 
+        Mockito.when(fileEntry.getMimeType())
+            .thenReturn("text/plain");
         Mockito.when(fileEntry.getName())
             .thenReturn("fileName");
         Mockito.when(fileEntry.getUrl())
             .thenReturn("base64:text");
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClient.createBodyPublisher(
-            context,
-            HttpClientUtils.Payload.of(fileEntry),
-            HttpClientUtils.Configuration.builder()
-                .build());
+            context, HttpClientUtils.Payload.of(fileEntry));
 
-        Assertions.assertEquals(MediaType.APPLICATION_OCTET_STREAM, mimeBodyPublisherAdapter.mediaType());
+        Assertions.assertEquals(MediaType.TEXT_PLAIN, mimeBodyPublisherAdapter.mediaType());
 
         //
 
-        HttpRequest.BodyPublisher bodyPublisher = httpClient.createBodyPublisher(
-            context, null, HttpClientUtils.Configuration.builder()
-                .build());
+        HttpRequest.BodyPublisher bodyPublisher = httpClient.createBodyPublisher(context, null);
 
         Assertions.assertEquals(0, bodyPublisher.contentLength());
     }
