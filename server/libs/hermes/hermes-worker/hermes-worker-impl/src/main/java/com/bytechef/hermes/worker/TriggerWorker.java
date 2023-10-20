@@ -25,7 +25,7 @@ import com.bytechef.hermes.coordinator.event.TriggerExecutionErrorEvent;
 import com.bytechef.hermes.coordinator.event.TriggerStartedApplicationEvent;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
-import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
+import com.bytechef.hermes.file.storage.TriggerFileStorage;
 import com.bytechef.hermes.worker.executor.TriggerWorkerExecutor;
 import com.bytechef.hermes.worker.trigger.event.CancelControlTriggerEvent;
 import com.bytechef.hermes.worker.trigger.event.TriggerExecutionEvent;
@@ -59,17 +59,17 @@ public class TriggerWorker {
     private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
     private final ApplicationEventPublisher eventPublisher;
-    private final TriggerFileStorageFacade triggerFileStorageFacade;
+    private final TriggerFileStorage triggerFileStorage;
     private final TriggerWorkerExecutor triggerWorkerExecutor;
     private final Map<WorkflowExecutionId, TriggerExecutionFuture<?>> triggerExecutions = new ConcurrentHashMap<>();
     private final TriggerHandlerResolver triggerHandlerResolver;
 
     public TriggerWorker(
-        ApplicationEventPublisher eventPublisher, TriggerFileStorageFacade triggerFileStorageFacade,
+        ApplicationEventPublisher eventPublisher, TriggerFileStorage triggerFileStorage,
         TriggerWorkerExecutor executorService, TriggerHandlerResolver triggerHandlerResolver) {
 
         this.eventPublisher = eventPublisher;
-        this.triggerFileStorageFacade = triggerFileStorageFacade;
+        this.triggerFileStorage = triggerFileStorage;
         this.triggerWorkerExecutor = executorService;
         this.triggerHandlerResolver = triggerHandlerResolver;
     }
@@ -153,7 +153,7 @@ public class TriggerWorker {
         } else {
             triggerExecution.setBatch(triggerOutput.batch());
             triggerExecution.setOutput(
-                triggerFileStorageFacade.storeTriggerExecutionOutput(
+                triggerFileStorage.storeTriggerExecutionOutput(
                     Validate.notNull(triggerExecution.getId(), "id"), triggerOutput.value()));
             triggerExecution.setState(triggerOutput.state());
         }

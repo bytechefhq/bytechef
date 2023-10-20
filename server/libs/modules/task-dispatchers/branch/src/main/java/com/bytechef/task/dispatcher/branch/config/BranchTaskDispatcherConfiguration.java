@@ -20,7 +20,7 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFacto
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -38,29 +38,29 @@ public class BranchTaskDispatcherConfiguration {
     private final ApplicationEventPublisher eventPublisher;
     private final ContextService contextService;
     private final TaskExecutionService taskExecutionService;
-    private final TaskFileStorageFacade taskFileStorageFacade;
+    private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public BranchTaskDispatcherConfiguration(
         ApplicationEventPublisher eventPublisher, ContextService contextService,
         TaskExecutionService taskExecutionService,
-        @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorageFacade taskFileStorageFacade) {
+        @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorage taskFileStorage) {
 
         this.eventPublisher = eventPublisher;
         this.contextService = contextService;
         this.taskExecutionService = taskExecutionService;
-        this.taskFileStorageFacade = taskFileStorageFacade;
+        this.taskFileStorage = taskFileStorage;
     }
 
     @Bean("branchTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory branchTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new BranchTaskCompletionHandler(
-            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorageFacade);
+            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage);
     }
 
     @Bean("branchTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory branchTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new BranchTaskDispatcher(
-            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorageFacade);
+            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
     }
 }

@@ -27,7 +27,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -47,19 +47,19 @@ public class JobExecutor {
     private final ContextService contextService;
     private final TaskDispatcher<? super TaskExecution> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
-    private final TaskFileStorageFacade taskFileStorageFacade;
+    private final TaskFileStorage taskFileStorage;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public JobExecutor(
         ContextService contextService, TaskDispatcher<? super TaskExecution> taskDispatcher,
-        TaskExecutionService taskExecutionService, TaskFileStorageFacade taskFileStorageFacade,
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
         WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
-        this.taskFileStorageFacade = taskFileStorageFacade;
+        this.taskFileStorage = taskFileStorage;
         this.workflowService = workflowService;
     }
 
@@ -78,7 +78,7 @@ public class JobExecutor {
     private void executeNextTask(Job job, Workflow workflow) {
         Validate.notNull(job.getId(), "'job.id' must not be null");
 
-        Map<String, ?> context = taskFileStorageFacade.readContextValue(
+        Map<String, ?> context = taskFileStorage.readContextValue(
             contextService.peek(Validate.notNull(job.getId(), "id"), Context.Classname.JOB));
         TaskExecution nextTaskExecution = nextTaskExecution(job, workflow);
 
@@ -88,7 +88,7 @@ public class JobExecutor {
 
         contextService.push(
             Validate.notNull(nextTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-            taskFileStorageFacade.storeContextValue(
+            taskFileStorage.storeContextValue(
                 Validate.notNull(nextTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION, context));
 
         taskDispatcher.dispatch(nextTaskExecution);

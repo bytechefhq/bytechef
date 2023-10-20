@@ -34,7 +34,7 @@ import com.bytechef.atlas.execution.domain.Context.Classname;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
@@ -58,19 +58,19 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
     private final ContextService contextService;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
-    private final TaskFileStorageFacade taskFileStorageFacade;
+    private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public BranchTaskDispatcher(
         ApplicationEventPublisher eventPublisher, ContextService contextService,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
-        TaskFileStorageFacade taskFileStorageFacade) {
+        TaskFileStorage taskFileStorage) {
 
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
-        this.taskFileStorageFacade = taskFileStorageFacade;
+        this.taskFileStorage = taskFileStorage;
     }
 
     @Override
@@ -103,7 +103,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
                     .workflowTask(subWorkflowTask)
                     .build();
 
-                Map<String, ?> context = taskFileStorageFacade.readContextValue(
+                Map<String, ?> context = taskFileStorage.readContextValue(
                     contextService.peek(Validate.notNull(taskExecution.getId(), "id"), Classname.TASK_EXECUTION));
 
                 subTaskExecution.evaluate(context);
@@ -112,7 +112,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
                 contextService.push(
                     Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
-                    taskFileStorageFacade.storeContextValue(
+                    taskFileStorage.storeContextValue(
                         Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION, context));
 
                 taskDispatcher.dispatch(subTaskExecution);
@@ -125,7 +125,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
             if (selectedCase.get("value") != null) {
                 taskExecution.setOutput(
-                    taskFileStorageFacade.storeTaskExecutionOutput(
+                    taskFileStorage.storeTaskExecutionOutput(
                         Validate.notNull(taskExecution.getId(), "id"), selectedCase.get("value")));
             }
 

@@ -22,7 +22,7 @@ import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
+import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
@@ -65,7 +65,7 @@ public class JobTestExecutor {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, jobService, objectMapper, taskExecutionService,
             MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get,
-            new TaskFileStorageFacadeImpl(new Base64FileStorageService(), new ObjectMapper()), workflowService);
+            new TaskFileStorageImpl(new Base64FileStorageService(), new ObjectMapper()), workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, inputs));
     }

@@ -30,8 +30,8 @@ import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
@@ -64,7 +64,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         }
     };
 
-    private final TaskFileStorageFacade taskFileStorageFacade = new TaskFileStorageFacadeImpl(
+    private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(
         new Base64FileStorageService(), objectMapper);
 
     @Test
@@ -159,7 +159,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             Executors.newSingleThreadExecutor(),
-            taskHandlerResolver, taskFileStorageFacade);
+            taskHandlerResolver, taskFileStorage);
 
         mapAdapterTaskHandlerRefs[0] = new MapTaskDispatcherAdapterTaskHandler(objectMapper, taskHandlerResolver);
 

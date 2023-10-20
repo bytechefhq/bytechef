@@ -20,7 +20,7 @@ import static com.bytechef.component.filesystem.constant.FilesystemConstants.FIL
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.test.JobTestExecutor;
@@ -49,7 +49,7 @@ public class FilesystemComponentHandlerIntTest {
     private JobTestExecutor jobTestExecutor;
 
     @Autowired
-    private TaskFileStorageFacade taskFileStorageFacade;
+    private TaskFileStorage taskFileStorage;
 
     @Test
     public void testRead() {
@@ -61,7 +61,7 @@ public class FilesystemComponentHandlerIntTest {
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = taskFileStorageFacade.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
         FileEntry fileEntry = fileStorageService.storeFileContent(
             FileEntryConstants.FILES_DIR, "sample.txt", Files.contentOf(getFile(), StandardCharsets.UTF_8));
@@ -90,7 +90,7 @@ public class FilesystemComponentHandlerIntTest {
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = taskFileStorageFacade.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
         assertThat((Map<?, ?>) outputs.get("writeLocalFile")).hasFieldOrPropertyWithValue("bytes", 5);
     }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.file.storage.facade;
+package com.bytechef.atlas.file.storage;
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.commons.util.CompressionUtils;
@@ -31,7 +31,7 @@ import org.springframework.lang.NonNull;
 /**
  * @author Ivica Cardic
  */
-public class TaskFileStorageFacadeImpl implements TaskFileStorageFacade {
+public class TaskFileStorageImpl implements TaskFileStorage {
 
     private static final String CONTEXT_FILES_DIR = "workflow_outputs_contexts";
     private static final String JOB_FILES_DIR = "workflow_outputs_jobs";
@@ -41,7 +41,7 @@ public class TaskFileStorageFacadeImpl implements TaskFileStorageFacade {
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI")
-    public TaskFileStorageFacadeImpl(FileStorageService fileStorageService, ObjectMapper objectMapper) {
+    public TaskFileStorageImpl(FileStorageService fileStorageService, ObjectMapper objectMapper) {
         this.fileStorageService = fileStorageService;
         this.objectMapper = objectMapper;
     }

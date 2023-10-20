@@ -21,7 +21,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.task.dispatcher.each.EachTaskDispatcher;
 import com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +50,7 @@ public class EachTaskDispatcherConfiguration {
 
     @Autowired
     @Qualifier("workflowAsyncTaskFileStorageFacade")
-    private TaskFileStorageFacade taskFileStorageFacade;
+    private TaskFileStorage taskFileStorage;
 
     @Bean("eachTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory eachTaskCompletionHandlerFactory() {
@@ -62,6 +62,6 @@ public class EachTaskDispatcherConfiguration {
     TaskDispatcherResolverFactory eachTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new EachTaskDispatcher(
             eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
-            taskFileStorageFacade);
+            taskFileStorage);
     }
 }

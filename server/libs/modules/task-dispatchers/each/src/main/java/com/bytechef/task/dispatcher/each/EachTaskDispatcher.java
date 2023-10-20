@@ -31,7 +31,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -60,20 +60,20 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     private final CounterService counterService;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
-    private final TaskFileStorageFacade taskFileStorageFacade;
+    private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public EachTaskDispatcher(
         ApplicationEventPublisher eventPublisher, ContextService contextService,
         CounterService counterService, TaskDispatcher<? super Task> taskDispatcher,
-        TaskExecutionService taskExecutionService, TaskFileStorageFacade taskFileStorageFacade) {
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         this.eventPublisher = eventPublisher;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
         this.contextService = contextService;
         this.counterService = counterService;
-        this.taskFileStorageFacade = taskFileStorageFacade;
+        this.taskFileStorage = taskFileStorage;
     }
 
     @Override
@@ -106,7 +106,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                     .build();
 
                 Map<String, Object> newContext = new HashMap<>(
-                    taskFileStorageFacade.readContextValue(
+                    taskFileStorage.readContextValue(
                         contextService.peek(
                             Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)));
 
@@ -118,7 +118,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
                 contextService.push(
                     Validate.notNull(iterateeTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-                    taskFileStorageFacade.storeContextValue(
+                    taskFileStorage.storeContextValue(
                         Validate.notNull(iterateeTaskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
                         newContext));
 

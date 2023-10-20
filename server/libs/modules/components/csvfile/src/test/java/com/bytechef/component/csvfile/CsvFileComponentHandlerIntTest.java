@@ -22,7 +22,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
@@ -53,7 +53,7 @@ public class CsvFileComponentHandlerIntTest {
     private JobTestExecutor jobTestExecutor;
 
     @Autowired
-    private TaskFileStorageFacade taskFileStorageFacade;
+    private TaskFileStorage taskFileStorage;
 
     @Test
     public void testRead() throws JSONException {
@@ -69,7 +69,7 @@ public class CsvFileComponentHandlerIntTest {
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = taskFileStorageFacade.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
         assertEquals(
             new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),
@@ -87,7 +87,7 @@ public class CsvFileComponentHandlerIntTest {
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = taskFileStorageFacade.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
         assertThat(((Map) outputs.get("writeCsvFile")).get(WorkflowConstants.NAME))
             .isEqualTo("file.csv");
@@ -102,7 +102,7 @@ public class CsvFileComponentHandlerIntTest {
                     FileEntryConstants.FILES_DIR, sampleFile.getName(),
                     Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
 
-        outputs = taskFileStorageFacade.readJobOutputs(job.getOutputs());
+        outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
         assertEquals(
             new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)),

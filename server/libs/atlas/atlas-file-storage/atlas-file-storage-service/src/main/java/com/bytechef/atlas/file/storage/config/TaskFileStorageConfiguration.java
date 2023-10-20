@@ -16,8 +16,8 @@
 
 package com.bytechef.atlas.file.storage.config;
 
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.filesystem.config.FilesystemFileStorageProperties;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
@@ -50,7 +50,7 @@ public class TaskFileStorageConfiguration {
 
     @Bean
     @ConditionalOnProperty("bytechef.workflow.async.output-storage.provider")
-    TaskFileStorageFacade workflowAsyncTaskFileStorageFacade(
+    TaskFileStorage workflowAsyncTaskFileStorageFacade(
         ObjectMapper objectMapper,
         @Value("${bytechef.workflow.async.output-storage.provider}") String workflowAsyncOutputStorageProvider) {
 
@@ -60,13 +60,13 @@ public class TaskFileStorageConfiguration {
                     workflowAsyncOutputStorageProvider));
         }
 
-        return new TaskFileStorageFacadeImpl(
+        return new TaskFileStorageImpl(
             getFileStorageService(workflowAsyncOutputStorageProvider), objectMapper);
     }
 
     @Bean
     @ConditionalOnProperty("bytechef.workflow.sync.output-storage.provider")
-    TaskFileStorageFacade workflowSyncTaskFileStorageFacade(
+    TaskFileStorage workflowSyncTaskFileStorageFacade(
         ObjectMapper objectMapper,
         @Value("${bytechef.workflow.sync.output-storage.provider}") String workflowSyncOutputStorageProvider) {
 
@@ -76,7 +76,7 @@ public class TaskFileStorageConfiguration {
                     workflowSyncOutputStorageProvider));
         }
 
-        return new TaskFileStorageFacadeImpl(
+        return new TaskFileStorageImpl(
             getFileStorageService(workflowSyncOutputStorageProvider), objectMapper);
     }
 

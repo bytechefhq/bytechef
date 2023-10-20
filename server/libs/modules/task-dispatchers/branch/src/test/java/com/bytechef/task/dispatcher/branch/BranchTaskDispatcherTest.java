@@ -34,8 +34,8 @@ import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,7 +60,7 @@ public class BranchTaskDispatcherTest {
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
     @SuppressWarnings("unchecked")
     private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
-    private final TaskFileStorageFacade taskFileStorageFacade = new TaskFileStorageFacadeImpl(
+    private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(
         base64FileStorageService, new ObjectMapper());
 
     @Test
@@ -70,7 +70,7 @@ public class BranchTaskDispatcherTest {
         when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorageFacade);
+            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
         TaskExecution taskExecution = TaskExecution.builder().workflowTask(
             WorkflowTask.of(
                 Map.of(
@@ -119,7 +119,7 @@ public class BranchTaskDispatcherTest {
             base64FileStorageService.storeFileContent("", "", "{}"));
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorageFacade);
+            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
         TaskExecution taskExecution = TaskExecution.builder()
             .id(1L)
             .workflowTask(
@@ -148,11 +148,11 @@ public class BranchTaskDispatcherTest {
     @Test
     public void test3() {
         when(contextService.peek(anyLong(), any())).thenReturn(
-            taskFileStorageFacade.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
+            taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
         when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorageFacade);
+            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
         TaskExecution taskExecution = TaskExecution.builder().workflowTask(
             WorkflowTask.of(
                 Map.of(
@@ -199,7 +199,7 @@ public class BranchTaskDispatcherTest {
         when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
-            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorageFacade);
+            eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
         TaskExecution taskExecution = TaskExecution.builder()
             .id(1L)
             .workflowTask(
@@ -234,6 +234,6 @@ public class BranchTaskDispatcherTest {
 
         taskExecution = taskExecutionCompleteEvent.getTaskExecution();
 
-        Assertions.assertEquals("1234", taskFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()));
+        Assertions.assertEquals("1234", taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
     }
 }

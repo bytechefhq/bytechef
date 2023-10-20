@@ -24,7 +24,7 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,17 +40,17 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskExecutionService taskExecutionService;
     private final TaskCompletionHandler taskCompletionHandler;
     private final CounterService counterService;
-    private final TaskFileStorageFacade taskFileStorageFacade;
+    private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public MapTaskCompletionHandler(
         TaskExecutionService taskExecutionService, TaskCompletionHandler taskCompletionHandler,
-        CounterService counterService, TaskFileStorageFacade taskFileStorageFacade) {
+        CounterService counterService, TaskFileStorage taskFileStorage) {
 
         this.taskExecutionService = taskExecutionService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.counterService = counterService;
-        this.taskFileStorageFacade = taskFileStorageFacade;
+        this.taskFileStorage = taskFileStorage;
     }
 
     @Override
@@ -83,10 +83,10 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
             mapTaskExecution.setEndDate(LocalDateTime.now());
 
             mapTaskExecution.setOutput(
-                taskFileStorageFacade.storeTaskExecutionOutput(
+                taskFileStorage.storeTaskExecutionOutput(
                     Validate.notNull(mapTaskExecution.getId(), "id"),
                     childTaskExecutions.stream()
-                        .map(output -> taskFileStorageFacade.readTaskExecutionOutput(output.getOutput()))
+                        .map(output -> taskFileStorage.readTaskExecutionOutput(output.getOutput()))
                         .collect(Collectors.toList())));
 
             taskCompletionHandler.handle(mapTaskExecution);

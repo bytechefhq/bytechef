@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.file.storage.facade;
+package com.bytechef.atlas.file.storage;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class TaskFileStorageFacadeTest {
+public class TriggerFileStorageTest {
 
     @Disabled
     @Test

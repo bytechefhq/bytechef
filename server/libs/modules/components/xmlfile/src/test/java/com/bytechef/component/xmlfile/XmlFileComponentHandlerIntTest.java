@@ -20,7 +20,7 @@ import static com.bytechef.component.xmlfile.constant.XmlFileConstants.FILE_ENTR
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.SOURCE;
 
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
@@ -52,7 +52,7 @@ public class XmlFileComponentHandlerIntTest {
     private JobTestExecutor jobTestExecutor;
 
     @Autowired
-    private TaskFileStorageFacade taskFileStorageFacade;
+    private TaskFileStorage taskFileStorage;
 
     @Test
     public void testRead() {
@@ -69,7 +69,7 @@ public class XmlFileComponentHandlerIntTest {
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = taskFileStorageFacade.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
         Assertions.assertThat(Map.of(
             "Flower",
@@ -100,7 +100,7 @@ public class XmlFileComponentHandlerIntTest {
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
 
-        Map<String, ?> outputs = taskFileStorageFacade.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
         FileEntry fileEntry = MapUtils.get(outputs, "writeXMLFile", FileEntry.class);
 

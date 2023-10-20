@@ -27,7 +27,7 @@ import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
-import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
+import com.bytechef.hermes.file.storage.TriggerFileStorage;
 import java.util.Collection;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -47,19 +47,19 @@ public class TriggerCompletionHandler {
     private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final JobFacade jobFacade;
     private final TriggerExecutionService triggerExecutionService;
-    private final TriggerFileStorageFacade triggerFileStorageFacade;
+    private final TriggerFileStorage triggerFileStorage;
     private final TriggerStateService triggerStateService;
 
     public TriggerCompletionHandler(
         InstanceAccessorRegistry instanceAccessorRegistry, JobFacade jobFacade,
         TriggerExecutionService triggerExecutionService,
-        @Qualifier("workflowAsyncTriggerFileStorageFacade") TriggerFileStorageFacade triggerFileStorageFacade,
+        @Qualifier("workflowAsyncTriggerFileStorageFacade") TriggerFileStorage triggerFileStorage,
         TriggerStateService triggerStateService) {
 
         this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.jobFacade = jobFacade;
         this.triggerExecutionService = triggerExecutionService;
-        this.triggerFileStorageFacade = triggerFileStorageFacade;
+        this.triggerFileStorage = triggerFileStorage;
         this.triggerStateService = triggerStateService;
     }
 
@@ -95,7 +95,7 @@ public class TriggerCompletionHandler {
             MetadataConstants.INSTANCE_ID, workflowExecutionId.getInstanceId(),
             MetadataConstants.INSTANCE_TYPE, workflowExecutionId.getInstanceType());
 
-        Object output = triggerFileStorageFacade.readTriggerExecutionOutput(triggerExecution.getOutput());
+        Object output = triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput());
 
         if (!triggerExecution.isBatch() && output instanceof Collection<?> collectionOutput) {
             for (Object outputItem : collectionOutput) {

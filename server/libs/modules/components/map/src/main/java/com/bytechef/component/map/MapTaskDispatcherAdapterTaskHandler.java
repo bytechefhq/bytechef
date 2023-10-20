@@ -31,8 +31,8 @@ import com.bytechef.atlas.execution.service.ContextServiceImpl;
 import com.bytechef.atlas.execution.service.CounterServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
@@ -72,13 +72,13 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
         List<Object> result = new ArrayList<>();
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
-        TaskFileStorageFacade taskFileStorageFacade = new TaskFileStorageFacadeImpl(
+        TaskFileStorage taskFileStorage = new TaskFileStorageImpl(
             new Base64FileStorageService(), objectMapper);
 
         syncMessageBroker.receive(CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS, message -> {
             TaskExecution completionTaskExecution = ((TaskExecutionCompleteEvent) message).getTaskExecution();
 
-            result.add(taskFileStorageFacade.readTaskExecutionOutput(completionTaskExecution.getOutput()));
+            result.add(taskFileStorage.readTaskExecutionOutput(completionTaskExecution.getOutput()));
         });
 
         List<ExecutionError> errors = Collections.synchronizedList(new ArrayList<>());
@@ -103,18 +103,18 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
         contextService.push(
             Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION,
-            taskFileStorageFacade.storeTaskExecutionOutput(
+            taskFileStorage.storeTaskExecutionOutput(
                 Validate.notNull(taskExecution.getId(), "id"), Collections.emptyMap()));
 
         TaskWorker taskWorker = new TaskWorker(
             getEventPublisher(syncMessageBroker), new CurrentThreadExecutorService(), taskHandlerResolver,
-            taskFileStorageFacade);
+            taskFileStorage);
 
         MapTaskDispatcher mapTaskDispatcher = new MapTaskDispatcher(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
             contextService, new CounterServiceImpl(new InMemoryCounterRepository()),
             curTaskExecution -> taskWorker.onTaskExecutionEvent(new TaskExecutionEvent(curTaskExecution)),
-            taskExecutionService, taskFileStorageFacade);
+            taskExecutionService, taskFileStorage);
 
         mapTaskDispatcher.dispatch(taskExecution);
 

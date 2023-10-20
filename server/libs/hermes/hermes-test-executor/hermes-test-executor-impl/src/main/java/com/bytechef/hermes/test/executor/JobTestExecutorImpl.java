@@ -22,7 +22,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.component.registry.ComponentOperation;
@@ -42,19 +42,19 @@ public class JobTestExecutorImpl implements JobTestExecutor {
     private final ContextService contextService;
     private final JobSyncExecutor jobSyncExecutor;
     private final TaskExecutionService taskExecutionService;
-    private final TaskFileStorageFacade taskFileStorageFacade;
+    private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public JobTestExecutorImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService,
         JobSyncExecutor jobSyncExecutor, TaskExecutionService taskExecutionService,
-        TaskFileStorageFacade taskFileStorageFacade) {
+        TaskFileStorage taskFileStorage) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
         this.jobSyncExecutor = jobSyncExecutor;
         this.taskExecutionService = taskExecutionService;
-        this.taskFileStorageFacade = taskFileStorageFacade;
+        this.taskFileStorage = taskFileStorage;
     }
 
     @Override
@@ -63,17 +63,17 @@ public class JobTestExecutorImpl implements JobTestExecutor {
 
         return new JobDTO(
             job,
-            taskFileStorageFacade.readContextValue(job.getOutputs()),
+            taskFileStorage.readContextValue(job.getOutputs()),
             CollectionUtils.map(
                 taskExecutionService.getJobTaskExecutions(Validate.notNull(job.getId(), "id")),
                 taskExecution -> new TaskExecutionDTO(
                     getComponentDefinition(taskExecution),
-                    taskFileStorageFacade.readContextValue(
+                    taskFileStorage.readContextValue(
                         contextService.peek(
                             Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION)),
                     taskExecution.getOutput() == null
                         ? null
-                        : taskFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()),
+                        : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()),
                     taskExecution)));
     }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.file.storage.facade;
+package com.bytechef.hermes.file.storage;
 
 import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.commons.util.JsonUtils;
@@ -28,7 +28,7 @@ import org.springframework.lang.NonNull;
 /**
  * @author Ivica Cardic
  */
-public class TriggerFileStorageFacadeImpl implements TriggerFileStorageFacade {
+public class TriggerFileStorageImpl implements TriggerFileStorage {
 
     private static final String TRIGGER_EXECUTION_FILES_DIR = "workflow_outputs_trigger_executions";
 
@@ -36,7 +36,7 @@ public class TriggerFileStorageFacadeImpl implements TriggerFileStorageFacade {
     private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI")
-    public TriggerFileStorageFacadeImpl(FileStorageService fileStorageService, ObjectMapper objectMapper) {
+    public TriggerFileStorageImpl(FileStorageService fileStorageService, ObjectMapper objectMapper) {
         this.fileStorageService = fileStorageService;
         this.objectMapper = objectMapper;
     }

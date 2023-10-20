@@ -21,7 +21,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
@@ -60,7 +60,7 @@ public class LoopTaskDispatcherIntTest {
     private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
 
     @Autowired
-    private TaskFileStorageFacade taskFileStorageFacade;
+    private TaskFileStorage taskFileStorage;
 
     @BeforeEach
     void beforeEach() {
@@ -155,12 +155,12 @@ public class LoopTaskDispatcherIntTest {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorageFacade),
+                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorageFacade),
+                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new SequenceTaskCompletionHandler(
                 contextService, taskCompletionHandler, taskDispatcher, taskExecutionService,
-                taskFileStorageFacade));
+                taskFileStorage));
     }
 
     @SuppressWarnings("PMD")
@@ -171,14 +171,14 @@ public class LoopTaskDispatcherIntTest {
         return List.of(
             (taskDispatcher) -> new ConditionTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService,
-                taskFileStorageFacade),
+                taskFileStorage),
             (taskDispatcher) -> new LoopBreakTaskDispatcher(eventPublisher, taskExecutionService),
             (taskDispatcher) -> new LoopTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService,
-                taskFileStorageFacade),
+                taskFileStorage),
             (taskDispatcher) -> new SequenceTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService,
-                taskFileStorageFacade));
+                taskFileStorage));
     }
 
     private TaskDispatcherWorkflowTestSupport.TaskHandlerMapSupplier getTaskHandlerMap() {

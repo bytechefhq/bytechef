@@ -18,7 +18,7 @@ package com.bytechef.atlas.execution.repository.jdbc;
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.repository.jdbc.config.WorkflowExecutionRepositoryIntTestConfiguration;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -39,7 +39,7 @@ public class JdbcContextRepositoryIntTest {
     private JdbcContextRepository contextRepository;
 
     @Autowired
-    private TaskFileStorageFacade taskFileStorageFacade;
+    private TaskFileStorage taskFileStorage;
 
     @AfterEach
     public void afterEach() {
@@ -50,7 +50,7 @@ public class JdbcContextRepositoryIntTest {
     public void testFindByStackId() {
         Context context = new Context(
             1L, Context.Classname.TASK_EXECUTION,
-            taskFileStorageFacade.storeContextValue(1L, Context.Classname.TASK_EXECUTION, Map.of("key", "value")));
+            taskFileStorage.storeContextValue(1L, Context.Classname.TASK_EXECUTION, Map.of("key", "value")));
 
         context = contextRepository.save(context);
 

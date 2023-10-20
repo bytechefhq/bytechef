@@ -17,6 +17,7 @@
 package com.bytechef.data.storage.db.config;
 
 import com.bytechef.data.storage.db.repository.DataStorageRepository;
+import com.bytechef.data.storage.db.service.DbDataStorageService;
 import com.bytechef.data.storage.db.service.DbDataStorageServiceImpl;
 import com.bytechef.data.storage.service.DataStorageService;
 import java.util.Optional;
@@ -42,16 +43,16 @@ public class DbDataStorageConfiguration {
     }
 
     @Bean
-    DbDataStorageServiceImpl dbDataStorageService(DataStorageRepository dataStorageRepository) {
+    DbDataStorageService dbDataStorageService(DataStorageRepository dataStorageRepository) {
         return new DbDataStorageServiceImpl(dataStorageRepository);
     }
 
     @Bean
-    DataStorageService dataStorageService(DbDataStorageServiceImpl dbDataStorageService) {
+    DataStorageService dataStorageService(DbDataStorageService dbDataStorageService) {
         return new DataStorageServiceImpl(dbDataStorageService);
     }
 
-    private record DataStorageServiceImpl(DbDataStorageServiceImpl dbDataStorageService) implements DataStorageService {
+    private record DataStorageServiceImpl(DbDataStorageService dbDataStorageService) implements DataStorageService {
 
         @Override
         public <T> Optional<T> fetch(String context, int scope, long scopeId, String key) {

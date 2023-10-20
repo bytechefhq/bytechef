@@ -18,7 +18,7 @@
 
 package com.bytechef.atlas.worker.config;
 
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.atlas.worker.executor.TaskWorkerExecutor;
 import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
@@ -96,11 +96,11 @@ public class TaskWorkerConfiguration {
     TaskWorker taskWorker(
         ApplicationEventPublisher eventPublisher, TaskWorkerExecutor taskWorkerExecutor,
         TaskHandlerResolver taskHandlerResolver,
-        @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorageFacade taskFileStorageFacade) {
+        @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorage taskFileStorage) {
 
         return new TaskWorker(
             eventPublisher, new ExecutorServiceWrapper(taskWorkerExecutor), taskHandlerResolver,
-            taskFileStorageFacade);
+            taskFileStorage);
     }
 
     private record ExecutorServiceWrapper(TaskWorkerExecutor taskWorkerExecutor) implements ExecutorService {

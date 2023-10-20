@@ -25,7 +25,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
@@ -78,7 +78,7 @@ public class WebhookConfiguration {
         JobFacade jobFacade, JobService jobService, ObjectMapper objectMapper,
         TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
         TriggerSyncExecutor triggerSyncExecutor,
-        @Qualifier("workflowSyncTaskFileStorageFacade") TaskFileStorageFacade taskFileStorageFacade,
+        @Qualifier("workflowSyncTaskFileStorageFacade") TaskFileStorage taskFileStorage,
         WorkflowService workflowService) {
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
@@ -87,24 +87,24 @@ public class WebhookConfiguration {
             eventPublisher, instanceAccessorRegistry,
             new JobSyncExecutor(
                 getApplicationEventListeners(
-                    jobService, syncMessageBroker, taskExecutionService, taskFileStorageFacade),
+                    jobService, syncMessageBroker, taskExecutionService, taskFileStorage),
                 contextService, jobService, syncMessageBroker,
                 getTaskCompletionHandlerFactories(
-                    contextService, counterService, taskExecutionService, taskFileStorageFacade),
+                    contextService, counterService, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(objectMapper),
                 getTaskDispatcherResolverFactories(
                     contextService, counterService, jobFacade, syncMessageBroker, taskExecutionService,
-                    taskFileStorageFacade),
-                taskExecutionService, taskHandlerRegistry, taskFileStorageFacade, workflowService),
-            triggerSyncExecutor, taskFileStorageFacade);
+                    taskFileStorage),
+                taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService),
+            triggerSyncExecutor, taskFileStorage);
     }
 
     private List<ApplicationEventListener> getApplicationEventListeners(
         JobService jobService, SyncMessageBroker syncMessageBroker,
-        TaskExecutionService taskExecutionService, TaskFileStorageFacade taskFileStorageFacade) {
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         SubflowJobStatusEventListener subflowJobStatusEventListener = new SubflowJobStatusEventListener(
-            getEventPublisher(syncMessageBroker), jobService, taskExecutionService, taskFileStorageFacade);
+            getEventPublisher(syncMessageBroker), jobService, taskExecutionService, taskFileStorage);
 
         return List.of(subflowJobStatusEventListener);
     }
@@ -115,27 +115,27 @@ public class WebhookConfiguration {
 
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
         ContextService contextService, CounterService counterService,
-        TaskExecutionService taskExecutionService, TaskFileStorageFacade taskFileStorageFacade) {
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new BranchTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorageFacade),
+                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorageFacade),
+                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new EachTaskCompletionHandler(
                 counterService, taskCompletionHandler, taskExecutionService),
             (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
                 taskExecutionService, taskCompletionHandler, counterService, taskDispatcher, contextService,
-                taskFileStorageFacade),
+                taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorageFacade),
+                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(taskExecutionService,
-                taskCompletionHandler, counterService, taskFileStorageFacade),
+                taskCompletionHandler, counterService, taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new ParallelTaskCompletionHandler(counterService,
                 taskCompletionHandler, taskExecutionService),
             (taskCompletionHandler, taskDispatcher) -> new SequenceTaskCompletionHandler(
                 contextService, taskCompletionHandler, taskDispatcher, taskExecutionService,
-                taskFileStorageFacade));
+                taskFileStorage));
     }
 
     private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories(ObjectMapper objectMapper) {
@@ -158,36 +158,36 @@ public class WebhookConfiguration {
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
         ContextService contextService, CounterService counterService, JobFacade jobFacade,
         SyncMessageBroker syncMessageBroker, TaskExecutionService taskExecutionService,
-        TaskFileStorageFacade taskFileStorageFacade) {
+        TaskFileStorage taskFileStorage) {
 
         ApplicationEventPublisher eventPublisher = getEventPublisher(syncMessageBroker);
 
         return List.of(
             (taskDispatcher) -> new BranchTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService,
-                taskFileStorageFacade),
+                taskFileStorage),
             (taskDispatcher) -> new ConditionTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService,
-                taskFileStorageFacade),
+                taskFileStorage),
             (taskDispatcher) -> new EachTaskDispatcher(
                 eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
-                taskFileStorageFacade),
+                taskFileStorage),
             (taskDispatcher) -> new ForkJoinTaskDispatcher(
                 eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
-                taskFileStorageFacade),
+                taskFileStorage),
             (taskDispatcher) -> new LoopBreakTaskDispatcher(eventPublisher, taskExecutionService),
             (taskDispatcher) -> new LoopTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService,
-                taskFileStorageFacade),
+                taskFileStorage),
             (taskDispatcher) -> new MapTaskDispatcher(
                 eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
-                taskFileStorageFacade),
+                taskFileStorage),
             (taskDispatcher) -> new ParallelTaskDispatcher(
                 eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
-                taskFileStorageFacade),
+                taskFileStorage),
             (taskDispatcher) -> new SequenceTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService,
-                taskFileStorageFacade),
+                taskFileStorage),
             (taskDispatcher) -> new SubflowTaskDispatcher(jobFacade));
     }
 }

@@ -33,8 +33,8 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacadeImpl;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -93,11 +93,11 @@ public class TaskDispatcherIntTestConfiguration {
         TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport(
             ContextService contextService, CounterService counterService, JobService jobService,
             ObjectMapper objectMapper, TaskExecutionService taskExecutionService,
-            TaskFileStorageFacade taskFileStorageFacade, WorkflowService workflowService) {
+            TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
             return new TaskDispatcherWorkflowTestSupport(
                 contextService, counterService, jobService, objectMapper, taskExecutionService,
-                taskFileStorageFacade, workflowService);
+                taskFileStorage, workflowService);
         }
 
         @Bean
@@ -121,8 +121,8 @@ public class TaskDispatcherIntTestConfiguration {
     public static class WorkflowFileStorageConfiguration {
 
         @Bean
-        TaskFileStorageFacade workflowFileStorageFacade(ObjectMapper objectMapper) {
-            return new TaskFileStorageFacadeImpl(new Base64FileStorageService(), objectMapper);
+        TaskFileStorage workflowFileStorageFacade(ObjectMapper objectMapper) {
+            return new TaskFileStorageImpl(new Base64FileStorageService(), objectMapper);
         }
     }
 }

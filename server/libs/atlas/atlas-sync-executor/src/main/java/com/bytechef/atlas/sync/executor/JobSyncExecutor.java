@@ -42,7 +42,7 @@ import com.bytechef.atlas.execution.facade.JobFacadeImpl;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.message.route.WorkerMessageRoute;
@@ -82,12 +82,12 @@ public class JobSyncExecutor {
     public JobSyncExecutor(
         @NonNull ContextService contextService, @NonNull JobService jobService,
         @NonNull ObjectMapper objectMapper, @NonNull TaskExecutionService taskExecutionService,
-        @NonNull TaskHandlerRegistry taskHandlerRegistry, @NonNull TaskFileStorageFacade taskFileStorageFacade,
+        @NonNull TaskHandlerRegistry taskHandlerRegistry, @NonNull TaskFileStorage taskFileStorage,
         @NonNull WorkflowService workflowService) {
 
         this(
             List.of(), contextService, jobService, new SyncMessageBroker(objectMapper), List.of(),
-            List.of(), List.of(), taskExecutionService, taskHandlerRegistry, taskFileStorageFacade,
+            List.of(), List.of(), taskExecutionService, taskHandlerRegistry, taskFileStorage,
             workflowService);
     }
 
@@ -99,12 +99,12 @@ public class JobSyncExecutor {
         @NonNull List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
         @NonNull List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories,
         @NonNull TaskExecutionService taskExecutionService, @NonNull TaskHandlerRegistry taskHandlerRegistry,
-        @NonNull TaskFileStorageFacade taskFileStorageFacade, @NonNull WorkflowService workflowService) {
+        @NonNull TaskFileStorage taskFileStorage, @NonNull WorkflowService workflowService) {
 
         this.jobService = jobService;
         this.jobFacade = new JobFacadeImpl(
             getEventPublisher(syncMessageBroker), new ContextServiceImpl(contextService),
-            new JobServiceImpl(jobService), taskFileStorageFacade, workflowService);
+            new JobServiceImpl(jobService), taskFileStorage, workflowService);
 
         syncMessageBroker.receive(
             CoordinatorMessageRoute.ERROR_EVENTS, event -> {
@@ -124,7 +124,7 @@ public class JobSyncExecutor {
 
         TaskWorker worker = new TaskWorker(
             getEventPublisher(syncMessageBroker), Executors.newCachedThreadPool(), taskHandlerResolverChain,
-            taskFileStorageFacade);
+            taskFileStorage);
 
         syncMessageBroker.receive(
             WorkerMessageRoute.TASK_EXECUTION_EVENTS, e -> worker.onTaskExecutionEvent((TaskExecutionEvent) e));
@@ -137,11 +137,11 @@ public class JobSyncExecutor {
                 Stream.of(new DefaultTaskDispatcher(getEventPublisher(syncMessageBroker), List.of()))));
 
         JobExecutor jobExecutor = new JobExecutor(
-            contextService, taskDispatcherChain, taskExecutionService, taskFileStorageFacade, workflowService);
+            contextService, taskDispatcherChain, taskExecutionService, taskFileStorage, workflowService);
 
         DefaultTaskCompletionHandler defaultTaskCompletionHandler = new DefaultTaskCompletionHandler(
             contextService, getEventPublisher(syncMessageBroker), jobExecutor, jobService, taskExecutionService,
-            taskFileStorageFacade,
+            taskFileStorage,
             workflowService);
 
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();

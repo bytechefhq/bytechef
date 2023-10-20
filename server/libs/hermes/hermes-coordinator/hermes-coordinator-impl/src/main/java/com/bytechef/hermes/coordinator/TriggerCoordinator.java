@@ -41,7 +41,7 @@ import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
-import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
+import com.bytechef.hermes.file.storage.TriggerFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
@@ -69,7 +69,7 @@ public class TriggerCoordinator {
     private final TriggerCompletionHandler triggerCompletionHandler;
     private final TriggerDispatcher triggerDispatcher;
     private final TriggerExecutionService triggerExecutionService;
-    private final TriggerFileStorageFacade triggerFileStorageFacade;
+    private final TriggerFileStorage triggerFileStorage;
     private final TriggerStateService triggerStateService;
     private final WorkflowService workflowService;
 
@@ -79,7 +79,7 @@ public class TriggerCoordinator {
         ApplicationEventPublisher eventPublisher, InstanceAccessorRegistry instanceAccessorRegistry,
         TriggerCompletionHandler triggerCompletionHandler, TriggerDispatcher triggerDispatcher,
         TriggerExecutionService triggerExecutionService,
-        @Qualifier("workflowAsyncTriggerFileStorageFacade") TriggerFileStorageFacade triggerFileStorageFacade,
+        @Qualifier("workflowAsyncTriggerFileStorageFacade") TriggerFileStorage triggerFileStorage,
         TriggerStateService triggerStateService, WorkflowService workflowService) {
 
         this.applicationEventListeners = applicationEventListeners;
@@ -89,7 +89,7 @@ public class TriggerCoordinator {
         this.triggerCompletionHandler = triggerCompletionHandler;
         this.triggerDispatcher = triggerDispatcher;
         this.triggerExecutionService = triggerExecutionService;
-        this.triggerFileStorageFacade = triggerFileStorageFacade;
+        this.triggerFileStorage = triggerFileStorage;
         this.triggerStateService = triggerStateService;
         this.workflowService = workflowService;
     }
@@ -148,7 +148,7 @@ public class TriggerCoordinator {
         triggerExecution = triggerExecutionService.create(triggerExecution);
 
         triggerExecution.setOutput(
-            triggerFileStorageFacade.storeTriggerExecutionOutput(
+            triggerFileStorage.storeTriggerExecutionOutput(
                 Validate.notNull(triggerExecution.getId(), "id"), listenerParameters.output()));
 
         handleTriggerExecutionCompletion(triggerExecution);

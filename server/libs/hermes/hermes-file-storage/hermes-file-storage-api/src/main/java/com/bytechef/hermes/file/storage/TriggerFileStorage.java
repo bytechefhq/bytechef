@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.file.storage.facade;
+package com.bytechef.hermes.file.storage;
 
 import com.bytechef.file.storage.domain.FileEntry;
 import org.springframework.lang.NonNull;
@@ -22,7 +22,7 @@ import org.springframework.lang.NonNull;
 /**
  * @author Ivica Cardic
  */
-public interface TriggerFileStorageFacade {
+public interface TriggerFileStorage {
 
     Object readTriggerExecutionOutput(@NonNull FileEntry fileEntry);
 

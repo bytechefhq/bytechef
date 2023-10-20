@@ -17,7 +17,7 @@
 package com.bytechef.hermes.worker.config;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.hermes.file.storage.facade.TriggerFileStorageFacade;
+import com.bytechef.hermes.file.storage.TriggerFileStorage;
 import com.bytechef.hermes.worker.TriggerWorker;
 import com.bytechef.hermes.worker.executor.TriggerWorkerExecutor;
 import com.bytechef.hermes.worker.trigger.factory.TriggerHandlerMapFactory;
@@ -58,10 +58,10 @@ public class TriggerWorkerConfiguration {
     @Bean
     TriggerWorker triggerWorker(
         ApplicationEventPublisher eventPublisher,
-        @Qualifier("workflowAsyncTriggerFileStorageFacade") TriggerFileStorageFacade triggerFileStorageFacade,
+        @Qualifier("workflowAsyncTriggerFileStorageFacade") TriggerFileStorage triggerFileStorage,
         TriggerWorkerExecutor triggerWorkerExecutor, TriggerHandlerResolver triggerHandlerResolver) {
 
-        return new TriggerWorker(eventPublisher, triggerFileStorageFacade, triggerWorkerExecutor,
+        return new TriggerWorker(eventPublisher, triggerFileStorage, triggerWorkerExecutor,
             triggerHandlerResolver);
     }
 }

@@ -17,7 +17,7 @@
 package com.bytechef.component.var;
 
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.file.storage.facade.TaskFileStorageFacade;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import java.nio.charset.StandardCharsets;
@@ -39,7 +39,7 @@ public class VarComponentHandlerIntTest {
     private JobTestExecutor jobTestExecutor;
 
     @Autowired
-    private TaskFileStorageFacade taskFileStorageFacade;
+    private TaskFileStorage taskFileStorage;
 
     @Test
     public void testVar() {
@@ -47,7 +47,7 @@ public class VarComponentHandlerIntTest {
             ENCODER.encodeToString("var_v1".getBytes(StandardCharsets.UTF_8)),
             Map.of());
 
-        Map<String, ?> outputs = taskFileStorageFacade.readJobOutputs(job.getOutputs());
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
         Assertions.assertEquals("1234", outputs.get("stringNumber"));
         Assertions.assertEquals(1234, (Integer) outputs.get("intNumber"));
