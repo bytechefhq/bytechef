@@ -1,57 +1,65 @@
-import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
+import {
+    Content,
+    Item,
+    Portal,
+    Root,
+    Trigger,
+} from '@radix-ui/react-dropdown-menu';
 import {Half2Icon, MoonIcon, SunIcon} from '@radix-ui/react-icons';
 import cx from 'classnames';
 import React, {useEffect, useState} from 'react';
 
-const themes = [
+const availableThemes = [
     {
         key: 'light',
         label: 'Light',
-        icon: <SunIcon />,
+        icon: <SunIcon className="h-5 w-5 text-gray-700 dark:text-gray-300" />,
     },
     {
         key: 'dark',
         label: 'Dark',
-        icon: <MoonIcon />,
+        icon: <MoonIcon className="h-5 w-5 text-gray-700 dark:text-gray-300" />,
     },
 
     {
         key: 'system',
         label: 'System',
-        icon: <Half2Icon />,
+        icon: (
+            <Half2Icon className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+        ),
     },
 ];
 
-const ThemeSwitcher = () => {
-    const [preferredTheme, setPreferredTheme] = useState<null | string>(null);
+const ThemeSwitcher: React.FC = () => {
+    const [currentTheme, setCurrentTheme] = useState(availableThemes[2]);
 
     useEffect(() => {
-        try {
-            const found = localStorage.getItem('theme');
-            setPreferredTheme(found);
-        } catch (error) {
-            // ignore
-        }
-    }, []);
+        const localTheme = localStorage.getItem('theme');
 
-    useEffect(() => {
         const prefersDarkQuery = window.matchMedia(
             '(prefers-color-scheme: dark)'
         );
-        const updateTheme = () => {
-            setPreferredTheme('system');
-        };
-        prefersDarkQuery.addEventListener('change', updateTheme);
 
-        return () => {
-            prefersDarkQuery.removeEventListener('change', updateTheme);
-        };
+        const setSystemTheme = () =>
+            setCurrentTheme(
+                availableThemes.find((theme) => theme.key === 'system')!
+            );
+
+        if (localTheme) {
+            setCurrentTheme(
+                availableThemes.find((theme) => theme.key === localTheme)!
+            );
+        } else {
+            prefersDarkQuery.addEventListener('change', setSystemTheme);
+        }
+
+        return prefersDarkQuery.removeEventListener('change', setSystemTheme);
     }, []);
 
     return (
         <div className="relative inline-block text-left">
-            <DropdownMenuPrimitive.Root>
-                <DropdownMenuPrimitive.Trigger
+            <Root>
+                <Trigger
                     className={cx(
                         'inline-flex select-none justify-center rounded-md px-2.5 py-2 text-sm font-medium',
                         'bg-white text-gray-900 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-100 hover:dark:bg-gray-600',
@@ -59,36 +67,13 @@ const ThemeSwitcher = () => {
                         'focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75'
                     )}
                 >
-                    {(function () {
-                        switch (preferredTheme) {
-                            case 'light':
-                                return (
-                                    <>
-                                        <SunIcon className="h-5 w-5 text-gray-700 dark:text-gray-300" />{' '}
-                                        &nbsp; Light
-                                    </>
-                                );
-                            case 'dark':
-                                return (
-                                    <>
-                                        <MoonIcon className="h-5 w-5 text-gray-700 dark:text-gray-300" />{' '}
-                                        &nbsp; Dark
-                                    </>
-                                );
-                            default:
-                                return (
-                                    <>
-                                        <Half2Icon className="h-5 w-5 text-gray-700 dark:text-gray-300" />{' '}
-                                        &nbsp; System
-                                    </>
-                                );
-                        }
-                    })()}
-                    {/* {isDark ? "dark" : "light"} */}
-                </DropdownMenuPrimitive.Trigger>
+                    {currentTheme.icon}
 
-                <DropdownMenuPrimitive.Portal>
-                    <DropdownMenuPrimitive.Content
+                    <span className="px-2">{currentTheme.label}</span>
+                </Trigger>
+
+                <Portal>
+                    <Content
                         align="start"
                         sideOffset={5}
                         className={cx(
@@ -97,35 +82,36 @@ const ThemeSwitcher = () => {
                             'bg-gray-50 dark:bg-gray-700'
                         )}
                     >
-                        {themes.map(({key, label, icon}, i) => {
+                        {availableThemes.map((theme) => {
+                            const {key, label, icon} = theme;
+
                             return (
-                                <DropdownMenuPrimitive.Item
-                                    key={`theme-${i}`}
+                                <Item
+                                    key={key}
                                     className={cx(
                                         'flex w-full cursor-default select-none items-center rounded-md px-2 py-2 text-xs outline-none',
                                         'text-gray-500 focus:bg-gray-200 dark:text-gray-400 dark:focus:bg-gray-800'
                                     )}
                                     onClick={() => {
-                                        /* eslint-disable  @typescript-eslint/no-explicit-any */
+                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                         (window as any).__setPreferredTheme(
                                             key
                                         );
-                                        setPreferredTheme(key);
+
+                                        setCurrentTheme(theme);
                                     }}
                                 >
-                                    {React.cloneElement(icon, {
-                                        className:
-                                            'w-5 h-5 mr-2 text-gray-700 dark:text-gray-300',
-                                    })}
-                                    <span className="grow text-gray-700 dark:text-gray-300">
+                                    {icon}
+
+                                    <span className="grow px-2 text-gray-700 dark:text-gray-300">
                                         {label}
                                     </span>
-                                </DropdownMenuPrimitive.Item>
+                                </Item>
                             );
                         })}
-                    </DropdownMenuPrimitive.Content>
-                </DropdownMenuPrimitive.Portal>
-            </DropdownMenuPrimitive.Root>
+                    </Content>
+                </Portal>
+            </Root>
         </div>
     );
 };
