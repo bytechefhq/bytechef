@@ -69,10 +69,9 @@ spring:
   cache:
     type: simple
   cloud:
-    consul:
+    redis:
       discovery:
         instanceId: ${spring.application.name}:${random.value}
-        enabled: false
   jackson:
     default-property-inclusion: non_null
     serialization:
