@@ -12,9 +12,9 @@ tasks:
           conditions:
             - number:
                 value1: ${itemIndex}
-                operation: greater
+                operation: GREATER
                 value2: 5
-          combineOperation: any
+          combineOperation: aNY
           caseTrue:
            - type: loop-break
           caseFalse:

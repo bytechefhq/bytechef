@@ -33,7 +33,7 @@ tasks:
     conditions:
       - number:
           value1: ${value1}
-          operation: equals
+          operation: EQUALS
           value2: ${value2}
     combineOperation: any
     caseTrue:
@@ -49,7 +49,7 @@ tasks:
     conditions:
       - number:
           value1: ${value1}
-          operation: notEquals
+          operation: NOT_EQUALS
           value2: ${value2}
     combineOperation: any
     caseTrue:
@@ -65,7 +65,7 @@ tasks:
     conditions:
       - number:
           value1: ${value1}
-          operation: greater
+          operation: GREATER
           value2: ${value2}
     combineOperation: any
     caseTrue:
@@ -81,7 +81,7 @@ tasks:
     conditions:
       - number:
           value1: ${value1}
-          operation: less
+          operation: LESS
           value2: ${value2}
     combineOperation: any
     caseTrue:
@@ -97,9 +97,9 @@ tasks:
     conditions:
       - number:
           value1: ${value1}
-          operation: greaterEquals
+          operation: GREATER_EQUALS
           value2: ${value2}
-    combineOperation: any
+    combineOperation: ANY
     caseTrue:
       - name: greaterEqualsResult
         type: core/var
@@ -113,9 +113,9 @@ tasks:
     conditions:
       - number:
           value1: ${value1}
-          operation: lessEquals
+          operation: LESS_EQUALS
           value2: ${value2}
-    combineOperation: any
+    combineOperation: ANY
     caseTrue:
       - name: lessEqualsResult
         type: core/var

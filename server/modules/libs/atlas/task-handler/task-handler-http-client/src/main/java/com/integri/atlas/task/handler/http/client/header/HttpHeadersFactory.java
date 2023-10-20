@@ -16,6 +16,12 @@
 
 package com.integri.atlas.task.handler.http.client.header;
 
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_BODY_CONTENT_TYPE;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_HEADER_PARAMETERS;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_MIME_TYPE;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RAW_PARAMETERS;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RESPONSE_FORMAT;
+
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import java.util.ArrayList;
@@ -42,34 +48,41 @@ public class HttpHeadersFactory {
     public List<HttpHeader> getHttpHeaders(TaskExecution taskExecution) {
         List<HttpHeader> httpHeaders = new ArrayList<>();
 
-        if (taskExecution.containsKey("headerParameters")) {
-            if (taskExecution.getBoolean("rawParameters", false)) {
+        if (taskExecution.containsKey(PROPERTY_HEADER_PARAMETERS)) {
+            if (taskExecution.getBoolean(PROPERTY_RAW_PARAMETERS, false)) {
                 httpHeaders.addAll(
                     fromHeaderParameters(
-                        jsonHelper.checkJSONObject(taskExecution.get("headerParameters"), String.class),
+                        jsonHelper.checkJSONObject(taskExecution.get(PROPERTY_HEADER_PARAMETERS), String.class),
                         (String value) -> value
                     )
                 );
             } else {
                 httpHeaders.addAll(
                     fromHeaderParameters(
-                        taskExecution.get("headerParameters", MultiValueMap.class),
+                        taskExecution.get(PROPERTY_HEADER_PARAMETERS, MultiValueMap.class),
                         (List<String> values) -> StringUtils.join(values, ',')
                     )
                 );
             }
         }
 
-        if (taskExecution.containsKey("responseFormat")) {
+        if (taskExecution.containsKey(PROPERTY_RESPONSE_FORMAT)) {
             httpHeaders.add(
-                new HttpHeader("Accept", ContentType.valueOf(taskExecution.get("responseFormat")).getMimeType())
+                new HttpHeader("Accept", ContentType.valueOf(taskExecution.get(PROPERTY_RESPONSE_FORMAT)).getMimeType())
             );
         }
 
-        if (taskExecution.containsKey("bodyContentType")) {
+        if (taskExecution.containsKey(PROPERTY_BODY_CONTENT_TYPE)) {
             httpHeaders.add(
-                new HttpHeader("Content-Type", ContentType.valueOf(taskExecution.get("bodyContentType")).getMimeType())
+                new HttpHeader(
+                    "Content-Type",
+                    ContentType.valueOf(taskExecution.get(PROPERTY_BODY_CONTENT_TYPE)).getMimeType()
+                )
             );
+        }
+
+        if (taskExecution.containsKey(PROPERTY_MIME_TYPE)) {
+            httpHeaders.add(new HttpHeader("Content-Type", taskExecution.get(PROPERTY_MIME_TYPE)));
         }
 
         return httpHeaders;

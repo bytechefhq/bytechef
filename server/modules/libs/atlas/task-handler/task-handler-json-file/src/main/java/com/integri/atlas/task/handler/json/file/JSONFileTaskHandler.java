@@ -16,10 +16,21 @@
 
 package com.integri.atlas.task.handler.json.file;
 
+import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_FILE_ENTRY;
+import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_FILE_NAME;
+import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_FILE_TYPE;
+import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_IS_ARRAY;
+import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_OPERATION;
+import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_PAGE_NUMBER;
+import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_PAGE_SIZE;
+import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.PROPERTY_PATH;
+import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.TASK_JSON_FILE;
+
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.file.storage.FileStorageService;
+import com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.FileType;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -37,18 +48,8 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ivica Cardic
  */
-@Component("jsonFile")
+@Component(TASK_JSON_FILE)
 public class JSONFileTaskHandler implements TaskHandler<Object> {
-
-    private enum FileType {
-        JSON,
-        JSONL,
-    }
-
-    private enum Operation {
-        READ,
-        WRITE,
-    }
 
     private final FileStorageService fileStorageService;
     private final JSONHelper jsonHelper;
@@ -64,16 +65,18 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
         Object result;
 
         FileType fileType = FileType.valueOf(
-            StringUtils.upperCase(taskExecution.get("fileType", String.class, "JSON"))
+            StringUtils.upperCase(taskExecution.get(PROPERTY_FILE_TYPE, String.class, FileType.JSON.name()))
         );
-        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
+        JSONFileTaskConstants.Operation operation = JSONFileTaskConstants.Operation.valueOf(
+            StringUtils.upperCase(taskExecution.getRequired(PROPERTY_OPERATION))
+        );
 
-        if (operation == Operation.READ) {
-            boolean isArray = taskExecution.get("isArray", Boolean.class, true);
-            FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);
+        if (operation == JSONFileTaskConstants.Operation.READ) {
+            boolean isArray = taskExecution.get(PROPERTY_IS_ARRAY, Boolean.class, true);
+            FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
 
             if (isArray) {
-                String path = taskExecution.get("path");
+                String path = taskExecution.get(PROPERTY_PATH);
                 InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl());
                 List<Map<String, ?>> items;
 
@@ -95,8 +98,8 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
                     }
                 }
 
-                Integer pageSize = taskExecution.get("pageSize");
-                Integer pageNumber = taskExecution.get("pageNumber");
+                Integer pageSize = taskExecution.get(PROPERTY_PAGE_SIZE);
+                Integer pageNumber = taskExecution.get(PROPERTY_PAGE_NUMBER);
                 Integer rangeStartIndex = null;
                 Integer rangeEndIndex = null;
 
@@ -118,11 +121,7 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
                 result = jsonHelper.read(fileStorageService.readFileContent(fileEntry.getUrl()), Map.class);
             }
         } else {
-            String fileName = taskExecution.get(
-                "fileName",
-                String.class,
-                "file." + (fileType == FileType.JSON ? "json" : "jsonl")
-            );
+            String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, getDefaultFileName(fileType));
             Object input = jsonHelper.checkJSON(taskExecution.getRequired("input"));
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -145,5 +144,9 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
         }
 
         return result;
+    }
+
+    private String getDefaultFileName(FileType fileType) {
+        return "file." + (fileType == FileType.JSON ? "json" : "jsonl");
     }
 }

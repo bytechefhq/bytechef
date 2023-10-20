@@ -21,9 +21,9 @@ tasks:
     conditions:
       - number:
           value1: ${value1}
-          operation: equals
+          operation: EQUALS
           value2: ${value2}
-    combineOperation: any
+    combineOperation: ANY
     caseTrue:
       - name: equalsResult
         type: core/var
@@ -37,9 +37,9 @@ tasks:
     conditions:
       - number:
           value1: ${value1}
-          operation: notEquals
+          operation: NOT_EQUALS
           value2: ${value2}
-    combineOperation: any
+    combineOperation: ANY
     caseTrue:
       - name: notEqualsResult
         type: core/var

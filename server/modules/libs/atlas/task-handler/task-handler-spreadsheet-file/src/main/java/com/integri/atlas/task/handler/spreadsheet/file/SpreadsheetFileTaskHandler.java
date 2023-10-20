@@ -16,6 +16,22 @@
 
 package com.integri.atlas.task.handler.spreadsheet.file;
 
+import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.*;
+import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.FileFormat;
+import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.Operation;
+import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_DELIMITER;
+import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_FILE_ENTRY;
+import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_FILE_FORMAT;
+import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_FILE_NAME;
+import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_HEADER_ROW;
+import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_INCLUDE_EMPTY_CELLS;
+import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_OPERATION;
+import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_PAGE_NUMBER;
+import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_PAGE_SIZE;
+import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_READ_AS_STRING;
+import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_SHEET_NAME;
+import static com.integri.atlas.task.handler.spreadsheet.file.SpreadsheetFileTaskConstants.PROPERTY_TASK_SPREADSHEET_FILE;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
@@ -37,20 +53,8 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ivica Cardic
  */
-@Component("spreadsheetFile")
+@Component(PROPERTY_TASK_SPREADSHEET_FILE)
 public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
-
-    private enum FileFormat {
-        CSV,
-        ODS,
-        XLS,
-        XLSX,
-    }
-
-    private enum Operation {
-        READ,
-        WRITE,
-    }
 
     private final JSONHelper jsonHelper;
     private final FileStorageService fileStorageService;
@@ -64,17 +68,17 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
     public Object handle(TaskExecution taskExecution) throws Exception {
         Object result;
 
-        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
+        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired(PROPERTY_OPERATION)));
 
         if (operation == Operation.READ) {
-            String delimiter = taskExecution.getString("delimiter", ",");
-            FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);
-            boolean headerRow = taskExecution.getBoolean("headerRow", true);
-            boolean includeEmptyCells = taskExecution.getBoolean("includeEmptyCells", false);
-            Integer pageSize = taskExecution.get("pageSize");
-            Integer pageNumber = taskExecution.get("pageNumber");
-            boolean readAsString = taskExecution.getBoolean("readAsString", false);
-            String sheetName = taskExecution.get("sheetName", null);
+            String delimiter = taskExecution.getString(PROPERTY_DELIMITER, ",");
+            FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
+            boolean headerRow = taskExecution.getBoolean(PROPERTY_HEADER_ROW, true);
+            boolean includeEmptyCells = taskExecution.getBoolean(PROPERTY_INCLUDE_EMPTY_CELLS, false);
+            Integer pageSize = taskExecution.get(PROPERTY_PAGE_SIZE);
+            Integer pageNumber = taskExecution.get(PROPERTY_PAGE_NUMBER);
+            boolean readAsString = taskExecution.getBoolean(PROPERTY_READ_AS_STRING, false);
+            String sheetName = taskExecution.get(PROPERTY_SHEET_NAME, null);
 
             try (InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl())) {
                 String extension = fileEntry.getExtension();
@@ -107,18 +111,16 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
                     );
             }
         } else {
-            FileFormat fileFormat = FileFormat.valueOf(StringUtils.upperCase(taskExecution.getRequired("fileFormat")));
-            String fileName = taskExecution.get(
-                "fileName",
-                String.class,
-                "spreadsheet." + StringUtils.lowerCase(fileFormat.name())
+            FileFormat fileFormat = FileFormat.valueOf(
+                StringUtils.upperCase(taskExecution.getRequired(PROPERTY_FILE_FORMAT))
             );
+            String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, getaDefaultFileName(fileFormat));
             List<Map<String, ?>> input = jsonHelper.checkJSONArray(
-                taskExecution.getRequired("input"),
+                taskExecution.getRequired(PROPERTY_INPUT),
                 new TypeReference<>() {}
             );
 
-            String sheetName = taskExecution.get("sheetName", String.class, "Sheet");
+            String sheetName = taskExecution.get(PROPERTY_SHEET_NAME, String.class, "Sheet");
 
             SpreadsheetProcessor spreadsheetProcessor = getSpreadsheetProcessor(fileFormat);
 
@@ -131,6 +133,10 @@ public class SpreadsheetFileTaskHandler implements TaskHandler<Object> {
         }
 
         return result;
+    }
+
+    private String getaDefaultFileName(FileFormat fileFormat) {
+        return "spreadsheet." + StringUtils.lowerCase(fileFormat.name());
     }
 
     private SpreadsheetProcessor getSpreadsheetProcessor(FileFormat fileFormat) {

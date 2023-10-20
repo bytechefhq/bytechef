@@ -25,6 +25,10 @@ import static com.integri.atlas.task.definition.dsl.TaskProperty.SELECT_PROPERTY
 import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.show;
 import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
+import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.*;
+import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.FileType.JSON;
+import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.FileType.JSONL;
+import static com.integri.atlas.task.handler.json.file.JSONFileTaskConstants.Operation;
 
 import com.integri.atlas.task.definition.TaskDeclaration;
 import com.integri.atlas.task.definition.dsl.TaskSpecification;
@@ -37,61 +41,82 @@ import org.springframework.stereotype.Component;
 public class JSONFileTaskDeclaration implements TaskDeclaration {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
-        .create("jsonFile")
+        .create(TASK_JSON_FILE)
         .displayName("JSON File")
         .description("Reads and writes data from a JSON file.")
         .properties(
-            SELECT_PROPERTY("fileType")
+            SELECT_PROPERTY(PROPERTY_FILE_TYPE)
                 .displayName("File Type")
                 .description("The file type to choose.")
-                .options(option("JSON", "JSON"), option("JSON Line", "JSONL"))
-                .defaultValue("JSON")
+                .options(option("JSON", JSON.name()), option("JSON Line", JSONL.name()))
+                .defaultValue(JSON.name())
                 .required(true),
-            SELECT_PROPERTY("operation")
+            SELECT_PROPERTY(PROPERTY_OPERATION)
                 .displayName("Operation")
                 .description("The operation to perform.")
                 .options(
-                    option("Read from file", "READ", "Reads data from a JSON file."),
-                    option("Write to file", "WRITE", "Writes the data to a JSON file.")
+                    option("Read from file", Operation.READ.name(), "Reads data from a JSON file."),
+                    option("Write to file", Operation.WRITE.name(), "Writes the data to a JSON file.")
                 )
-                .defaultValue("READ")
+                .defaultValue(Operation.READ.name())
                 .required(true),
-            JSON_PROPERTY("fileEntry")
+            JSON_PROPERTY(PROPERTY_FILE_ENTRY)
                 .displayName("File")
                 .description("The object property which contains a reference to the JSON file to read from.")
-                .displayOption(show("operation", "READ"))
+                .displayOption(show(PROPERTY_OPERATION, Operation.READ.name()))
                 .required(true),
-            JSON_PROPERTY("input")
+            JSON_PROPERTY(PROPERTY_INPUT)
                 .displayName("Input")
                 .description("Object or array of objects to write to the file.")
-                .displayOption(show("operation", parameterValues("WRITE")))
+                .displayOption(show(PROPERTY_OPERATION, parameterValues(Operation.WRITE.name())))
                 .required(true),
-            BOOLEAN_PROPERTY("isArray")
+            BOOLEAN_PROPERTY(PROPERTY_IS_ARRAY)
                 .displayName("Is Array")
                 .description("The object input is array?")
-                .displayOption(show("operation", "READ"))
+                .displayOption(show(PROPERTY_OPERATION, Operation.READ.name()))
                 .defaultValue(true),
             COLLECTION_PROPERTY("options")
                 .displayName("Options")
                 .placeholder("Add Option")
                 .options(
-                    STRING_PROPERTY("fileName")
+                    STRING_PROPERTY(PROPERTY_FILE_NAME)
                         .displayName("File Name")
                         .description("File name to set for binary data. By default, \"file.json\" will be used.")
-                        .displayOption(show("operation", "WRITE"))
+                        .displayOption(show(PROPERTY_OPERATION, Operation.WRITE.name()))
                         .defaultValue("file.json"),
-                    STRING_PROPERTY("path")
+                    STRING_PROPERTY(PROPERTY_PATH)
                         .displayName("Path")
                         .description("The path where the array is e.g 'data'. Leave blank to use the top level object.")
-                        .displayOption(show("operation", parameterValues("READ"), "isArray", parameterValues(true))),
-                    INTEGER_PROPERTY("pageSize")
+                        .displayOption(
+                            show(
+                                PROPERTY_OPERATION,
+                                parameterValues(Operation.READ.name()),
+                                PROPERTY_IS_ARRAY,
+                                parameterValues(true)
+                            )
+                        ),
+                    INTEGER_PROPERTY(PROPERTY_PAGE_SIZE)
                         .displayName("Page Size")
                         .description("The amount of child elements to return in a page.")
-                        .displayOption(show("operation", parameterValues("READ"), "isArray", parameterValues(true))),
-                    INTEGER_PROPERTY("pageNumber")
+                        .displayOption(
+                            show(
+                                PROPERTY_OPERATION,
+                                parameterValues(Operation.READ.name()),
+                                PROPERTY_IS_ARRAY,
+                                parameterValues(true)
+                            )
+                        ),
+                    INTEGER_PROPERTY(JSONFileTaskConstants.PROPERTY_PAGE_NUMBER)
                         .displayName("Page Number")
                         .description("The page number to get.")
-                        .displayOption(show("operation", parameterValues("READ"), "isArray", parameterValues(true)))
+                        .displayOption(
+                            show(
+                                PROPERTY_OPERATION,
+                                parameterValues(Operation.READ.name()),
+                                PROPERTY_IS_ARRAY,
+                                parameterValues(true)
+                            )
+                        )
                 )
         );
 

@@ -22,9 +22,11 @@ import static com.integri.atlas.task.definition.dsl.TaskProperty.SELECT_PROPERTY
 import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.show;
 import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
+import static com.integri.atlas.task.handler.xml.converter.XMLConverterTaskConstants.*;
 
 import com.integri.atlas.task.definition.TaskDeclaration;
 import com.integri.atlas.task.definition.dsl.TaskSpecification;
+import com.integri.atlas.task.handler.xml.converter.XMLConverterTaskConstants.Operation;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,28 +36,32 @@ import org.springframework.stereotype.Component;
 public class XMLConverterTaskDeclaration implements TaskDeclaration {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
-        .create("xmlConverter")
+        .create(TASK_XML_CONVERTER)
         .displayName("XML Converter")
         .description("Converts between XML string and object/array.")
         .properties(
-            SELECT_PROPERTY("operation")
+            SELECT_PROPERTY(PROPERTY_OPERATION)
                 .displayName("Operation")
                 .description("The operation to perform.")
                 .options(
-                    option("Convert from XML string", "FROM_XML", "Converts the XML string to object/array."),
+                    option(
+                        "Convert from XML string",
+                        Operation.FROM_XML.name(),
+                        "Converts the XML string to object/array."
+                    ),
                     option("Convert to XML string", "TO_XML", "Writes the object/array to a XML string.")
                 )
-                .defaultValue("FROM_XML")
+                .defaultValue(Operation.FROM_XML.name())
                 .required(true),
-            STRING_PROPERTY("input")
+            STRING_PROPERTY(PROPERTY_INPUT)
                 .displayName("Input")
                 .description("XML string to convert to the data.")
-                .displayOption(show("operation", parameterValues("FROM_XML")))
+                .displayOption(show(PROPERTY_OPERATION, parameterValues(Operation.FROM_XML.name())))
                 .required(true),
-            JSON_PROPERTY("input")
+            JSON_PROPERTY(PROPERTY_INPUT)
                 .displayName("Input")
                 .description("The data to convert to XML string.")
-                .displayOption(show("operation", parameterValues("TO_XML")))
+                .displayOption(show(PROPERTY_OPERATION, parameterValues(Operation.TO_XML.name())))
                 .required(true)
         );
 

@@ -16,12 +16,22 @@
 
 package com.integri.atlas.task.handler.xml.file;
 
+import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_FILE_ENTRY;
+import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_FILE_NAME;
+import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_INPUT;
+import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_IS_ARRAY;
+import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_OPERATION;
+import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_PAGE_NUMBER;
+import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_PAGE_SIZE;
+import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.TASK_XML_FILE;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
+import com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.Operation;
 import com.integri.atlas.task.handler.xml.helper.XMLHelper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,7 +46,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ivica Cardic
  */
-@Component("xmlFile")
+@Component(TASK_XML_FILE)
 public class XMLFileTaskHandler implements TaskHandler<Object> {
 
     private final JSONHelper jsonHelper;
@@ -48,25 +58,20 @@ public class XMLFileTaskHandler implements TaskHandler<Object> {
         this.xmlHelper = xmlHelper;
     }
 
-    private enum Operation {
-        READ,
-        WRITE,
-    }
-
     private final FileStorageService fileStorageService;
 
     @Override
     public Object handle(TaskExecution taskExecution) throws Exception {
         Object result;
 
-        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
+        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired(PROPERTY_OPERATION)));
 
         if (operation == Operation.READ) {
-            boolean isArray = taskExecution.get("isArray", Boolean.class, true);
-            FileEntry fileEntry = taskExecution.getRequired("fileEntry", FileEntry.class);
+            boolean isArray = taskExecution.get(PROPERTY_IS_ARRAY, Boolean.class, true);
+            FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
 
             if (isArray) {
-                String path = taskExecution.get("path");
+                String path = taskExecution.get(XMLFileTaskConstants.PROPERTY_PATH);
                 InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl());
                 List<Map<String, ?>> items;
 
@@ -82,8 +87,8 @@ public class XMLFileTaskHandler implements TaskHandler<Object> {
                     items = xmlHelper.read(inputStream, path, new TypeReference<>() {});
                 }
 
-                Integer pageSize = taskExecution.get("pageSize");
-                Integer pageNumber = taskExecution.get("pageNumber");
+                Integer pageSize = taskExecution.get(PROPERTY_PAGE_SIZE);
+                Integer pageNumber = taskExecution.get(PROPERTY_PAGE_NUMBER);
                 Integer rangeStartIndex = null;
                 Integer rangeEndIndex = null;
 
@@ -105,8 +110,8 @@ public class XMLFileTaskHandler implements TaskHandler<Object> {
                 result = xmlHelper.read(fileStorageService.readFileContent(fileEntry.getUrl()), Map.class);
             }
         } else {
-            String fileName = taskExecution.get("fileName", String.class, "file.xml");
-            Object input = jsonHelper.checkJSON(taskExecution.getRequired("input"));
+            String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, "file.xml");
+            Object input = jsonHelper.checkJSON(taskExecution.getRequired(PROPERTY_INPUT));
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 

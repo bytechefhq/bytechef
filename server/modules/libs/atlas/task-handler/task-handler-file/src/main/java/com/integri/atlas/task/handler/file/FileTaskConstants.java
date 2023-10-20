@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.dispatcher.sequence;
-
-import com.integri.atlas.task.definition.TaskDeclaration;
-import com.integri.atlas.task.definition.dsl.TaskSpecification;
+package com.integri.atlas.task.handler.file;
 
 /**
  * @author Ivica Cardic
  */
-public class SequenceTaskDeclaration implements TaskDeclaration {
+public class FileTaskConstants {
 
-    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
-        .create(SequenceTaskConstants.TASK_SEQUENCE)
-        .displayName("Sequence")
-        .description("Executes list of tasks in a sequence");
+    public static final String PROPERTY_CONTENT = "content";
+    public static final String PROPERTY_FILE_ENTRY = "fileEntry";
+    public static final String PROPERTY_FILE_NAME = "fileName";
+    public static final String PROPERTY_OPERATION = "operation";
+    static final String TASK_FILE = "file";
 
-    @Override
-    public TaskSpecification getSpecification() {
-        return TASK_SPECIFICATION;
+    public enum Operation {
+        READ,
+        WRITE,
     }
 }

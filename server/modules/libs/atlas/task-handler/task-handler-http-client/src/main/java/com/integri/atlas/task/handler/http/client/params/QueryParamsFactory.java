@@ -16,6 +16,9 @@
 
 package com.integri.atlas.task.handler.http.client.params;
 
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_QUERY_PARAMETERS;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RAW_PARAMETERS;
+
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import java.util.ArrayList;
@@ -42,17 +45,17 @@ public class QueryParamsFactory {
     public String getQueryParams(TaskExecution taskExecution) {
         String queryParams = "";
 
-        if (taskExecution.containsKey("queryParameters")) {
-            if (taskExecution.getBoolean("rawParameters", false)) {
+        if (taskExecution.containsKey(PROPERTY_QUERY_PARAMETERS)) {
+            if (taskExecution.getBoolean(PROPERTY_RAW_PARAMETERS, false)) {
                 queryParams =
                     fromQueryParameters(
-                        jsonHelper.checkJSONObject(taskExecution.get("queryParameters"), String.class),
+                        jsonHelper.checkJSONObject(taskExecution.get(PROPERTY_QUERY_PARAMETERS), String.class),
                         (String value) -> value
                     );
             } else {
                 queryParams =
                     fromQueryParameters(
-                        taskExecution.get("queryParameters", MultiValueMap.class),
+                        taskExecution.get(PROPERTY_QUERY_PARAMETERS, MultiValueMap.class),
                         (List<String> values) -> StringUtils.join(values, ",")
                     );
             }

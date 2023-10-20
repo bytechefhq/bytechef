@@ -102,6 +102,11 @@ public class SpreadsheetFileTaskDeclarationTest {
                                 "name":"XLSX",
                                 "value":"XLSX",
                                 "description":"Microsoft Excel"
+                            },
+                            {
+                                "name":"ODS",
+                                "value":"ODS",
+                                "description":"Open Office"
                             }
                         ]
                     },

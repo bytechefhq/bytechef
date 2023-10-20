@@ -16,6 +16,14 @@
 
 package com.integri.atlas.task.handler.http.client;
 
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_AUTHENTICATION_TYPE;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_BODY_PARAMETERS;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_PROPERTY_URI;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_RAW_PARAMETERS;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_REQUEST_METHOD;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_TIMEOUT;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.TASK_HTTP_CLIENT;
+
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
@@ -35,7 +43,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 
-@Component("httpClient")
+@Component(TASK_HTTP_CLIENT)
 public class HttpClientTaskHandler implements TaskHandler<Object> {
 
     public HttpClientTaskHandler(
@@ -56,15 +64,15 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
     public Object handle(TaskExecution taskExecution) throws Exception {
         IntegriHttpClient integriHttpClient = new IntegriHttpClient(
             httpAuthenticationFactory.create(
-                taskExecution.getRequiredString("authenticationType"),
+                taskExecution.getRequiredString(PROPERTY_AUTHENTICATION_TYPE),
                 taskExecution.get("credentials", MapObject.class)
             ),
-            taskExecution.getLong("timeout", 10000)
+            taskExecution.getLong(PROPERTY_TIMEOUT, 10000)
         );
 
         HttpResponse httpResponse = integriHttpClient.send(
-            taskExecution.getRequiredString("requestMethod"),
-            resolveURI(taskExecution.getRequiredString("uri"), queryParamsFactory.getQueryParams(taskExecution)),
+            taskExecution.getRequiredString(PROPERTY_REQUEST_METHOD),
+            resolveURI(taskExecution.getRequiredString(PROPERTY_PROPERTY_URI), queryParamsFactory.getQueryParams(taskExecution)),
             httpHeadersFactory.getHttpHeaders(taskExecution),
             getBodyPublisher(taskExecution),
             getBodyHandler(taskExecution)

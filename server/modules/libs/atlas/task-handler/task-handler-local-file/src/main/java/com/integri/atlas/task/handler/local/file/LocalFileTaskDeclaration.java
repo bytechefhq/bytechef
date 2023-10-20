@@ -21,41 +21,49 @@ import static com.integri.atlas.task.definition.dsl.TaskProperty.SELECT_PROPERTY
 import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.show;
 import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
+import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.*;
+import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.PROPERTY_FILE_ENTRY;
+import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.PROPERTY_FILE_NAME;
+import static com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.PROPERTY_OPERATION;
 
 import com.integri.atlas.task.definition.TaskDeclaration;
 import com.integri.atlas.task.definition.dsl.TaskSpecification;
+import com.integri.atlas.task.handler.local.file.LocalFileTaskConstants.Operation;
 import org.springframework.stereotype.Component;
 
 @Component
 public class LocalFileTaskDeclaration implements TaskDeclaration {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
-        .create("localFile")
+        .create(TASK_LOCAL_FILE)
         .displayName("Local File")
         .description("Reads or writes a binary file from/to disk")
         .properties(
-            SELECT_PROPERTY("operation")
+            SELECT_PROPERTY(PROPERTY_OPERATION)
                 .displayName("Operation")
                 .description("The operation to perform.")
-                .options(option("Read to file", "READ"), option("Write from file", "WRITE"))
-                .defaultValue("READ")
+                .options(
+                    option("Read to file", Operation.READ.name()),
+                    option("Write from file", Operation.WRITE.name())
+                )
+                .defaultValue(Operation.READ.name())
                 .required(true),
-            JSON_PROPERTY("fileEntry")
+            JSON_PROPERTY(PROPERTY_FILE_ENTRY)
                 .displayName("File")
                 .description("The object property which contains a reference to the file to be written.")
-                .displayOption(show("operation", "WRITE"))
+                .displayOption(show(PROPERTY_OPERATION, Operation.WRITE.name()))
                 .required(true),
-            STRING_PROPERTY("fileName")
+            STRING_PROPERTY(PROPERTY_FILE_NAME)
                 .displayName("File Name")
                 .description("The path of the file to read.")
-                .displayOption(show("operation", "READ"))
+                .displayOption(show(PROPERTY_OPERATION, "READ"))
                 .defaultValue("")
                 .placeholder("/data/your_file.pdf")
                 .required(true),
-            STRING_PROPERTY("fileName")
+            STRING_PROPERTY(PROPERTY_FILE_NAME)
                 .displayName("File Name")
                 .description("The path to which the file should be written.")
-                .displayOption(show("operation", "WRITE"))
+                .displayOption(show(PROPERTY_OPERATION, Operation.WRITE.name()))
                 .defaultValue("")
                 .placeholder("/data/your_file.pdf")
                 .required(true)

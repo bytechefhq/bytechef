@@ -27,6 +27,19 @@ import static com.integri.atlas.task.definition.dsl.TaskProperty.hide;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.multipleValues;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.show;
 import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.CombineOperation;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.Operation;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_BOOLEAN;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_COMBINE_OPERATION;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_CONDITIONS;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_DATE_TIME;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_NUMBER;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_OPERATION;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_RAW_CONDITIONS;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_STRING;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_VALUE_1;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_VALUE_2;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.TASK_IF;
 
 import com.integri.atlas.task.definition.TaskDeclaration;
 import com.integri.atlas.task.definition.dsl.TaskSpecification;
@@ -37,120 +50,128 @@ import com.integri.atlas.task.definition.dsl.TaskSpecification;
 public class IfTaskDeclaration implements TaskDeclaration {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
-        .create("if")
-        .displayName("IF")
+        .create(TASK_IF)
+        .displayName("If")
         .description("Directs a stream based on true/false results of comparisons")
         .properties(
-            BOOLEAN_PROPERTY("rawConditions")
+            BOOLEAN_PROPERTY(PROPERTY_RAW_CONDITIONS)
                 .displayName("RAW Conditions")
                 .description("If the conditions should be set via the key-value pair in UI or as an raw expression).")
                 .defaultValue(false),
-            STRING_PROPERTY("conditions")
+            STRING_PROPERTY(PROPERTY_CONDITIONS)
                 .displayName("Conditions")
                 .description("The conditions expressed as an expression.")
                 .displayOption(show("rawConditions", true)),
-            COLLECTION_PROPERTY("conditions")
+            COLLECTION_PROPERTY(PROPERTY_CONDITIONS)
                 .displayName("Conditions")
                 .placeholder("Add Condition")
                 .description("The type of values to compare.")
-                .displayOption(show("rawConditions", false))
+                .displayOption(show(PROPERTY_RAW_CONDITIONS, false))
                 .typeOption(multipleValues(true))
                 .options(
-                    GROUP_PROPERTY("boolean")
+                    GROUP_PROPERTY(PROPERTY_BOOLEAN)
                         .displayName("Boolean")
                         .groupProperties(
-                            BOOLEAN_PROPERTY("value1")
+                            BOOLEAN_PROPERTY(PROPERTY_VALUE_1)
                                 .displayName("Value 1")
                                 .description("The boolean value to compare with the second one.")
                                 .defaultValue(false),
-                            SELECT_PROPERTY("operation")
+                            SELECT_PROPERTY(PROPERTY_OPERATION)
                                 .displayName("Operation")
                                 .description("Compare operation to decide where to map data.")
-                                .options(option("Equal", "equal"), option("Not Equal", "notEqual"))
-                                .defaultValue("equal"),
-                            BOOLEAN_PROPERTY("value2")
+                                .options(
+                                    option("Equals", Operation.EQUALS.name()),
+                                    option("Not Equals", Operation.NOT_EQUALS.name())
+                                )
+                                .defaultValue(Operation.EQUALS.name()),
+                            BOOLEAN_PROPERTY(PROPERTY_VALUE_2)
                                 .displayName("Value 2")
                                 .description("The boolean value to compare with the first one.")
                                 .defaultValue(false)
                         ),
-                    GROUP_PROPERTY("dateTime")
+                    GROUP_PROPERTY(PROPERTY_DATE_TIME)
                         .displayName("Date & Time")
                         .groupProperties(
-                            DATE_TIME_PROPERTY("value1")
+                            DATE_TIME_PROPERTY(PROPERTY_VALUE_1)
                                 .displayName("Value 1")
                                 .description("The date & time value to compare with the second one.")
                                 .defaultValue(null),
-                            SELECT_PROPERTY("operation")
+                            SELECT_PROPERTY(PROPERTY_OPERATION)
                                 .displayName("Operation")
                                 .description("Compare operation to decide where to map data.")
-                                .options(option("After", "after"), option("Before", "before"))
-                                .defaultValue("after"),
-                            DATE_TIME_PROPERTY("value2")
+                                .options(
+                                    option("After", Operation.AFTER.name()),
+                                    option("Before", Operation.BEFORE.name())
+                                )
+                                .defaultValue(Operation.AFTER.name()),
+                            DATE_TIME_PROPERTY(PROPERTY_VALUE_2)
                                 .displayName("Value 2")
                                 .description("The date & time value to compare with the first one.")
                                 .defaultValue(null)
                         ),
-                    GROUP_PROPERTY("number")
+                    GROUP_PROPERTY(PROPERTY_NUMBER)
                         .displayName("Number")
                         .groupProperties(
-                            NUMBER_PROPERTY("value1")
+                            NUMBER_PROPERTY(PROPERTY_VALUE_1)
                                 .displayName("Value 1")
                                 .description("The number value to compare with the second one.")
                                 .defaultValue(0),
-                            SELECT_PROPERTY("operation")
+                            SELECT_PROPERTY(PROPERTY_OPERATION)
                                 .displayName("Operation")
                                 .description("Compare operation to decide where to map data.")
                                 .options(
-                                    option("Smaller", "smaller"),
-                                    option("Smaller or Equal", "smallerEqual"),
-                                    option("Equal", "equal"),
-                                    option("Not Equal", "notEqual"),
-                                    option("Larger", "larger"),
-                                    option("Larger or Equal", "largerEqual"),
-                                    option("Empty", "empty")
+                                    option("Less", Operation.LESS.name()),
+                                    option("Less or Equals", Operation.LESS_EQUALS.name()),
+                                    option("Equals", Operation.EQUALS.name()),
+                                    option("Not Equals", Operation.NOT_EQUALS.name()),
+                                    option("Greater", Operation.GREATER.name()),
+                                    option("Greater or Equals", Operation.GREATER_EQUALS.name()),
+                                    option("Empty", Operation.EMPTY.name())
                                 )
-                                .defaultValue("smaller"),
-                            NUMBER_PROPERTY("value2")
+                                .defaultValue(Operation.LESS.name()),
+                            NUMBER_PROPERTY(PROPERTY_VALUE_2)
                                 .displayName("Value 2")
                                 .description("The number value to compare with the first one.")
                                 .defaultValue(0)
-                                .displayOption(hide("operation"))
+                                .displayOption(hide(PROPERTY_OPERATION))
                         ),
-                    GROUP_PROPERTY("string")
+                    GROUP_PROPERTY(PROPERTY_STRING)
                         .displayName("String")
                         .groupProperties(
-                            STRING_PROPERTY("value1")
+                            STRING_PROPERTY(PROPERTY_VALUE_1)
                                 .displayName("Value 1")
                                 .description("The string value to compare with the second one.")
                                 .defaultValue(""),
-                            SELECT_PROPERTY("operation")
+                            SELECT_PROPERTY(PROPERTY_OPERATION)
                                 .displayName("Operation")
                                 .description("Compare operation to decide where to map data.")
                                 .options(
-                                    option("Equal", "equal"),
-                                    option("Not Equal", "notEqual"),
-                                    option("Contains", "contains"),
-                                    option("Not Contains", "notContains"),
-                                    option("Starts With", "startsWith"),
-                                    option("Ends With", "endsWith"),
-                                    option("Regex", "regex"),
-                                    option("Empty", "empty")
+                                    option("Equals", Operation.EQUALS.name()),
+                                    option("Not Equals", Operation.NOT_EQUALS.name()),
+                                    option("Contains", Operation.CONTAINS.name()),
+                                    option("Not Contains", Operation.NOT_CONTAINS.name()),
+                                    option("Starts With", Operation.STARTS_WITH.name()),
+                                    option("Ends With", Operation.ENDS_WITH.name()),
+                                    option("Regex", Operation.REGEX.name()),
+                                    option("Empty", Operation.EMPTY.name())
                                 )
-                                .defaultValue("equal"),
-                            STRING_PROPERTY("value2")
+                                .defaultValue(Operation.EQUALS.name()),
+                            STRING_PROPERTY(PROPERTY_VALUE_2)
                                 .displayName("Value 2")
                                 .description("The string value to compare with the first one.")
                                 .defaultValue("")
-                                .displayOption(hide("operation", "empty", "regex")),
-                            STRING_PROPERTY("value2")
+                                .displayOption(
+                                    hide(PROPERTY_OPERATION, Operation.EMPTY.name(), Operation.REGEX.name())
+                                ),
+                            STRING_PROPERTY(PROPERTY_VALUE_2)
                                 .displayName("Regex")
                                 .description("The regex value to compare with the first one.")
                                 .placeholder("/text/i")
                                 .defaultValue("")
-                                .displayOption(show("operation", "regex"))
+                                .displayOption(show(PROPERTY_OPERATION, Operation.REGEX.name()))
                         )
                 ),
-            SELECT_PROPERTY("combineOperation")
+            SELECT_PROPERTY(PROPERTY_COMBINE_OPERATION)
                 .displayName("Combine")
                 .description(
                     """
@@ -158,12 +179,20 @@ public class IfTaskDeclaration implements TaskDeclaration {
                      matches or only if ALL are met.
                     """
                 )
-                .displayOption(show("rawConditions", false))
+                .displayOption(show(PROPERTY_RAW_CONDITIONS, false))
                 .options(
-                    option("All", "ALL", "Only if all conditions are met, the workflow goes into \"true\" branch."),
-                    option("Any", "ANY", "If any condition is met, the workflow goes into \"true\" branch.")
+                    option(
+                        "All",
+                        CombineOperation.ALL.name(),
+                        "Only if all conditions are met, the workflow goes into \"true\" branch."
+                    ),
+                    option(
+                        "Any",
+                        CombineOperation.ANY.name(),
+                        "If any condition is met, the workflow goes into \"true\" branch."
+                    )
                 )
-                .defaultValue("ALL")
+                .defaultValue(CombineOperation.ALL.name())
         );
 
     @Override

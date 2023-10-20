@@ -16,21 +16,10 @@
 
 package com.integri.atlas.task.dispatcher.sequence;
 
-import com.integri.atlas.task.definition.TaskDeclaration;
-import com.integri.atlas.task.definition.dsl.TaskSpecification;
-
 /**
  * @author Ivica Cardic
  */
-public class SequenceTaskDeclaration implements TaskDeclaration {
+public class SequenceTaskConstants {
 
-    public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
-        .create(SequenceTaskConstants.TASK_SEQUENCE)
-        .displayName("Sequence")
-        .description("Executes list of tasks in a sequence");
-
-    @Override
-    public TaskSpecification getSpecification() {
-        return TASK_SPECIFICATION;
-    }
+    public static final String TASK_SEQUENCE = "sequence";
 }

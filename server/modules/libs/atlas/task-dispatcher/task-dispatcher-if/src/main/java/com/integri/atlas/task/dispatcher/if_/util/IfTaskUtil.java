@@ -16,9 +16,21 @@
 
 package com.integri.atlas.task.dispatcher.if_.util;
 
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.CombineOperation;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.Operation;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_BOOLEAN;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_COMBINE_OPERATION;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_CONDITIONS;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_DATE_TIME;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_NUMBER;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_OPERATION;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_RAW_CONDITIONS;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_STRING;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_VALUE_1;
+import static com.integri.atlas.task.dispatcher.if_.IfTaskConstants.PROPERTY_VALUE_2;
+
 import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.task.TaskExecution;
-import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,13 +46,13 @@ public class IfTaskUtil {
     private static final ExpressionParser expressionParser = new SpelExpressionParser();
 
     public static boolean resolveCase(TaskExecution ifTask) {
-        boolean rawConditions = ifTask.get("rawConditions", Boolean.class, false);
+        boolean rawConditions = ifTask.get(PROPERTY_RAW_CONDITIONS, Boolean.class, false);
 
         if (rawConditions) {
-            return ifTask.get("conditions", Boolean.class);
+            return ifTask.getBoolean(PROPERTY_CONDITIONS);
         } else {
-            List<MapObject> conditionsUI = ifTask.getList("conditions", MapObject.class);
-            String combineOperation = ifTask.getRequiredString("combineOperation");
+            List<MapObject> conditionsUI = ifTask.getList(PROPERTY_CONDITIONS, MapObject.class);
+            String combineOperation = ifTask.getRequiredString(PROPERTY_COMBINE_OPERATION);
 
             return expressionParser
                 .parseExpression(
@@ -59,12 +71,12 @@ public class IfTaskUtil {
 
                 String conditionTemplate = conditionTemplates
                     .get(operandType)
-                    .get(conditionParts.getRequiredString("operation"));
+                    .get(conditionParts.getRequiredString(PROPERTY_OPERATION));
 
                 conditionExpressions.add(
                     conditionTemplate
-                        .replace("${value1}", conditionParts.getRequiredString("value1"))
-                        .replace("${value2}", conditionParts.getRequiredString("value2"))
+                        .replace("${value1}", conditionParts.getRequiredString(PROPERTY_VALUE_1))
+                        .replace("${value2}", conditionParts.getRequiredString(PROPERTY_VALUE_2))
                 );
             }
         }
@@ -73,9 +85,9 @@ public class IfTaskUtil {
     }
 
     private static String getBooleanOperator(String combineOperation) {
-        if (combineOperation.equalsIgnoreCase("ANY")) {
+        if (combineOperation.equalsIgnoreCase(CombineOperation.ANY.name())) {
             return "||";
-        } else if (combineOperation.equalsIgnoreCase("ALL")) {
+        } else if (combineOperation.equalsIgnoreCase(CombineOperation.ALL.name())) {
             return "&&";
         }
 
@@ -86,50 +98,50 @@ public class IfTaskUtil {
 
     static {
         conditionTemplates.put(
-            "boolean",
+            PROPERTY_BOOLEAN,
             Map.ofEntries(
-                Map.entry("equals", "${value1} == ${value2}"),
-                Map.entry("notEquals", "${value1} != ${value2}")
+                Map.entry(Operation.EQUALS.name(), "${value1} == ${value2}"),
+                Map.entry(Operation.NOT_EQUALS.name(), "${value1} != ${value2}")
             )
         );
 
         conditionTemplates.put(
-            "dateTime",
+            PROPERTY_DATE_TIME,
             Map.ofEntries(
                 Map.entry(
-                    "after",
+                    Operation.AFTER.name(),
                     "T(java.time.LocalDateTime).parse('${value1}').isAfter(T(java.time.LocalDateTime).parse('${value2}'))"
                 ),
                 Map.entry(
-                    "before",
+                    Operation.BEFORE.name(),
                     "T(java.time.LocalDateTime).parse('${value1}').isBefore(T(java.time.LocalDateTime).parse('${value2}'))"
                 )
             )
         );
 
         conditionTemplates.put(
-            "number",
+            PROPERTY_NUMBER,
             Map.ofEntries(
-                Map.entry("equals", "${value1} == ${value2}"),
-                Map.entry("notEquals", "${value1} != ${value2}"),
-                Map.entry("greater", "${value1} > ${value2}"),
-                Map.entry("less", "${value1} < ${value2}"),
-                Map.entry("greaterEquals", "${value1} >= ${value2}"),
-                Map.entry("lessEquals", "${value1} <= ${value2}")
+                Map.entry(Operation.EQUALS.name(), "${value1} == ${value2}"),
+                Map.entry(Operation.NOT_EQUALS.name(), "${value1} != ${value2}"),
+                Map.entry(Operation.GREATER.name(), "${value1} > ${value2}"),
+                Map.entry(Operation.LESS.name(), "${value1} < ${value2}"),
+                Map.entry(Operation.GREATER_EQUALS.name(), "${value1} >= ${value2}"),
+                Map.entry(Operation.LESS_EQUALS.name(), "${value1} <= ${value2}")
             )
         );
 
         conditionTemplates.put(
-            "string",
+            PROPERTY_STRING,
             Map.ofEntries(
-                Map.entry("equals", "'${value1}'.equals('${value2}')"),
-                Map.entry("notEquals", "!'${value1}'.equals('${value2}')"),
-                Map.entry("contains", "'${value1}'.contains('${value2}')"),
-                Map.entry("notContains", "!'${value1}'.contains('${value2}')"),
-                Map.entry("startsWith", "'${value1}'.startsWith('${value2}')"),
-                Map.entry("endsWith", "'${value1}'.endsWith('${value2}')"),
-                Map.entry("isEmpty", "'${value1}'.isEmpty()"),
-                Map.entry("regex", "'${value1}' matches '${value2}'")
+                Map.entry(Operation.EQUALS.name(), "'${value1}'.equals('${value2}')"),
+                Map.entry(Operation.NOT_EQUALS.name(), "!'${value1}'.equals('${value2}')"),
+                Map.entry(Operation.CONTAINS.name(), "'${value1}'.contains('${value2}')"),
+                Map.entry(Operation.NOT_CONTAINS.name(), "!'${value1}'.contains('${value2}')"),
+                Map.entry(Operation.STARTS_WITH.name(), "'${value1}'.startsWith('${value2}')"),
+                Map.entry(Operation.ENDS_WITH.name(), "'${value1}'.endsWith('${value2}')"),
+                Map.entry(Operation.EMPTY.name(), "'${value1}'.isEmpty()"),
+                Map.entry(Operation.REGEX.name(), "'${value1}' matches '${value2}'")
             )
         );
     }
