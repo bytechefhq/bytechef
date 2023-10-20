@@ -8,13 +8,11 @@ import ReactFlow, {
     useReactFlow,
     useStore,
 } from 'reactflow';
-import 'reactflow/dist/base.css';
 import PlaceholderEdge from './edges/PlaceholderEdge';
 import WorkflowEdge from './edges/WorkflowEdge';
 import PlaceholderNode from './nodes/PlaceholderNode';
 import WorkflowNode from './nodes/WorkflowNode';
-
-import './WorkflowEditor.css';
+import useHandleDrop from './hooks/useHandleDrop';
 import useLayout from './hooks/useLayout';
 import {PlayIcon} from '@heroicons/react/24/outline';
 import RightSlideOver from './components/NodeDetailsDialog';
@@ -22,10 +20,9 @@ import {
     ComponentDefinitionModel,
     TaskDispatcherDefinitionModel,
 } from 'middleware/definition-registry';
-import getFormattedName from './utils/getFormattedName';
 
-const uuid = (): string =>
-    new Date().getTime().toString(36) + Math.random().toString(36).slice(2);
+import 'reactflow/dist/base.css';
+import './WorkflowEditor.css';
 
 type WorkflowProps = {
     components: ComponentDefinitionModel[];
@@ -80,14 +77,55 @@ const Workflow = ({components, flowControls}: WorkflowProps): JSX.Element => {
         []
     );
 
-    const {getNode, getNodes, setNodes, setEdges, setViewport} = useReactFlow();
-
-    const nodes = getNodes();
+    const {getEdge, getNode, setViewport} = useReactFlow();
 
     const {width} = useStore((store) => ({
         width: store.width,
         height: store.height,
     }));
+
+    const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge] =
+        useHandleDrop();
+
+    const onDrop: DragEventHandler = (event) => {
+        const droppedNodeName = event.dataTransfer.getData(
+            'application/reactflow'
+        );
+
+        const droppedNode = [...components, ...flowControls].find(
+            (node) => node.name === droppedNodeName
+        );
+
+        if (!droppedNode) {
+            return;
+        }
+
+        if (event.target instanceof HTMLElement) {
+            const targetNodeElement = event.target.closest(
+                '.react-flow__node'
+            ) as HTMLElement;
+
+            if (targetNodeElement) {
+                const targetNodeId = targetNodeElement.dataset.id!;
+
+                const targetNode = getNode(targetNodeId);
+
+                if (targetNode) {
+                    handleDropOnPlaceholderNode(targetNode, droppedNode);
+                }
+            }
+        } else if (event.target instanceof SVGElement) {
+            const targetEdgeElement = event.target.closest('.react-flow__edge');
+
+            if (targetEdgeElement) {
+                const targetEdge = getEdge(targetEdgeElement.id);
+
+                if (targetEdge) {
+                    handleDropOnWorkflowEdge(targetEdge, droppedNode);
+                }
+            }
+        }
+    };
 
     useEffect(() => {
         setViewportWidth(width);
@@ -98,81 +136,6 @@ const Workflow = ({components, flowControls}: WorkflowProps): JSX.Element => {
             zoom: 1,
         });
     }, [setViewport, width]);
-
-    const createPlaceholderNode = (
-        sourceId: string,
-        droppedNode: ComponentDefinitionModel | TaskDispatcherDefinitionModel
-    ) => {
-        const dropTargetNode = getNode(sourceId);
-
-        if (!dropTargetNode) {
-            return;
-        }
-
-        const nodeIndex = nodes.findIndex(
-            (node) => node.id === dropTargetNode.id
-        );
-
-        const newWorkflowNode = {
-            ...dropTargetNode,
-            display: droppedNode.display,
-            name: droppedNode.name,
-            data: {
-                icon: droppedNode.display?.icon || (
-                    <PlayIcon className="h-8 w-8 text-gray-700" />
-                ),
-                label: droppedNode.display?.label,
-                name: getFormattedName(droppedNode.name!, nodes),
-            },
-            type: 'workflow',
-        };
-
-        const targetId = uuid();
-
-        const newPlaceholderNode = {
-            id: targetId,
-            data: {label: '+'},
-            position: {x: 0, y: 150},
-            type: 'placeholder',
-        };
-
-        setNodes((nodes) => {
-            nodes[nodeIndex] = newWorkflowNode;
-
-            return [...nodes, newPlaceholderNode];
-        });
-
-        const newPlaceholderEdge = {
-            id: `${sourceId}=>${targetId}`,
-            source: sourceId,
-            target: targetId,
-            type: 'placeholder',
-        };
-
-        setEdges((edges) => [...edges, newPlaceholderEdge]);
-    };
-
-    const onDrop: DragEventHandler = (event) => {
-        if (event.target instanceof HTMLElement) {
-            const targetNodeElement = event.target.closest(
-                '.react-flow__node'
-            ) as HTMLElement;
-
-            const nodeName = event.dataTransfer.getData(
-                'application/reactflow'
-            );
-
-            const droppedNode = [...components, ...flowControls].find(
-                (node) => node.name === nodeName
-            );
-
-            if (targetNodeElement && droppedNode) {
-                const targetNodeId = targetNodeElement.dataset.id!;
-
-                createPlaceholderNode(targetNodeId, droppedNode);
-            }
-        }
-    };
 
     useLayout();
 
@@ -194,7 +157,6 @@ const Workflow = ({components, flowControls}: WorkflowProps): JSX.Element => {
                 nodesDraggable={false}
                 nodesConnectable={false}
                 onDrop={onDrop}
-                // onDragOver={onDragOver}
                 panOnDrag
                 panOnScroll
                 proOptions={{hideAttribution: true}}
