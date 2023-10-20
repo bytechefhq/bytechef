@@ -92,7 +92,7 @@ public class IntegrationFacadeIntTest {
     public void testCreate() {
         Integration integration = new Integration();
 
-        integration.setName("name");
+        integration.setName("name1");
         integration.setDescription("description");
 
         Category category = categoryRepository.save(new Category("name"));
@@ -104,14 +104,14 @@ public class IntegrationFacadeIntTest {
 
         assertThat(integration.getCategoryId()).isEqualTo(category.getId());
         assertThat(integration.getDescription()).isEqualTo("description");
-        assertThat(integration.getName()).isEqualTo("name");
+        assertThat(integration.getName()).isEqualTo("name1");
         assertThat(integration.getId()).isNotNull();
         assertThat(integration.getTagIds()).hasSize(1);
         assertThat(integration.getWorkflowIds()).hasSize(1);
 
         integration = new Integration();
 
-        integration.setName("name");
+        integration.setName("name2");
         integration.setWorkflowIds(List.of("workflow2"));
 
         integration = integrationFacade.create(integration);
@@ -124,14 +124,14 @@ public class IntegrationFacadeIntTest {
     public void testDelete() {
         Integration integration1 = new Integration();
 
-        integration1.setName("name");
+        integration1.setName("name1");
         integration1.setTags(List.of(new Tag("tag1")));
 
         integration1 = integrationFacade.create(integration1);
 
         Integration integration2 = new Integration();
 
-        integration2.setName("name");
+        integration2.setName("name2");
         integration2.setTags(List.of(new Tag("tag1")));
 
         integration2 = integrationFacade.create(integration2);

@@ -24,6 +24,7 @@ import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,6 +41,11 @@ public class ConnectionServiceIntTest {
 
     @Autowired
     private ConnectionRepository connectionRepository;
+
+    @BeforeEach
+    public void beforeEach() {
+        connectionRepository.deleteAll();
+    }
 
     @Test
     public void testCreate() {

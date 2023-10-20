@@ -80,6 +80,8 @@ public class IntegrationRepositoryIntTest {
 
         assertThat(resultIntegration).isEqualTo(integration);
 
+        integrationRepository.deleteById(integration.getId());
+
         integration = getIntegration(List.of("workflowId"));
 
         integration = integrationRepository.save(integration);
