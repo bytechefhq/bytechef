@@ -43,22 +43,19 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskDispatcher taskDispatcher;
     private final ContextRepository contextRepository;
     private final TaskEvaluator taskEvaluator;
-    private final IfTaskUtil ifTaskHelper;
 
     public IfTaskCompletionHandler(
         TaskExecutionRepository aTaskExecutionRepo,
         TaskCompletionHandler aTaskCompletionHandler,
         TaskDispatcher aTaskDispatcher,
         ContextRepository aContextRepository,
-        TaskEvaluator aTaskEvaluator,
-        IfTaskUtil aIfTaskHelper
+        TaskEvaluator aTaskEvaluator
     ) {
         taskExecutionRepo = aTaskExecutionRepo;
         taskCompletionHandler = aTaskCompletionHandler;
         taskDispatcher = aTaskDispatcher;
         contextRepository = aContextRepository;
         taskEvaluator = aTaskEvaluator;
-        ifTaskHelper = aIfTaskHelper;
     }
 
     @Override
@@ -78,7 +75,7 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
 
         List<MapObject> tasks;
 
-        if (ifTaskHelper.resolveCase(taskEvaluator, ifTask)) {
+        if (IfTaskUtil.resolveCase(taskEvaluator, ifTask)) {
             tasks = ifTask.getList("caseTrue", MapObject.class);
         } else {
             tasks = ifTask.getList("caseFalse", MapObject.class);
