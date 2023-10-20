@@ -1,9 +1,11 @@
 import {useQuery} from '@tanstack/react-query';
 import {
     CategoryModel,
+    GetProjectExecutionRequest,
     GetProjectExecutionsRequest,
     PageModel,
     ProjectCategoriesApi,
+    ProjectExecutionModel,
     ProjectExecutionsApi,
     ProjectInstanceModel,
     ProjectInstanceTagsApi,
@@ -39,6 +41,10 @@ export const ProjectKeys = {
     projectExecutions: (filter: GetProjectExecutionsRequest) => [
         'projectExecutions',
         filter,
+    ],
+    projectExecution: (request: GetProjectExecutionRequest) => [
+        'projectExecution',
+        request,
     ],
 };
 
@@ -94,4 +100,16 @@ export const useGetProjectExecutionsQuery = (
 ) =>
     useQuery<PageModel, Error>(ProjectKeys.projectExecutions(request), () =>
         new ProjectExecutionsApi().getProjectExecutions(request)
+    );
+
+export const useGetProjectExecutionQuery = (
+    request: GetProjectExecutionRequest,
+    isEnabled: boolean
+) =>
+    useQuery<ProjectExecutionModel, Error>(
+        ProjectKeys.projectExecution(request),
+        () => new ProjectExecutionsApi().getProjectExecution(request),
+        {
+            enabled: isEnabled,
+        }
     );
