@@ -124,13 +124,25 @@ subprojects {
         useJUnitPlatform()
         exclude "**/*IntTest*"
         testLogging {
-            events "FAILED", "SKIPPED"
+            events "standardOut", "passed", "skipped", "failed"
+            showExceptions true
             exceptionFormat "full"
+            showCauses true
+            showStackTraces true
         }
         jvmArgs += "-Djava.security.egd=file:/dev/./urandom -Xmx256m"
         // uncomment if the tests reports are not generated
         // ignoreFailures true
         reports.html.enabled = false
+
+        afterSuite { desc, result ->
+            if (!desc.parent) { // will match the outermost suite
+                def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+                def startItem = '|  ', endItem = '  |'
+                def repeatLength = startItem.length() + output.length() + endItem.length()
+                println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
+            }
+        }
     }
 
     task testIntegration(type: Test) {
@@ -139,8 +151,11 @@ subprojects {
         group = "verification"
         include "**/*IntTest*"
         testLogging {
-            events "FAILED", "SKIPPED"
+            events "standardOut", "passed", "skipped", "failed"
+            showExceptions true
             exceptionFormat "full"
+            showCauses true
+            showStackTraces true
         }
         jvmArgs += "-Djava.security.egd=file:/dev/./urandom -Xmx256m"
 
@@ -149,6 +164,15 @@ subprojects {
         // uncomment if the tests reports are not generated
         // ignoreFailures true
         reports.html.enabled = false
+
+        afterSuite { desc, result ->
+            if (!desc.parent) { // will match the outermost suite
+                def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+                def startItem = '|  ', endItem = '  |'
+                def repeatLength = startItem.length() + output.length() + endItem.length()
+                println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
+            }
+        }
     }
 
     check.dependsOn testIntegration
