@@ -20,7 +20,7 @@ package com.bytechef.hermes.definition.registry.facade;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.util.CollectionUtils;
@@ -48,13 +48,13 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
     }
 
     @Override
-    public List<ComponentDefinitionDTO> getComponentDefinitions(
+    public List<ComponentDefinition> getComponentDefinitions(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
         Boolean triggerDefinitions, List<String> include) {
 
         List<Connection> connections = connectionService.getConnections();
 
-        List<ComponentDefinitionDTO> componentDefinitionDTOs = componentDefinitionService.getComponentDefinitions()
+        List<ComponentDefinition> components = componentDefinitionService.getComponentDefinitions()
             .stream()
             .filter(
                 filter(
@@ -64,16 +64,15 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
             .toList();
 
         if (include != null && !include.isEmpty()) {
-            componentDefinitionDTOs = new ArrayList<>(componentDefinitionDTOs);
+            components = new ArrayList<>(components);
 
-            componentDefinitionDTOs.sort(
-                Comparator.comparing(componentDefinitionDTO -> include.indexOf(componentDefinitionDTO.getName())));
+            components.sort(Comparator.comparing(component -> include.indexOf(component.getName())));
         }
 
-        return componentDefinitionDTOs;
+        return components;
     }
 
-    private static Predicate<ComponentDefinitionDTO> filter(
+    private static Predicate<ComponentDefinition> filter(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
         Boolean triggerDefinitions, List<String> include, List<Connection> connections) {
 
@@ -102,7 +101,7 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
         };
     }
 
-    private static boolean noneMatch(List<Connection> connections, ComponentDefinitionDTO componentDefinition) {
+    private static boolean noneMatch(List<Connection> connections, ComponentDefinition componentDefinition) {
         return connections.stream()
             .noneMatch(connection -> Objects.equals(connection.getComponentName(), componentDefinition.getName()));
     }

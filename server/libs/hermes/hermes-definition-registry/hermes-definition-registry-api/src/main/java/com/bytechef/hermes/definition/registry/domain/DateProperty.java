@@ -15,31 +15,35 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property.BooleanProperty;
+import com.bytechef.hermes.definition.Property;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public class BooleanPropertyDTO extends ValuePropertyDTO<Boolean> {
+public class DateProperty extends ValueProperty<LocalDate> {
 
-    private List<OptionDTO> options;
+    private List<Option> options;
+    private OptionsDataSource optionsDataSource;
 
-    private BooleanPropertyDTO() {
+    private DateProperty() {
     }
 
-    public BooleanPropertyDTO(BooleanProperty booleanProperty) {
-        super(booleanProperty);
+    public DateProperty(Property.DateProperty dateProperty) {
+        super(dateProperty);
 
-        this.options = CollectionUtils.map(
-            OptionalUtils.orElse(booleanProperty.getOptions(), List.of()), OptionDTO::new);
+        this.options = CollectionUtils.map(OptionalUtils.orElse(dateProperty.getOptions(), List.of()), Option::new);
+        this.optionsDataSource = OptionalUtils.mapOrElse(
+            dateProperty.getOptionsDataSource(), OptionsDataSource::new, null);
     }
 
     @Override
@@ -47,31 +51,36 @@ public class BooleanPropertyDTO extends ValuePropertyDTO<Boolean> {
         return propertyVisitor.visit(this);
     }
 
-    public List<OptionDTO> getOptions() {
+    public List<Option> getOptions() {
         return Collections.unmodifiableList(options);
+    }
+
+    public Optional<OptionsDataSource> getOptionsDataSource() {
+        return Optional.ofNullable(optionsDataSource);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof BooleanPropertyDTO that))
+        if (!(o instanceof DateProperty that))
             return false;
-        return Objects.equals(options, that.options);
+        return Objects.equals(options, that.options) && Objects.equals(optionsDataSource, that.optionsDataSource);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(options);
+        return Objects.hash(options, optionsDataSource);
     }
 
     @Override
     public String toString() {
-        return "BooleanPropertyDTO{" +
+        return "DateProperty{" +
             "options=" + options +
+            ", optionsDataSource=" + optionsDataSource +
             ", controlType=" + controlType +
             ", defaultValue=" + defaultValue +
             ", exampleValue=" + exampleValue +
-            "} ";
+            "} " + super.toString();
     }
 }

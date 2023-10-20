@@ -18,8 +18,8 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.dto.HelpDTO;
-import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.Help;
+import com.bytechef.hermes.definition.registry.domain.TriggerDefinition;
 import com.bytechef.hermes.configuration.web.rest.model.HelpModel;
 import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionModel;
@@ -35,23 +35,23 @@ public class TriggerDefinitionMapper {
         OptionalMapper.class
     })
     public interface TriggerDefinitionToTriggerDefinitionModelMapper
-        extends Converter<TriggerDefinitionDTO, TriggerDefinitionModel> {
+        extends Converter<TriggerDefinition, TriggerDefinitionModel> {
 
         @Override
-        TriggerDefinitionModel convert(TriggerDefinitionDTO triggerDefinitionDTO);
+        TriggerDefinitionModel convert(TriggerDefinition triggerDefinition);
 
-        HelpModel map(HelpDTO helpDTO);
+        HelpModel map(Help help);
     }
 
     @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
         OptionalMapper.class
     })
     public interface TriggerDefinitionToTriggerDefinitionBasicModelMapper
-        extends Converter<TriggerDefinitionDTO, TriggerDefinitionBasicModel> {
+        extends Converter<TriggerDefinition, TriggerDefinitionBasicModel> {
 
         @Override
-        TriggerDefinitionBasicModel convert(TriggerDefinitionDTO triggerDefinitionDTO);
+        TriggerDefinitionBasicModel convert(TriggerDefinition triggerDefinition);
 
-        HelpModel map(HelpDTO helpDTO);
+        HelpModel map(Help help);
     }
 }

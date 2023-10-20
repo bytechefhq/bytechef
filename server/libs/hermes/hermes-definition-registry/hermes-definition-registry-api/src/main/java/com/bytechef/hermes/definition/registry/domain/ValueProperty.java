@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.ControlType;
 
 import java.util.Optional;
@@ -26,16 +25,16 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public abstract class ValuePropertyDTO<V> extends PropertyDTO {
+public abstract class ValueProperty<V> extends Property {
 
     protected ControlType controlType;
     protected V defaultValue;
     protected V exampleValue;
 
-    protected ValuePropertyDTO() {
+    protected ValueProperty() {
     }
 
-    public ValuePropertyDTO(Property.ValueProperty<V> valueProperty) {
+    public ValueProperty(com.bytechef.hermes.definition.Property.ValueProperty<V> valueProperty) {
         super(valueProperty);
 
         this.controlType = valueProperty.getControlType();

@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property.DateTimeProperty;
+import com.bytechef.hermes.definition.Property;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -30,21 +29,25 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public class DateTimePropertyDTO extends ValuePropertyDTO<LocalDateTime> {
+public class IntegerProperty extends ValueProperty<Integer> {
 
-    private List<OptionDTO> options;
-    private OptionsDataSourceDTO optionsDataSource;
+    private Integer maxValue;
+    private Integer minValue;
+    private List<Option> options;
+    private OptionsDataSource optionsDataSource;
 
-    private DateTimePropertyDTO() {
+    private IntegerProperty() {
     }
 
-    public DateTimePropertyDTO(DateTimeProperty dateTimeProperty) {
-        super(dateTimeProperty);
+    public IntegerProperty(Property.IntegerProperty integerProperty) {
+        super(integerProperty);
 
+        this.maxValue = OptionalUtils.orElse(integerProperty.getMaxValue(), null);
+        this.minValue = OptionalUtils.orElse(integerProperty.getMinValue(), null);
         this.options = CollectionUtils.map(
-            OptionalUtils.orElse(dateTimeProperty.getOptions(), List.of()), OptionDTO::new);
+            OptionalUtils.orElse(integerProperty.getOptions(), List.of()), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
-            dateTimeProperty.getOptionsDataSource(), OptionsDataSourceDTO::new, null);
+            integerProperty.getOptionsDataSource(), OptionsDataSource::new, null);
     }
 
     @Override
@@ -52,11 +55,19 @@ public class DateTimePropertyDTO extends ValuePropertyDTO<LocalDateTime> {
         return propertyVisitor.visit(this);
     }
 
-    public List<OptionDTO> getOptions() {
+    public Optional<Integer> getMaxValue() {
+        return Optional.ofNullable(maxValue);
+    }
+
+    public Optional<Integer> getMinValue() {
+        return Optional.ofNullable(minValue);
+    }
+
+    public List<Option> getOptions() {
         return Collections.unmodifiableList(options);
     }
 
-    public Optional<OptionsDataSourceDTO> getOptionsDataSource() {
+    public Optional<OptionsDataSource> getOptionsDataSource() {
         return Optional.ofNullable(optionsDataSource);
     }
 
@@ -64,20 +75,23 @@ public class DateTimePropertyDTO extends ValuePropertyDTO<LocalDateTime> {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof DateTimePropertyDTO that))
+        if (!(o instanceof IntegerProperty that))
             return false;
-        return Objects.equals(options, that.options) && Objects.equals(optionsDataSource, that.optionsDataSource);
+        return Objects.equals(maxValue, that.maxValue) && Objects.equals(minValue, that.minValue)
+            && Objects.equals(options, that.options) && Objects.equals(optionsDataSource, that.optionsDataSource);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(options, optionsDataSource);
+        return Objects.hash(maxValue, minValue, options, optionsDataSource);
     }
 
     @Override
     public String toString() {
-        return "DateTimePropertyDTO{" +
-            "options=" + options +
+        return "IntegerProperty{" +
+            "maxValue=" + maxValue +
+            ", minValue=" + minValue +
+            ", options=" + options +
             ", optionsDataSource=" + optionsDataSource +
             ", controlType=" + controlType +
             ", defaultValue=" + defaultValue +

@@ -26,10 +26,10 @@ import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.helios.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.configuration.service.OAuth2Service;
-import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.definition.registry.domain.ConnectionDefinition;
+import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
@@ -65,8 +65,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         OAuth2Service oAuth2Service, ProjectInstanceWorkflowService projectInstanceWorkflowService,
         TagService tagService, WorkflowService workflowService) {
 
-        this.connectionService = connectionService;
         this.connectionDefinitionService = connectionDefinitionService;
+        this.connectionService = connectionService;
         this.oAuth2Service = oAuth2Service;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.tagService = tagService;
@@ -138,15 +138,15 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     public List<ConnectionDTO> getConnections(String componentName, Integer componentVersion) {
         List<Connection> connections = new ArrayList<>();
 
-        List<ConnectionDefinitionDTO> connectionDefinitionDTOs = connectionDefinitionService.getConnectionDefinitions(
+        List<ConnectionDefinition> connectionDefinitions = connectionDefinitionService.getConnectionDefinitions(
             componentName, componentVersion);
 
-        for (ConnectionDefinitionDTO connectionDefinitionDTO : connectionDefinitionDTOs) {
+        for (ConnectionDefinition connectionDefinition : connectionDefinitions) {
             connections.addAll(connectionService.getConnections(
-                connectionDefinitionDTO.getComponentName(), connectionDefinitionDTO.getVersion()));
+                connectionDefinition.getComponentName(), connectionDefinition.getVersion()));
         }
 
-        return getConnectionDTOs(connections);
+        return getConnections(connections);
     }
 
     @Override
@@ -154,7 +154,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     public List<ConnectionDTO> getConnections(String componentName, Integer connectionVersion, Long tagId) {
         List<Connection> connections = connectionService.getConnections(componentName, connectionVersion, tagId);
 
-        return getConnectionDTOs(connections);
+        return getConnections(connections);
     }
 
     @Override
@@ -240,7 +240,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return connectionService.getConnection(projectInstanceWorkflowConnection.getConnectionId());
     }
 
-    private List<ConnectionDTO> getConnectionDTOs(List<Connection> connections) {
+    private List<ConnectionDTO> getConnections(List<Connection> connections) {
         List<Tag> tags = tagService.getTags(connections.stream()
             .flatMap(connection -> com.bytechef.commons.util.CollectionUtils.stream(connection.getTagIds()))
             .filter(Objects::nonNull)

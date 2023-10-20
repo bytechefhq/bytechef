@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
@@ -29,13 +28,13 @@ import java.util.Objects;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class ResourcesDTO {
+public class Resources {
 
     private final Map<String, String> additionalUrls;
     private final List<String> categories;
     private final String documentationUrl;
 
-    public ResourcesDTO(Resources resources) {
+    public Resources(com.bytechef.hermes.definition.Resources resources) {
         this.additionalUrls = OptionalUtils.orElse(resources.getAdditionalUrls(), Map.of());
         this.categories = OptionalUtils.orElse(resources.getCategories(), List.of());
         this.documentationUrl = Objects.requireNonNull(resources.getDocumentationUrl());
@@ -57,7 +56,7 @@ public class ResourcesDTO {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof ResourcesDTO that))
+        if (!(o instanceof Resources that))
             return false;
         return Objects.equals(additionalUrls, that.additionalUrls) && Objects.equals(categories, that.categories)
             && Objects.equals(documentationUrl, that.documentationUrl);
@@ -70,7 +69,7 @@ public class ResourcesDTO {
 
     @Override
     public String toString() {
-        return "ResourcesDTO{" +
+        return "Resources{" +
             "additionalUrls=" + additionalUrls +
             ", categories=" + categories +
             ", documentationUrl='" + documentationUrl + '\'' +

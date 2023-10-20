@@ -202,7 +202,7 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         String componentName) {
 
         return ResponseEntity.ok(
-            componentDefinitionService.getComponentDefinitions(componentName)
+            componentDefinitionService.getComponentDefinitionVersions(componentName)
                 .stream()
                 .map(componentDefinition -> conversionService.convert(
                     componentDefinition, ComponentDefinitionBasicModel.class))

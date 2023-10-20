@@ -15,35 +15,31 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property.TimeProperty;
+import com.bytechef.hermes.definition.Property;
 
-import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public class TimePropertyDTO extends ValuePropertyDTO<LocalTime> {
+public class BooleanProperty extends ValueProperty<Boolean> {
 
-    private List<OptionDTO> options;
-    private OptionsDataSourceDTO optionsDataSource;
+    private List<Option> options;
 
-    private TimePropertyDTO() {
+    private BooleanProperty() {
     }
 
-    public TimePropertyDTO(TimeProperty timeProperty) {
-        super(timeProperty);
+    public BooleanProperty(Property.BooleanProperty booleanProperty) {
+        super(booleanProperty);
 
-        this.options = CollectionUtils.map(OptionalUtils.orElse(timeProperty.getOptions(), List.of()), OptionDTO::new);
-        this.optionsDataSource = OptionalUtils.mapOrElse(
-            timeProperty.getOptionsDataSource(), OptionsDataSourceDTO::new, null);
+        this.options = CollectionUtils.map(
+            OptionalUtils.orElse(booleanProperty.getOptions(), List.of()), Option::new);
     }
 
     @Override
@@ -51,35 +47,28 @@ public class TimePropertyDTO extends ValuePropertyDTO<LocalTime> {
         return propertyVisitor.visit(this);
     }
 
-    public List<OptionDTO> getOptions() {
+    public List<Option> getOptions() {
         return Collections.unmodifiableList(options);
-    }
-
-    public Optional<OptionsDataSourceDTO> getOptionsDataSource() {
-        return Optional.ofNullable(optionsDataSource);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof TimePropertyDTO that))
+        if (!(o instanceof BooleanProperty that))
             return false;
-        if (!super.equals(o))
-            return false;
-        return Objects.equals(options, that.options) && Objects.equals(optionsDataSource, that.optionsDataSource);
+        return Objects.equals(options, that.options);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), options, optionsDataSource);
+        return Objects.hash(options);
     }
 
     @Override
     public String toString() {
-        return "TimePropertyDTO{" +
+        return "BooleanProperty{" +
             "options=" + options +
-            ", optionsDataSource=" + optionsDataSource +
             ", controlType=" + controlType +
             ", defaultValue=" + defaultValue +
             ", exampleValue=" + exampleValue +

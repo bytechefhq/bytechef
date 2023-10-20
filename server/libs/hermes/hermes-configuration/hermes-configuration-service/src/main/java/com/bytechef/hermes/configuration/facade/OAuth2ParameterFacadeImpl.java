@@ -18,7 +18,7 @@
 package com.bytechef.hermes.configuration.facade;
 
 import com.bytechef.hermes.configuration.service.OAuth2Service;
-import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
+import com.bytechef.hermes.definition.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
@@ -43,10 +43,10 @@ public class OAuth2ParameterFacadeImpl implements OAuth2ParameterFacade {
     }
 
     @Override
-    public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
+    public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName) {
 
-        return connectionDefinitionService.getOAuth2Parameters(
+        return connectionDefinitionService.getOAuth2AuthorizationParameters(
             componentName, connectionVersion,
             oAuth2Service.checkPredefinedParameters(componentName, connectionParameters),
             authorizationName);

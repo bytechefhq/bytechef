@@ -18,20 +18,20 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.dto.AnyPropertyDTO;
-import com.bytechef.hermes.definition.registry.dto.ArrayPropertyDTO;
-import com.bytechef.hermes.definition.registry.dto.BooleanPropertyDTO;
-import com.bytechef.hermes.definition.registry.dto.DatePropertyDTO;
-import com.bytechef.hermes.definition.registry.dto.DateTimePropertyDTO;
-import com.bytechef.hermes.definition.registry.dto.DynamicPropertiesPropertyDTO;
-import com.bytechef.hermes.definition.registry.dto.IntegerPropertyDTO;
-import com.bytechef.hermes.definition.registry.dto.NullPropertyDTO;
-import com.bytechef.hermes.definition.registry.dto.NumberPropertyDTO;
-import com.bytechef.hermes.definition.registry.dto.ObjectPropertyDTO;
-import com.bytechef.hermes.definition.registry.dto.OptionsDataSourceDTO;
-import com.bytechef.hermes.definition.registry.dto.PropertyDTO;
-import com.bytechef.hermes.definition.registry.dto.StringPropertyDTO;
-import com.bytechef.hermes.definition.registry.dto.TimePropertyDTO;
+import com.bytechef.hermes.definition.registry.domain.Property;
+import com.bytechef.hermes.definition.registry.domain.AnyProperty;
+import com.bytechef.hermes.definition.registry.domain.ArrayProperty;
+import com.bytechef.hermes.definition.registry.domain.BooleanProperty;
+import com.bytechef.hermes.definition.registry.domain.DateProperty;
+import com.bytechef.hermes.definition.registry.domain.DateTimeProperty;
+import com.bytechef.hermes.definition.registry.domain.DynamicPropertiesProperty;
+import com.bytechef.hermes.definition.registry.domain.IntegerProperty;
+import com.bytechef.hermes.definition.registry.domain.NullProperty;
+import com.bytechef.hermes.definition.registry.domain.NumberProperty;
+import com.bytechef.hermes.definition.registry.domain.ObjectProperty;
+import com.bytechef.hermes.definition.registry.domain.OptionsDataSource;
+import com.bytechef.hermes.definition.registry.domain.StringProperty;
+import com.bytechef.hermes.definition.registry.domain.TimeProperty;
 import com.bytechef.hermes.configuration.web.rest.model.AnyPropertyModel;
 import com.bytechef.hermes.configuration.web.rest.model.ArrayPropertyModel;
 import com.bytechef.hermes.configuration.web.rest.model.BooleanPropertyModel;
@@ -60,103 +60,103 @@ import java.util.List;
 @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
     OptionalMapper.class
 })
-public interface PropertyMapper extends Converter<PropertyDTO, PropertyModel>, PropertyDTO.PropertyVisitor {
+public interface PropertyMapper extends Converter<Property, PropertyModel>, Property.PropertyVisitor {
 
     @Override
-    default PropertyModel convert(PropertyDTO property) {
+    default PropertyModel convert(Property property) {
         return (PropertyModel) property.accept(this);
     }
 
     @Override
-    default AnyPropertyModel visit(AnyPropertyDTO anyPropertyDTO) {
-        return map(anyPropertyDTO);
+    default AnyPropertyModel visit(AnyProperty anyProperty) {
+        return map(anyProperty);
     }
 
     @Override
-    default ArrayPropertyModel visit(ArrayPropertyDTO arrayPropertyDTO) {
-        return map(arrayPropertyDTO);
+    default ArrayPropertyModel visit(ArrayProperty arrayProperty) {
+        return map(arrayProperty);
     }
 
     @Override
-    default BooleanPropertyModel visit(BooleanPropertyDTO booleanPropertyDTO) {
-        return map(booleanPropertyDTO);
+    default BooleanPropertyModel visit(BooleanProperty booleanProperty) {
+        return map(booleanProperty);
     }
 
     @Override
-    default DatePropertyModel visit(DatePropertyDTO datePropertyDTO) {
-        return map(datePropertyDTO);
+    default DatePropertyModel visit(DateProperty dateProperty) {
+        return map(dateProperty);
     }
 
     @Override
-    default DateTimePropertyModel visit(DateTimePropertyDTO dateTimePropertyDTO) {
-        return map(dateTimePropertyDTO);
+    default DateTimePropertyModel visit(DateTimeProperty dateTimeProperty) {
+        return map(dateTimeProperty);
     }
 
     @Override
-    default DynamicPropertiesPropertyModel visit(DynamicPropertiesPropertyDTO dynamicPropertiesPropertyDTO) {
-        return map(dynamicPropertiesPropertyDTO);
+    default DynamicPropertiesPropertyModel visit(DynamicPropertiesProperty dynamicPropertiesProperty) {
+        return map(dynamicPropertiesProperty);
     }
 
     @Override
-    default IntegerPropertyModel visit(IntegerPropertyDTO integerPropertyDTO) {
-        return map(integerPropertyDTO);
+    default IntegerPropertyModel visit(IntegerProperty integerProperty) {
+        return map(integerProperty);
     }
 
     @Override
-    default NullPropertyModel visit(NullPropertyDTO nullPropertyDTO) {
-        return map(nullPropertyDTO);
+    default NullPropertyModel visit(NullProperty nullProperty) {
+        return map(nullProperty);
     }
 
     @Override
-    default NumberPropertyModel visit(NumberPropertyDTO numberPropertyDTO) {
-        return map(numberPropertyDTO);
+    default NumberPropertyModel visit(NumberProperty numberProperty) {
+        return map(numberProperty);
     }
 
     @Override
-    default ObjectPropertyModel visit(ObjectPropertyDTO objectPropertyDTO) {
-        return map(objectPropertyDTO);
+    default ObjectPropertyModel visit(ObjectProperty objectProperty) {
+        return map(objectProperty);
     }
 
     @Override
-    default StringPropertyModel visit(StringPropertyDTO stringPropertyDTO) {
-        return map(stringPropertyDTO);
+    default StringPropertyModel visit(StringProperty stringProperty) {
+        return map(stringProperty);
     }
 
     @Override
-    default TimePropertyModel visit(TimePropertyDTO timePropertyDTO) {
-        return map(timePropertyDTO);
+    default TimePropertyModel visit(TimeProperty timeProperty) {
+        return map(timeProperty);
     }
 
-    AnyPropertyModel map(AnyPropertyDTO anyPropertyDTO);
+    AnyPropertyModel map(AnyProperty anyPropertyDTO);
 
-    ArrayPropertyModel map(ArrayPropertyDTO arrayProperty);
+    ArrayPropertyModel map(ArrayProperty arrayProperty);
 
-    BooleanPropertyModel map(BooleanPropertyDTO booleanProperty);
+    BooleanPropertyModel map(BooleanProperty booleanProperty);
 
-    DatePropertyModel map(DatePropertyDTO dateProperty);
+    DatePropertyModel map(DateProperty dateProperty);
 
-    DateTimePropertyModel map(DateTimePropertyDTO dateTimeProperty);
+    DateTimePropertyModel map(DateTimeProperty dateTimeProperty);
 
-    DynamicPropertiesPropertyModel map(DynamicPropertiesPropertyDTO dynamicPropertiesProperty);
+    DynamicPropertiesPropertyModel map(DynamicPropertiesProperty dynamicPropertiesProperty);
 
-    IntegerPropertyModel map(IntegerPropertyDTO integerProperty);
+    IntegerPropertyModel map(IntegerProperty integerProperty);
 
     @Mapping(target = "exampleValue", ignore = true)
     @Mapping(target = "defaultValue", ignore = true)
     @Mapping(target = "controlType", ignore = true)
-    NullPropertyModel map(NullPropertyDTO nullProperty);
+    NullPropertyModel map(NullProperty nullProperty);
 
-    NumberPropertyModel map(NumberPropertyDTO numberProperty);
+    NumberPropertyModel map(NumberProperty numberProperty);
 
-    ObjectPropertyModel map(ObjectPropertyDTO objectProperty);
+    ObjectPropertyModel map(ObjectProperty objectProperty);
 
-    OptionsDataSourceModel map(OptionsDataSourceDTO optionsDataSource);
+    OptionsDataSourceModel map(OptionsDataSource optionsDataSource);
 
-    StringPropertyModel map(StringPropertyDTO stringProperty);
+    StringPropertyModel map(StringProperty stringProperty);
 
-    TimePropertyModel map(TimePropertyDTO timeProperty);
+    TimePropertyModel map(TimeProperty timeProperty);
 
-    default List<PropertyModel> map(List<? extends PropertyDTO> properties) {
+    default List<PropertyModel> map(List<? extends Property> properties) {
         if (CollectionUtils.isEmpty(properties)) {
             return Collections.emptyList();
         } else {

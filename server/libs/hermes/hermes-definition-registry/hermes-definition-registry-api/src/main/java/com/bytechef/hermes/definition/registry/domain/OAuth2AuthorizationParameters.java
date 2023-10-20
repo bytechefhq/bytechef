@@ -15,25 +15,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.service;
+package com.bytechef.hermes.definition.registry.domain;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public class TaskDispatcherDefinitionServiceTest {
-
-    @Disabled
-    @Test
-    public void testGetTaskDispatcherDefinition() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    public void testGetTaskDispatcherDefinitions() {
-        // TODO
-    }
+@SuppressFBWarnings("EI")
+public record OAuth2AuthorizationParameters(String authorizationUrl, String clientId, List<String> scopes) {
 }

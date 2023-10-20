@@ -18,7 +18,7 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionModel;
 import org.mapstruct.Mapper;
@@ -34,20 +34,20 @@ public class ConnectionDefinitionMapper {
         OptionalMapper.class
     })
     public interface ConnectionDefinitionToConnectionDefinitionModelMapper
-        extends Converter<ConnectionDefinitionDTO, ConnectionDefinitionModel> {
+        extends Converter<ConnectionDefinition, ConnectionDefinitionModel> {
 
         @Override
         @Mapping(target = "baseUri", ignore = true)
-        ConnectionDefinitionModel convert(ConnectionDefinitionDTO connectionDefinitionDTO);
+        ConnectionDefinitionModel convert(ConnectionDefinition connectionDefinition);
     }
 
     @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
         OptionalMapper.class
     })
     public interface ConnectionDefinitionToConnectionDefinitionBasicModelMapper
-        extends Converter<ConnectionDefinitionDTO, ConnectionDefinitionBasicModel> {
+        extends Converter<ConnectionDefinition, ConnectionDefinitionBasicModel> {
 
         @Override
-        ConnectionDefinitionBasicModel convert(ConnectionDefinitionDTO connectionDefinitionDTO);
+        ConnectionDefinitionBasicModel convert(ConnectionDefinition connectionDefinition);
     }
 }

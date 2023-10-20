@@ -15,15 +15,31 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import java.util.List;
+import com.bytechef.hermes.definition.Property;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
-public record OAuth2AuthorizationParametersDTO(String authorizationUrl, String clientId, List<String> scopes) {
+public class NullProperty extends ValueProperty<Void> {
+
+    private NullProperty() {
+    }
+
+    public NullProperty(Property.NullProperty nullProperty) {
+        super(nullProperty);
+    }
+
+    @Override
+    public Object accept(PropertyVisitor propertyVisitor) {
+        return propertyVisitor.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return "NullProperty{" +
+            "controlType=" + controlType +
+            "} ";
+    }
 }

@@ -22,7 +22,6 @@ import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.context.factory.ContextConnectionFactory;
 import com.bytechef.hermes.component.context.factory.ContextFactory;
-import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
@@ -33,19 +32,17 @@ import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSch
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
 import com.bytechef.hermes.definition.DynamicOptionsProperty;
-import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.OptionsDataSource;
 import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
-import com.bytechef.hermes.definition.Property.ValueProperty;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.util.ComponentContextSupplier;
-import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.ActionDefinition;
 import com.bytechef.hermes.definition.registry.component.util.CustomActionUtils;
 import com.bytechef.hermes.definition.registry.component.ComponentOperation;
-import com.bytechef.hermes.definition.registry.dto.OptionDTO;
-import com.bytechef.hermes.definition.registry.dto.PropertyDTO;
-import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
+import com.bytechef.hermes.definition.registry.domain.Property;
+import com.bytechef.hermes.definition.registry.domain.Option;
+import com.bytechef.hermes.definition.registry.domain.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;
@@ -73,7 +70,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
+    public List<? extends ValueProperty<?>> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, Long connectionId, Map<String, ?> connectionParameters,
         String authorizationName) {
@@ -84,13 +81,14 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return ComponentContextSupplier.get(
             getActionContext(componentName, connectionId),
             () -> {
-                List<? extends ValueProperty<?>> valueProperties = propertiesFunction.apply(
-                    contextConnectionFactory.createConnection(
-                        componentName, componentVersion, connectionParameters, authorizationName),
-                    actionParameters);
+                List<? extends com.bytechef.hermes.definition.Property.ValueProperty<?>> valueProperties =
+                    propertiesFunction.apply(
+                        contextConnectionFactory.createConnection(
+                            componentName, componentVersion, connectionParameters, authorizationName),
+                        actionParameters);
 
                 return valueProperties.stream()
-                    .map(valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty))
+                    .map(valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty))
                     .toList();
             });
     }
@@ -112,7 +110,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public List<OptionDTO> executeOptions(
+    public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, String searchText, Long connectionId, Map<String, ?> connectionParameters,
         String authorizationName) {
@@ -123,19 +121,19 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return ComponentContextSupplier.get(
             getActionContext(componentName, connectionId),
             () -> {
-                List<Option<?>> options = optionsFunction.apply(
+                List<com.bytechef.hermes.definition.Option<?>> options = optionsFunction.apply(
                     contextConnectionFactory.createConnection(
                         componentName, componentVersion, connectionParameters, authorizationName),
                     actionParameters, searchText);
 
                 return options.stream()
-                    .map(OptionDTO::new)
+                    .map(Option::new)
                     .toList();
             });
     }
 
     @Override
-    public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
+    public List<? extends ValueProperty<?>> executeOutputSchema(
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         Long connectionId, Map<String, ?> connectionParameters, String authorizationName) {
 
@@ -145,7 +143,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return ComponentContextSupplier.get(
             getActionContext(componentName, connectionId),
             () -> {
-                return PropertyDTO.toPropertyDTO(
+                return Property.toProperty(
                     outputSchemaFunction.apply(
                         contextConnectionFactory.createConnection(
                             componentName, componentVersion, connectionParameters, authorizationName),
@@ -158,7 +156,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         String componentName, int componentVersion, String actionName, long taskExecutionId,
         Map<String, ?> inputParameters, Map<String, Long> connectionIdMap) {
 
-        ActionDefinition actionDefinition = resolveActionDefinition(componentName, componentVersion, actionName);
+        com.bytechef.hermes.component.definition.ActionDefinition actionDefinition =
+            resolveActionDefinition(componentName, componentVersion, actionName);
         ActionContext context = contextFactory.createActionContext(connectionIdMap, taskExecutionId);
 
         return ComponentContextSupplier.get(
@@ -184,33 +183,32 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public ActionDefinitionDTO getActionDefinition(String componentName, int componentVersion, String actionName) {
-        return toActionDefinitionDTO(resolveActionDefinition(componentName, componentVersion, actionName));
+    public ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName) {
+        return new ActionDefinition(resolveActionDefinition(componentName, componentVersion, actionName));
     }
 
     @Override
-    public List<ActionDefinitionDTO> getActionDefinitions(String componentName, int componentVersion) {
+    public List<ActionDefinition> getActionDefinitions(String componentName, int componentVersion) {
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
 
-        List<ActionDefinitionDTO> actionDefinitionDTOs =
+        List<ActionDefinition> actions =
             componentDefinitionRegistry.getActionDefinitions(componentName, componentVersion)
                 .stream()
-                .map(this::toActionDefinitionDTO)
+                .map(ActionDefinition::new)
                 .toList();
 
         if (OptionalUtils.orElse(componentDefinition.getCustomAction(), false)) {
-            actionDefinitionDTOs = new ArrayList<>(actionDefinitionDTOs);
+            actions = new ArrayList<>(actions);
 
-            actionDefinitionDTOs.add(
-                toActionDefinitionDTO(CustomActionUtils.getCustomActionDefinition(componentDefinition)));
+            actions.add(new ActionDefinition(CustomActionUtils.getCustomActionDefinition(componentDefinition)));
         }
 
-        return actionDefinitionDTOs;
+        return actions;
     }
 
     @Override
-    public List<ActionDefinitionDTO> getActionDefinitions(List<ComponentOperation> componentOperations) {
+    public List<ActionDefinition> getActionDefinitions(List<ComponentOperation> componentOperations) {
         return componentOperations.stream()
             .map(componentOperation -> getActionDefinition(
                 componentOperation.componentName(), componentOperation.componentVersion(),
@@ -253,8 +251,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
 
-        ActionDefinition actionDefinition = componentDefinitionRegistry.getActionDefinition(
-            componentName, componentVersion, actionName);
+        com.bytechef.hermes.component.definition.ActionDefinition actionDefinition =
+            componentDefinitionRegistry.getActionDefinition(
+                componentName, componentVersion, actionName);
 
         getActionDefinition(componentName, componentVersion, actionName);
 
@@ -270,8 +269,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     private OutputSchemaFunction
         getOutputSchemaFunction(String componentName, int componentVersion, String actionName) {
-        ActionDefinition actionDefinition = componentDefinitionRegistry.getActionDefinition(
-            componentName, componentVersion, actionName);
+        com.bytechef.hermes.component.definition.ActionDefinition actionDefinition =
+            componentDefinitionRegistry.getActionDefinition(
+                componentName, componentVersion, actionName);
 
         OutputSchemaDataSource outputSchemaDataSource = OptionalUtils.get(actionDefinition.getOutputSchemaDataSource());
 
@@ -280,8 +280,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     private SampleOutputFunction
         getSampleOutputFunction(String componentName, int componentVersion, String actionName) {
-        ActionDefinition actionDefinition = componentDefinitionRegistry.getActionDefinition(
-            componentName, componentVersion, actionName);
+        com.bytechef.hermes.component.definition.ActionDefinition actionDefinition =
+            componentDefinitionRegistry.getActionDefinition(
+                componentName, componentVersion, actionName);
 
         SampleOutputDataSource sampleOutputDataSource = OptionalUtils.get(
             actionDefinition.getSampleOutputDataSource());
@@ -289,8 +290,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return sampleOutputDataSource.getSampleOutput();
     }
 
-    private ActionDefinition resolveActionDefinition(String componentName, int componentVersion, String actionName) {
-        ActionDefinition actionDefinition;
+    private com.bytechef.hermes.component.definition.ActionDefinition resolveActionDefinition(
+        String componentName, int componentVersion, String actionName) {
+
+        com.bytechef.hermes.component.definition.ActionDefinition actionDefinition;
 
         if (Objects.equals(actionName, CustomActionUtils.CUSTOM)) {
             ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
@@ -303,9 +306,5 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         }
 
         return actionDefinition;
-    }
-
-    private ActionDefinitionDTO toActionDefinitionDTO(ActionDefinition actionDefinition) {
-        return new ActionDefinitionDTO(actionDefinition);
     }
 }

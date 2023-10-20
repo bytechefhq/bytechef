@@ -18,7 +18,7 @@
 package com.bytechef.hermes.definition.registry.remote.client.service;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
-import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.TaskDispatcherDefinition;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
@@ -38,33 +38,33 @@ public class TaskDispatcherDefinitionServiceClient implements TaskDispatcherDefi
     }
 
     @Override
-    public TaskDispatcherDefinitionDTO getTaskDispatcherDefinition(String name, Integer version) {
+    public TaskDispatcherDefinition getTaskDispatcherDefinition(String name, Integer version) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("coordinator-service-app")
                 .path(
                     "/api/internal/task-dispatcher-definition-service/get-task-dispatcher-definition/{name}/{version}")
                 .build(name, version),
-            new ParameterizedTypeReference<TaskDispatcherDefinitionDTO>() {});
+            new ParameterizedTypeReference<>() {});
     }
 
     @Override
-    public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitions() {
+    public List<TaskDispatcherDefinition> getTaskDispatcherDefinitions() {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("coordinator-service-app")
                 .path("/api/internal/task-dispatcher-definition-service/get-task-dispatcher-definitions")
                 .build(),
-            new ParameterizedTypeReference<List<TaskDispatcherDefinitionDTO>>() {});
+            new ParameterizedTypeReference<>() {});
     }
 
     @Override
-    public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitionVersions(String name) {
+    public List<TaskDispatcherDefinition> getTaskDispatcherDefinitionVersions(String name) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("coordinator-service-app")
                 .path("/api/internal/task-dispatcher-definition-service/get-task-dispatcher-definition-versions/{name}")
                 .build(name),
-            new ParameterizedTypeReference<List<TaskDispatcherDefinitionDTO>>() {});
+            new ParameterizedTypeReference<>() {});
     }
 }

@@ -30,8 +30,8 @@ import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistryImpl;
 import com.bytechef.hermes.component.context.factory.ContextFactory;
-import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
-import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
+import com.bytechef.hermes.definition.registry.domain.ConnectionDefinition;
+import com.bytechef.hermes.definition.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
@@ -131,8 +131,7 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     TriggerDefinitionFacade triggerDefinitionFacade(
-        ConnectionService connectionService,
-        TriggerDefinitionService triggerDefinitionService,
+        ConnectionService connectionService, TriggerDefinitionService triggerDefinitionService,
         @Value("bytechef.webhookUrl") String webhookUrl) {
 
         return new TriggerDefinitionFacadeImpl(
@@ -204,13 +203,13 @@ public class DefinitionRegistryConfiguration {
          * Called from the Context.Connection instance.
          */
         @Override
-        public Optional<String> executeFetchBaseUri(
+        public Optional<String> executeBaseUri(
             String componentName, int connectionVersion, Map<String, ?> connectionParameters) {
             if (connectionDefinitionService.connectionExists(componentName, connectionVersion)) {
-                return connectionDefinitionService.executeFetchBaseUri(
+                return connectionDefinitionService.executeBaseUri(
                     componentName, connectionVersion, connectionParameters);
             } else {
-                return connectionDefinitionServiceClient.executeFetchBaseUri(
+                return connectionDefinitionServiceClient.executeBaseUri(
                     componentName, connectionVersion, connectionParameters);
             }
         }
@@ -224,26 +223,26 @@ public class DefinitionRegistryConfiguration {
         }
 
         @Override
-        public ConnectionDefinitionDTO getConnectionDefinition(String componentName, int componentVersion) {
+        public ConnectionDefinition getConnectionDefinition(String componentName, int componentVersion) {
             return connectionDefinitionService.getConnectionDefinition(componentName, componentVersion);
         }
 
         @Override
-        public List<ConnectionDefinitionDTO> getConnectionDefinitions(String componentName, Integer componentVersion) {
+        public List<ConnectionDefinition> getConnectionDefinitions(String componentName, Integer componentVersion) {
             return connectionDefinitionService.getConnectionDefinitions(componentName, componentVersion);
         }
 
         @Override
-        public List<ConnectionDefinitionDTO> getConnectionDefinitions() {
+        public List<ConnectionDefinition> getConnectionDefinitions() {
             return connectionDefinitionService.getConnectionDefinitions();
         }
 
         @Override
-        public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
+        public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
             String componentName, int connectionVersion, Map<String, ?> connectionParameters,
             String authorizationName) {
 
-            return connectionDefinitionService.getOAuth2Parameters(
+            return connectionDefinitionService.getOAuth2AuthorizationParameters(
                 componentName, connectionVersion, connectionParameters, authorizationName);
         }
     }

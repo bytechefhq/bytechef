@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.facade;
 
-import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.ComponentDefinition;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ import java.util.List;
  */
 public interface ComponentDefinitionFacade {
 
-    List<ComponentDefinitionDTO> getComponentDefinitions(
+    List<ComponentDefinition> getComponentDefinitions(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
         Boolean triggerDefinitions, List<String> include);
 }

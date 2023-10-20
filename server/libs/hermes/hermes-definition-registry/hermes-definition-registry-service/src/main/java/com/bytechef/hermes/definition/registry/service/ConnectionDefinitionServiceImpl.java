@@ -28,10 +28,9 @@ import com.bytechef.hermes.component.definition.Authorization.ClientIdFunction;
 import com.bytechef.hermes.component.definition.Authorization.PkceFunction;
 import com.bytechef.hermes.component.definition.Authorization.ScopesFunction;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
-import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
-import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
+import com.bytechef.hermes.definition.registry.domain.ConnectionDefinition;
+import com.bytechef.hermes.definition.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.definition.registry.util.AuthorizationUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -106,13 +105,13 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public Optional<String> executeFetchBaseUri(
+    public Optional<String> executeBaseUri(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters) {
 
-        ConnectionDefinition connectionDefinition = componentDefinitionRegistry.getComponentConnectionDefinition(
-            componentName, connectionVersion);
+        com.bytechef.hermes.component.definition.ConnectionDefinition connectionDefinition =
+            componentDefinitionRegistry.getComponentConnectionDefinition(componentName, connectionVersion);
 
-        ConnectionDefinition.BaseUriFunction baseUriFunction =
+        com.bytechef.hermes.component.definition.ConnectionDefinition.BaseUriFunction baseUriFunction =
             OptionalUtils.orElse(connectionDefinition.getBaseUri(), AuthorizationUtils::getDefaultBaseUri);
 
         return Optional.ofNullable(baseUriFunction.apply(connectionParameters));
@@ -129,27 +128,27 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public ConnectionDefinitionDTO getConnectionDefinition(
+    public ConnectionDefinition getConnectionDefinition(
         String componentName, int componentVersion) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
 
-        return toConnectionDefinitionDTO(OptionalUtils.get(componentDefinition.getConnection()));
+        return new ConnectionDefinition(OptionalUtils.get(componentDefinition.getConnection()));
     }
 
     @Override
-    public List<ConnectionDefinitionDTO> getConnectionDefinitions() {
+    public List<ConnectionDefinition> getConnectionDefinitions() {
         return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
             .filter(componentDefinition -> OptionalUtils.isPresent(componentDefinition.getConnection()))
-            .map(componentDefinition -> toConnectionDefinitionDTO(
+            .map(componentDefinition -> new ConnectionDefinition(
                 OptionalUtils.get(componentDefinition.getConnection())))
             .toList();
     }
 
     @Override
-    public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
+    public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters,
         String authorizationName) {
 
@@ -163,21 +162,17 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         ScopesFunction scopesFunction = OptionalUtils.orElse(
             authorization.getScopes(), AuthorizationUtils::getDefaultScopes);
 
-        return new OAuth2AuthorizationParametersDTO(
+        return new OAuth2AuthorizationParameters(
             authorizationUrlFunction.apply(connectionParameters),
             clientIdFunction.apply(connectionParameters),
             scopesFunction.apply(connectionParameters));
     }
 
     @Override
-    public List<ConnectionDefinitionDTO> getConnectionDefinitions(String componentName, Integer componentVersion) {
+    public List<ConnectionDefinition> getConnectionDefinitions(String componentName, Integer componentVersion) {
         return componentDefinitionRegistry.getConnectionDefinitions(componentName, componentVersion)
             .stream()
-            .map(this::toConnectionDefinitionDTO)
+            .map(ConnectionDefinition::new)
             .toList();
-    }
-
-    private ConnectionDefinitionDTO toConnectionDefinitionDTO(ConnectionDefinition connectionDefinition) {
-        return new ConnectionDefinitionDTO(connectionDefinition);
     }
 }

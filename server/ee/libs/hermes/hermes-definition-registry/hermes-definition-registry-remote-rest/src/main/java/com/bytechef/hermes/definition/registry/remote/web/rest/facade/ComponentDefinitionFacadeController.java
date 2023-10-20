@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.remote.web.rest.facade;
 
-import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +48,7 @@ public class ComponentDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<ComponentDefinitionDTO>> getComponentDefinitions(
+    public ResponseEntity<List<ComponentDefinition>> getComponentDefinitions(
         @RequestParam(value = "actionDefinitions", required = false) Boolean actionDefinitions,
         @RequestParam(value = "connectionDefinitions", required = false) Boolean connectionDefinitions,
         @RequestParam(value = "connectionInstances", required = false) Boolean connectionInstances,

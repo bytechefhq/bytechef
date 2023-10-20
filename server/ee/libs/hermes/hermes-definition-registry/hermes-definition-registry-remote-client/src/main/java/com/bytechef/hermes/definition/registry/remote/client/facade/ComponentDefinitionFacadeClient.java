@@ -19,7 +19,7 @@ package com.bytechef.hermes.definition.registry.remote.client.facade;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.commons.webclient.DefaultWebClient;
-import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.remote.client.AbstractWorkerClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,7 +45,7 @@ public class ComponentDefinitionFacadeClient extends AbstractWorkerClient implem
     }
 
     @Override
-    public List<ComponentDefinitionDTO> getComponentDefinitions(
+    public List<ComponentDefinition> getComponentDefinitions(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
         Boolean triggerDefinitions, List<String> include) {
 
@@ -54,7 +54,7 @@ public class ComponentDefinitionFacadeClient extends AbstractWorkerClient implem
                 .stream()
                 .map(serviceInstance -> defaultWebClient.getMono(
                     uriBuilder -> toUri(
-                        uriBuilder, serviceInstance, "/component-definition-facade/get-component-definitions", Map.of(),
+                        uriBuilder, serviceInstance, "/component-definition-facade/get-components", Map.of(),
                         new LinkedMultiValueMap<>() {
                             {
                                 if (actionDefinitions != null) {
@@ -74,16 +74,16 @@ public class ComponentDefinitionFacadeClient extends AbstractWorkerClient implem
                                 }
                             }
                         }),
-                    new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
+                    new ParameterizedTypeReference<List<ComponentDefinition>>() {}))
                 .toList(),
             this::toComponentDefinitions)
             .block();
     }
 
     @SuppressWarnings("unchecked")
-    private List<ComponentDefinitionDTO> toComponentDefinitions(Object[] objectArray) {
+    private List<ComponentDefinition> toComponentDefinitions(Object[] objectArray) {
         return Arrays.stream(objectArray)
-            .map(object -> (List<ComponentDefinitionDTO>) object)
+            .map(object -> (List<ComponentDefinition>) object)
             .flatMap(Collection::stream)
             .distinct()
             .toList();

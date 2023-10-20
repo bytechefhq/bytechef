@@ -27,13 +27,13 @@ public class ActionDefinitionServiceTest {
 
     @Disabled
     @Test
-    public void testGetComponentActionDefinitionMono() {
+    public void testGetComponentActionDefinition() {
         // TODO
     }
 
     @Disabled
     @Test
-    public void testGetComponentActionDefinitionsMono() {
+    public void testGetComponentActionDefinitions() {
         // TODO
     }
 }

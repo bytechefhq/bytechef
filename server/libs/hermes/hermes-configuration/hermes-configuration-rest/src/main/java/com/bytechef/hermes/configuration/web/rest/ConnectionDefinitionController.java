@@ -50,7 +50,7 @@ public class ConnectionDefinitionController implements ConnectionDefinitionsApi 
 
         return ResponseEntity.ok(
             conversionService.convert(
-                oAuth2ParameterFacade.getOAuth2Parameters(
+                oAuth2ParameterFacade.getOAuth2AuthorizationParameters(
                     parametersRequestModel.getComponentName(), parametersRequestModel.getConnectionVersion(),
                     parametersRequestModel.getParameters(), parametersRequestModel.getAuthorizationName()),
                 OAuth2AuthorizationParametersModel.class));

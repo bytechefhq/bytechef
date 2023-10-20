@@ -20,8 +20,8 @@ package com.bytechef.hermes.component.context.factory;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.context.ContextConnectionImpl;
-import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
-import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionBasicDTO;
+import com.bytechef.hermes.definition.registry.domain.ComponentDefinition;
+import com.bytechef.hermes.definition.registry.domain.ConnectionDefinitionBasic;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 
@@ -47,14 +47,13 @@ public class ContextConnectionFactoryImpl implements ContextConnectionFactory {
     public Connection createConnection(
         String componentName, int componentVersion, Map<String, ?> connectionParameters, String authorizationName) {
 
-        ComponentDefinitionDTO componentDefinitionDTO = componentDefinitionService.getComponentDefinition(
+        ComponentDefinition component = componentDefinitionService.getComponentDefinition(
             componentName, componentVersion);
 
-        ConnectionDefinitionBasicDTO connectionDefinitionBasicDTO = OptionalUtils.get(
-            componentDefinitionDTO.getConnection());
+        ConnectionDefinitionBasic connectionDefinitionBasic = OptionalUtils.get(component.getConnection());
 
         return new ContextConnectionImpl(
-            componentName, connectionDefinitionBasicDTO.getVersion(), connectionParameters, authorizationName,
+            componentName, connectionDefinitionBasic.getVersion(), connectionParameters, authorizationName,
             connectionDefinitionService);
     }
 }

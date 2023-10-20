@@ -18,8 +18,8 @@
 package com.bytechef.hermes.definition.registry.facade;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.hermes.definition.registry.dto.OptionDTO;
-import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
+import com.bytechef.hermes.definition.registry.domain.Option;
+import com.bytechef.hermes.definition.registry.domain.ValueProperty;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public interface TriggerDefinitionFacade {
 
-    List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
+    List<? extends ValueProperty<?>> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, Object> triggerParameters, Long connectionId);
 
@@ -53,11 +53,11 @@ public interface TriggerDefinitionFacade {
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         String workflowExecutionId, Long connectionId);
 
-    List<OptionDTO> executeOptions(
+    List<Option> executeOptions(
         String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, ?> triggerParameters, Long connectionId, String searchText);
 
-    List<? extends ValuePropertyDTO<?>> executeOutputSchema(
+    List<? extends ValueProperty<?>> executeOutputSchema(
         String componentName, int componentVersion, String triggerName, Map<String, ?> triggerParameters,
         Long connectionId);
 

@@ -17,10 +17,10 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.ActionDefinition;
 import com.bytechef.hermes.definition.registry.component.ComponentOperation;
-import com.bytechef.hermes.definition.registry.dto.OptionDTO;
-import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
+import com.bytechef.hermes.definition.registry.domain.Option;
+import com.bytechef.hermes.definition.registry.domain.ValueProperty;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public interface ActionDefinitionService {
 
-    List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
+    List<? extends ValueProperty<?>> executeDynamicProperties(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, Long connectionId, Map<String, ?> connectionParameters,
         String authorizationName);
@@ -39,12 +39,12 @@ public interface ActionDefinitionService {
         String componentName, int componentVersion, String actionName, Map<String, ?> actionParameters,
         Long connectionId, Map<String, ?> connectionParameters, String authorizationName);
 
-    List<OptionDTO> executeOptions(
+    List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, String searchText, Long connectionId, Map<String, ?> connectionParameters,
         String authorizationName);
 
-    List<? extends ValuePropertyDTO<?>> executeOutputSchema(
+    List<? extends ValueProperty<?>> executeOutputSchema(
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         Long connectionId, Map<String, ?> connectionParameters, String authorizationName);
 
@@ -56,9 +56,9 @@ public interface ActionDefinitionService {
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         Long connectionId, Map<String, ?> connectionParameters, String authorizationName);
 
-    ActionDefinitionDTO getActionDefinition(String componentName, int componentVersion, String actionName);
+    ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName);
 
-    List<ActionDefinitionDTO> getActionDefinitions(String componentName, int componentVersion);
+    List<ActionDefinition> getActionDefinitions(String componentName, int componentVersion);
 
-    List<ActionDefinitionDTO> getActionDefinitions(List<ComponentOperation> componentOperations);
+    List<ActionDefinition> getActionDefinitions(List<ComponentOperation> componentOperations);
 }

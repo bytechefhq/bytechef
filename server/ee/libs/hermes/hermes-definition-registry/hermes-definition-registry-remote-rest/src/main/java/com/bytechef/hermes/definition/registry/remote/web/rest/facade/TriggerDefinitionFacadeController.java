@@ -18,8 +18,8 @@
 package com.bytechef.hermes.definition.registry.remote.web.rest.facade;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.hermes.definition.registry.dto.OptionDTO;
-import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
+import com.bytechef.hermes.definition.registry.domain.Option;
+import com.bytechef.hermes.definition.registry.domain.ValueProperty;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
@@ -144,7 +144,7 @@ public class TriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public List<OptionDTO> executeOptions(@Valid @RequestBody OptionsRequest optionsRequest) {
+    public List<Option> executeOptions(@Valid @RequestBody OptionsRequest optionsRequest) {
         return triggerDefinitionFacade.executeOptions(
             optionsRequest.componentName, optionsRequest.componentVersion, optionsRequest.triggerName,
             optionsRequest.propertyName, optionsRequest.triggerParameters, optionsRequest.connectionId,
@@ -160,7 +160,7 @@ public class TriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public List<? extends ValuePropertyDTO<?>>
+    public List<? extends ValueProperty<?>>
         executeProperties(@Valid @RequestBody PropertiesRequest propertiesRequest) {
         return triggerDefinitionFacade.executeDynamicProperties(
             propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.triggerName,
@@ -176,7 +176,7 @@ public class TriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
+    public List<? extends ValueProperty<?>> executeOutputSchema(
         @Valid @RequestBody TriggerDefinitionFacadeController.OutputSchemaRequest outputSchemaRequest) {
 
         return triggerDefinitionFacade.executeOutputSchema(

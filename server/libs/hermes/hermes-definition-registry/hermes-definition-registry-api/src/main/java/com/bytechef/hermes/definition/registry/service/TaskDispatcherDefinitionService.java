@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
+import com.bytechef.hermes.definition.registry.domain.TaskDispatcherDefinition;
 
 import java.util.List;
 
@@ -26,9 +26,9 @@ import java.util.List;
  */
 public interface TaskDispatcherDefinitionService {
 
-    TaskDispatcherDefinitionDTO getTaskDispatcherDefinition(String name, Integer version);
+    TaskDispatcherDefinition getTaskDispatcherDefinition(String name, Integer version);
 
-    List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitions();
+    List<TaskDispatcherDefinition> getTaskDispatcherDefinitions();
 
-    List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitionVersions(String name);
+    List<TaskDispatcherDefinition> getTaskDispatcherDefinitionVersions(String name);
 }

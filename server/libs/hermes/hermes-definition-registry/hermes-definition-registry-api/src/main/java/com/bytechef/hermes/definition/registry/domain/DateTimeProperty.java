@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property.StringProperty;
-import com.bytechef.hermes.definition.Property.StringProperty.SampleDataType;
+import com.bytechef.hermes.definition.Property;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -30,23 +30,21 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public class StringPropertyDTO extends ValuePropertyDTO<String> {
+public class DateTimeProperty extends ValueProperty<LocalDateTime> {
 
-    private List<OptionDTO> options;
-    private OptionsDataSourceDTO optionsDataSource;
-    private SampleDataType sampleDataType;
+    private List<Option> options;
+    private OptionsDataSource optionsDataSource;
 
-    private StringPropertyDTO() {
+    private DateTimeProperty() {
     }
 
-    public StringPropertyDTO(StringProperty stringProperty) {
-        super(stringProperty);
+    public DateTimeProperty(Property.DateTimeProperty dateTimeProperty) {
+        super(dateTimeProperty);
 
         this.options = CollectionUtils.map(
-            OptionalUtils.orElse(stringProperty.getOptions(), List.of()), OptionDTO::new);
+            OptionalUtils.orElse(dateTimeProperty.getOptions(), List.of()), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
-            stringProperty.getOptionsDataSource(), OptionsDataSourceDTO::new, null);
-        this.sampleDataType = OptionalUtils.orElse(stringProperty.getSampleDataType(), SampleDataType.JSON);
+            dateTimeProperty.getOptionsDataSource(), OptionsDataSource::new, null);
     }
 
     @Override
@@ -54,41 +52,33 @@ public class StringPropertyDTO extends ValuePropertyDTO<String> {
         return propertyVisitor.visit(this);
     }
 
-    public List<OptionDTO> getOptions() {
+    public List<Option> getOptions() {
         return Collections.unmodifiableList(options);
     }
 
-    public Optional<OptionsDataSourceDTO> getOptionsDataSource() {
+    public Optional<OptionsDataSource> getOptionsDataSource() {
         return Optional.ofNullable(optionsDataSource);
-    }
-
-    public SampleDataType getSampleDataType() {
-        return sampleDataType;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof StringPropertyDTO that))
+        if (!(o instanceof DateTimeProperty that))
             return false;
-        if (!super.equals(o))
-            return false;
-        return Objects.equals(options, that.options) && Objects.equals(optionsDataSource, that.optionsDataSource)
-            && sampleDataType == that.sampleDataType;
+        return Objects.equals(options, that.options) && Objects.equals(optionsDataSource, that.optionsDataSource);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), options, optionsDataSource, sampleDataType);
+        return Objects.hash(options, optionsDataSource);
     }
 
     @Override
     public String toString() {
-        return "StringPropertyDTO{" +
+        return "DateTimeProperty{" +
             "options=" + options +
             ", optionsDataSource=" + optionsDataSource +
-            ", sampleDataType=" + sampleDataType +
             ", controlType=" + controlType +
             ", defaultValue=" + defaultValue +
             ", exampleValue=" + exampleValue +

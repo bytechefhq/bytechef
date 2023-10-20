@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.dto;
+package com.bytechef.hermes.definition.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property.NumberProperty;
+import com.bytechef.hermes.definition.Property;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,27 +29,27 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public class NumberPropertyDTO extends ValuePropertyDTO<Double> {
+public class NumberProperty extends ValueProperty<Double> {
 
     private Integer maxValue;
     private Integer minValue;
     private Integer numberPrecision;
-    private List<OptionDTO> options;
-    private OptionsDataSourceDTO optionsDataSource;
+    private List<Option> options;
+    private OptionsDataSource optionsDataSource;
 
-    private NumberPropertyDTO() {
+    private NumberProperty() {
     }
 
-    public NumberPropertyDTO(NumberProperty numberProperty) {
+    public NumberProperty(Property.NumberProperty numberProperty) {
         super(numberProperty);
 
         this.maxValue = OptionalUtils.orElse(numberProperty.getMaxValue(), null);
         this.minValue = OptionalUtils.orElse(numberProperty.getMinValue(), null);
         this.numberPrecision = OptionalUtils.orElse(numberProperty.getNumberPrecision(), null);
         this.options = CollectionUtils.map(
-            OptionalUtils.orElse(numberProperty.getOptions(), List.of()), OptionDTO::new);
+            OptionalUtils.orElse(numberProperty.getOptions(), List.of()), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
-            numberProperty.getOptionsDataSource(), OptionsDataSourceDTO::new, null);
+            numberProperty.getOptionsDataSource(), OptionsDataSource::new, null);
     }
 
     @Override
@@ -69,11 +69,11 @@ public class NumberPropertyDTO extends ValuePropertyDTO<Double> {
         return Optional.ofNullable(numberPrecision);
     }
 
-    public List<OptionDTO> getOptions() {
+    public List<Option> getOptions() {
         return Collections.unmodifiableList(options);
     }
 
-    public Optional<OptionsDataSourceDTO> getOptionsDataSource() {
+    public Optional<OptionsDataSource> getOptionsDataSource() {
         return Optional.ofNullable(optionsDataSource);
     }
 
@@ -81,7 +81,7 @@ public class NumberPropertyDTO extends ValuePropertyDTO<Double> {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof NumberPropertyDTO that))
+        if (!(o instanceof NumberProperty that))
             return false;
         return Objects.equals(maxValue, that.maxValue) && Objects.equals(minValue, that.minValue)
             && Objects.equals(numberPrecision, that.numberPrecision) && Objects.equals(options, that.options)
@@ -95,7 +95,7 @@ public class NumberPropertyDTO extends ValuePropertyDTO<Double> {
 
     @Override
     public String toString() {
-        return "NumberPropertyDTO{" +
+        return "NumberProperty{" +
             "maxValue=" + maxValue +
             ", minValue=" + minValue +
             ", numberPrecision=" + numberPrecision +
