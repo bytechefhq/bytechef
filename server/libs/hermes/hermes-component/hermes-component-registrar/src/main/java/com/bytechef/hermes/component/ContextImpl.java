@@ -24,9 +24,9 @@ import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.event.TaskProgressedWorkflowEvent;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacade;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.InputStream;
 import java.util.Optional;
@@ -36,20 +36,20 @@ import java.util.Optional;
  */
 public class ContextImpl implements Context {
 
-    private final ConnectionDefinitionFacade connectionDefinitionFacade;
+    private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
     private final TaskExecution taskExecution;
 
     public ContextImpl(
-        ConnectionDefinitionFacade connectionDefinitionFacade,
+        ConnectionDefinitionService connectionDefinitionService,
         ConnectionService connectionService,
         EventPublisher eventPublisher,
         FileStorageService fileStorageService,
         TaskExecution taskExecution) {
 
-        this.connectionDefinitionFacade = connectionDefinitionFacade;
+        this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
@@ -66,13 +66,16 @@ public class ContextImpl implements Context {
     @Override
     public void applyConnectionAuthorization(Authorization.AuthorizationContext authorizationContext) {
         fetchConnectionId()
-            .ifPresent(connection -> connectionDefinitionFacade.applyAuthorization(connection, authorizationContext));
+            .map(connectionService::getConnection)
+            .ifPresent(
+                connection -> connectionDefinitionService.executeAuthorizationApply(connection, authorizationContext));
     }
 
     @Override
     public Optional<String> fetchConnectionBaseUri() {
         return fetchConnectionId()
-            .flatMap(connectionDefinitionFacade::fetchBaseUri);
+            .map(connectionService::getConnection)
+            .flatMap(connectionDefinitionService::fetchBaseUri);
     }
 
     @Override
@@ -102,7 +105,7 @@ public class ContextImpl implements Context {
         try {
             return getFileEntry(fileStorageService.storeFileContent(fileName, inputStream));
         } catch (Exception exception) {
-            throw new ActionExecutionException("Unable to store file " + fileName, exception);
+            throw new ComponentExecutionException("Unable to store file " + fileName, exception);
         }
     }
 

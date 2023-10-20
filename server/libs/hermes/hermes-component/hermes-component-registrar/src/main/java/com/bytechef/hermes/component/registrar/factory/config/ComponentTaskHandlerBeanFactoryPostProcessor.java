@@ -18,7 +18,6 @@
 package com.bytechef.hermes.component.registrar.factory.config;
 
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.definition.registry.ComponentDefinitionAccessor;
 import com.bytechef.hermes.component.registrar.oas.task.handler.OpenApiComponentTaskHandlerBeanDefinitionLoader;
 import com.bytechef.hermes.component.registrar.task.handler.ComponentTaskHandlerBeanDefinitionLoader;
 import com.bytechef.hermes.component.registrar.task.handler.ComponentTaskHandlerBeanDefinitionLoader.TaskHandlerBeanDefinitionEntry;
@@ -54,11 +53,13 @@ public class ComponentTaskHandlerBeanFactoryPostProcessor implements BeanFactory
                 .stream())
             .toList();
 
-        beanFactory.registerSingleton(
-            "componentDefinitionAccessor",
-            (ComponentDefinitionAccessor) () -> componentTaskHandlerFactories.stream()
-                .map(ComponentTaskHandlerBeanDefinition::componentDefinition)
-                .toList());
+        for (ComponentTaskHandlerBeanDefinition componentTaskHandlerBeanDefinition : componentTaskHandlerFactories) {
+            ComponentDefinition componentDefinition = componentTaskHandlerBeanDefinition.componentDefinition();
+
+            beanFactory.registerSingleton(
+                getBeanName(componentDefinition.getName(), componentDefinition.getVersion(), "ComponentDefinition"),
+                componentDefinition);
+        }
 
         for (ComponentTaskHandlerBeanDefinition componentTaskHandlerBeanDefinition : componentTaskHandlerFactories) {
             ComponentDefinition componentDefinition = componentTaskHandlerBeanDefinition.componentDefinition();

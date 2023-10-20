@@ -27,7 +27,7 @@ import com.bytechef.hermes.component.ContextImpl;
 import com.bytechef.hermes.component.ParametersImpl;
 import com.bytechef.hermes.component.util.ContextSupplier;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.definition.registry.facade.ConnectionDefinitionFacade;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -37,7 +37,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class DefaultComponentTaskHandler implements TaskHandler<Object> {
 
     private final ActionDefinition actionDefinition;
-    private final ConnectionDefinitionFacade connectionDefinitionFacade;
+    private final ConnectionDefinitionService connectionDefinitionService;
     protected final ComponentHandler componentHandler;
     private final ConnectionService connectionService;
     private final EventPublisher eventPublisher;
@@ -45,12 +45,12 @@ public class DefaultComponentTaskHandler implements TaskHandler<Object> {
 
     @SuppressFBWarnings("EI2")
     public DefaultComponentTaskHandler(
-        ActionDefinition actionDefinition, ConnectionDefinitionFacade connectionDefinitionFacade,
+        ActionDefinition actionDefinition, ConnectionDefinitionService connectionDefinitionService,
         ComponentHandler componentHandler, ConnectionService connectionService, EventPublisher eventPublisher,
         FileStorageService fileStorageService) {
 
         this.actionDefinition = actionDefinition;
-        this.connectionDefinitionFacade = connectionDefinitionFacade;
+        this.connectionDefinitionService = connectionDefinitionService;
         this.componentHandler = componentHandler;
         this.connectionService = connectionService;
         this.eventPublisher = eventPublisher;
@@ -60,7 +60,7 @@ public class DefaultComponentTaskHandler implements TaskHandler<Object> {
     @Override
     public Object handle(TaskExecution taskExecution) {
         Context context = new ContextImpl(
-            connectionDefinitionFacade, connectionService, eventPublisher, fileStorageService, taskExecution);
+            connectionDefinitionService, connectionService, eventPublisher, fileStorageService, taskExecution);
 
         return ContextSupplier.get(
             context,

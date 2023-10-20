@@ -40,7 +40,7 @@ public class DefaultComponentTaskHandlerBeanDefinitionLoader
 
         return BeanDefinitionBuilder.genericBeanDefinition(DefaultComponentTaskHandler.class)
             .addConstructorArgValue(actionDefinition)
-            .addConstructorArgReference("connectionDefinitionFacade")
+            .addConstructorArgReference("connectionDefinitionService")
             .addConstructorArgValue(componentHandler)
             .addConstructorArgReference("connectionService")
             .addConstructorArgReference("eventPublisher")
