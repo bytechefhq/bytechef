@@ -10,7 +10,7 @@ import InlineSVG from 'react-inlinesvg';
 import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
 
 import WorkflowNodesList from '../components/WorkflowNodesList';
-import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getFormattedName from '../utils/getFormattedName';
 
 interface ContextualMenuProps {
@@ -35,7 +35,7 @@ const ContextualMenu = ({
         Array<TaskDispatcherDefinitionModel>
     >([]);
 
-    const {componentNames, setComponentNames} = useWorkflowDefinitionStore();
+    const {componentNames, setComponentNames} = useWorkflowDataStore();
 
     const {getEdge, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 

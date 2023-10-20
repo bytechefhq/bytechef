@@ -1,5 +1,6 @@
 import {TagModel} from '@/middleware/helios/configuration';
-import {DataPillType} from '@/types/types';
+import {ComponentDataType, DataPillType} from '@/types/types';
+import {ChangeEvent} from 'react';
 import {FieldValues} from 'react-hook-form/dist/types';
 import {FormState, UseFormRegister} from 'react-hook-form/dist/types/form';
 import {twMerge} from 'tailwind-merge';
@@ -22,35 +23,48 @@ export interface PropertyFormProps {
 
 interface PropertiesProps {
     actionName?: string;
+    currentComponentData?: ComponentDataType;
     customClassName?: string;
     dataPills?: DataPillType[];
     formState?: FormState<FieldValues>;
     mention?: boolean;
+    onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     properties: Array<PropertyType>;
     register?: UseFormRegister<PropertyFormProps>;
 }
 
 const Properties = ({
     actionName,
+    currentComponentData,
     customClassName,
     dataPills,
     formState,
     mention,
+    onChange,
     properties,
     register,
 }: PropertiesProps) => (
     <ul className={twMerge('h-full', customClassName)}>
-        {properties.map((property, index) => (
-            <Property
-                actionName={actionName}
-                dataPills={dataPills}
-                formState={formState}
-                key={`${property.name}_${index}`}
-                mention={mention}
-                property={property}
-                register={register}
-            />
-        ))}
+        {properties.map((property, index) => {
+            const defaultValue =
+                currentComponentData?.properties?.[
+                    property.name as keyof (typeof currentComponentData)['properties']
+                ];
+
+            return (
+                <Property
+                    actionName={actionName}
+                    dataPills={dataPills}
+                    defaultValue={defaultValue || ''}
+                    formState={formState}
+                    key={`${property.name}_${index}`}
+                    mention={mention}
+                    onChange={onChange}
+                    property={property}
+                    register={register}
+                />
+            );
+        })}
     </ul>
 );
 

@@ -2,6 +2,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {
+    ChangeEvent,
     DetailedHTMLProps,
     InputHTMLAttributes,
     ReactNode,
@@ -17,7 +18,7 @@ type InputProps = {
     labelClassName?: string;
     leadingIcon?: ReactNode;
     name: string;
-    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     trailing?: ReactNode;
     type?: string;
     value?: string;

@@ -2,7 +2,7 @@ import {DataPillType} from '@/types/types';
 import Input from 'components/Input/Input';
 import MentionsInput from 'components/MentionsInput/MentionsInput';
 import {FormInputIcon, FunctionSquareIcon} from 'lucide-react';
-import {ReactNode, useState} from 'react';
+import {ChangeEvent, ReactNode, useState} from 'react';
 
 import {Button} from '../ui/button';
 
@@ -14,10 +14,11 @@ interface InputPropertyProps {
     error?: boolean;
     fieldsetClassName?: string;
     hidden?: boolean;
-    mention?: boolean;
-    name?: string;
     label?: string;
     leadingIcon?: ReactNode;
+    mention?: boolean;
+    name?: string;
+    onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     required?: boolean;
     type?: string;
 }
@@ -25,6 +26,7 @@ interface InputPropertyProps {
 const InputProperty = ({
     controlType,
     dataPills,
+    defaultValue,
     description,
     error,
     hidden,
@@ -32,6 +34,7 @@ const InputProperty = ({
     leadingIcon,
     mention,
     name,
+    onChange,
     required,
     type,
 }: InputPropertyProps) => {
@@ -85,6 +88,7 @@ const InputProperty = ({
             {!mentionInput && (
                 <Input
                     className="py-2"
+                    defaultValue={defaultValue}
                     description={description}
                     error={error}
                     fieldsetClassName="flex-1 mb-0"
@@ -93,6 +97,10 @@ const InputProperty = ({
                     leadingIcon={leadingIcon}
                     name={name!}
                     onChange={(event) => {
+                        if (onChange) {
+                            onChange(event);
+                        }
+
                         if (isNumericalInput) {
                             const {value} = event.target;
 

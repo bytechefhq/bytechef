@@ -14,7 +14,7 @@ import {useCallback, useState} from 'react';
 
 import {useDataPillPanelStore} from '../stores/useDataPillPanelStore';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
-import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import DataPillPanelBody from './DataPillPanelBody';
 
 export type ComponentActionData = {
@@ -28,7 +28,7 @@ const DataPillPanel = () => {
 
     const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
     const {currentNode, nodeDetailsDialogOpen} = useNodeDetailsDialogStore();
-    const {componentNames} = useWorkflowDefinitionStore();
+    const {componentNames} = useWorkflowDataStore();
 
     const panelContainerRef = useCallback(
         (panelContainer: HTMLDivElement) =>
@@ -59,7 +59,7 @@ const DataPillPanel = () => {
         !!normalizedPreviousComponentNames.length
     );
 
-    const {componentActions} = useWorkflowDefinitionStore();
+    const {componentActions} = useWorkflowDataStore();
 
     const taskTypes = componentActions?.map(
         (componentAction) =>

@@ -6,3 +6,13 @@ export type DataPillType = {
     id: string;
     value: string;
 };
+
+export type ComponentDataType = {
+    name: string;
+    connection?: object;
+    notes?: string;
+    properties?: object;
+    title?: string;
+    version?: number;
+    workflowAlias?: string;
+};

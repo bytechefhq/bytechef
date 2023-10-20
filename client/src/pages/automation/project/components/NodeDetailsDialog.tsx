@@ -4,7 +4,7 @@ import {
     ComponentDefinitionModel,
 } from '@/middleware/hermes/configuration';
 import {PropertyType} from '@/types/projectTypes';
-import {DataPillType} from '@/types/types';
+import {ComponentDataType, DataPillType} from '@/types/types';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
@@ -17,11 +17,12 @@ import {
     useGetComponentDefinitionQuery,
     useGetComponentDefinitionsQuery,
 } from 'queries/componentDefinitions.queries';
-import {useEffect, useState} from 'react';
+import {ChangeEvent, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import Select from '../../../../components/Select/Select';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import getSubProperties from '../utils/getSubProperties';
 import CurrentActionSelect from './CurrentActionSelect';
@@ -50,6 +51,9 @@ const TABS = [
 
 type CurrentComponentType =
     | ({
+          connection?: object;
+          notes?: string;
+          properties?: object;
           workflowAlias?: string;
       } & ComponentDefinitionModel)
     | undefined;
@@ -69,13 +73,15 @@ const NodeDetailsDialog = ({
         componentName: currentNode.originNodeName || currentNode.name,
     });
 
+    const {componentData, setComponentData} = useWorkflowDefinitionStore();
+
     const {
         componentActions,
         componentNames,
         dataPills,
         setComponentActions,
         setDataPills,
-    } = useWorkflowDefinitionStore();
+    } = useWorkflowDataStore();
 
     let currentComponent: CurrentComponentType;
 
@@ -286,15 +292,26 @@ const NodeDetailsDialog = ({
         if (currentAction && currentActionFetched) {
             setCurrentActionName(currentAction.name);
 
-            if (componentActions && currentComponent) {
-                const index = componentActions.findIndex(
-                    (action) =>
-                        action.workflowAlias?.match(new RegExp(/-\d$/)) &&
-                        action.workflowAlias === currentComponent?.workflowAlias
-                );
+            setComponentActions([
+                ...componentActions,
+                {
+                    actionName: currentAction.name,
+                    componentName: currentComponent?.name as string,
+                    workflowAlias: currentComponent?.workflowAlias as string,
+                },
+            ]);
 
-                if (index !== -1) {
-                    componentActions.splice(index, 1, {
+            if (componentActions && currentComponent) {
+                const duplicateComponentActionIndex =
+                    componentActions.findIndex(
+                        (action) =>
+                            action.workflowAlias?.match(new RegExp(/-\d$/)) &&
+                            action.workflowAlias ===
+                                currentComponent?.workflowAlias
+                    );
+
+                if (duplicateComponentActionIndex !== -1) {
+                    componentActions.splice(duplicateComponentActionIndex, 1, {
                         actionName: currentAction.name,
                         componentName: currentComponent.name,
                         workflowAlias: currentComponent.workflowAlias,
@@ -302,25 +319,87 @@ const NodeDetailsDialog = ({
 
                     setComponentActions(componentActions);
                 } else {
-                    const otherComponentActions = componentActions.filter(
-                        (action) =>
-                            action.workflowAlias !==
-                            currentComponent?.workflowAlias
+                    const orderedComponentActions = componentNames.map(
+                        (componentName) => {
+                            const componentActionIndex =
+                                componentActions.findIndex(
+                                    (componentAction) =>
+                                        componentAction.workflowAlias ===
+                                        componentName
+                                );
+
+                            return componentActions[componentActionIndex];
+                        }
                     );
 
-                    setComponentActions([
-                        ...otherComponentActions,
+                    const updatedComponentActions = [
+                        ...orderedComponentActions.slice(0, currentNodeIndex),
                         {
                             actionName: currentAction.name,
                             componentName: currentComponent.name,
                             workflowAlias: currentComponent.workflowAlias,
                         },
-                    ]);
+                        ...orderedComponentActions.slice(currentNodeIndex + 1),
+                    ];
+
+                    setComponentActions(updatedComponentActions);
                 }
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeTab, currentAction, currentActionFetched]);
+    }, [activeTab, currentComponent, currentAction, currentActionFetched]);
+
+    useEffect(() => {
+        if (currentComponent) {
+            const componentDataIndex = componentData.findIndex(
+                (component) => component.name === currentComponent?.name
+            );
+
+            if (!componentDataIndex) {
+                setComponentData([
+                    ...componentData.filter(
+                        (item) => item.name !== currentComponent?.name
+                    ),
+                    {
+                        connection: currentComponent.connection,
+                        name: currentComponent.name,
+                        title: currentComponent.title,
+                        version: currentComponent.version,
+                        workflowAlias: currentComponent.workflowAlias,
+                    },
+                ]);
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentComponent]);
+
+    let currentComponentData: ComponentDataType | undefined;
+
+    const otherComponentData = componentData.filter((component) => {
+        if (component.name !== currentComponent?.name) {
+            return true;
+        } else {
+            currentComponentData = component;
+
+            return false;
+        }
+    });
+
+    const handlePropertyChange = (event: ChangeEvent<HTMLInputElement>) => {
+        if (currentComponentData) {
+            setComponentData([
+                ...otherComponentData,
+                {
+                    ...currentComponentData,
+                    name: currentComponentData.name as string,
+                    properties: {
+                        ...currentComponentData.properties,
+                        [event.target.name]: event.target.value,
+                    },
+                },
+            ]);
+        }
+    };
 
     return (
         <Dialog.Root
@@ -409,14 +488,30 @@ const NodeDetailsDialog = ({
                                         {activeTab === 'description' && (
                                             <DescriptionTab
                                                 component={currentComponent}
+                                                currentComponentData={
+                                                    currentComponentData
+                                                }
+                                                otherComponentData={
+                                                    otherComponentData
+                                                }
                                             />
                                         )}
+
+                                        {activeTab === 'connection' &&
+                                            currentComponent.connection && (
+                                                <ConnectionTab
+                                                    component={currentComponent}
+                                                />
+                                            )}
 
                                         {activeTab === 'properties' &&
                                             !!currentActionProperties?.length && (
                                                 <Properties
                                                     actionName={
                                                         currentActionName
+                                                    }
+                                                    currentComponentData={
+                                                        currentComponentData
                                                     }
                                                     customClassName="p-4 overflow-y-auto relative"
                                                     dataPills={dataPills}
@@ -426,13 +521,9 @@ const NodeDetailsDialog = ({
                                                     mention={
                                                         !!dataPills?.length
                                                     }
-                                                />
-                                            )}
-
-                                        {activeTab === 'connection' &&
-                                            currentComponent.connection && (
-                                                <ConnectionTab
-                                                    component={currentComponent}
+                                                    onChange={
+                                                        handlePropertyChange
+                                                    }
                                                 />
                                             )}
 
