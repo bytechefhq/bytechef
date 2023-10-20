@@ -18,6 +18,7 @@
 package com.bytechef.hermes.trigger;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.util.Assert;
 
 import java.util.Map;
 
@@ -25,5 +26,10 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record WorkflowTrigger(String name, String label, Map<String, Object> parameters) {
+public record WorkflowTrigger(String name, String label, Map<String, Object> parameters, String type) {
+
+    public WorkflowTrigger {
+        Assert.notNull(name, "'name' must not be null");
+        Assert.notNull(type, "'type' must not be null");
+    }
 }
