@@ -1,3 +1,9 @@
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import getRandomId from '@/pages/automation/project/utils/getRandomId';
 import QuillMention from 'quill-mention';
 import React, {ReactNode, useCallback, useMemo, useRef, useState} from 'react';
@@ -8,6 +14,7 @@ import './mentionsInput.css';
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
 import {useNodeDetailsDialogStore} from '@/pages/automation/project/stores/useNodeDetailsDialogStore';
 import {DataPillType} from '@/types/types';
+import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {twMerge} from 'tailwind-merge';
 
 import MentionBlot from './MentionBlot';
@@ -24,17 +31,23 @@ const MentionInputListItem = (item: DataPillType) => `
 `;
 
 type MentionsInputProps = {
+    controlType?: string;
     data: Array<DataPillType>;
+    description?: string;
+    fieldsetClassName?: string;
     label?: string;
     leadingIcon?: ReactNode;
     placeholder?: string;
 };
 
 const MentionsInput = ({
+    controlType,
     data,
+    description,
+    fieldsetClassName,
     label,
     leadingIcon,
-    placeholder,
+    placeholder = "Mention datapills using '{'",
 }: MentionsInputProps) => {
     const [value, setValue] = useState('');
 
@@ -51,7 +64,7 @@ const MentionsInput = ({
             blotName: 'mention',
             dataAttributes: ['component'],
             fixMentionsToQuill: true,
-            mentionDenotationChars: ['${'],
+            mentionDenotationChars: ['{'],
             onOpen: useCallback(() => {
                 if (!editorRef.current) {
                     return;
@@ -132,21 +145,53 @@ const MentionsInput = ({
 
     const isFocused = focusedInput?.props.id === elementId;
 
+    const isNumberKey = (event: KeyboardEvent) => {
+        const {key} = event;
+
+        return (
+            (key >= '0' && key <= '9') ||
+            key === 'Backspace' ||
+            key === 'Delete' ||
+            key === 'ArrowLeft' ||
+            key === 'ArrowRight' ||
+            key === 'Tab' ||
+            key === '{'
+        );
+    };
+
     return (
-        <fieldset className="w-full">
+        <fieldset className={twMerge('w-full', fieldsetClassName)}>
             {label && (
-                <label
-                    className="mb-1 block px-2 text-sm font-medium capitalize text-gray-700"
-                    htmlFor={elementId}
-                >
-                    {label}
-                </label>
+                <div className="flex items-center">
+                    <label
+                        className={twMerge(
+                            'block text-sm font-medium capitalize text-gray-700',
+                            description && 'mr-1'
+                        )}
+                        htmlFor={elementId}
+                    >
+                        {label}
+                    </label>
+
+                    {description && (
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <QuestionMarkCircledIcon />
+                                </TooltipTrigger>
+
+                                <TooltipContent>{description}</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    )}
+                </div>
             )}
 
             <div
                 className={twMerge(
                     'flex items-center',
                     isFocused && 'ring ring-blue-500 shadow-lg shadow-blue-200',
+                    label && 'mt-1',
                     leadingIcon && 'relative rounded-md border border-gray-300'
                 )}
             >
@@ -165,12 +210,34 @@ const MentionsInput = ({
                     id={elementId}
                     key={elementId}
                     modules={modules}
-                    onChange={setValue}
+                    onChange={(value) => {
+                        if (controlType === 'INTEGER') {
+                            if (value.startsWith('<p><div')) {
+                                setValue(value);
+                            } else {
+                                const integerOnlyValue = value.replace(
+                                    /[^0-9]/g,
+                                    ''
+                                );
+
+                                if (integerOnlyValue) {
+                                    setValue(`<p>${integerOnlyValue}</p>`);
+                                }
+                            }
+                        } else {
+                            setValue(value);
+                        }
+                    }}
                     onFocus={() => {
                         if (editorRef.current) {
                             setFocusedInput(editorRef.current);
 
                             setDataPillPanelOpen(true);
+                        }
+                    }}
+                    onKeyPress={(event: KeyboardEvent) => {
+                        if (controlType === 'INTEGER' && !isNumberKey(event)) {
+                            event.preventDefault();
                         }
                     }}
                     placeholder={placeholder}
