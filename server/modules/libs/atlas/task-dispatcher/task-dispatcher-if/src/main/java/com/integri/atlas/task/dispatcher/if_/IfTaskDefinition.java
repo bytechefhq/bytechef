@@ -27,7 +27,6 @@ import static com.integri.atlas.engine.core.task.description.TaskProperty.hide;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.multipleValues;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
-import static com.integri.atlas.engine.core.task.description.TaskSpecification.create;
 
 import com.integri.atlas.engine.core.task.TaskDefinition;
 import com.integri.atlas.engine.core.task.description.TaskSpecification;
@@ -37,7 +36,7 @@ import com.integri.atlas.engine.core.task.description.TaskSpecification;
  */
 public class IfTaskDefinition implements TaskDefinition {
 
-    private static final TaskSpecification TASK_DESCRIPTION = create("if")
+    private static final TaskSpecification TASK_SPECIFICATION = TaskSpecification.create("if")
         .displayName("IF")
         .description("Directs a stream based on true/false results of comparisons")
         .properties(
@@ -166,6 +165,6 @@ public class IfTaskDefinition implements TaskDefinition {
 
     @Override
     public TaskSpecification getSpecification() {
-        return TASK_DESCRIPTION;
+        return TASK_SPECIFICATION;
     }
 }
