@@ -7,6 +7,7 @@ import Button from 'components/Button/Button';
 import Input from 'components/Input/Input';
 import React, {useEffect, useState} from 'react';
 import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
+import {twMerge} from 'tailwind-merge';
 
 import PageLoader from '../../../components/PageLoader/PageLoader';
 import Select from '../../../components/Select/Select';
@@ -160,13 +161,15 @@ const Project: React.FC = () => {
                             </div>
                         </div>
 
-                        <div>
-                            <ToggleGroup
-                                defaultValue="designer"
-                                toggleItems={headerToggleItems}
-                                onValueChange={(value) => setView(value)}
-                            />
-                        </div>
+                        <ToggleGroup
+                            containerClassName={twMerge(
+                                'ml-[14%]',
+                                leftSidebarOpen && 'ml-[96px]'
+                            )}
+                            defaultValue="designer"
+                            toggleItems={headerToggleItems}
+                            onValueChange={(value) => setView(value)}
+                        />
                     </header>
                 }
                 leftSidebarHeader={
