@@ -15,7 +15,7 @@ export function DesktopSidebar({
     return (
         <div className="hidden lg:flex lg:shrink-0">
             <div className="flex w-[64px] flex-col">
-                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-gray-100 dark:bg-gray-800">
+                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-gray-50 dark:bg-gray-800">
                     <div className="flex-1">
                         <Link to={''}>
                             <div className="flex items-center justify-center py-4">

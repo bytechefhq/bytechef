@@ -99,7 +99,7 @@ export const SidebarContentLayout: React.FC<PropsWithChildren<Props>> = ({
             </Transition.Root>
 
             <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col">
-                <nav className="flex h-full flex-col border-gray-200 bg-gray-50 px-4 dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
+                <nav className="flex h-full flex-col border-l border-gray-100 bg-gray-50 px-4 dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
                     <h1
                         aria-labelledby="primary-heading"
                         className="py-4 pr-4 text-xl font-semibold tracking-tight text-gray-900 dark:text-gray-200"
