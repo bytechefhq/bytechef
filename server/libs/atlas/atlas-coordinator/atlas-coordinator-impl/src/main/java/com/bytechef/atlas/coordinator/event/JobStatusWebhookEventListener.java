@@ -24,17 +24,13 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
 import com.bytechef.atlas.event.WorkflowEvent;
 import com.bytechef.atlas.service.JobService;
-import com.bytechef.commons.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
@@ -75,11 +71,10 @@ public class JobStatusWebhookEventListener implements EventListener {
             return;
         }
 
-        for (Map<String, Object> webhook : job.getWebhooks()) {
-            if (JobStatusWorkflowEvent.JOB_STATUS.equals(
-                MapValueUtils.getRequiredString(webhook, WorkflowConstants.TYPE))) {
+        for (Job.Webhook webhook : job.getWebhooks()) {
+            if (JobStatusWorkflowEvent.JOB_STATUS.equals(webhook.type())) {
 
-                Map<String, Object> webhookEvent = new HashMap<>(webhook);
+                Map<String, Object> webhookEvent = webhook.toMap();
 
                 webhookEvent.put(WorkflowConstants.EVENT, workflowEvent);
 
@@ -89,41 +84,53 @@ public class JobStatusWebhookEventListener implements EventListener {
                     if (context.getRetryCount() == 0) {
                         logger.debug(
                             "Calling webhook {} -> {}",
-                            MapValueUtils.getRequiredString(webhook, WorkflowConstants.URL),
+                            webhook.url(),
                             webhookEvent);
                     } else {
                         logger.debug(
                             "[Retry: {}] Calling webhook {} -> {}",
                             context.getRetryCount(),
-                            MapValueUtils.getRequiredString(webhook, WorkflowConstants.URL),
+                            webhook.url(),
                             webhookEvent);
                     }
 
-                    return restTemplate.postForObject(
-                        MapValueUtils.getRequiredString(webhook, WorkflowConstants.URL), webhookEvent, String.class);
+                    return restTemplate.postForObject(webhook.url(), webhookEvent, String.class);
                 });
             }
         }
     }
 
-    private RetryTemplate createRetryTemplate(Map<String, Object> webhook) {
-        Map<String, Object> retryParams = MapValueUtils.get(webhook, "retry", new ParameterizedTypeReference<>() {},
-            Collections.emptyMap());
+    private RetryTemplate createRetryTemplate(Job.Webhook webhook) {
+        Job.Retry retry = webhook.retry();
 
         RetryTemplate retryTemplate = new RetryTemplate();
 
         ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
 
         backOffPolicy.setInitialInterval(
-            MapValueUtils.getDuration(retryParams, "initialInterval", Duration.of(2, ChronoUnit.SECONDS))
+            (retry.initialInterval() == null
+                ? Duration.of(2, ChronoUnit.SECONDS)
+                : Duration.of(retry.initialInterval(), ChronoUnit.SECONDS))
                 .toMillis());
         backOffPolicy.setMaxInterval(
-            MapValueUtils.getDuration(retryParams, "maxInterval", Duration.of(30, ChronoUnit.SECONDS))
+            (retry.maxInterval() == null
+                ? Duration.of(2, ChronoUnit.SECONDS)
+                : Duration.of(retry.maxInterval(), ChronoUnit.SECONDS))
                 .toMillis());
-        backOffPolicy.setMultiplier(MapValueUtils.getDouble(retryParams, "multiplier", 2.0));
+        backOffPolicy.setMultiplier(
+            retry.multiplier() == null
+                ? 2.0
+                : retry.multiplier());
+
         retryTemplate.setBackOffPolicy(backOffPolicy);
+
         SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
-        retryPolicy.setMaxAttempts(MapValueUtils.getInteger(retryParams, "maxAttempts", 5));
+
+        retryPolicy.setMaxAttempts(
+            retry.maxAttempts() == null
+                ? 5
+                : retry.maxAttempts());
+
         retryTemplate.setRetryPolicy(retryPolicy);
 
         return retryTemplate;

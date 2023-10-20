@@ -19,7 +19,9 @@ package com.bytechef.coordinator.config;
 
 import com.bytechef.atlas.repository.jdbc.converter.ExecutionErrorToStringConverter;
 import com.bytechef.atlas.repository.jdbc.converter.StringToExecutionErrorConverter;
+import com.bytechef.atlas.repository.jdbc.converter.StringToWebhookConverter;
 import com.bytechef.atlas.repository.jdbc.converter.StringToWorkflowTaskConverter;
+import com.bytechef.atlas.repository.jdbc.converter.WebhookToStringConverter;
 import com.bytechef.atlas.repository.jdbc.converter.WorkflowTaskToStringConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -66,7 +68,9 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
         return Arrays.asList(
             new ExecutionErrorToStringConverter(objectMapper),
             new StringToExecutionErrorConverter(objectMapper),
+            new StringToWebhookConverter(objectMapper),
             new StringToWorkflowTaskConverter(objectMapper),
+            new WebhookToStringConverter(objectMapper),
             new WorkflowTaskToStringConverter(objectMapper));
     }
 }

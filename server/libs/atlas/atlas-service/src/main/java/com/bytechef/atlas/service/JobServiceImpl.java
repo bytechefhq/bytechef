@@ -207,9 +207,9 @@ public class JobServiceImpl implements JobService {
 
         // validate webhooks
 
-        for (Map<String, Object> webhook : jobParametersDTO.getWebhooks()) {
-            Assert.notNull(webhook.get(WorkflowConstants.TYPE), "must define 'type' on webhook");
-            Assert.notNull(webhook.get(WorkflowConstants.URL), "must define 'url' on webhook");
+        for (Job.Webhook webhook : jobParametersDTO.getWebhooks()) {
+            Assert.notNull(webhook.type(), "must define 'type' on webhook");
+            Assert.notNull(webhook.url(), "must define 'url' on webhook");
         }
     }
 }
