@@ -55,7 +55,7 @@ public class ComponentCommand implements Callable<Integer> {
             names = {"--base-package-name"},
             paramLabel = "base package name",
             description = "package for generated classes",
-            defaultValue = "com.bytechef.atlas")
+            defaultValue = "com.bytechef.task.handler")
     private String basePackageName;
 
     @Option(
