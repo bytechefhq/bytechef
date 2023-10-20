@@ -8,8 +8,9 @@ dependencies {
     implementation project(":server:libs:core:commons:commons-data")
     implementation project(":server:libs:core:commons:commons-utils")
 
-    testImplementation project(":server:libs:atlas:atlas-config")
+    testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-impl")
     testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-jdbc")
+    testImplementation project(":server:libs:atlas:atlas-service")
     testImplementation project(":server:libs:atlas:atlas-upgrade")
     testImplementation project(":server:libs:hermes:hermes-integration:hermes-integration-upgrade")
     testImplementation project(":server:libs:test-support")

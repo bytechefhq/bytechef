@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.integration.facade.impl;
+package com.bytechef.hermes.integration.facade.impl;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.workflow.WorkflowFormat;
-import com.bytechef.integration.domain.Integration;
-import com.bytechef.integration.facade.IntegrationFacade;
-import com.bytechef.integration.service.IntegrationService;
+import com.bytechef.hermes.integration.domain.Integration;
+import com.bytechef.hermes.integration.facade.IntegrationFacade;
+import com.bytechef.hermes.integration.service.IntegrationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +45,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         if (!integration.containsWorkflows()) {
             Workflow workflow = new Workflow();
 
-            workflow.setContent(
+            workflow.setDefinition(
                     """
                 {
                     "tasks": []

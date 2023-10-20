@@ -14,18 +14,24 @@
  * limitations under the License.
  */
 
-package com.bytechef.integration.facade;
+package com.bytechef.hermes.integration.facade;
 
-import com.bytechef.integration.domain.Integration;
+import com.bytechef.hermes.integration.config.IntegrationIntTestConfiguration;
+import com.bytechef.hermes.integration.domain.Integration;
+import com.bytechef.test.extension.PostgresTestContainerExtension;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@ExtendWith(PostgresTestContainerExtension.class)
+@SpringBootTest(
+        classes = IntegrationIntTestConfiguration.class,
+        properties = "bytechef.workflow.workflow-repository.jdbc.enabled=true")
 public class IntegrationFacadeIntTest {
 
     @Autowired
