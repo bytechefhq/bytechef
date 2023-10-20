@@ -194,7 +194,9 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
     }
 
     public void setProjectInstanceId(Long projectInstanceId) {
-        this.projectInstanceId = AggregateReference.to(projectInstanceId);
+        if (projectInstanceId != null) {
+            this.projectInstanceId = AggregateReference.to(projectInstanceId);
+        }
     }
 
     public void setVersion(int version) {
