@@ -38,7 +38,7 @@ public interface TriggerScheduler {
         WorkflowExecutionId workflowExecutionId);
 
     void scheduleScheduleTrigger(
-        String pattern, String zoneId, Map<String, Object> output, String workflowExecutionId);
+        String pattern, String zoneId, Map<String, Object> output, WorkflowExecutionId workflowExecutionId);
 
     void schedulePollingTrigger(WorkflowExecutionId workflowExecutionId);
 }

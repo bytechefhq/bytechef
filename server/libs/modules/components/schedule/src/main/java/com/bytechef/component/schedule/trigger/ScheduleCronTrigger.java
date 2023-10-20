@@ -23,6 +23,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDe
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 
 import java.util.Map;
@@ -84,6 +85,6 @@ public class ScheduleCronTrigger {
             MapUtils.getString(inputParameters, TIMEZONE), Map.of(
                 EXPRESSION, MapUtils.getString(inputParameters, EXPRESSION),
                 TIMEZONE, MapUtils.getString(inputParameters, TIMEZONE)),
-            workflowExecutionId);
+            WorkflowExecutionId.parse(workflowExecutionId));
     }
 }

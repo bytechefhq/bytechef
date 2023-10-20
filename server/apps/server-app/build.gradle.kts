@@ -6,7 +6,6 @@ springBoot {
 }
 
 dependencies {
-    implementation(libs.com.github.kagkarlsson.db.scheduler.spring.boot.starter)
     implementation("org.apache.activemq:artemis-jakarta-server")
     implementation(libs.org.openapitools.jackson.databind.nullable)
     implementation("org.springframework.boot:spring-boot-starter-artemis")
@@ -15,6 +14,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-quartz")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.kafka:spring-kafka")
     implementation(libs.org.springdoc.springdoc.openapi.starter.webmvc.ui)

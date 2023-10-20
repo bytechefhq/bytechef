@@ -101,6 +101,8 @@ spring:
     job-store-type: jdbc
     jdbc:
       initialize-schema: always
+    properties:
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
   task:
     execution:
       thread-name-prefix: server-app-task-

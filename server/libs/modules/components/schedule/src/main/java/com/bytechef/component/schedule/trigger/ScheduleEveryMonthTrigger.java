@@ -23,6 +23,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDe
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.hermes.component.util.MapUtils;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 
 import java.util.Map;
@@ -109,6 +110,6 @@ public class ScheduleEveryMonthTrigger {
                 MINUTE, MapUtils.getInteger(inputParameters, MINUTE),
                 DAY_OF_MONTH, MapUtils.getInteger(inputParameters, DAY_OF_MONTH),
                 TIMEZONE, MapUtils.getString(inputParameters, TIMEZONE)),
-            workflowExecutionId);
+            WorkflowExecutionId.parse(workflowExecutionId));
     }
 }
