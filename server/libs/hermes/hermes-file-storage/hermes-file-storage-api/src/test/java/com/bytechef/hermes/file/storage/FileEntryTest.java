@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
 import com.bytechef.hermes.file.storage.domain.FileEntry;
 import java.util.Collections;
@@ -52,7 +53,7 @@ public class FileEntryTest {
     @Test
     public void testSpelEvaluation() {
         SpelTaskEvaluator evaluator = SpelTaskEvaluator.create();
-        TaskExecution taskExecution = TaskExecution.of("result", "${fileEntry.name} ${fileEntry.url}");
+        TaskExecution taskExecution = TaskExecution.of(WorkflowTask.of("result", "${fileEntry.name} ${fileEntry.url}"));
 
         TaskExecution evaluated = evaluator.evaluate(
                 taskExecution,
