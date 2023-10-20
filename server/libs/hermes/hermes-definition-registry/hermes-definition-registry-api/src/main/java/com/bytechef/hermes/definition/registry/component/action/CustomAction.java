@@ -191,7 +191,7 @@ public class CustomAction {
                 .controlType(ControlType.SCHEMA_DESIGNER)
                 .sampleDataType(SampleDataType.JSON))
         .outputSchema(getOutputSchemaFunction())
-        .execute(CustomAction::execute);
+        .perform(CustomAction::perform);
 
     public static ActionDefinition getCustomActionDefinition(ComponentDefinition componentDefinition) {
         return CUSTOM_ACTION_DEFINITION.help(
@@ -201,7 +201,7 @@ public class CustomAction {
                 .map(Help::getLearnMoreUrl), null));
     }
 
-    protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionContext context) {
         return HttpClientUtils.exchange(
             MapValueUtils.getRequiredString(inputParameters, PATH),
             MapValueUtils.getRequired(inputParameters, METHOD, HttpClientUtils.RequestMethod.class))

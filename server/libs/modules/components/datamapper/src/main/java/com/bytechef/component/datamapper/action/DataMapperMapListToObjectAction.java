@@ -54,9 +54,9 @@ public class DataMapperMapListToObjectAction {
                 .description("The value of the key will become the value in the new object.")
                 .required(true))
         .outputSchema(getOutputSchemaFunction(), object())
-        .execute(DataMapperMapListToObjectAction::execute);
+        .perform(DataMapperMapListToObjectAction::perform);
 
-    protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionContext context) {
         // TODO
         return null;
     }

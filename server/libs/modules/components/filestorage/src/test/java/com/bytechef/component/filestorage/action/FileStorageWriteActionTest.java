@@ -52,7 +52,7 @@ public class FileStorageWriteActionTest {
                 Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.eq("file.txt")))
                 .thenReturn("file.txt");
 
-            FileStorageWriteAction.executeWrite(context, Map.of());
+            FileStorageWriteAction.perform(Map.of(), context);
 
             ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
             ArgumentCaptor<String> contentArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -72,7 +72,7 @@ public class FileStorageWriteActionTest {
                 Mockito.anyMap(), Mockito.eq(FILENAME), Mockito.eq("file.txt")))
                 .thenReturn("test.txt");
 
-            FileStorageWriteAction.executeWrite(context, Map.of());
+            FileStorageWriteAction.perform(Map.of(), context);
 
             ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 

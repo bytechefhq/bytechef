@@ -46,7 +46,7 @@ public class FilesystemRmActionTest {
             mockedStatic.when(() -> MapValueUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH)))
                 .thenReturn(tempDir.getAbsolutePath());
 
-            FilesystemRmAction.executeRm(Mockito.mock(Context.class), Map.of());
+            FilesystemRmAction.perform(Map.of(), Mockito.mock(Context.class));
 
             Assertions.assertFalse(tempDir.exists());
         }

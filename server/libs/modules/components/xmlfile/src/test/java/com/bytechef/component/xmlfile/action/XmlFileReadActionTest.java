@@ -71,7 +71,7 @@ public class XmlFileReadActionTest {
             Mockito.when(context.readFileToString(Mockito.any(Context.FileEntry.class)))
                 .thenReturn(java.nio.file.Files.readString(Path.of(file.getAbsolutePath())));
 
-            Assertions.assertThat((Map<String, ?>) XmlFileReadAction.executeRead(context, Map.of()))
+            Assertions.assertThat((Map<String, ?>) XmlFileReadAction.perform(Map.of(), context))
                 .isEqualTo(
                     Map.of(
                         "Flower",
@@ -104,7 +104,7 @@ public class XmlFileReadActionTest {
             Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
                 .thenReturn(new FileInputStream(file));
 
-            Assertions.assertThat((List<?>) XmlFileReadAction.executeRead(context, Map.of()))
+            Assertions.assertThat((List<?>) XmlFileReadAction.perform(Map.of(), context))
                 .isEqualTo(
                     List.of(
                         Map.of(
@@ -133,7 +133,7 @@ public class XmlFileReadActionTest {
             Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
                 .thenReturn(new FileInputStream(file));
 
-            Assertions.assertThat(((List<?>) XmlFileReadAction.executeRead(context, Map.of()))
+            Assertions.assertThat(((List<?>) XmlFileReadAction.perform(Map.of(), context))
                 .size())
                 .isEqualTo(2);
         }

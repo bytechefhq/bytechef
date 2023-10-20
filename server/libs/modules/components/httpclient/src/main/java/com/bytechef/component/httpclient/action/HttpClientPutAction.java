@@ -54,9 +54,9 @@ public class HttpClientPutAction {
 
                 HttpClientActionUtils.options(true)))
         .outputSchema(getOutputSchemaFunction(), HttpClientConstants.OUTPUT_PROPERTIES)
-        .execute((actionContext, inputParameters) -> executePut(inputParameters));
+        .perform((inputParameters, actionContext) -> perform(inputParameters));
 
-    protected static Object executePut(Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters) {
         return HttpClientActionUtils.execute(inputParameters, RequestMethod.PUT);
     }
 

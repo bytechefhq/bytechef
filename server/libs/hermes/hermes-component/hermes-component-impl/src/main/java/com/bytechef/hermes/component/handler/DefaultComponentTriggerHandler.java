@@ -107,7 +107,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
 
             WebhookOutput webhookOutput = dynamicWebhookRequestFunction.apply(
                 new DynamicWebhookRequestContext(
-                    triggerContext, triggerExecution.getParameters(),
+                    triggerExecution.getParameters(),
                     MapValueUtils.get(triggerExecution.getParameters(), HEADERS, WebhookHeaders.class),
                     MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
                     MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
@@ -116,7 +116,8 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
                         datStorageService.fetchValue(
                             Context.DataStorageScope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(),
                             workflowExecutionId.toString()),
-                        null)));
+                        null),
+                    triggerContext));
 
             output = webhookOutput.getValue();
         } else if (TriggerType.WEBHOOK_STATIC == triggerType) {
@@ -125,11 +126,12 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
 
             WebhookOutput webhookOutput = staticWebhookRequestFunction.apply(
                 new StaticWebhookRequestContext(
-                    triggerContext, triggerExecution.getParameters(),
+                    triggerExecution.getParameters(),
                     MapValueUtils.get(triggerExecution.getParameters(), HEADERS, WebhookHeaders.class),
                     MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
                     MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
-                    MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class)));
+                    MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class),
+                    triggerContext));
 
             output = webhookOutput.getValue();
         } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID_DYNAMIC == triggerType) {
@@ -137,12 +139,12 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
 
             PollOutput pollOutput = pollFunction.apply(
                 new PollContext(
-                    triggerContext, triggerExecution.getParameters(),
-                    OptionalUtils.orElse(
+                    triggerExecution.getParameters(), OptionalUtils.orElse(
                         datStorageService.fetchValue(
                             Context.DataStorageScope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(),
                             workflowExecutionId.toString()),
-                        null)));
+                        null),
+                    triggerContext));
 
             List<Map<?, ?>> records = new ArrayList<>(
                 pollOutput.records() == null ? Collections.emptyList() : pollOutput.records());
@@ -150,8 +152,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
             while (pollOutput.pollImmediately()) {
                 pollOutput = pollFunction.apply(
                     new PollContext(
-                        triggerContext, triggerExecution.getParameters(),
-                        pollOutput.closureParameters()));
+                        triggerExecution.getParameters(), pollOutput.closureParameters(), triggerContext));
 
                 records.addAll(pollOutput.records());
             }
@@ -173,11 +174,11 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
 
     private Boolean validateWebhook(TriggerContext triggerContext, TriggerExecution triggerExecution) {
         WebhookValidateContext context = new WebhookValidateContext(
-            triggerContext, triggerExecution.getParameters(),
+            triggerExecution.getParameters(),
             MapValueUtils.get(triggerExecution.getParameters(), HEADERS, WebhookHeaders.class),
             MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
             MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
-            MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class));
+            MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class), triggerContext);
 
         return triggerDefinition.getWebhookValidate()
             .map(webhookValidateFunction -> webhookValidateFunction.apply(context))

@@ -48,9 +48,9 @@ public class FilesystemReadFileAction {
             .placeholder("/data/your_file.pdf")
             .required(true))
         .outputSchema(ComponentDSL.fileEntry())
-        .execute(FilesystemReadFileAction::executeReadFile);
+        .perform(FilesystemReadFileAction::perform);
 
-    protected static FileEntry executeReadFile(Context context, Map<String, ?> inputParameters) {
+    protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
         String filename = MapValueUtils.getRequiredString(inputParameters, FILENAME);
 
         try (InputStream inputStream = new FileInputStream(filename)) {

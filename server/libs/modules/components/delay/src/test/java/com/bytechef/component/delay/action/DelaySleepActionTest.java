@@ -43,7 +43,7 @@ public class DelaySleepActionTest {
 
             long now = System.currentTimeMillis();
 
-            DelaySleepAction.executeDelay(Mockito.mock(Context.class), Map.of("duration", "1.5S"));
+            DelaySleepAction.perform(Map.of("duration", "1.5S"), Mockito.mock(Context.class));
 
             long delta = System.currentTimeMillis() - now;
 
@@ -61,7 +61,7 @@ public class DelaySleepActionTest {
 
             long now = System.currentTimeMillis();
 
-            DelaySleepAction.executeDelay(Mockito.mock(Context.class), Map.of(MILLIS, 500L));
+            DelaySleepAction.perform(Map.of(MILLIS, 500L), Mockito.mock(Context.class));
 
             long delta = System.currentTimeMillis() - now;
 
@@ -74,7 +74,7 @@ public class DelaySleepActionTest {
     public void test3() {
         long now = System.currentTimeMillis();
 
-        DelaySleepAction.executeDelay(Mockito.mock(Context.class), Map.of());
+        DelaySleepAction.perform(Map.of(), Mockito.mock(Context.class));
 
         long delta = System.currentTimeMillis() - now;
 

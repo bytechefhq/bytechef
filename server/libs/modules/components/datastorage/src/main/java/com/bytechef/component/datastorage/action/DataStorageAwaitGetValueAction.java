@@ -64,9 +64,9 @@ public class DataStorageAwaitGetValueAction {
                 .properties(
                     any(VALUE),
                     integer(TIMEOUT)))
-        .execute(DataStorageAwaitGetValueAction::execute);
+        .perform(DataStorageAwaitGetValueAction::perform);
 
-    protected static Object execute(ActionContext actionContext, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionContext actionContext) {
         // TODO
 
         return null;

@@ -64,9 +64,9 @@ public class DataMapperMapMultipleValuesBetweenObjectsAction {
                             .label("To")))
                 .required(true))
         .outputSchema(getOutputSchemaFunction(), object())
-        .execute(DataMapperMapMultipleValuesBetweenObjectsAction::execute);
+        .perform(DataMapperMapMultipleValuesBetweenObjectsAction::perform);
 
-    protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionContext context) {
         // TODO
         return null;
     }

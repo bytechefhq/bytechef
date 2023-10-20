@@ -89,7 +89,7 @@ public class JsonFileReadActionTest {
 
             assertEquals(
                 new JSONObject(Files.contentOf(file, StandardCharsets.UTF_8)),
-                new JSONObject((Map<String, ?>) JsonFileReadAction.executeRead(context, Map.of())),
+                new JSONObject((Map<String, ?>) JsonFileReadAction.perform(Map.of(), context)),
                 true);
         }
     }
@@ -120,7 +120,7 @@ public class JsonFileReadActionTest {
 
             assertEquals(
                 new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)),
-                new JSONArray((List<?>) JsonFileReadAction.executeRead(context, Map.of())),
+                new JSONArray((List<?>) JsonFileReadAction.perform(Map.of(), context)),
                 true);
         }
 
@@ -141,7 +141,7 @@ public class JsonFileReadActionTest {
             mockedStatic.when(() -> MapValueUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
                 .thenReturn(2);
 
-            Assertions.assertThat(((List<?>) JsonFileReadAction.executeRead(context, Map.of())).size())
+            Assertions.assertThat(((List<?>) JsonFileReadAction.perform(Map.of(), context)).size())
                 .isEqualTo(2);
         }
     }
@@ -170,7 +170,7 @@ public class JsonFileReadActionTest {
 
             assertEquals(
                 new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
-                new JSONArray((List<?>) JsonFileReadAction.executeRead(context, Map.of())),
+                new JSONArray((List<?>) JsonFileReadAction.perform(Map.of(), context)),
                 true);
         }
 
@@ -192,7 +192,7 @@ public class JsonFileReadActionTest {
             mockedStatic.when(() -> MapValueUtils.getInteger(Mockito.anyMap(), Mockito.eq(PAGE_SIZE)))
                 .thenReturn(2);
 
-            Assertions.assertThat(((List<?>) JsonFileReadAction.executeRead(context, Map.of())).size())
+            Assertions.assertThat(((List<?>) JsonFileReadAction.perform(Map.of(), context)).size())
                 .isEqualTo(2);
         }
     }

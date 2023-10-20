@@ -4,7 +4,7 @@
     "deprecated": null,
     "description": "Add a new member to the list.",
     "sampleOutput": "{ \"id\": \"string\", \"email_address\": \"string\", \"unique_email_id\": \"string\", \"contact_id\": \"string\", \"full_name\": \"string\", \"web_id\": 0, \"email_type\": \"string\", \"status\": \"subscribed\", \"unsubscribe_reason\": \"string\", \"consents_to_one_to_one_messaging\": true, \"merge_fields\": { \"property1\": null, \"property2\": null }, \"interests\": { \"property1\": true, \"property2\": true }, \"stats\": { \"avg_open_rate\": 0, \"avg_click_rate\": 0, \"ecommerce_data\": { \"total_revenue\": 0, \"number_of_orders\": 0, \"currency_code\": \"USD\" } }, \"ip_signup\": \"string\", \"timestamp_signup\": \"2019-08-24T14:15:22Z\", \"ip_opt\": \"string\", \"timestamp_opt\": \"2019-08-24T14:15:22Z\", \"member_rating\": 0, \"last_changed\": \"2019-08-24T14:15:22Z\", \"language\": \"string\", \"vip\": true, \"email_client\": \"string\", \"location\": { \"latitude\": 0, \"longitude\": 0, \"gmtoff\": 0, \"dstoff\": 0, \"country_code\": \"string\", \"timezone\": \"string\", \"region\": \"string\" }, \"marketing_permissions\": [ { \"marketing_permission_id\": \"string\", \"text\": \"string\", \"enabled\": true } ], \"last_note\": { \"note_id\": 0, \"created_at\": \"2019-08-24T14:15:22Z\", \"created_by\": \"string\", \"note\": \"string\" }, \"source\": \"string\", \"tags_count\": 0, \"tags\": [ { \"id\": 0, \"name\": \"string\" } ], \"list_id\": \"string\", \"_links\": [ { \"rel\": \"string\", \"href\": \"string\", \"method\": \"GET\", \"targetSchema\": \"string\", \"schema\": \"string\" } ] }",
-    "execute": null,
+   "perform": null,
     "help": null,
     "metadata": {
       "path": "/lists/{listId}/members",

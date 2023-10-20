@@ -81,9 +81,12 @@ public class OdsFileWriteAction {
                 .defaultValue("Sheet")
                 .advancedOption(true))
         .outputSchema(fileEntry())
-        .execute(OdsFileWriteAction::executeWrite);
+        .perform(OdsFileWriteAction::perform);
 
-    protected static FileEntry executeWrite(Context context, Map<String, ?> inputParameters) {
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
         String fileName = MapValueUtils.getString(inputParameters, FILENAME, "file.ods");
         List<Map<String, ?>> rows = (List) MapValueUtils.getList(inputParameters, ROWS, List.of());
         String sheetName = MapValueUtils.getString(inputParameters, SHEET_NAME, "Sheet");

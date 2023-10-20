@@ -78,7 +78,7 @@ public class XmlFileWriteActionTest {
             mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(source);
 
-            XmlFileWriteAction.executeWrite(context, Map.of());
+            XmlFileWriteAction.perform(Map.of(), context);
 
             ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(
                 ByteArrayInputStream.class);
@@ -107,7 +107,7 @@ public class XmlFileWriteActionTest {
             mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(source);
 
-            XmlFileWriteAction.executeWrite(context, Map.of());
+            XmlFileWriteAction.perform(Map.of(), context);
 
             ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -142,7 +142,7 @@ public class XmlFileWriteActionTest {
             mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(source);
 
-            XmlFileWriteAction.executeWrite(context, Map.of());
+            XmlFileWriteAction.perform(Map.of(), context);
 
             ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
                 .forClass(ByteArrayInputStream.class);
@@ -171,7 +171,7 @@ public class XmlFileWriteActionTest {
             mockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
                 .thenReturn(source);
 
-            XmlFileWriteAction.executeWrite(context, Map.of());
+            XmlFileWriteAction.perform(Map.of(), context);
 
             ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 

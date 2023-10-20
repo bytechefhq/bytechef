@@ -41,9 +41,9 @@ public class LoggerInfoAction {
     public static final ActionDefinition ACTION_DEFINITION = action(INFO)
         .title("Info")
         .properties(string(TEXT))
-        .execute(LoggerInfoAction::executeInfo);
+        .perform(LoggerInfoAction::perform);
 
-    protected static Object executeInfo(Context context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, Context context) {
         logger.info(MapValueUtils.getString(inputParameters, TEXT));
 
         return null;

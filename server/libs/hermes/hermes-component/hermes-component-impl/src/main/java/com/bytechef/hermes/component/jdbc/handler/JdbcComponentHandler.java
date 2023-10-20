@@ -87,23 +87,23 @@ public class JdbcComponentHandler implements ComponentHandler {
         this.updateJdbcOperation = new UpdateJdbcOperation(jdbcExecutor);
     }
 
-    protected Map<String, Integer> executeDelete(Context context, Map<String, ?> inputParameters) {
+    protected Map<String, Integer> performDelete(Context context, Map<String, ?> inputParameters) {
         return deleteJdbcOperation.execute(context, inputParameters);
     }
 
-    protected Map<String, Integer> executeExecute(Context context, Map<String, ?> inputParameters) {
+    protected Map<String, Integer> performExecute(Context context, Map<String, ?> inputParameters) {
         return executeJdbcOperation.execute(context, inputParameters);
     }
 
-    protected Map<String, Integer> executeInsert(Context context, Map<String, ?> inputParameters) {
+    protected Map<String, Integer> performInsert(Context context, Map<String, ?> inputParameters) {
         return insertJdbcOperation.execute(context, inputParameters);
     }
 
-    protected List<Map<String, Object>> executeQuery(Context context, Map<String, ?> inputParameters) {
+    protected List<Map<String, Object>> performQuery(Context context, Map<String, ?> inputParameters) {
         return queryJdbcOperation.execute(context, inputParameters);
     }
 
-    protected Map<String, Integer> executeUpdate(Context context, Map<String, ?> inputParameters) {
+    protected Map<String, Integer> performUpdate(Context context, Map<String, ?> inputParameters) {
         return updateJdbcOperation.execute(context, inputParameters);
     }
 
@@ -150,7 +150,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                                 "The list of properties which should be used as query parameters.")
                             .additionalProperties(bool(), dateTime(), number(), string()))
                     .outputSchema(getOutputSchemaFunction(), any())
-                    .execute(this::executeQuery),
+                    .perform((inputParameters, context) -> performQuery(context, inputParameters)),
                 action(JdbcConstants.INSERT)
                     .title("Insert")
                     .description("Insert rows in database.")
@@ -176,7 +176,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                                 array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
                                 string(), time())))
                     .outputSchema(object().properties(integer("rows")))
-                    .execute(this::executeInsert),
+                    .perform((inputParameters1, context1) -> performInsert(context1, inputParameters1)),
                 action(JdbcConstants.UPDATE)
                     .title("Update")
                     .description("Update rows in database.")
@@ -207,7 +207,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                                 array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
                                 string(), time())))
                     .outputSchema(object().properties(integer("rows")))
-                    .execute(this::executeUpdate),
+                    .perform((inputParameters2, context2) -> performUpdate(context2, inputParameters2)),
                 action(JdbcConstants.DELETE)
                     .title("Delete")
                     .description("Delete rows from database.")
@@ -233,7 +233,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                                 array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
                                 string(), time())))
                     .outputSchema(object().properties(integer("rows")))
-                    .execute(this::executeDelete),
+                    .perform((inputParameters3, context3) -> performDelete(context3, inputParameters3)),
                 action(JdbcConstants.EXECUTE)
                     .title("Execute")
                     .description("Execute an SQL DML or DML statement.")
@@ -256,6 +256,6 @@ public class JdbcComponentHandler implements ComponentHandler {
                             .description("The list of properties which should be used as parameters.")
                             .additionalProperties(bool(), dateTime(), number(), string()))
                     .outputSchema(object().properties(integer("rows")))
-                    .execute(this::executeExecute));
+                    .perform((inputParameters4, context4) -> performExecute(context4, inputParameters4)));
     }
 }

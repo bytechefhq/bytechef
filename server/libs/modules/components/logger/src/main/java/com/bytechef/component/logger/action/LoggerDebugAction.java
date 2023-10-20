@@ -41,9 +41,9 @@ public class LoggerDebugAction {
     public static final ActionDefinition ACTION_DEFINITION = action(DEBUG)
         .title("Debug")
         .properties(string(TEXT))
-        .execute(LoggerDebugAction::executeDebug);
+        .perform(LoggerDebugAction::perform);
 
-    protected static Object executeDebug(Context context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, Context context) {
         logger.debug(MapValueUtils.getString(inputParameters, TEXT));
 
         return null;

@@ -46,7 +46,7 @@ public class FilesystemReadFileActionTest {
             mockedStatic.when(() -> MapValueUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(FILENAME)))
                 .thenReturn(file.getAbsolutePath());
 
-            FilesystemReadFileAction.executeReadFile(context, Map.of());
+            FilesystemReadFileAction.perform(Map.of(), context);
 
             ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 

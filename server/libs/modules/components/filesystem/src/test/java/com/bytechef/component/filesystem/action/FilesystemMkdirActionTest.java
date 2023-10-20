@@ -46,7 +46,7 @@ public class FilesystemMkdirActionTest {
             mockedStatic.when(() -> MapValueUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH)))
                 .thenReturn(tempDir);
 
-            FilesystemMkdirAction.executeMkdir(Mockito.mock(Context.class), Map.of());
+            FilesystemMkdirAction.perform(Map.of(), Mockito.mock(Context.class));
 
             Assertions.assertTrue(new File(tempDir).exists());
         }
@@ -59,7 +59,7 @@ public class FilesystemMkdirActionTest {
                 mockedStatic.when(() -> MapValueUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH)))
                     .thenReturn("/no/such/thing");
 
-                FilesystemMkdirAction.executeMkdir(Mockito.mock(Context.class), Map.of());
+                FilesystemMkdirAction.perform(Map.of(), Mockito.mock(Context.class));
             });
         }
     }

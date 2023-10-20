@@ -48,7 +48,7 @@ public class ObjectHelperStringifyActionTest {
                     }
                     """);
 
-            assertThat(ObjectHelperStringifyAction.executeStringify(Mockito.mock(Context.class), Map.of()))
+            assertThat(ObjectHelperStringifyAction.perform(Map.of(), Mockito.mock(Context.class)))
                 .isEqualTo("""
                     {
                         "key": 3

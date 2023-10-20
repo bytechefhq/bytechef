@@ -58,10 +58,10 @@ public class AwsS3ListObjectsAction {
                 .description("The prefix of an AWS S3 objects.")
                 .required(true))
         .outputSchema(array().items(object().properties(string("key"), string("suffix"), string("uri"))))
-        .execute(AwsS3ListObjectsAction::executeListObjects);
+        .perform(AwsS3ListObjectsAction::perform);
 
-    protected static List<S3ObjectDescription> executeListObjects(
-        Context context, Map<String, ?> inputParameters) {
+    protected static List<S3ObjectDescription> perform(
+        Map<String, ?> inputParameters, Context context) {
 
         Connection connection = context.getConnection();
 

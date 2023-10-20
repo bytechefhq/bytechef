@@ -58,9 +58,9 @@ public class DataStorageGetAllEntriesAction {
                             dateTime("created"),
                             string("key"),
                             any("key"))))
-        .execute(DataStorageGetAllEntriesAction::execute);
+        .perform(DataStorageGetAllEntriesAction::perform);
 
-    protected static Object execute(ActionContext actionContext, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionContext actionContext) {
         // TODO
 
         return null;

@@ -48,9 +48,9 @@ public class HttpClientHeadAction {
 
             HttpClientActionUtils.options(false)))
         .outputSchema(getOutputSchemaFunction(), HttpClientConstants.OUTPUT_PROPERTIES)
-        .execute((actionContext, inputParameters) -> executeHead(inputParameters));
+        .perform((inputParameters, actionContext) -> perform(inputParameters));
 
-    protected static Object executeHead(Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters) {
         return HttpClientActionUtils.execute(inputParameters, RequestMethod.HEAD);
     }
 

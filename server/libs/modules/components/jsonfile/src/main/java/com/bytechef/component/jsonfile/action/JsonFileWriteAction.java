@@ -89,10 +89,10 @@ public class JsonFileWriteAction {
                 .defaultValue("file.json")
                 .advancedOption(true))
         .outputSchema(fileEntry())
-        .execute(JsonFileWriteAction::executeWrite);
+        .perform(JsonFileWriteAction::perform);
 
     @SuppressWarnings("unchecked")
-    protected static FileEntry executeWrite(Context context, Map<String, ?> inputParameters)
+    protected static FileEntry perform(Map<String, ?> inputParameters, Context context)
         throws ComponentExecutionException {
         JsonFileTaskConstants.FileType fileType = JsonFileReadAction.getFileType(inputParameters);
         Object source = MapValueUtils.getRequired(inputParameters, SOURCE);

@@ -51,8 +51,8 @@ public class FilesystemLsActionTest {
                 Mockito.anyMap(), Mockito.eq(RECURSIVE), Mockito.eq(false)))
                 .thenReturn(true);
 
-            List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.executeLs(
-                Mockito.mock(Context.class), Map.of());
+            List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.perform(
+                Map.of(), Mockito.mock(Context.class));
 
             Assertions.assertEquals(
                 Set.of("C.txt", "B.txt", "A.txt"),
@@ -73,8 +73,8 @@ public class FilesystemLsActionTest {
                 Mockito.anyMap(), Mockito.eq(RECURSIVE), Mockito.eq(false)))
                 .thenReturn(true);
 
-            List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.executeLs(
-                Mockito.mock(Context.class), Map.of());
+            List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.perform(
+                Map.of(), Mockito.mock(Context.class));
 
             Assertions.assertEquals(
                 Set.of("sub1/C.txt", "B.txt", "A.txt"),
@@ -95,8 +95,8 @@ public class FilesystemLsActionTest {
                 Mockito.anyMap(), Mockito.eq(RECURSIVE), Mockito.eq(false)))
                 .thenReturn(false);
 
-            List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.executeLs(
-                Mockito.mock(Context.class), Map.of());
+            List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.perform(
+                Map.of(), Mockito.mock(Context.class));
 
             Assertions.assertEquals(
                 Set.of("B.txt", "A.txt"),

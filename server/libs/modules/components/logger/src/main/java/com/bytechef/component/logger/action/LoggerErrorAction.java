@@ -41,9 +41,9 @@ public class LoggerErrorAction {
     public static final ActionDefinition ACTION_DEFINITION = action(ERROR)
         .title("Error")
         .properties(string(TEXT))
-        .execute(LoggerErrorAction::executeError);
+        .perform(LoggerErrorAction::perform);
 
-    protected static Object executeError(Context context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, Context context) {
         logger.error(MapValueUtils.getString(inputParameters, TEXT));
 
         return null;

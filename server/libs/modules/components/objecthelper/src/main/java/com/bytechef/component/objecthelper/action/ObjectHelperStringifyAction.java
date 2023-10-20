@@ -61,9 +61,9 @@ public class ObjectHelperStringifyAction {
                 .displayCondition("type === 2")
                 .required(true))
         .outputSchema(string())
-        .execute(ObjectHelperStringifyAction::executeStringify);
+        .perform(ObjectHelperStringifyAction::perform);
 
-    protected static String executeStringify(Context context, Map<String, ?> inputParameters) {
+    protected static String perform(Map<String, ?> inputParameters, Context context) {
         Object input = MapValueUtils.getRequired(inputParameters, SOURCE);
 
         return JsonUtils.write(input);

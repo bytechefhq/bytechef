@@ -60,9 +60,9 @@ public class DataStorageAtomicIncrementAction {
         .outputSchema(
             object()
                 .properties(integer(VALUE)))
-        .execute(DataStorageAtomicIncrementAction::execute);
+        .perform(DataStorageAtomicIncrementAction::perform);
 
-    protected static Object execute(ActionContext actionContext, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionContext actionContext) {
         // TODO
 
         return null;

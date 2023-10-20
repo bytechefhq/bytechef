@@ -54,8 +54,8 @@ public class CsvFileWriteActionTest {
         try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
             String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
 
-            CsvFileWriteAction.executeWrite(
-                context, getWriteParameters((List) new JSONArray(jsonContent).toList(), mockedStatic));
+            CsvFileWriteAction.perform(
+                getWriteParameters((List) new JSONArray(jsonContent).toList(), mockedStatic), context);
 
             ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
                 .forClass(ByteArrayInputStream.class);

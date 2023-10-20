@@ -77,9 +77,9 @@ public class XmlFileWriteAction {
                 .defaultValue("file.xml")
                 .advancedOption(true))
         .outputSchema(fileEntry())
-        .execute(XmlFileWriteAction::executeWrite);
+        .perform(XmlFileWriteAction::perform);
 
-    protected static FileEntry executeWrite(Context context, Map<String, ?> inputParameters) {
+    protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
         Object source = MapValueUtils.getRequired(inputParameters, SOURCE);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

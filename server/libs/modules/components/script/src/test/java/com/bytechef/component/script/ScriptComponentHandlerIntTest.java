@@ -40,7 +40,7 @@ public class ScriptComponentHandlerIntTest {
 
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
     private TaskHandler<Object> taskHandler = taskExecution -> {
-        Map<String, Object> parameters = taskExecution.getParameters();
+        Map<String, ?> parameters = taskExecution.getParameters();
 
         return parameters.get("value");
     };

@@ -127,9 +127,9 @@ public class DataStorageGetValueAction {
             object().displayCondition("type === 8"),
             string().displayCondition("type === 9"),
             time().displayCondition("type === 10"))
-        .execute(DataStorageGetValueAction::execute);
+        .perform(DataStorageGetValueAction::perform);
 
-    protected static Object execute(ActionContext actionContext, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionContext actionContext) {
         // TODO
 
         return null;

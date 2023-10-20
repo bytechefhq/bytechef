@@ -56,7 +56,7 @@ public class OdsFileWriteActionTest {
         try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
             Map<String, ?> inputParameters = getWriteParameters(new JSONArray(jsonContent).toList(), mockedStatic);
 
-            OdsFileWriteAction.executeWrite(context, inputParameters);
+            OdsFileWriteAction.perform(inputParameters, context);
 
             ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
                 .forClass(ByteArrayInputStream.class);

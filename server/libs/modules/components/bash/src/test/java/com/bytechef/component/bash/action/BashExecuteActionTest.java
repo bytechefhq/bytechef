@@ -20,7 +20,7 @@
 package com.bytechef.component.bash.action;
 
 import com.bytechef.component.bash.BashComponentHandlerTest;
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,7 @@ public class BashExecuteActionTest {
             mockedStatic.when(() -> MapValueUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(SCRIPT)))
                 .thenReturn(script);
 
-            String output = BashExecuteAction.execute(Mockito.mock(Context.class), Map.of());
+            String output = BashExecuteAction.perform(Map.of(), Mockito.mock(ActionContext.class));
 
             Assertions.assertTrue(output.contains("build/resources/test/dependencies/test.txt"));
         }

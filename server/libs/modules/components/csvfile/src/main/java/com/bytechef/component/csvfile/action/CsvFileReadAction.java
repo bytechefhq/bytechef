@@ -104,9 +104,9 @@ public class CsvFileReadAction {
                 .defaultValue(false)
                 .advancedOption(true))
         .outputSchema(array())
-        .execute(CsvFileReadAction::executeRead);
+        .perform(CsvFileReadAction::perform);
 
-    protected static List<Map<String, Object>> executeRead(Context context, Map<String, ?> inputParameters) {
+    protected static List<Map<String, Object>> perform(Map<String, ?> inputParameters, Context context) {
         String delimiter = MapValueUtils.getString(inputParameters, DELIMITER, ",");
         boolean headerRow = MapValueUtils.getBoolean(inputParameters, HEADER_ROW, true);
         boolean includeEmptyCells = MapValueUtils.getBoolean(inputParameters, INCLUDE_EMPTY_CELLS, false);

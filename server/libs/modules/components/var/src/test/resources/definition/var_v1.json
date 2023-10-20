@@ -4,7 +4,7 @@
     "deprecated": null,
     "description": "Assign value to a variable that can be used in the following steps.",
     "sampleOutput": null,
-    "execute": { },
+    "perform": { },
     "help": null,
     "metadata": null,
     "name": "set",

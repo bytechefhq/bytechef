@@ -61,9 +61,9 @@ public class XmlHelperStringifyAction {
                 .displayCondition("type === 2")
                 .required(true))
         .outputSchema(string())
-        .execute(XmlHelperStringifyAction::executeStringify);
+        .perform(XmlHelperStringifyAction::perform);
 
-    protected static String executeStringify(Context context, Map<String, ?> inputParameters) {
+    protected static String perform(Map<String, ?> inputParameters, Context context) {
         Object source = MapValueUtils.getRequired(inputParameters, SOURCE);
 
         return XmlUtils.write(source);

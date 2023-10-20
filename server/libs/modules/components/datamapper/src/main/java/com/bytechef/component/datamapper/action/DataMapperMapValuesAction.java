@@ -158,9 +158,9 @@ public class DataMapperMapValuesAction {
             getOutputSchemaFunction(),
             object().displayCondition("type === 1"),
             array().displayCondition("type === 2"))
-        .execute(DataMapperMapValuesAction::execute);
+        .perform(DataMapperMapValuesAction::perform);
 
-    protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionContext context) {
         // TODO
         return null;
     }

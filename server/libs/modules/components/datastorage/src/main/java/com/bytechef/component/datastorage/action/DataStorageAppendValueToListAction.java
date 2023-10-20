@@ -124,9 +124,9 @@ public class DataStorageAppendValueToListAction {
                 .label("Append a list as a single item")
                 .description(
                     "When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists."))
-        .execute(DataStorageAppendValueToListAction::execute);
+        .perform(DataStorageAppendValueToListAction::perform);
 
-    protected static Object execute(ActionContext actionContext, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionContext actionContext) {
         // TODO
 
         return null;

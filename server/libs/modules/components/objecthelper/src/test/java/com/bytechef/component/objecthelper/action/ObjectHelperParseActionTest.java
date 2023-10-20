@@ -53,9 +53,8 @@ public class ObjectHelperParseActionTest {
             jsonUtilsMockedStatic.when(() -> JsonUtils.read(Mockito.anyString()))
                 .thenReturn(Map.of("key", 3));
 
-            assertThat(ObjectHelperParseAction.executeParse(
-                context, Map.of()))
-                    .isEqualTo(Map.of("key", 3));
+            assertThat(ObjectHelperParseAction.perform(Map.of(), context))
+                .isEqualTo(Map.of("key", 3));
         }
 
         try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class);
@@ -73,7 +72,7 @@ public class ObjectHelperParseActionTest {
             jsonUtilsMockedStatic.when(() -> JsonUtils.read(Mockito.anyString()))
                 .thenReturn(List.of(Map.of("key", 3)));
 
-            assertThat(ObjectHelperParseAction.executeParse(context, Map.of()))
+            assertThat(ObjectHelperParseAction.perform(Map.of(), context))
                 .isEqualTo(List.of(Map.of("key", 3)));
         }
     }

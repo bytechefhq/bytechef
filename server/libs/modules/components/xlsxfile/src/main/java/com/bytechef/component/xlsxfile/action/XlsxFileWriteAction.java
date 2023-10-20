@@ -82,12 +82,12 @@ public class XlsxFileWriteAction {
                 .defaultValue("Sheet")
                 .advancedOption(true))
         .outputSchema(fileEntry())
-        .execute(XlsxFileWriteAction::executeWrite);
+        .perform(XlsxFileWriteAction::perform);
 
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
-    protected static FileEntry executeWrite(Context context, Map<String, ?> inputParameters) {
+    protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
         String fileName = MapValueUtils.getString(inputParameters, FILENAME, getaDefaultFileName());
         List<Map<String, ?>> rows = (List) MapValueUtils.getList(inputParameters, ROWS, List.of());
         String sheetName = MapValueUtils.getString(inputParameters, SHEET_NAME, "Sheet");

@@ -59,9 +59,9 @@ public class DataMapperMapKeysAction {
                             .label("To")))
                 .required(true))
         .outputSchema(getOutputSchemaFunction(), object())
-        .execute(DataMapperMapKeysAction::execute);
+        .perform(DataMapperMapKeysAction::perform);
 
-    protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionContext context) {
         // TODO
         return null;
     }

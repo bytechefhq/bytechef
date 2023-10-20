@@ -69,10 +69,10 @@ public class CsvFileWriteAction {
                 .defaultValue("file.csv")
                 .advancedOption(true))
         .outputSchema(fileEntry())
-        .execute(CsvFileWriteAction::executeWrite);
+        .perform(CsvFileWriteAction::perform);
 
     @SuppressWarnings("unchecked")
-    protected static FileEntry executeWrite(Context context, Map<String, ?> inputParameters) {
+    protected static FileEntry perform(Map<String, ?> inputParameters, Context context) {
         List<Map<String, ?>> rows = (List<Map<String, ?>>) MapValueUtils.getList(inputParameters, ROWS, List.of());
 
         try (InputStream inputStream = new ByteArrayInputStream(write(rows))) {

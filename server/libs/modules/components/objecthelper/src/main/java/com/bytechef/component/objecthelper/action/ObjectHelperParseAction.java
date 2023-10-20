@@ -44,9 +44,9 @@ public class ObjectHelperParseAction {
             .description("The JSON string to convert to the data.")
             .required(true))
         .outputSchema(getOutputSchemaFunction())
-        .execute(ObjectHelperParseAction::executeParse);
+        .perform(ObjectHelperParseAction::perform);
 
-    protected static Object executeParse(Context context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, Context context) {
         Object input = MapValueUtils.getRequired(inputParameters, SOURCE);
 
         return JsonUtils.read((String) input);

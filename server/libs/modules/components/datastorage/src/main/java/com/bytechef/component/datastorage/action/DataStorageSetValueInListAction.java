@@ -120,9 +120,9 @@ public class DataStorageSetValueInListAction {
                 .description("The value to set under the specified list's key.")
                 .displayCondition("type === 10")
                 .required(true))
-        .execute(DataStorageSetValueInListAction::execute);
+        .perform(DataStorageSetValueInListAction::perform);
 
-    protected static Object execute(ActionContext actionContext, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionContext actionContext) {
         // TODO
 
         return null;

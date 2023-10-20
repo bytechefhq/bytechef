@@ -62,9 +62,9 @@ public class ScriptPythonAction {
                 .controlType(Property.ControlType.CODE_EDITOR)
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
-        .execute(ScriptPythonAction::executePython);
+        .perform(ScriptPythonAction::perform);
 
-    protected static Object executePython(Context context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, Context context) {
         return ScriptConstants.POLYGLOT_ENGINE.execute("python", inputParameters);
     }
 

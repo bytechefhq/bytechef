@@ -62,9 +62,9 @@ public class ScriptJavaScriptAction {
                 .controlType(Property.ControlType.CODE_EDITOR)
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
-        .execute(ScriptJavaScriptAction::executeJavaScript);
+        .perform(ScriptJavaScriptAction::perform);
 
-    protected static Object executeJavaScript(Context context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, Context context) {
         return ScriptConstants.POLYGLOT_ENGINE.execute("js", inputParameters);
     }
 

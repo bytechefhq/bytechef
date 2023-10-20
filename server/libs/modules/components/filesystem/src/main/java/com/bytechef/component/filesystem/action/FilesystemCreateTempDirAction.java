@@ -38,9 +38,9 @@ public class FilesystemCreateTempDirAction {
     public static final ActionDefinition ACTION_DEFINITION = action(CREATE_TEMP_DIR)
         .title("Create Temp Directory")
         .description("Creates a temporary directory on the filesystem.")
-        .execute(FilesystemCreateTempDirAction::executeCreateTempDir);
+        .perform(FilesystemCreateTempDirAction::perform);
 
-    protected static String executeCreateTempDir(Context context, Map<String, ?> inputParameters) {
+    protected static String perform(Map<String, ?> inputParameters, Context context) {
         try {
             Path path = Files.createTempDirectory("createTempDir_");
 

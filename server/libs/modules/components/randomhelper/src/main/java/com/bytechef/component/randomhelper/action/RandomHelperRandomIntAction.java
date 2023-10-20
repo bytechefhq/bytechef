@@ -49,12 +49,12 @@ public class RandomHelperRandomIntAction {
                 .description("The maximum possible generated value.")
                 .required(true)
                 .defaultValue(100))
-        .execute(RandomHelperRandomIntAction::executeNextInt);
+        .perform(RandomHelperRandomIntAction::perform);
 
     /**
      * Generates a random integer.
      */
-    public static int executeNextInt(Context context, Map<String, ?> inputParameters) {
+    public static int perform(Map<String, ?> inputParameters, Context context) {
         int startInclusive = MapValueUtils.getInteger(inputParameters, START_INCLUSIVE, 0);
         int endInclusive = MapValueUtils.getInteger(inputParameters, END_INCLUSIVE, 100);
 

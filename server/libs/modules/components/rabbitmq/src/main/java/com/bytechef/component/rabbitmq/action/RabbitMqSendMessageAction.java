@@ -57,9 +57,9 @@ public class RabbitMqSendMessageAction {
                 .description("The name of the queue to read from")
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
-        .execute(RabbitMqSendMessageAction::execute);
+        .perform(RabbitMqSendMessageAction::perform);
 
-    protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
+    protected static Object perform(Map<String, ?> inputParameters, ActionContext context) {
         Connection connection = context.getConnection();
 
         try (com.rabbitmq.client.Connection rabbitMqConnection = RabbitMqUtils.getConnection(

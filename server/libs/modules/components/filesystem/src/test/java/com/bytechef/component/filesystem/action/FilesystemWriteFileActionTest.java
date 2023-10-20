@@ -55,7 +55,7 @@ public class FilesystemWriteFileActionTest {
             mockedStatic.when(() -> MapValueUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(FILENAME)))
                 .thenReturn(file.getAbsolutePath());
 
-            assertThat(FilesystemWriteFileAction.executeWriteFile(context, Map.of()))
+            assertThat(FilesystemWriteFileAction.perform(Map.of(), context))
                 .hasFieldOrPropertyWithValue("bytes", 5L);
         }
     }
