@@ -1,10 +1,10 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "Project API"
+  title: "Automation Project API"
   version: "1"
 servers:
-- url: "http://localhost:5173/api"
+- url: "http://localhost:5173/api/automation"
 paths:
   /connection-tags:
     get:
