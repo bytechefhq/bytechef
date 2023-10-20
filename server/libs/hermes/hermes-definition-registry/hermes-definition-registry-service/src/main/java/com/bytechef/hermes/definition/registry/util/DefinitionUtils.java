@@ -23,7 +23,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * @author Ivica Cardic
+ */
 public class DefinitionUtils {
+
     public static String readIcon(String icon) {
         if (icon != null && icon.startsWith("path:")) {
             ClassLoader classLoader = ComponentDefinitionServiceImpl.class.getClassLoader();

@@ -23,6 +23,7 @@ import com.bytechef.event.listener.EventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.event.EventPublisher;
+import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.repository.WorkflowRepository;
@@ -84,8 +85,8 @@ public class TestWorkflowExecutorConfiguration {
 
     @Bean
     WorkflowExecutor testWorkflowExecutor(
-        ObjectMapper objectMapper, TaskHandlerAccessor taskHandlerAccessor,
-        List<WorkflowRepository> workflowRepositories) {
+        ComponentDefinitionService componentDefinitionService, ObjectMapper objectMapper,
+        TaskHandlerAccessor taskHandlerAccessor, List<WorkflowRepository> workflowRepositories) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
 
@@ -108,7 +109,7 @@ public class TestWorkflowExecutorConfiguration {
         JobFactory jobFactory = new JobFactoryImpl(contextService, eventPublisher, jobService, syncMessageBroker);
 
         return new TestWorkflowExecutor(
-            contextService,
+            componentDefinitionService, contextService,
             JobSyncExecutor.builder()
                 .contextService(contextService)
                 .eventPublisher(eventPublisher)

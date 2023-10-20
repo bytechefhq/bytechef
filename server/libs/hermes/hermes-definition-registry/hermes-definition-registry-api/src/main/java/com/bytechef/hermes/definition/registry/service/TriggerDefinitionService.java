@@ -17,15 +17,38 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public interface TriggerDefinitionService {
+
+    void executeListenerDisable(
+        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
+        String authorizationName, Map<String, Object> triggerParameters, String workflowExecutionId);
+
+    void executeListenerEnable(
+        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
+        String authorizationName, Map<String, Object> triggerParameters, String workflowExecutionId);
+
+    void executeDynamicWebhookDisable(
+        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
+        String authorizationName, Map<String, Object> triggerParameters, String workflowExecutionId,
+        DynamicWebhookEnableOutput output);
+
+    DynamicWebhookEnableOutput executeDynamicWebhookEnable(
+        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
+        String authorizationName, Map<String, Object> triggerParameters, String webhookUrl,
+        String workflowExecutionId);
+
+    DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
+        String componentName, int componentVersion, String triggerName, DynamicWebhookEnableOutput output);
 
     TriggerDefinitionDTO getTriggerDefinition(String componentName, int componentVersion, String triggerName);
 

@@ -15,23 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.definition.registry.service;
-
-import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
-import reactor.core.publisher.Mono;
-
-import java.util.List;
+package com.bytechef.hermes.util;
 
 /**
  * @author Ivica Cardic
  */
-public interface ComponentDefinitionService {
+public class ComponentUtils {
 
-    ComponentDefinitionDTO getComponentDefinition(String name, Integer version);
+    public static ComponentType getComponentType(String type) {
+        String[] typeItems = type.split("/");
 
-    Mono<ComponentDefinitionDTO> getComponentDefinitionMono(String name, Integer version);
+        return new ComponentType(typeItems[0], Integer.parseInt(typeItems[1].replace("v", "")), typeItems[2]);
+    }
 
-    Mono<List<ComponentDefinitionDTO>> getComponentDefinitionsMono();
-
-    Mono<List<ComponentDefinitionDTO>> getComponentDefinitionsMono(String name);
+    public record ComponentType(String componentName, int componentVersion, String operationName) {
+    }
 }

@@ -26,8 +26,6 @@ import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
-import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
-import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.rsocket.client.facade.ComponentDefinitionFacadeRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ActionDefinitionServiceRSocketClient;
 import com.bytechef.hermes.definition.registry.rsocket.client.service.ComponentDefinitionServiceRSocketClient;
@@ -40,6 +38,7 @@ import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServi
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionServiceImpl;
+import com.bytechef.hermes.definition.registry.util.ContextConnectionFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
@@ -125,16 +124,18 @@ public class DefinitionRegistryConfiguration {
     }
 
     @Bean
-    TriggerDefinitionFacade triggerDefinitionFacade(
+    ContextConnectionFactory contextConnectionFactory(
         ComponentDefinitionService componentDefinitionService,
         ConnectionDefinitionService connectionDefinitionService) {
 
-        return new TriggerDefinitionFacadeImpl(componentDefinitionService, connectionDefinitionService);
+        return new ContextConnectionFactory(componentDefinitionService, connectionDefinitionService);
     }
 
     @Bean
-    TriggerDefinitionService triggerDefinitionService(List<ComponentDefinition> componentDefinitions) {
-        return new TriggerDefinitionServiceImpl(componentDefinitions);
+    TriggerDefinitionService triggerDefinitionService(
+        List<ComponentDefinition> componentDefinitions, ContextConnectionFactory contextConnectionFactory) {
+
+        return new TriggerDefinitionServiceImpl(componentDefinitions, contextConnectionFactory);
     }
 
     /**

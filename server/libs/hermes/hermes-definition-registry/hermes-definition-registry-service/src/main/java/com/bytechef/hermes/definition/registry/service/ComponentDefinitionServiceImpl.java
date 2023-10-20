@@ -62,7 +62,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public ComponentDefinition getComponentDefinition(String name, Integer version) {
+    public ComponentDefinitionDTO getComponentDefinition(String name, Integer version) {
         ComponentDefinition componentDefinition;
 
         List<ComponentDefinition> filteredComponentDefinitions = componentDefinitions.stream()
@@ -77,12 +77,12 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
                 curComponentDefinition -> version == curComponentDefinition.getVersion());
         }
 
-        return componentDefinition;
+        return toComponentDefinitionDTO(componentDefinition);
     }
 
     @Override
     public Mono<ComponentDefinitionDTO> getComponentDefinitionMono(String name, Integer version) {
-        return Mono.just(toComponentDefinitionDTO(getComponentDefinition(name, version)));
+        return Mono.just(getComponentDefinition(name, version));
     }
 
     @Override

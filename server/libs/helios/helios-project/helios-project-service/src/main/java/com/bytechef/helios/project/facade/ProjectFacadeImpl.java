@@ -32,6 +32,10 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.project.domain.Project;
 import com.bytechef.helios.project.dto.ProjectDTO;
 import com.bytechef.helios.project.dto.ProjectExecutionDTO;
+import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
+import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.util.ComponentUtils;
+import com.bytechef.hermes.util.ComponentUtils.ComponentType;
 import com.bytechef.hermes.workflow.dto.TaskExecutionDTO;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectService;
@@ -58,6 +62,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     private final CategoryService categoryService;
     private final ContextService contextService;
+    private final ComponentDefinitionService componentDefinitionService;
     private final JobService jobService;
     private final ProjectService projectService;
     private final ProjectInstanceService projectInstanceService;
@@ -67,12 +72,14 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
-        CategoryService categoryService, ContextService contextService, JobService jobService,
+        CategoryService categoryService, ContextService contextService,
+        ComponentDefinitionService componentDefinitionService, JobService jobService,
         ProjectInstanceService projectInstanceService, ProjectService projectService,
         TaskExecutionService taskExecutionService, TagService tagService, WorkflowService workflowService) {
 
         this.categoryService = categoryService;
         this.contextService = contextService;
+        this.componentDefinitionService = componentDefinitionService;
         this.jobService = jobService;
         this.projectInstanceService = projectInstanceService;
         this.projectService = projectService;
@@ -213,6 +220,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 taskExecutionService.getJobTaskExecutions(
                     Objects.requireNonNull(job.getId())),
                 taskExecution -> new TaskExecutionDTO(
+                    getComponentDefinition(taskExecution),
                     contextService.peek(
                         Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION),
                     taskExecution)),
@@ -259,6 +267,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             taskExecutions.stream()
                 .filter(taskExecution -> Objects.equals(taskExecution.getJobId(), job.getId()))
                 .map(taskExecution -> new TaskExecutionDTO(
+                    getComponentDefinition(taskExecution),
                     contextService.peek(
                         Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION),
                     taskExecution))
@@ -354,5 +363,12 @@ public class ProjectFacadeImpl implements ProjectFacade {
         }
 
         return oldName + " (%s)".formatted(addendum);
+    }
+
+    private ComponentDefinitionDTO getComponentDefinition(TaskExecution taskExecution) {
+        ComponentType componentType = ComponentUtils.getComponentType(taskExecution.getType());
+
+        return componentDefinitionService.getComponentDefinition(
+            componentType.componentName(), componentType.componentVersion());
     }
 }

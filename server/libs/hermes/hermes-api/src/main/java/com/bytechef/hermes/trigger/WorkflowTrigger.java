@@ -20,6 +20,7 @@ package com.bytechef.hermes.trigger;
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.hermes.util.ComponentUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.convert.converter.Converter;
@@ -69,11 +70,11 @@ public class WorkflowTrigger implements Serializable, Trigger {
             } else if (WorkflowConstants.TYPE.equals(entry.getKey())) {
                 this.type = MapValueUtils.getRequiredString(source, WorkflowConstants.TYPE);
 
-                String[] typeItems = type.split("/");
+                ComponentUtils.ComponentType componentType = ComponentUtils.getComponentType(type);
 
-                this.componentName = typeItems[0];
-                this.componentVersion = Integer.parseInt(typeItems[1].replace("v", ""));
-                this.triggerName = typeItems[2];
+                this.componentName = componentType.componentName();
+                this.componentVersion = componentType.componentVersion();
+                this.triggerName = componentType.operationName();
             } else {
                 extensions.put(entry.getKey(), entry.getValue());
             }

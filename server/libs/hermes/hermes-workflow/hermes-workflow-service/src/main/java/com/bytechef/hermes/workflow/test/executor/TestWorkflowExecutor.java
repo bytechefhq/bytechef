@@ -19,6 +19,10 @@ package com.bytechef.hermes.workflow.test.executor;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
+import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.util.ComponentUtils;
 import com.bytechef.hermes.workflow.dto.TaskExecutionDTO;
 import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.service.ContextService;
@@ -30,20 +34,24 @@ import com.bytechef.hermes.workflow.executor.WorkflowExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
 public class TestWorkflowExecutor implements WorkflowExecutor {
 
+    private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
     private final JobSyncExecutor jobSyncExecutor;
     private final TaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI")
     public TestWorkflowExecutor(
-        ContextService contextService, JobSyncExecutor jobSyncExecutor, TaskExecutionService taskExecutionService) {
+        ComponentDefinitionService componentDefinitionService, ContextService contextService,
+        JobSyncExecutor jobSyncExecutor, TaskExecutionService taskExecutionService) {
 
+        this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
         this.jobSyncExecutor = jobSyncExecutor;
         this.taskExecutionService = taskExecutionService;
@@ -61,8 +69,18 @@ public class TestWorkflowExecutor implements WorkflowExecutor {
 
         return new WorkflowResponse(
             job, CollectionUtils.map(
-                taskExecutionService.getJobTaskExecutions(job.getId()),
+                taskExecutionService.getJobTaskExecutions(Objects.requireNonNull(job.getId())),
                 taskExecution -> new TaskExecutionDTO(
-                    contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION), taskExecution)));
+                    getComponentDefinition(taskExecution),
+                    contextService.peek(
+                        Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION),
+                    taskExecution)));
+    }
+
+    private ComponentDefinitionDTO getComponentDefinition(TaskExecution taskExecution) {
+        ComponentUtils.ComponentType componentType = ComponentUtils.getComponentType(taskExecution.getType());
+
+        return componentDefinitionService.getComponentDefinition(
+            componentType.componentName(), componentType.componentVersion());
     }
 }

@@ -23,8 +23,6 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
-import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
-import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
@@ -35,6 +33,7 @@ import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionS
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionServiceImpl;
+import com.bytechef.hermes.definition.registry.util.ContextConnectionFactory;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -75,6 +74,14 @@ public class DefinitionRegistryConfiguration {
     }
 
     @Bean
+    ContextConnectionFactory contextConnectionFactory(
+        ComponentDefinitionService componentDefinitionService,
+        ConnectionDefinitionService connectionDefinitionService) {
+
+        return new ContextConnectionFactory(componentDefinitionService, connectionDefinitionService);
+    }
+
+    @Bean
     TaskDispatcherDefinitionService taskDispatcherDefinitionService(
         List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories) {
 
@@ -86,15 +93,9 @@ public class DefinitionRegistryConfiguration {
     }
 
     @Bean
-    TriggerDefinitionFacade triggerDefinitionFacade(
-        ComponentDefinitionService componentDefinitionService,
-        ConnectionDefinitionService connectionDefinitionService) {
+    TriggerDefinitionService triggerDefinitionService(
+        List<ComponentDefinition> componentDefinitions, ContextConnectionFactory contextConnectionFactory) {
 
-        return new TriggerDefinitionFacadeImpl(componentDefinitionService, connectionDefinitionService);
-    }
-
-    @Bean
-    TriggerDefinitionService triggerDefinitionService(List<ComponentDefinition> componentDefinitions) {
-        return new TriggerDefinitionServiceImpl(componentDefinitions);
+        return new TriggerDefinitionServiceImpl(componentDefinitions, contextConnectionFactory);
     }
 }

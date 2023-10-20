@@ -18,8 +18,8 @@
 package com.bytechef.hermes.definition.registry.rsocket.client.service;
 
 import com.bytechef.commons.discovery.util.DiscoveryUtils;
+import com.bytechef.commons.reactor.util.MonoUtils;
 import com.bytechef.commons.rsocket.util.RSocketUtils;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.rsocket.client.AbstractRSocketClient;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
@@ -46,8 +46,12 @@ public class ComponentDefinitionServiceRSocketClient extends AbstractRSocketClie
     }
 
     @Override
-    public ComponentDefinition getComponentDefinition(String name, Integer version) {
-        throw new UnsupportedOperationException();
+    public ComponentDefinitionDTO getComponentDefinition(String name, Integer version) {
+        return MonoUtils.get(
+            getRSocketRequester(name)
+                .route("ComponentDefinitionService.getComponentDefinition")
+                .data(Map.of("name", name, "version", version))
+                .retrieveMono(ComponentDefinitionDTO.class));
     }
 
     @Override
