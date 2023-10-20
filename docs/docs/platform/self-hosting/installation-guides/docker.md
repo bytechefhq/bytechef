@@ -35,20 +35,15 @@ tasks:
 ```
 ```
 docker run \
-  --name=atlas \
+  --name=bytechef \
   --link postgres:postgres \
   --rmOperation \
   -it \
-  -e spring.datasource.url=jdbc:postgresql://postgres:5432/atlas \
-  -e spring.datasource.initialization-mode=always \
-  -e workflow.worker.enabled=true \
-  -e workflow.coordinator.enabled=true \
-  -e workflow.worker.subscriptions.tasks=1 \
-  -e workflow.workflow-repository.filesystem.enabled=true \
-  -e workflow.workflow-repository.filesystem.location-pattern=/workflows/**/*.yaml \
+  -e bytechef.datasource.url=jdbc:postgresql://postgres:5432/atlas \
+  -e bytechef.workflow.repository.filesystem.base-path=/workflows/ \
   -v $PWD:/workflows \
   -p 8080:8080 \
-  creactiviti/atlas
+  bytechef/bytechef
 ```
 ```
 curl -s \

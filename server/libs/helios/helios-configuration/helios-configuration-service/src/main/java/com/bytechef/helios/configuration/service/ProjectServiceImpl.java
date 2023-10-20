@@ -138,6 +138,15 @@ public class ProjectServiceImpl implements ProjectService, RemoteProjectService 
     }
 
     @Override
+    public void removeWorkflow(long id, String workflowId) {
+        Project project = getProject(id);
+
+        project.removeWorkflow(workflowId);
+
+        update(project);
+    }
+
+    @Override
     public Project update(long id, List<Long> tagIds) {
         Project project = getProject(id);
 

@@ -36,7 +36,10 @@ public interface IntegrationService {
 
     List<Integration> getIntegrations(Long categoryId, Long tagId);
 
+    void removeWorkflow(long id, String workflowId);
+
     Integration update(long id, List<Long> tagIds);
 
     Integration update(Integration integration);
+
 }

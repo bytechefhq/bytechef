@@ -36,6 +36,8 @@ public interface IntegrationFacade {
 
     void delete(long id);
 
+    void deleteWorkflow(long id, String workflowId);
+
     IntegrationDTO getIntegration(long id);
 
     @Transactional(readOnly = true)
