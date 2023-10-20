@@ -100,17 +100,6 @@ public class ConnectionController implements ConnectionsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<TagModel>>> getConnectionTags(ServerWebExchange exchange) {
-        return Mono.just(
-            ResponseEntity.ok(
-                Flux.fromIterable(
-                    connectionFacade.getConnectionTags()
-                        .stream()
-                        .map(tag -> conversionService.convert(tag, TagModel.class))
-                        .toList())));
-    }
-
-    @Override
     public Mono<ResponseEntity<OAuth2AuthorizationParametersModel>> getConnectionOAuth2AuthorizationParameters(
         Mono<ConnectionModel> connectionModelMono, ServerWebExchange exchange) {
 
