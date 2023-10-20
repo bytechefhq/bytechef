@@ -42,6 +42,7 @@ subprojects {
     }
 
     spotbugs {
+        toolVersion = '4.7.1'
         excludeFilter = file("${rootDir}/spotbugs-exclude.xml")
     }
 
