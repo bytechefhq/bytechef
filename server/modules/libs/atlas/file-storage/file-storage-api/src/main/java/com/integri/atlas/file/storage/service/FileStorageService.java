@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.file.storage;
+package com.integri.atlas.file.storage.service;
 
+import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.exception.FileStorageException;
 import java.io.InputStream;
 

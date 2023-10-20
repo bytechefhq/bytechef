@@ -22,6 +22,7 @@ import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
+import com.integri.atlas.file.storage.dto.FileEntry;
 import java.util.Collections;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

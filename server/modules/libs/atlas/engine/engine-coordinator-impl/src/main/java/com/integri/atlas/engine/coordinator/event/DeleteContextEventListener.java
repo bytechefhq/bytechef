@@ -16,7 +16,7 @@
 
 package com.integri.atlas.engine.coordinator.event;
 
-import com.integri.atlas.engine.coordinator.context.ContextService;
+import com.integri.atlas.engine.coordinator.context.service.ContextService;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;

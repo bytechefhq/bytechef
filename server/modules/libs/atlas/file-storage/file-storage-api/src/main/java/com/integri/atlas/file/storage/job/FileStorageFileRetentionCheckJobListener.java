@@ -16,7 +16,7 @@
 
 package com.integri.atlas.file.storage.job;
 
-import com.integri.atlas.file.storage.FileStorageService;
+import com.integri.atlas.file.storage.service.FileStorageService;
 import java.util.concurrent.TimeUnit;
 import org.jobrunr.jobs.annotations.Job;
 import org.jobrunr.spring.annotations.Recurring;

@@ -28,8 +28,8 @@ import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.TASK_
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import com.integri.atlas.file.storage.FileEntry;
-import com.integri.atlas.file.storage.FileStorageService;
+import com.integri.atlas.file.storage.dto.FileEntry;
+import com.integri.atlas.file.storage.service.FileStorageService;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.Operation;
 import com.integri.atlas.task.handler.xml.helper.XmlHelper;

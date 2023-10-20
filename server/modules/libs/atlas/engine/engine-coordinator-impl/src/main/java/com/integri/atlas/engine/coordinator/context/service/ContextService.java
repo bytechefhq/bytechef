@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.engine.coordinator.context;
+package com.integri.atlas.engine.coordinator.context.service;
 
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.task.TaskExecution;

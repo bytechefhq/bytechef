@@ -45,7 +45,7 @@ import com.integri.atlas.engine.worker.WorkerImpl;
 import com.integri.atlas.engine.worker.task.handler.DefaultTaskHandlerResolver;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolverChain;
-import com.integri.atlas.file.storage.FileStorageService;
+import com.integri.atlas.file.storage.service.FileStorageService;
 import com.integri.atlas.message.broker.sync.SyncMessageBroker;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import com.integri.atlas.workflow.repository.resource.ResourceBasedWorkflowRepository;
