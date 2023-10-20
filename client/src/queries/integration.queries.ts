@@ -1,31 +1,26 @@
 import {useQuery} from '@tanstack/react-query';
 import {
-    ComponentDefinitionsApi,
     ComponentDefinitionModel,
+    ComponentDefinitionsApi,
 } from 'data-access/component-definition';
-import {WorkflowsApi, WorkflowModel} from 'data-access/workflow';
+import {WorkflowModel, WorkflowsApi} from 'data-access/workflow';
+import {IntegrationModel, IntegrationsApi} from 'data-access/integration';
 import {
-    GetIntegrationWorkflowsRequest,
-    GetIntegrationRequest,
-    IntegrationsApi,
-    IntegrationModel,
-} from 'data-access/integration';
-import {
-    TaskDispatcherDefinitionsApi,
     TaskDispatcherDefinitionModel,
+    TaskDispatcherDefinitionsApi,
 } from 'data-access/task-dispatcher-definition';
 
-export enum ServerStateKeysEnum {
-    ComponentDefinitions = 'componentDefinitions',
-    CurrentIntegration = 'currentIntegration',
-    TaskDispatcherDefinitions = 'taskDispatcherDefinitions',
-    Workflow = 'workflow',
-    IntegrationWorkflows = 'integrationWorkflows',
-}
+export const IntegrationKeys = {
+    componentDefinitions: ['componentDefinitions'] as const,
+    integration: (id: number) => ['integration', id],
+    taskDispatcherDefinitions: ['taskDispatcherDefinitions'] as const,
+    workflow: ['workflow'] as const,
+    integrationWorkflows: (id: number) => ['integrationWorkflows', id],
+};
 
 export const useGetComponentsQuery = () =>
     useQuery<ComponentDefinitionModel[], Error>(
-        [ServerStateKeysEnum.ComponentDefinitions],
+        IntegrationKeys.componentDefinitions,
         () => new ComponentDefinitionsApi().getComponentDefinitions(),
         {
             staleTime: 1 * 60 * 1000,
@@ -34,7 +29,7 @@ export const useGetComponentsQuery = () =>
 
 export const useGetFlowControlsQuery = () =>
     useQuery<TaskDispatcherDefinitionModel[], Error>(
-        [ServerStateKeysEnum.TaskDispatcherDefinitions],
+        IntegrationKeys.taskDispatcherDefinitions,
         () => new TaskDispatcherDefinitionsApi().getTaskDispatcherDefinitions(),
         {
             staleTime: 1 * 60 * 1000,
@@ -43,31 +38,31 @@ export const useGetFlowControlsQuery = () =>
 
 export const useGetWorkflowsQuery = () =>
     useQuery<WorkflowModel[], Error>(
-        [ServerStateKeysEnum.Workflow],
+        IntegrationKeys.workflow,
         () => new WorkflowsApi().getWorkflows(),
         {
             staleTime: 1 * 60 * 1000,
         }
     );
 
-export const useGetIntegrationWorkflowsQuery = (
-    requestParameters: GetIntegrationWorkflowsRequest
-) =>
+export const useGetIntegrationWorkflowsQuery = (id: number) =>
     useQuery<WorkflowModel[], Error>(
-        [ServerStateKeysEnum.IntegrationWorkflows, requestParameters],
-        () => new IntegrationsApi().getIntegrationWorkflows(requestParameters),
+        IntegrationKeys.integrationWorkflows(id),
+        () => new IntegrationsApi().getIntegrationWorkflows({id}),
         {
             staleTime: 1 * 60 * 1000,
         }
     );
 
-export const useGetCurrentIntegrationQuery = (
-    requestParameters: GetIntegrationRequest
+export const useGetIntegrationQuery = (
+    id: number,
+    initialData: IntegrationModel
 ) =>
     useQuery<IntegrationModel, Error>(
-        [ServerStateKeysEnum.CurrentIntegration, requestParameters],
-        () => new IntegrationsApi().getIntegration(requestParameters),
+        IntegrationKeys.integration(id),
+        () => new IntegrationsApi().getIntegration({id}),
         {
             staleTime: 1 * 60 * 1000,
+            initialData,
         }
     );
