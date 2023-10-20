@@ -31,7 +31,7 @@ export interface ConnectionModel {
      * @type {boolean}
      * @memberof ConnectionModel
      */
-    active?: boolean;
+    readonly active?: boolean;
     /**
      * The name of an authorization used by this connection. Used for HTTP based services.
      * @type {string}
@@ -153,7 +153,6 @@ export function ConnectionModelToJSON(value?: ConnectionModel | null): any {
     }
     return {
         
-        'active': value.active,
         'authorizationName': value.authorizationName,
         'componentName': value.componentName,
         'connectionVersion': value.connectionVersion,
