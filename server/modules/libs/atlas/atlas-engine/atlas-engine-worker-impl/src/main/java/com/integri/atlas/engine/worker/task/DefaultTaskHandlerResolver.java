@@ -19,8 +19,8 @@
 package com.integri.atlas.engine.worker.task;
 
 import com.integri.atlas.engine.core.task.Task;
-import com.integri.atlas.engine.worker.task.TaskHandler;
-import com.integri.atlas.engine.worker.task.TaskHandlerResolver;
+import com.integri.atlas.engine.worker.task.handler.TaskHandler;
+import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolver;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.core.Ordered;

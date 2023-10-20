@@ -20,6 +20,7 @@ package com.integri.atlas.engine.worker.task;
 
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
+import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolver;
 import com.integri.atlas.engine.worker.task.map.MapTaskHandlerAdapter;
 import java.util.List;
 import java.util.Map;
