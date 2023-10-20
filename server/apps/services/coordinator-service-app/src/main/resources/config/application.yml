@@ -116,8 +116,8 @@ bytechef:
     context-repository:
       provider: jdbc
     message-broker:
-      # messaging provider between Coordinator and Workers (jms | amqp | kafka) default: amqp
-      provider: amqp
+      # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
+      provider: redis
     persistence:
       provider: jdbc
     serialization:

@@ -117,7 +117,8 @@ bytechef:
 
   workflow:
     message-broker:
-      provider: amqp
+      # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
+      provider: redis
     persistence:
       provider: jdbc
     serialization:
