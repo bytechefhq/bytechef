@@ -2,7 +2,6 @@ package com.bytechef.dione.integration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.dione.integration.web.rest.model.StatusModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -27,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-04T17:08:22.844227+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-07T12:46:16.005268+01:00[Europe/Zagreb]")
 public class IntegrationModel {
 
   @JsonProperty("category")
@@ -63,8 +62,43 @@ public class IntegrationModel {
   @JsonProperty("integrationVersion")
   private Integer integrationVersion;
 
+  /**
+   * A status of an integration.
+   */
+  public enum StatusEnum {
+    PUBLISHED("PUBLISHED"),
+    
+    UNPUBLISHED("UNPUBLISHED");
+
+    private String value;
+
+    StatusEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static StatusEnum fromValue(String value) {
+      for (StatusEnum b : StatusEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
   @JsonProperty("status")
-  private StatusModel status;
+  private StatusEnum status;
 
   @JsonProperty("tags")
   @Valid
@@ -267,22 +301,22 @@ public class IntegrationModel {
     this.integrationVersion = integrationVersion;
   }
 
-  public IntegrationModel status(StatusModel status) {
+  public IntegrationModel status(StatusEnum status) {
     this.status = status;
     return this;
   }
 
   /**
-   * Get status
+   * A status of an integration.
    * @return status
   */
-  @Valid 
-  @Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public StatusModel getStatus() {
+  
+  @Schema(name = "status", description = "A status of an integration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public StatusEnum getStatus() {
     return status;
   }
 
-  public void setStatus(StatusModel status) {
+  public void setStatus(StatusEnum status) {
     this.status = status;
   }
 
