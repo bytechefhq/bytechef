@@ -80,7 +80,7 @@ public class HttpClientTaskDeclarationTest {
                         }
                     }
                 ],
-                "description":"Makes an HTTP request and returns the response data",
+                "description":"Makes an HTTP request and returns the response data.",
                 "displayName":"HTTP Client",
                 "name":"httpClient",
                 "properties":[
@@ -172,31 +172,51 @@ public class HttpClientTaskDeclarationTest {
                         "type":"SELECT",
                         "options":[
                             {
-                                "name":"Binary",
-                                "value":"BINARY"
-                            },
-                            {
                                 "name":"JSON",
-                                "value":"JSON"
+                                "value":"JSON",
+                                "description": "The response is automatically converted to object/array."
+                            },
+                             {
+                                "name":"XML",
+                                "value":"XML",
+                                "description": "The response is automatically converted to object/array."
                             },
                             {
-                                "name":"String",
-                                "value":"STRING"
-                            }
+                                "name":"Text",
+                                "value":"TEXT",
+                                 "description": "The response is returned as a text."
+                            },
+                             {
+                                "name":"File",
+                                "value":"FILE",
+                                "description": "The response is returned as a file object."
+                            },
                         ]
+                    },
+                    {
+                        "defaultValue":"",
+                        "description":"The name of the file if the response is returned as a file object.",
+                        "displayName":"Response File Name",
+                        "displayOption":{
+                            "show":{
+                                "responseFormat":["FILE"]
+                            }
+                        },
+                        "name":"responseFileName",
+                        "type":"STRING",
+                    },
+                    {
+                        "defaultValue":false,
+                        "description":"If the header, query and/or body parameters should be set via the key-value pair in UI or as an object/JSON string based).",
+                        "displayName":"RAW Parameters",
+                        "name":"rawParameters",
+                        "type":"BOOLEAN"
                     },
                     {
                         "displayName":"Options",
                         "name":"options",
                         "type":"COLLECTION",
                         "options":[
-                            {
-                                "defaultValue":false,
-                                "description":"If the query and/or body parameters should be set via the key-value pair UI or RAW.",
-                                "displayName":"RAW Parameters",
-                                "name":"rawParameters",
-                                "type":"BOOLEAN"
-                            },
                             {
                                 "defaultValue":"JSON",
                                 "description":"Content-Type to use when sending body parameters.",
@@ -214,6 +234,10 @@ public class HttpClientTaskDeclarationTest {
                                         "value":"JSON"
                                     },
                                     {
+                                        "name":"Raw",
+                                        "value":"RAW"
+                                    },
+                                    {
                                         "name":"Form-Data",
                                         "value":"FORM_DATA"
                                     },
@@ -226,6 +250,19 @@ public class HttpClientTaskDeclarationTest {
                                         "value":"BINARY"
                                     }
                                 ]
+                            },
+                            {
+                                "description":"Mime-Type to use when sending raw body content.",
+                                "displayName":"Mime Type",
+                                "displayOption":{
+                                    "show":{
+                                        "bodyContentType": ["RAW"],
+                                        "requestMethod":["PATCH","POST","PUT"]
+                                    }
+                                },
+                                "name":"mimeType",
+                                placeholder: "text/xml",
+                                "type":"STRING",
                             },
                             {
                                 "defaultValue":false,
@@ -268,26 +305,24 @@ public class HttpClientTaskDeclarationTest {
                                 "description":"Time in ms to wait for the server to send a response before aborting the request.",
                                 "displayName":"Timeout",
                                 "name":"timeout",
-                                "type":"NUMBER",
+                                "type":"INTEGER",
                                 "typeOption":{
-                                    "minValue":1.0,
-                                    "multipleValues":false
+                                    "minValue":1
                                 }
                             }
                         ],
                         "placeholder":"Add Option"
                     },
                     {
-                        "defaultValue":"",
-                        "description":"Header parameters to send as RAW.",
+                        "description":"Header parameters to send as an object/JSON string.",
                         "displayName":"Header Parameters",
                         "displayOption":{
-                            "hide":{
+                            "show":{
                                 "rawParameters":[true]
                             }
                         },
-                        "name":"headerParametersRaw",
-                        "type":"STRING"
+                        "name":"headerParameters",
+                        "type":"JSON"
                     },
                     {
                         "defaultValue":"",
@@ -298,7 +333,7 @@ public class HttpClientTaskDeclarationTest {
                                 "rawParameters":[false]
                             }
                         },
-                        "name":"headerParametersKeyValue",
+                        "name":"headerParameters",
                         "type":"COLLECTION",
                         "typeOption":{
                             "multipleValues":true
@@ -328,16 +363,15 @@ public class HttpClientTaskDeclarationTest {
                         "placeholder":"Add Parameter"
                     },
                     {
-                        "defaultValue":"",
-                        "description":"Query parameters as RAW.",
+                        "description":"Query parameters to send as an object/JSON string.",
                         "displayName":"Query Parameters",
                         "displayOption":{
-                            "hide":{
+                            "show":{
                                 "rawParameters":[true]
                             }
                         },
-                        "name":"queryParametersRaw",
-                        "type":"STRING"
+                        "name":"queryParameters",
+                        "type":"JSON"
                     },
                     {
                         "defaultValue":"",
@@ -348,7 +382,7 @@ public class HttpClientTaskDeclarationTest {
                                 "rawParameters":[false]
                             }
                         },
-                        "name":"queryParametersKeyValue",
+                        "name":"queryParameters",
                         "type":"COLLECTION",
                         "typeOption":{
                             "multipleValues":true
@@ -379,18 +413,17 @@ public class HttpClientTaskDeclarationTest {
                         "placeholder":"Add Parameter"
                     },
                     {
-                        "defaultValue":"",
-                        "description":"Body parameters as RAW.",
+                        "description":"Body parameters to send as an object/JSON string.",
                         "displayName":"Body Parameters",
                         "displayOption":{
                             "show":{
                                 "rawParameters":[true],
-                                "bodyContentType":["JSON","FORM_DATA","FORM_URLENCODED"],
+                                 "bodyContentType":["JSON", "FORM_DATA", "FORM_URLENCODED", "RAW"],
                                 "requestMethod":["PATCH","POST","PUT"]
                             }
                         },
-                        "name":"bodyParametersRaw",
-                        "type":"STRING"
+                        "name":"bodyParameters",
+                        "type":"JSON"
                     },
                     {
                         "defaultValue":"",
@@ -399,11 +432,11 @@ public class HttpClientTaskDeclarationTest {
                         "displayOption":{
                             "show":{
                                 "rawParameters":[false],
-                                "bodyContentType":["JSON","FORM_DATA","FORM_URLENCODED"],
+                                "bodyContentType":["JSON", "FORM_DATA", "FORM_URLENCODED", "RAW"],
                                 "requestMethod":["PATCH","POST","PUT"]
                             }
                         },
-                        "name":"bodyParametersKeyValue",
+                        "name":"bodyParameters",
                         "type":"COLLECTION",
                         "typeOption":{
                             "multipleValues":true
@@ -443,7 +476,7 @@ public class HttpClientTaskDeclarationTest {
                             }
                         },
                         "name":"fileEntry",
-                        "type":"FILE_ENTRY"
+                        "type":"JSON"
                     }
                 ],
                 "version":1.0

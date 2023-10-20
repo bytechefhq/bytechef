@@ -16,14 +16,14 @@
 
 package com.integri.atlas.task.handler.http.client;
 
-import static com.integri.atlas.task.definition.dsl.TaskCredential.*;
+import static com.integri.atlas.task.definition.dsl.TaskCredential.credential;
 import static com.integri.atlas.task.definition.dsl.TaskParameterValue.parameterValues;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.COLLECTION_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.TaskProperty.FILE_ENTRY_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.GROUP_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.TaskProperty.NUMBER_PROPERTY;
-import static com.integri.atlas.task.definition.dsl.TaskProperty.OPTION_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.INTEGER_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.JSON_PROPERTY;
+import static com.integri.atlas.task.definition.dsl.TaskProperty.SELECT_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.minValue;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.multipleValues;
@@ -40,7 +40,7 @@ public class HttpClientTaskDeclaration implements TaskDeclaration {
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
         .create("httpClient")
         .displayName("HTTP Client")
-        .description("Makes an HTTP request and returns the response data")
+        .description("Makes an HTTP request and returns the response data.")
         .credentials(
             credential("httpBasicAuth").required(true).displayOption(show("authenticationType", "BASIC_AUTH")),
             credential("httpDigestAuth").required(true).displayOption(show("authenticationType", "DIGEST_AUTH")),
@@ -52,7 +52,7 @@ public class HttpClientTaskDeclaration implements TaskDeclaration {
             // General properties
             //
 
-            OPTION_PROPERTY("authenticationType")
+            SELECT_PROPERTY("authenticationType")
                 .displayName("Authentication Type")
                 .options(
                     option("Basic Auth", "BASIC_AUTH"),
@@ -62,7 +62,7 @@ public class HttpClientTaskDeclaration implements TaskDeclaration {
                     option("OAuth2", "OAUTH2"),
                     option("None", "")
                 ),
-            OPTION_PROPERTY("requestMethod")
+            SELECT_PROPERTY("requestMethod")
                 .displayName("Request Method")
                 .options(
                     option("DELETE", "DELETE"),
@@ -84,32 +84,55 @@ public class HttpClientTaskDeclaration implements TaskDeclaration {
                 .displayName("Allow Unauthorized Certs")
                 .description("Download the response even if SSL certificate validation is not possible.")
                 .defaultValue(false),
-            OPTION_PROPERTY("responseFormat")
+            SELECT_PROPERTY("responseFormat")
                 .displayName("Response Format")
                 .description("The format in which the data gets returned from the URL.")
-                .options(option("Binary", "BINARY"), option("JSON", "JSON"), option("String", "STRING"))
+                .options(
+                    option("JSON", "JSON", "The response is automatically converted to object/array."),
+                    option("XML", "XML", "The response is automatically converted to object/array."),
+                    option("Text", "TEXT", "The response is returned as a text."),
+                    option("File", "FILE", "The response is returned as a file object.")
+                )
                 .defaultValue("JSON"),
+            STRING_PROPERTY("responseFileName")
+                .displayName("Response File Name")
+                .description("The name of the file if the response is returned as a file object.")
+                .displayOption(show("responseFormat", parameterValues("FILE")))
+                .defaultValue(""),
+            BOOLEAN_PROPERTY("rawParameters")
+                .displayName("RAW Parameters")
+                .description(
+                    "If the header, query and/or body parameters should be set via the key-value pair in UI or as an object/JSON string based)."
+                )
+                .defaultValue(false),
             COLLECTION_PROPERTY("options")
                 .displayName("Options")
                 .placeholder("Add Option")
                 .options(
-                    BOOLEAN_PROPERTY("rawParameters")
-                        .displayName("RAW Parameters")
-                        .description(
-                            "If the query and/or body parameters should be set via the key-value pair UI or RAW."
-                        )
-                        .defaultValue(false),
-                    OPTION_PROPERTY("bodyContentType")
+                    SELECT_PROPERTY("bodyContentType")
                         .displayName("Body Content Type")
                         .description("Content-Type to use when sending body parameters.")
                         .displayOption(show("requestMethod", "PATCH", "POST", "PUT"))
                         .options(
                             option("JSON", "JSON"),
+                            option("Raw", "RAW"),
                             option("Form-Data", "FORM_DATA"),
                             option("Form-Urlencoded", "FORM_URLENCODED"),
                             option("Binary", "BINARY")
                         )
                         .defaultValue("JSON"),
+                    STRING_PROPERTY("mimeType")
+                        .displayName("Mime Type")
+                        .description("Mime-Type to use when sending raw body content.")
+                        .displayOption(
+                            show(
+                                "requestMethod",
+                                parameterValues("PATCH", "POST", "PUT"),
+                                "bodyContentType",
+                                parameterValues("RAW")
+                            )
+                        )
+                        .placeholder("text/xml"),
                     BOOLEAN_PROPERTY("fullResponse")
                         .displayName("Full Response")
                         .description("Returns the full response data instead of only the body.")
@@ -131,7 +154,7 @@ public class HttpClientTaskDeclaration implements TaskDeclaration {
                         .description("HTTP proxy to use.")
                         .placeholder("http://myproxy:3128")
                         .defaultValue(""),
-                    NUMBER_PROPERTY("timeout")
+                    INTEGER_PROPERTY("timeout")
                         .displayName("Timeout")
                         .description(
                             "Time in ms to wait for the server to send a response before aborting the request."
@@ -143,12 +166,11 @@ public class HttpClientTaskDeclaration implements TaskDeclaration {
             // Header properties
             //
 
-            STRING_PROPERTY("headerParametersRaw")
+            JSON_PROPERTY("headerParameters")
                 .displayName("Header Parameters")
-                .description("Header parameters to send as RAW.")
-                .displayOption(show("rawParameters", true))
-                .defaultValue(""),
-            COLLECTION_PROPERTY("headerParametersKeyValue")
+                .description("Header parameters to send as an object/JSON string.")
+                .displayOption(show("rawParameters", true)),
+            COLLECTION_PROPERTY("headerParameters")
                 .displayName("Header Parameters")
                 .description("Header parameters to send.")
                 .displayOption(show("rawParameters", parameterValues(false)))
@@ -173,12 +195,11 @@ public class HttpClientTaskDeclaration implements TaskDeclaration {
             // Query properties
             //
 
-            STRING_PROPERTY("queryParametersRaw")
+            JSON_PROPERTY("queryParameters")
                 .displayName("Query Parameters")
-                .description("Query parameters as RAW.")
-                .displayOption(show("rawParameters", true))
-                .defaultValue(""),
-            COLLECTION_PROPERTY("queryParametersKeyValue")
+                .description("Query parameters to send as an object/JSON string.")
+                .displayOption(show("rawParameters", true)),
+            COLLECTION_PROPERTY("queryParameters")
                 .displayName("Query Parameters")
                 .description("Query parameters to send.")
                 .displayOption(show("rawParameters", parameterValues(false)))
@@ -203,21 +224,20 @@ public class HttpClientTaskDeclaration implements TaskDeclaration {
             // Body Content properties
             //
 
-            STRING_PROPERTY("bodyParametersRaw")
+            JSON_PROPERTY("bodyParameters")
                 .displayName("Body Parameters")
-                .description("Body parameters as RAW.")
+                .description("Body parameters to send as an object/JSON string.")
                 .displayOption(
                     show(
                         "rawParameters",
                         parameterValues(true),
                         "bodyContentType",
-                        parameterValues("JSON", "FORM_DATA", "FORM_URLENCODED"),
+                        parameterValues("JSON", "FORM_DATA", "FORM_URLENCODED", "RAW"),
                         "requestMethod",
                         parameterValues("PATCH", "POST", "PUT")
                     )
-                )
-                .defaultValue(""),
-            COLLECTION_PROPERTY("bodyParametersKeyValue")
+                ),
+            COLLECTION_PROPERTY("bodyParameters")
                 .displayName("Body Parameters")
                 .description("Body parameters to send.")
                 .displayOption(
@@ -225,7 +245,7 @@ public class HttpClientTaskDeclaration implements TaskDeclaration {
                         "rawParameters",
                         parameterValues(false),
                         "bodyContentType",
-                        parameterValues("JSON", "FORM_DATA", "FORM_URLENCODED"),
+                        parameterValues("JSON", "FORM_DATA", "FORM_URLENCODED", "RAW"),
                         "requestMethod",
                         parameterValues("PATCH", "POST", "PUT")
                     )
@@ -247,7 +267,7 @@ public class HttpClientTaskDeclaration implements TaskDeclaration {
                                 .defaultValue("")
                         )
                 ),
-            FILE_ENTRY_PROPERTY("fileEntry")
+            JSON_PROPERTY("fileEntry")
                 .displayName("File")
                 .description("The object property which contains a reference to the file with data to upload.")
                 .displayOption(
