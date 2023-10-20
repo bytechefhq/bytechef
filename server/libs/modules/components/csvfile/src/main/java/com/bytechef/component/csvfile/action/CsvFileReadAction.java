@@ -23,10 +23,10 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.ValueUtils;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -231,14 +231,56 @@ public class CsvFileReadAction {
             if (readAsString) {
                 value = valueString;
             } else {
-                value = ValueUtils.valueOF(valueString);
+                value = valueOF(valueString);
             }
         }
 
         return value;
     }
 
-    public record ReadConfiguration(
+    private static Object valueOF(String string) {
+        Object value = null;
+
+        try {
+            value = Integer.parseInt(string);
+        } catch (NumberFormatException nfe) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(nfe.getMessage(), nfe);
+            }
+        }
+
+        if (value == null) {
+            try {
+                value = Long.parseLong(string);
+            } catch (NumberFormatException nfe) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace(nfe.getMessage(), nfe);
+                }
+            }
+        }
+
+        if (value == null) {
+            try {
+                value = Double.parseDouble(string);
+            } catch (NumberFormatException nfe) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace(nfe.getMessage(), nfe);
+                }
+            }
+        }
+
+        if (value == null) {
+            value = BooleanUtils.toBooleanObject(string);
+        }
+
+        if (value == null) {
+            value = string;
+        }
+
+        return value;
+    }
+
+    protected record ReadConfiguration(
         String delimiter,
         boolean headerRow,
         boolean includeEmptyCells,

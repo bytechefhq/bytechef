@@ -22,7 +22,7 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.ValueUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -31,6 +31,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.NumberToTextConverter;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,6 +62,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  * @author Ivica Cardic
  */
 public class XlsxFileReadAction {
+
+    private static final Logger logger = LoggerFactory.getLogger(XlsxFileReadAction.class);
 
     public static final ActionDefinition ACTION_DEFINITION = action(XlsxFileConstants.READ)
         .title("Read from file")
@@ -140,63 +144,6 @@ public class XlsxFileReadAction {
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to handle action " + inputParameters, ioException);
         }
-    }
-
-    private static Workbook getWorkbook(XlsxFileConstants.FileFormat fileFormat, InputStream inputStream)
-        throws IOException {
-        return fileFormat == XlsxFileConstants.FileFormat.XLS ? new HSSFWorkbook(inputStream)
-            : new XSSFWorkbook(inputStream);
-    }
-
-    private static boolean isEmpty(final Object object) {
-        if (object == null) {
-            return true;
-        }
-
-        if (object instanceof CharSequence) {
-            return ((CharSequence) object).length() == 0;
-        }
-
-        return false;
-    }
-
-    @SuppressWarnings("checkstyle:whitespaceafter")
-    private static Object processValue(Cell cell, boolean includeEmptyCells, boolean readAsString) {
-        Object value = null;
-
-        if (cell != null) {
-            value = switch (cell.getCellType()) {
-                case BOOLEAN -> cell.getBooleanCellValue();
-                case FORMULA -> cell.getCellFormula();
-                case NUMERIC -> {
-                    Object numericValue;
-
-                    if (DateUtil.isCellDateFormatted(cell)) {
-                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-
-                        numericValue = formatter.format(cell.getDateCellValue());
-                    } else {
-                        numericValue = ValueUtils.valueOF(NumberToTextConverter.toText(cell.getNumericCellValue()));
-                    }
-
-                    yield numericValue;
-                }
-                case STRING -> cell.getStringCellValue();
-                default -> throw new ComponentExecutionException("Unexpected value: %s".formatted(cell.getCellType()));
-            };
-        }
-
-        if (isEmpty(value)) {
-            if (includeEmptyCells) {
-                value = "";
-            }
-        } else {
-            if (readAsString) {
-                value = String.valueOf(value);
-            }
-        }
-
-        return value;
     }
 
     protected static List<Map<String, ?>> read(
@@ -282,7 +229,106 @@ public class XlsxFileReadAction {
         return rows;
     }
 
-    public record ReadConfiguration(
+    private static Workbook getWorkbook(XlsxFileConstants.FileFormat fileFormat, InputStream inputStream)
+        throws IOException {
+        return fileFormat == XlsxFileConstants.FileFormat.XLS ? new HSSFWorkbook(inputStream)
+            : new XSSFWorkbook(inputStream);
+    }
+
+    private static boolean isEmpty(final Object object) {
+        if (object == null) {
+            return true;
+        }
+
+        if (object instanceof CharSequence) {
+            return ((CharSequence) object).length() == 0;
+        }
+
+        return false;
+    }
+
+    @SuppressWarnings("checkstyle:whitespaceafter")
+    private static Object processValue(Cell cell, boolean includeEmptyCells, boolean readAsString) {
+        Object value = null;
+
+        if (cell != null) {
+            value = switch (cell.getCellType()) {
+                case BOOLEAN -> cell.getBooleanCellValue();
+                case FORMULA -> cell.getCellFormula();
+                case NUMERIC -> {
+                    Object numericValue;
+
+                    if (DateUtil.isCellDateFormatted(cell)) {
+                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+                        numericValue = formatter.format(cell.getDateCellValue());
+                    } else {
+                        numericValue = valueOF(NumberToTextConverter.toText(cell.getNumericCellValue()));
+                    }
+
+                    yield numericValue;
+                }
+                case STRING -> cell.getStringCellValue();
+                default -> throw new ComponentExecutionException("Unexpected value: %s".formatted(cell.getCellType()));
+            };
+        }
+
+        if (isEmpty(value)) {
+            if (includeEmptyCells) {
+                value = "";
+            }
+        } else {
+            if (readAsString) {
+                value = String.valueOf(value);
+            }
+        }
+
+        return value;
+    }
+
+    private static Object valueOF(String string) {
+        Object value = null;
+
+        try {
+            value = Integer.parseInt(string);
+        } catch (NumberFormatException nfe) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(nfe.getMessage(), nfe);
+            }
+        }
+
+        if (value == null) {
+            try {
+                value = Long.parseLong(string);
+            } catch (NumberFormatException nfe) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace(nfe.getMessage(), nfe);
+                }
+            }
+        }
+
+        if (value == null) {
+            try {
+                value = Double.parseDouble(string);
+            } catch (NumberFormatException nfe) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace(nfe.getMessage(), nfe);
+                }
+            }
+        }
+
+        if (value == null) {
+            value = BooleanUtils.toBooleanObject(string);
+        }
+
+        if (value == null) {
+            value = string;
+        }
+
+        return value;
+    }
+
+    protected record ReadConfiguration(
         boolean headerRow,
         boolean includeEmptyCells,
         long rangeStartRow,
