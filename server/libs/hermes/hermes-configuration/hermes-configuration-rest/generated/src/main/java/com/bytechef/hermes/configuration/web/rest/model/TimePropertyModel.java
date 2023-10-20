@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TimeProperty", description = "A time property.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-21T12:30:40.155708+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-23T06:45:09.319464+02:00[Europe/Zagreb]")
 public class TimePropertyModel extends ValuePropertyModel {
 
   @Valid
@@ -91,67 +91,67 @@ public class TimePropertyModel extends ValuePropertyModel {
 
 
   public TimePropertyModel controlType(ControlTypeModel controlType) {
-    super.setControlType(controlType);
+    super.controlType(controlType);
     return this;
   }
 
   public TimePropertyModel defaultValue(Object defaultValue) {
-    super.setDefaultValue(defaultValue);
+    super.defaultValue(defaultValue);
     return this;
   }
 
   public TimePropertyModel exampleValue(Object exampleValue) {
-    super.setExampleValue(exampleValue);
+    super.exampleValue(exampleValue);
     return this;
   }
 
   public TimePropertyModel advancedOption(Boolean advancedOption) {
-    super.setAdvancedOption(advancedOption);
+    super.advancedOption(advancedOption);
     return this;
   }
 
   public TimePropertyModel description(String description) {
-    super.setDescription(description);
+    super.description(description);
     return this;
   }
 
   public TimePropertyModel displayCondition(String displayCondition) {
-    super.setDisplayCondition(displayCondition);
+    super.displayCondition(displayCondition);
     return this;
   }
 
   public TimePropertyModel expressionEnabled(Boolean expressionEnabled) {
-    super.setExpressionEnabled(expressionEnabled);
+    super.expressionEnabled(expressionEnabled);
     return this;
   }
 
   public TimePropertyModel hidden(Boolean hidden) {
-    super.setHidden(hidden);
+    super.hidden(hidden);
     return this;
   }
 
   public TimePropertyModel label(String label) {
-    super.setLabel(label);
+    super.label(label);
     return this;
   }
 
   public TimePropertyModel name(String name) {
-    super.setName(name);
+    super.name(name);
     return this;
   }
 
   public TimePropertyModel placeholder(String placeholder) {
-    super.setPlaceholder(placeholder);
+    super.placeholder(placeholder);
     return this;
   }
 
   public TimePropertyModel required(Boolean required) {
-    super.setRequired(required);
+    super.required(required);
     return this;
   }
 
   public TimePropertyModel type(PropertyTypeModel type) {
-    super.setType(type);
+    super.type(type);
     return this;
   }
   @Override
