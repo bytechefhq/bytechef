@@ -18,11 +18,11 @@ const IntegrationList = () => {
         error,
         isLoading,
     } = useGetIntegrationsQuery({
-        categoryIds: searchParams.get('categoryId')
-            ? [parseInt(searchParams.get('categoryId')!)]
+        categoryId: searchParams.get('categoryId')
+            ? parseInt(searchParams.get('categoryId')!)
             : undefined,
-        tagIds: searchParams.get('tagId')
-            ? [parseInt(searchParams.get('tagId')!)]
+        tagId: searchParams.get('tagId')
+            ? parseInt(searchParams.get('tagId')!)
             : undefined,
     });
 

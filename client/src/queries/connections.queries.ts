@@ -1,23 +1,17 @@
-import {useQuery} from '@tanstack/react-query';
-
 import {
     ConnectionModel,
     ConnectionsApi,
-    GetComponentConnectionsRequest,
     GetConnectionsRequest,
     TagModel,
-} from '../middleware/automation/connection';
+} from '@/middleware/automation/connection';
 import {
     ConnectionDefinitionsApi,
     GetOAuth2AuthorizationParametersRequestModel,
     OAuth2AuthorizationParametersModel,
-} from '../middleware/core/workflow/configuration';
+} from '@/middleware/core/workflow/configuration';
+import {useQuery} from '@tanstack/react-query';
 
 export const ConnectionKeys = {
-    componentConnectionList: (request: GetComponentConnectionsRequest) => [
-        ...ConnectionKeys.connections,
-        request,
-    ],
     connection: (id: number) => [...ConnectionKeys.connections, id],
     connectionList: (filters: GetConnectionsRequest) => [
         ...ConnectionKeys.connections,
@@ -29,16 +23,6 @@ export const ConnectionKeys = {
     connectionTags: ['connectionTags'] as const,
     connections: ['connections'] as const,
 };
-
-export const useGetComponentConnectionsQuery = (
-    request: GetComponentConnectionsRequest,
-    enabledCondition?: boolean
-) =>
-    useQuery<ConnectionModel[], Error>(
-        ConnectionKeys.componentConnectionList(request),
-        () => new ConnectionsApi().getComponentConnections(request),
-        {enabled: false || enabledCondition}
-    );
 
 export const useGetConnectionsQuery = (
     filters: GetConnectionsRequest,

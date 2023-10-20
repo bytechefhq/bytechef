@@ -4,7 +4,7 @@ import EmptyList from 'components/EmptyList/EmptyList';
 import Select from 'components/Select/Select';
 import {ComponentDefinitionModel} from 'middleware/core/workflow/configuration';
 import ConnectionDialog from 'pages/automation/connections/components/ConnectionDialog';
-import {useGetComponentConnectionsQuery} from 'queries/connections.queries';
+import {useGetConnectionsQuery} from 'queries/connections.queries';
 import {useState} from 'react';
 
 import {useConnectionNoteStore} from '../../stores/useNodeDetailsDialogStore';
@@ -13,10 +13,10 @@ const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
     const [showEditConnectionDialog, setShowEditConnectionDialog] =
         useState(false);
 
-    const {data: connections} = useGetComponentConnectionsQuery(
+    const {data: connections} = useGetConnectionsQuery(
         {
-            componentName: component.name!,
-            componentVersion: component.version!,
+            componentName: component.name,
+            connectionVersion: component.connection?.version,
         },
         !!component.connection?.componentName
     );

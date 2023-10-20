@@ -25,9 +25,9 @@ const ProjectInstanceList = ({project}: {project: ProjectModel}) => {
         error,
         isLoading,
     } = useGetProjectInstancesQuery({
-        projectIds: project.id !== undefined ? [project.id!] : undefined,
-        tagIds: searchParams.get('tagId')
-            ? [parseInt(searchParams.get('tagId')!)]
+        projectId: project.id !== undefined ? project.id! : undefined,
+        tagId: searchParams.get('tagId')
+            ? parseInt(searchParams.get('tagId')!)
             : undefined,
     });
 

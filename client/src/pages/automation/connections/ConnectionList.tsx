@@ -18,11 +18,11 @@ const ConnectionList = () => {
         error,
         isLoading,
     } = useGetConnectionsQuery({
-        componentNames: searchParams.get('componentName')
-            ? [searchParams.get('componentName')!]
+        componentName: searchParams.get('componentName')
+            ? searchParams.get('componentName')!
             : undefined,
-        tagIds: searchParams.get('tagId')
-            ? [parseInt(searchParams.get('tagId')!)]
+        tagId: searchParams.get('tagId')
+            ? parseInt(searchParams.get('tagId')!)
             : undefined,
     });
 
