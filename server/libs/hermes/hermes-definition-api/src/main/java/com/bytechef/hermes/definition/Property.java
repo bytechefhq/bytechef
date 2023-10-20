@@ -171,7 +171,7 @@ public sealed interface Property<P extends Property<P>> permits Property.OneOfPr
         extends ValueProperty<Object, ObjectProperty>permits ModifiableObjectProperty {
 
         @Schema(name = "additionalProperties", description = "Types of dynamically defined properties.")
-        List<Property<?>> getAdditionalProperties();
+        List<? extends Property<?>> getAdditionalProperties();
 
         @Schema(name = "objectType", description = "The object type.")
         String getObjectType();
