@@ -10,13 +10,13 @@ export const IntegrationList: React.FC<PropsWithChildren> = () => {
   if (error) return <div>An error has occurred: + {error.message}</div>
 
   return (
-    <div className="overflow-hidden bg-gray-50 dark:bg-gray-800 sm:rounded-md">
-      <ul role="list" className="divide-y divide-gray-100 dark:divide-gray-600">
+    <div>
+      <ul role="list" className="divide-y divide-gray-100 dark:divide-gray-800">
         {items.map((item) => (
           <li key={item.id}>
             <a
               href={''}
-              className="block px-4 hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="block hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               <div className="flex items-center py-4">
                 <div className="flex min-w-0 flex-1 items-center">
