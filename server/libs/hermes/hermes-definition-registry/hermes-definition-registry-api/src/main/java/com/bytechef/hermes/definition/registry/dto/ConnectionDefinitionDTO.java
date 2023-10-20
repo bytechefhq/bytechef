@@ -44,7 +44,7 @@ public record ConnectionDefinitionDTO(
             componentDefinition.getDescription(), componentDefinition.getName(),
             CollectionUtils.map(
                 OptionalUtils.orElse(connectionDefinition.getProperties(), Collections.emptyList()),
-                PropertyDTO::toPropertyDTO),
+                valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty)),
             ComponentDefinitionDTO.getTitle(componentDefinition), connectionDefinition.getVersion());
     }
 
@@ -53,7 +53,8 @@ public record ConnectionDefinitionDTO(
             .map(authorization -> new AuthorizationDTO(
                 authorization.getDescription(), authorization.getName(),
                 CollectionUtils.map(
-                    OptionalUtils.orElse(authorization.getProperties(), List.of()), PropertyDTO::toPropertyDTO),
+                    OptionalUtils.orElse(authorization.getProperties(), List.of()),
+                    valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty)),
                 OptionalUtils.orElse(authorization.getTitle(), getDefaultTitle(authorization)),
                 authorization.getType()))
             .toList();

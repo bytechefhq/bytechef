@@ -32,7 +32,7 @@ public abstract class ValuePropertyDTO<V> extends PropertyDTO {
     private final V defaultValue;
     private final V exampleValue;
 
-    public ValuePropertyDTO(Property.ValueProperty<V, ?> valueProperty) {
+    public ValuePropertyDTO(Property.ValueProperty<V> valueProperty) {
         super(valueProperty);
 
         this.controlType = valueProperty.getControlType();

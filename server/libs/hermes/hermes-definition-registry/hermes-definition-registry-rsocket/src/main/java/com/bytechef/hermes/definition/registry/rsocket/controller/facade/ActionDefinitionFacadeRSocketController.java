@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.controller.facade;
 
-import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.registry.dto.OptionDTO;
+import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -50,7 +50,7 @@ public class ActionDefinitionFacadeRSocketController {
     }
 
     @MessageMapping("ActionDefinitionFacade.executeOptions")
-    public Mono<List<Option<?>>> executeOptions(Options options) {
+    public Mono<List<OptionDTO>> executeOptions(Options options) {
 
         return Mono.just(
             actionDefinitionFacade.executeOptions(
@@ -59,7 +59,7 @@ public class ActionDefinitionFacadeRSocketController {
     }
 
     @MessageMapping("ActionDefinitionFacade.executeProperties")
-    public Mono<List<? extends Property<?>>> executeProperties(Properties properties) {
+    public Mono<List<? extends ValuePropertyDTO<?>>> executeProperties(Properties properties) {
 
         return Mono.just(
             actionDefinitionFacade.executeDynamicProperties(
@@ -68,7 +68,7 @@ public class ActionDefinitionFacadeRSocketController {
     }
 
     @MessageMapping("ActionDefinitionFacade.executeOutputSchema")
-    public Mono<List<? extends Property<?>>> executeOutputSchema(OutputSchema outputSchema) {
+    public Mono<List<? extends ValuePropertyDTO<?>>> executeOutputSchema(OutputSchema outputSchema) {
 
         return Mono.just(
             actionDefinitionFacade.executeOutputSchema(

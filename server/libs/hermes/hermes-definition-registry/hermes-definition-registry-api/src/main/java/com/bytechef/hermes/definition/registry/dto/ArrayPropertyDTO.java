@@ -31,7 +31,7 @@ import java.util.Optional;
  */
 public class ArrayPropertyDTO extends ValuePropertyDTO<Object[]> {
 
-    private final List<PropertyDTO> items;
+    private final List<? extends PropertyDTO> items;
     private final boolean multipleValues; // Defaults to true
     private final List<OptionDTO> options;
     private final OptionsDataSourceDTO optionsDataSource;
@@ -40,7 +40,8 @@ public class ArrayPropertyDTO extends ValuePropertyDTO<Object[]> {
         super(arrayProperty);
 
         this.items = CollectionUtils.map(
-            OptionalUtils.orElse(arrayProperty.getItems(), List.of(ComponentDSL.string())), PropertyDTO::toPropertyDTO);
+            OptionalUtils.orElse(arrayProperty.getItems(), List.of(ComponentDSL.string())),
+            valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty));
         this.multipleValues = OptionalUtils.orElse(arrayProperty.getMultipleValues(), true);
         this.options = CollectionUtils.map(OptionalUtils.orElse(arrayProperty.getOptions(), List.of()), OptionDTO::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
@@ -52,7 +53,7 @@ public class ArrayPropertyDTO extends ValuePropertyDTO<Object[]> {
         return propertyVisitor.visit(this);
     }
 
-    public List<PropertyDTO> getItems() {
+    public List<? extends PropertyDTO> getItems() {
         return Collections.unmodifiableList(items);
     }
 

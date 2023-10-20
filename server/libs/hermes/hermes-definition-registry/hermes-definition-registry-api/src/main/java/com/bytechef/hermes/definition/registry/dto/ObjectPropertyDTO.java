@@ -42,7 +42,7 @@ public class ObjectPropertyDTO extends ValuePropertyDTO<Object> {
 
         this.additionalProperties = CollectionUtils.map(
             OptionalUtils.orElse(objectProperty.getAdditionalProperties(), List.of()),
-            PropertyDTO::toPropertyDTO);
+            valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty));
         this.multipleValues = OptionalUtils.orElse(objectProperty.getMultipleValues(), true);
         this.objectType = OptionalUtils.orElse(objectProperty.getObjectType(), null);
         this.options =
@@ -50,7 +50,8 @@ public class ObjectPropertyDTO extends ValuePropertyDTO<Object> {
         this.optionsDataSource = OptionalUtils.mapOrElse(
             objectProperty.getOptionsDataSource(), OptionsDataSourceDTO::new, null);
         this.properties = CollectionUtils.map(
-            OptionalUtils.orElse(objectProperty.getProperties(), List.of()), PropertyDTO::toPropertyDTO);
+            OptionalUtils.orElse(objectProperty.getProperties(), List.of()),
+            valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty));
     }
 
     @Override

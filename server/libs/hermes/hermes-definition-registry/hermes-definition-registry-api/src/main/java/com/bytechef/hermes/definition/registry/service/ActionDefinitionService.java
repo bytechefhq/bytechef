@@ -17,9 +17,9 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
+import com.bytechef.hermes.definition.registry.dto.OptionDTO;
+import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -33,15 +33,15 @@ public interface ActionDefinitionService {
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         String authorizationName, Map<String, Object> connectionParameters);
 
-    List<Option<?>> executeOptions(
+    List<OptionDTO> executeOptions(
         String propertyName, String actionName, String componentName, int componentVersion,
         Map<String, Object> actionParameters, String authorizationName, Map<String, Object> connectionParameters);
 
-    List<? extends Property<?>> executeOutputSchema(
+    List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         String authorizationName, Map<String, Object> connectionParameters);
 
-    List<? extends Property<?>> executeDynamicProperties(
+    List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
         String propertyName, String actionName, String componentName, int componentVersion,
         Map<String, Object> actionParameters, String authorizationName, Map<String, Object> connectionParameters);
 

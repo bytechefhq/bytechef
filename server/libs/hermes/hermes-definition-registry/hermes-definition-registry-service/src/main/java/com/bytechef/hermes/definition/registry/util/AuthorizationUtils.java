@@ -19,6 +19,7 @@ package com.bytechef.hermes.definition.registry.util;
 
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.hermes.component.definition.Authorization.ApiTokenLocation;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
 import com.bytechef.hermes.component.definition.Authorization.TokenUrlFunction;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
@@ -40,11 +41,9 @@ public class AuthorizationUtils {
                 Map<String, Object> connectionInputParameters, AuthorizationContext authorizationContext) -> {
 
                 String addTo = MapValueUtils.getString(
-                    connectionInputParameters, Authorization.ADD_TO, Authorization.ApiTokenLocation.HEADER.name());
+                    connectionInputParameters, Authorization.ADD_TO, ApiTokenLocation.HEADER.name());
 
-                if (Authorization.ApiTokenLocation
-                    .valueOf(addTo.toUpperCase()) == Authorization.ApiTokenLocation.HEADER) {
-
+                if (ApiTokenLocation.valueOf(addTo.toUpperCase()) == ApiTokenLocation.HEADER) {
                     authorizationContext.setHeaders(
                         Map.of(
                             MapValueUtils.getString(
@@ -62,19 +61,17 @@ public class AuthorizationUtils {
             };
             case BASIC_AUTH, DIGEST_AUTH -> (
                 Map<String, Object> connectionInputParameters,
-                AuthorizationContext authorizationContext) -> authorizationContext
-                    .setUsernamePassword(
-                        MapValueUtils.getString(connectionInputParameters, Authorization.USERNAME),
-                        MapValueUtils.getString(connectionInputParameters, Authorization.PASSWORD));
+                AuthorizationContext authorizationContext) -> authorizationContext.setUsernamePassword(
+                    MapValueUtils.getString(connectionInputParameters, Authorization.USERNAME),
+                    MapValueUtils.getString(connectionInputParameters, Authorization.PASSWORD));
             case BEARER_TOKEN -> (
                 Map<String, Object> connectionInputParameters,
-                AuthorizationContext authorizationContext) -> authorizationContext
-                    .setHeaders(
-                        Map.of(
-                            Authorization.AUTHORIZATION,
-                            List.of(
-                                Authorization.BEARER + " " +
-                                    MapValueUtils.getString(connectionInputParameters, Authorization.TOKEN))));
+                AuthorizationContext authorizationContext) -> authorizationContext.setHeaders(
+                    Map.of(
+                        Authorization.AUTHORIZATION,
+                        List.of(
+                            Authorization.BEARER + " " +
+                                MapValueUtils.getString(connectionInputParameters, Authorization.TOKEN))));
             case CUSTOM -> (
                 Map<String, Object> connectionInputParameters, AuthorizationContext authorizationContext) -> {};
             case OAUTH2_AUTHORIZATION_CODE, OAUTH2_AUTHORIZATION_CODE_PKCE, OAUTH2_CLIENT_CREDENTIALS,

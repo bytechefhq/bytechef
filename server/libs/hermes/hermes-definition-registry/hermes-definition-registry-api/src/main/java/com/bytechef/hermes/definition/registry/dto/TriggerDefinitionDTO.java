@@ -47,7 +47,8 @@ public record TriggerDefinitionDTO(
             getHelp(triggerDefinition.getHelp()),
             triggerDefinition.getName(),
             CollectionUtils.map(
-                OptionalUtils.orElse(triggerDefinition.getOutputSchema(), List.of()), PropertyDTO::toPropertyDTO),
+                OptionalUtils.orElse(triggerDefinition.getOutputSchema(), Collections.emptyList()),
+                PropertyDTO::toPropertyDTO),
             OptionalUtils.mapOrElse(
                 triggerDefinition.getOutputSchemaDataSource(), outputSchemaDataSource -> true, false),
             CollectionUtils.map(

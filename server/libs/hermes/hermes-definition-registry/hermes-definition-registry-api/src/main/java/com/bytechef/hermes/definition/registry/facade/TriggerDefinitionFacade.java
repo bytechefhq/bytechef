@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.facade;
 
-import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.registry.dto.OptionDTO;
+import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -32,15 +32,15 @@ public interface TriggerDefinitionFacade {
         String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
         long connectionId);
 
-    List<Option<?>> executeOptions(
+    List<OptionDTO> executeOptions(
         String propertyName, String triggerName, String componentName, int componentVersion,
         Map<String, Object> triggerParameters, long connectionId);
 
-    List<? extends Property<?>> executeOutputSchema(
+    List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
         long connectionId);
 
-    List<? extends Property<?>> executeDynamicProperties(
+    List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
         String propertyName, String triggerName, String componentName, int componentVersion,
         Map<String, Object> triggerParameters, long connectionId);
 

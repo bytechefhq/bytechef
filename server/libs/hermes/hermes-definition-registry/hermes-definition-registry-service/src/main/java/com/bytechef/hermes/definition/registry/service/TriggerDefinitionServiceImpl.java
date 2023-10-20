@@ -29,10 +29,8 @@ import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSch
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
 import com.bytechef.hermes.definition.DynamicOptionsProperty;
-import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.OptionsDataSource;
 import com.bytechef.hermes.definition.PropertiesDataSource;
-import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
@@ -41,8 +39,11 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhook
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerDisableConsumer;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEnableConsumer;
+import com.bytechef.hermes.definition.registry.dto.OptionDTO;
+import com.bytechef.hermes.definition.registry.dto.PropertyDTO;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.component.factory.ContextConnectionFactory;
+import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
@@ -118,7 +119,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public List<? extends Property<?>> executeDynamicProperties(
+    public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
         String propertyName, String triggerName, String componentName, int componentVersion,
         Map<String, Object> triggerParameters, String authorizationName, Map<String, Object> connectionParameters) {
 
@@ -133,7 +134,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return propertiesFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            triggerParameters);
+            triggerParameters)
+            .stream()
+            .map(valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty))
+            .toList();
     }
 
     @Override
@@ -192,7 +196,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public List<Option<?>> executeOptions(
+    public List<OptionDTO> executeOptions(
         String propertyName, String triggerName, String componentName, int componentVersion,
         Map<String, Object> triggerParameters, String authorizationName, Map<String, Object> connectionParameters) {
 
@@ -206,11 +210,14 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return optionsFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            triggerParameters);
+            triggerParameters)
+            .stream()
+            .map(OptionDTO::new)
+            .toList();
     }
 
     @Override
-    public List<? extends Property<?>> executeOutputSchema(
+    public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
         String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
         String authorizationName, Map<String, Object> connectionParameters) {
 
@@ -225,7 +232,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return outputSchemaFunction.apply(
             contextConnectionFactory.createConnection(
                 componentName, componentVersion, connectionParameters, authorizationName),
-            triggerParameters);
+            triggerParameters)
+            .stream()
+            .map(outputProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(outputProperty))
+            .toList();
     }
 
     @Override

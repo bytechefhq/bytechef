@@ -47,13 +47,13 @@ public record TaskDispatcherDefinitionDTO(
             taskDispatcherDefinition.getName(),
             CollectionUtils.map(
                 OptionalUtils.orElse(taskDispatcherDefinition.getOutputSchema(), List.of()),
-                PropertyDTO::toPropertyDTO),
+                valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty)),
             CollectionUtils.map(
                 OptionalUtils.orElse(taskDispatcherDefinition.getProperties(), List.of()), PropertyDTO::toPropertyDTO),
             getResources(taskDispatcherDefinition),
             CollectionUtils.map(
                 OptionalUtils.orElse(taskDispatcherDefinition.getTaskProperties(), List.of()),
-                PropertyDTO::toPropertyDTO),
+                valueProperty -> (ValuePropertyDTO<?>) PropertyDTO.toPropertyDTO(valueProperty)),
             getTitle(taskDispatcherDefinition), taskDispatcherDefinition.getVersion());
     }
 

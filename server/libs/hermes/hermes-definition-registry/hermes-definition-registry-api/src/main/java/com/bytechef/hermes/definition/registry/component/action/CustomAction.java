@@ -25,6 +25,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.Help;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.definition.Property.ControlType;
 import com.bytechef.hermes.definition.Property.StringProperty.SampleDataType;
@@ -35,10 +36,17 @@ import java.util.stream.Collectors;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
+import static com.bytechef.hermes.definition.DefinitionDSL.array;
+import static com.bytechef.hermes.definition.DefinitionDSL.bool;
+import static com.bytechef.hermes.definition.DefinitionDSL.date;
+import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
+import static com.bytechef.hermes.definition.DefinitionDSL.integer;
+import static com.bytechef.hermes.definition.DefinitionDSL.nullable;
+import static com.bytechef.hermes.definition.DefinitionDSL.number;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.definition.DefinitionDSL.time;
 
 /**
  * @author Ivica Cardic
@@ -136,7 +144,8 @@ public class CustomAction {
                 .label("Body Content - JSON")
                 .description("Body Parameters to send.")
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.JSON.name()))
-                .additionalProperties(oneOf())
+                .additionalProperties(
+                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
                 .placeholder("Add Parameter"),
             object(BODY_CONTENT)
                 .label("Body Content - XML")
@@ -148,7 +157,7 @@ public class CustomAction {
                 .description("Body parameters to send.")
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_DATA.name()))
                 .placeholder("Add Parameter")
-                .additionalProperties(oneOf().types(string(), fileEntry())),
+                .additionalProperties(string(), fileEntry()),
             object(BODY_CONTENT)
                 .label("Body Content - Form URL-Encoded")
                 .description("Body parameters to send.")
@@ -179,7 +188,7 @@ public class CustomAction {
                     "Please provide a description of the desired format for the API's output schema. This format will then be utilized to generate the data tree for the output.")
                 .controlType(ControlType.SCHEMA_DESIGNER)
                 .sampleDataType(SampleDataType.JSON))
-        .outputSchema(oneOf())
+        .outputSchema(getOutputSchemaFunction())
         .execute(CustomAction::execute);
 
     public static ActionDefinition getCustomActionDefinition(ComponentDefinition componentDefinition) {
@@ -228,5 +237,10 @@ public class CustomAction {
         }
 
         return body;
+    }
+
+    protected static OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (connection, inputParameters) -> null;
     }
 }
