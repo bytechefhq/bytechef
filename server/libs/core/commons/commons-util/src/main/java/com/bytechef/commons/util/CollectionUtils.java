@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * @author Ivica Cardic
@@ -59,10 +60,17 @@ public final class CollectionUtils {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v2));
     }
 
-    public static boolean containsKey(Map<String, Object> map, String key) {
-        Assert.notNull(map, "'map' must not be null");
+    public static <T> List<T> concatDistinct(List<T> list1, List<T> list2) {
+        Assert.notNull(list1, "'list1' must not be null");
+        Assert.notNull(list2, "'list2' must not be null");
 
-        return map.containsKey(key);
+        return Stream.concat(list1.stream(), list2.stream())
+            .distinct()
+            .toList();
+    }
+
+    public static <T> boolean contains(List<T> list, T item) {
+        return org.springframework.util.CollectionUtils.contains(list.iterator(), item);
     }
 
     public static <T, R> List<R> map(List<T> list, Function<? super T, R> mapper) {
@@ -91,5 +99,15 @@ public final class CollectionUtils {
         Set<Map.Entry<K, V>> entry = map.entrySet();
 
         return entry.stream();
+    }
+
+    public static <T> List<T> toList(Iterable<T> iterable) {
+        Stream<T> stream = StreamSupport.stream(iterable.spliterator(), false);
+
+        return stream.toList();
+    }
+
+    public static <T> List<T> toList(Stream<T> stream) {
+        return stream.toList();
     }
 }
