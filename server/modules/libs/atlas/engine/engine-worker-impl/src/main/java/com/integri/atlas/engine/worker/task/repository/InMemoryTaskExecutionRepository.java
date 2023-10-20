@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.worker.task.map;
+package com.integri.atlas.engine.worker.task.repository;
 
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
@@ -31,7 +31,7 @@ import org.springframework.util.Assert;
  * @author Arik Cohen
  * @since Feb, 21 2020
  */
-class InMemoryTaskExecutionRepository implements TaskExecutionRepository {
+public class InMemoryTaskExecutionRepository implements TaskExecutionRepository {
 
     private final Map<String, TaskExecution> executions = new HashMap<>();
 

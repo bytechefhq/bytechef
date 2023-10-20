@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.worker.task.map;
+package com.integri.atlas.engine.worker.task.repository;
 
 import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ import java.util.Map;
  * @author Arik Cohen
  * @since Feb, 21 2020
  */
-class InMemoryCounterRepository implements CounterRepository {
+public class InMemoryCounterRepository implements CounterRepository {
 
     private final Map<String, Long> counters = new HashMap<>();
 
