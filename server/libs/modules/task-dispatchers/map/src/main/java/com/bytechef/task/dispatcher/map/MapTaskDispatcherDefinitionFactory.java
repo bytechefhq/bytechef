@@ -18,7 +18,6 @@
 package com.bytechef.task.dispatcher.map;
 
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
@@ -40,10 +39,9 @@ import org.springframework.stereotype.Component;
 public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(MAP)
-        .display(
-            display("Map")
-                .description(
-                    "Produces a new collection of values by mapping each value in `list` through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source `list`."))
+        .title("Map")
+        .description(
+            "Produces a new collection of values by mapping each value in `list` through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source `list`.")
         .properties(
             array(LIST).label("List of items")
                 .description("List of items to iterate over."),

@@ -23,7 +23,6 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
@@ -157,30 +156,30 @@ public class LoopTaskDispatcherIntTest {
 
     @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
-        CounterService counterService, TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService) {
+        CounterService counterService, TaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
+                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService),
             (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
+                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService),
             (taskCompletionHandler, taskDispatcher) -> new SequenceTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService));
+                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService));
     }
 
     @SuppressWarnings("PMD")
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
         ContextService contextService, CounterService counterService, MessageBroker messageBroker,
-        TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService) {
+        TaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskDispatcher) -> new ConditionTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
+                contextService, messageBroker, taskDispatcher, taskExecutionService),
             (taskDispatcher) -> new LoopBreakTaskDispatcher(messageBroker, taskExecutionService),
             (taskDispatcher) -> new LoopTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
+                contextService, messageBroker, taskDispatcher, taskExecutionService),
             (taskDispatcher) -> new SequenceTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService));
+                contextService, messageBroker, taskDispatcher, taskExecutionService));
     }
 
     private TaskDispatcherWorkflowTestSupport.TaskHandlerMapSupplier getTaskHandlerMap() {

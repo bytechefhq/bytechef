@@ -37,7 +37,6 @@ import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.commons.util.MapValueUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -60,18 +59,16 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
     private final ContextService contextService;
     private final MessageBroker messageBroker;
     private final TaskDispatcher<? super Task> taskDispatcher;
-    private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
 
     public BranchTaskDispatcher(
         ContextService contextService, MessageBroker messageBroker, TaskDispatcher<? super Task> taskDispatcher,
-        TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService) {
+        TaskExecutionService taskExecutionService) {
 
         this.contextService = contextService;
         this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
-        this.taskEvaluator = taskEvaluator;
     }
 
     @Override
@@ -108,7 +105,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
                 Map<String, Object> context = contextService.peek(
                     taskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
-                subTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+                subTaskExecution.evaluate(context);
 
                 subTaskExecution = taskExecutionService.create(subTaskExecution);
 

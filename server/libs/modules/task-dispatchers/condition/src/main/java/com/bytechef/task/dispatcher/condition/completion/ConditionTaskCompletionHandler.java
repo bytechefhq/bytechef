@@ -30,7 +30,6 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.task.dispatcher.condition.util.ConditionTaskUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -50,19 +49,15 @@ public class ConditionTaskCompletionHandler implements TaskCompletionHandler {
     private final ContextService contextService;
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher<? super Task> taskDispatcher;
-    private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
 
     public ConditionTaskCompletionHandler(
-        ContextService contextService,
-        TaskCompletionHandler taskCompletionHandler,
-        TaskDispatcher<? super Task> taskDispatcher,
-        TaskEvaluator taskEvaluator,
-        TaskExecutionService taskExecutionService) {
+        ContextService contextService, TaskCompletionHandler taskCompletionHandler,
+        TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService) {
+
         this.contextService = contextService;
         this.taskCompletionHandler = taskCompletionHandler;
         this.taskDispatcher = taskDispatcher;
-        this.taskEvaluator = taskEvaluator;
         this.taskExecutionService = taskExecutionService;
     }
 
@@ -121,7 +116,7 @@ public class ConditionTaskCompletionHandler implements TaskCompletionHandler {
             Map<String, Object> context = contextService.peek(
                 conditionTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
-            subTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
+            subTaskExecution.evaluate(context);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 

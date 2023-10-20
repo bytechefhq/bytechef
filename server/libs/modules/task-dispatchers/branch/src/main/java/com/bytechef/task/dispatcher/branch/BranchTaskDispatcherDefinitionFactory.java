@@ -18,7 +18,6 @@
 package com.bytechef.task.dispatcher.branch;
 
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.object;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
@@ -41,8 +40,8 @@ import org.springframework.stereotype.Component;
 public class BranchTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(BRANCH)
-        .display(display("Branch")
-            .description("Executes one and only one branch of execution based on the `expression` value."))
+        .title("Branch")
+        .description("Executes one and only one branch of execution based on the `expression` value.")
         .properties(string(EXPRESSION)
             .label("Expression")
             .description("Defines expression upon which evaluation the proper branch continues execution."))

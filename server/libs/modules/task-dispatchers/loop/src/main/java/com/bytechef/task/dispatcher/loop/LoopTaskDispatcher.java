@@ -36,7 +36,6 @@ import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.commons.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -58,19 +57,15 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     private final ContextService contextService;
     private final MessageBroker messageBroker;
     private final TaskDispatcher<? super Task> taskDispatcher;
-    private final TaskEvaluator taskEvaluator;
     private final TaskExecutionService taskExecutionService;
 
     public LoopTaskDispatcher(
-        ContextService contextService,
-        MessageBroker messageBroker,
-        TaskDispatcher<? super Task> taskDispatcher,
-        TaskEvaluator taskEvaluator,
+        ContextService contextService, MessageBroker messageBroker, TaskDispatcher<? super Task> taskDispatcher,
         TaskExecutionService taskExecutionService) {
+
         this.contextService = contextService;
         this.taskDispatcher = taskDispatcher;
         this.messageBroker = messageBroker;
-        this.taskEvaluator = taskEvaluator;
         this.taskExecutionService = taskExecutionService;
     }
 
@@ -93,7 +88,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 .parentId(taskExecution.getId())
                 .priority(taskExecution.getPriority())
                 .taskNumber(1)
-                .workflowTask(WorkflowTask.of(iteratee))
+                .workflowTask(new WorkflowTask(iteratee))
                 .build();
 
             Map<String, Object> newContext = new HashMap<>(
@@ -105,7 +100,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
             newContext.put(MapValueUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), 0);
 
-            subTaskExecution = taskEvaluator.evaluate(subTaskExecution, newContext);
+            subTaskExecution.evaluate(newContext);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 

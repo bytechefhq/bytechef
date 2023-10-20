@@ -35,7 +35,6 @@ import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -59,26 +58,27 @@ public class EachTaskDispatcherTest {
     public void testDispatch1() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-                taskDispatcher, taskExecutionService, messageBroker, contextService, counterService,
-                TaskEvaluator.create());
-            dispatcher.dispatch(new TaskExecution(WorkflowTask.of("type")));
+                taskDispatcher, taskExecutionService, messageBroker, contextService, counterService);
+            dispatcher.dispatch(TaskExecution.builder()
+                .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type")))
+                .build());
         });
     }
 
     @Test
     public void testDispatch2() {
         when(contextService.peek(anyLong(), any())).thenReturn(Collections.emptyMap());
-        when(taskExecutionService.create(any())).thenReturn(new TaskExecution(1L));
+        when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
 
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-            taskDispatcher, taskExecutionService, messageBroker, contextService, counterService,
-            TaskEvaluator.create());
-        TaskExecution taskExecution = new TaskExecution(
-            WorkflowTask.of(
+            taskDispatcher, taskExecutionService, messageBroker, contextService, counterService);
+        TaskExecution taskExecution = TaskExecution.builder().workflowTask(
+            new WorkflowTask(
                 Map.of(
                     WorkflowConstants.TYPE, "type",
                     WorkflowConstants.PARAMETERS,
-                    Map.of("list", Arrays.asList(1, 2, 3), "iteratee", Collections.singletonMap("type", "print")))));
+                    Map.of("list", Arrays.asList(1, 2, 3), "iteratee", Collections.singletonMap("type", "print")))))
+            .build();
 
         taskExecution.setId(1L);
         taskExecution.setJobId(1L);
@@ -94,15 +94,17 @@ public class EachTaskDispatcherTest {
     @Test
     public void testDispatch3() {
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
-            taskDispatcher, taskExecutionService, messageBroker, contextService, counterService,
-            TaskEvaluator.create());
-        TaskExecution taskExecution = new TaskExecution(
-            1L,
-            WorkflowTask.of(
-                Map.of(
-                    WorkflowConstants.TYPE, "type",
-                    WorkflowConstants.PARAMETERS,
-                    Map.of("list", List.of(), "iteratee", Collections.singletonMap("type", "print")))));
+            taskDispatcher, taskExecutionService, messageBroker, contextService, counterService);
+        TaskExecution taskExecution = TaskExecution.builder()
+            .id(
+                1L)
+            .workflowTask(
+                new WorkflowTask(
+                    Map.of(
+                        WorkflowConstants.TYPE, "type",
+                        WorkflowConstants.PARAMETERS,
+                        Map.of("list", List.of(), "iteratee", Collections.singletonMap("type", "print")))))
+            .build();
 
         when(taskExecutionService.update(any())).thenReturn(taskExecution);
 

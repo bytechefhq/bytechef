@@ -22,7 +22,6 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.task.dispatcher.loop.LoopBreakTaskDispatcher;
 import com.bytechef.task.dispatcher.loop.LoopTaskDispatcher;
 import com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
@@ -43,15 +42,12 @@ public class LoopTaskDispatcherConfiguration {
     private MessageBroker messageBroker;
 
     @Autowired
-    private TaskEvaluator taskEvaluator;
-
-    @Autowired
     private TaskExecutionService taskExecutionService;
 
     @Bean
     TaskCompletionHandlerFactory loopTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
-            contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService);
+            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService);
     }
 
     @Bean("loopBreakTaskDispatcherResolverFactory_v1")
@@ -62,6 +58,6 @@ public class LoopTaskDispatcherConfiguration {
     @Bean("loopTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory loopTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new LoopTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService);
+            contextService, messageBroker, taskDispatcher, taskExecutionService);
     }
 }

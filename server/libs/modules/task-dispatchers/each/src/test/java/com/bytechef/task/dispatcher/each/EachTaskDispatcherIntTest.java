@@ -57,14 +57,13 @@ public class EachTaskDispatcherIntTest {
     public void testEachTaskDispatcher() {
         taskDispatcherWorkflowTestSupport.execute(
             ENCODER.encodeToString("each_v1".getBytes(StandardCharsets.UTF_8)),
-            (counterService, taskEvaluator, taskExecutionService) -> List.of(
+            (counterService, taskExecutionService) -> List.of(
                 (taskCompletionHandler, taskDispatcher) -> new EachTaskCompletionHandler(taskExecutionService,
                     taskCompletionHandler, counterService)),
             (
-                contextService, counterService, messageBroker, taskEvaluator, taskExecutionService) -> List.of(
+                contextService, counterService, messageBroker, taskExecutionService) -> List.of(
                     (taskDispatcher) -> new EachTaskDispatcher(
-                        taskDispatcher, taskExecutionService, messageBroker, contextService, counterService,
-                        taskEvaluator)),
+                        taskDispatcher, taskExecutionService, messageBroker, contextService, counterService)),
             () -> Map.of("var", testVarTaskHandler));
 
         Assertions.assertEquals(

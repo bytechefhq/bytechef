@@ -17,15 +17,14 @@
 
 package com.bytechef.task.dispatcher.subflow.config;
 
+import com.bytechef.atlas.facade.JobFacade;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.autoconfigure.annotation.ConditionalOnCoordinator;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.SubflowJobStatusEventListener;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,41 +34,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SubflowTaskDispatcherConfiguration {
 
-    private final MessageBroker messageBroker;
-
-    public SubflowTaskDispatcherConfiguration(MessageBroker messageBroker) {
-        this.messageBroker = messageBroker;
-    }
-
     @Bean("subflowTaskDispatcherResolverFactory_v1")
-    TaskDispatcherResolverFactory subflowTaskDispatcherResolverFactory() {
-        return (taskDispatcher) -> new SubflowTaskDispatcher(messageBroker);
+    TaskDispatcherResolverFactory subflowTaskDispatcherResolverFactory(JobFacade jobFacade) {
+        return (taskDispatcher) -> new SubflowTaskDispatcher(jobFacade);
     }
 
     @Configuration
     @ConditionalOnCoordinator
     public static class SubflowJobStatusEventListenerConfiguration {
 
-        private final JobService jobService;
-        private final MessageBroker messageBroker;
-        private final TaskEvaluator taskEvaluator;
-        private final TaskExecutionService taskExecutionService;
-
-        @SuppressFBWarnings("EI")
-        public SubflowJobStatusEventListenerConfiguration(
-            JobService jobService, MessageBroker messageBroker, TaskEvaluator taskEvaluator,
-            TaskExecutionService taskExecutionService) {
-
-            this.jobService = jobService;
-            this.messageBroker = messageBroker;
-            this.taskEvaluator = taskEvaluator;
-            this.taskExecutionService = taskExecutionService;
-        }
-
         @Bean
-        SubflowJobStatusEventListener subflowJobStatusEventListener() {
-            return new SubflowJobStatusEventListener(
-                jobService, messageBroker, taskExecutionService, taskEvaluator);
+        SubflowJobStatusEventListener subflowJobStatusEventListener(
+            JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
+            return new SubflowJobStatusEventListener(jobService, messageBroker, taskExecutionService);
         }
     }
 }
