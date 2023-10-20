@@ -29,25 +29,25 @@ public class XMLHelperTest {
     private static final XMLHelper xmlHelper = new XMLHelper();
 
     @Test
-    public void testDeserialize() {
+    public void testRead() {
         Assertions
             .assertThat(
-                xmlHelper.deserialize(
+                xmlHelper.read(
                     """
-        <Flower id="45">
-            <name>Poppy</name>
-            <color>RED</color>
-            <petals>9</petals>
-            <Florists>
-                 <Florist>
-                     <name>Joe</name>
-                 </Florist>
-                 <Florist>
-                     <name>Mark</name>
-                 </Florist>
-            </Florists>
-        </Flower>
-        """
+                    <Flower id="45">
+                        <name>Poppy</name>
+                        <color>RED</color>
+                        <petals>9</petals>
+                        <Florists>
+                             <Florist>
+                                 <name>Joe</name>
+                             </Florist>
+                             <Florist>
+                                 <name>Mark</name>
+                             </Florist>
+                        </Florists>
+                    </Flower>
+                    """
                 )
             )
             .isEqualTo(
@@ -67,25 +67,25 @@ public class XMLHelperTest {
 
         Assertions
             .assertThat(
-                xmlHelper.deserialize(
+                xmlHelper.read(
                     """
-        <Flowers>
-            <Flower id="45">
-                <name>Poppy</name>
-                <color>RED</color>
-                <petals>9</petals>
-                <Florists>
-                     <Florist>
-                         <name>Joe</name>
-                     </Florist>
-                     <Florist>
-                         <name>Mark</name>
-                     </Florist>
-                </Florists>
-            </Flower>
-            <Flower id="46"><name>Rose</name><color>YELLOW</color><petals>5</petals></Flower>
-        </Flowers>
-        """,
+                    <Flowers>
+                        <Flower id="45">
+                            <name>Poppy</name>
+                            <color>RED</color>
+                            <petals>9</petals>
+                            <Florists>
+                                 <Florist>
+                                     <name>Joe</name>
+                                 </Florist>
+                                 <Florist>
+                                     <name>Mark</name>
+                                 </Florist>
+                            </Florists>
+                        </Flower>
+                        <Flower id="46"><name>Rose</name><color>YELLOW</color><petals>5</petals></Flower>
+                    </Flowers>
+                    """,
                     List.class
                 )
             )
@@ -109,11 +109,11 @@ public class XMLHelperTest {
     }
 
     @Test
-    public void testSerialize() {
+    public void testWrite() {
         Assertions
             .assertThat(
-                xmlHelper.deserialize(
-                    xmlHelper.serialize(
+                xmlHelper.read(
+                    xmlHelper.write(
                         Map.of(
                             "name",
                             "Poppy",
@@ -131,7 +131,7 @@ public class XMLHelperTest {
                 )
             )
             .isEqualTo(
-                xmlHelper.deserialize(
+                xmlHelper.read(
                     """
                     <Flower id="45">
                         <name>Poppy</name>
@@ -152,8 +152,8 @@ public class XMLHelperTest {
 
         Assertions
             .assertThat(
-                xmlHelper.deserialize(
-                    xmlHelper.serialize(
+                xmlHelper.read(
+                    xmlHelper.write(
                         List.of(
                             Map.of(
                                 "name",
@@ -175,7 +175,7 @@ public class XMLHelperTest {
                 )
             )
             .isEqualTo(
-                xmlHelper.deserialize(
+                xmlHelper.read(
                     """
                     <Flowers>
                         <Flower id="45">

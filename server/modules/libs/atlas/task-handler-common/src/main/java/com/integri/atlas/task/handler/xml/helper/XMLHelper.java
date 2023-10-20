@@ -31,7 +31,7 @@ public class XMLHelper {
     private static final XmlMapper xmlMapper = new XmlMapper();
 
     @SuppressWarnings("unchecked")
-    public Map<String, ?> deserialize(String xml) {
+    public Map<String, ?> read(String xml) {
         try {
             return xmlMapper.convertValue(xmlMapper.readTree(xml), Map.class);
         } catch (Exception e) {
@@ -39,21 +39,9 @@ public class XMLHelper {
         }
     }
 
-    public <T> T deserialize(String xml, Class<T> clazz) {
+    public <T> T read(String xml, Class<T> clazz) {
         try {
             return xmlMapper.readValue(xml, clazz);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public String serialize(Object value) {
-        return serialize(value, "root");
-    }
-
-    public String serialize(Object value, String rootName) {
-        try {
-            return xmlMapper.writer().withRootName(rootName).writeValueAsString(value);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -62,6 +50,18 @@ public class XMLHelper {
     public Stream<Map<String, ?>> stream(InputStream inputStream) {
         try {
             return new XMLStreamReaderStream(inputStream, xmlMapper);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String write(Object object) {
+        return write(object, "root");
+    }
+
+    public String write(Object object, String rootName) {
+        try {
+            return xmlMapper.writer().withRootName(rootName).writeValueAsString(object);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

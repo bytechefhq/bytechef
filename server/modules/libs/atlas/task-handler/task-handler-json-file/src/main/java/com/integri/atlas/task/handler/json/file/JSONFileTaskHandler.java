@@ -94,7 +94,7 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
                         items =
                             bufferedReader
                                 .lines()
-                                .map(line -> (Map<String, ?>) jsonHelper.deserialize(line, Map.class))
+                                .map(line -> (Map<String, ?>) jsonHelper.read(line, Map.class))
                                 .collect(Collectors.toList());
                     }
                 }
@@ -119,7 +119,7 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
 
                 result = items;
             } else {
-                result = jsonHelper.deserialize(fileStorageService.readFileContent(fileEntry.getUrl()), Map.class);
+                result = jsonHelper.read(fileStorageService.readFileContent(fileEntry.getUrl()), Map.class);
             }
         } else {
             String fileName = taskExecution.get(
@@ -133,12 +133,12 @@ public class JSONFileTaskHandler implements TaskHandler<Object> {
 
             if (fileType == FileType.JSON) {
                 try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
-                    printWriter.println(jsonHelper.serialize(input));
+                    printWriter.println(jsonHelper.write(input));
                 }
             } else {
                 try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream)) {
                     for (Map<String, ?> item : (List<Map<String, ?>>) input) {
-                        printWriter.println(jsonHelper.serialize(item));
+                        printWriter.println(jsonHelper.write(item));
                     }
                 }
             }

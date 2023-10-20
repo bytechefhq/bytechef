@@ -72,6 +72,6 @@ public class JSONConverterTaskHandlerTest {
         taskExecution.put("input", input);
         taskExecution.put("operation", "TO_JSON");
 
-        assertThat(jsonConverterTaskHandler.handle(taskExecution)).isEqualTo(jsonHelper.serialize(input));
+        assertThat(jsonConverterTaskHandler.handle(taskExecution)).isEqualTo(jsonHelper.write(input));
     }
 }

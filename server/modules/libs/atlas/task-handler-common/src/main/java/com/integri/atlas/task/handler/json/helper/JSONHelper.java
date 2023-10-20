@@ -59,9 +59,9 @@ public class JSONHelper {
                 result = map;
             } else if (object instanceof String string && (string.startsWith("{") || string.startsWith("["))) {
                 if (string.startsWith("{")) {
-                    result = deserialize(string, Map.class);
+                    result = read(string, Map.class);
                 } else {
-                    result = deserialize(string, List.class);
+                    result = read(string, List.class);
                 }
             } else {
                 throw new IllegalArgumentException(
@@ -97,9 +97,9 @@ public class JSONHelper {
             if (object instanceof List list) {
                 items = list;
             } else if (object instanceof Collection collection) {
-                items = new ArrayList(collection);
+                items = new ArrayList<>(collection);
             } else if (object instanceof String string && string.startsWith("[")) {
-                items = deserialize(string);
+                items = read(string);
             } else {
                 throw new IllegalArgumentException(
                     String.format("%s cannot be converted to JSON compatible format", object)
@@ -136,7 +136,7 @@ public class JSONHelper {
             if (object instanceof Map map) {
                 result = map;
             } else if (object instanceof String string && string.startsWith("{")) {
-                result = deserialize(string);
+                result = read(string);
             } else {
                 throw new IllegalArgumentException(
                     String.format("%s cannot be converted to JSON compatible format", object)
@@ -155,7 +155,7 @@ public class JSONHelper {
         return result;
     }
 
-    public <T> T deserialize(String json) {
+    public <T> T read(String json) {
         try {
             return objectMapper.readValue(json, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
@@ -163,33 +163,27 @@ public class JSONHelper {
         }
     }
 
-    public <T> T deserialize(String value, Class<T> clazz) {
+    public <T> T read(String json, Class<T> clazz) {
         try {
-            return objectMapper.readValue(value, clazz);
+            return objectMapper.readValue(json, clazz);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public <T> T deserialize(String value, TypeReference<T> typeReference) {
-        return deserialize(value, typeFactory.constructType(typeReference));
+    public <T> T read(String json, TypeReference<T> typeReference) {
+        return read(json, typeFactory.constructType(typeReference));
     }
 
-    public <T> T deserialize(String value, JavaType javaType) {
+    public <T> T read(String json, JavaType javaType) {
         try {
-            return objectMapper.readValue(value, javaType);
+            return objectMapper.readValue(json, javaType);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public String serialize(Object value) {
-        try {
-            return objectMapper.writeValueAsString(value);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+
 
     public Stream<Map<String, ?>> stream(InputStream inputStream) {
         try {
@@ -199,12 +193,20 @@ public class JSONHelper {
         }
     }
 
-    private List<Class<?>> getClasses(Object result) {
-        Class<?> resultClass = result.getClass();
+    public String write(Object object) {
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<Class<?>> getClasses(Object object) {
+        Class<?> resultClass = object.getClass();
 
         List<Class<?>> classes = ClassUtils.getAllInterfaces(resultClass);
 
-        classes.add(result.getClass());
+        classes.add(object.getClass());
         return classes;
     }
 

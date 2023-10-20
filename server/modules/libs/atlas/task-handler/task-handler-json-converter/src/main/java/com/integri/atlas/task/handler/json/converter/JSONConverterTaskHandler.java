@@ -46,9 +46,9 @@ public class JSONConverterTaskHandler implements TaskHandler<Object> {
         Object input = taskExecution.getRequired("input");
 
         if (operation == Operation.FROM_JSON) {
-            return jsonHelper.deserialize((String) input, new TypeReference<>() {});
+            return jsonHelper.read((String) input, new TypeReference<>() {});
         } else {
-            return jsonHelper.serialize(input);
+            return jsonHelper.write(input);
         }
     }
 }

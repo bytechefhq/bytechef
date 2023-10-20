@@ -49,11 +49,11 @@ public class XMLConverterTaskHandler implements TaskHandler<Object> {
         if (operation == Operation.FROM_XML) {
             String input = taskExecution.getRequiredString("input");
 
-            return xmlHelper.deserialize(input);
+            return xmlHelper.read(input);
         } else {
             Object input = jsonHelper.checkJSON(taskExecution.getRequired("input"));
 
-            return xmlHelper.serialize(input);
+            return xmlHelper.write(input);
         }
     }
 }
