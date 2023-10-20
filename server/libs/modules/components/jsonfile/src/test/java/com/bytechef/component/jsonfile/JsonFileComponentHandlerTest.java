@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.json.file;
+package com.bytechef.component.jsonfile;
 
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
@@ -22,11 +22,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.test.MockContext;
-import com.bytechef.hermes.component.test.MockExecutionParameters;
 import com.bytechef.hermes.component.test.json.JsonArrayUtils;
 import com.bytechef.hermes.component.test.json.JsonObjectUtils;
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.hermes.component.test.mock.MockContext;
+import com.bytechef.hermes.component.test.mock.MockExecutionParameters;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class JsonFileComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        DefinitionAssert.assertEquals("definition/json-file_v1.json", new JsonFileComponentHandler().getDefinition());
+        AssertUtils.assertEquals("definition/jsonfile_v1.json", new JsonFileComponentHandler().getDefinition());
     }
 
     @Test

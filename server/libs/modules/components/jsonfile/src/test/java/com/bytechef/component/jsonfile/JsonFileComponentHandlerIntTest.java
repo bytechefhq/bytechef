@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.json.file;
+package com.bytechef.component.jsonfile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
+import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
-import com.bytechef.atlas.test.workflow.WorkflowExecutor;
-import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.test.MockFileEntry;
+import com.bytechef.atlas.sync.executor.WorkflowExecutor;
+import com.bytechef.commons.collection.MapUtils;
+import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.component.test.json.JsonArrayUtils;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
@@ -36,13 +37,12 @@ import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@ComponentIntTest
 public class JsonFileComponentHandlerIntTest {
 
     @Autowired
@@ -56,7 +56,7 @@ public class JsonFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_array.json");
 
         Job job = workflowExecutor.execute(
-                "json-file_v1_read",
+                "jsonfile_v1_read",
                 Map.of(
                         "fileEntry",
                         fileStorageService
@@ -78,7 +78,7 @@ public class JsonFileComponentHandlerIntTest {
     @Test
     public void testWrite() throws IOException, JSONException {
         Job job = workflowExecutor.execute(
-                "json-file_v1_write",
+                "jsonfile_v1_write",
                 Map.of(
                         "source",
                         JsonArrayUtils.toList(
@@ -88,11 +88,13 @@ public class JsonFileComponentHandlerIntTest {
 
         Map<String, Object> outputs = job.getOutputs();
 
-        FileEntry fileEntry = new MockFileEntry(outputs, "writeJSONFile");
+        assertThat(MapUtils.getMapKey(outputs, "writeJSONFile", WorkflowConstants.NAME))
+                .isEqualTo("file.json");
+
         File sampleFile = getFile("sample_array.json");
 
         job = workflowExecutor.execute(
-                "json-file_v1_read",
+                "jsonfile_v1_read",
                 Map.of(
                         "fileEntry",
                         fileStorageService
@@ -106,8 +108,6 @@ public class JsonFileComponentHandlerIntTest {
                 JsonArrayUtils.of(Files.contentOf(sampleFile, Charset.defaultCharset())),
                 JsonArrayUtils.of((List<?>) outputs.get("readJSONFile")),
                 true);
-
-        assertThat(fileEntry.getName()).isEqualTo("file.json");
     }
 
     private File getFile(String fileName) throws IOException {
