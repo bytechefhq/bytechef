@@ -27,7 +27,7 @@ const ReadOnlyWorkflow = ({
                 <Button
                     label="Edit"
                     className="ml-4"
-                    size={'small'}
+                    size="small"
                     displayType="secondary"
                 />
 
@@ -35,7 +35,7 @@ const ReadOnlyWorkflow = ({
                     aria-label="Close panel"
                     className="ml-auto"
                     displayType="icon"
-                    size={'small'}
+                    size="small"
                     icon={
                         <Cross1Icon
                             className="h-3 w-3 cursor-pointer text-gray-900"

@@ -55,7 +55,7 @@ export function DesktopSidebar({
 
                     <div className="flex shrink-0 justify-center py-4">
                         <Link className="flex" to={'/settings'}>
-                            <Avatar size={'small'} />
+                            <Avatar size="small" />
                         </Link>
                     </div>
                 </div>
