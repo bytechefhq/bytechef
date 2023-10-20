@@ -21,20 +21,36 @@ import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.domain.IntegrationWorkflow;
 import com.bytechef.hermes.integration.web.rest.mapper.config.IntegrationMapperSpringConfig;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
+import com.bytechef.tag.domain.Tag;
+import com.bytechef.tag.service.TagService;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
 @Mapper(config = IntegrationMapperSpringConfig.class)
-public interface IntegrationMapper extends Converter<Integration, IntegrationModel> {
+public abstract class IntegrationMapper implements Converter<Integration, IntegrationModel> {
 
-    @Mapping(target = "workflowIds", source = "integrationWorkflows")
-    IntegrationModel convert(Integration integration);
+    @Autowired
+    private TagService tagService;
 
-    default String map(IntegrationWorkflow integrationWorkflow) {
+    @Mapping(target = "tags", ignore = true)
+    public abstract IntegrationModel convert(Integration integration);
+
+    public String map(IntegrationWorkflow integrationWorkflow) {
         return integrationWorkflow.getWorkflowId();
+    }
+
+    @AfterMapping
+    protected void afterMapping(Integration integration, @MappingTarget IntegrationModel integrationModel) {
+        integrationModel.setTags(tagService.getTags(integration.getTagIds())
+            .stream()
+            .map(Tag::getName)
+            .toList());
     }
 }

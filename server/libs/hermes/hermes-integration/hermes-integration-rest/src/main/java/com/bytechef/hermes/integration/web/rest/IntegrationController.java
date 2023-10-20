@@ -18,10 +18,10 @@
 package com.bytechef.hermes.integration.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.facade.IntegrationFacade;
 import com.bytechef.hermes.integration.service.IntegrationService;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
+import com.bytechef.hermes.integration.web.rest.model.PutIntegrationTagsRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +38,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @ConditionalOnApi
 @RequestMapping("${openapi.openAPIDefinition.base-path:}")
-public class IntegrationController implements IntegrationsApi {
+public class IntegrationController implements IntegrationsApi, IntegrationTagsApi {
 
     private final ConversionService conversionService;
     private final IntegrationFacade integrationFacade;
@@ -55,17 +55,22 @@ public class IntegrationController implements IntegrationsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> deleteIntegration(String id, ServerWebExchange exchange) {
-        integrationService.delete(id);
+    public Mono<ResponseEntity<Void>> deleteIntegration(Long id, ServerWebExchange exchange) {
+        integrationFacade.delete(id);
 
         return Mono.just(ResponseEntity.ok()
             .build());
     }
 
     @Override
-    public Mono<ResponseEntity<IntegrationModel>> getIntegration(String id, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<IntegrationModel>> getIntegration(Long id, ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(
             conversionService.convert(integrationService.getIntegration(id), IntegrationModel.class)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<Flux<String>>> getIntegrationTags(ServerWebExchange exchange) {
+        return Mono.just(ResponseEntity.ok(Flux.fromIterable(integrationFacade.getIntegrationTags())));
     }
 
     @Override
@@ -82,20 +87,32 @@ public class IntegrationController implements IntegrationsApi {
         Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
 
         return integrationModelMono.map(integrationModel -> ResponseEntity.ok(conversionService.convert(
-            integrationFacade.initialize(conversionService.convert(integrationModel, Integration.class)),
+            integrationFacade.create(integrationModel.getName(), integrationModel.getDescription(),
+                integrationModel.getCategory(), integrationModel.getWorkflowIds(), integrationModel.getTags()),
             IntegrationModel.class)));
     }
 
     @Override
     public Mono<ResponseEntity<IntegrationModel>> putIntegration(
-        String id, Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
-        return integrationModelMono.map(integrationModel -> {
-            Integration integration = conversionService.convert(integrationModel, Integration.class);
+        Long id, Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
 
-            integration.setId(id);
+        return integrationModelMono.map(integrationModel -> ResponseEntity.ok(
+            conversionService.convert(
+                integrationFacade.update(
+                    id, integrationModel.getName(), integrationModel.getDescription(), integrationModel.getCategory(),
+                    integrationModel.getWorkflowIds(), integrationModel.getTags()),
+                IntegrationModel.class)));
+    }
 
-            return ResponseEntity.ok(
-                conversionService.convert(integrationService.update(integration), IntegrationModel.class));
+    @Override
+    public Mono<ResponseEntity<Void>> putIntegrationTags(
+        Long id, Mono<PutIntegrationTagsRequestModel> putIntegrationTagsRequestModelMono, ServerWebExchange exchange) {
+
+        return putIntegrationTagsRequestModelMono.map(putIntegrationTagsRequestModel -> {
+            integrationFacade.update(id, null, null, null, null, putIntegrationTagsRequestModel.getTags());
+
+            return ResponseEntity.noContent()
+                .build();
         });
     }
 }

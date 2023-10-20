@@ -50,4 +50,5 @@ dependencies {
     implementation project(":server:libs:core:autoconfigure-annotations")
 
     testImplementation "org.springframework.boot:spring-boot-starter-webflux"
+    testImplementation project(":server:libs:core:tag:tag-service")
 }
