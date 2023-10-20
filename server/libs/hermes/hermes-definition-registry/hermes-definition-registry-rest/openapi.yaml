@@ -41,7 +41,7 @@ paths:
       description: "Get an action of a component definition."
       summary: "Get an action of a component definition."
       tags:
-      - "action-definitions"
+      - "component-definitions"
       operationId: "getActionDefinition"
       parameters:
       - name: "componentName"
