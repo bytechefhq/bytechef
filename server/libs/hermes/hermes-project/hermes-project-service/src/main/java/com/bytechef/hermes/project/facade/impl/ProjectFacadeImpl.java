@@ -119,7 +119,20 @@ public class ProjectFacadeImpl implements ProjectFacade {
             workflowIds.add(workflow.getId());
         }
 
+        List<Project> projects = projectService.getProjects();
+
+        int addendum = 0;
+
+        for (Project curProject : projects) {
+            String name = curProject.getName();
+
+            if (name.startsWith(project.getName())) {
+                addendum++;
+            }
+        }
+
         project.setId(null);
+        project.setName(project.getName() + " (%s)".formatted(addendum));
         project.setVersion(0);
         project.setWorkflowIds(workflowIds);
 
