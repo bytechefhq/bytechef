@@ -1,18 +1,15 @@
 import {QueueListIcon} from '@heroicons/react/24/outline';
-import {
-    CellContext,
-    createColumnHelper,
-    flexRender,
-    getCoreRowModel,
-    useReactTable,
-} from '@tanstack/react-table';
+import DatePicker from 'components/DatePicker/DatePicker';
+import EmptyList from 'components/EmptyList/EmptyList';
 import FilterableSelect, {
     ISelectOption,
 } from 'components/FilterableSelect/FilterableSelect';
+import PageFooter from 'components/PageFooter/PageFooter';
 import PageHeader from 'components/PageHeader/PageHeader';
+import PageLoader from 'components/PageLoader/PageLoader';
+import Pagination from 'components/Pagination/Pagination';
 import LayoutContainer from 'layouts/LayoutContainer/LayoutContainer';
 import {
-    JobBasicModel,
     ProjectExecutionModel,
     ProjectExecutionModelFromJSON,
 } from 'middleware/project';
@@ -27,106 +24,36 @@ import {useState} from 'react';
 import {OnChangeValue} from 'react-select';
 import {twMerge} from 'tailwind-merge';
 
-import Badge from '../../../components/Badge/Badge';
-import DatePicker from '../../../components/DatePicker/DatePicker';
-import EmptyList from '../../../components/EmptyList/EmptyList';
-import PageFooter from '../../../components/PageFooter/PageFooter';
-import PageLoader from '../../../components/PageLoader/PageLoader';
-import Pagination from '../../../components/Pagination/Pagination';
 import useExecutionDetailsDialogStore from '../project/stores/useExecutionDetailsDialogStore';
-import ExecutionDetailsDialog from './ExecutionDetailsDialog';
-
-const columnHelper = createColumnHelper<ProjectExecutionModel>();
-
-const columns = [
-    columnHelper.accessor((row) => row.job, {
-        header: 'Status',
-        cell: (info) => (
-            <Badge
-                color={
-                    info.getValue()?.status === 'COMPLETED'
-                        ? 'green'
-                        : info.getValue()?.status === 'FAILED'
-                        ? 'red'
-                        : 'default'
-                }
-                text={info.getValue()?.status ?? ''}
-            />
-        ),
-    }),
-    columnHelper.accessor('project', {
-        header: 'Project',
-        cell: (info) => info.getValue()?.name,
-    }),
-    columnHelper.accessor('workflow', {
-        header: 'Workflow',
-        cell: (info) => info.getValue()?.label,
-    }),
-    columnHelper.accessor('instance', {
-        header: 'Instance',
-        cell: (info) => info.getValue()?.name,
-    }),
-    columnHelper.accessor((row) => row.job, {
-        header: 'Duration',
-        cell: (info) => getDuration(info),
-    }),
-    columnHelper.accessor((row) => row.job, {
-        header: 'Completed date',
-        cell: (info) => (
-            <>
-                {info.getValue()?.endDate &&
-                    `${info.getValue()?.endDate?.toLocaleDateString()} ${info
-                        .getValue()
-                        ?.endDate?.toLocaleTimeString()}`}
-            </>
-        ),
-    }),
-];
+import ExecutionDetailsDialog from './components/ExecutionDetailsDialog';
+import ExecutionsTable from './components/ExecutionsTable';
 
 const jobStatusOptions = [
     {
         label: GetProjectExecutionsJobStatusEnum.Started,
         value: GetProjectExecutionsJobStatusEnum.Started,
     },
-
     {
         label: GetProjectExecutionsJobStatusEnum.Completed,
         value: GetProjectExecutionsJobStatusEnum.Completed,
     },
-
     {
         label: GetProjectExecutionsJobStatusEnum.Created,
         value: GetProjectExecutionsJobStatusEnum.Created,
     },
-
     {
         label: GetProjectExecutionsJobStatusEnum.Stopped,
         value: GetProjectExecutionsJobStatusEnum.Stopped,
     },
-
     {
         label: GetProjectExecutionsJobStatusEnum.Failed,
         value: GetProjectExecutionsJobStatusEnum.Failed,
     },
 ];
 
-function getDuration(
-    info: CellContext<ProjectExecutionModel, JobBasicModel | undefined>
-): string | undefined {
-    const startDate = info.getValue()?.startDate?.getTime();
-    const endDate = info.getValue()?.endDate?.getTime();
-
-    if (startDate && endDate) {
-        return `${Math.round((endDate - startDate) / 1000)}s`;
-    } else {
-        return undefined;
-    }
-}
-
 export const Executions = () => {
     const [filterStatus, setFilterStatus] =
         useState<GetProjectExecutionsJobStatusEnum>();
-
     const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(
         undefined
     );
@@ -138,11 +65,7 @@ export const Executions = () => {
     const [filterInstanceId, setFilterInstanceId] = useState<number>();
     const [filterPageNumber, setFilterPageNumber] = useState<number>();
 
-    const {
-        data: projectInstances,
-        error: projectInstancesError,
-        isLoading: projectInstancesLoading,
-    } = useGetProjectInstancesQuery({});
+    const {data: projectInstances} = useGetProjectInstancesQuery({});
 
     const {
         data: projects,
@@ -164,11 +87,25 @@ export const Executions = () => {
         pageNumber: filterPageNumber,
     });
 
-    const {
-        data: workflows,
-        error: workflowsError,
-        isLoading: workflowsLoading,
-    } = useGetWorkflowsQuery();
+    const {data: workflows, error: workflowsError} = useGetWorkflowsQuery();
+
+    const {executionDetailsDialogOpen} = useExecutionDetailsDialogStore();
+
+    const emptyListMessage =
+        !filterStatus &&
+        !filterProjectId &&
+        !filterWorkflowId &&
+        !filterStartDate &&
+        !filterEndDate &&
+        !filterInstanceId &&
+        !filterPageNumber
+            ? "You don't have any executed workflows yet."
+            : 'There is no executed workflows for the current criteria.';
+
+    const tableData = projectExecutionsPage?.content?.map(
+        (projectExecution: ProjectExecutionModel) =>
+            ProjectExecutionModelFromJSON(projectExecution)
+    );
 
     return (
         <PageLoader
@@ -231,17 +168,15 @@ export const Executions = () => {
                                 onChange={setFilterEndDate}
                             />
 
-                            {!projectsLoading && !projectsError && (
+                            {projects?.length && (
                                 <FilterableSelect
                                     isClearable
                                     label="Projects"
                                     name="project"
-                                    options={
-                                        projects?.map((project) => ({
-                                            label: project.name,
-                                            value: (project.id || 0).toString(),
-                                        })) || []
-                                    }
+                                    options={projects?.map((project) => ({
+                                        label: project.name,
+                                        value: (project.id || 0).toString(),
+                                    }))}
                                     onChange={(
                                         value: OnChangeValue<
                                             ISelectOption,
@@ -259,21 +194,16 @@ export const Executions = () => {
                                 />
                             )}
 
-                            {!workflowsLoading && !workflowsError && (
+                            {workflows?.length && (
                                 <FilterableSelect
                                     isClearable
                                     label="Workflows"
                                     name="workflows"
-                                    options={
-                                        workflows?.map((workflow) => ({
-                                            label:
-                                                workflow.label ||
-                                                'undefined label',
-                                            value: (
-                                                workflow.id || 0
-                                            ).toString(),
-                                        })) || []
-                                    }
+                                    options={workflows?.map((workflow) => ({
+                                        label:
+                                            workflow.label || 'undefined label',
+                                        value: (workflow.id || 0).toString(),
+                                    }))}
                                     onChange={(
                                         value: OnChangeValue<
                                             ISelectOption,
@@ -289,38 +219,33 @@ export const Executions = () => {
                                 />
                             )}
 
-                            {!projectInstancesLoading &&
-                                !projectInstancesError && (
-                                    <FilterableSelect
-                                        isClearable
-                                        label="Instances"
-                                        name="instances"
-                                        options={
-                                            projectInstances?.map(
-                                                (instance) => ({
-                                                    label: instance.name,
-                                                    value: (
-                                                        instance.id || 0
-                                                    ).toString(),
-                                                })
-                                            ) || []
-                                        }
-                                        onChange={(
-                                            value: OnChangeValue<
-                                                ISelectOption,
-                                                false
-                                            >
-                                        ) => {
-                                            if (value) {
-                                                setFilterInstanceId(
-                                                    Number(value.value)
-                                                );
-                                            } else {
-                                                setFilterInstanceId(undefined);
-                                            }
-                                        }}
-                                    />
-                                )}
+                            {projectInstances?.length && (
+                                <FilterableSelect
+                                    isClearable
+                                    label="Instances"
+                                    name="instances"
+                                    options={projectInstances?.map(
+                                        (instance) => ({
+                                            label: instance.name,
+                                            value: (
+                                                instance.id || 0
+                                            ).toString(),
+                                        })
+                                    )}
+                                    onChange={(
+                                        value: OnChangeValue<
+                                            ISelectOption,
+                                            false
+                                        >
+                                    ) =>
+                                        value
+                                            ? setFilterInstanceId(
+                                                  Number(value.value)
+                                              )
+                                            : setFilterInstanceId(undefined)
+                                    }
+                                />
+                            )}
                         </div>
                     </>
                 }
@@ -331,114 +256,27 @@ export const Executions = () => {
                         <div
                             className={twMerge(
                                 'w-full px-4 2xl:mx-auto 2xl:w-4/5',
-                                projectExecutionsPage.content.length === 0
-                                    ? 'place-self-center'
-                                    : ''
+                                !projectExecutionsPage.content.length &&
+                                    'place-self-center'
                             )}
                         >
-                            {projectExecutionsPage.content.length === 0 ? (
+                            {tableData ? (
+                                <ExecutionsTable data={tableData} />
+                            ) : (
                                 <EmptyList
                                     icon={
                                         <QueueListIcon className="h-12 w-12 text-gray-400" />
                                     }
-                                    message={
-                                        !filterStatus &&
-                                        !filterProjectId &&
-                                        !filterWorkflowId &&
-                                        !filterStartDate &&
-                                        !filterEndDate &&
-                                        !filterInstanceId &&
-                                        !filterPageNumber
-                                            ? "You don't have any executed workflows yet."
-                                            : 'There is no executed workflows for the current criteria.'
-                                    }
+                                    message={emptyListMessage}
                                     title="No executed workflows"
-                                />
-                            ) : (
-                                <Table
-                                    data={projectExecutionsPage.content.map(
-                                        (
-                                            projectExecution: ProjectExecutionModel
-                                        ) =>
-                                            ProjectExecutionModelFromJSON(
-                                                projectExecution
-                                            )
-                                    )}
                                 />
                             )}
                         </div>
                     )}
+
+                {executionDetailsDialogOpen && <ExecutionDetailsDialog />}
             </LayoutContainer>
         </PageLoader>
-    );
-};
-
-const Table = ({data}: {data: ProjectExecutionModel[]}): JSX.Element => {
-    const table = useReactTable<ProjectExecutionModel>({
-        data,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-    });
-
-    const [selectedItemId, setSelectedItemId] = useState<number | undefined>();
-
-    const {setExecutionDetailsOpen} = useExecutionDetailsDialogStore();
-
-    const handleRowClick = (index: number) => {
-        if (data[index]?.id) {
-            setSelectedItemId(data[index]?.id);
-            setExecutionDetailsOpen(true);
-        }
-    };
-
-    return (
-        <>
-            <table className="w-full divide-y divide-gray-300 bg-white text-sm">
-                <thead>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <tr key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => (
-                                <th
-                                    key={header.id}
-                                    className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
-                                >
-                                    {!header.isPlaceholder &&
-                                        flexRender(
-                                            header.column.columnDef.header,
-                                            header.getContext()
-                                        )}
-                                </th>
-                            ))}
-                        </tr>
-                    ))}
-                </thead>
-
-                <tbody className="divide-y divide-gray-200 bg-white">
-                    {table.getRowModel().rows.map((row) => (
-                        <tr
-                            key={row.id}
-                            onClick={() => handleRowClick(row.index)}
-                        >
-                            {row.getVisibleCells().map((cell) => (
-                                <td
-                                    key={cell.id}
-                                    className="whitespace-nowrap px-3 py-4 text-sm text-gray-900"
-                                >
-                                    {flexRender(
-                                        cell.column.columnDef.cell,
-                                        cell.getContext()
-                                    )}
-                                </td>
-                            ))}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-
-            {selectedItemId && (
-                <ExecutionDetailsDialog selectedItemId={selectedItemId} />
-            )}
-        </>
     );
 };
 
