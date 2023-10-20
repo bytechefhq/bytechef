@@ -34,15 +34,15 @@ import java.time.LocalDateTime;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
 @ConditionalOnEnabled("coordinator")
-public class ProjectWorkflowExecutionController implements WorkflowExecutionsApi {
+public class ProjectWorkflowExecutionApiController implements ProjectWorkflowExecutionApi {
 
     private final ConversionService conversionService;
     private final WorkflowExecutionFacade workflowExecutionFacade;
 
     @SuppressFBWarnings("EI")
-    public ProjectWorkflowExecutionController(
+    public ProjectWorkflowExecutionApiController(
         ConversionService conversionService, WorkflowExecutionFacade workflowExecutionFacade) {
 
         this.conversionService = conversionService;

@@ -18,14 +18,11 @@
 package com.bytechef.helios.configuration.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
-import com.bytechef.helios.configuration.web.rest.model.TagModel;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.helios.configuration.web.rest.model.CreateProjectWorkflowRequestModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
-import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.helios.configuration.dto.ProjectDTO;
 import com.bytechef.helios.configuration.facade.ProjectFacade;
-import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -38,15 +35,15 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
 @ConditionalOnEnabled("coordinator")
-public class ProjectController implements ProjectsApi {
+public class ProjectApiController implements ProjectApi {
 
     private final ConversionService conversionService;
     private final ProjectFacade projectFacade;
 
     @SuppressFBWarnings("EI2")
-    public ProjectController(ConversionService conversionService, ProjectFacade projectFacade) {
+    public ProjectApiController(ConversionService conversionService, ProjectFacade projectFacade) {
         this.conversionService = conversionService;
         this.projectFacade = projectFacade;
     }
@@ -106,34 +103,10 @@ public class ProjectController implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<List<WorkflowModel>> getProjectWorkflows(Long id) {
-        return ResponseEntity.ok(
-            projectFacade.getProjectWorkflows(id)
-                .stream()
-                .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
-                .toList());
-    }
-
-    @Override
     @SuppressFBWarnings("NP")
     public ResponseEntity<ProjectModel> updateProject(Long id, ProjectModel projectModel) {
         return ResponseEntity.ok(conversionService.convert(
             projectFacade.updateProject(conversionService.convert(projectModel.id(id), ProjectDTO.class)),
             ProjectModel.class));
-    }
-
-    @Override
-    public ResponseEntity<Void> updateProjectTags(Long id, UpdateTagsRequestModel updateTagsRequestModel) {
-        List<TagModel> tagModels = updateTagsRequestModel.getTags();
-
-        projectFacade.updateProjectTags(
-            id,
-            tagModels.stream()
-                .map(tagModel -> conversionService.convert(tagModel, Tag.class))
-                .toList());
-
-        return ResponseEntity
-            .noContent()
-            .build();
     }
 }

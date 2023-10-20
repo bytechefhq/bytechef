@@ -40,16 +40,16 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/automation")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
 @ConditionalOnEnabled("coordinator")
-public class ProjectJobController implements JobsApi {
+public class ProjectJobApiController implements ProjectJobApi {
 
     private final ConversionService conversionService;
     private final JobFacade jobFacade;
     private final JobService jobService;
 
     @SuppressFBWarnings("EI2")
-    public ProjectJobController(ConversionService conversionService, JobFacade jobFacade, JobService jobService) {
+    public ProjectJobApiController(ConversionService conversionService, JobFacade jobFacade, JobService jobService) {
         this.conversionService = conversionService;
         this.jobFacade = jobFacade;
         this.jobService = jobService;

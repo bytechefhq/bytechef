@@ -31,8 +31,6 @@ import com.bytechef.hermes.connection.service.ConnectionServiceImpl;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
-import com.bytechef.hermes.connection.service.RemoteConnectionService;
-import com.bytechef.hermes.configuration.service.OAuth2Service;
 import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
