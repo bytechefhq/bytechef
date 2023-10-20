@@ -42,7 +42,7 @@ import org.springframework.util.StringUtils;
  */
 public class TaskStartedEventListener implements EventListener {
 
-    private static final Logger log = LoggerFactory.getLogger(TaskStartedEventListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskStartedEventListener.class);
 
     private final TaskExecutionService taskExecutionService;
     private final TaskDispatcher<? super Task> taskDispatcher;
@@ -64,13 +64,13 @@ public class TaskStartedEventListener implements EventListener {
 
             TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
 
-            if (log.isDebugEnabled()) {
+            if (logger.isDebugEnabled()) {
                 if (StringUtils.hasText(taskExecution.getName())) {
-                    log.debug(
+                    logger.debug(
                         "Task id={}, name='{}', type='{}' started", taskExecution.getId(), taskExecution.getName(),
                         taskExecution.getType());
                 } else {
-                    log.debug("Task id={}, type='{}' started", taskExecution.getId(), taskExecution.getType());
+                    logger.debug("Task id={}, type='{}' started", taskExecution.getId(), taskExecution.getType());
                 }
             }
 

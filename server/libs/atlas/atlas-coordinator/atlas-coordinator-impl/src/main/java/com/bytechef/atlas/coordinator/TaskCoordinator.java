@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TaskCoordinator {
 
-    private static final Logger log = LoggerFactory.getLogger(TaskCoordinator.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskCoordinator.class);
 
     private final EventPublisher eventPublisher;
     private final JobExecutor jobExecutor;
@@ -85,8 +85,8 @@ public class TaskCoordinator {
 
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
 
-        if (log.isDebugEnabled()) {
-            log.debug("Job id={}, label='{}' started", job.getId(), job.getLabel());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Job id={}, label='{}' started", job.getId(), job.getLabel());
         }
     }
 
@@ -117,8 +117,8 @@ public class TaskCoordinator {
                     Objects.requireNonNull(currentTaskExecution.getId())));
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Job id={}, label='{}' stopped", job.getId(), job.getLabel());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Job id={}, label='{}' stopped", job.getId(), job.getLabel());
         }
     }
 
@@ -132,8 +132,8 @@ public class TaskCoordinator {
 
         jobExecutor.execute(job);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Job id={}, label='{}' resumed", job.getId(), job.getLabel());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Job id={}, label='{}' resumed", job.getId(), job.getLabel());
         }
     }
 

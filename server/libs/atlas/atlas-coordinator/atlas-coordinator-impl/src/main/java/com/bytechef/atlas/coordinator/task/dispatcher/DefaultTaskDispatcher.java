@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultTaskDispatcher.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultTaskDispatcher.class);
 
     private final MessageBroker messageBroker;
     private final List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors;
@@ -60,8 +60,8 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
 
         MessageRoute messageRoute = calculateQueueName(taskExecution);
 
-        if (log.isDebugEnabled()) {
-            log.debug(
+        if (logger.isDebugEnabled()) {
+            logger.debug(
                 "Task id={}, type='{}' sent to route='{}'", taskExecution.getId(), taskExecution.getType(),
                 messageRoute);
         }

@@ -26,7 +26,7 @@ import org.springframework.http.HttpHeaders;
  */
 public class HeaderUtils {
 
-    private static final Logger log = LoggerFactory.getLogger(HeaderUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(HeaderUtils.class);
 
     private HeaderUtils() {
     }
@@ -49,7 +49,7 @@ public class HeaderUtils {
         String entityName,
         String errorKey,
         String defaultMessage) {
-        log.error("Entity processing failed, {}", defaultMessage);
+        logger.error("Entity processing failed, {}", defaultMessage);
 
         String message = enableTranslation ? "error." + errorKey : defaultMessage;
 

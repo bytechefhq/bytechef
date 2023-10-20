@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TriggerStartedEventListener implements EventListener {
 
-    private static final Logger log = LoggerFactory.getLogger(TriggerStartedEventListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(TriggerStartedEventListener.class);
 
     private final MessageBroker messageBroker;
     private final TriggerExecutionService triggerExecutionService;
@@ -56,8 +56,8 @@ public class TriggerStartedEventListener implements EventListener {
 
             TriggerExecution triggerExecution = triggerExecutionService.getTriggerExecution(triggerExecutionId);
 
-            if (log.isDebugEnabled()) {
-                log.debug(
+            if (logger.isDebugEnabled()) {
+                logger.debug(
                     "Trigger id={}, name='{}', type='{}' started", triggerExecution.getId(), triggerExecution.getName(),
                     triggerExecution.getType());
             }

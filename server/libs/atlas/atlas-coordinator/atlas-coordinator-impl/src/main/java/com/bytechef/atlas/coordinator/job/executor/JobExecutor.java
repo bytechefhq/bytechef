@@ -45,7 +45,7 @@ import java.util.Objects;
  */
 public class JobExecutor {
 
-    private static final Logger log = LoggerFactory.getLogger(JobExecutor.class);
+    private static final Logger logger = LoggerFactory.getLogger(JobExecutor.class);
 
     private final ContextService contextService;
     private final TaskDispatcher<? super TaskExecution> taskDispatcher;
@@ -91,11 +91,11 @@ public class JobExecutor {
 
         taskDispatcher.dispatch(nextTaskExecution);
 
-        if (log.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             if (!StringUtils.hasText(nextTaskExecution.getName())) {
-                log.debug("Task id={}, type='{}' executed", nextTaskExecution.getId(), nextTaskExecution.getType());
+                logger.debug("Task id={}, type='{}' executed", nextTaskExecution.getId(), nextTaskExecution.getType());
             } else {
-                log.debug(
+                logger.debug(
                     "Task id={}, type='{}', name='{}' executed",
                     nextTaskExecution.getId(), nextTaskExecution.getType(), nextTaskExecution.getName());
             }

@@ -31,7 +31,7 @@ import org.testcontainers.utility.DockerImageName;
  */
 public class RedisTestContainer implements InitializingBean, DisposableBean {
 
-    private static final Logger log = LoggerFactory.getLogger(RedisTestContainer.class);
+    private static final Logger logger = LoggerFactory.getLogger(RedisTestContainer.class);
 
     private GenericContainer<?> redisContainer;
 
@@ -47,7 +47,7 @@ public class RedisTestContainer implements InitializingBean, DisposableBean {
         if (null == redisContainer) {
             redisContainer = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
                 .withExposedPorts(6379)
-                .withLogConsumer(new Slf4jLogConsumer(log))
+                .withLogConsumer(new Slf4jLogConsumer(logger))
                 .withPrivilegedMode(true)
                 .withReuse(true);
         }

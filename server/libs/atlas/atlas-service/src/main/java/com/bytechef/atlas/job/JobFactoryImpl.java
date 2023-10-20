@@ -33,7 +33,7 @@ import org.springframework.util.Assert;
 
 public class JobFactoryImpl implements JobFactory {
 
-    private static final Logger log = LoggerFactory.getLogger(JobFactoryImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(JobFactoryImpl.class);
 
     private final ContextService contextService;
     private final EventPublisher eventPublisher;
@@ -64,7 +64,7 @@ public class JobFactoryImpl implements JobFactory {
 
         messageBroker.send(TaskMessageRoute.TASKS_JOBS, job.getId());
 
-        log.debug("Job id={}, label='{}' created", job.getId(), job.getLabel());
+        logger.debug("Job id={}, label='{}' created", job.getId(), job.getLabel());
 
         return job.getId();
     }

@@ -39,11 +39,9 @@ import org.springframework.web.client.RestTemplate;
  */
 public class TaskStartedWebhookEventListener implements EventListener {
 
-    private static final Logger log = LoggerFactory.getLogger(TaskStartedWebhookEventListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskStartedWebhookEventListener.class);
 
     private final JobService jobService;
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final RestTemplate rest = new RestTemplate();
 
@@ -78,8 +76,8 @@ public class TaskStartedWebhookEventListener implements EventListener {
 
                 rest.postForObject(webhook.url(), webhookEvent, String.class);
 
-                if (log.isDebugEnabled()) {
-                    log.debug("Webhook url={}, type='{}' called", webhook.url(), webhook.type());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Webhook url={}, type='{}' called", webhook.url(), webhook.type());
                 }
             }
         }

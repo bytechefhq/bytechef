@@ -53,7 +53,7 @@ import org.springframework.util.StringUtils;
  */
 public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultTaskCompletionHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultTaskCompletionHandler.class);
 
     private final ContextService contextService;
     private final EventPublisher eventPublisher;
@@ -86,11 +86,11 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         Assert.notNull(taskExecution, "'taskExecution' must not be null");
         Assert.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
 
-        if (log.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             if (!StringUtils.hasText(taskExecution.getName())) {
-                log.debug("Task id={}, type='{}' completed", taskExecution.getId(), taskExecution.getType());
+                logger.debug("Task id={}, type='{}' completed", taskExecution.getId(), taskExecution.getType());
             } else {
-                log.debug(
+                logger.debug(
                     "Task id={}, type='{}', name='{}' completed",
                     taskExecution.getId(), taskExecution.getType(), taskExecution.getName());
             }
@@ -99,7 +99,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         Job job = jobService.getTaskExecutionJob(taskExecution.getId());
 
         if (job == null) {
-            log.error("Unknown job id={}", taskExecution.getJobId());
+            logger.error("Unknown job id={}", taskExecution.getJobId());
         } else {
             taskExecution.setStatus(Status.COMPLETED);
 
@@ -148,8 +148,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
 
-        if (log.isDebugEnabled()) {
-            log.debug("Job id={}, label='{}' completed", job.getId(), job.getLabel());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Job id={}, label='{}' completed", job.getId(), job.getLabel());
         }
     }
 

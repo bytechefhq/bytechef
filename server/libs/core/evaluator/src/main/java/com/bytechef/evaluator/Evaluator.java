@@ -47,7 +47,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
  */
 public class Evaluator {
 
-    private static final Logger log = LoggerFactory.getLogger(Evaluator.class);
+    private static final Logger logger = LoggerFactory.getLogger(Evaluator.class);
 
     private static final ExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
     private static final Map<String, MethodExecutor> METHOD_EXECUTOR_MAP = new HashMap<>();
@@ -124,8 +124,8 @@ public class Evaluator {
                 try {
                     return expression.getValue(createEvaluationContext(context));
                 } catch (SpelEvaluationException e) {
-                    if (log.isTraceEnabled()) {
-                        log.trace(e.getMessage());
+                    if (logger.isTraceEnabled()) {
+                        logger.trace(e.getMessage());
                     }
 
                     return value;

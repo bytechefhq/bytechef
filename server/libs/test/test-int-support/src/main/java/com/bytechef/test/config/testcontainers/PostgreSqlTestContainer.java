@@ -33,7 +33,7 @@ import org.testcontainers.utility.DockerImageName;
  */
 public class PostgreSqlTestContainer implements InitializingBean, DisposableBean {
 
-    private static final Logger log = LoggerFactory.getLogger(PostgreSqlTestContainer.class);
+    private static final Logger logger = LoggerFactory.getLogger(PostgreSqlTestContainer.class);
     private final long memoryInBytes = 100 * 1024 * 1024;
     private final long memorySwapInBytes = 200 * 1024 * 1024;
 
@@ -55,7 +55,7 @@ public class PostgreSqlTestContainer implements InitializingBean, DisposableBean
                         .withMemory(memoryInBytes)
                         .withMemorySwap(memorySwapInBytes))
                 .withDatabaseName("bytechef")
-                .withLogConsumer(new Slf4jLogConsumer(log))
+                .withLogConsumer(new Slf4jLogConsumer(logger))
                 .withPrivilegedMode(true)
                 .withReuse(true)
                 .withTmpFs(Collections.singletonMap("/testtmpfs", "rw"));

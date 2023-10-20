@@ -37,7 +37,7 @@ import org.springframework.util.StringUtils;
  */
 @SpringBootApplication(scanBasePackages = "com.bytechef")
 public class PlatformApplication {
-    private static final Logger log = LoggerFactory.getLogger(PlatformApplication.class);
+    private static final Logger logger = LoggerFactory.getLogger(PlatformApplication.class);
 
     private static String gitCommitId;
 
@@ -77,10 +77,10 @@ public class PlatformApplication {
 
             hostAddress = inetAddress.getHostAddress();
         } catch (UnknownHostException e) {
-            log.warn("The host name could not be determined, using `localhost` as fallback");
+            logger.warn("The host name could not be determined, using `localhost` as fallback");
         }
 
-        log.info(
+        logger.info(
             """
                 \n----------------------------------------------------------
                 \tApplication '{}' is running! Access URLs:
