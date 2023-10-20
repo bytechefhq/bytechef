@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-@ConditionalOnExpression("'${spring.application.name}'=='server-app' or '${spring.application.name}'=='worker-service-app'")
+@ConditionalOnExpression("'${spring.application.name}'=='server-app' or '${spring.application.name}'=='coordinator-service-app'")
 public class BranchTaskDispatcherConfiguration {
 
     @Autowired
