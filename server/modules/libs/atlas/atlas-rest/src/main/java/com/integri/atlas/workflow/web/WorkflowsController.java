@@ -20,7 +20,7 @@ package com.integri.atlas.workflow.web;
 
 import com.integri.atlas.engine.coordinator.annotation.ConditionalOnCoordinator;
 import com.integri.atlas.engine.coordinator.workflow.Workflow;
-import com.integri.atlas.engine.coordinator.workflow.WorkflowRepository;
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 

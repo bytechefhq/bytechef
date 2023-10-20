@@ -18,8 +18,6 @@
 
 package com.integri.atlas.engine.coordinator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.ImmutableMap;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.coordinator.job.Job;
@@ -29,7 +27,7 @@ import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.messagebroker.Queues;
 import com.integri.atlas.engine.core.messagebroker.SyncMessageBroker;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
-import com.integri.atlas.repository.yaml.workflow.ResourceBasedWorkflowRepository;
+import com.integri.atlas.workflow.repository.yaml.ResourceBasedWorkflowRepository;
 import com.integri.atlas.engine.worker.task.DefaultTaskHandlerResolver;
 import com.integri.atlas.engine.core.task.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.core.task.TaskExecution;
@@ -39,7 +37,6 @@ import com.integri.atlas.taskhandler.io.Print;
 import com.integri.atlas.taskhandler.random.RandomInt;
 import com.integri.atlas.taskhandler.time.Sleep;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

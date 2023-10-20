@@ -39,7 +39,7 @@ import com.integri.atlas.engine.coordinator.event.TaskStartedEventListener;
 import com.integri.atlas.engine.coordinator.event.TaskStartedWebhookEventListener;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.core.messagebroker.MessageBroker;
-import com.integri.atlas.engine.coordinator.workflow.WorkflowRepository;
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
 import com.integri.atlas.engine.coordinator.task.ControlTaskDispatcher;
 import com.integri.atlas.engine.core.task.repository.CounterRepository;
 import com.integri.atlas.engine.coordinator.task.EachTaskDispatcher;

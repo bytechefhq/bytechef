@@ -18,11 +18,11 @@
 
 package com.integri.atlas.config;
 
-import com.integri.atlas.repository.git.workflow.GitWorkflowRepository;
+import com.integri.atlas.workflow.repository.git.GitWorkflowRepository;
 import com.integri.atlas.engine.config.AtlasProperties;
-import com.integri.atlas.engine.coordinator.workflow.WorkflowRepository;
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
 import com.integri.atlas.engine.coordinator.workflow.WorkflowRepositoryChain;
-import com.integri.atlas.repository.yaml.workflow.ResourceBasedWorkflowRepository;
+import com.integri.atlas.workflow.repository.yaml.ResourceBasedWorkflowRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

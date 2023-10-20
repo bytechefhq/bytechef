@@ -37,7 +37,7 @@ import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.coordinator.job.SimpleJob;
 import com.integri.atlas.engine.core.messagebroker.MessageBroker;
 import com.integri.atlas.engine.core.messagebroker.Queues;
-import com.integri.atlas.engine.coordinator.workflow.WorkflowRepository;
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
 import com.integri.atlas.engine.core.task.CancelTask;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskDispatcher;

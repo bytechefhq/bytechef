@@ -22,6 +22,7 @@ import com.integri.atlas.engine.coordinator.cache.Clearable;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
