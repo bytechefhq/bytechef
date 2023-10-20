@@ -9,11 +9,13 @@ const CurrentActionSelect = ({
     description,
     handleValueChange,
     loading,
+    value,
 }: {
     actions: ActionDefinitionBasicModel[] | [];
     description: string | undefined;
     handleValueChange: (value: string) => void;
     loading: boolean;
+    value: string;
 }) => {
     const singleActionComponent = actions?.length === 1;
 
@@ -48,6 +50,7 @@ const CurrentActionSelect = ({
                             label: action.title!,
                             value: action.name,
                         }))}
+                        value={value}
                         triggerClassName={'w-full bg-gray-100 border-none'}
                     />
 

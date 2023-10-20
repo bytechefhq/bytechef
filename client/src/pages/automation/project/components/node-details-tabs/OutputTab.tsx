@@ -43,7 +43,7 @@ const OutputTab = ({outputSchema}: {outputSchema: PropertyModel[]}) => {
     const {currentNode} = useNodeDetailsDialogStore();
 
     return (
-        <div className="max-h-full flex-[1_1_1px] overflow-auto p-4">
+        <div className="max-h-full flex-[1_1_1px] p-4">
             {outputSchema.map((schema: PropertyType, index) => (
                 <>
                     <div className="mb-2 flex items-center">

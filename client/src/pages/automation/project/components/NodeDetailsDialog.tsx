@@ -178,6 +178,7 @@ const NodeDetailsDialog = () => {
                                         description={currentAction?.description}
                                         handleValueChange={setCurrentActionName}
                                         loading={currentActionLoading}
+                                        value={currentActionName}
                                     />
                                 )}
 
@@ -201,38 +202,45 @@ const NodeDetailsDialog = () => {
                                     </div>
                                 )}
 
-                                {activeTab === 'description' && (
-                                    <DescriptionTab
-                                        component={currentComponent}
-                                    />
-                                )}
+                                <div className="relative h-full overflow-y-auto">
+                                    <div className="absolute left-0 top-0 w-full">
+                                        {activeTab === 'description' && (
+                                            <DescriptionTab
+                                                component={currentComponent}
+                                            />
+                                        )}
 
-                                {activeTab === 'properties' &&
-                                    !!currentAction?.properties?.length && (
-                                        <Properties
-                                            actionName={currentActionName}
-                                            customClassName="p-4 overflow-auto"
-                                            properties={
-                                                currentAction.properties
-                                            }
-                                        />
-                                    )}
+                                        {activeTab === 'properties' &&
+                                            !!currentAction?.properties
+                                                ?.length && (
+                                                <Properties
+                                                    actionName={
+                                                        currentActionName
+                                                    }
+                                                    customClassName="p-4 overflow-y-auto"
+                                                    properties={
+                                                        currentAction.properties
+                                                    }
+                                                />
+                                            )}
 
-                                {activeTab === 'connection' &&
-                                    currentComponent.connection && (
-                                        <ConnectionTab
-                                            component={currentComponent}
-                                        />
-                                    )}
+                                        {activeTab === 'connection' &&
+                                            currentComponent.connection && (
+                                                <ConnectionTab
+                                                    component={currentComponent}
+                                                />
+                                            )}
 
-                                {activeTab === 'output' &&
-                                    currentAction?.outputSchema && (
-                                        <OutputTab
-                                            outputSchema={
-                                                currentAction.outputSchema
-                                            }
-                                        />
-                                    )}
+                                        {activeTab === 'output' &&
+                                            currentAction?.outputSchema && (
+                                                <OutputTab
+                                                    outputSchema={
+                                                        currentAction.outputSchema
+                                                    }
+                                                />
+                                            )}
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="mt-auto flex p-4">
