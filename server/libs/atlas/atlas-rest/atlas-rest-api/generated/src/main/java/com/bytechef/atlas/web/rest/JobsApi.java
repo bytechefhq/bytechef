@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:18:39.516542+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:14.422631+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "jobs", description = "the jobs API")
 public interface JobsApi {
@@ -90,7 +90,7 @@ public interface JobsApi {
      * Get a job by id.
      *
      * @param id The id of the job to return. (required)
-     * @return The job. (status code 200)
+     * @return The job object. (status code 200)
      */
     @Operation(
         operationId = "getJob",
@@ -98,7 +98,7 @@ public interface JobsApi {
         description = "Get a job by id.",
         tags = { "jobs" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The job.", content = {
+            @ApiResponse(responseCode = "200", description = "The job object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = JobModel.class))
             })
         }
@@ -131,7 +131,7 @@ public interface JobsApi {
      * Get task executions of a job.
      *
      * @param id The id of the job to return task executions for. (required)
-     * @return List of task executions. (status code 200)
+     * @return A list of task executions. (status code 200)
      */
     @Operation(
         operationId = "getJobTaskExecutions",
@@ -139,7 +139,7 @@ public interface JobsApi {
         description = "Get task executions of a job.",
         tags = { "task-executions" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "List of task executions.", content = {
+            @ApiResponse(responseCode = "200", description = "A list of task executions.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = TaskExecutionModel.class)))
             })
         }

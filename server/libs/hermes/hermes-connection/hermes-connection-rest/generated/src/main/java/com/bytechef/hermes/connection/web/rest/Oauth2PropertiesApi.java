@@ -5,6 +5,7 @@
  */
 package com.bytechef.hermes.connection.web.rest;
 
+import com.bytechef.hermes.connection.web.rest.model.OAuth2PropertiesModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,41 +35,41 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T10:00:29.397533+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:16.549230+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "oauth2", description = "the oauth2 API")
-public interface Oauth2AppsApi {
+public interface Oauth2PropertiesApi {
 
     /**
-     * GET /oauth2-apps : Get registered OAuth2 apps.
-     * Get registered OAuth2 apps.
+     * GET /oauth2-properties : Get OAuth2 properties.
+     * Get OAuth2 properties.
      *
-     * @return The list of OAuth2App object. (status code 200)
+     * @return The OAuth2Properties object. (status code 200)
      */
     @Operation(
-        operationId = "getOAuth2Apps",
-        summary = "Get registered OAuth2 apps.",
-        description = "Get registered OAuth2 apps.",
+        operationId = "getOAuth2Properties",
+        summary = "Get OAuth2 properties.",
+        description = "Get OAuth2 properties.",
         tags = { "oauth2" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The list of OAuth2App object.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = String.class)))
+            @ApiResponse(responseCode = "200", description = "The OAuth2Properties object.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = OAuth2PropertiesModel.class))
             })
         }
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/oauth2-apps",
+        value = "/oauth2-properties",
         produces = { "application/json" }
     )
-    default Mono<ResponseEntity<Flux<String>>> getOAuth2Apps(
+    default Mono<ResponseEntity<OAuth2PropertiesModel>> getOAuth2Properties(
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "[ \"\", \"\" ]";
+                String exampleString = "{ \"redirectUri\" : \"redirectUri\", \"predefinedApps\" : [ \"predefinedApps\", \"predefinedApps\" ] }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }

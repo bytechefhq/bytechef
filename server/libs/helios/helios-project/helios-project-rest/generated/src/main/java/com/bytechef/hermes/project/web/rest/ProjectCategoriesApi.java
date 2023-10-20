@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:18:40.041735+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:15.647046+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "project-categories", description = "the project-categories API")
 public interface ProjectCategoriesApi {
@@ -43,7 +43,7 @@ public interface ProjectCategoriesApi {
      * GET /project-categories : Get categories.
      * Get categories.
      *
-     * @return The list of categories. (status code 200)
+     * @return A list of categories. (status code 200)
      */
     @Operation(
         operationId = "getProjectCategories",
@@ -51,7 +51,7 @@ public interface ProjectCategoriesApi {
         description = "Get categories.",
         tags = { "project-categories" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The list of categories.", content = {
+            @ApiResponse(responseCode = "200", description = "A list of categories.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.category.web.rest.model.CategoryModel.class)))
             })
         }

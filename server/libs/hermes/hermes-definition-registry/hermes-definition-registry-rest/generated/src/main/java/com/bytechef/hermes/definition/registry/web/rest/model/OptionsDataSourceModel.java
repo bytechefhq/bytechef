@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "OptionsDataSource", description = "Defines function that should dynamically load options for the property.")
 @JsonTypeName("OptionsDataSource")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:09:55.588650+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:16.972666+01:00[Europe/Zagreb]")
 public class OptionsDataSourceModel {
 
   @JsonProperty("loadOptionsDependsOn")
@@ -44,11 +44,11 @@ public class OptionsDataSourceModel {
   }
 
   /**
-   * The list of property names on which value change the property options should load/reload.
+   * A list of property names on which value change the property options should load/reload.
    * @return loadOptionsDependsOn
   */
   
-  @Schema(name = "loadOptionsDependsOn", description = "The list of property names on which value change the property options should load/reload.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "loadOptionsDependsOn", description = "A list of property names on which value change the property options should load/reload.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<String> getLoadOptionsDependsOn() {
     return loadOptionsDependsOn;
   }

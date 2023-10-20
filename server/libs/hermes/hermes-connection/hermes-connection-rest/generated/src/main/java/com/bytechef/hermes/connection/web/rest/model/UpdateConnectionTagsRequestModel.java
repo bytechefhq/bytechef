@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "updateConnectionTags_request", description = "The request object that contains the array of tags.")
 @JsonTypeName("updateConnectionTags_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T10:00:29.397533+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:16.549230+01:00[Europe/Zagreb]")
 public class UpdateConnectionTagsRequestModel {
 
   @JsonProperty("tags")

@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Authorization", description = "Contains information required for a connection's authorization.")
 @JsonTypeName("Authorization")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:09:55.588650+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:16.972666+01:00[Europe/Zagreb]")
 public class AuthorizationModel {
 
   @JsonProperty("display")
@@ -35,9 +35,6 @@ public class AuthorizationModel {
 
   @JsonProperty("name")
   private String name;
-
-  @JsonProperty("redirectUri")
-  private String redirectUri;
 
   @JsonProperty("properties")
   @Valid
@@ -82,25 +79,6 @@ public class AuthorizationModel {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public AuthorizationModel redirectUri(String redirectUri) {
-    this.redirectUri = redirectUri;
-    return this;
-  }
-
-  /**
-   * The redirect URI used for OAuth2 callback URL.
-   * @return redirectUri
-  */
-  
-  @Schema(name = "redirectUri", accessMode = Schema.AccessMode.READ_ONLY, description = "The redirect URI used for OAuth2 callback URL.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public String getRedirectUri() {
-    return redirectUri;
-  }
-
-  public void setRedirectUri(String redirectUri) {
-    this.redirectUri = redirectUri;
   }
 
   public AuthorizationModel properties(List<PropertyModel> properties) {
@@ -160,14 +138,13 @@ public class AuthorizationModel {
     AuthorizationModel authorization = (AuthorizationModel) o;
     return Objects.equals(this.display, authorization.display) &&
         Objects.equals(this.name, authorization.name) &&
-        Objects.equals(this.redirectUri, authorization.redirectUri) &&
         Objects.equals(this.properties, authorization.properties) &&
         Objects.equals(this.type, authorization.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(display, name, redirectUri, properties, type);
+    return Objects.hash(display, name, properties, type);
   }
 
   @Override
@@ -176,7 +153,6 @@ public class AuthorizationModel {
     sb.append("class AuthorizationModel {\n");
     sb.append("    display: ").append(toIndentedString(display)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    redirectUri: ").append(toIndentedString(redirectUri)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");

@@ -39,17 +39,17 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-12T13:09:55.588650+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-22T18:48:16.972666+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "action-definitions", description = "the action-definitions API")
 public interface ComponentDefinitionsApi {
 
     /**
-     * GET /component-definitions/{name}/{version}/actions/{actionName} : Get an action of a component definition.
+     * GET /component-definitions/{componentName}/{componentVersion}/actions/{actionName} : Get an action of a component definition.
      * Get an action of a component definition.
      *
-     * @param name The name of the component. (required)
-     * @param version The version of the component to get. (required)
+     * @param componentName The name of the component. (required)
+     * @param componentVersion The version of the component to get. (required)
      * @param actionName The name of the action to get. (required)
      * @return Successful operation. (status code 200)
      */
@@ -66,12 +66,12 @@ public interface ComponentDefinitionsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions/{name}/{version}/actions/{actionName}",
+        value = "/component-definitions/{componentName}/{componentVersion}/actions/{actionName}",
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<ActionDefinitionModel>> getActionDefinition(
-        @Parameter(name = "name", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("name") String name,
-        @Parameter(name = "version", description = "The version of the component to get.", required = true, in = ParameterIn.PATH) @PathVariable("version") Integer version,
+        @Parameter(name = "componentName", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of the component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "actionName", description = "The name of the action to get.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
@@ -90,10 +90,11 @@ public interface ComponentDefinitionsApi {
 
 
     /**
-     * GET /component-definitions/{name}/connection-definition : Get connection definition for a component.
+     * GET /component-definitions/{componentName}/{componentVersion}/connection-definition : Get connection definition for a component.
      * Get connection definition for a component.
      *
-     * @param name The name of the component. (required)
+     * @param componentName The name of a component. (required)
+     * @param componentVersion The version of a component. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -109,18 +110,19 @@ public interface ComponentDefinitionsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions/{name}/connection-definition",
+        value = "/component-definitions/{componentName}/{componentVersion}/connection-definition",
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<ConnectionDefinitionModel>> getComponentConnectionDefinition(
-        @Parameter(name = "name", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("name") String name,
+        @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"authorizationRequired\" : true, \"componentDisplay\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"authorizations\" : [ { \"redirectUri\" : \"redirectUri\", \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] }, { \"redirectUri\" : \"redirectUri\", \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] } ], \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"componentName\" : \"componentName\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] }";
+                String exampleString = "{ \"authorizationRequired\" : true, \"componentDisplay\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"baseUri\" : \"baseUri\", \"authorizations\" : [ { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] }, { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] } ], \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"componentName\" : \"componentName\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -131,10 +133,11 @@ public interface ComponentDefinitionsApi {
 
 
     /**
-     * GET /component-definitions/{name}/connection-definitions : Get all compatible connection definitions for a component.
+     * GET /component-definitions/{componentName}/{componentVersion}/connection-definitions : Get all compatible connection definitions for a component.
      * Get all compatible connection definitions for a component.
      *
-     * @param name The name of the component. (required)
+     * @param componentName The name of a component. (required)
+     * @param componentVersion The version of a component. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -150,11 +153,12 @@ public interface ComponentDefinitionsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions/{name}/connection-definitions",
+        value = "/component-definitions/{componentName}/{componentVersion}/connection-definitions",
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<Flux<ConnectionDefinitionBasicModel>>> getComponentConnectionDefinitions(
-        @Parameter(name = "name", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("name") String name,
+        @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
@@ -172,11 +176,11 @@ public interface ComponentDefinitionsApi {
 
 
     /**
-     * GET /component-definitions/{name}/{version} : Get a component definition.
+     * GET /component-definitions/{componentName}/{componentVersion} : Get a component definition.
      * Get a component definition.
      *
-     * @param name The name of the component to get. (required)
-     * @param version The version of the component to get. (required)
+     * @param componentName The name of the component to get. (required)
+     * @param componentVersion The version of the component to get. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -192,19 +196,19 @@ public interface ComponentDefinitionsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions/{name}/{version}",
+        value = "/component-definitions/{componentName}/{componentVersion}",
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<ComponentDefinitionWithBasicActionsModel>> getComponentDefinition(
-        @Parameter(name = "name", description = "The name of the component to get.", required = true, in = ParameterIn.PATH) @PathVariable("name") String name,
-        @Parameter(name = "version", description = "The version of the component to get.", required = true, in = ParameterIn.PATH) @PathVariable("version") Integer version,
+        @Parameter(name = "componentName", description = "The name of the component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "componentVersion", description = "The version of the component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
         exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
         for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
             if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"connection\" : { \"authorizationRequired\" : true, \"componentDisplay\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"authorizations\" : [ { \"redirectUri\" : \"redirectUri\", \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] }, { \"redirectUri\" : \"redirectUri\", \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] } ], \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"componentName\" : \"componentName\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] }, \"actions\" : [ { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\" }, { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\" } ], \"version\" : 0 }";
+                String exampleString = "{ \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"connection\" : { \"authorizationRequired\" : true, \"componentDisplay\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"baseUri\" : \"baseUri\", \"authorizations\" : [ { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] }, { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] } ], \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"componentName\" : \"componentName\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"metadata\" : { \"key\" : \"{}\" }, \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] }, \"actions\" : [ { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\" }, { \"display\" : { \"subtitle\" : \"subtitle\", \"icon\" : \"icon\", \"description\" : \"description\", \"label\" : \"label\", \"category\" : \"category\", \"tags\" : [ \"tags\", \"tags\" ] }, \"name\" : \"name\" } ], \"version\" : 0 }";
                 result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
                 break;
             }
@@ -215,10 +219,10 @@ public interface ComponentDefinitionsApi {
 
 
     /**
-     * GET /component-definitions/{name} : Get all component definition versions of a component definition.
+     * GET /component-definitions/{componentName} : Get all component definition versions of a component definition.
      * Get all component definition versions of a component definition.
      *
-     * @param name The name of the component to get. (required)
+     * @param componentName The name of the component to get. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -234,11 +238,11 @@ public interface ComponentDefinitionsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions/{name}",
+        value = "/component-definitions/{componentName}",
         produces = { "application/json" }
     )
     default Mono<ResponseEntity<Flux<ComponentDefinitionBasicModel>>> getComponentDefinitionVersions(
-        @Parameter(name = "name", description = "The name of the component to get.", required = true, in = ParameterIn.PATH) @PathVariable("name") String name,
+        @Parameter(name = "componentName", description = "The name of the component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
