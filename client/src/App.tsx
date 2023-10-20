@@ -18,10 +18,10 @@ const navigation: {
 }[] = [
     {
         name: 'Integrations',
-        href: '/integrations',
+        href: '/automation/integrations',
         icon: Square3Stack3DIcon,
     },
-    {name: 'Connections', href: '/connections', icon: LinkIcon},
+    {name: 'Connections', href: '/automation/connections', icon: LinkIcon},
 ];
 
 function App() {

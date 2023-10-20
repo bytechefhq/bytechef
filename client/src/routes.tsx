@@ -21,15 +21,15 @@ export const router = createBrowserRouter([
                     fetch(
                         `http://localhost:5173/api/integrations/${params.integrationId}`
                     ),
-                path: 'integrations/:integrationId',
+                path: 'automation/integrations/:integrationId',
                 element: <Integration />,
             },
             {
-                path: 'integrations',
+                path: 'automation/integrations',
                 element: <Integrations />,
             },
             {
-                path: 'connections',
+                path: 'automation/connections',
                 element: <Connections />,
             },
             {
