@@ -17,6 +17,7 @@ import * as runtime from '../runtime';
 import type {
   GetIntegrationTags200Response,
   Integration,
+  PostIntegrationWorkflowRequest,
   PutIntegrationTagsRequest,
 } from '../models';
 import {
@@ -24,6 +25,8 @@ import {
     GetIntegrationTags200ResponseToJSON,
     IntegrationFromJSON,
     IntegrationToJSON,
+    PostIntegrationWorkflowRequestFromJSON,
+    PostIntegrationWorkflowRequestToJSON,
     PutIntegrationTagsRequestFromJSON,
     PutIntegrationTagsRequestToJSON,
 } from '../models';
@@ -38,6 +41,11 @@ export interface GetIntegrationRequest {
 
 export interface PostIntegrationRequest {
     integration: Integration;
+}
+
+export interface PostIntegrationWorkflowOperationRequest {
+    id: number;
+    postIntegrationWorkflowRequest: PostIntegrationWorkflowRequest;
 }
 
 export interface PutIntegrationRequest {
@@ -206,6 +214,45 @@ export class IntegrationsApi extends runtime.BaseAPI {
      */
     async postIntegration(requestParameters: PostIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Integration> {
         const response = await this.postIntegrationRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates new workflow and adds it to an existing integration.
+     * Creates new workflow and adds it to an existing integration.
+     */
+    async postIntegrationWorkflowRaw(requestParameters: PostIntegrationWorkflowOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Integration>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling postIntegrationWorkflow.');
+        }
+
+        if (requestParameters.postIntegrationWorkflowRequest === null || requestParameters.postIntegrationWorkflowRequest === undefined) {
+            throw new runtime.RequiredError('postIntegrationWorkflowRequest','Required parameter requestParameters.postIntegrationWorkflowRequest was null or undefined when calling postIntegrationWorkflow.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/integrations/{id}/workflows`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: PostIntegrationWorkflowRequestToJSON(requestParameters.postIntegrationWorkflowRequest),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationFromJSON(jsonValue));
+    }
+
+    /**
+     * Creates new workflow and adds it to an existing integration.
+     * Creates new workflow and adds it to an existing integration.
+     */
+    async postIntegrationWorkflow(requestParameters: PostIntegrationWorkflowOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Integration> {
+        const response = await this.postIntegrationWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
