@@ -20,6 +20,7 @@ import static com.integri.atlas.engine.core.task.description.TaskAuthentication.
 import static com.integri.atlas.engine.core.task.description.TaskAuthentication.credential;
 import static com.integri.atlas.engine.core.task.description.TaskDescription.task;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValues;
+import static com.integri.atlas.engine.core.task.description.TaskProperty.BINARY_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.GROUP_PROPERTY;
@@ -252,6 +253,17 @@ public class HttpRequestTaskDescriptor implements TaskDescriptor {
                                 .description("Name of the parameter.")
                                 .defaultValue("")
                         )
+                ),
+            BINARY_PROPERTY("bodyBinaryItem")
+                .displayName("Binary")
+                .description("The Binary property that represents binary data.")
+                .displayOption(
+                    show(
+                        "bodyContentType",
+                        parameterValues("BINARY"),
+                        "requestMethod",
+                        parameterValues("PATCH", "POST", "PUT")
+                    )
                 )
         );
 
