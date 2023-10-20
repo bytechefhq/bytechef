@@ -1,7 +1,7 @@
 dependencies {
     api "org.springframework.cloud:spring-cloud-starter"
     api "org.springframework.cloud:spring-cloud-starter-loadbalancer"
-    api project(":server:libs:core:discovery:discover-metadata-api")
+    api project(":server:libs:core:discovery:discovery-metadata-api")
 
     implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "io.projectreactor:reactor-core"
