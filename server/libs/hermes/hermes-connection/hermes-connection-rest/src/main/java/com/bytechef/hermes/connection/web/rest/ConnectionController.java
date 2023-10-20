@@ -23,6 +23,7 @@ import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionUpdateModel;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
@@ -33,7 +34,8 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 @ConditionalOnApi
-public class ConnectionController implements ConnectionControllerApi {
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+public class ConnectionController implements ConnectionsApi {
 
     private final ConversionService conversionService;
     private final ConnectionService connectionService;

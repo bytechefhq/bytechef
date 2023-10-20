@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.connection.web.rest.config.ConnectionRestTestConfiguration;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
 import com.bytechef.hermes.connection.web.rest.model.ConnectionUpdateModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -36,13 +37,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 /**
  * @author Ivica Cardic
  */
+@ContextConfiguration(classes = ConnectionRestTestConfiguration.class)
 @WebFluxTest(value = ConnectionController.class)
-public class ConnectionControllerTest {
+public class ConnectionControllerIntTest {
 
     @MockBean
     private ConnectionService connectionService;
