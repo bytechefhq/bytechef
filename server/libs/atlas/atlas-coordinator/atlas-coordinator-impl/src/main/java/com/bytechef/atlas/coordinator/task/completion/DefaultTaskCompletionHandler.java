@@ -31,6 +31,7 @@ import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
+import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.collection.MapUtils;
@@ -129,7 +130,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
                     MapUtils.getRequiredString(output, WorkflowConstants.VALUE));
         }
 
-        TaskExecution evaluatedJobTaskExecution = taskEvaluator.evaluate(new TaskExecution(source), context);
+        TaskExecution evaluatedJobTaskExecution =
+                taskEvaluator.evaluate(TaskExecution.of(new WorkflowTask(source)), context);
         Job updateJob = new Job(job);
 
         updateJob.setStatus(JobStatus.COMPLETED);

@@ -72,12 +72,12 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
         logger.error("Task {}: {}\n{}", taskExecution.getId(), error.getMessage(), error.getStackTrace());
 
         // set task status to FAILED and persist
-        TaskExecution errorTaskExecution = new TaskExecution(taskExecution);
+        TaskExecution erroredTaskExecution = new TaskExecution(taskExecution);
 
-        errorTaskExecution.setStatus(TaskStatus.FAILED);
-        errorTaskExecution.setEndTime(LocalDateTime.now());
+        erroredTaskExecution.setStatus(TaskStatus.FAILED);
+        erroredTaskExecution.setEndTime(LocalDateTime.now());
 
-        taskExecutionService.update(errorTaskExecution);
+        taskExecutionService.update(erroredTaskExecution);
 
         // if the task is retryable, then retry it
         if (taskExecution.getRetryAttempts() < taskExecution.getRetry()) {
@@ -94,22 +94,22 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
         }
         // if it's not retryable then we're gonna fail the job
         else {
-            while (errorTaskExecution.getParentId() != null) { // mark parent tasks as FAILED as well
-                errorTaskExecution =
-                        new TaskExecution(taskExecutionService.getTaskExecution(errorTaskExecution.getParentId()));
-                errorTaskExecution.setStatus(TaskStatus.FAILED);
-                errorTaskExecution.setEndTime(LocalDateTime.now());
+            while (erroredTaskExecution.getParentId() != null) { // mark parent tasks as FAILED as well
+                erroredTaskExecution =
+                        new TaskExecution(taskExecutionService.getTaskExecution(erroredTaskExecution.getParentId()));
+                erroredTaskExecution.setStatus(TaskStatus.FAILED);
+                erroredTaskExecution.setEndTime(LocalDateTime.now());
 
-                taskExecutionService.update(errorTaskExecution);
+                taskExecutionService.update(erroredTaskExecution);
             }
 
-            Job job = jobService.getTaskExecutionJob(errorTaskExecution.getId());
+            Job job = jobService.getTaskExecutionJob(erroredTaskExecution.getId());
 
-            Assert.notNull(job, "job not found for task: " + errorTaskExecution.getId());
+            Assert.notNull(job, "job not found for task: " + erroredTaskExecution.getId());
 
             Job updateJob = new Job(job);
 
-            Assert.notNull(updateJob, String.format("No job found for task %s ", errorTaskExecution.getId()));
+            Assert.notNull(updateJob, String.format("No job found for task %s ", erroredTaskExecution.getId()));
 
             updateJob.setStatus(JobStatus.FAILED);
             updateJob.setEndTime(new Date());
