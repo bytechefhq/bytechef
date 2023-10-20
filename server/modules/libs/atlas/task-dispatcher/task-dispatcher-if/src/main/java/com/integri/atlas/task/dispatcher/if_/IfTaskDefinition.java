@@ -144,8 +144,8 @@ public class IfTaskDefinition implements TaskDefinition {
             SELECT_PROPERTY("combineOperation")
                 .displayName("Combine")
                 .options(
-                    option("All", "all", "Only if all conditions are met, the workflow goes into \"true\" branch."),
-                    option("Any", "any", "If any condition is met, the workflow goes into \"true\" branch.")
+                    option("All", "ALL", "Only if all conditions are met, the workflow goes into \"true\" branch."),
+                    option("Any", "ANY", "If any condition is met, the workflow goes into \"true\" branch.")
                 )
                 .description(
                     """
@@ -153,7 +153,7 @@ public class IfTaskDefinition implements TaskDefinition {
                              matches or only if ALL are met.
                             """
                 )
-                .defaultValue("all"),
+                .defaultValue("ALL"),
             COLLECTION_PROPERTY("caseTrue")
                 .description("List of tasks that will be executed when result of resolving all conditions is TRUE")
                 .displayName("Case TRUE")

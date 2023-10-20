@@ -62,9 +62,9 @@ public class IfTaskUtil {
     }
 
     private static String getBooleanOperator(String combineOperation) {
-        if (combineOperation.equals("any")) {
+        if (combineOperation.equalsIgnoreCase("ANY")) {
             return "||";
-        } else if (combineOperation.equals("all")) {
+        } else if (combineOperation.equalsIgnoreCase("ALL")) {
             return "&&";
         }
 
