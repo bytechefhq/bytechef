@@ -72,10 +72,10 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
     }
 
     @Override
-    public void destroy() {
+    public void destroy() throws InterruptedException {
         redisListenerEndpointRegistrar.stop();
 
-        executorService.shutdown();
+        executorService.shutdownNow();
     }
 
     @Bean
@@ -101,7 +101,7 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
         }
 
         @Bean
-        RedisTemplate<String, RedisMessage> redisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, RedisMessage> redisMessageRedisTemplate(RedisConnectionFactory connectionFactory) {
             RedisTemplate<String, RedisMessage> redisTemplate = new RedisTemplate<>();
 
             redisTemplate.setConnectionFactory(connectionFactory);

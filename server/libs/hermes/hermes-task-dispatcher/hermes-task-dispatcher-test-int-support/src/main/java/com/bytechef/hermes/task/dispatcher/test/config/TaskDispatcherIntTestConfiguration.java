@@ -38,8 +38,7 @@ import org.springframework.context.annotation.Import;
         DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class
     })
 @Import({
-    ResourceWorkflowRepositoryConfiguration.class,
-    WorkflowExecutorConfiguration.class,
+    ResourceWorkflowRepositoryConfiguration.class, WorkflowExecutorConfiguration.class,
     WorkflowMapperConfiguration.class
 })
 @SpringBootConfiguration

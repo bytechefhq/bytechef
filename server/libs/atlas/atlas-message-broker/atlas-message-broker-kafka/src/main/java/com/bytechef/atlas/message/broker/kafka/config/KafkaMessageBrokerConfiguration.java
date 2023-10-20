@@ -134,11 +134,9 @@ public class KafkaMessageBrokerConfiguration
     }
 
     @Bean
-    ProducerFactory<String, Object> producerFactory(
-        ObjectMapper aObjectMapper, KafkaProperties aKafkaProperties) {
-
+    ProducerFactory<String, Object> producerFactory(ObjectMapper objectMapper, KafkaProperties kafkaProperties) {
         return new DefaultKafkaProducerFactory<>(
-            producerConfigs(aKafkaProperties), new StringSerializer(), new JsonSerializer<>(aObjectMapper));
+            producerConfigs(kafkaProperties), new StringSerializer(), new JsonSerializer<>(objectMapper));
     }
 
     @Bean
@@ -159,7 +157,7 @@ public class KafkaMessageBrokerConfiguration
     }
 
     @Bean
-    MessageConverter jacksonMessageConverter(ObjectMapper aObjectMapper) {
+    MessageConverter jacksonMessageConverter(ObjectMapper objectMapper) {
         MappingJackson2MessageConverter mappingJackson2MessageConverter = new MappingJackson2MessageConverter() {
 
             @Override
@@ -208,37 +206,37 @@ public class KafkaMessageBrokerConfiguration
             }
         };
 
-        mappingJackson2MessageConverter.setObjectMapper(aObjectMapper);
+        mappingJackson2MessageConverter.setObjectMapper(objectMapper);
 
         return mappingJackson2MessageConverter;
     }
 
     @Bean
-    MessageHandlerMethodFactory messageHandlerMethodFactory(MessageConverter aMessageConverter) {
+    MessageHandlerMethodFactory messageHandlerMethodFactory(MessageConverter messageConverter) {
         DefaultMessageHandlerMethodFactory messageHandlerMethodFactory = new DefaultMessageHandlerMethodFactory();
-        messageHandlerMethodFactory.setMessageConverter(aMessageConverter);
+        messageHandlerMethodFactory.setMessageConverter(messageConverter);
 
         return messageHandlerMethodFactory;
     }
 
-    private KafkaListenerContainerFactory createContainerFactory(int aConcurrency) {
+    private KafkaListenerContainerFactory createContainerFactory(int concurrency) {
         ConcurrentKafkaListenerContainerFactory factory = new ConcurrentKafkaListenerContainerFactory();
 
-        factory.setConcurrency(aConcurrency);
+        factory.setConcurrency(concurrency);
 
         return factory;
     }
 
     private MethodKafkaListenerEndpoint<String, String> createListenerEndpoint(
-        String aQueueName, Object aListener, Method listenerMethod) {
+        String queueName, Object listener, Method listenerMethod) {
 
         final MethodKafkaListenerEndpoint<String, String> endpoint = new MethodKafkaListenerEndpoint<>();
 
         endpoint.setBeanFactory(beanFactory);
-        endpoint.setBean(aListener);
+        endpoint.setBean(listener);
         endpoint.setMethod(listenerMethod);
-        endpoint.setId(aQueueName + "Endpoint");
-        endpoint.setTopics(aQueueName);
+        endpoint.setId(queueName + "Endpoint");
+        endpoint.setTopics(queueName);
         endpoint.setMessageHandlerMethodFactory(messageHandlerMethodFactory);
 
         return endpoint;
