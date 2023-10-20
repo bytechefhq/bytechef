@@ -7,8 +7,8 @@ import {
     useGetConnectionTagsQuery,
     useGetConnectionsQuery,
 } from '../../../queries/connections.queries';
-import ConnectionDialog from './ConnectionDialog';
 import ConnectionListItem from './ConnectionListItem';
+import ConnectionDialog from './components/ConnectionDialog';
 
 const ConnectionList = () => {
     const [searchParams] = useSearchParams();

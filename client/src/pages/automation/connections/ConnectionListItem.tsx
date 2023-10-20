@@ -16,7 +16,7 @@ import {
 } from '../../../mutations/connections.mutations';
 import {ComponentDefinitionKeys} from '../../../queries/componentDefinitions.queries';
 import {ConnectionKeys} from '../../../queries/connections.queries';
-import ConnectionDialog from './ConnectionDialog';
+import ConnectionDialog from './components/ConnectionDialog';
 
 interface ConnectionListItemProps {
     connection: ConnectionModel;

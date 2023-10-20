@@ -2,7 +2,7 @@ import {Link} from 'react-router-dom';
 
 import reactLogo from '../../assets/logo.svg';
 import Avatar from '../Avatar/Avatar';
-import {Tooltip} from '../Tooltip/Tooltip';
+import Tooltip from '../Tooltip/Tooltip';
 
 export function DesktopSidebar({
     navigation,
