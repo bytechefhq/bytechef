@@ -16,9 +16,10 @@
 
 package com.bytechef.hermes.component.impl;
 
-import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -28,73 +29,74 @@ import java.util.Map;
  */
 public class ExecutionParametersImpl implements ExecutionParameters {
 
-    private final TaskExecution taskExecution;
+    private final WorkflowTask workflowTask;
 
-    public ExecutionParametersImpl(TaskExecution taskExecution) {
-        this.taskExecution = new TaskExecution(taskExecution);
+    @SuppressFBWarnings("EI2")
+    public ExecutionParametersImpl(WorkflowTask workflowTask) {
+        this.workflowTask = workflowTask;
     }
 
     @Override
     public boolean getBoolean(String key, boolean defaultValue) {
-        return taskExecution.getBoolean(key, defaultValue);
+        return workflowTask.getBoolean(key, defaultValue);
     }
 
     @Override
     public int getInteger(String key, int defaultValue) {
-        return taskExecution.getInteger(key, defaultValue);
+        return workflowTask.getInteger(key, defaultValue);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> List<T> getList(String key) {
-        return taskExecution.get(key, List.class);
+        return workflowTask.get(key, List.class);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> List<T> getList(String key, List<T> defaultValue) {
-        return taskExecution.get(key, List.class, defaultValue);
+        return workflowTask.get(key, List.class, defaultValue);
     }
 
     @Override
     public String getRequiredString(String key) {
-        return taskExecution.getRequiredString(key);
+        return workflowTask.getRequiredString(key);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public FileEntry getFileEntry(String key) {
-        return new FileEntryImpl(com.bytechef.hermes.file.storage.domain.FileEntry.of((Map) taskExecution.getMap(key)));
+        return new FileEntryImpl(com.bytechef.hermes.file.storage.domain.FileEntry.of((Map) workflowTask.getMap(key)));
     }
 
     @Override
     public boolean containsKey(String key) {
-        return taskExecution.containsKey(key);
+        return workflowTask.containsKey(key);
     }
 
     @Override
     public long getLong(String key) {
-        return taskExecution.getLong(key);
+        return workflowTask.getLong(key);
     }
 
     @Override
     public Duration getDuration(String key) {
-        return taskExecution.getDuration(key);
+        return workflowTask.getDuration(key);
     }
 
     @Override
     public Object getRequiredObject(String key) {
-        return taskExecution.getRequired(key);
+        return workflowTask.getRequired(key);
     }
 
     @Override
     public String getString(String key) {
-        return taskExecution.getString(key);
+        return workflowTask.getString(key);
     }
 
     @Override
     public Integer getInteger(String key) {
-        return taskExecution.getInteger(key);
+        return workflowTask.getInteger(key);
     }
 
     @Override
@@ -106,32 +108,32 @@ public class ExecutionParametersImpl implements ExecutionParameters {
 
     @Override
     public String getString(String key, String defaultValue) {
-        return taskExecution.getString(key, defaultValue);
+        return workflowTask.getString(key, defaultValue);
     }
 
     @Override
     public long getLong(String key, long defaultValue) {
-        return taskExecution.getLong(key, defaultValue);
+        return workflowTask.getLong(key, defaultValue);
     }
 
     @Override
     public Map<String, Object> getMap(String key) {
-        return taskExecution.getMap(key);
+        return workflowTask.getMap(key);
     }
 
     @Override
     public Map<String, Object> getMap(String key, Map<String, Object> defaultValue) {
-        return taskExecution.getMap(key, defaultValue);
+        return workflowTask.getMap(key, defaultValue);
     }
 
     @Override
     public Object getObject(String key) {
-        return taskExecution.get(key);
+        return workflowTask.get(key);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> List<T> getRequiredList(String key) {
-        return taskExecution.getRequired(key, List.class);
+        return workflowTask.getRequired(key, List.class);
     }
 }
