@@ -11,7 +11,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
     testImplementation "org.testcontainers:postgresql"
     testImplementation project(":modules:libs:atlas:engine:engine-core-impl")
-    testImplementation project(":modules:libs:atlas:test-util")
+    testImplementation project(":modules:libs:atlas:test-common")
 
     testRuntimeOnly "org.postgresql:postgresql"
 }
