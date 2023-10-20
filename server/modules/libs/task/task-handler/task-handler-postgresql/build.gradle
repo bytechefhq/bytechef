@@ -1,8 +1,0 @@
-dependencies {
-    compileOnly project(":modules:libs:task:task-jdbc")
-
-    runtimeOnly "org.postgresql:postgresql"
-
-    testImplementation "com.zaxxer:HikariCP"
-    testImplementation project(":modules:libs:task:task-jdbc")
-}

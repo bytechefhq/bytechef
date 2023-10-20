@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.postgresql;
+package com.bytechef.component.postgresql;
+
+import com.bytechef.hermes.component.jdbc.JdbcComponentHandler;
+import com.bytechef.hermes.test.definition.DefinitionAssert;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class PostgreSQLTaskConstants {
+public class PostgreSQLComponentDefinitionTest {
 
-    public static final String POSTGRESQL = "postgresql";
-    public static final float VERSION_1_0 = 1.0f;
+    @Test
+    public void testGetComponentDefinition() {
+        DefinitionAssert.assertEquals(
+                "definition/postgresql_v1.json",
+                new JdbcComponentHandler(
+                                null, new PostgreSQLJdbcComponentDefinitionFactory().getJdbcComponentDefinition())
+                        .getDefinition());
+    }
 }
