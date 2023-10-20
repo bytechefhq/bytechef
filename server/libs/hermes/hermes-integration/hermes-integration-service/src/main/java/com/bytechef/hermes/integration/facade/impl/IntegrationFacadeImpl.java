@@ -116,6 +116,13 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
+    public List<Workflow> getIntegrationWorkflows(Long id) {
+        Integration integration = integrationService.getIntegration(id);
+
+        return workflowService.getWorkflows(integration.getWorkflowIds());
+    }
+
+    @Override
     public Integration update(Long id, List<Tag> tags) {
         tags = CollectionUtils.isEmpty(tags) ? null : tagService.save(tags);
 

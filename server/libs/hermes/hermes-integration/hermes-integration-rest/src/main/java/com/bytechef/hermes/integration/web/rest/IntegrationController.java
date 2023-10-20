@@ -111,6 +111,17 @@ public class IntegrationController implements IntegrationsApi {
     }
 
     @Override
+    public Mono<ResponseEntity<Flux<WorkflowModel>>> getIntegrationWorkflows(Long id, ServerWebExchange exchange) {
+        return Mono.just(
+            ResponseEntity.ok(
+                Flux.fromIterable(
+                    integrationFacade.getIntegrationWorkflows(id)
+                        .stream()
+                        .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
+                        .toList())));
+    }
+
+    @Override
     @Transactional
     public Mono<ResponseEntity<IntegrationModel>> postIntegration(
         Mono<IntegrationModel> integrationModelMono, ServerWebExchange exchange) {
