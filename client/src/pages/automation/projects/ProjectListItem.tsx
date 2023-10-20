@@ -1,6 +1,6 @@
 import {CalendarIcon} from '@heroicons/react/24/outline';
 import {useQueryClient} from '@tanstack/react-query';
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 
 import AlertDialog from '../../../components/AlertDialog/AlertDialog';
@@ -22,10 +22,7 @@ import {
     useDuplicateProjectMutation,
     useUpdateProjectTagsMutation,
 } from '../../../mutations/projects.mutations';
-import {
-    ProjectKeys,
-    useGetProjectWorkflowsQuery,
-} from '../../../queries/projects.queries';
+import {ProjectKeys} from '../../../queries/projects.queries';
 import ProjectDialog from './ProjectDialog';
 
 interface ProjectItemProps {
@@ -42,18 +39,12 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
     const queryClient = useQueryClient();
 
-    const {data: projectWorkflows} = useGetProjectWorkflowsQuery(
-        project?.id as number
-    );
-
     const createProjectWorkflowRequestMutation =
         useCreateProjectWorkflowRequestMutation({
             onSuccess: (workflow) => {
-                if (projectWorkflows) {
-                    navigate(
-                        `/automation/projects/${project.id}/workflow/${workflow?.id}`
-                    );
-                }
+                navigate(
+                    `/automation/projects/${project.id}/workflow/${workflow?.id}`
+                );
 
                 setShowWorkflowDialog(false);
             },
@@ -107,7 +98,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
     return (
         <>
-            <div className="flex items-center">
+            <li className="flex items-center rounded-md border-b border-b-gray-100 bg-white p-2 py-3 hover:bg-gray-50">
                 {initialWorkflowId && (
                     <Link
                         className="flex-1 pr-8"
@@ -203,22 +194,20 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                 )}
 
                 <DropdownMenu id={project.id} menuItems={dropdownItems} />
-            </div>
+            </li>
 
-            {showDeleteDialog && (
-                <AlertDialog
-                    danger
-                    isOpen
-                    message="This action cannot be undone. This will permanently delete the project and workflows it contains."
-                    title="Are you absolutely sure?"
-                    setIsOpen={setShowDeleteDialog}
-                    onConfirmClick={() => {
-                        if (project.id) {
-                            deleteProjectMutation.mutate(project.id);
-                        }
-                    }}
-                />
-            )}
+            <AlertDialog
+                danger
+                isOpen={showDeleteDialog}
+                message="This action cannot be undone. This will permanently delete the project and workflows it contains."
+                title="Are you absolutely sure?"
+                setIsOpen={setShowDeleteDialog}
+                onConfirmClick={() => {
+                    if (project.id) {
+                        deleteProjectMutation.mutate(project.id);
+                    }
+                }}
+            />
 
             {showEditDialog && (
                 <ProjectDialog
