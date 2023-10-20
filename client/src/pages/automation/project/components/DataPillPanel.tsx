@@ -10,6 +10,7 @@ import {Cross1Icon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
 import {useGetActionDefinitionsQuery} from 'queries/actionDefinitions.queries';
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
+import {useCallback, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {PropertyType} from 'types/projectTypes';
 
@@ -18,7 +19,7 @@ import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import DataPill from './DataPill';
 
-const DataPillPanelBody = () => {
+const DataPillPanelBody = ({containerHeight}: {containerHeight: number}) => {
     const {componentActions, componentNames, dataPills, setDataPills} =
         useWorkflowDefinitionStore();
 
@@ -81,7 +82,7 @@ const DataPillPanelBody = () => {
     };
 
     return (
-        <Accordion type="multiple">
+        <Accordion className="h-full" collapsible type="single">
             {previousComponents?.map((component, index) => {
                 const {icon, name, title} = component;
 
@@ -90,7 +91,7 @@ const DataPillPanelBody = () => {
                 }
 
                 const outputSchema: PropertyType | undefined =
-                    actionData[index].outputSchema;
+                    actionData[index]?.outputSchema;
 
                 const properties = outputSchema?.properties?.length
                     ? outputSchema.properties
@@ -101,7 +102,14 @@ const DataPillPanelBody = () => {
                 );
 
                 return (
-                    <AccordionItem className="group" key={name} value={name}>
+                    <AccordionItem
+                        className="group group-data-[state=open]:h-full"
+                        key={name}
+                        style={{
+                            maxHeight: containerHeight / 2,
+                        }}
+                        value={name}
+                    >
                         {!!existingProperties?.length && (
                             <>
                                 <AccordionTrigger className="group flex w-full items-center justify-between border-gray-100 bg-white p-4 group-data-[state=closed]:border-b">
@@ -118,8 +126,13 @@ const DataPillPanelBody = () => {
                                     <ChevronDownIcon className="h-5 w-5 text-gray-400 transition-transform duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-180" />
                                 </AccordionTrigger>
 
-                                <AccordionContent className="w-full space-y-4 border-b border-gray-100 bg-gray-100 p-2 group-data-[state=open]:h-full">
-                                    <ul className="flex w-full flex-col space-y-2">
+                                <AccordionContent
+                                    className="w-full space-y-4 overflow-y-scroll border-b border-gray-100 bg-gray-100 p-2 group-data-[state=open]:h-full"
+                                    style={{
+                                        maxHeight: containerHeight / 2 - 52,
+                                    }}
+                                >
+                                    <ul className="flex w-full flex-col space-y-2 group-data-[state=open]:h-full">
                                         {existingProperties?.map(
                                             (property: PropertyType) => (
                                                 <DataPill
@@ -145,8 +158,18 @@ const DataPillPanelBody = () => {
 };
 
 const DataPillPanel = () => {
+    const [panelContainerHeight, setPanelContainerHeight] = useState(0);
+
     const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
     const {nodeDetailsDialogOpen} = useNodeDetailsDialogStore();
+
+    const panelContainerRef = useCallback(
+        (panelContainer: HTMLDivElement) =>
+            setPanelContainerHeight(
+                panelContainer?.getBoundingClientRect().height
+            ),
+        []
+    );
 
     return (
         <Dialog.Root
@@ -159,7 +182,10 @@ const DataPillPanel = () => {
                     className="fixed inset-y-2 right-[492px] top-16 z-10 w-screen max-w-[320px] overflow-hidden rounded-xl border-l bg-white shadow-lg"
                     onInteractOutside={(event) => event.preventDefault()}
                 >
-                    <div className="flex h-full flex-col bg-white shadow-xl">
+                    <div
+                        className="flex h-full flex-col bg-white shadow-xl"
+                        ref={panelContainerRef}
+                    >
                         <header className="border-b border-gray-100 p-4">
                             <Dialog.Title className="flex content-center items-center text-lg font-medium text-gray-900">
                                 <span>Data Pill Panel</span>
@@ -184,8 +210,10 @@ const DataPillPanel = () => {
                             </Dialog.Description>
                         </header>
 
-                        <main className="flex flex-col">
-                            <DataPillPanelBody />
+                        <main className="flex h-full flex-col">
+                            <DataPillPanelBody
+                                containerHeight={panelContainerHeight}
+                            />
                         </main>
                     </div>
                 </Dialog.Content>
