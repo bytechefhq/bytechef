@@ -18,8 +18,8 @@
 
 package com.integri.atlas.engine.coordinator;
 
-import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.MapObject;
+import com.integri.atlas.engine.context.service.ContextService;
 import com.integri.atlas.engine.coordinator.job.executor.DefaultJobExecutor;
 import com.integri.atlas.engine.coordinator.task.completion.DefaultTaskCompletionHandler;
 import com.integri.atlas.engine.coordinator.task.dispatcher.DefaultTaskDispatcher;
@@ -31,7 +31,7 @@ import com.integri.atlas.engine.message.broker.sync.SyncMessageBroker;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.task.execution.repository.TaskExecutionRepository;
-import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
+import com.integri.atlas.engine.task.execution.service.TaskExecutionService;
 import com.integri.atlas.engine.worker.Worker;
 import com.integri.atlas.engine.worker.WorkerImpl;
 import com.integri.atlas.engine.worker.task.handler.DefaultTaskHandlerResolver;

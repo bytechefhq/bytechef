@@ -24,7 +24,7 @@ import com.integri.atlas.engine.counter.service.CounterService;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
-import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
+import com.integri.atlas.engine.task.execution.service.TaskExecutionService;
 import com.integri.atlas.task.dispatcher.parallel.ParallelTaskDispatcher;
 
 /**

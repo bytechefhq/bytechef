@@ -16,8 +16,8 @@
 
 package com.integri.atlas.engine.coordinator.event;
 
-import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.Constants;
+import com.integri.atlas.engine.context.service.ContextService;
 import com.integri.atlas.engine.event.Events;
 import com.integri.atlas.engine.event.WorkflowEvent;
 import com.integri.atlas.engine.job.Job;

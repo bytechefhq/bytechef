@@ -30,7 +30,7 @@ import com.integri.atlas.engine.job.SimpleJob;
 import com.integri.atlas.engine.job.service.JobService;
 import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
-import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
+import com.integri.atlas.engine.task.execution.service.TaskExecutionService;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
 

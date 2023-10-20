@@ -1,3 +1,0 @@
-dependencies {
-    api project(":modules:libs:atlas:engine:engine-counter:engine-counter-repository:engine-counter-repository-api")
-}

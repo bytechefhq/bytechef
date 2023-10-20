@@ -18,9 +18,9 @@
 
 package com.integri.atlas.engine.coordinator.job.executor;
 
-import com.integri.atlas.context.service.ContextService;
 import com.integri.atlas.engine.context.Context;
 import com.integri.atlas.engine.context.MapContext;
+import com.integri.atlas.engine.context.service.ContextService;
 import com.integri.atlas.engine.job.Job;
 import com.integri.atlas.engine.job.JobStatus;
 import com.integri.atlas.engine.task.WorkflowTask;
@@ -29,7 +29,7 @@ import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.TaskStatus;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
+import com.integri.atlas.engine.task.execution.service.TaskExecutionService;
 import com.integri.atlas.engine.uuid.UUIDGenerator;
 import com.integri.atlas.engine.workflow.Workflow;
 import com.integri.atlas.engine.workflow.service.WorkflowService;

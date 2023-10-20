@@ -1,4 +1,0 @@
-dependencies {
-    api project(":modules:libs:atlas:engine:engine-commons")
-    api project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-api")
-}

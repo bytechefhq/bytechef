@@ -30,7 +30,7 @@ import com.integri.atlas.engine.job.service.JobService;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.task.execution.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.task.execution.servic.TaskExecutionService;
+import com.integri.atlas.engine.task.execution.service.TaskExecutionService;
 import com.integri.atlas.task.dispatcher.subflow.SubflowTaskDispatcher;
 import java.util.Objects;
 

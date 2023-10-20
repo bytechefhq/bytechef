@@ -1,26 +1,21 @@
 subprojects {
     dependencies {
         compileOnly "org.springframework:spring-core"
-        compileOnly project(":modules:libs:atlas:engine:engine-commons")
+        compileOnly project(":modules:libs:atlas:engine:engine-api")
         compileOnly project(":modules:libs:atlas:engine:engine-coordinator:engine-coordinator-api")
-        compileOnly project(":modules:libs:atlas:engine:engine-context:engine-context-service")
-        compileOnly project(":modules:libs:atlas:engine:engine-counter:engine-counter-service")
-        compileOnly project(":modules:libs:atlas:engine:engine-job:engine-job-service")
+        compileOnly project(":modules:libs:atlas:engine:engine-service")
         compileOnly project(":modules:libs:atlas:engine:engine-message-broker:engine-message-broker-api")
-        compileOnly project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-service")
         compileOnly project(":modules:libs:atlas:task-definition:task-definition-api")
 
         testImplementation "com.fasterxml.jackson.core:jackson-annotations"
         testImplementation "com.fasterxml.jackson.core:jackson-databind"
         testImplementation project(":modules:libs:atlas:engine:engine-coordinator:engine-coordinator-impl")
         testImplementation project(":modules:libs:atlas:engine:engine-worker:engine-worker-impl")
-        testImplementation project(":modules:libs:atlas:engine:engine-job:engine-job-api")
+        testImplementation project(":modules:libs:atlas:engine:engine-api")
         testImplementation project(":modules:libs:atlas:task-definition:task-definition-api")
         testImplementation project(":modules:libs:atlas:task-handler:task-handler-core")
         testImplementation project(":modules:libs:atlas:test-commons")
-        testImplementation project(":modules:libs:atlas:engine:engine-context:engine-context-service")
-        testImplementation project(":modules:libs:atlas:engine:engine-counter:engine-counter-service")
-        testImplementation project(":modules:libs:atlas:engine:engine-task-execution:engine-task-execution-service")
+        testImplementation project(":modules:libs:atlas:engine:engine-service")
 
         testRuntimeOnly "org.postgresql:postgresql"
         testRuntimeOnly "org.testcontainers:postgresql"

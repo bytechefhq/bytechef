@@ -1,4 +1,4 @@
 dependencies {
-    api project(":modules:libs:atlas:engine:engine-commons")
+    api project(":modules:libs:atlas:engine:engine-api")
     api project(":modules:libs:atlas:file-storage:file-storage-api")
 }
