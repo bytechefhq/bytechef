@@ -103,3 +103,8 @@ atlas:
       enabled: false
       url: https://github.com/integri/atlas-workflows.git
       search-paths: demo/
+
+org:
+  jobrunr:
+    background-job-server:
+      enabled: true
