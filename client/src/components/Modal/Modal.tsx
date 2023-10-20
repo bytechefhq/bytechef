@@ -17,11 +17,10 @@ import {Dispatch, Fragment, SetStateAction} from 'react';
 
 interface ModalProps {
     children: React.ReactNode;
-    description: string;
+    description?: string;
     isOpen: boolean;
     title: string;
     triggerLabel?: string;
-    description?: string;
     setIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 

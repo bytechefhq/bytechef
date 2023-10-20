@@ -4,7 +4,7 @@ import Modal from 'components/Modal/Modal';
 import {useForm} from 'react-hook-form';
 import Button from 'components/Button/Button';
 import {useQueryClient} from '@tanstack/react-query';
-import {useWorkflowMutation} from '../../mutations/integrations.mutations';
+import {useCreateIntegrationWorkflowRequestMutation} from '../../mutations/integrations.mutations';
 import {WorkflowModel} from 'middleware/integration';
 import TextArea from 'components/TextArea/TextArea';
 
@@ -15,7 +15,7 @@ interface WorkflowModalProps {
     version: undefined;
 }
 
-const WorkflowModal = ({visible = false, id}: WorkflowModalProps) => {
+const WorkflowModal = ({id, visible = false}: WorkflowModalProps) => {
     const [isOpen, setIsOpen] = useState(visible);
 
     useEffect(() => {
@@ -37,30 +37,39 @@ const WorkflowModal = ({visible = false, id}: WorkflowModalProps) => {
         },
     });
 
-    const {mutate, isLoading} = useWorkflowMutation({
-        onSuccess: (_result) => {
+    const {mutate, isLoading} = useCreateIntegrationWorkflowRequestMutation({
+        onSuccess: () => {
             queryClient.invalidateQueries();
-            setIsOpen(false);
-            reset();
+
+            closeModal();
         },
     });
+
+    function closeModal() {
+        reset();
+        setIsOpen(false);
+    }
 
     function createWorkflow() {
         const formData = getValues();
 
-        mutate(formData);
+        mutate({
+            id: id!,
+            createIntegrationWorkflowRequestModel: formData,
+        });
     }
 
     return (
         <Modal
-            confirmButtonLabel="Create"
-            form
             isOpen={isOpen}
-            setIsOpen={setIsOpen}
+            setIsOpen={(isOpen) => {
+                if (isOpen) {
+                    setIsOpen(isOpen);
+                } else {
+                    closeModal();
+                }
+            }}
             title="Create Workflow"
-            triggerLabel=""
-            onCloseClick={reset}
-            onConfirmButtonClick={handleSubmit(createWorkflow)}
         >
             <Input
                 error={touchedFields.name && !!errors.name}
@@ -87,7 +96,7 @@ const WorkflowModal = ({visible = false, id}: WorkflowModalProps) => {
                 />
 
                 <Button
-                    label={isLoading ? 'Creating...' : 'Create'}
+                    label={isLoading ? 'Saving...' : 'Save'}
                     onClick={handleSubmit(createWorkflow)}
                     type="submit"
                     disabled={isLoading}
