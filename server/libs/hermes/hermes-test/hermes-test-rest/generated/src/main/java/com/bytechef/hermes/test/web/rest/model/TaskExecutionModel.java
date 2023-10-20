@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.hermes.test.web.rest.model.ComponentDefinitionModel;
 import com.bytechef.hermes.test.web.rest.model.ExecutionErrorModel;
+import com.bytechef.hermes.test.web.rest.model.WorkflowTaskModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -28,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to the task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T08:22:57.875357+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T09:01:48.972647+02:00[Europe/Zagreb]")
 public class TaskExecutionModel {
 
   private ComponentDefinitionModel component;
@@ -123,7 +124,7 @@ public class TaskExecutionModel {
 
   private Long retryDelayMillis;
 
-  private com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel workflowTask;
+  private WorkflowTaskModel workflowTask;
 
   private String type;
 
@@ -614,7 +615,7 @@ public class TaskExecutionModel {
     this.retryDelayMillis = retryDelayMillis;
   }
 
-  public TaskExecutionModel workflowTask(com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel workflowTask) {
+  public TaskExecutionModel workflowTask(WorkflowTaskModel workflowTask) {
     this.workflowTask = workflowTask;
     return this;
   }
@@ -626,11 +627,11 @@ public class TaskExecutionModel {
   @Valid 
   @Schema(name = "workflowTask", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowTask")
-  public com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel getWorkflowTask() {
+  public WorkflowTaskModel getWorkflowTask() {
     return workflowTask;
   }
 
-  public void setWorkflowTask(com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel workflowTask) {
+  public void setWorkflowTask(WorkflowTaskModel workflowTask) {
     this.workflowTask = workflowTask;
   }
 

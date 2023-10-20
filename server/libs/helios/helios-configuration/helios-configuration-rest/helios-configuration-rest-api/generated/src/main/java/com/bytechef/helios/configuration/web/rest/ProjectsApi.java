@@ -10,6 +10,7 @@ import com.bytechef.helios.configuration.web.rest.model.CreateProjectWorkflowReq
 import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
 import com.bytechef.helios.configuration.web.rest.model.TagModel;
 import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-05T16:00:45.187993+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T09:23:31.578949+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "projects", description = "The Automation Projects API")
 public interface ProjectsApi {
@@ -101,7 +102,7 @@ public interface ProjectsApi {
         tags = { "projects" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated project object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.hermes.configuration.web.rest.model.WorkflowModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
             })
         }
     )
@@ -111,7 +112,7 @@ public interface ProjectsApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<com.bytechef.hermes.configuration.web.rest.model.WorkflowModel> createProjectWorkflow(
+    default ResponseEntity<WorkflowModel> createProjectWorkflow(
         @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "CreateProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody CreateProjectWorkflowRequestModel createProjectWorkflowRequestModel
     ) {
@@ -329,7 +330,7 @@ public interface ProjectsApi {
         tags = { "projects" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated project object.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.hermes.configuration.web.rest.model.WorkflowModel.class)))
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowModel.class)))
             })
         }
     )
@@ -338,7 +339,7 @@ public interface ProjectsApi {
         value = "/projects/{id}/workflows",
         produces = { "application/json" }
     )
-    default ResponseEntity<List<com.bytechef.hermes.configuration.web.rest.model.WorkflowModel>> getProjectWorkflows(
+    default ResponseEntity<List<WorkflowModel>> getProjectWorkflows(
         @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         getRequest().ifPresent(request -> {

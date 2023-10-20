@@ -1,12 +1,12 @@
-package com.bytechef.hermes.configuration.web.rest.model;
+package com.bytechef.helios.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.configuration.web.rest.model.InputModel;
-import com.bytechef.hermes.configuration.web.rest.model.OutputModel;
-import com.bytechef.hermes.configuration.web.rest.model.WorkflowConnectionModel;
-import com.bytechef.hermes.configuration.web.rest.model.WorkflowFormatModel;
-import com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel;
+import com.bytechef.helios.configuration.web.rest.model.InputModel;
+import com.bytechef.helios.configuration.web.rest.model.OutputModel;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowConnectionModel;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowFormatModel;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-05T16:00:46.440360+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T09:23:31.578949+02:00[Europe/Zagreb]")
 public class WorkflowModel {
 
   @Valid

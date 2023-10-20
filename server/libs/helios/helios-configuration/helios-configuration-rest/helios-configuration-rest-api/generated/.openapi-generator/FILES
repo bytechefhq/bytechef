@@ -3,10 +3,13 @@ pom.xml
 src/main/java/com/bytechef/helios/configuration/web/rest/ApiUtil.java
 src/main/java/com/bytechef/helios/configuration/web/rest/ProjectInstancesApi.java
 src/main/java/com/bytechef/helios/configuration/web/rest/ProjectsApi.java
+src/main/java/com/bytechef/helios/configuration/web/rest/WorkflowsApi.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/CategoryModel.java
+src/main/java/com/bytechef/helios/configuration/web/rest/model/ConnectionModel.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/CreateProjectInstanceWorkflowJob200ResponseModel.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/CreateProjectWorkflowRequestModel.java
-src/main/java/com/bytechef/helios/configuration/web/rest/model/OAuth2AuthorizationParametersModel.java
+src/main/java/com/bytechef/helios/configuration/web/rest/model/InputModel.java
+src/main/java/com/bytechef/helios/configuration/web/rest/model/OutputModel.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/ProjectBasicModel.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/ProjectInstanceBasicModel.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/ProjectInstanceModel.java
@@ -16,3 +19,7 @@ src/main/java/com/bytechef/helios/configuration/web/rest/model/ProjectInstanceWo
 src/main/java/com/bytechef/helios/configuration/web/rest/model/ProjectModel.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/TagModel.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/UpdateTagsRequestModel.java
+src/main/java/com/bytechef/helios/configuration/web/rest/model/WorkflowConnectionModel.java
+src/main/java/com/bytechef/helios/configuration/web/rest/model/WorkflowFormatModel.java
+src/main/java/com/bytechef/helios/configuration/web/rest/model/WorkflowModel.java
+src/main/java/com/bytechef/helios/configuration/web/rest/model/WorkflowTaskModel.java

@@ -1,4 +1,4 @@
-package com.bytechef.hermes.configuration.web.rest.model;
+package com.bytechef.dione.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of the task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-05T16:00:46.440360+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T09:23:30.497811+02:00[Europe/Zagreb]")
 public class WorkflowTaskModel {
 
   @Valid
