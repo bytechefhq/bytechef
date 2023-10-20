@@ -1,8 +1,4 @@
-apis/ProjectCategoriesApi.ts
-apis/ProjectInstanceRequestersApi.ts
-apis/ProjectInstanceTagsApi.ts
 apis/ProjectInstancesApi.ts
-apis/ProjectTagsApi.ts
 apis/ProjectsApi.ts
 apis/index.ts
 index.ts

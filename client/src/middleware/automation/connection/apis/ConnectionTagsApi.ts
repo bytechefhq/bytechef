@@ -37,7 +37,7 @@ export class ConnectionTagsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/connection-tags`,
+            path: `/connections/tags`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
