@@ -23,31 +23,40 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Category", description = "A category.")
 @JsonTypeName("Category")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-24T06:34:54.496924+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:42.386427+02:00[Europe/Zagreb]")
 public class CategoryModel {
 
-  @JsonProperty("createdBy")
   private String createdBy;
 
-  @JsonProperty("createdDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
-  @JsonProperty("id")
   private Long id;
 
-  @JsonProperty("name")
   private String name;
 
-  @JsonProperty("lastModifiedBy")
   private String lastModifiedBy;
 
-  @JsonProperty("lastModifiedDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
-  @JsonProperty("__version")
   private Integer version;
+
+  /**
+   * Default constructor
+   * @deprecated Use {@link CategoryModel#CategoryModel(String)}
+   */
+  @Deprecated
+  public CategoryModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public CategoryModel(String name) {
+    this.name = name;
+  }
 
   public CategoryModel createdBy(String createdBy) {
     this.createdBy = createdBy;
@@ -60,6 +69,7 @@ public class CategoryModel {
   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdBy")
   public String getCreatedBy() {
     return createdBy;
   }
@@ -79,6 +89,7 @@ public class CategoryModel {
   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdDate")
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -98,6 +109,7 @@ public class CategoryModel {
   */
   
   @Schema(name = "id", description = "The id of the category.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("id")
   public Long getId() {
     return id;
   }
@@ -117,6 +129,7 @@ public class CategoryModel {
   */
   @NotNull 
   @Schema(name = "name", description = "The name of the category.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("name")
   public String getName() {
     return name;
   }
@@ -136,6 +149,7 @@ public class CategoryModel {
   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedBy")
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -155,6 +169,7 @@ public class CategoryModel {
   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedDate")
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -174,6 +189,7 @@ public class CategoryModel {
   */
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("__version")
   public Integer getVersion() {
     return version;
   }

@@ -24,34 +24,26 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobBasic", description = "Represents an execution of a workflow.")
 @JsonTypeName("JobBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:22:37.259464+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-02T07:24:03.629162+02:00[Europe/Zagreb]")
 public class JobBasicModel {
 
-  @JsonProperty("createdBy")
   private String createdBy;
 
-  @JsonProperty("createdDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
-  @JsonProperty("endDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime endDate;
 
-  @JsonProperty("id")
   private String id;
 
-  @JsonProperty("label")
   private String label;
 
-  @JsonProperty("lastModifiedBy")
   private String lastModifiedBy;
 
-  @JsonProperty("lastModifiedDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
-  @JsonProperty("startDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime startDate;
 
@@ -96,8 +88,23 @@ public class JobBasicModel {
     }
   }
 
-  @JsonProperty("status")
   private StatusEnum status;
+
+  /**
+   * Default constructor
+   * @deprecated Use {@link JobBasicModel#JobBasicModel(StatusEnum)}
+   */
+  @Deprecated
+  public JobBasicModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public JobBasicModel(StatusEnum status) {
+    this.status = status;
+  }
 
   public JobBasicModel createdBy(String createdBy) {
     this.createdBy = createdBy;
@@ -110,6 +117,7 @@ public class JobBasicModel {
   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdBy")
   public String getCreatedBy() {
     return createdBy;
   }
@@ -129,6 +137,7 @@ public class JobBasicModel {
   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdDate")
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -148,6 +157,7 @@ public class JobBasicModel {
   */
   @Valid 
   @Schema(name = "endDate", description = "The time execution entered end status COMPLETED, STOPPED, FAILED", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("endDate")
   public LocalDateTime getEndDate() {
     return endDate;
   }
@@ -167,6 +177,7 @@ public class JobBasicModel {
   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "Id of the job.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("id")
   public String getId() {
     return id;
   }
@@ -186,6 +197,7 @@ public class JobBasicModel {
   */
   
   @Schema(name = "label", accessMode = Schema.AccessMode.READ_ONLY, description = "The job's human-readable name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("label")
   public String getLabel() {
     return label;
   }
@@ -205,6 +217,7 @@ public class JobBasicModel {
   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedBy")
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -224,6 +237,7 @@ public class JobBasicModel {
   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedDate")
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -243,6 +257,7 @@ public class JobBasicModel {
   */
   @Valid 
   @Schema(name = "startDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time of when the job began.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("startDate")
   public LocalDateTime getStartDate() {
     return startDate;
   }
@@ -262,6 +277,7 @@ public class JobBasicModel {
   */
   
   @Schema(name = "status", accessMode = Schema.AccessMode.READ_ONLY, description = "The job's status.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("status")
   public StatusEnum getStatus() {
     return status;
   }

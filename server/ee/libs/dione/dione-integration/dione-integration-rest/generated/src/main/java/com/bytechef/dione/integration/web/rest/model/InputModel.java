@@ -1,4 +1,4 @@
-package com.bytechef.helios.project.web.rest.model;
+package com.bytechef.dione.integration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Input")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-02T07:24:03.629162+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-02T07:24:04.031022+02:00[Europe/Zagreb]")
 public class InputModel {
 
   private String label;

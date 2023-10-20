@@ -3,6 +3,8 @@ package com.bytechef.helios.project.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.helios.project.web.rest.model.ProjectModel;
+import com.bytechef.hermes.connection.web.rest.model.ConnectionModel;
+import com.bytechef.tag.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -29,52 +31,39 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstance", description = "Contains specific configuration required for the execution of project workflows.")
 @JsonTypeName("ProjectInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:22:37.259464+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-02T07:24:03.629162+02:00[Europe/Zagreb]")
 public class ProjectInstanceModel {
 
-  @JsonProperty("configurationParameters")
   @Valid
-  private Map<String, Object> configurationParameters = null;
+  private Map<String, Object> configurationParameters = new HashMap<>();
 
-  @JsonProperty("connectionIds")
   @Valid
-  private List<Long> connectionIds = null;
+  private List<Long> connectionIds;
 
-  @JsonProperty("connections")
   @Valid
-  private List<com.bytechef.hermes.connection.web.rest.model.ConnectionModel> connections = null;
+  private List<@Valid ConnectionModel> connections;
 
-  @JsonProperty("description")
   private String description;
 
-  @JsonProperty("createdBy")
   private String createdBy;
 
-  @JsonProperty("createdDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
 
-  @JsonProperty("id")
   private Long id;
 
-  @JsonProperty("lastExecutionDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastExecutionDate;
 
-  @JsonProperty("lastModifiedBy")
   private String lastModifiedBy;
 
-  @JsonProperty("lastModifiedDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
-  @JsonProperty("name")
   private String name;
 
-  @JsonProperty("project")
   private ProjectModel project;
 
-  @JsonProperty("projectId")
   private Long projectId;
 
   /**
@@ -112,15 +101,28 @@ public class ProjectInstanceModel {
     }
   }
 
-  @JsonProperty("status")
   private StatusEnum status;
 
-  @JsonProperty("tags")
   @Valid
-  private List<com.bytechef.tag.web.rest.model.TagModel> tags = null;
+  private List<@Valid TagModel> tags;
 
-  @JsonProperty("__version")
   private Integer version;
+
+  /**
+   * Default constructor
+   * @deprecated Use {@link ProjectInstanceModel#ProjectInstanceModel(String)}
+   */
+  @Deprecated
+  public ProjectInstanceModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public ProjectInstanceModel(String name) {
+    this.name = name;
+  }
 
   public ProjectInstanceModel configurationParameters(Map<String, Object> configurationParameters) {
     this.configurationParameters = configurationParameters;
@@ -141,6 +143,7 @@ public class ProjectInstanceModel {
   */
   
   @Schema(name = "configurationParameters", description = "The configuration parameters of an project instance used as workflow input values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("configurationParameters")
   public Map<String, Object> getConfigurationParameters() {
     return configurationParameters;
   }
@@ -168,6 +171,7 @@ public class ProjectInstanceModel {
   */
   
   @Schema(name = "connectionIds", description = "The ids of connections used by a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectionIds")
   public List<Long> getConnectionIds() {
     return connectionIds;
   }
@@ -176,12 +180,12 @@ public class ProjectInstanceModel {
     this.connectionIds = connectionIds;
   }
 
-  public ProjectInstanceModel connections(List<com.bytechef.hermes.connection.web.rest.model.ConnectionModel> connections) {
+  public ProjectInstanceModel connections(List<@Valid ConnectionModel> connections) {
     this.connections = connections;
     return this;
   }
 
-  public ProjectInstanceModel addConnectionsItem(com.bytechef.hermes.connection.web.rest.model.ConnectionModel connectionsItem) {
+  public ProjectInstanceModel addConnectionsItem(ConnectionModel connectionsItem) {
     if (this.connections == null) {
       this.connections = new ArrayList<>();
     }
@@ -195,11 +199,12 @@ public class ProjectInstanceModel {
   */
   @Valid 
   @Schema(name = "connections", accessMode = Schema.AccessMode.READ_ONLY, description = "The connections used by a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<com.bytechef.hermes.connection.web.rest.model.ConnectionModel> getConnections() {
+  @JsonProperty("connections")
+  public List<@Valid ConnectionModel> getConnections() {
     return connections;
   }
 
-  public void setConnections(List<com.bytechef.hermes.connection.web.rest.model.ConnectionModel> connections) {
+  public void setConnections(List<@Valid ConnectionModel> connections) {
     this.connections = connections;
   }
 
@@ -214,6 +219,7 @@ public class ProjectInstanceModel {
   */
   
   @Schema(name = "description", description = "The description of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
   public String getDescription() {
     return description;
   }
@@ -233,6 +239,7 @@ public class ProjectInstanceModel {
   */
   
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdBy")
   public String getCreatedBy() {
     return createdBy;
   }
@@ -252,6 +259,7 @@ public class ProjectInstanceModel {
   */
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdDate")
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -271,6 +279,7 @@ public class ProjectInstanceModel {
   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("id")
   public Long getId() {
     return id;
   }
@@ -290,6 +299,7 @@ public class ProjectInstanceModel {
   */
   @Valid 
   @Schema(name = "lastExecutionDate", description = "The last execution date of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastExecutionDate")
   public LocalDateTime getLastExecutionDate() {
     return lastExecutionDate;
   }
@@ -309,6 +319,7 @@ public class ProjectInstanceModel {
   */
   
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedBy")
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -328,6 +339,7 @@ public class ProjectInstanceModel {
   */
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedDate")
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -347,6 +359,7 @@ public class ProjectInstanceModel {
   */
   @NotNull 
   @Schema(name = "name", description = "The name of a project instance.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("name")
   public String getName() {
     return name;
   }
@@ -366,6 +379,7 @@ public class ProjectInstanceModel {
   */
   @Valid 
   @Schema(name = "project", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("project")
   public ProjectModel getProject() {
     return project;
   }
@@ -385,6 +399,7 @@ public class ProjectInstanceModel {
   */
   
   @Schema(name = "projectId", description = "Th id of a project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectId")
   public Long getProjectId() {
     return projectId;
   }
@@ -404,6 +419,7 @@ public class ProjectInstanceModel {
   */
   
   @Schema(name = "status", description = "The status of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("status")
   public StatusEnum getStatus() {
     return status;
   }
@@ -412,12 +428,12 @@ public class ProjectInstanceModel {
     this.status = status;
   }
 
-  public ProjectInstanceModel tags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
+  public ProjectInstanceModel tags(List<@Valid TagModel> tags) {
     this.tags = tags;
     return this;
   }
 
-  public ProjectInstanceModel addTagsItem(com.bytechef.tag.web.rest.model.TagModel tagsItem) {
+  public ProjectInstanceModel addTagsItem(TagModel tagsItem) {
     if (this.tags == null) {
       this.tags = new ArrayList<>();
     }
@@ -431,11 +447,12 @@ public class ProjectInstanceModel {
   */
   @Valid 
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<com.bytechef.tag.web.rest.model.TagModel> getTags() {
+  @JsonProperty("tags")
+  public List<@Valid TagModel> getTags() {
     return tags;
   }
 
-  public void setTags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
+  public void setTags(List<@Valid TagModel> tags) {
     this.tags = tags;
   }
 
@@ -450,6 +467,7 @@ public class ProjectInstanceModel {
   */
   
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("__version")
   public Integer getVersion() {
     return version;
   }

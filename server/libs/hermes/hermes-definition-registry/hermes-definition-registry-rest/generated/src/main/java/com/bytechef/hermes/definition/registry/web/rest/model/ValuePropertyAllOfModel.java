@@ -22,16 +22,13 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ValueProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class ValuePropertyAllOfModel {
 
-  @JsonProperty("controlType")
   private ControlTypeModel controlType;
 
-  @JsonProperty("defaultValue")
   private Object defaultValue;
 
-  @JsonProperty("exampleValue")
   private Object exampleValue;
 
   public ValuePropertyAllOfModel controlType(ControlTypeModel controlType) {
@@ -45,6 +42,7 @@ public class ValuePropertyAllOfModel {
   */
   @Valid 
   @Schema(name = "controlType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("controlType")
   public ControlTypeModel getControlType() {
     return controlType;
   }
@@ -64,6 +62,7 @@ public class ValuePropertyAllOfModel {
   */
   
   @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("defaultValue")
   public Object getDefaultValue() {
     return defaultValue;
   }
@@ -83,6 +82,7 @@ public class ValuePropertyAllOfModel {
   */
   
   @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("exampleValue")
   public Object getExampleValue() {
     return exampleValue;
   }

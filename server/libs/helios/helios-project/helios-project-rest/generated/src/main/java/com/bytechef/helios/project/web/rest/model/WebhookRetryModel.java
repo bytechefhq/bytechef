@@ -20,19 +20,15 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Webhook_retry")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:22:37.259464+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-02T07:24:03.629162+02:00[Europe/Zagreb]")
 public class WebhookRetryModel {
 
-  @JsonProperty("initialInterval")
   private Integer initialInterval;
 
-  @JsonProperty("maxInterval")
   private Integer maxInterval;
 
-  @JsonProperty("maxAttempts")
   private Integer maxAttempts;
 
-  @JsonProperty("multiplier")
   private Integer multiplier;
 
   public WebhookRetryModel initialInterval(Integer initialInterval) {
@@ -46,6 +42,7 @@ public class WebhookRetryModel {
   */
   
   @Schema(name = "initialInterval", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("initialInterval")
   public Integer getInitialInterval() {
     return initialInterval;
   }
@@ -65,6 +62,7 @@ public class WebhookRetryModel {
   */
   
   @Schema(name = "maxInterval", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("maxInterval")
   public Integer getMaxInterval() {
     return maxInterval;
   }
@@ -84,6 +82,7 @@ public class WebhookRetryModel {
   */
   
   @Schema(name = "maxAttempts", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("maxAttempts")
   public Integer getMaxAttempts() {
     return maxAttempts;
   }
@@ -103,6 +102,7 @@ public class WebhookRetryModel {
   */
   
   @Schema(name = "multiplier", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("multiplier")
   public Integer getMultiplier() {
     return multiplier;
   }

@@ -22,15 +22,13 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OAuth2Properties")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-26T06:48:59.929614+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-02T07:19:29.675799+02:00[Europe/Zagreb]")
 public class OAuth2PropertiesModel {
 
-  @JsonProperty("redirectUri")
   private String redirectUri;
 
-  @JsonProperty("predefinedApps")
   @Valid
-  private List<String> predefinedApps = null;
+  private List<String> predefinedApps;
 
   public OAuth2PropertiesModel redirectUri(String redirectUri) {
     this.redirectUri = redirectUri;
@@ -43,6 +41,7 @@ public class OAuth2PropertiesModel {
   */
   
   @Schema(name = "redirectUri", accessMode = Schema.AccessMode.READ_ONLY, description = "The redirect URI used for OAuth2 callback URL.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("redirectUri")
   public String getRedirectUri() {
     return redirectUri;
   }
@@ -70,6 +69,7 @@ public class OAuth2PropertiesModel {
   */
   
   @Schema(name = "predefinedApps", accessMode = Schema.AccessMode.READ_ONLY, description = "The list of predefined OAuth2 apps.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("predefinedApps")
   public List<String> getPredefinedApps() {
     return predefinedApps;
   }

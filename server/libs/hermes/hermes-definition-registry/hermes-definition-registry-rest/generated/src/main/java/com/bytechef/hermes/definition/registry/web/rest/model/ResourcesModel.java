@@ -21,10 +21,9 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Resources", description = "A set of available resources.")
 @JsonTypeName("Resources")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class ResourcesModel {
 
-  @JsonProperty("documentationUrl")
   private String documentationUrl;
 
   public ResourcesModel documentationUrl(String documentationUrl) {
@@ -38,6 +37,7 @@ public class ResourcesModel {
   */
   
   @Schema(name = "documentationUrl", description = "The url of available documentation.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("documentationUrl")
   public String getDocumentationUrl() {
     return documentationUrl;
   }

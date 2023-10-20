@@ -20,17 +20,30 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createIntegrationWorkflow_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-27T18:32:20.850700+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-02T07:24:04.031022+02:00[Europe/Zagreb]")
 public class CreateIntegrationWorkflowRequestModel {
 
-  @JsonProperty("label")
   private String label;
 
-  @JsonProperty("description")
   private String description;
 
-  @JsonProperty("definition")
   private String definition;
+
+  /**
+   * Default constructor
+   * @deprecated Use {@link CreateIntegrationWorkflowRequestModel#CreateIntegrationWorkflowRequestModel(String)}
+   */
+  @Deprecated
+  public CreateIntegrationWorkflowRequestModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public CreateIntegrationWorkflowRequestModel(String label) {
+    this.label = label;
+  }
 
   public CreateIntegrationWorkflowRequestModel label(String label) {
     this.label = label;
@@ -43,6 +56,7 @@ public class CreateIntegrationWorkflowRequestModel {
   */
   @NotNull 
   @Schema(name = "label", description = "The descriptive name for a workflow.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("label")
   public String getLabel() {
     return label;
   }
@@ -62,6 +76,7 @@ public class CreateIntegrationWorkflowRequestModel {
   */
   
   @Schema(name = "description", description = "The workflow description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
   public String getDescription() {
     return description;
   }
@@ -81,6 +96,7 @@ public class CreateIntegrationWorkflowRequestModel {
   */
   
   @Schema(name = "definition", description = "The workflow definition.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("definition")
   public String getDefinition() {
     return definition;
   }

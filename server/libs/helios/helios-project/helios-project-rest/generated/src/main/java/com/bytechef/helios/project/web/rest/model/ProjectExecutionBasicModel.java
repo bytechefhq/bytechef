@@ -25,22 +25,17 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectExecutionBasic", description = "Contains information about execution of one of project workflows.")
 @JsonTypeName("ProjectExecutionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:22:37.259464+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-02T07:24:03.629162+02:00[Europe/Zagreb]")
 public class ProjectExecutionBasicModel {
 
-  @JsonProperty("id")
   private Long id;
 
-  @JsonProperty("instance")
   private ProjectInstanceBasicModel instance;
 
-  @JsonProperty("job")
   private JobBasicModel job;
 
-  @JsonProperty("project")
   private ProjectBasicModel project;
 
-  @JsonProperty("workflow")
   private WorkflowBasicModel workflow;
 
   public ProjectExecutionBasicModel id(Long id) {
@@ -54,6 +49,7 @@ public class ProjectExecutionBasicModel {
   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project execution.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("id")
   public Long getId() {
     return id;
   }
@@ -73,6 +69,7 @@ public class ProjectExecutionBasicModel {
   */
   @Valid 
   @Schema(name = "instance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("instance")
   public ProjectInstanceBasicModel getInstance() {
     return instance;
   }
@@ -92,6 +89,7 @@ public class ProjectExecutionBasicModel {
   */
   @Valid 
   @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("job")
   public JobBasicModel getJob() {
     return job;
   }
@@ -111,6 +109,7 @@ public class ProjectExecutionBasicModel {
   */
   @Valid 
   @Schema(name = "project", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("project")
   public ProjectBasicModel getProject() {
     return project;
   }
@@ -130,6 +129,7 @@ public class ProjectExecutionBasicModel {
   */
   @Valid 
   @Schema(name = "workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflow")
   public WorkflowBasicModel getWorkflow() {
     return workflow;
   }

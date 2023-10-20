@@ -2,19 +2,9 @@ package com.bytechef.hermes.definition.registry.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.ArrayPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.BooleanPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ControlTypeModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.DatePropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.DateTimePropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.DynamicPropertiesPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.IntegerPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.NumberPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ObjectPropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.OneOfPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyTypeModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.StringPropertyModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -46,35 +36,24 @@ import jakarta.annotation.Generated;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible = true)
 @JsonSubTypes({
   @JsonSubTypes.Type(value = ArrayPropertyModel.class, name = "ARRAY"),
-  @JsonSubTypes.Type(value = ArrayPropertyModel.class, name = "ArrayProperty"),
   @JsonSubTypes.Type(value = BooleanPropertyModel.class, name = "BOOLEAN"),
-  @JsonSubTypes.Type(value = BooleanPropertyModel.class, name = "BooleanProperty"),
   @JsonSubTypes.Type(value = DatePropertyModel.class, name = "DATE"),
   @JsonSubTypes.Type(value = DateTimePropertyModel.class, name = "DATE_TIME"),
   @JsonSubTypes.Type(value = DynamicPropertiesPropertyModel.class, name = "DYNAMIC_PROPERTIES"),
-  @JsonSubTypes.Type(value = DatePropertyModel.class, name = "DateProperty"),
-  @JsonSubTypes.Type(value = DateTimePropertyModel.class, name = "DateTimeProperty"),
   @JsonSubTypes.Type(value = IntegerPropertyModel.class, name = "INTEGER"),
-  @JsonSubTypes.Type(value = IntegerPropertyModel.class, name = "IntegerProperty"),
   @JsonSubTypes.Type(value = NumberPropertyModel.class, name = "NUMBER"),
-  @JsonSubTypes.Type(value = NumberPropertyModel.class, name = "NumberProperty"),
   @JsonSubTypes.Type(value = ObjectPropertyModel.class, name = "OBJECT"),
   @JsonSubTypes.Type(value = OneOfPropertyModel.class, name = "ONE_OF"),
-  @JsonSubTypes.Type(value = ObjectPropertyModel.class, name = "ObjectProperty"),
-  @JsonSubTypes.Type(value = StringPropertyModel.class, name = "STRING"),
-  @JsonSubTypes.Type(value = StringPropertyModel.class, name = "StringProperty")
+  @JsonSubTypes.Type(value = StringPropertyModel.class, name = "STRING")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class ValuePropertyModel extends PropertyModel {
 
-  @JsonProperty("controlType")
   private ControlTypeModel controlType;
 
-  @JsonProperty("defaultValue")
   private Object defaultValue;
 
-  @JsonProperty("exampleValue")
   private Object exampleValue;
 
   public ValuePropertyModel controlType(ControlTypeModel controlType) {
@@ -88,6 +67,7 @@ public class ValuePropertyModel extends PropertyModel {
   */
   @Valid 
   @Schema(name = "controlType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("controlType")
   public ControlTypeModel getControlType() {
     return controlType;
   }
@@ -107,6 +87,7 @@ public class ValuePropertyModel extends PropertyModel {
   */
   
   @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("defaultValue")
   public Object getDefaultValue() {
     return defaultValue;
   }
@@ -126,6 +107,7 @@ public class ValuePropertyModel extends PropertyModel {
   */
   
   @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("exampleValue")
   public Object getExampleValue() {
     return exampleValue;
   }

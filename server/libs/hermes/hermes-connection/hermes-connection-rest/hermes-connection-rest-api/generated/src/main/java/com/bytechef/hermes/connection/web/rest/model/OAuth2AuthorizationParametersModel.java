@@ -22,18 +22,15 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OAuth2AuthorizationParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-26T06:48:59.929614+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-02T07:19:29.675799+02:00[Europe/Zagreb]")
 public class OAuth2AuthorizationParametersModel {
 
-  @JsonProperty("authorizationUrl")
   private String authorizationUrl;
 
-  @JsonProperty("clientId")
   private String clientId;
 
-  @JsonProperty("scopes")
   @Valid
-  private List<String> scopes = null;
+  private List<String> scopes;
 
   public OAuth2AuthorizationParametersModel authorizationUrl(String authorizationUrl) {
     this.authorizationUrl = authorizationUrl;
@@ -46,6 +43,7 @@ public class OAuth2AuthorizationParametersModel {
   */
   
   @Schema(name = "authorizationUrl", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("authorizationUrl")
   public String getAuthorizationUrl() {
     return authorizationUrl;
   }
@@ -65,6 +63,7 @@ public class OAuth2AuthorizationParametersModel {
   */
   
   @Schema(name = "clientId", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("clientId")
   public String getClientId() {
     return clientId;
   }
@@ -92,6 +91,7 @@ public class OAuth2AuthorizationParametersModel {
   */
   
   @Schema(name = "scopes", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("scopes")
   public List<String> getScopes() {
     return scopes;
   }

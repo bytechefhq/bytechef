@@ -22,17 +22,32 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinitionBasic", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class ComponentDefinitionBasicModel {
 
-  @JsonProperty("display")
   private DisplayModel display;
 
-  @JsonProperty("name")
   private String name;
 
-  @JsonProperty("version")
   private Integer version;
+
+  /**
+   * Default constructor
+   * @deprecated Use {@link ComponentDefinitionBasicModel#ComponentDefinitionBasicModel(DisplayModel, String, Integer)}
+   */
+  @Deprecated
+  public ComponentDefinitionBasicModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public ComponentDefinitionBasicModel(DisplayModel display, String name, Integer version) {
+    this.display = display;
+    this.name = name;
+    this.version = version;
+  }
 
   public ComponentDefinitionBasicModel display(DisplayModel display) {
     this.display = display;
@@ -45,6 +60,7 @@ public class ComponentDefinitionBasicModel {
   */
   @NotNull @Valid 
   @Schema(name = "display", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("display")
   public DisplayModel getDisplay() {
     return display;
   }
@@ -64,6 +80,7 @@ public class ComponentDefinitionBasicModel {
   */
   @NotNull 
   @Schema(name = "name", description = "The name of a component.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("name")
   public String getName() {
     return name;
   }
@@ -83,6 +100,7 @@ public class ComponentDefinitionBasicModel {
   */
   @NotNull 
   @Schema(name = "version", description = "The version of a component.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("version")
   public Integer getVersion() {
     return version;
   }

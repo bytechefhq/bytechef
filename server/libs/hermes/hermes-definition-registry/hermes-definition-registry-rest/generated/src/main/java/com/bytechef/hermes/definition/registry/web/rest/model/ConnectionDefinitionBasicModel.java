@@ -22,14 +22,28 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinitionBasic", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class ConnectionDefinitionBasicModel {
 
-  @JsonProperty("componentName")
   private String componentName;
 
-  @JsonProperty("componentDisplay")
   private DisplayModel componentDisplay;
+
+  /**
+   * Default constructor
+   * @deprecated Use {@link ConnectionDefinitionBasicModel#ConnectionDefinitionBasicModel(String)}
+   */
+  @Deprecated
+  public ConnectionDefinitionBasicModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public ConnectionDefinitionBasicModel(String componentName) {
+    this.componentName = componentName;
+  }
 
   public ConnectionDefinitionBasicModel componentName(String componentName) {
     this.componentName = componentName;
@@ -42,6 +56,7 @@ public class ConnectionDefinitionBasicModel {
   */
   @NotNull 
   @Schema(name = "componentName", description = "The name of a component this connection can be used for.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("componentName")
   public String getComponentName() {
     return componentName;
   }
@@ -61,6 +76,7 @@ public class ConnectionDefinitionBasicModel {
   */
   @Valid 
   @Schema(name = "componentDisplay", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("componentDisplay")
   public DisplayModel getComponentDisplay() {
     return componentDisplay;
   }

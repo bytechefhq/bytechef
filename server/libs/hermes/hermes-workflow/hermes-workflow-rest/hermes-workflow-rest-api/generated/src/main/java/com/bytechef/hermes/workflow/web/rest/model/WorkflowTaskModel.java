@@ -25,41 +25,49 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of the task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T14:11:10.397866+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:43.010591+02:00[Europe/Zagreb]")
 public class WorkflowTaskModel {
 
-  @JsonProperty("finalize")
   @Valid
-  private List<WorkflowTaskModel> finalize = null;
+  private List<@Valid WorkflowTaskModel> finalize;
 
-  @JsonProperty("label")
   private String label;
 
-  @JsonProperty("name")
   private String name;
 
-  @JsonProperty("node")
   private String node;
 
-  @JsonProperty("parameters")
   @Valid
-  private Map<String, Object> parameters = null;
+  private Map<String, Object> parameters = new HashMap<>();
 
-  @JsonProperty("post")
   @Valid
-  private List<WorkflowTaskModel> post = null;
+  private List<@Valid WorkflowTaskModel> post;
 
-  @JsonProperty("pre")
   @Valid
-  private List<WorkflowTaskModel> pre = null;
+  private List<@Valid WorkflowTaskModel> pre;
 
-  @JsonProperty("timeout")
   private String timeout;
 
-  @JsonProperty("type")
   private String type;
 
-  public WorkflowTaskModel finalize(List<WorkflowTaskModel> finalize) {
+  /**
+   * Default constructor
+   * @deprecated Use {@link WorkflowTaskModel#WorkflowTaskModel(String, String)}
+   */
+  @Deprecated
+  public WorkflowTaskModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public WorkflowTaskModel(String name, String type) {
+    this.name = name;
+    this.type = type;
+  }
+
+  public WorkflowTaskModel finalize(List<@Valid WorkflowTaskModel> finalize) {
     this.finalize = finalize;
     return this;
   }
@@ -78,11 +86,12 @@ public class WorkflowTaskModel {
   */
   @Valid 
   @Schema(name = "finalize", description = "The (optional) list of tasks that are to be executed after execution of a task -- regardless of whether it had failed or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<WorkflowTaskModel> getFinalize() {
+  @JsonProperty("finalize")
+  public List<@Valid WorkflowTaskModel> getFinalize() {
     return finalize;
   }
 
-  public void setFinalize(List<WorkflowTaskModel> finalize) {
+  public void setFinalize(List<@Valid WorkflowTaskModel> finalize) {
     this.finalize = finalize;
   }
 
@@ -97,6 +106,7 @@ public class WorkflowTaskModel {
   */
   
   @Schema(name = "label", description = "The human-readable description of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("label")
   public String getLabel() {
     return label;
   }
@@ -116,6 +126,7 @@ public class WorkflowTaskModel {
   */
   @NotNull 
   @Schema(name = "name", description = "The identifier name of the task. Task names are used for assigning the output of one task so it can be later used by subsequent tasks.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("name")
   public String getName() {
     return name;
   }
@@ -135,6 +146,7 @@ public class WorkflowTaskModel {
   */
   
   @Schema(name = "node", description = "Defines the name of the type of the node that the task execution will be routed to. For instance, if the node value is \"encoder\", then the task will be routed to the \"encoder\" queue which is presumably subscribed to by worker nodes of \"encoder\" type.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("node")
   public String getNode() {
     return node;
   }
@@ -162,6 +174,7 @@ public class WorkflowTaskModel {
   */
   
   @Schema(name = "parameters", description = "Key-value map of task parameters.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("parameters")
   public Map<String, Object> getParameters() {
     return parameters;
   }
@@ -170,7 +183,7 @@ public class WorkflowTaskModel {
     this.parameters = parameters;
   }
 
-  public WorkflowTaskModel post(List<WorkflowTaskModel> post) {
+  public WorkflowTaskModel post(List<@Valid WorkflowTaskModel> post) {
     this.post = post;
     return this;
   }
@@ -189,15 +202,16 @@ public class WorkflowTaskModel {
   */
   @Valid 
   @Schema(name = "post", description = "The (optional) list of tasks that are to be executed after the successful execution of a task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<WorkflowTaskModel> getPost() {
+  @JsonProperty("post")
+  public List<@Valid WorkflowTaskModel> getPost() {
     return post;
   }
 
-  public void setPost(List<WorkflowTaskModel> post) {
+  public void setPost(List<@Valid WorkflowTaskModel> post) {
     this.post = post;
   }
 
-  public WorkflowTaskModel pre(List<WorkflowTaskModel> pre) {
+  public WorkflowTaskModel pre(List<@Valid WorkflowTaskModel> pre) {
     this.pre = pre;
     return this;
   }
@@ -216,11 +230,12 @@ public class WorkflowTaskModel {
   */
   @Valid 
   @Schema(name = "pre", description = "The (optional) list of tasks that are to be executed prior to a task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<WorkflowTaskModel> getPre() {
+  @JsonProperty("pre")
+  public List<@Valid WorkflowTaskModel> getPre() {
     return pre;
   }
 
-  public void setPre(List<WorkflowTaskModel> pre) {
+  public void setPre(List<@Valid WorkflowTaskModel> pre) {
     this.pre = pre;
   }
 
@@ -235,6 +250,7 @@ public class WorkflowTaskModel {
   */
   
   @Schema(name = "timeout", description = "The timeout expression which describes when a task should be deemed as timed-out.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("timeout")
   public String getTimeout() {
     return timeout;
   }
@@ -254,6 +270,7 @@ public class WorkflowTaskModel {
   */
   @NotNull 
   @Schema(name = "type", description = "Type of the task.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("type")
   public String getType() {
     return type;
   }

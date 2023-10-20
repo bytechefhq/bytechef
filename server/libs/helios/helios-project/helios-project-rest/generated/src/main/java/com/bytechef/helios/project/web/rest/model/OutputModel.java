@@ -20,14 +20,29 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Output")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-31T07:22:37.259464+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-02T07:24:03.629162+02:00[Europe/Zagreb]")
 public class OutputModel {
 
-  @JsonProperty("name")
   private String name;
 
-  @JsonProperty("value")
   private Object value;
+
+  /**
+   * Default constructor
+   * @deprecated Use {@link OutputModel#OutputModel(String, Object)}
+   */
+  @Deprecated
+  public OutputModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public OutputModel(String name, Object value) {
+    this.name = name;
+    this.value = value;
+  }
 
   public OutputModel name(String name) {
     this.name = name;
@@ -40,6 +55,7 @@ public class OutputModel {
   */
   @NotNull 
   @Schema(name = "name", description = "The name of an output", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("name")
   public String getName() {
     return name;
   }
@@ -59,6 +75,7 @@ public class OutputModel {
   */
   @NotNull 
   @Schema(name = "value", description = "The value of an output", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("value")
   public Object getValue() {
     return value;
   }

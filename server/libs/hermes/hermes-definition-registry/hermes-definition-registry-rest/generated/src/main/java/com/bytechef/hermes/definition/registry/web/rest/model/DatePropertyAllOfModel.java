@@ -24,17 +24,15 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("DateProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class DatePropertyAllOfModel {
 
-  @JsonProperty("options")
   @Valid
-  private List<OptionModel> options = null;
+  private List<@Valid OptionModel> options;
 
-  @JsonProperty("optionsDataSource")
   private OptionsDataSourceModel optionsDataSource;
 
-  public DatePropertyAllOfModel options(List<OptionModel> options) {
+  public DatePropertyAllOfModel options(List<@Valid OptionModel> options) {
     this.options = options;
     return this;
   }
@@ -53,11 +51,12 @@ public class DatePropertyAllOfModel {
   */
   @Valid 
   @Schema(name = "options", description = "The list of valid property options.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<OptionModel> getOptions() {
+  @JsonProperty("options")
+  public List<@Valid OptionModel> getOptions() {
     return options;
   }
 
-  public void setOptions(List<OptionModel> options) {
+  public void setOptions(List<@Valid OptionModel> options) {
     this.options = options;
   }
 
@@ -72,6 +71,7 @@ public class DatePropertyAllOfModel {
   */
   @Valid 
   @Schema(name = "optionsDataSource", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("optionsDataSource")
   public OptionsDataSourceModel getOptionsDataSource() {
     return optionsDataSource;
   }

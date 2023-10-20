@@ -27,30 +27,23 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinition", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:21:11.145214+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-01T22:58:40.927821+02:00[Europe/Zagreb]")
 public class ConnectionDefinitionModel {
 
-  @JsonProperty("authorizationRequired")
   private Boolean authorizationRequired;
 
-  @JsonProperty("authorizations")
   @Valid
-  private List<AuthorizationModel> authorizations = null;
+  private List<@Valid AuthorizationModel> authorizations;
 
-  @JsonProperty("baseUri")
   private String baseUri;
 
-  @JsonProperty("componentName")
   private String componentName;
 
-  @JsonProperty("componentDisplay")
   private DisplayModel componentDisplay;
 
-  @JsonProperty("properties")
   @Valid
-  private List<PropertyModel> properties = null;
+  private List<@Valid PropertyModel> properties;
 
-  @JsonProperty("resources")
   private ResourcesModel resources;
 
   public ConnectionDefinitionModel authorizationRequired(Boolean authorizationRequired) {
@@ -64,6 +57,7 @@ public class ConnectionDefinitionModel {
   */
   
   @Schema(name = "authorizationRequired", description = "If connection requires an authorization to be configured or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("authorizationRequired")
   public Boolean getAuthorizationRequired() {
     return authorizationRequired;
   }
@@ -72,7 +66,7 @@ public class ConnectionDefinitionModel {
     this.authorizationRequired = authorizationRequired;
   }
 
-  public ConnectionDefinitionModel authorizations(List<AuthorizationModel> authorizations) {
+  public ConnectionDefinitionModel authorizations(List<@Valid AuthorizationModel> authorizations) {
     this.authorizations = authorizations;
     return this;
   }
@@ -91,11 +85,12 @@ public class ConnectionDefinitionModel {
   */
   @Valid 
   @Schema(name = "authorizations", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<AuthorizationModel> getAuthorizations() {
+  @JsonProperty("authorizations")
+  public List<@Valid AuthorizationModel> getAuthorizations() {
     return authorizations;
   }
 
-  public void setAuthorizations(List<AuthorizationModel> authorizations) {
+  public void setAuthorizations(List<@Valid AuthorizationModel> authorizations) {
     this.authorizations = authorizations;
   }
 
@@ -110,6 +105,7 @@ public class ConnectionDefinitionModel {
   */
   
   @Schema(name = "baseUri", description = "Defines the base URI for all future HTTP requests.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("baseUri")
   public String getBaseUri() {
     return baseUri;
   }
@@ -129,6 +125,7 @@ public class ConnectionDefinitionModel {
   */
   
   @Schema(name = "componentName", description = "The name of a component this connection can be used for.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("componentName")
   public String getComponentName() {
     return componentName;
   }
@@ -148,6 +145,7 @@ public class ConnectionDefinitionModel {
   */
   @Valid 
   @Schema(name = "componentDisplay", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("componentDisplay")
   public DisplayModel getComponentDisplay() {
     return componentDisplay;
   }
@@ -156,7 +154,7 @@ public class ConnectionDefinitionModel {
     this.componentDisplay = componentDisplay;
   }
 
-  public ConnectionDefinitionModel properties(List<PropertyModel> properties) {
+  public ConnectionDefinitionModel properties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
     return this;
   }
@@ -175,11 +173,12 @@ public class ConnectionDefinitionModel {
   */
   @Valid 
   @Schema(name = "properties", description = "The properties of the connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<PropertyModel> getProperties() {
+  @JsonProperty("properties")
+  public List<@Valid PropertyModel> getProperties() {
     return properties;
   }
 
-  public void setProperties(List<PropertyModel> properties) {
+  public void setProperties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
   }
 
@@ -194,6 +193,7 @@ public class ConnectionDefinitionModel {
   */
   @Valid 
   @Schema(name = "resources", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("resources")
   public ResourcesModel getResources() {
     return resources;
   }
