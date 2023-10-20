@@ -94,7 +94,9 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
             }
         } else {
             SimpleTaskExecution completion = SimpleTaskExecution.of(aTask);
+            completion.setStartTime(new Date());
             completion.setEndTime(new Date());
+            completion.setExecutionTime(0);
             messageBroker.send(Queues.COMPLETIONS, completion);
         }
     }

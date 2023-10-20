@@ -49,6 +49,19 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     @Override
+    public boolean canHandle(TaskExecution taskExecution) {
+        String parentId = taskExecution.getParentId();
+
+        if (parentId != null) {
+            TaskExecution parentExecution = taskExecutionRepository.findOne(parentId);
+
+            return parentExecution.getType().equals(DSL.EACH);
+        }
+
+        return false;
+    }
+
+    @Override
     public void handle(TaskExecution taskExecution) {
         SimpleTaskExecution completedSubtaskExecution = SimpleTaskExecution.of(taskExecution);
 
@@ -71,18 +84,5 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
             taskCompletionHandler.handle(eachTaskExecution);
             counterRepository.delete(taskExecution.getParentId());
         }
-    }
-
-    @Override
-    public boolean canHandle(TaskExecution aTaskExecution) {
-        String parentId = aTaskExecution.getParentId();
-
-        if (parentId != null) {
-            TaskExecution parentExecution = taskExecutionRepository.findOne(parentId);
-
-            return parentExecution.getType().equals(DSL.EACH);
-        }
-
-        return false;
     }
 }

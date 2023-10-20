@@ -22,6 +22,7 @@ import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobStatus;
 import com.integri.atlas.engine.coordinator.workflow.Workflow;
 import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowRepository;
+import com.integri.atlas.engine.core.context.Context;
 import com.integri.atlas.engine.core.context.MapContext;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
@@ -33,6 +34,7 @@ import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -42,67 +44,77 @@ import java.util.Date;
 public class DefaultJobExecutor implements JobExecutor {
 
     private WorkflowRepository workflowRepository;
-    private TaskExecutionRepository jobTaskRepository;
+    private TaskExecutionRepository taskExecutionRepository;
     private ContextRepository contextRepository;
     private TaskDispatcher taskDispatcher;
     private TaskEvaluator taskEvaluator;
 
     @Override
-    public void execute(Job aJob) {
-        Workflow workflow = workflowRepository.findOne(aJob.getWorkflowId());
-        if (aJob.getStatus() != JobStatus.STARTED) {
+    public void execute(Job job) {
+        Workflow workflow = workflowRepository.findOne(job.getWorkflowId());
+
+        if (job.getStatus() != JobStatus.STARTED) {
             throw new IllegalStateException("should not be here");
-        } else if (hasMoreTasks(aJob, workflow)) {
-            executeNextTask(aJob, workflow);
+        } else if (hasMoreTasks(job, workflow)) {
+            executeNextTask(job, workflow);
         } else {
             throw new IllegalStateException("no tasks to execute!");
         }
+    }
+
+    public void setContextRepository(ContextRepository contextRepository) {
+        this.contextRepository = contextRepository;
+    }
+
+    public void setTaskExecutionRepository(TaskExecutionRepository taskExecutionRepository) {
+        this.taskExecutionRepository = taskExecutionRepository;
+    }
+
+    public void setTaskDispatcher(TaskDispatcher taskDispatcher) {
+        this.taskDispatcher = taskDispatcher;
+    }
+
+    public void setTaskEvaluator(TaskEvaluator taskEvaluator) {
+        this.taskEvaluator = taskEvaluator;
+    }
+
+    public void setWorkflowRepository(WorkflowRepository workflowRepository) {
+        this.workflowRepository = workflowRepository;
     }
 
     private boolean hasMoreTasks(Job aJob, Workflow aWorkflow) {
         return aJob.getCurrentTask() < aWorkflow.getTasks().size();
     }
 
-    private SimpleTaskExecution nextTask(Job aJob, Workflow aWorkflow) {
-        WorkflowTask task = aWorkflow.getTasks().get(aJob.getCurrentTask());
-        SimpleTaskExecution mt = new SimpleTaskExecution(task.asMap());
-        mt.setCreateTime(new Date());
-        mt.setId(UUIDGenerator.generate());
-        mt.setStatus(TaskStatus.CREATED);
-        mt.setJobId(aJob.getId());
-        mt.setPriority(aJob.getPriority());
-        if (aWorkflow.getRetry() > 0 && mt.getRetry() < 1) {
-            mt.setRetry(aWorkflow.getRetry());
+    private SimpleTaskExecution nextTaskExecution(Job job, Workflow workflow) {
+        List<WorkflowTask> workflowTasks = workflow.getTasks();
+
+        WorkflowTask workflowTask = workflowTasks.get(job.getCurrentTask());
+
+        SimpleTaskExecution taskExecution = new SimpleTaskExecution(workflowTask.asMap());
+
+        taskExecution.setCreateTime(new Date());
+        taskExecution.setId(UUIDGenerator.generate());
+        taskExecution.setJobId(job.getId());
+        taskExecution.setPriority(job.getPriority());
+        taskExecution.setStatus(TaskStatus.CREATED);
+
+        if (workflow.getRetry() > 0 && taskExecution.getRetry() < 1) {
+            taskExecution.setRetry(workflow.getRetry());
         }
-        return mt;
+
+        return taskExecution;
     }
 
-    private void executeNextTask(Job aJob, Workflow aWorkflow) {
-        TaskExecution nextTask = nextTask(aJob, aWorkflow);
-        MapContext context = new MapContext(contextRepository.peek(aJob.getId()));
-        contextRepository.push(nextTask.getId(), context);
-        TaskExecution evaluatedTask = taskEvaluator.evaluate(nextTask, context);
-        jobTaskRepository.create(evaluatedTask);
-        taskDispatcher.dispatch(evaluatedTask);
-    }
+    private void executeNextTask(Job job, Workflow workflow) {
+        TaskExecution nextTaskExecution = nextTaskExecution(job, workflow);
+        Context context = new MapContext(contextRepository.peek(job.getId()));
 
-    public void setWorkflowRepository(WorkflowRepository aWorkflowRepository) {
-        workflowRepository = aWorkflowRepository;
-    }
+        contextRepository.push(nextTaskExecution.getId(), context);
 
-    public void setJobTaskRepository(TaskExecutionRepository aJobTaskRepository) {
-        jobTaskRepository = aJobTaskRepository;
-    }
+        TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(nextTaskExecution, context);
 
-    public void setContextRepository(ContextRepository aContextRepository) {
-        contextRepository = aContextRepository;
-    }
-
-    public void setTaskDispatcher(TaskDispatcher aTaskDispatcher) {
-        taskDispatcher = aTaskDispatcher;
-    }
-
-    public void setTaskEvaluator(TaskEvaluator aTaskEvaluator) {
-        taskEvaluator = aTaskEvaluator;
+        taskExecutionRepository.create(evaluatedTaskExecution);
+        taskDispatcher.dispatch(evaluatedTaskExecution);
     }
 }

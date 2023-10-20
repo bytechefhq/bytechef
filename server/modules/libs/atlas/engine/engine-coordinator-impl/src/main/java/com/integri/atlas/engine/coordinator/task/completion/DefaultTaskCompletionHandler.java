@@ -50,99 +50,117 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
-    private Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger log = LoggerFactory.getLogger(DefaultTaskCompletionHandler.class);
 
     private JobRepository jobRepository;
     private WorkflowRepository workflowRepository;
-    private TaskExecutionRepository jobTaskRepository;
+    private TaskExecutionRepository taskExecutionRepository;
     private ContextRepository contextRepository;
     private JobExecutor jobExecutor;
     private EventPublisher eventPublisher;
     private TaskEvaluator taskEvaluator;
 
     @Override
-    public void handle(TaskExecution aTask) {
-        log.debug("Completing task {}", aTask.getId());
-        Job job = jobRepository.getByTaskId(aTask.getId());
-        if (job != null) {
-            SimpleTaskExecution task = SimpleTaskExecution.of(aTask);
-            task.setStatus(TaskStatus.COMPLETED);
-            jobTaskRepository.merge(task);
-            SimpleJob mjob = new SimpleJob(job);
-            if (task.getOutput() != null && task.getName() != null) {
-                Context context = contextRepository.peek(job.getId());
-                MapContext newContext = new MapContext(context.asMap());
-                newContext.put(task.getName(), task.getOutput());
-                contextRepository.push(job.getId(), newContext);
-            }
-            if (hasMoreTasks(mjob)) {
-                mjob.setCurrentTask(mjob.getCurrentTask() + 1);
-                jobRepository.merge(mjob);
-                jobExecutor.execute(mjob);
-            } else {
-                complete(mjob);
-            }
-        } else {
-            log.error("Unknown job: {}", aTask.getJobId());
-        }
+    public boolean canHandle(TaskExecution taskExecution) {
+        return taskExecution.getParentId() == null;
     }
 
     @Override
-    public boolean canHandle(TaskExecution aJobTask) {
-        return aJobTask.getParentId() == null;
-    }
+    public void handle(TaskExecution taskExecution) {
+        log.debug("Completing task {}", taskExecution.getId());
 
-    private boolean hasMoreTasks(Job aJob) {
-        Workflow workflow = workflowRepository.findOne(aJob.getWorkflowId());
-        return aJob.getCurrentTask() + 1 < workflow.getTasks().size();
-    }
+        Job job = jobRepository.getByTaskId(taskExecution.getId());
 
-    private void complete(SimpleJob aJob) {
-        Workflow workflow = workflowRepository.findOne(aJob.getWorkflowId());
-        List<Accessor> outputs = workflow.getOutputs();
-        Context context = contextRepository.peek(aJob.getId());
-        SimpleTaskExecution jobOutput = new SimpleTaskExecution();
-        for (Accessor output : outputs) {
-            jobOutput.set(output.getRequiredString(DSL.NAME), output.getRequiredString(DSL.VALUE));
+        if (job != null) {
+            SimpleTaskExecution completedTaskExecution = SimpleTaskExecution.of(taskExecution);
+
+            completedTaskExecution.setStatus(TaskStatus.COMPLETED);
+
+            taskExecutionRepository.merge(completedTaskExecution);
+
+            SimpleJob simpleJob = new SimpleJob(job);
+
+            if (completedTaskExecution.getOutput() != null && completedTaskExecution.getName() != null) {
+                Context context = contextRepository.peek(job.getId());
+
+                MapContext newContext = new MapContext(context.asMap());
+
+                newContext.put(completedTaskExecution.getName(), completedTaskExecution.getOutput());
+
+                contextRepository.push(job.getId(), newContext);
+            }
+
+            if (hasMoreTasks(simpleJob)) {
+                simpleJob.setCurrentTask(simpleJob.getCurrentTask() + 1);
+
+                jobRepository.merge(simpleJob);
+                jobExecutor.execute(simpleJob);
+            } else {
+                complete(simpleJob);
+            }
+        } else {
+            log.error("Unknown job: {}", taskExecution.getJobId());
         }
-        TaskExecution evaledjobOutput = taskEvaluator.evaluate(jobOutput, context);
-        SimpleJob job = new SimpleJob((Job) aJob);
-        job.setStatus(JobStatus.COMPLETED);
-        job.setEndTime(new Date());
-        job.setCurrentTask(-1);
-        job.setOutputs(evaledjobOutput);
-        jobRepository.merge(job);
+    }
+
+    private void complete(Job job) {
+        SimpleTaskExecution jobTaskExecution = new SimpleTaskExecution();
+        Context context = contextRepository.peek(job.getId());
+        Workflow workflow = workflowRepository.findOne(job.getWorkflowId());
+
+        List<Accessor> outputs = workflow.getOutputs();
+
+        for (Accessor output : outputs) {
+            jobTaskExecution.set(output.getRequiredString(DSL.NAME), output.getRequiredString(DSL.VALUE));
+        }
+
+        TaskExecution evaluatedJobTaskExecution = taskEvaluator.evaluate(jobTaskExecution, context);
+        SimpleJob simpleJob = new SimpleJob(job);
+
+        simpleJob.setStatus(JobStatus.COMPLETED);
+        simpleJob.setEndTime(new Date());
+        simpleJob.setCurrentTask(-1);
+        simpleJob.setOutputs(evaluatedJobTaskExecution);
+
+        jobRepository.merge(simpleJob);
         eventPublisher.publishEvent(
-            WorkflowEvent.of(Events.JOB_STATUS, "jobId", aJob.getId(), "status", job.getStatus())
+            WorkflowEvent.of(Events.JOB_STATUS, "jobId", job.getId(), "status", simpleJob.getStatus())
         );
-        log.debug("Job {} completed successfully", aJob.getId());
+
+        log.debug("Job {} completed successfully", job.getId());
     }
 
-    public void setJobRepository(JobRepository aJobRepository) {
-        jobRepository = aJobRepository;
+    private boolean hasMoreTasks(Job job) {
+        Workflow workflow = workflowRepository.findOne(job.getWorkflowId());
+
+        return job.getCurrentTask() + 1 < workflow.getTasks().size();
     }
 
-    public void setWorkflowRepository(WorkflowRepository aWorkflowRepository) {
-        workflowRepository = aWorkflowRepository;
+    public void setContextRepository(ContextRepository contextRepository) {
+        this.contextRepository = contextRepository;
     }
 
-    public void setJobTaskRepository(TaskExecutionRepository aJobTaskRepository) {
-        jobTaskRepository = aJobTaskRepository;
+    public void setEventPublisher(EventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
     }
 
-    public void setContextRepository(ContextRepository aContextRepository) {
-        contextRepository = aContextRepository;
+    public void setJobExecutor(JobExecutor jobExecutor) {
+        this.jobExecutor = jobExecutor;
     }
 
-    public void setJobExecutor(JobExecutor aJobExecutor) {
-        jobExecutor = aJobExecutor;
+    public void setJobRepository(JobRepository jobRepository) {
+        this.jobRepository = jobRepository;
     }
 
-    public void setEventPublisher(EventPublisher aEventPublisher) {
-        eventPublisher = aEventPublisher;
+    public void setTaskEvaluator(TaskEvaluator taskEvaluator) {
+        this.taskEvaluator = taskEvaluator;
     }
 
-    public void setTaskEvaluator(TaskEvaluator aTaskEvaluator) {
-        taskEvaluator = aTaskEvaluator;
+    public void setTaskExecutionRepository(TaskExecutionRepository taskExecutionRepository) {
+        this.taskExecutionRepository = taskExecutionRepository;
+    }
+
+    public void setWorkflowRepository(WorkflowRepository workflowRepository) {
+        this.workflowRepository = workflowRepository;
     }
 }

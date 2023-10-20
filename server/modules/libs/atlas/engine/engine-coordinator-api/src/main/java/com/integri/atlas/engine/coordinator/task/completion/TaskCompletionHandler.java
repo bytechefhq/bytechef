@@ -21,14 +21,13 @@ package com.integri.atlas.engine.coordinator.task.completion;
 import com.integri.atlas.engine.core.task.TaskExecution;
 
 /**
- * A strategy interface for handling {@link com.integri.atlas.engine.core.task.TaskExecution}
- * completions.
+ * A strategy interface for handling {@link com.integri.atlas.engine.core.task.TaskExecution} completions.
  *
  * @author Arik Cohen
  * @since Apr 23, 2017
  */
 public interface TaskCompletionHandler {
-    void handle(TaskExecution aJobTask);
+    void handle(TaskExecution taskExecution);
 
-    boolean canHandle(TaskExecution aJobTask);
+    boolean canHandle(TaskExecution taskExecution);
 }

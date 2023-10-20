@@ -115,7 +115,9 @@ public class ForkTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
             }
         } else {
             SimpleTaskExecution completion = SimpleTaskExecution.of(aTask);
+            completion.setStartTime(new Date());
             completion.setEndTime(new Date());
+            completion.setExecutionTime(0);
             messageBroker.send(Queues.COMPLETIONS, completion);
         }
     }

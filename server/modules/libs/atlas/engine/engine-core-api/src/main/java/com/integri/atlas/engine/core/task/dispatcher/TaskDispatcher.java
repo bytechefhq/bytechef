@@ -31,8 +31,7 @@ public interface TaskDispatcher<T extends Task> {
     /**
      * Dispatches a {@link Task} instance.
      *
-     * @param aTask
-     *          The task to dispatch
+     * @param task The task to dispatch
      */
-    void dispatch(T aTask);
+    void dispatch(T task);
 }

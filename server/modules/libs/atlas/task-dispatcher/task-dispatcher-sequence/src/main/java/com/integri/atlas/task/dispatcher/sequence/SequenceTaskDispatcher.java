@@ -43,21 +43,21 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     private final ContextRepository contextRepository;
     private final MessageBroker messageBroker;
     private final TaskDispatcher taskDispatcher;
-    private final TaskExecutionRepository taskExecutionRepository;
     private final TaskEvaluator taskEvaluator;
+    private final TaskExecutionRepository taskExecutionRepository;
 
     public SequenceTaskDispatcher(
         ContextRepository contextRepository,
         MessageBroker messageBroker,
         TaskDispatcher taskDispatcher,
-        TaskExecutionRepository taskExecutionRepository,
-        TaskEvaluator taskEvaluator
+        TaskEvaluator taskEvaluator,
+        TaskExecutionRepository taskExecutionRepository
     ) {
         this.contextRepository = contextRepository;
         this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
-        this.taskExecutionRepository = taskExecutionRepository;
         this.taskEvaluator = taskEvaluator;
+        this.taskExecutionRepository = taskExecutionRepository;
     }
 
     @Override
@@ -93,13 +93,13 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             taskExecutionRepository.create(evaluatedSubTaskExecution);
             taskDispatcher.dispatch(evaluatedSubTaskExecution);
         } else {
-            SimpleTaskExecution completion = SimpleTaskExecution.of(taskExecution);
+            SimpleTaskExecution completionTaskExecution = SimpleTaskExecution.of(taskExecution);
 
-            completion.setStartTime(new Date());
-            completion.setEndTime(new Date());
-            completion.setExecutionTime(0);
+            completionTaskExecution.setStartTime(new Date());
+            completionTaskExecution.setEndTime(new Date());
+            completionTaskExecution.setExecutionTime(0);
 
-            messageBroker.send(Queues.COMPLETIONS, completion);
+            messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
         }
     }
 

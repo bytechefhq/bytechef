@@ -47,8 +47,9 @@ public class SequenceTaskDispatcherIntTest extends BaseTaskIntTest {
 
         Context context = contextRepository.peek(job.getId());
 
+        Assertions.assertEquals(1, (Integer) context.get("value1"));
+        Assertions.assertEquals(2, (Integer) context.get("value2"));
         Assertions.assertEquals(3, (Integer) context.get("value3"));
-        Assertions.assertEquals(3, (Integer) context.get("sumSequence"));
     }
 
     @Override
@@ -58,11 +59,11 @@ public class SequenceTaskDispatcherIntTest extends BaseTaskIntTest {
     ) {
         return List.of(
             new SequenceTaskCompletionHandler(
-                taskExecutionRepository,
+                contextRepository,
                 taskCompletionHandler,
                 taskDispatcher,
-                contextRepository,
-                SpelTaskEvaluator.create()
+                SpelTaskEvaluator.create(),
+                taskExecutionRepository
             )
         );
     }
@@ -77,8 +78,8 @@ public class SequenceTaskDispatcherIntTest extends BaseTaskIntTest {
                 contextRepository,
                 coordinatorMessageBroker,
                 taskDispatcher,
-                taskExecutionRepository,
-                SpelTaskEvaluator.create()
+                SpelTaskEvaluator.create(),
+                taskExecutionRepository
             )
         );
     }

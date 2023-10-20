@@ -82,14 +82,14 @@ public abstract class BaseTaskIntTest {
 
     protected List<TaskCompletionHandler> getTaskCompletionHandlers(
         TaskCompletionHandler taskCompletionHandler,
-        TaskDispatcher taskDispatcher
+        TaskDispatcher<?> taskDispatcher
     ) {
         return List.of();
     }
 
     protected List<TaskDispatcherResolver> getTaskDispatcherResolvers(
         MessageBroker coordinatorMessageBroker,
-        TaskDispatcher taskDispatcher
+        TaskDispatcher<?> taskDispatcher
     ) {
         return List.of();
     }
@@ -147,7 +147,7 @@ public abstract class BaseTaskIntTest {
 
         TaskDispatcherChain taskDispatcherChain = new TaskDispatcherChain();
 
-        taskDispatcherChain.setResolvers(
+        taskDispatcherChain.setTaskDispatcherResolvers(
             Stream
                 .concat(
                     getTaskDispatcherResolvers(coordinatorMessageBroker, taskDispatcherChain).stream(),
@@ -163,7 +163,7 @@ public abstract class BaseTaskIntTest {
         DefaultJobExecutor jobExecutor = new DefaultJobExecutor();
 
         jobExecutor.setContextRepository(contextRepository);
-        jobExecutor.setJobTaskRepository(taskExecutionRepository);
+        jobExecutor.setTaskExecutionRepository(taskExecutionRepository);
         jobExecutor.setWorkflowRepository(new ResourceBasedWorkflowRepository(getWorkflowMapper()));
         jobExecutor.setTaskDispatcher(taskDispatcherChain);
         jobExecutor.setTaskEvaluator(SpelTaskEvaluator.create());
@@ -175,7 +175,7 @@ public abstract class BaseTaskIntTest {
         defaultTaskCompletionHandler.setContextRepository(contextRepository);
         defaultTaskCompletionHandler.setJobExecutor(jobExecutor);
         defaultTaskCompletionHandler.setJobRepository(jobRepository);
-        defaultTaskCompletionHandler.setJobTaskRepository(taskExecutionRepository);
+        defaultTaskCompletionHandler.setTaskExecutionRepository(taskExecutionRepository);
         defaultTaskCompletionHandler.setWorkflowRepository(new ResourceBasedWorkflowRepository(getWorkflowMapper()));
         defaultTaskCompletionHandler.setEventPublisher(eventPublisher);
         defaultTaskCompletionHandler.setTaskEvaluator(SpelTaskEvaluator.create());
@@ -198,7 +198,7 @@ public abstract class BaseTaskIntTest {
         return jobRepository.getById(job.getId());
     }
 
-    private TaskExecutionErrorHandler getJobTaskErrorHandler(TaskDispatcher taskDispatcher) {
+    private TaskExecutionErrorHandler getJobTaskErrorHandler(TaskDispatcher<?> taskDispatcher) {
         TaskExecutionErrorHandler jobTaskErrorHandler = new TaskExecutionErrorHandler();
 
         jobTaskErrorHandler.setJobRepository(jobRepository);

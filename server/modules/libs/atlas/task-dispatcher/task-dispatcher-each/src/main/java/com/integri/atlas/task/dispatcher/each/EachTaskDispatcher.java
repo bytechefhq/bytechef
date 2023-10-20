@@ -91,34 +91,36 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
             for (int i = 0; i < list.size(); i++) {
                 Object item = list.get(i);
-                SimpleTaskExecution subtaskTaskExecution = SimpleTaskExecution.of(iteratee);
+                SimpleTaskExecution subTaskExecution = SimpleTaskExecution.of(iteratee);
 
-                subtaskTaskExecution.setId(UUIDGenerator.generate());
-                subtaskTaskExecution.setParentId(taskExecution.getId());
-                subtaskTaskExecution.setStatus(TaskStatus.CREATED);
-                subtaskTaskExecution.setJobId(taskExecution.getJobId());
-                subtaskTaskExecution.setCreateTime(new Date());
-                subtaskTaskExecution.setPriority(taskExecution.getPriority());
-                subtaskTaskExecution.setTaskNumber(i + 1);
+                subTaskExecution.setCreateTime(new Date());
+                subTaskExecution.setId(UUIDGenerator.generate());
+                subTaskExecution.setJobId(taskExecution.getJobId());
+                subTaskExecution.setParentId(taskExecution.getId());
+                subTaskExecution.setPriority(taskExecution.getPriority());
+                subTaskExecution.setStatus(TaskStatus.CREATED);
+                subTaskExecution.setTaskNumber(i + 1);
 
                 MapContext context = new MapContext(contextRepository.peek(taskExecution.getId()));
 
                 context.set(taskExecution.getString("itemVar", "item"), item);
                 context.set(taskExecution.getString("itemIndex", "itemIndex"), i);
 
-                contextRepository.push(subtaskTaskExecution.getId(), context);
+                contextRepository.push(subTaskExecution.getId(), context);
 
-                TaskExecution evaluatedSubtaskExecution = taskEvaluator.evaluate(subtaskTaskExecution, context);
+                TaskExecution evaluatedSubtaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
                 taskExecutionRepository.create(evaluatedSubtaskExecution);
                 taskDispatcher.dispatch(evaluatedSubtaskExecution);
             }
         } else {
-            SimpleTaskExecution completion = SimpleTaskExecution.of(taskExecution);
+            SimpleTaskExecution completionTaskExecution = SimpleTaskExecution.of(taskExecution);
 
-            completion.setEndTime(new Date());
+            completionTaskExecution.setStartTime(new Date());
+            completionTaskExecution.setEndTime(new Date());
+            completionTaskExecution.setExecutionTime(0);
 
-            messageBroker.send(Queues.COMPLETIONS, completion);
+            messageBroker.send(Queues.COMPLETIONS, completionTaskExecution);
         }
     }
 

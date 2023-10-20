@@ -28,23 +28,26 @@ import java.util.List;
  */
 public class TaskDispatcherChain implements TaskDispatcher<Task> {
 
-    private List<TaskDispatcherResolver> resolvers;
+    private List<TaskDispatcherResolver> taskDispatcherResolvers;
 
     public TaskDispatcherChain() {}
 
     @Override
-    public void dispatch(Task aTask) {
-        for (TaskDispatcherResolver resolver : resolvers) {
-            TaskDispatcher executor = resolver.resolve(aTask);
-            if (executor != null) {
-                executor.dispatch(aTask);
+    public void dispatch(Task task) {
+        for (TaskDispatcherResolver taskDispatcherResolver : taskDispatcherResolvers) {
+            TaskDispatcher taskDispatcher = taskDispatcherResolver.resolve(task);
+
+            if (taskDispatcher != null) {
+                taskDispatcher.dispatch(task);
+
                 return;
             }
         }
-        throw new IllegalArgumentException("Unable to execute task: " + aTask);
+
+        throw new IllegalArgumentException("Unable to execute task: " + task);
     }
 
-    public void setResolvers(List<TaskDispatcherResolver> aResolvers) {
-        resolvers = aResolvers;
+    public void setTaskDispatcherResolvers(List<TaskDispatcherResolver> taskDispatcherResolvers) {
+        this.taskDispatcherResolvers = taskDispatcherResolvers;
     }
 }
