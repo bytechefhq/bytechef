@@ -79,6 +79,11 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
+    public Integration update(Integration integration) {
+        return integrationRepository.save(integration);
+    }
+
+    @Override
     public Integration update(
         long id, String name, String description, String category, Set<String> workflowIds, Set<Tag> tags) {
 

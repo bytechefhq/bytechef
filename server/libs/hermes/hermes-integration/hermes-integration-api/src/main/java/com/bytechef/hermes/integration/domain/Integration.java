@@ -83,6 +83,10 @@ public final class Integration implements Persistable<Long> {
     public Integration() {
     }
 
+    public Integration(String name) {
+        this.name = name;
+    }
+
     @PersistenceCreator
     public Integration(
         String name, String description, Set<IntegrationTag> integrationTags,

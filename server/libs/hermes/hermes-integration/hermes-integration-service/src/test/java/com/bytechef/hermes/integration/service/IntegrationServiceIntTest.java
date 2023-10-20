@@ -105,8 +105,19 @@ public class IntegrationServiceIntTest {
     }
 
     @Test
+    public void testUpdate1() {
+        Integration integration = integrationRepository.save(getIntegration());
+
+        integration.addWorkflow("workflow2");
+
+        integration = integrationService.update(integration);
+
+        assertThat(integration.getWorkflowIds()).contains("workflow2");
+    }
+
+    @Test
     @SuppressFBWarnings("NP")
-    public void testUpdate() {
+    public void testUpdate2() {
         Integration integration = integrationRepository.save(getIntegration());
 
         Integration updatedIntegration = integrationService.update(integration.getId(), null, null, null, null, null);

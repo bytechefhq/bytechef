@@ -17,6 +17,8 @@
 
 package com.bytechef.hermes.integration.facade;
 
+import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.hermes.integration.config.IntegrationIntTestConfiguration;
 import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.repository.IntegrationRepository;
@@ -31,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,10 +50,13 @@ public class IntegrationFacadeIntTest {
     private IntegrationFacade integrationFacade;
 
     @Autowired
+    private IntegrationRepository integrationRepository;
+
+    @Autowired
     TagRepository tagRepository;
 
     @Autowired
-    private IntegrationRepository integrationRepository;
+    private WorkflowRepository workflowRepository;
 
     @BeforeEach
     @SuppressFBWarnings("NP")
@@ -62,6 +68,22 @@ public class IntegrationFacadeIntTest {
         for (Tag tag : tagRepository.findAll()) {
             tagRepository.deleteById(tag.getId());
         }
+    }
+
+    @Test
+    @SuppressFBWarnings("NP")
+    public void testAddWorkflow() {
+        Integration integration = integrationRepository.save(new Integration("name"));
+
+        integration = integrationFacade.addWorkflow(integration.getId(), "Workflow 1");
+
+        Set<String> workflowIds = integration.getWorkflowIds();
+
+        Workflow workflow = workflowRepository.findById(workflowIds.iterator()
+            .next())
+            .orElseThrow();
+
+        assertThat(workflow.getLabel()).isEqualTo("Workflow 1");
     }
 
     @Test

@@ -22,6 +22,7 @@ import com.bytechef.hermes.integration.facade.IntegrationFacade;
 import com.bytechef.hermes.integration.service.IntegrationService;
 import com.bytechef.hermes.integration.web.rest.model.GetIntegrationTags200ResponseModel;
 import com.bytechef.hermes.integration.web.rest.model.IntegrationModel;
+import com.bytechef.hermes.integration.web.rest.model.PostIntegrationWorkflowRequestModel;
 import com.bytechef.hermes.integration.web.rest.model.PutIntegrationTagsRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
@@ -99,6 +100,17 @@ public class IntegrationController implements IntegrationsApi, IntegrationTagsAp
                 integrationFacade.create(
                     integrationModel.getName(), integrationModel.getDescription(), integrationModel.getCategory(),
                     integrationModel.getWorkflowIds(), integrationModel.getTags()),
+                IntegrationModel.class)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<IntegrationModel>> postIntegrationWorkflow(
+        Long id, Mono<PostIntegrationWorkflowRequestModel> postIntegrationWorkflowRequestModelMono,
+        ServerWebExchange exchange) {
+
+        return postIntegrationWorkflowRequestModelMono.map(postIntegrationWorkflowRequestModel -> ResponseEntity.ok(
+            conversionService.convert(
+                integrationFacade.addWorkflow(id, postIntegrationWorkflowRequestModel.getWorkflowName()),
                 IntegrationModel.class)));
     }
 

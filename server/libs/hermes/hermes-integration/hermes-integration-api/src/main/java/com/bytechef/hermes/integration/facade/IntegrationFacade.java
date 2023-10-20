@@ -27,6 +27,8 @@ import java.util.Set;
  */
 public interface IntegrationFacade {
 
+    Integration addWorkflow(long id, String workflowName);
+
     Integration create(
         String name, String description, String category, List<String> workflowIds, List<String> tagNames);
 
