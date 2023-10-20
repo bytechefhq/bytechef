@@ -5,7 +5,6 @@ subprojects {
 
     dependencies {
         api project(":server:libs:hermes:hermes-component:hermes-component-api")
-        api project(":server:libs:hermes:hermes-component:hermes-component-jdbc-api")
 
         implementation libs.commons.io
         implementation "com.fasterxml.jackson.core:jackson-databind"
@@ -13,8 +12,6 @@ subprojects {
         implementation "org.slf4j:slf4j-api"
         implementation project(":server:libs:core:commons:commons-utils")
 
-        testImplementation project(":server:libs:atlas:atlas-test-support")
-        testImplementation project(":server:libs:atlas:atlas-upgrade")
         testImplementation project(":server:libs:hermes:hermes-component:hermes-component-test-support")
     }
 }
