@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.integration.domain;
+package com.bytechef.hermes.integration.domain;
 
-import com.bytechef.integration.domain.annotation.Default;
+import com.bytechef.hermes.integration.domain.annotation.Default;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Collection;

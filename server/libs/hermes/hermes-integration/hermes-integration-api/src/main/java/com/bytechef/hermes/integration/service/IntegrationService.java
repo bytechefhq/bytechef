@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.integration.facade;
+package com.bytechef.hermes.integration.service;
 
-import com.bytechef.integration.domain.Integration;
+import com.bytechef.hermes.integration.domain.Integration;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public interface IntegrationFacade {
-
+public interface IntegrationService {
     Integration add(Integration integration);
+
+    void delete(String id);
+
+    Integration getIntegration(String id);
+
+    List<Integration> getIntegrations();
+
+    Integration update(Integration integration);
 }
