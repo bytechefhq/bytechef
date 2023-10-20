@@ -48,7 +48,7 @@ public class ScriptJavaAction {
             string(SCRIPT)
                 .label("Java code")
                 .description("Add your Java custom logic here.")
-                .controlType(Property.ControlType.CODE))
+                .controlType(Property.ControlType.CODE_EDITOR))
         .outputSchema(oneOf())
         .perform(ScriptJavaAction::performJava);
 

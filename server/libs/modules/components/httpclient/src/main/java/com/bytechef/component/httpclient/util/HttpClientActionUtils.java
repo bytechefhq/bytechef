@@ -52,7 +52,6 @@ import static com.bytechef.hermes.component.util.HttpClientUtils.allowUnauthoriz
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
-import static com.bytechef.hermes.definition.DefinitionDSL.show;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -82,11 +81,11 @@ public class HttpClientActionUtils {
             properties.add(string(BODY_CONTENT_MIME_TYPE)
                 .label("Content Type")
                 .description("Mime-Type to use when sending raw body content.")
-                .displayOption(
-                    show(BODY_CONTENT_TYPE,
-                        List.of(
-                            BodyContentType.BINARY.name(),
-                            BodyContentType.RAW.name())))
+                .displayCondition(
+                    "['%s', '%s'].includes('%s')".formatted(
+                        BodyContentType.BINARY.name(),
+                        BodyContentType.RAW.name(),
+                        BODY_CONTENT_TYPE))
                 .defaultValue("text/plain")
                 .placeholder("text/plain")
                 .advancedOption(true));

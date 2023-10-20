@@ -1,9 +1,4 @@
 {
-  "display": {
-    "description": "The Random Helper allows you to generate random values.",
-    "label": "Random Helper"
-  },
-  "name": "randomHelper",
   "actions": [
     {
       "display": {
@@ -14,16 +9,18 @@
       "properties": [
         {
           "description": "The minimum possible generated value.",
-          "name": "startInclusive",
           "required": true,
+          "name": "startInclusive",
           "type": "INTEGER",
+          "controlType": "INPUT_INTEGER",
           "defaultValue": 0
         },
         {
           "description": "The maximum possible generated value.",
-          "name": "endInclusive",
           "required": true,
+          "name": "endInclusive",
           "type": "INTEGER",
+          "controlType": "INPUT_INTEGER",
           "defaultValue": 100
         }
       ]
@@ -36,5 +33,10 @@
       "name": "randomFloat"
     }
   ],
+  "display": {
+    "description": "The Random Helper allows you to generate random values.",
+    "label": "Random Helper"
+  },
+  "name": "randomHelper",
   "version": 1
 }

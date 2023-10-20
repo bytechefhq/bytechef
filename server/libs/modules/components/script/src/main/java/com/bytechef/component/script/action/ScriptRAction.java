@@ -48,7 +48,7 @@ public class ScriptRAction {
             string(SCRIPT)
                 .label("R code")
                 .description("Add your R custom logic here.")
-                .controlType(Property.ControlType.CODE))
+                .controlType(Property.ControlType.CODE_EDITOR))
         .outputSchema(oneOf())
         .perform(ScriptRAction::performR);
 

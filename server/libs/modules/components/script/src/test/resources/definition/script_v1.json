@@ -11,28 +11,38 @@
           "type": "ONE_OF",
           "types": [
             {
-              "type": "ARRAY"
+              "type": "ARRAY",
+              "controlType": "JSON_BUILDER",
+              "multipleValues": true
             },
             {
-              "type": "BOOLEAN"
+              "type": "BOOLEAN",
+              "controlType": "CHECKBOX"
             },
             {
-              "type": "DATE"
+              "type": "DATE",
+              "controlType": "DATE"
             },
             {
-              "type": "DATE_TIME"
+              "type": "DATE_TIME",
+              "controlType": "DATE_TIME"
             },
             {
-              "type": "INTEGER"
+              "type": "INTEGER",
+              "controlType": "INPUT_INTEGER"
             },
             {
-              "type": "NUMBER"
+              "type": "NUMBER",
+              "controlType": "INPUT_NUMBER"
             },
             {
-              "type": "OBJECT"
+              "type": "OBJECT",
+              "controlType": "JSON_BUILDER",
+              "multipleValues": true
             },
             {
-              "type": "STRING"
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
             }
           ]
         }
@@ -43,44 +53,56 @@
           "label": "Input",
           "name": "input",
           "type": "OBJECT",
+          "controlType": "JSON_BUILDER",
           "additionalProperties": [
             {
               "type": "ONE_OF",
               "types": [
                 {
-                  "type": "ARRAY"
+                  "type": "ARRAY",
+                  "controlType": "JSON_BUILDER",
+                  "multipleValues": true
                 },
                 {
-                  "type": "BOOLEAN"
+                  "type": "BOOLEAN",
+                  "controlType": "CHECKBOX"
                 },
                 {
-                  "type": "DATE"
+                  "type": "DATE",
+                  "controlType": "DATE"
                 },
                 {
-                  "type": "DATE_TIME"
+                  "type": "DATE_TIME",
+                  "controlType": "DATE_TIME"
                 },
                 {
-                  "type": "INTEGER"
+                  "type": "INTEGER",
+                  "controlType": "INPUT_INTEGER"
                 },
                 {
-                  "type": "NUMBER"
+                  "type": "NUMBER",
+                  "controlType": "INPUT_NUMBER"
                 },
                 {
-                  "type": "OBJECT"
+                  "type": "OBJECT",
+                  "controlType": "JSON_BUILDER",
+                  "multipleValues": true
                 },
                 {
-                  "type": "STRING"
+                  "type": "STRING",
+                  "controlType": "INPUT_TEXT"
                 }
               ]
             }
-          ]
+          ],
+          "multipleValues": true
         },
         {
           "description": "Add your Java custom logic here.",
           "label": "Java code",
           "name": "script",
           "type": "STRING",
-          "controlType": "CODE"
+          "controlType": "CODE_EDITOR"
         }
       ]
     },
@@ -95,28 +117,38 @@
           "type": "ONE_OF",
           "types": [
             {
-              "type": "ARRAY"
+              "type": "ARRAY",
+              "controlType": "JSON_BUILDER",
+              "multipleValues": true
             },
             {
-              "type": "BOOLEAN"
+              "type": "BOOLEAN",
+              "controlType": "CHECKBOX"
             },
             {
-              "type": "DATE"
+              "type": "DATE",
+              "controlType": "DATE"
             },
             {
-              "type": "DATE_TIME"
+              "type": "DATE_TIME",
+              "controlType": "DATE_TIME"
             },
             {
-              "type": "INTEGER"
+              "type": "INTEGER",
+              "controlType": "INPUT_INTEGER"
             },
             {
-              "type": "NUMBER"
+              "type": "NUMBER",
+              "controlType": "INPUT_NUMBER"
             },
             {
-              "type": "OBJECT"
+              "type": "OBJECT",
+              "controlType": "JSON_BUILDER",
+              "multipleValues": true
             },
             {
-              "type": "STRING"
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
             }
           ]
         }
@@ -127,44 +159,56 @@
           "label": "Input",
           "name": "input",
           "type": "OBJECT",
+          "controlType": "JSON_BUILDER",
           "additionalProperties": [
             {
               "type": "ONE_OF",
               "types": [
                 {
-                  "type": "ARRAY"
+                  "type": "ARRAY",
+                  "controlType": "JSON_BUILDER",
+                  "multipleValues": true
                 },
                 {
-                  "type": "BOOLEAN"
+                  "type": "BOOLEAN",
+                  "controlType": "CHECKBOX"
                 },
                 {
-                  "type": "DATE"
+                  "type": "DATE",
+                  "controlType": "DATE"
                 },
                 {
-                  "type": "DATE_TIME"
+                  "type": "DATE_TIME",
+                  "controlType": "DATE_TIME"
                 },
                 {
-                  "type": "INTEGER"
+                  "type": "INTEGER",
+                  "controlType": "INPUT_INTEGER"
                 },
                 {
-                  "type": "NUMBER"
+                  "type": "NUMBER",
+                  "controlType": "INPUT_NUMBER"
                 },
                 {
-                  "type": "OBJECT"
+                  "type": "OBJECT",
+                  "controlType": "JSON_BUILDER",
+                  "multipleValues": true
                 },
                 {
-                  "type": "STRING"
+                  "type": "STRING",
+                  "controlType": "INPUT_TEXT"
                 }
               ]
             }
-          ]
+          ],
+          "multipleValues": true
         },
         {
           "description": "Add your JavaScript custom logic here.",
           "label": "JavaScript code",
           "name": "script",
           "type": "STRING",
-          "controlType": "CODE"
+          "controlType": "CODE_EDITOR"
         }
       ]
     },
@@ -179,28 +223,38 @@
           "type": "ONE_OF",
           "types": [
             {
-              "type": "ARRAY"
+              "type": "ARRAY",
+              "controlType": "JSON_BUILDER",
+              "multipleValues": true
             },
             {
-              "type": "BOOLEAN"
+              "type": "BOOLEAN",
+              "controlType": "CHECKBOX"
             },
             {
-              "type": "DATE"
+              "type": "DATE",
+              "controlType": "DATE"
             },
             {
-              "type": "DATE_TIME"
+              "type": "DATE_TIME",
+              "controlType": "DATE_TIME"
             },
             {
-              "type": "INTEGER"
+              "type": "INTEGER",
+              "controlType": "INPUT_INTEGER"
             },
             {
-              "type": "NUMBER"
+              "type": "NUMBER",
+              "controlType": "INPUT_NUMBER"
             },
             {
-              "type": "OBJECT"
+              "type": "OBJECT",
+              "controlType": "JSON_BUILDER",
+              "multipleValues": true
             },
             {
-              "type": "STRING"
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
             }
           ]
         }
@@ -211,44 +265,56 @@
           "label": "Input",
           "name": "input",
           "type": "OBJECT",
+          "controlType": "JSON_BUILDER",
           "additionalProperties": [
             {
               "type": "ONE_OF",
               "types": [
                 {
-                  "type": "ARRAY"
+                  "type": "ARRAY",
+                  "controlType": "JSON_BUILDER",
+                  "multipleValues": true
                 },
                 {
-                  "type": "BOOLEAN"
+                  "type": "BOOLEAN",
+                  "controlType": "CHECKBOX"
                 },
                 {
-                  "type": "DATE"
+                  "type": "DATE",
+                  "controlType": "DATE"
                 },
                 {
-                  "type": "DATE_TIME"
+                  "type": "DATE_TIME",
+                  "controlType": "DATE_TIME"
                 },
                 {
-                  "type": "INTEGER"
+                  "type": "INTEGER",
+                  "controlType": "INPUT_INTEGER"
                 },
                 {
-                  "type": "NUMBER"
+                  "type": "NUMBER",
+                  "controlType": "INPUT_NUMBER"
                 },
                 {
-                  "type": "OBJECT"
+                  "type": "OBJECT",
+                  "controlType": "JSON_BUILDER",
+                  "multipleValues": true
                 },
                 {
-                  "type": "STRING"
+                  "type": "STRING",
+                  "controlType": "INPUT_TEXT"
                 }
               ]
             }
-          ]
+          ],
+          "multipleValues": true
         },
         {
           "description": "Add your Python custom logic here.",
           "label": "Python code",
           "name": "script",
           "type": "STRING",
-          "controlType": "CODE"
+          "controlType": "CODE_EDITOR"
         }
       ]
     },
@@ -263,28 +329,38 @@
           "type": "ONE_OF",
           "types": [
             {
-              "type": "ARRAY"
+              "type": "ARRAY",
+              "controlType": "JSON_BUILDER",
+              "multipleValues": true
             },
             {
-              "type": "BOOLEAN"
+              "type": "BOOLEAN",
+              "controlType": "CHECKBOX"
             },
             {
-              "type": "DATE"
+              "type": "DATE",
+              "controlType": "DATE"
             },
             {
-              "type": "DATE_TIME"
+              "type": "DATE_TIME",
+              "controlType": "DATE_TIME"
             },
             {
-              "type": "INTEGER"
+              "type": "INTEGER",
+              "controlType": "INPUT_INTEGER"
             },
             {
-              "type": "NUMBER"
+              "type": "NUMBER",
+              "controlType": "INPUT_NUMBER"
             },
             {
-              "type": "OBJECT"
+              "type": "OBJECT",
+              "controlType": "JSON_BUILDER",
+              "multipleValues": true
             },
             {
-              "type": "STRING"
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
             }
           ]
         }
@@ -295,44 +371,56 @@
           "label": "Input",
           "name": "input",
           "type": "OBJECT",
+          "controlType": "JSON_BUILDER",
           "additionalProperties": [
             {
               "type": "ONE_OF",
               "types": [
                 {
-                  "type": "ARRAY"
+                  "type": "ARRAY",
+                  "controlType": "JSON_BUILDER",
+                  "multipleValues": true
                 },
                 {
-                  "type": "BOOLEAN"
+                  "type": "BOOLEAN",
+                  "controlType": "CHECKBOX"
                 },
                 {
-                  "type": "DATE"
+                  "type": "DATE",
+                  "controlType": "DATE"
                 },
                 {
-                  "type": "DATE_TIME"
+                  "type": "DATE_TIME",
+                  "controlType": "DATE_TIME"
                 },
                 {
-                  "type": "INTEGER"
+                  "type": "INTEGER",
+                  "controlType": "INPUT_INTEGER"
                 },
                 {
-                  "type": "NUMBER"
+                  "type": "NUMBER",
+                  "controlType": "INPUT_NUMBER"
                 },
                 {
-                  "type": "OBJECT"
+                  "type": "OBJECT",
+                  "controlType": "JSON_BUILDER",
+                  "multipleValues": true
                 },
                 {
-                  "type": "STRING"
+                  "type": "STRING",
+                  "controlType": "INPUT_TEXT"
                 }
               ]
             }
-          ]
+          ],
+          "multipleValues": true
         },
         {
           "description": "Add your R custom logic here.",
           "label": "R code",
           "name": "script",
           "type": "STRING",
-          "controlType": "CODE"
+          "controlType": "CODE_EDITOR"
         }
       ]
     },
@@ -347,28 +435,38 @@
           "type": "ONE_OF",
           "types": [
             {
-              "type": "ARRAY"
+              "type": "ARRAY",
+              "controlType": "JSON_BUILDER",
+              "multipleValues": true
             },
             {
-              "type": "BOOLEAN"
+              "type": "BOOLEAN",
+              "controlType": "CHECKBOX"
             },
             {
-              "type": "DATE"
+              "type": "DATE",
+              "controlType": "DATE"
             },
             {
-              "type": "DATE_TIME"
+              "type": "DATE_TIME",
+              "controlType": "DATE_TIME"
             },
             {
-              "type": "INTEGER"
+              "type": "INTEGER",
+              "controlType": "INPUT_INTEGER"
             },
             {
-              "type": "NUMBER"
+              "type": "NUMBER",
+              "controlType": "INPUT_NUMBER"
             },
             {
-              "type": "OBJECT"
+              "type": "OBJECT",
+              "controlType": "JSON_BUILDER",
+              "multipleValues": true
             },
             {
-              "type": "STRING"
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
             }
           ]
         }
@@ -379,44 +477,56 @@
           "label": "Input",
           "name": "input",
           "type": "OBJECT",
+          "controlType": "JSON_BUILDER",
           "additionalProperties": [
             {
               "type": "ONE_OF",
               "types": [
                 {
-                  "type": "ARRAY"
+                  "type": "ARRAY",
+                  "controlType": "JSON_BUILDER",
+                  "multipleValues": true
                 },
                 {
-                  "type": "BOOLEAN"
+                  "type": "BOOLEAN",
+                  "controlType": "CHECKBOX"
                 },
                 {
-                  "type": "DATE"
+                  "type": "DATE",
+                  "controlType": "DATE"
                 },
                 {
-                  "type": "DATE_TIME"
+                  "type": "DATE_TIME",
+                  "controlType": "DATE_TIME"
                 },
                 {
-                  "type": "INTEGER"
+                  "type": "INTEGER",
+                  "controlType": "INPUT_INTEGER"
                 },
                 {
-                  "type": "NUMBER"
+                  "type": "NUMBER",
+                  "controlType": "INPUT_NUMBER"
                 },
                 {
-                  "type": "OBJECT"
+                  "type": "OBJECT",
+                  "controlType": "JSON_BUILDER",
+                  "multipleValues": true
                 },
                 {
-                  "type": "STRING"
+                  "type": "STRING",
+                  "controlType": "INPUT_TEXT"
                 }
               ]
             }
-          ]
+          ],
+          "multipleValues": true
         },
         {
           "description": "Add your Ruby custom logic here.",
           "label": "Ruby code",
           "name": "script",
           "type": "STRING",
-          "controlType": "CODE"
+          "controlType": "CODE_EDITOR"
         }
       ]
     }

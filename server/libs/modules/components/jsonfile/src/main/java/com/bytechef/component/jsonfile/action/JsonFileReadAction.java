@@ -50,7 +50,6 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
-import static com.bytechef.hermes.definition.DefinitionDSL.show;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -82,21 +81,21 @@ public class JsonFileReadAction {
                 .label("Path")
                 .description(
                     "The path where the array is e.g 'data'. Leave blank to use the top level object.")
-                .displayOption(show(IS_ARRAY, true))
+                .displayCondition("%s === true".formatted(IS_ARRAY))
                 .advancedOption(true),
             integer(PAGE_SIZE)
                 .label("Page Size")
                 .description("The amount of child elements to return in a page.")
-                .displayOption(show(IS_ARRAY, true))
+                .displayCondition("%s === true".formatted(IS_ARRAY))
                 .advancedOption(true),
             integer(PAGE_NUMBER)
                 .label("Page Number")
                 .description("The page number to get.")
-                .displayOption(show(IS_ARRAY, true))
+                .displayCondition("%s === true".formatted(IS_ARRAY))
                 .advancedOption(true))
         .outputSchema(
-            array().displayOption(show(IS_ARRAY, true)),
-            object().displayOption(show(IS_ARRAY, false)))
+            array().displayCondition("%s === true".formatted(IS_ARRAY)),
+            object().displayCondition("%s === false".formatted(IS_ARRAY)))
         .perform(JsonFileReadAction::performRead);
 
     @SuppressWarnings("unchecked")

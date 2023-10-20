@@ -59,7 +59,6 @@ import org.mockito.Mockito;
 public class XlsxFileComponentHandlerTest {
 
     private static final Context context = Mockito.mock(Context.class);
-    private static final XlsxFileComponentHandler xlsxFileComponentHandler = new XlsxFileComponentHandler();
 
     @Test
     public void testGetComponentDefinition() {

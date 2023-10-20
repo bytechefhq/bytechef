@@ -1,9 +1,4 @@
 {
-  "display": {
-    "description": "Sets a value which can then be referenced in other tasks.",
-    "label": "Delay"
-  },
-  "name": "delay",
   "actions": [
     {
       "display": {
@@ -14,13 +9,19 @@
         {
           "description": "Time in milliseconds.",
           "label": "Millis",
+          "required": true,
           "name": "millis",
           "type": "INTEGER",
-          "required": true,
+          "controlType": "INPUT_INTEGER",
           "defaultValue": 1
         }
       ]
     }
   ],
+  "display": {
+    "description": "Sets a value which can then be referenced in other tasks.",
+    "label": "Delay"
+  },
+  "name": "delay",
   "version": 1
 }

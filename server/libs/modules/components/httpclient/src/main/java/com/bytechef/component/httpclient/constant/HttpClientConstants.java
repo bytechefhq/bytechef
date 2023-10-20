@@ -17,7 +17,6 @@
 
 package com.bytechef.component.httpclient.constant;
 
-import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.definition.Property;
 
 import java.util.Arrays;
@@ -25,13 +24,14 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
+import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
-import static com.bytechef.hermes.definition.DefinitionDSL.show;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -67,66 +67,61 @@ public class HttpClientConstants {
             object(BODY_CONTENT)
                 .label("JSON")
                 .description("Body Parameters to send.")
-                .displayOption(show(BODY_CONTENT_TYPE, HttpClientUtils.BodyContentType.JSON.name()))
+                .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.JSON.name()))
                 .additionalProperties(oneOf())
                 .placeholder("Add Parameter"),
             object(BODY_CONTENT)
                 .label("XML")
                 .description("XML content to send.")
-                .displayOption(show(BODY_CONTENT_TYPE, HttpClientUtils.BodyContentType.XML.name()))
+                .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.XML.name()))
                 .additionalProperties(oneOf())
                 .placeholder("Add Parameter"),
             object(BODY_CONTENT)
                 .label("Form Data")
                 .description("Body parameters to send.")
-                .displayOption(show(BODY_CONTENT_TYPE, HttpClientUtils.BodyContentType.FORM_DATA.name()))
+                .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_DATA.name()))
                 .placeholder("Add Parameter")
                 .additionalProperties(oneOf().types(string(), fileEntry())),
             object(BODY_CONTENT)
                 .label("Form URL-Encoded")
                 .description("Body parameters to send.")
-                .displayOption(show(BODY_CONTENT_TYPE, HttpClientUtils.BodyContentType.FORM_URL_ENCODED.name()))
+                .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_URL_ENCODED.name()))
                 .placeholder("Add Parameter")
                 .additionalProperties(string()),
             string(BODY_CONTENT)
                 .label("Raw")
                 .description("The raw text to send.")
-                .displayOption(show(BODY_CONTENT_TYPE, HttpClientUtils.BodyContentType.RAW.name())),
+                .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.RAW.name())),
             fileEntry(BODY_CONTENT)
                 .label("Binary")
                 .description("The object property which contains a reference to the file to upload.")
-                .displayOption(show(BODY_CONTENT_TYPE, HttpClientUtils.BodyContentType.BINARY.name()))));
+                .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))));
 
     public static final List<Property<?>> OUTPUT_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(
             object().properties(oneOf("body").types(array(), object()), object("headers"), integer("status"))
-                .displayOption(show(
-                    RESPONSE_FORMAT,
-                    List.of(HttpClientUtils.ResponseFormat.JSON.name(), HttpClientUtils.ResponseFormat.XML.name()),
-                    FULL_RESPONSE,
-                    List.of(false))),
+                .displayCondition(
+                    "['%s', '%s'].includes('%s') && %s === false".formatted(
+                        ResponseFormat.JSON.name(), ResponseFormat.XML.name(), RESPONSE_FORMAT, FULL_RESPONSE)),
             oneOf()
                 .types(array(), object())
-                .displayOption(show(
-                    RESPONSE_FORMAT,
-                    List.of(HttpClientUtils.ResponseFormat.JSON.name(), HttpClientUtils.ResponseFormat.XML.name()),
-                    FULL_RESPONSE,
-                    List.of(true))),
-            string().displayOption(
-                show(RESPONSE_FORMAT, List.of(HttpClientUtils.ResponseFormat.TEXT.name()), FULL_RESPONSE,
-                    List.of(true))),
+                .displayCondition(
+                    "['%s', '%s'].includes('%s') && %s === true".formatted(
+                        ResponseFormat.JSON.name(), ResponseFormat.XML.name(), RESPONSE_FORMAT, FULL_RESPONSE)),
+            string().displayCondition(
+                "%s === '%s' && %s === true".formatted(RESPONSE_FORMAT, ResponseFormat.TEXT.name(), FULL_RESPONSE)),
             object().properties(string("body"), object("headers"), integer("status"))
-                .displayOption(
-                    show(RESPONSE_FORMAT, List.of(HttpClientUtils.ResponseFormat.TEXT.name()), FULL_RESPONSE,
-                        List.of(false))),
+                .displayCondition(
+                    "%s === '%s' && %s === false".formatted(RESPONSE_FORMAT, ResponseFormat.TEXT.name(),
+                        FULL_RESPONSE)),
             fileEntry()
-                .displayOption(
-                    show(RESPONSE_FORMAT, List.of(HttpClientUtils.ResponseFormat.BINARY.name()), FULL_RESPONSE,
-                        List.of(true))),
+                .displayCondition(
+                    "%s === '%s' && %s === true".formatted(RESPONSE_FORMAT, ResponseFormat.BINARY.name(),
+                        FULL_RESPONSE)),
             object().properties(fileEntry("body"), object("headers"), integer("status"))
-                .displayOption(
-                    show(RESPONSE_FORMAT, List.of(HttpClientUtils.ResponseFormat.BINARY.name()), FULL_RESPONSE,
-                        List.of(false)))));
+                .displayCondition(
+                    "%s === '%s' && %s === false".formatted(RESPONSE_FORMAT, ResponseFormat.BINARY.name(),
+                        FULL_RESPONSE))));
 
     public static final List<Property<?>> COMMON_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(
@@ -151,21 +146,21 @@ public class HttpClientConstants {
                 .options(
                     option(
                         "JSON",
-                        HttpClientUtils.ResponseFormat.JSON.name(),
+                        ResponseFormat.JSON.name(),
                         "The response is automatically converted to object/array."),
                     option(
                         "XML",
-                        HttpClientUtils.ResponseFormat.XML.name(),
+                        ResponseFormat.XML.name(),
                         "The response is automatically converted to object/array."),
-                    option("Text", HttpClientUtils.ResponseFormat.TEXT.name(), "The response is returned as a text."),
+                    option("Text", ResponseFormat.TEXT.name(), "The response is returned as a text."),
                     option(
-                        "File", HttpClientUtils.ResponseFormat.BINARY.name(),
+                        "File", ResponseFormat.BINARY.name(),
                         "The response is returned as a file object."))
-                .defaultValue(HttpClientUtils.ResponseFormat.JSON.name()),
+                .defaultValue(ResponseFormat.JSON.name()),
             string(RESPONSE_FILENAME)
                 .label("Response Filename")
                 .description("The name of the file if the response is returned as a file object.")
-                .displayOption(show(RESPONSE_FORMAT, HttpClientUtils.ResponseFormat.BINARY.name())),
+                .displayCondition("%s === '%s'".formatted(RESPONSE_FORMAT, ResponseFormat.BINARY.name())),
 
             //
             // Header properties

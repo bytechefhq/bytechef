@@ -199,7 +199,7 @@ public class ComponentDefinitionTest {
         jsonAssertEquals(
             """
                 {
-                    "controlType": "INPUT_NUMBER",
+                    "controlType": "SELECT",
                     "defaultValue":2,
                     "description":"description",
                     "label":"label",

@@ -8,7 +8,8 @@
       "properties": [
         {
           "name": "text",
-          "type": "STRING"
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         }
       ]
     },
@@ -20,7 +21,8 @@
       "properties": [
         {
           "name": "text",
-          "type": "STRING"
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         }
       ]
     },
@@ -32,7 +34,8 @@
       "properties": [
         {
           "name": "text",
-          "type": "STRING"
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         }
       ]
     },
@@ -44,7 +47,8 @@
       "properties": [
         {
           "name": "text",
-          "type": "STRING"
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         }
       ]
     }
