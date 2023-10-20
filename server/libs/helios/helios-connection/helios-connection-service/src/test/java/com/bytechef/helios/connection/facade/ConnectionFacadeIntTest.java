@@ -163,7 +163,7 @@ public class ConnectionFacadeIntTest {
 
         connection = connectionRepository.save(connection);
 
-        List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(null, null);
+        List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections((List<String>) null, null);
 
         Assertions.assertThat(
             CollectionUtils.map(connectionDTOs, ConnectionDTO::toConnection))

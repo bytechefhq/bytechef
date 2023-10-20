@@ -24,6 +24,7 @@ import com.bytechef.helios.project.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.connection.WorkflowConnection;
+import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.oauth2.config.OAuth2Properties;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.helios.connection.dto.ConnectionDTO;
@@ -37,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -128,6 +130,31 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return new ConnectionDTO(
             isConnectionUsed(Objects.requireNonNull(connection.getId())), connection,
             tagService.getTags(connection.getTagIds()));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ConnectionDTO> getConnections(String componentName, Integer componentVersion) {
+        List<Connection> connections = new ArrayList<>();
+
+        List<ConnectionDefinitionDTO> connectionDefinitionDTOs = connectionDefinitionService.getConnectionDefinitions(
+            componentName, componentVersion);
+
+        for (ConnectionDefinitionDTO connectionDefinitionDTO : connectionDefinitionDTOs) {
+            connections.addAll(connectionService.getConnections(
+                connectionDefinitionDTO.componentName(), connectionDefinitionDTO.version()));
+        }
+
+        List<Tag> tags = tagService.getTags(connections.stream()
+            .flatMap(connection -> connection.getTagIds()
+                .stream())
+            .filter(Objects::nonNull)
+            .toList());
+
+        return connections.stream()
+            .map(connection -> new ConnectionDTO(
+                isConnectionUsed(Objects.requireNonNull(connection.getId())), connection, filterTags(tags, connection)))
+            .toList();
     }
 
     @Override
