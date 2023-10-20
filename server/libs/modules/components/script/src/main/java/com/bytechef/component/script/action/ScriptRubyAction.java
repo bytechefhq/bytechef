@@ -70,6 +70,6 @@ public class ScriptRubyAction {
 
     protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (inputParameters, connection) -> null;
+        return (inputParameters, connection, context) -> null;
     }
 }

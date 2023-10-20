@@ -26,12 +26,11 @@ import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.lang.Nullable;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -56,14 +55,14 @@ public class ContextImpl implements ActionContext, TriggerContext {
 
     @SuppressFBWarnings("EI")
     public ContextImpl(
-        @Nullable Connection connection, DataStorageService dataStorageService, EventPublisher eventPublisher,
-        ObjectMapper objectMapper, FileStorageService fileStorageService, HttpClientExecutor httpClientExecutor,
-        Long taskExecutionId, XmlMapper xmlMapper) {
+        String componentName, ComponentConnection connection, DataStorageService dataStorageService,
+        EventPublisher eventPublisher, ObjectMapper objectMapper, FileStorageService fileStorageService,
+        HttpClientExecutor httpClientExecutor, Long taskExecutionId, XmlMapper xmlMapper) {
 
         this.data = new DataImpl(dataStorageService);
         this.event = taskExecutionId == null ? null : new EventImpl(eventPublisher, taskExecutionId);
         this.file = new FileImpl(fileStorageService);
-        this.http = new HttpImpl(connection, httpClientExecutor);
+        this.http = new HttpImpl(componentName, connection, this, httpClientExecutor);
         this.json = new JsonImpl(objectMapper);
         this.xml = new XmlImpl(xmlMapper);
     }
@@ -158,7 +157,7 @@ public class ContextImpl implements ActionContext, TriggerContext {
         }
     }
 
-    private class FileImpl implements File {
+    private static class FileImpl implements File {
 
         private final FileStorageService fileStorageService;
 
@@ -197,54 +196,63 @@ public class ContextImpl implements ActionContext, TriggerContext {
 
     private static class HttpImpl implements Http {
 
-        private final Connection connection;
+        private final String componentName;
+        private final ComponentConnection connection;
+        private final Context context;
         private final HttpClientExecutor httpClientExecutor;
 
-        private HttpImpl(Connection connection, HttpClientExecutor httpClientExecutor) {
+        private HttpImpl(
+            String componentName, ComponentConnection connection, Context context,
+            HttpClientExecutor httpClientExecutor) {
+
+            this.componentName = componentName;
             this.connection = connection;
+            this.context = context;
             this.httpClientExecutor = httpClientExecutor;
         }
 
         @Override
         public Executor delete(String url) {
-            return new ExecutorImpl(url, RequestMethod.DELETE, connection, httpClientExecutor);
+            return new ExecutorImpl(url, RequestMethod.DELETE, componentName, connection, context, httpClientExecutor);
         }
 
         @Override
         public Executor exchange(String url, RequestMethod requestMethod) {
-            return new ExecutorImpl(url, requestMethod, connection, httpClientExecutor);
+            return new ExecutorImpl(url, requestMethod, componentName, connection, context, httpClientExecutor);
         }
 
         @Override
         public Executor head(String url) {
-            return new ExecutorImpl(url, RequestMethod.HEAD, connection, httpClientExecutor);
+            return new ExecutorImpl(url, RequestMethod.HEAD, componentName, connection, context, httpClientExecutor);
         }
 
         @Override
         public Executor get(String url) {
-            return new ExecutorImpl(url, RequestMethod.GET, connection, httpClientExecutor);
+            return new ExecutorImpl(url, RequestMethod.GET, componentName, connection, context, httpClientExecutor);
         }
 
         @Override
         public Executor patch(String url) {
-            return new ExecutorImpl(url, RequestMethod.PATCH, connection, httpClientExecutor);
+            return new ExecutorImpl(url, RequestMethod.PATCH, componentName, connection, context, httpClientExecutor);
         }
 
         @Override
         public Executor post(String url) {
-            return new ExecutorImpl(url, RequestMethod.POST, connection, httpClientExecutor);
+            return new ExecutorImpl(url, RequestMethod.POST, componentName, connection, context, httpClientExecutor);
         }
 
         @Override
         public Executor put(String url) {
-            return new ExecutorImpl(url, RequestMethod.PUT, connection, httpClientExecutor);
+            return new ExecutorImpl(url, RequestMethod.PUT, componentName, connection, context, httpClientExecutor);
         }
 
         private static class ExecutorImpl implements Executor {
 
             private Http.Body body;
+            private final String componentName;
             private Configuration configuration = new Configuration();
-            private final Connection connection;
+            private final ComponentConnection connection;
+            private final Context context;
             private final HttpClientExecutor httpClientExecutor;
             private Map<String, List<String>> headers = new HashMap<>();
             private Map<String, List<String>> queryParameters = new HashMap<>();
@@ -252,9 +260,12 @@ public class ContextImpl implements ActionContext, TriggerContext {
             private final String url;
 
             private ExecutorImpl(
-                String url, RequestMethod requestMethod, Connection connection, HttpClientExecutor httpClientExecutor) {
+                String url, RequestMethod requestMethod, String componentName, ComponentConnection connection,
+                Context context, HttpClientExecutor httpClientExecutor) {
 
+                this.componentName = componentName;
                 this.connection = connection;
+                this.context = context;
                 this.httpClientExecutor = httpClientExecutor;
                 this.url = url;
                 this.requestMethod = requestMethod;
@@ -307,7 +318,8 @@ public class ContextImpl implements ActionContext, TriggerContext {
             public Http.Response execute() throws ComponentExecutionException {
                 try {
                     return httpClientExecutor.execute(
-                        url, headers, queryParameters, body, configuration, requestMethod, connection);
+                        url, headers, queryParameters, body, configuration, requestMethod, componentName, connection,
+                        context);
                 } catch (Exception e) {
                     throw new ComponentExecutionException("Unable to execute HTTP request", e);
                 }
@@ -315,13 +327,7 @@ public class ContextImpl implements ActionContext, TriggerContext {
         }
     }
 
-    private static class JsonImpl implements Json {
-
-        private final ObjectMapper objectMapper;
-
-        public JsonImpl(ObjectMapper objectMapper) {
-            this.objectMapper = objectMapper;
-        }
+    private record JsonImpl(ObjectMapper objectMapper) implements Json {
 
         @Override
         public Object read(InputStream inputStream) {
@@ -469,13 +475,7 @@ public class ContextImpl implements ActionContext, TriggerContext {
         }
     }
 
-    private static class XmlImpl implements Xml {
-
-        private final XmlMapper xmlMapper;
-
-        public XmlImpl(XmlMapper xmlMapper) {
-            this.xmlMapper = xmlMapper;
-        }
+    private record XmlImpl(XmlMapper xmlMapper) implements Xml {
 
         @Override
         public Map<String, ?> read(InputStream inputStream) {

@@ -15,18 +15,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registry.facade;
+package com.bytechef.hermes.component.registry.dto;
 
-import org.springframework.lang.NonNull;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public interface ActionDefinitionFacade {
-
-    Object executePerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, long taskExecutionId,
-        @NonNull Map<String, ?> inputParameters, Long connectionId);
+@SuppressFBWarnings("EI")
+public record ComponentConnection(int version, Map<String, ?> parameters, String authorizationName) {
 }

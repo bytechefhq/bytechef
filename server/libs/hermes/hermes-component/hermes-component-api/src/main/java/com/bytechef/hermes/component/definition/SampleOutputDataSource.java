@@ -40,9 +40,10 @@ public interface SampleOutputDataSource {
         /**
          * @param inputParameters
          * @param connectionParameters
+         * @param context
          * @return
          */
-        Object apply(ParameterMap inputParameters, ParameterMap connectionParameters)
+        Object apply(ParameterMap inputParameters, ParameterMap connectionParameters, Context context)
             throws ComponentExecutionException;
     }
 }

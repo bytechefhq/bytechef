@@ -17,30 +17,16 @@
 
 package com.bytechef.hermes.component.registry.service;
 
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
-import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
-import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
-import com.bytechef.hermes.connection.domain.Connection;
 import org.springframework.lang.NonNull;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 public interface RemoteConnectionDefinitionService {
-
-    ApplyResponse executeAuthorizationApply(@NonNull Connection connection);
-
-    AuthorizationCallbackResponse executeAuthorizationCallback(
-        @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
-        @NonNull String authorizationName, @NonNull String redirectUri);
-
-    Optional<String> executeBaseUri(@NonNull Connection connection);
 
     AuthorizationType getAuthorizationType(
         @NonNull String componentName, int connectionVersion, @NonNull String authorizationName);
@@ -51,8 +37,4 @@ public interface RemoteConnectionDefinitionService {
 
     List<ConnectionDefinition> getConnectionDefinitions(
         @NonNull String componentName, @NonNull Integer componentVersion);
-
-    OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-        @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
-        @NonNull String authorizationName);
 }

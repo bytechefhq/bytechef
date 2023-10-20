@@ -130,7 +130,7 @@ public class XmlFileReadAction {
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (inputParameters, connection) -> {
+        return (inputParameters, connection, context) -> {
             if (inputParameters.getBoolean(IS_ARRAY, false)) {
                 return object();
             } else {

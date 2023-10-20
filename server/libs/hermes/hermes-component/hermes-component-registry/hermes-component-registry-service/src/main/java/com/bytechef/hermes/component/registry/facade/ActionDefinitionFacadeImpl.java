@@ -17,6 +17,8 @@
 
 package com.bytechef.hermes.component.registry.facade;
 
+import com.bytechef.hermes.component.definition.factory.ContextFactory;
+import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.RemoteConnectionService;
@@ -36,12 +38,15 @@ import java.util.Map;
 public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade, RemoteActionDefinitionFacade {
 
     private final RemoteConnectionService connectionService;
+    private final ContextFactory contextFactory;
     private final ActionDefinitionService actionDefinitionService;
 
     @SuppressFBWarnings("EI")
     public ActionDefinitionFacadeImpl(
-        RemoteConnectionService connectionService, ActionDefinitionService actionDefinitionService) {
+        RemoteConnectionService connectionService, ContextFactory contextFactory,
+        ActionDefinitionService actionDefinitionService) {
 
+        this.contextFactory = contextFactory;
         this.actionDefinitionService = actionDefinitionService;
         this.connectionService = connectionService;
     }
@@ -51,22 +56,23 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade, Remot
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         Map<String, Object> actionParameters, Long connectionId) {
 
-        Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
+        ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return actionDefinitionService.executeDynamicProperties(
-            componentName, componentVersion, actionName, propertyName, actionParameters, connection);
+            componentName, componentVersion, actionName, propertyName, actionParameters,
+            componentConnection, contextFactory.createActionContext(componentName, componentConnection));
     }
 
     @Override
     public String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, Object> actionParameters,
-        Long connectionId) {
+        @NonNull Map<String, Object> actionParameters, Long connectionId) {
 
-        Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
+        ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return actionDefinitionService.executeEditorDescription(
-            componentName, componentVersion, actionName, actionParameters, connection);
+            componentName, componentVersion, actionName, actionParameters, componentConnection,
+            contextFactory.createActionContext(componentName, componentConnection));
     }
 
     @Override
@@ -74,22 +80,23 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade, Remot
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, Object> actionParameters, Long connectionId, String searchText) {
 
-        Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
+        ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return actionDefinitionService.executeOptions(
-            componentName, componentVersion, actionName, propertyName, actionParameters, searchText, connection);
+            componentName, componentVersion, actionName, propertyName, actionParameters, searchText,
+            componentConnection, contextFactory.createActionContext(componentName, componentConnection));
     }
 
     @Override
     public List<? extends ValueProperty<?>> executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, Object> actionParameters,
-        Long connectionId) {
+        @NonNull Map<String, Object> actionParameters, Long connectionId) {
 
-        Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
+        ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return actionDefinitionService.executeOutputSchema(
-            componentName, componentVersion, actionName, actionParameters, connection);
+            componentName, componentVersion, actionName, actionParameters, componentConnection,
+            contextFactory.createActionContext(componentName, componentConnection));
     }
 
     @Override
@@ -97,10 +104,11 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade, Remot
         @NonNull String componentName, int componentVersion, @NonNull String actionName, long taskExecutionId,
         @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
-        Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
+        ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return actionDefinitionService.executePerform(
-            componentName, componentVersion, actionName, taskExecutionId, inputParameters, connection);
+            componentName, componentVersion, actionName, taskExecutionId, inputParameters,
+            componentConnection, contextFactory.createActionContext(componentName, componentConnection));
     }
 
     @Override
@@ -108,9 +116,23 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade, Remot
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, Object> inputParameters, Long connectionId) {
 
-        Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
+        ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return actionDefinitionService.executeSampleOutput(
-            componentName, componentVersion, actionName, inputParameters, connection);
+            componentName, componentVersion, actionName, inputParameters, componentConnection,
+            contextFactory.createActionContext(componentName, componentConnection));
+    }
+
+    private ComponentConnection getComponentConnection(Long connectionId) {
+        ComponentConnection componentConnection = null;
+
+        if (connectionId != null) {
+            Connection connection = connectionService.getConnection(connectionId);
+
+            componentConnection = new ComponentConnection(
+                connection.getVersion(), connection.getParameters(), connection.getAuthorizationName());
+        }
+
+        return componentConnection;
     }
 }

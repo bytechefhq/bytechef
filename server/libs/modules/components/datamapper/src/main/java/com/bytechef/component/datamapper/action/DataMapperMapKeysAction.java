@@ -69,6 +69,6 @@ public class DataMapperMapKeysAction {
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (inputParameters, connection) -> object();
+        return (inputParameters, connection, context) -> object();
     }
 }

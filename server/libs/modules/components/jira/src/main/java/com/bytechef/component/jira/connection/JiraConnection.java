@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class JiraConnection {
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters) -> "https://your-domain.atlassian.net")
+        .baseUri((connectionParameters, context) -> "https://your-domain.atlassian.net")
         .authorizations(authorization(
             AuthorizationType.BASIC_AUTH.toLowerCase(), AuthorizationType.BASIC_AUTH)
                 .title("Basic Auth")
@@ -57,7 +57,7 @@ public class JiraConnection {
                         string(CLIENT_SECRET)
                             .label("Client Secret")
                             .required(true))
-                    .authorizationUrl(connection -> "https://auth.atlassian.com/authorize")
-                    .scopes(connection -> List.of("read:jira-work", "write:jira-work"))
-                    .tokenUrl(connection -> "https://auth.atlassian.com/oauth/token"));
+                    .authorizationUrl((connection, context) -> "https://auth.atlassian.com/authorize")
+                    .scopes((connection, context) -> List.of("read:jira-work", "write:jira-work"))
+                    .tokenUrl((connection, context) -> "https://auth.atlassian.com/oauth/token"));
 }

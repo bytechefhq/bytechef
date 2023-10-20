@@ -31,9 +31,10 @@ public interface EditorDescriptionDataSource {
         /**
          * @param inputParameters
          * @param connectionParameters
+         * @param context
          * @return
          */
-        String apply(ParameterMap inputParameters, ParameterMap connectionParameters)
+        String apply(ParameterMap inputParameters, ParameterMap connectionParameters, Context context)
             throws ComponentExecutionException;
 
     }

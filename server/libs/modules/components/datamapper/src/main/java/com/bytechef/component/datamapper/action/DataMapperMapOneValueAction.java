@@ -267,7 +267,7 @@ public class DataMapperMapOneValueAction {
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (inputParameters, connection) -> switch (inputParameters.getRequiredInteger(TYPE)) {
+        return (inputParameters, connection, context) -> switch (inputParameters.getRequiredInteger(TYPE)) {
             case 1 -> array();
             case 2 -> bool();
             case 3 -> date();

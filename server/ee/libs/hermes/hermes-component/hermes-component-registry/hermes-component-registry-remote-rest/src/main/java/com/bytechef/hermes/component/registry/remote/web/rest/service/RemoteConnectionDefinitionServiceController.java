@@ -17,26 +17,18 @@
 
 package com.bytechef.hermes.component.registry.remote.web.rest.service;
 
-import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
-import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
-import com.bytechef.hermes.connection.domain.Connection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -53,52 +45,6 @@ public class RemoteConnectionDefinitionServiceController {
         RemoteConnectionDefinitionService connectionDefinitionService) {
 
         this.connectionDefinitionService = connectionDefinitionService;
-    }
-
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/execute-authorization-apply",
-        consumes = {
-            "application/json"
-        },
-        produces = {
-            "application/json"
-        })
-    public ResponseEntity<Authorization.ApplyResponse> executeAuthorizationApply(
-        @RequestBody Connection connection) {
-
-        return ResponseEntity.ok(
-            connectionDefinitionService.executeAuthorizationApply(connection));
-    }
-
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/execute-authorization-callback",
-        consumes = {
-            "application/json"
-        },
-        produces = {
-            "application/json"
-        })
-    public ResponseEntity<AuthorizationCallbackResponse> executeAuthorizationCallback(
-        @Valid @RequestBody AuthorizationCallbackRequest authorizationCallbackRequest) {
-
-        ConnectionRequest connectionRequest = authorizationCallbackRequest.connection();
-
-        return ResponseEntity.ok(
-            connectionDefinitionService.executeAuthorizationCallback(
-                connectionRequest.componentName, connectionRequest.connectionVersion, connectionRequest.parameters,
-                connectionRequest.authorizationName, authorizationCallbackRequest.redirectUri()));
-    }
-
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/execute-base-uri")
-    public ResponseEntity<String> executeBaseUri(@RequestBody Connection connection) {
-        return connectionDefinitionService.executeBaseUri(connection)
-            .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity.noContent()
-                .build());
     }
 
     @RequestMapping(
@@ -150,33 +96,5 @@ public class RemoteConnectionDefinitionServiceController {
         })
     public ResponseEntity<List<ConnectionDefinition>> getConnectionDefinitions() {
         return ResponseEntity.ok(connectionDefinitionService.getConnectionDefinitions());
-    }
-
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/get-oauth2-authorization-parameters",
-        consumes = {
-            "application/json"
-        },
-        produces = {
-            "application/json"
-        })
-    public ResponseEntity<OAuth2AuthorizationParameters> getOAuth2AuthorizationParameters(
-        @Valid @RequestBody RemoteConnectionDefinitionServiceController.ConnectionRequest connection) {
-
-        return ResponseEntity.ok(
-            connectionDefinitionService.getOAuth2AuthorizationParameters(
-                connection.componentName, connection.connectionVersion, connection.parameters,
-                connection.authorizationName));
-    }
-
-    @SuppressFBWarnings("EI")
-    public record AuthorizationCallbackRequest(@NotNull ConnectionRequest connection, @NotNull String redirectUri) {
-    }
-
-    @SuppressFBWarnings("EI")
-    public record ConnectionRequest(
-        @NotNull String componentName, int connectionVersion, @NotNull Map<String, Object> parameters,
-        @NotNull String authorizationName) {
     }
 }

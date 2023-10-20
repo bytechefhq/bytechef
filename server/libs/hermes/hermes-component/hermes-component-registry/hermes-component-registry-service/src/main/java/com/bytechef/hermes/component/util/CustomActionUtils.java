@@ -227,6 +227,6 @@ public class CustomActionUtils {
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (inputParameters, connection) -> null;
+        return (inputParameters, connection, context) -> null;
     }
 }

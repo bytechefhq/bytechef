@@ -170,11 +170,11 @@ public interface Authorization {
     interface AcquireFunction {
 
         /**
-         *
          * @param connectionParameters
+         * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters);
+        String apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
     }
 
     /**
@@ -184,11 +184,11 @@ public interface Authorization {
     interface ApplyFunction {
 
         /**
-         *
          * @param connectionParameters
+         * @param context
          * @return
          */
-        ApplyResponse apply(ParameterMap connectionParameters);
+        ApplyResponse apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
     }
 
     /**
@@ -198,15 +198,15 @@ public interface Authorization {
     interface AuthorizationCallbackFunction {
 
         /**
-         *
          * @param connectionParameters
          * @param code
          * @param redirectUri
          * @param codeVerifier
+         * @param context
          * @return
          */
         AuthorizationCallbackResponse apply(
-            ParameterMap connectionParameters, String code, String redirectUri, String codeVerifier)
+            ParameterMap connectionParameters, String code, String redirectUri, String codeVerifier, Context context)
             throws ComponentExecutionException;
     }
 
@@ -217,11 +217,11 @@ public interface Authorization {
     interface AuthorizationUrlFunction {
 
         /**
-         *
          * @param connectionParameters
+         * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters);
+        String apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
     }
 
     /**
@@ -231,11 +231,11 @@ public interface Authorization {
     interface ClientIdFunction {
 
         /**
-         *
          * @param connectionParameters
+         * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters);
+        String apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
     }
 
     /**
@@ -245,11 +245,11 @@ public interface Authorization {
     interface ClientSecretFunction {
 
         /**
-         *
          * @param connectionParameters
+         * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters);
+        String apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
     }
 
     /**
@@ -258,7 +258,8 @@ public interface Authorization {
     @FunctionalInterface
     interface PkceFunction {
 
-        Pkce apply(String verifier, String challenge, String challengeMethod);
+        Pkce apply(String verifier, String challenge, String challengeMethod, Context context)
+            throws ComponentExecutionException;
     }
 
     /**
@@ -268,11 +269,11 @@ public interface Authorization {
     interface RefreshFunction {
 
         /**
-         *
          * @param connectionParameters
+         * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters);
+        String apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
     }
 
     /**
@@ -282,11 +283,11 @@ public interface Authorization {
     interface RefreshUrlFunction {
 
         /**
-         *
          * @param connectionParameters
+         * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters);
+        String apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
     }
 
     /**
@@ -296,11 +297,11 @@ public interface Authorization {
     interface ScopesFunction {
 
         /**
-         *
          * @param connectionParameters
+         * @param context
          * @return
          */
-        List<String> apply(ParameterMap connectionParameters);
+        List<String> apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
     }
 
     /**
@@ -310,11 +311,11 @@ public interface Authorization {
     interface TokenUrlFunction {
 
         /**
-         *
          * @param connectionParameters
+         * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters);
+        String apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
     }
 
     /**

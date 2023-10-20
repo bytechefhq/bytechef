@@ -17,23 +17,19 @@
 
 package com.bytechef.worker.config;
 
-import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
-import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
+import com.bytechef.hermes.component.registry.dto.ComponentConnection;
+import com.bytechef.hermes.component.registry.remote.client.facade.RemoteConnectionDefinitionFacadeClient;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
-import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
-import com.bytechef.hermes.component.registry.remote.client.service.RemoteConnectionDefinitionServiceClient;
-import com.bytechef.hermes.connection.domain.Connection;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.lang.NonNull;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Configuration
@@ -41,41 +37,34 @@ public class DefinitionRegistryConfiguration {
 
     @Bean("workerConnectionDefinitionService")
     @Primary
-    RemoteConnectionDefinitionService connectionDefinitionService(
+    ConnectionDefinitionService connectionDefinitionService(
         @Qualifier("connectionDefinitionService") ConnectionDefinitionService connectionDefinitionService,
-        RemoteConnectionDefinitionServiceClient connectionDefinitionServiceClient) {
+        RemoteConnectionDefinitionFacadeClient connectionDefinitionFacadeClient) {
 
-        return new WorkerConnectionDefinitionService(connectionDefinitionService, connectionDefinitionServiceClient);
+        return new WorkerConnectionDefinitionService(connectionDefinitionService, connectionDefinitionFacadeClient);
     }
 
     /**
      * Compound ConnectionDefinitionService impl that supports the use case where a component (for example, HttpClient
      * or Script) uses a compatible connection from a different component that can be in a different worker instance.
      */
-    private static class WorkerConnectionDefinitionService implements RemoteConnectionDefinitionService {
-
-        private final ConnectionDefinitionService connectionDefinitionService;
-        private final RemoteConnectionDefinitionServiceClient connectionDefinitionServiceClient;
-
-        public WorkerConnectionDefinitionService(
-            ConnectionDefinitionService connectionDefinitionService,
-            RemoteConnectionDefinitionServiceClient connectionDefinitionServiceClient) {
-
-            this.connectionDefinitionService = connectionDefinitionService;
-            this.connectionDefinitionServiceClient = connectionDefinitionServiceClient;
-        }
+    private record WorkerConnectionDefinitionService(
+        ConnectionDefinitionService connectionDefinitionService,
+        RemoteConnectionDefinitionFacadeClient connectionDefinitionFacadeClient)
+        implements ConnectionDefinitionService {
 
         /**
          * Called from the Context.Connection instance.
          */
         @Override
-        public ApplyResponse executeAuthorizationApply(@NonNull Connection connection) {
-            if (connectionDefinitionService.connectionExists(
-                connection.getComponentName(), connection.getConnectionVersion())) {
+        public ApplyResponse executeAuthorizationApply(
+            @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
 
-                return connectionDefinitionService.executeAuthorizationApply(connection);
+            if (connectionDefinitionService.connectionExists(componentName, connection.version())) {
+                return connectionDefinitionService.executeAuthorizationApply(
+                    componentName, connection, context);
             } else {
-                return connectionDefinitionServiceClient.executeAuthorizationApply(connection);
+                return connectionDefinitionFacadeClient.executeAuthorizationApply(componentName, connection);
             }
         }
 
@@ -84,58 +73,37 @@ public class DefinitionRegistryConfiguration {
          */
         @Override
         public AuthorizationCallbackResponse executeAuthorizationCallback(
-            @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
-            @NonNull String authorizationName, @NonNull String redirectUri) {
+            @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context,
+            @NonNull String redirectUri) {
 
             return connectionDefinitionService.executeAuthorizationCallback(
-                componentName, connectionVersion, connectionParameters, authorizationName, redirectUri);
+                componentName, connection, context, redirectUri);
+        }
+
+        @Override
+        public boolean connectionExists(String componentName, int connectionVersion) {
+            return connectionDefinitionService.connectionExists(componentName, connectionVersion);
         }
 
         /**
          * Called from the HttpClientExecutor instance.
          */
         @Override
-        public Optional<String> executeBaseUri(@NonNull Connection connection) {
-            if (connectionDefinitionService.connectionExists(
-                connection.getComponentName(), connection.getConnectionVersion())) {
+        public Optional<String> executeBaseUri(
+            @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
 
-                return connectionDefinitionService.executeBaseUri(connection);
+            if (connectionDefinitionService.connectionExists(componentName, connection.version())) {
+                return connectionDefinitionService.executeBaseUri(componentName, connection, context);
             } else {
-                return connectionDefinitionServiceClient.executeBaseUri(connection);
+                return connectionDefinitionFacadeClient.executeBaseUri(componentName, connection);
             }
         }
 
         @Override
-        public Authorization.AuthorizationType getAuthorizationType(
-            @NonNull String componentName, int connectionVersion, @NonNull String authorizationName) {
-
-            return connectionDefinitionService.getAuthorizationType(
-                componentName, connectionVersion, authorizationName);
-        }
-
-        @Override
-        public ConnectionDefinition getConnectionDefinition(@NonNull String componentName, int componentVersion) {
-            return connectionDefinitionService.getConnectionDefinition(componentName, componentVersion);
-        }
-
-        @Override
-        public List<ConnectionDefinition>
-            getConnectionDefinitions(@NonNull String componentName, @NonNull Integer componentVersion) {
-            return connectionDefinitionService.getConnectionDefinitions(componentName, componentVersion);
-        }
-
-        @Override
-        public List<ConnectionDefinition> getConnectionDefinitions() {
-            return connectionDefinitionService.getConnectionDefinitions();
-        }
-
-        @Override
         public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
-            @NonNull String componentName, int connectionVersion, @NonNull Map<String, ?> connectionParameters,
-            @NonNull String authorizationName) {
+            @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
 
-            return connectionDefinitionService.getOAuth2AuthorizationParameters(
-                componentName, connectionVersion, connectionParameters, authorizationName);
+            return connectionDefinitionService.getOAuth2AuthorizationParameters(componentName, connection, context);
         }
     }
 }

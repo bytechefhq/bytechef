@@ -17,23 +17,17 @@
 
 package com.bytechef.hermes.component.registry.service;
 
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
 import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
 import org.springframework.lang.NonNull;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public interface RemoteTriggerDefinitionService {
-
-    DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> outputParameters);
 
     TriggerDefinition getTriggerDefinition(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName);

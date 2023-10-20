@@ -19,19 +19,19 @@ package com.bytechef.hermes.component.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
+import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.definition.EditorDescriptionDataSource;
 import com.bytechef.hermes.component.definition.EditorDescriptionDataSource.EditorDescriptionFunction;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
-import com.bytechef.hermes.component.definition.factory.ContextFactory;
 import com.bytechef.hermes.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.hermes.component.definition.ParameterMapImpl;
-import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.definition.DynamicOptionsProperty;
 import com.bytechef.hermes.definition.OptionsDataSource;
 import com.bytechef.hermes.definition.PropertiesDataSource;
@@ -55,20 +55,16 @@ import java.util.Map;
 public class ActionDefinitionServiceImpl implements ActionDefinitionService, RemoteActionDefinitionService {
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
-    private final ContextFactory contextFactory;
 
     @SuppressFBWarnings("EI2")
-    public ActionDefinitionServiceImpl(
-        ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory) {
-
+    public ActionDefinitionServiceImpl(ComponentDefinitionRegistry componentDefinitionRegistry) {
         this.componentDefinitionRegistry = componentDefinitionRegistry;
-        this.contextFactory = contextFactory;
     }
 
     @Override
     public List<? extends ValueProperty<?>> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, Connection connection) {
+        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
         ComponentPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
             componentName, componentVersion, actionName, propertyName);
@@ -76,8 +72,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService, Rem
         List<? extends com.bytechef.hermes.definition.Property.ValueProperty<?>> valueProperties =
             propertiesFunction.apply(
                 new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.getParameters()),
-                contextFactory.createActionContext(connection));
+                connection == null ? null : new ParameterMapImpl(connection.parameters()),
+                context);
 
         return valueProperties.stream()
             .map(valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty))
@@ -87,29 +83,28 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService, Rem
     @Override
     public String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters,
-        Connection connection) {
+        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
         EditorDescriptionFunction editorDescriptionFunction = getEditorDescriptionFunction(
             componentName, componentVersion, actionName);
 
         return editorDescriptionFunction.apply(
             new ParameterMapImpl(inputParameters),
-            connection == null ? null : new ParameterMapImpl(connection.getParameters()));
+            connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
     }
 
     @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, String searchText, Connection connection) {
+        @NonNull Map<String, ?> inputParameters, String searchText, ComponentConnection connection,
+        @NonNull ActionContext context) {
 
         ComponentOptionsFunction optionsFunction = getComponentOptionsFunction(
             componentName, componentVersion, actionName, propertyName);
 
         List<com.bytechef.hermes.definition.Option<?>> options = optionsFunction.apply(
             new ParameterMapImpl(inputParameters),
-            connection == null ? null : new ParameterMapImpl(connection.getParameters()),
-            searchText, contextFactory.createActionContext(connection));
+            connection == null ? null : new ParameterMapImpl(connection.parameters()), searchText, context);
 
         return options.stream()
             .map(Option::new)
@@ -119,8 +114,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService, Rem
     @Override
     public List<? extends ValueProperty<?>> executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters,
-        Connection connection) {
+        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
         OutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(
             componentName, componentVersion, actionName);
@@ -128,13 +122,13 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService, Rem
         return Property.toProperty(
             outputSchemaFunction.apply(
                 new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.getParameters())));
+                connection == null ? null : new ParameterMapImpl(connection.parameters()), context));
     }
 
     @Override
     public Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, long taskExecutionId,
-        @NonNull Map<String, ?> inputParameters, Connection connection) {
+        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
         com.bytechef.hermes.component.definition.ActionDefinition actionDefinition =
             resolveActionDefinition(componentName, componentVersion, actionName);
@@ -142,22 +136,21 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService, Rem
         return OptionalUtils.mapOrElse(
             actionDefinition.getPerform(), performFunction -> performFunction.apply(
                 new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.getParameters()),
-                contextFactory.createActionContext(connection, taskExecutionId)),
+                connection == null ? null : new ParameterMapImpl(connection.parameters()), context),
             null);
     }
 
     @Override
     public Object executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> actionParameters, Connection connection) {
+        @NonNull Map<String, ?> actionParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
         SampleOutputFunction sampleOutputFunction = getSampleOutputFunction(
             componentName, componentVersion, actionName);
 
         return sampleOutputFunction.apply(
             new ParameterMapImpl(actionParameters),
-            connection == null ? null : new ParameterMapImpl(connection.getParameters()));
+            connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
     }
 
     @Override
@@ -231,7 +224,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService, Rem
         return OptionalUtils.mapOrElse(
             actionDefinition.getEditorDescriptionDataSource(),
             EditorDescriptionDataSource::getEditorDescription,
-            (inputParameters, connectionParameters) -> OptionalUtils.orElse(componentDefinition.getTitle(),
+            (inputParameters, connectionParameters, context) -> OptionalUtils.orElse(componentDefinition.getTitle(),
                 componentDefinition.getName()) + ": " +
                 OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName()));
     }

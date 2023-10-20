@@ -105,7 +105,7 @@ public class OpenApiComponentTaskHandlerIntTest {
         @Override
         public ModifiableConnectionDefinition
             modifyConnection(ModifiableConnectionDefinition modifiableConnectionDefinition) {
-            modifiableConnectionDefinition.baseUri((connectionParameters) -> "http://localhost:9999");
+            modifiableConnectionDefinition.baseUri((connectionParameters, context) -> "http://localhost:9999");
 
             return modifiableConnectionDefinition;
         }

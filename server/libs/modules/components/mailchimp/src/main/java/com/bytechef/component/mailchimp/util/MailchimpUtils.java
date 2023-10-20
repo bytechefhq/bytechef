@@ -19,16 +19,12 @@ package com.bytechef.component.mailchimp.util;
 
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.definition.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,20 +40,12 @@ public class MailchimpUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(MailchimpUtils.class);
 
-    public static String getMailChimpServer(String accessToken) {
-        Map<?, ?> response;
-
-        try {
-            response = (Map<?, ?>) HttpClient.newHttpClient()
-                .send(
-                    HttpRequest.newBuilder()
-                        .uri(URI.create("https://login.mailchimp.com/oauth2/metadata"))
-                        .header(AUTHORIZATION, "OAuth " + accessToken)
-                        .build(),
-                    HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+    public static String getMailChimpServer(String accessToken, Context context) {
+        Map<?, ?> response = (Map<?, ?>) context.http(http -> http.get("https://login.mailchimp.com/oauth2/metadata")
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .header(AUTHORIZATION, "OAuth " + accessToken)
+            .execute()
+            .body());
 
         return (String) response.get("dc");
     }
@@ -67,7 +55,7 @@ public class MailchimpUtils {
         return (inputParameters, connectionParameters, searchText, context) -> {
             String accessToken = connectionParameters.getRequiredString(ACCESS_TOKEN);
 
-            String url = "https://%s.api.mailchimp.com/3.0/lists".formatted(getMailChimpServer(accessToken));
+            String url = "https://%s.api.mailchimp.com/3.0/lists".formatted(getMailChimpServer(accessToken, context));
 
             Map<String, ?> response = context
                 .http(http -> http.get(url))

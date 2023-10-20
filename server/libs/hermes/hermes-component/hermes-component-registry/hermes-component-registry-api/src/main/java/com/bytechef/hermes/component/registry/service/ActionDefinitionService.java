@@ -17,7 +17,8 @@
 
 package com.bytechef.hermes.component.registry.service;
 
-import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import org.springframework.lang.NonNull;
@@ -33,25 +34,31 @@ public interface ActionDefinitionService {
 
     List<? extends ValueProperty<?>> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, @Nullable Connection connection);
+        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
+        @NonNull ActionContext context);
 
     String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @Nullable Connection connection);
+        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
+        @NonNull ActionContext context);
 
     List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, ?> inputParameters, String searchText, @Nullable Connection connection);
+        @NonNull Map<String, ?> inputParameters, String searchText, @Nullable ComponentConnection connection,
+        @NonNull ActionContext context);
 
     List<? extends ValueProperty<?>> executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @Nullable Connection connection);
+        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
+        @NonNull ActionContext context);
 
     Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, long taskExecutionId,
-        @NonNull Map<String, ?> inputParameters, @Nullable Connection connection);
+        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
+        @NonNull ActionContext context);
 
     Object executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> actionParameters, @Nullable Connection connection);
+        @NonNull Map<String, ?> actionParameters, @Nullable ComponentConnection connection,
+        @NonNull ActionContext context);
 }

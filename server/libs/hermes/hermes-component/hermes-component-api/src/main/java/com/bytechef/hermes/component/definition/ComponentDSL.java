@@ -913,9 +913,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         @Override
         public ModifiableAuthorization getAuthorization(String authorizationName) {
-            if (authorizations == null) {
-                throw new IllegalStateException("Authorization %s does not exist".formatted(authorizationName));
-            }
+            Objects.requireNonNull(authorizations, "Authorization %s does not exist".formatted(authorizationName));
 
             return authorizations.stream()
                 .filter(authorization -> Objects.equals(authorization.getName(), authorizationName))
