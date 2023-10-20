@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.rsocket.client;
+package com.bytechef.atlas.rsocket.client.service;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.service.TaskExecutionService;
@@ -32,11 +32,11 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class TaskExecutionRSocketClient implements TaskExecutionService {
+public class TaskExecutionServiceRSocketClient implements TaskExecutionService {
 
     private final RSocketRequester rSocketRequester;
 
-    public TaskExecutionRSocketClient(RSocketRequester rSocketRequester) {
+    public TaskExecutionServiceRSocketClient(RSocketRequester rSocketRequester) {
         this.rSocketRequester = rSocketRequester;
     }
 
@@ -50,7 +50,7 @@ public class TaskExecutionRSocketClient implements TaskExecutionService {
     }
 
     @Override
-    public TaskExecution getTaskExecution(String id) {
+    public TaskExecution getTaskExecution(long id) {
         return rSocketRequester
             .route("getTaskExecution")
             .data(id)
@@ -59,7 +59,7 @@ public class TaskExecutionRSocketClient implements TaskExecutionService {
     }
 
     @Override
-    public List<TaskExecution> getJobTaskExecutions(String jobId) {
+    public List<TaskExecution> getJobTaskExecutions(long jobId) {
         return rSocketRequester
             .route("getJobTaskExecutions")
             .data(jobId)
@@ -68,7 +68,7 @@ public class TaskExecutionRSocketClient implements TaskExecutionService {
     }
 
     @Override
-    public List<TaskExecution> getParentTaskExecutions(String parentId) {
+    public List<TaskExecution> getParentTaskExecutions(long parentId) {
         return rSocketRequester
             .route("getParentTaskExecutions")
             .data(parentId)
@@ -87,7 +87,7 @@ public class TaskExecutionRSocketClient implements TaskExecutionService {
 
     @Override
     public void updateStatus(
-        String id, TaskStatus status, LocalDateTime startTime, LocalDateTime endTime) {
+        long id, TaskStatus status, LocalDateTime startTime, LocalDateTime endTime) {
         TaskExecution taskExecution = new TaskExecution();
 
         taskExecution.setEndTime(endTime);

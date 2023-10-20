@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.rsocket.client;
+package com.bytechef.atlas.rsocket.client.service;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
@@ -29,23 +29,19 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class WorkflowRSocketClient implements WorkflowService {
+public class WorkflowServiceRSocketClient implements WorkflowService {
 
     private final RSocketRequester rSocketRequester;
 
-    public WorkflowRSocketClient(RSocketRequester rSocketRequester) {
+    public WorkflowServiceRSocketClient(RSocketRequester rSocketRequester) {
         this.rSocketRequester = rSocketRequester;
     }
 
     @Override
     public Workflow create(String definition, Workflow.Format format, Workflow.SourceType sourceType) {
-        Workflow workflow = new Workflow();
-
-        workflow.setSourceType(sourceType);
-
         return rSocketRequester
             .route("createWorkflow")
-            .data(workflow)
+            .data(new Workflow(definition, format, sourceType))
             .retrieveMono(Workflow.class)
             .block();
     }
@@ -77,14 +73,9 @@ public class WorkflowRSocketClient implements WorkflowService {
 
     @Override
     public Workflow update(String id, String definition) {
-        Workflow workflow = new Workflow();
-
-        workflow.setDefinition(definition);
-        workflow.setId(id);
-
         return rSocketRequester
             .route("updateWorkflow")
-            .data(workflow)
+            .data(new Workflow(id, definition))
             .retrieveMono(Workflow.class)
             .block();
     }

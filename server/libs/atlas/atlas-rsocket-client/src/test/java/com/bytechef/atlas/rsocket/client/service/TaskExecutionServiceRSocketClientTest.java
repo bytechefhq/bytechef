@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.rsocket.client;
+package com.bytechef.atlas.rsocket.client.service;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class WorkflowRSocketClientTest {
+public class TaskExecutionServiceRSocketClientTest {
 
     @Disabled
     @Test
@@ -33,13 +33,13 @@ public class WorkflowRSocketClientTest {
 
     @Disabled
     @Test
-    void testGetWorkflow() {
+    void testGetTaskExecution() {
         // TODO
     }
 
     @Disabled
     @Test
-    void testGetWorkflows() {
+    void testGetParentTaskExecutions() {
         // TODO
     }
 

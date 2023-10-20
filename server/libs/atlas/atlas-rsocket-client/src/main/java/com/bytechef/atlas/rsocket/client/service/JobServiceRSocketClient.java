@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.rsocket.client;
+package com.bytechef.atlas.rsocket.client.service;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.service.JobService;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.messaging.rsocket.RSocketRequester;
@@ -31,11 +32,11 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class JobRSocketClient implements JobService {
+public class JobServiceRSocketClient implements JobService {
 
     private final RSocketRequester rSocketRequester;
 
-    public JobRSocketClient(RSocketRequester rSocketRequester) {
+    public JobServiceRSocketClient(RSocketRequester rSocketRequester) {
         this.rSocketRequester = rSocketRequester;
     }
 
@@ -49,7 +50,7 @@ public class JobRSocketClient implements JobService {
     }
 
     @Override
-    public Job getJob(String id) {
+    public Job getJob(long id) {
         return rSocketRequester.route("getJob")
             .data(id)
             .retrieveMono(Job.class)
@@ -82,7 +83,7 @@ public class JobRSocketClient implements JobService {
     }
 
     @Override
-    public Job getTaskExecutionJob(String taskExecutionId) {
+    public Job getTaskExecutionJob(long taskExecutionId) {
         return rSocketRequester
             .route("getTaskExecutionJob")
             .data(taskExecutionId)
@@ -91,7 +92,7 @@ public class JobRSocketClient implements JobService {
     }
 
     @Override
-    public Job resume(String jobId) {
+    public Job resume(long jobId) {
         return rSocketRequester
             .route("resumeJob")
             .data(jobId)
@@ -100,7 +101,7 @@ public class JobRSocketClient implements JobService {
     }
 
     @Override
-    public Job start(String jobId) {
+    public Job start(long jobId) {
         return rSocketRequester
             .route("startJob")
             .data(jobId)
@@ -109,7 +110,7 @@ public class JobRSocketClient implements JobService {
     }
 
     @Override
-    public Job stop(String jobId) {
+    public Job stop(long jobId) {
         return rSocketRequester
             .route("stopJob")
             .data(jobId)
