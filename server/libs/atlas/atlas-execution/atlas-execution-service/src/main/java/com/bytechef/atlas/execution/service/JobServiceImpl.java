@@ -123,7 +123,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Page<Job> searchJobs(
+    public Page<Job> getJobs(
         String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
         Integer pageNumber) {
 

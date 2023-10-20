@@ -191,7 +191,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             projectIds = projectInstanceService.getProjectIds();
         }
 
-        List<Project> projects = projectService.searchProjects(categoryIds, projectIds, tagIds);
+        List<Project> projects = projectService.getProjects(categoryIds, projectIds, tagIds);
 
         return CollectionUtils.map(
             projects,

@@ -98,7 +98,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             projectWorkflowIds = project.getWorkflowIds();
         }
 
-        Page<Job> jobsPage = jobService.searchJobs(
+        Page<Job> jobsPage = jobService.getJobs(
             jobStatus, jobStartDate, jobEndDate, workflowId, projectWorkflowIds, pageNumber);
 
         List<Workflow> workflows = workflowService.getWorkflows(
