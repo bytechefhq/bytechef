@@ -97,7 +97,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
 
-        contextService.push(taskExecution.getId(), Context.Classname.TASK_EXECUTION, new Context());
+        contextService.push(taskExecution.getId(), Context.Classname.TASK_EXECUTION, Collections.emptyMap());
 
         MapTaskDispatcher dispatcher = MapTaskDispatcher.builder()
             .contextService(contextService)
