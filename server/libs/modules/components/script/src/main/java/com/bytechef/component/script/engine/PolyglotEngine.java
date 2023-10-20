@@ -48,7 +48,8 @@ public class PolyglotEngine {
                 .getMember("perform")
                 .as(new TypeLiteral<>() {});
 
-            return performFunction.apply(ProxyObject.fromMap((Map<String, Object>) MapValueUtils.getMap(inputParameters, INPUT)));
+            return performFunction
+                .apply(ProxyObject.fromMap((Map<String, Object>) MapValueUtils.getMap(inputParameters, INPUT)));
         }
     }
 }

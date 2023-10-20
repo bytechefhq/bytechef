@@ -20,6 +20,7 @@ package com.bytechef.component.csvfile.action;
 import com.bytechef.component.csvfile.CsvFileComponentHandler;
 import com.bytechef.component.csvfile.constant.CsvFileConstants;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.MapValueUtils;
@@ -115,7 +116,7 @@ public class CsvFileReadAction {
 
         try (
             InputStream inputStream = context.getFileStream(
-                MapValueUtils.getRequiredFileEntry(inputParameters, FILE_ENTRY))) {
+                MapValueUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class))) {
             Integer rangeStartRow = null;
             Integer rangeEndRow = null;
 

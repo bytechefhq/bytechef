@@ -75,7 +75,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     @Override
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        Map<String, Object> iteratee = MapValueUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
+        Map<String, ?> iteratee = MapValueUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
         List<Object> list = MapValueUtils.getRequiredList(taskExecution.getParameters(), LIST, Object.class);
 
         taskExecution.setStartDate(LocalDateTime.now());

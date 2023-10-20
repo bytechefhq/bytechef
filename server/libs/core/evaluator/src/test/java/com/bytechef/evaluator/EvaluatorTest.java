@@ -171,7 +171,7 @@ public class EvaluatorTest {
         Map<String, Object> map = Evaluator.evaluate(
             Map.of("type", "type", "sub", Collections.singletonMap("list", "${range(1,3)}")), Collections.emptyMap());
 
-        Map<String, Object> sub = MapValueUtils.getMap(map, "sub");
+        Map<String, ?> sub = MapValueUtils.getMap(map, "sub");
 
         Assertions.assertEquals(Arrays.asList(1, 2, 3), sub.get("list"));
     }

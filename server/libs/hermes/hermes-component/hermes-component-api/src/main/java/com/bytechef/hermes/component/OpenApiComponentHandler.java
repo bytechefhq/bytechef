@@ -34,10 +34,18 @@ import java.util.List;
  */
 public interface OpenApiComponentHandler extends ComponentDefinitionFactory {
 
+    /**
+     *
+     */
     enum PropertyType {
         BODY, PATH, HEADER, QUERY
     }
 
+    /**
+     *
+     * @param actionDefinitions
+     * @return
+     */
     default List<ActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
         return Arrays.stream(actionDefinitions)
             .map(this::modifyAction)
@@ -53,26 +61,56 @@ public interface OpenApiComponentHandler extends ComponentDefinitionFactory {
             .toList();
     }
 
+    /**
+     *
+     * @param actionDefinition
+     * @return
+     */
     default ModifiableActionDefinition modifyAction(ModifiableActionDefinition actionDefinition) {
         return actionDefinition;
     }
 
+    /**
+     *
+     * @param modifiableComponentDefinition
+     * @return
+     */
     default ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition;
     }
 
+    /**
+     *
+     * @param connectionDefinition
+     * @return
+     */
     default ModifiableConnectionDefinition modifyConnection(ModifiableConnectionDefinition connectionDefinition) {
         return connectionDefinition;
     }
 
+    /**
+     *
+     * @param property
+     * @return
+     */
     default Property<?> modifyProperty(Property<?> property) {
         return property;
     }
 
+    /**
+     *
+     * @return
+     */
     default List<TriggerDefinition> getTriggers() {
         return List.of();
     }
 
+    /**
+     *
+     * @param actionDefinition
+     * @param result
+     * @return
+     */
     default Object postExecute(ActionDefinition actionDefinition, Object result) {
         return result;
     }

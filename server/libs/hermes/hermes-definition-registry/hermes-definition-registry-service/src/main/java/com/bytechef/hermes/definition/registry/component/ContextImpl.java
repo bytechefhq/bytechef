@@ -17,21 +17,17 @@
 
 package com.bytechef.hermes.definition.registry.component;
 
+import com.bytechef.commons.typeconverter.TypeConverter;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.event.TaskProgressedWorkflowEvent;
-import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
-import com.bytechef.hermes.definition.registry.component.definition.WebhookBodyImpl;
-import com.bytechef.hermes.definition.registry.component.definition.WebhookHeadersImpl;
-import com.bytechef.hermes.definition.registry.component.definition.WebhookParametersImpl;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.core.convert.converter.Converter;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -43,13 +39,6 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 public class ContextImpl implements ActionContext, TriggerContext {
-
-    static {
-        MapValueUtils.addConverter(new ContextFileEntryConverter());
-        MapValueUtils.addConverter(new WebhookBodyImpl.WebhookBodyConverter());
-        MapValueUtils.addConverter(new WebhookHeadersImpl.WebhookHeadersConverter());
-        MapValueUtils.addConverter(new WebhookParametersImpl.WebhookParametersConverter());
-    }
 
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
@@ -169,10 +158,18 @@ public class ContextImpl implements ActionContext, TriggerContext {
             connection.getConnectionVersion(), connection.getParameters());
     }
 
-    private static class ContextFileEntryConverter implements Converter<Map<?, ?>, FileEntry> {
+    public static class ContextFileEntryConverter implements TypeConverter.Conversion<FileEntry> {
 
-        @Override
-        public FileEntry convert(Map<?, ?> source) {
+        public Object[] getTypeKeys() {
+            return new Object[] {
+                FileEntry.class
+            };
+        }
+
+        @SuppressWarnings("unchecked")
+        public FileEntry convert(Object value) {
+            Map<String, ?> source = (Map<String, ?>) value;
+
             return new ContextFileEntry(
                 (String) source.get("extension"),
                 (String) source.get("mimeType"),
@@ -181,14 +178,14 @@ public class ContextImpl implements ActionContext, TriggerContext {
         }
     }
 
-    public static class ContextFileEntry implements FileEntry {
+    private static class ContextFileEntry implements FileEntry {
 
         private final String extension;
         private final String mimeType;
         private final String name;
         private final String url;
 
-        public ContextFileEntry(String extension, String mimeType, String name, String url) {
+        private ContextFileEntry(String extension, String mimeType, String name, String url) {
             this.extension = extension;
             this.mimeType = mimeType;
             this.name = name;

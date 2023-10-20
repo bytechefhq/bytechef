@@ -87,9 +87,8 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         TaskExecution loopTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
         boolean loopForever = MapValueUtils.getBoolean(loopTaskExecution.getParameters(), LOOP_FOREVER, false);
-        Map<String, Object> iteratee = MapValueUtils.getRequiredMap(loopTaskExecution.getParameters(), ITERATEE);
-        List<Object> list = MapValueUtils.getList(
-            loopTaskExecution.getParameters(), LIST, Object.class, Collections.emptyList());
+        Map<String, ?> iteratee = MapValueUtils.getRequiredMap(loopTaskExecution.getParameters(), ITERATEE);
+        List<?> list = MapValueUtils.getList(loopTaskExecution.getParameters(), LIST, Collections.emptyList());
 
         if (loopForever || taskExecution.getTaskNumber() < list.size()) {
             TaskExecution subTaskExecution = TaskExecution.builder()

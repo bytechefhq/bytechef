@@ -20,6 +20,7 @@
 package com.bytechef.atlas.task;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
+import com.bytechef.commons.typeconverter.TypeConverter;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapValueUtils;
 import java.util.Collections;
@@ -29,8 +30,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
 
 /**
@@ -40,17 +39,13 @@ import org.springframework.util.Assert;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class WorkflowTask implements Task {
 
-    static {
-        MapValueUtils.addConverter(new WorkflowTaskConverter());
-    }
-
     private List<WorkflowTask> finalize = Collections.emptyList();
     private String label;
     private final Map<String, Object> extensions = new HashMap<>();
-    private Map<String, Object> metadata = new HashMap<>();
+    private Map<String, ?> metadata = new HashMap<>();
     private String name;
     private String node;
-    private Map<String, Object> parameters = Collections.emptyMap();
+    private Map<String, ?> parameters = Collections.emptyMap();
     private List<WorkflowTask> post = Collections.emptyList();
     private List<WorkflowTask> pre = Collections.emptyList();
     private String timeout;
@@ -62,7 +57,7 @@ public class WorkflowTask implements Task {
     private WorkflowTask(Map<String, ?> source) {
         for (Map.Entry<String, ?> entry : source.entrySet()) {
             if (WorkflowConstants.FINALIZE.equals(entry.getKey())) {
-                this.finalize =  MapValueUtils.getList(
+                this.finalize = MapValueUtils.getList(
                     source, WorkflowConstants.FINALIZE, WorkflowTask.class, Collections.emptyList());
             } else if (WorkflowConstants.LABEL.equals(entry.getKey())) {
                 this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
@@ -266,12 +261,17 @@ public class WorkflowTask implements Task {
             + parameters + '\'' + '}';
     }
 
-    private static class WorkflowTaskConverter implements Converter<Map, WorkflowTask> {
+    public static class WorkflowTaskConverter implements TypeConverter.Conversion<WorkflowTask> {
 
-        @Override
+        public Object[] getTypeKeys() {
+            return new Object[] {
+                WorkflowTask.class
+            };
+        }
+
         @SuppressWarnings("unchecked")
-        public WorkflowTask convert(Map source) {
-            return new WorkflowTask(source);
+        public WorkflowTask convert(Object value) {
+            return new WorkflowTask((Map<String, ?>) value);
         }
     }
 }

@@ -17,9 +17,9 @@
 
 package com.bytechef.hermes.definition.registry.component.definition;
 
+import com.bytechef.commons.typeconverter.TypeConverter;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
-import org.springframework.core.convert.converter.Converter;
 
 import java.util.Map;
 
@@ -62,10 +62,19 @@ public class WebhookBodyImpl implements WebhookBody {
             '}';
     }
 
-    public static class WebhookBodyConverter implements Converter<Map<String, Object>, WebhookBody> {
+    public static class WebhookBodyConverter implements TypeConverter.Conversion<WebhookBody> {
+
+        public Object[] getTypeKeys() {
+            return new Object[] {
+                WebhookBody.class
+            };
+        }
 
         @Override
-        public WebhookBody convert(Map<String, Object> source) {
+        @SuppressWarnings("unchecked")
+        public WebhookBody convert(Object value) {
+            Map<String, ?> source = (Map<String, ?>) value;
+
             return new WebhookBodyImpl(
                 MapValueUtils.get(source, "content"), MapValueUtils.get(source, "content", ContentType.class),
                 MapValueUtils.getString(source, "contentType"));

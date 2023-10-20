@@ -64,7 +64,7 @@ public class FilesystemWriteFileAction {
         String fileName = MapValueUtils.getRequiredString(inputParameters, FILENAME);
 
         try (InputStream inputStream = context.getFileStream(
-            MapValueUtils.getRequiredFileEntry(inputParameters, FILE_ENTRY))) {
+            MapValueUtils.getRequired(inputParameters, FILE_ENTRY, Context.FileEntry.class))) {
 
             return Map.of("bytes", Files.copy(inputStream, Path.of(fileName), StandardCopyOption.REPLACE_EXISTING));
         } catch (IOException ioException) {

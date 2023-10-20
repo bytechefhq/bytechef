@@ -79,7 +79,7 @@ public class XlsxFileWriteAction {
 
     protected static FileEntry executeWrite(Context context, Map<String, ?> inputParameters) {
         String fileName = MapValueUtils.getString(inputParameters, FILENAME, getaDefaultFileName());
-        List<Map<String, ?>> rows = (List)MapValueUtils.getList(inputParameters, ROWS, List.of());
+        List<Map<String, ?>> rows = (List) MapValueUtils.getList(inputParameters, ROWS, List.of());
         String sheetName = MapValueUtils.getString(inputParameters, SHEET_NAME, "Sheet");
 
         try {

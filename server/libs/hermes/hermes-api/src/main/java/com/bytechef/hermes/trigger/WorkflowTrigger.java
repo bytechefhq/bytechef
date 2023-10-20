@@ -19,11 +19,10 @@ package com.bytechef.hermes.trigger;
 
 import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.commons.typeconverter.TypeConverter;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.util.ComponentUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
@@ -45,7 +44,7 @@ public class WorkflowTrigger implements Serializable, Trigger {
     private final Map<String, Object> extensions = new HashMap<>();
     private String name;
     private String label;
-    private Map<String, Object> parameters;
+    private Map<String, ?> parameters;
     private String timeout;
     private String type;
     private String triggerName;
@@ -53,8 +52,8 @@ public class WorkflowTrigger implements Serializable, Trigger {
     private WorkflowTrigger() {
     }
 
-    private WorkflowTrigger(Map<String, Object> source) {
-        for (Map.Entry<String, Object> entry : source.entrySet()) {
+    private WorkflowTrigger(Map<String, ?> source) {
+        for (Map.Entry<String, ?> entry : source.entrySet()) {
             if (WorkflowConstants.LABEL.equals(entry.getKey())) {
                 this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
             } else if (WorkflowConstants.NAME.equals(entry.getKey())) {
@@ -84,9 +83,8 @@ public class WorkflowTrigger implements Serializable, Trigger {
     }
 
     public static List<WorkflowTrigger> of(Workflow workflow) {
-        return workflow.getExtensions("triggers", new ParameterizedTypeReference<Map<String, Object>>() {}, List.of())
+        return workflow.getExtensions("triggers", WorkflowTrigger.class, List.of())
             .stream()
-            .map(WorkflowTrigger::new)
             .toList();
     }
 
@@ -184,5 +182,19 @@ public class WorkflowTrigger implements Serializable, Trigger {
             + timeout + '\'' + ", type='"
             + type + '\'' + ", parameters='"
             + parameters + '\'' + '}';
+    }
+
+    public static class WorkflowTriggerConverter implements TypeConverter.Conversion<WorkflowTrigger> {
+
+        public Object[] getTypeKeys() {
+            return new Object[] {
+                WorkflowTrigger.class
+            };
+        }
+
+        @SuppressWarnings("unchecked")
+        public WorkflowTrigger convert(Object value) {
+            return new WorkflowTrigger((Map<String, ?>) value);
+        }
     }
 }

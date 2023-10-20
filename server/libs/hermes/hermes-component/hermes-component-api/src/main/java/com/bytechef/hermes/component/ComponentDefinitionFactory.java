@@ -26,5 +26,9 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
  */
 public interface ComponentDefinitionFactory {
 
+    /**
+     *
+     * @return
+     */
     ComponentDefinition getDefinition();
 }

@@ -28,6 +28,9 @@ import java.util.Optional;
  */
 public interface Context {
 
+    /**
+     *
+     */
     enum DataStorageScope {
         ACCOUNT(4, "Account"),
         CURRENT_EXECUTION(1, "Current Execution"),
@@ -61,43 +64,130 @@ public interface Context {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     Optional<Connection> fetchConnection();
 
+    /**
+     *
+     * @param scope
+     * @param scopeId
+     * @param key
+     * @return
+     * @param <T>
+     */
     <T> Optional<T> fetchValue(DataStorageScope scope, long scopeId, String key);
 
+    /**
+     *
+     * @return
+     */
     Connection getConnection();
 
+    /**
+     *
+     * @param fileEntry
+     * @return
+     */
     InputStream getFileStream(FileEntry fileEntry);
 
+    /**
+     *
+     * @param progress
+     */
     void publishActionProgressEvent(int progress);
 
+    /**
+     *
+     * @param fileEntry
+     * @return
+     */
     String readFileToString(FileEntry fileEntry);
 
+    /**
+     *
+     * @param scope
+     * @param scopeId
+     * @param key
+     * @param value
+     */
     void saveValue(DataStorageScope scope, long scopeId, String key, Object value);
 
+    /**
+     *
+     * @param fileName
+     * @param data
+     * @return
+     */
     FileEntry storeFileContent(String fileName, String data);
 
+    /**
+     *
+     * @param fileName
+     * @param inputStream
+     * @return
+     */
     FileEntry storeFileContent(String fileName, InputStream inputStream);
 
+    /**
+     *
+     */
     interface Connection {
 
+        /**
+         *
+         * @param authorizationContext
+         */
         void applyAuthorization(Authorization.AuthorizationContext authorizationContext);
 
+        /**
+         *
+         * @return
+         */
         Optional<String> fetchBaseUri();
 
+        /**
+         *
+         * @return
+         */
         String getBaseUri();
 
+        /**
+         *
+         * @return
+         */
         Map<String, Object> getParameters();
     }
 
+    /**
+     *
+     */
     interface FileEntry {
 
+        /**
+         *
+         * @return
+         */
         String getExtension();
 
+        /**
+         *
+         * @return
+         */
         String getMimeType();
 
+        /**
+         *
+         * @return
+         */
         String getName();
 
+        /**
+         *
+         * @return
+         */
         String getUrl();
     }
 }

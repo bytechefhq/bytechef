@@ -83,7 +83,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
     @Override
     public Object handle(TriggerExecution triggerExecution) throws TriggerExecutionException {
         TriggerContext context = contextFactory.createTriggerContext(
-            MapValueUtils.getMap(triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS));
+            MapValueUtils.getMap(triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class));
 
         return ComponentContextSupplier.get(
             context, componentDefinitionFactory.getDefinition(), () -> doHandle(triggerExecution, context));

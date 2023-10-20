@@ -51,7 +51,8 @@ public class DefaultComponentActionTaskHandler implements TaskHandler<Object> {
     @Override
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
         ActionContext context = contextFactory.createActionContext(
-            MapValueUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS), taskExecution.getId());
+            MapValueUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class),
+            taskExecution.getId());
 
         return ComponentContextSupplier.get(
             context, componentHandler.getDefinition(),

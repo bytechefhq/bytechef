@@ -19,6 +19,7 @@ package com.bytechef.component.xlsxfile.action;
 
 import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.MapValueUtils;
@@ -109,7 +110,7 @@ public class XlsxFileReadAction {
         .execute(XlsxFileReadAction::executeRead);
 
     protected static List<Map<String, ?>> executeRead(Context context, Map<String, ?> inputParameters) {
-        Context.FileEntry fileEntry = MapValueUtils.getRequiredFileEntry(inputParameters, FILE_ENTRY);
+        FileEntry fileEntry = MapValueUtils.getRequired(inputParameters, FILE_ENTRY, FileEntry.class);
         boolean headerRow = MapValueUtils.getBoolean(inputParameters, HEADER_ROW, true);
         boolean includeEmptyCells = MapValueUtils.getBoolean(inputParameters, INCLUDE_EMPTY_CELLS, false);
         Integer pageSize = MapValueUtils.getInteger(inputParameters, PAGE_SIZE);
