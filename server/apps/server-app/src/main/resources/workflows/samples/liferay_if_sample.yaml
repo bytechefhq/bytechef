@@ -17,10 +17,6 @@ inputs:
     label: Full path of file in local file system that contains data bytes for API endpoint 1 - custom object endpoint
     type: string
     required: true
-  - name: apiEndpointUrl2
-    label: API Endpoint URL 2
-    type: string
-    required: true
   - name: objectEntriesSourceFileUrl
     label: Full path of file in local file system that contains data bytes for API endpoint 2 - batch engine endpoint
     type: string
@@ -46,9 +42,6 @@ tasks:
     headerParameters:
       - key: Authorization
         value: Basic ${apiToken}
-    bodyContentType: JSON
-    sendFile: true
-    fileEntry: ${jsonFileEntry1}
 
   - type: logger/v1/info
     name: loggLiferayObjectApiGet
@@ -63,51 +56,46 @@ tasks:
           value2: "200"
     combineOperation: ANY
     caseTrue:
-      - name: equalsResult
-        type: var
-        value: "true branch"
+      - type: filesystem/v1/readFile
+        name: jsonFileEntry1
+        description: Read file at `filename` location on local file system and create `jsonFileEntry1` object in memory
+        filename: ${objectDefinitionSourceFileUrl}
+
+      - type: jsonFile/v1/read
+        name: jsonObject1
+        description: Create Json object `jsonObject1` by reading bytes of fileEntry `jsonFileEntry1`
+        fileEntry: ${jsonFileEntry1}
+        isArray: false
+
+      - type: logger/v1/info
+        name: loggJsonObject1
+        description: Print created Json object `jsonObject1` in log with INFO log level
+        text: Payload in the file ${jsonObject1}
+
+      - type: httpClient/v1/post
+        name: liferayApiPost1
+        description: >
+          Post content of `jsonFileEntry1` to Liferay `batchEngineEndpointUrl`. `sendFile` is
+          set to `true` to tell processor to seek content bytes in fileEntry `jsonFileEntry1`
+          and bodyContentType `JSON` creates request's `ContentType` header value application/json
+        label: Post content to Liferay Batch Engine REST endpoint
+        uri: ${batchEngineEndpointUrl}
+        responseFormat: JSON
+        headerParameters:
+          - key: Authorization
+            value: Basic ${apiToken}
+        bodyContentType: JSON
+        sendFile: true
+        fileEntry: ${jsonFileEntry1}
+
+      - type: logger/v1/info
+        name: loggEndpointResponse1
+        description: Print received response content in log with INFO log level
+        text: Result ${liferayApiPost1}
     caseFalse:
-      - name: equalsResult
-        type: var
-        value: "false branch"
-
-  - type: filesystem/v1/readFile
-    name: jsonFileEntry1
-    description: Read file at `filename` location on local file system and create `jsonFileEntry1` object in memory
-    filename: ${objectDefinitionSourceFileUrl}
-
-  - type: jsonFile/v1/read
-    name: jsonObject1
-    description: Create Json object `jsonObject1` by reading bytes of fileEntry `jsonFileEntry1`
-    fileEntry: ${jsonFileEntry1}
-    isArray: false
-
-  - type: logger/v1/info
-    name: loggJsonObject1
-    description: Print created Json object `jsonObject1` in log with INFO log level
-    text: Payload in the file ${jsonObject1}
-
-  - type: httpClient/v1/post
-    name: liferayApiPost1
-    description: >
-      Post content of `jsonFileEntry1` to Liferay `batchEngineEndpointUrl`. `sendFile` is
-      set to `true` to tell processor to seek content bytes in fileEntry `jsonFileEntry1`
-      and bodyContentType `JSON` creates request's `ContentType` header value application/json
-    label: Post content to Liferay Batch Engine REST endpoint
-    uri: ${batchEngineEndpointUrl}
-    responseFormat: JSON
-    headerParameters:
-      -
-        key: Authorization
-        value: Basic ${apiToken}
-    bodyContentType: JSON
-    sendFile: true
-    fileEntry: ${jsonFileEntry1}
-
-  - type: logger/v1/info
-    name: loggEndpointResponse1
-    description: Print received response content in log with INFO log level
-    text: Result ${liferayApiPost1}
+      - type: logger/v1/info
+        name: loggDefinitionExistis
+        text: "Custom Object Definition Exists"
 
   - type: filesystem/v1/readFile
     name: jsonFileEntry2
