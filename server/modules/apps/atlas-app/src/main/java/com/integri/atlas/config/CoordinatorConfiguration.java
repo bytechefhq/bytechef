@@ -40,7 +40,7 @@ import com.integri.atlas.engine.coordinator.task.ControlTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.EachTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.ForkTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.ParallelTaskDispatcher;
-import com.integri.atlas.engine.coordinator.task.SubflowJobStatusEventListener;
+import com.integri.atlas.engine.coordinator.event.SubflowJobStatusEventListener;
 import com.integri.atlas.engine.coordinator.task.SubflowTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.SwitchTaskDispatcher;
 import com.integri.atlas.engine.coordinator.task.TaskDispatcherChain;
