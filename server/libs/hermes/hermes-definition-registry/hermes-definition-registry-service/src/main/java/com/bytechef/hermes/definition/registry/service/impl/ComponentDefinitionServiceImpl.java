@@ -53,17 +53,17 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
-    public Mono<List<ComponentDefinition>> getComponentDefinitions(String name) {
+    public Mono<List<ComponentDefinition>> getComponentDefinitions() {
         return Mono.just(componentDefinitionFactories.stream()
             .map(ComponentDefinitionFactory::getDefinition)
-            .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), name))
             .collect(Collectors.toList()));
     }
 
     @Override
-    public Mono<List<ComponentDefinition>> getComponentDefinitions() {
+    public Mono<List<ComponentDefinition>> getComponentDefinitions(String name) {
         return Mono.just(componentDefinitionFactories.stream()
             .map(ComponentDefinitionFactory::getDefinition)
+            .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), name))
             .collect(Collectors.toList()));
     }
 

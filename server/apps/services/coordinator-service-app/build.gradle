@@ -14,7 +14,6 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-rsocket"
     implementation "org.springframework.boot:spring-boot-starter-webflux"
     implementation "org.springframework.kafka:spring-kafka"
-    implementation libs.springdoc.openapi.starter.webflux.ui
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
     implementation project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-config")
     implementation project(":server:libs:atlas:atlas-event:atlas-event-impl")
