@@ -40,7 +40,9 @@ public class ConnectionRSocketController {
 
     @MessageMapping("createConnection")
     public Mono<Connection> createConnection(Connection connection) {
-        return Mono.create(sink -> sink.success(connectionService.add(connection)));
+        return Mono
+            .create(sink -> sink.success(connectionService.create(connection.getName(), connection.getComponentName(),
+                connection.getComponentVersion(), connection.getAuthorizationName(), connection.getParameters())));
     }
 
     @MessageMapping("getConnection")
