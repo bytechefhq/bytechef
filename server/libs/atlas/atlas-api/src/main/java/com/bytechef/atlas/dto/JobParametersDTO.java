@@ -34,7 +34,6 @@ public class JobParametersDTO {
 
     private Map<String, Object> inputs = Collections.emptyMap();
     private String label;
-    private Map<String, Object> outputs = Collections.emptyMap();
     private Long parentTaskExecutionId;
     private int priority = Prioritizable.DEFAULT_PRIORITY;
     private String workflowId;
@@ -61,18 +60,15 @@ public class JobParametersDTO {
     }
 
     @Default
-    public JobParametersDTO(Map<String, Object> inputs, String label, Map<String, Object> outputs,
-        Long parentTaskExecutionId, Integer priority, String workflowId, List<Map<String, Object>> webhooks) {
+    public JobParametersDTO(
+        Map<String, Object> inputs, String label, Long parentTaskExecutionId, Integer priority, String workflowId,
+        List<Map<String, Object>> webhooks) {
 
         if (inputs != null) {
             this.inputs = new HashMap<>(inputs);
         }
 
         this.label = label;
-
-        if (outputs != null) {
-            this.outputs = new HashMap<>(outputs);
-        }
 
         this.parentTaskExecutionId = parentTaskExecutionId;
 
@@ -93,10 +89,6 @@ public class JobParametersDTO {
 
     public String getLabel() {
         return label;
-    }
-
-    public Map<String, Object> getOutputs() {
-        return new HashMap<>(outputs);
     }
 
     public Long getParentTaskExecutionId() {
@@ -128,7 +120,6 @@ public class JobParametersDTO {
 
         return Objects.equals(this.inputs, workflowParameters.inputs)
             && Objects.equals(this.label, workflowParameters.label)
-            && Objects.equals(this.outputs, workflowParameters.outputs)
             && Objects.equals(this.parentTaskExecutionId, workflowParameters.parentTaskExecutionId)
             && Objects.equals(this.priority, workflowParameters.priority)
             && Objects.equals(this.workflowId, workflowParameters.workflowId)
@@ -137,7 +128,7 @@ public class JobParametersDTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(inputs, label, outputs, parentTaskExecutionId, priority, workflowId, webhooks);
+        return Objects.hash(inputs, label, parentTaskExecutionId, priority, workflowId, webhooks);
     }
 
     @Override
@@ -145,7 +136,6 @@ public class JobParametersDTO {
         return "JobParameters{" +
             "inputs=" + inputs +
             ", label='" + label + '\'' +
-            ", outputs=" + outputs +
             ", parentTaskExecutionId='" + parentTaskExecutionId + '\'' +
             ", priority=" + priority +
             ", workflowId='" + workflowId + '\'' +
