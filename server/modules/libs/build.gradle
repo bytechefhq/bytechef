@@ -1,0 +1,59 @@
+plugins {
+    id "org.springframework.boot" version "${springBootVersion}" apply false
+}
+
+subprojects {
+    apply plugin: "com.integri.java-library-conventions"
+    apply plugin: "io.spring.dependency-management"
+
+    dependencyManagement {
+        imports {
+            mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+        exclude "**/*IntTest*"
+        testLogging {
+            events "FAILED", "SKIPPED"
+        }
+        jvmArgs += "-Djava.security.egd=file:/dev/./urandom -Xmx256m"
+        // uncomment if the tests reports are not generated
+        // ignoreFailures true
+        reports.html.enabled = false
+    }
+
+    task integrationTest(type: Test) {
+        useJUnitPlatform()
+        description = "Execute integration tests."
+        group = "verification"
+        include "**/*IntTest*"
+        testLogging {
+            events "FAILED", "SKIPPED"
+        }
+        jvmArgs += "-Djava.security.egd=file:/dev/./urandom -Xmx256m"
+        if (project.hasProperty("testcontainers")) {
+            environment "spring.profiles.active", "testcontainers"
+        }
+
+        // uncomment if the tests reports are not generated
+        // ignoreFailures true
+        reports.html.enabled = false
+    }
+
+    check.dependsOn integrationTest
+
+    task testReport(type: TestReport) {
+        destinationDir = file("$buildDir/reports/tests")
+        reportOn test
+    }
+
+    task integrationTestReport(type: TestReport) {
+        destinationDir = file("$buildDir/reports/tests")
+        reportOn integrationTest
+    }
+
+    dependencies {
+    }
+}

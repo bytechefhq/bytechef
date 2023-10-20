@@ -1,0 +1,50 @@
+plugins {
+    id "com.diffplug.spotless"
+    id "com.integri.java-common-conventions"
+}
+
+subprojects {
+    apply plugin: "com.diffplug.spotless"
+
+    eclipse {
+        sourceSets {
+            main {
+                java {
+                    srcDirs += ["build/generated/sources/annotationProcessor/java/main"]
+                }
+            }
+        }
+    }
+
+    idea {
+        module {
+            excludeDirs += files("node_modules")
+        }
+    }
+
+    spotless {
+        format "misc", {
+            // define the files to apply `misc` to
+            target "*.gradle", "src/*/java/**/*.java", "*.md", ".gitignore"
+
+            trimTrailingWhitespace()
+            indentWithSpaces(4)
+            endWithNewline()
+        }
+        java {
+            target "src/*/java/**/*.java"
+
+            importOrder()
+            licenseHeader '/* (C)$YEAR */'
+            prettier(["prettier": "2.4.0", "prettier-plugin-java": "1.4.0"]).config(["parser": "java", "printWidth": 120, "tabWidth": 4, "useTabs": false])
+        }
+    }
+
+    task cleanResources(type: Delete) {
+        delete "build/resources"
+    }
+}
+
+wrapper {
+    gradleVersion = "7.2.0"
+}
