@@ -17,7 +17,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.repository.git.workflow;
+package com.bytechef.atlas.repository.git.operations;
 
 import com.bytechef.atlas.workflow.mapper.WorkflowResource;
 import java.util.List;
@@ -26,6 +26,7 @@ import java.util.List;
  * @author Arik Cohen
  */
 public interface GitWorkflowOperations {
+
     List<WorkflowResource> getHeadFiles();
 
     WorkflowResource getFile(String fileId);
