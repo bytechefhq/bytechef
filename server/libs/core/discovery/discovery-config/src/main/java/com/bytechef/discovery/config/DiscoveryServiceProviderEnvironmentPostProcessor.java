@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.autoconfigure.consul;
+package com.bytechef.discovery.config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,19 +27,24 @@ import org.springframework.core.env.MapPropertySource;
 /**
  * @author Ivica Cardic
  */
-public class ConsulEnvironmentPostProcessor implements EnvironmentPostProcessor {
+public class DiscoveryServiceProviderEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (Objects.equals(environment.getProperty("discovery-client.provider", String.class, "property"), "consul")) {
+        String discoveryServiceProvider = environment.getProperty("bytechef.discovery-service.provider", String.class);
+
+        source.put("spring.cloud.consul.enabled", false);
+        source.put("spring.cloud.redis.enabled", false);
+
+        if (Objects.equals(discoveryServiceProvider, "consul")) {
             source.put("spring.cloud.consul.enabled", true);
         } else {
-            source.put("spring.cloud.consul.enabled", false);
+            source.put("spring.cloud.redis.enabled", true);
         }
 
-        MapPropertySource mapPropertySource = new MapPropertySource("Custom Spring Cloud Consul Config", source);
+        MapPropertySource mapPropertySource = new MapPropertySource("Custom Spring Cloud Config", source);
 
         environment.getPropertySources().addFirst(mapPropertySource);
     }
