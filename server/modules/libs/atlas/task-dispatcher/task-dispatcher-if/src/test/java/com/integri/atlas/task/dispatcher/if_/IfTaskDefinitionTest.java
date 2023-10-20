@@ -81,7 +81,7 @@ public class IfTaskDefinitionTest {
                                 "displayName":"Boolean",
                                 "name":"boolean",
                                 "type":"GROUP",
-                                "groupProperties":[
+                                "fields":[
                                     {
                                         "defaultValue":false,
                                         "description":"The boolean value to compare with the second one.",
@@ -119,7 +119,7 @@ public class IfTaskDefinitionTest {
                                 "displayName":"Date & Time",
                                 "name":"dateTime",
                                 "type":"GROUP",
-                                "groupProperties":[
+                                "fields":[
                                     {
                                         "defaultValue":"",
                                         "description":"The date & time value to compare with the second one.",
@@ -156,7 +156,7 @@ public class IfTaskDefinitionTest {
                                 "displayName":"Number",
                                 "name":"number",
                                 "type":"GROUP",
-                                "groupProperties":[
+                                "fields":[
                                     {
                                         "defaultValue":0,
                                         "description":"The number value to compare with the second one.",
@@ -219,7 +219,7 @@ public class IfTaskDefinitionTest {
                                 "displayName":"String",
                                 "name":"string",
                                 "type":"GROUP",
-                                "groupProperties":[
+                                "fields":[
                                     {
                                         "defaultValue":"",
                                         "description":"The string value to compare with the second one.",

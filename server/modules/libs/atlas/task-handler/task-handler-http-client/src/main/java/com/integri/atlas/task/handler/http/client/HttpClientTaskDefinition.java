@@ -235,7 +235,7 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                 .options(
                     GROUP_PROPERTY(PROPERTY_PARAMETER)
                         .displayName("Parameter")
-                        .groupProperties(
+                        .fields(
                             STRING_PROPERTY(PROPERTY_NAME)
                                 .displayName("Name")
                                 .description("Name of the parameter.")
@@ -264,7 +264,7 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                 .options(
                     GROUP_PROPERTY(PROPERTY_PARAMETER)
                         .displayName("Parameter")
-                        .groupProperties(
+                        .fields(
                             STRING_PROPERTY(PROPERTY_NAME)
                                 .displayName("Name")
                                 .description("Name of the parameter.")
@@ -321,7 +321,7 @@ public class HttpClientTaskDefinition implements TaskDefinition {
                 .options(
                     GROUP_PROPERTY(PROPERTY_PARAMETER)
                         .displayName("Parameter")
-                        .groupProperties(
+                        .fields(
                             STRING_PROPERTY(PROPERTY_NAME)
                                 .displayName("Name")
                                 .description("Name of the parameter.")
