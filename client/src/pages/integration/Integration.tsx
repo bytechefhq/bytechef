@@ -168,7 +168,7 @@ const Integration: React.FC = () => {
                     leftSidebarHeader={
                         <>
                             <Input
-                                fieldsetClassName="px-4 py-4 mb-0"
+                                fieldsetClassName="p-4 mb-0"
                                 name="workflowElementsFilter"
                                 onChange={(event) =>
                                     setFilter(event.target.value)
