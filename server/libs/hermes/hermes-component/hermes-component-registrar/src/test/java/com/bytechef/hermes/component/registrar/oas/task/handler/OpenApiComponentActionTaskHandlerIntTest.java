@@ -30,15 +30,14 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.registry.ComponentDefinitionRegistryImpl;
 import com.bytechef.hermes.component.registrar.oas.handler.OpenApiComponentActionTaskHandler;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.Response;
-import com.bytechef.hermes.component.util.JsonUtilsConfiguration;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.constant.MetadataConstants;
-import com.bytechef.hermes.component.definition.registry.ComponentDefinitionRegistryImpl;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
@@ -47,6 +46,7 @@ import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServi
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.domain.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.tag.service.TagService;
 import com.bytechef.test.annotation.EmbeddedSql;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -835,6 +835,7 @@ public class OpenApiComponentActionTaskHandlerIntTest {
 
     @ComponentScan(
         basePackages = {
+            "com.bytechef.hermes.component.util",
             "com.bytechef.hermes.connection"
         })
     @EnableAutoConfiguration
@@ -844,22 +845,8 @@ public class OpenApiComponentActionTaskHandlerIntTest {
         @MockBean
         DataStorageService dataStorageService;
 
-        @Bean
-        JsonUtilsConfiguration jsonUtilsConfiguration(ObjectMapper objectMapper) {
-            return new JsonUtilsConfiguration(objectMapper);
-        }
-
-        @Bean
-        ObjectMapper objectMapper() {
-            return new ObjectMapper() {
-                {
-                    disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-                    registerModule(new JavaTimeModule());
-                    registerModule(new Jdk8Module());
-                }
-            };
-        }
+        @MockBean
+        MessageBroker messageBroker;
 
         @Bean
         ConnectionDefinitionService connectionDefinitionService() {
@@ -874,6 +861,18 @@ public class OpenApiComponentActionTaskHandlerIntTest {
 
             return new ContextFactoryImpl(
                 connectionDefinitionService, connectionService, dataStorageService, e -> {}, FILE_STORAGE_SERVICE);
+        }
+
+        @Bean
+        ObjectMapper objectMapper() {
+            return new ObjectMapper() {
+                {
+                    disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+                    registerModule(new JavaTimeModule());
+                    registerModule(new Jdk8Module());
+                }
+            };
         }
 
         @EnableCaching

@@ -21,6 +21,7 @@ import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.util.HttpClientUtils;
@@ -106,8 +107,7 @@ public class OpenApiClient {
 
                 body = switch (bodyContentType) {
                     case BINARY -> HttpClientUtils.Body.of(
-                        MapValueUtils.getRequired(parameters, property.getName(), Context.FileEntry.class),
-                        mimeType);
+                        MapValueUtils.getRequired(parameters, property.getName(), FileEntry.class), mimeType);
                     case FORM_DATA, FORM_URL_ENCODED -> HttpClientUtils.Body.of(
                         MapValueUtils.getRequiredMap(parameters, property.getName()));
                     case JSON, XML -> {
