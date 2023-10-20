@@ -17,8 +17,6 @@
 package com.integri.atlas.task.handler.http.client;
 
 import com.integri.atlas.engine.coordinator.job.Job;
-import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowMapper;
-import com.integri.atlas.engine.coordinator.workflow.repository.YAMLWorkflowMapper;
 import com.integri.atlas.engine.core.context.Context;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.handler.http.client.authentication.HttpAuthenticationFactory;
@@ -84,10 +82,5 @@ public class HttpClientTaskHandlerIntTest extends BaseTaskIntTest {
                 jsonHelper
             )
         );
-    }
-
-    @Override
-    protected WorkflowMapper getWorkflowMapper() {
-        return new YAMLWorkflowMapper();
     }
 }
