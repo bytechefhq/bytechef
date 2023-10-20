@@ -43,8 +43,6 @@ public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConn
 
     BaseUriFunction getBaseUri();
 
-    String getComponentName();
-
     Optional<String> getDescription();
 
     String getName();

@@ -17,6 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
+import com.bytechef.hermes.definition.Option;
+import com.bytechef.hermes.definition.OptionsDataSource;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
 import com.bytechef.hermes.definition.registry.web.rest.model.ArrayPropertyModel;
@@ -28,6 +30,8 @@ import com.bytechef.hermes.definition.registry.web.rest.model.IntegerPropertyMod
 import com.bytechef.hermes.definition.registry.web.rest.model.NumberPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ObjectPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.OneOfPropertyModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.OptionModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.OptionsDataSourceModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.StringPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.TimePropertyModel;
@@ -36,6 +40,9 @@ import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -120,15 +127,23 @@ public interface PropertyMapper extends Converter<Property<?>, PropertyModel>, P
 
     NumberPropertyModel map(Property.NumberProperty numberProperty);
 
+    ObjectPropertyModel map(Property.ObjectProperty objectProperty);
+
     OneOfPropertyModel map(Property.OneOfProperty oneOfProperty);
 
-    ObjectPropertyModel map(Property.ObjectProperty objectProperty);
+    OptionsDataSourceModel map(OptionsDataSource optionsDataSource);
 
     StringPropertyModel map(Property.StringProperty stringProperty);
 
     TimePropertyModel map(Property.TimeProperty timeProperty);
 
+    OptionModel map(Option<?> option);
+
     default Boolean mapToBoolean(Optional<Boolean> optional) {
+        return optional.orElse(null);
+    }
+
+    default Integer mapToInteger(Optional<Integer> optional) {
         return optional.orElse(null);
     }
 
@@ -136,8 +151,44 @@ public interface PropertyMapper extends Converter<Property<?>, PropertyModel>, P
         return JsonNullable.of(value);
     }
 
+    default LocalDate mapToLocalDate(Optional<LocalDate> optional) {
+        return optional.orElse(null);
+    }
+
+    default LocalDateTime mapToLocalDateTime(Optional<LocalDateTime> optional) {
+        return optional.orElse(null);
+    }
+
+    default LocalTime mapToLocalTime(Optional<LocalTime> optional) {
+        return optional.orElse(null);
+    }
+
+    default Object mapToObject(Optional<Object> optional) {
+        return optional.orElse(null);
+    }
+
+    default OptionsDataSourceModel mapToOptionsDataSourceModel(Optional<OptionsDataSource> optional) {
+        return optional.map(this::map)
+            .orElse(null);
+    }
+
+    default List<PropertyModel> mapToProperties(Optional<List<? extends Property<?>>> optional) {
+        return optional.map(
+            properties -> properties.stream()
+                .map(this::convert)
+                .toList())
+            .orElse(Collections.emptyList());
+    }
+
     default String mapToString(Optional<String> optional) {
         return optional.orElse(null);
+    }
+
+    default List<OptionModel> mapToOptions(Optional<List<Option<?>>> optional) {
+        return optional.map(options -> options.stream()
+            .map(this::map)
+            .toList())
+            .orElse(Collections.emptyList());
     }
 
     default List<PropertyModel> map(List<? extends Property<?>> properties) {

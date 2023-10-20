@@ -106,15 +106,15 @@ public sealed interface Property<P extends Property<P>>
 
     Optional<Boolean> getAdvancedOption();
 
-    String getDescription();
+    Optional<String> getDescription();
 
-    String getDisplayCondition();
+    Optional<String> getDisplayCondition();
 
     Optional<Boolean> getExpressionDisabled();
 
     Optional<Boolean> getHidden();
 
-    String getLabel();
+    Optional<String> getLabel();
 
     Map<String, Object> getMetadata();
 
@@ -173,9 +173,9 @@ public sealed interface Property<P extends Property<P>>
 
         ControlType getControlType();
 
-        V getDefaultValue();
+        Optional<V> getDefaultValue();
 
-        V getExampleValue();
+        Optional<V> getExampleValue();
     }
 
     @JsonDeserialize(as = ModifiableArrayProperty.class)
@@ -184,11 +184,11 @@ public sealed interface Property<P extends Property<P>>
 
         List<Property<?>> getItems();
 
-        Boolean getMultipleValues();
+        Optional<Boolean> getMultipleValues();
 
-        List<Option<?>> getOptions();
+        Optional<List<Option<?>>> getOptions();
 
-        OptionsDataSource getOptionsDataSource();
+        Optional<OptionsDataSource> getOptionsDataSource();
     }
 
     @JsonDeserialize(as = ModifiableBooleanProperty.class)
@@ -200,7 +200,7 @@ public sealed interface Property<P extends Property<P>>
     sealed interface DateProperty
         extends ValueProperty<LocalDate, DateProperty> permits ModifiableDateProperty {
 
-        List<Option<?>> getOptions();
+        Optional<List<Option<?>>> getOptions();
 
         OptionsDataSource getOptionsDataSource();
     }
@@ -209,7 +209,7 @@ public sealed interface Property<P extends Property<P>>
     sealed interface DateTimeProperty extends
         ValueProperty<LocalDateTime, DateTimeProperty> permits ModifiableDateTimeProperty {
 
-        List<Option<?>> getOptions();
+        Optional<List<Option<?>>> getOptions();
 
         OptionsDataSource getOptionsDataSource();
     }
@@ -218,13 +218,13 @@ public sealed interface Property<P extends Property<P>>
     sealed interface IntegerProperty extends
         ValueProperty<Integer, IntegerProperty> permits ModifiableIntegerProperty {
 
-        Integer getMaxValue();
+        Optional<Integer> getMaxValue();
 
-        Integer getMinValue();
+        Optional<Integer> getMinValue();
 
-        List<Option<?>> getOptions();
+        Optional<List<Option<?>>> getOptions();
 
-        OptionsDataSource getOptionsDataSource();
+        Optional<OptionsDataSource> getOptionsDataSource();
     }
 
     @JsonDeserialize(as = ModifiableNullProperty.class)
@@ -236,41 +236,41 @@ public sealed interface Property<P extends Property<P>>
     sealed interface NumberProperty
         extends ValueProperty<Double, NumberProperty> permits ModifiableNumberProperty {
 
-        Integer getMaxValue();
+        Optional<Integer> getMaxValue();
 
-        Integer getMinValue();
+        Optional<Integer> getMinValue();
 
-        Integer getNumberPrecision();
+        Optional<Integer> getNumberPrecision();
 
-        List<Option<?>> getOptions();
+        Optional<List<Option<?>>> getOptions();
 
-        OptionsDataSource getOptionsDataSource();
+        Optional<OptionsDataSource> getOptionsDataSource();
     }
 
     @JsonDeserialize(as = ModifiableObjectProperty.class)
     sealed interface ObjectProperty
         extends ValueProperty<Object, ObjectProperty> permits ModifiableObjectProperty {
 
-        List<? extends Property<?>> getAdditionalProperties();
+        Optional<List<? extends Property<?>>> getAdditionalProperties();
 
-        Boolean getMultipleValues();
+        Optional<Boolean> getMultipleValues();
 
-        String getObjectType();
+        Optional<String> getObjectType();
 
-        List<Option<?>> getOptions();
+        Optional<List<Option<?>>> getOptions();
 
-        OptionsDataSource getOptionsDataSource();
+        Optional<OptionsDataSource> getOptionsDataSource();
 
-        List<? extends Property<?>> getProperties();
+        Optional<List<? extends Property<?>>> getProperties();
     }
 
     @JsonDeserialize(as = ModifiableStringProperty.class)
     sealed interface StringProperty
         extends ValueProperty<String, StringProperty> permits ModifiableStringProperty {
 
-        List<Option<?>> getOptions();
+        Optional<List<Option<?>>> getOptions();
 
-        OptionsDataSource getOptionsDataSource();
+        Optional<OptionsDataSource> getOptionsDataSource();
     }
 
     @JsonDeserialize(as = ModifiableTimeProperty.class)
