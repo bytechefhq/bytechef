@@ -19,19 +19,23 @@ package com.bytechef.hermes.integration.domain;
 
 import com.bytechef.tag.domain.Tag;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.PersistenceCreator;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
@@ -43,8 +47,11 @@ import org.springframework.util.CollectionUtils;
 @Table
 public final class Integration implements Persistable<Long> {
 
-    @Column
-    private String category;
+    @Transient
+    private Category category;
+
+    @Column("category_id")
+    private AggregateReference<Category, Long> categoryRef;
 
     @CreatedBy
     @Column("created_by")
@@ -76,6 +83,9 @@ public final class Integration implements Persistable<Long> {
     @Column("last_modified_date")
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
+
+    @Transient
+    private Set<Tag> tags = Collections.emptySet();
 
     @Version
     private int version;
@@ -125,7 +135,12 @@ public final class Integration implements Persistable<Long> {
         return getClass().hashCode();
     }
 
-    public String getCategory() {
+    public Long getCategoryId() {
+        return categoryRef == null ? null : categoryRef.getId();
+    }
+
+    @SuppressFBWarnings("EI")
+    public Category getCategory() {
         return category;
     }
 
@@ -171,6 +186,10 @@ public final class Integration implements Persistable<Long> {
             .collect(Collectors.toSet());
     }
 
+    public Set<Tag> getTags() {
+        return Collections.unmodifiableSet(tags);
+    }
+
     public int getVersion() {
         return version;
     }
@@ -187,8 +206,19 @@ public final class Integration implements Persistable<Long> {
             .ifPresent(integrationWorkflows::remove);
     }
 
-    public void setCategory(String category) {
+    @SuppressFBWarnings({
+        "EI", "NP"
+    })
+    public void setCategory(Category category) {
         this.category = category;
+
+        if (category != null && !category.isNew()) {
+            this.categoryRef = AggregateReference.to(category.getId());
+        }
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryRef = AggregateReference.to(categoryId);
     }
 
     public void setDescription(String description) {
@@ -203,16 +233,12 @@ public final class Integration implements Persistable<Long> {
         this.name = name;
     }
 
-    public void setWorkflowIds(Set<String> workflowIds) {
-        integrationWorkflows = new HashSet<>();
-
-        for (String workflowId : workflowIds) {
-            addWorkflow(workflowId);
-        }
-    }
-
     public void setTags(Set<Tag> tags) {
-        integrationTags = new HashSet<>();
+        if (!CollectionUtils.isEmpty(tags)) {
+            this.tags = new HashSet<>(tags);
+        }
+
+        this.integrationTags = new HashSet<>();
 
         if (!CollectionUtils.isEmpty(tags)) {
             for (Tag tag : tags) {
@@ -221,16 +247,32 @@ public final class Integration implements Persistable<Long> {
         }
     }
 
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public void setWorkflowIds(Set<String> workflowIds) {
+        integrationWorkflows = new HashSet<>();
+
+        for (String workflowId : workflowIds) {
+            addWorkflow(workflowId);
+        }
+    }
+
     @Override
     public String toString() {
-        return "Integration{" + "createdBy='"
-            + createdBy + '\'' + ", createdDate="
-            + createdDate + ", description='"
-            + description + '\'' + ", id='"
-            + id + '\'' + ", name='"
-            + name + '\'' + ", lastModifiedBy='"
-            + lastModifiedBy + '\'' + ", lastModifiedDate="
-            + lastModifiedDate + ", version="
-            + version + '}';
+        return "Integration{" +
+            "categoryId=" + getCategoryId() +
+            ", createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
+            ", description='" + description + '\'' +
+            ", id=" + id +
+            ", integrationTags=" + integrationTags +
+            ", integrationWorkflows=" + integrationWorkflows +
+            ", name='" + name + '\'' +
+            ", lastModifiedBy='" + lastModifiedBy + '\'' +
+            ", lastModifiedDate=" + lastModifiedDate +
+            ", version=" + version +
+            '}';
     }
 }
