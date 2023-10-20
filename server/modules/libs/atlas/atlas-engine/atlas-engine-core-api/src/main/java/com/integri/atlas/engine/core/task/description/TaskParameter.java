@@ -20,6 +20,8 @@ package com.integri.atlas.engine.core.task.description;
 
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValue;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -52,6 +54,26 @@ public sealed interface TaskParameter
     }
 
     static TaskParameter parameter(Integer... values) {
+        return new TaskParameterList(
+            Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList())
+        );
+    }
+
+    static TaskParameter parameter(JsonNode value) {
+        return parameterValue(value);
+    }
+
+    static TaskParameter parameter(JsonNode... values) {
+        return new TaskParameterList(
+            Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList())
+        );
+    }
+
+    static TaskParameter parameter(LocalDateTime value) {
+        return parameterValue(value);
+    }
+
+    static TaskParameter parameter(LocalDateTime... values) {
         return new TaskParameterList(
             Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList())
         );

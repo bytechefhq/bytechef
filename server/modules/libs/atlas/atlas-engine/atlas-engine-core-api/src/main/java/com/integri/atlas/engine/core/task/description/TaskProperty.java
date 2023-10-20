@@ -19,8 +19,9 @@
 package com.integri.atlas.engine.core.task.description;
 
 import static com.integri.atlas.engine.core.task.description.TaskParameter.parameter;
-import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValue;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,20 +29,69 @@ import java.util.stream.Stream;
 /**
  * @author Ivica Cardic
  */
-public final class TaskProperty implements TaskPropertyOption {
+public abstract sealed class TaskProperty<T extends TaskProperty<?>>
+    permits
+        TaskProperty.BooleanTaskProperty,
+        TaskProperty.ColorTaskProperty,
+        TaskProperty.DateTimeTaskProperty,
+        TaskProperty.CollectionTaskProperty,
+        TaskProperty.GroupTaskProperty,
+        TaskProperty.JSONTaskProperty,
+        TaskProperty.MultiSelectTaskProperty,
+        TaskProperty.NumberTaskProperty,
+        TaskProperty.SelectTaskProperty,
+        TaskProperty.StringTaskProperty {
 
-    private TaskParameter defaultValue;
-    private String description;
-    private String displayName;
-    private DisplayOption displayOption;
-    private String name;
-    private List<TaskPropertyOption> options;
-    private String placeholder;
-    private Boolean required;
-    private TaskPropertyType type;
-    private TaskPropertyTypeOption propertyTypeOption;
+    protected TaskParameter defaultValue;
+    protected String description;
+    protected String displayName;
+    protected DisplayOption displayOption;
+    protected String name;
+    protected Boolean required;
+    protected TaskPropertyType type;
+    protected TaskPropertyTypeOption typeOption;
 
     private TaskProperty() {}
+
+    public static BooleanTaskProperty BOOLEAN_PROPERTY(String name) {
+        return new BooleanTaskProperty(name);
+    }
+
+    public static ColorTaskProperty COLOR_PROPERTY(String name) {
+        return new ColorTaskProperty(name);
+    }
+
+    public static DateTimeTaskProperty DATE_TIME_PROPERTY(String name) {
+        return new DateTimeTaskProperty(name);
+    }
+
+    public static CollectionTaskProperty COLLECTION_PROPERTY(String name) {
+        return new CollectionTaskProperty(name);
+    }
+
+    public static GroupTaskProperty GROUP_PROPERTY(String name) {
+        return new GroupTaskProperty(name);
+    }
+
+    public static JSONTaskProperty JSON_PROPERTY(String name) {
+        return new JSONTaskProperty(name);
+    }
+
+    public static MultiSelectTaskProperty MULTI_SELECT_PROPERTY(String name) {
+        return new MultiSelectTaskProperty(name);
+    }
+
+    public static NumberTaskProperty NUMBER_PROPERTY(String name) {
+        return new NumberTaskProperty(name);
+    }
+
+    public static SelectTaskProperty SELECT_PROPERTY(String name) {
+        return new SelectTaskProperty(name);
+    }
+
+    public static StringTaskProperty STRING_PROPERTY(String name) {
+        return new StringTaskProperty(name);
+    }
 
     public static DisplayOption hide(String k1) {
         return DisplayOption.displayOption().hide(k1);
@@ -455,144 +505,43 @@ public final class TaskProperty implements TaskPropertyOption {
         return TaskPropertyTypeOption.propertyTypeOption().numberPrecision(numberPrecision);
     }
 
-    public static TaskProperty property() {
-        return new TaskProperty();
-    }
-
-    public static List<TaskProperty> properties(TaskProperty... taskProperties) {
+    public static List<TaskProperty<?>> properties(TaskProperty<?>... taskProperties) {
         return List.of(taskProperties);
     }
 
-    public TaskProperty defaultValue(int value) {
-        defaultValue = parameterValue(value);
-
-        return this;
-    }
-
-    public TaskProperty defaultValue(long value) {
-        defaultValue = parameterValue(value);
-
-        return this;
-    }
-
-    public TaskProperty defaultValue(float value) {
-        defaultValue = parameterValue(value);
-
-        return this;
-    }
-
-    public TaskProperty defaultValue(double value) {
-        defaultValue = parameterValue(value);
-
-        return this;
-    }
-
-    public TaskProperty defaultValue(String value) {
-        defaultValue = parameterValue(value);
-
-        return this;
-    }
-
-    public TaskProperty defaultValue(Boolean... values) {
-        defaultValue = parameter(values);
-
-        return this;
-    }
-
-    public TaskProperty defaultValue(Integer... values) {
-        defaultValue = parameter(values);
-
-        return this;
-    }
-
-    public TaskProperty defaultValue(Long... values) {
-        defaultValue = parameter(values);
-
-        return this;
-    }
-
-    public TaskProperty defaultValue(Float... values) {
-        defaultValue = parameter(values);
-
-        return this;
-    }
-
-    public TaskProperty defaultValue(Double... values) {
-        defaultValue = parameter(values);
-
-        return this;
-    }
-
-    public TaskProperty defaultValue(String... values) {
-        defaultValue = parameter(values);
-
-        return this;
-    }
-
-    public TaskProperty defaultValue(TaskParameter defaultValue) {
-        this.defaultValue = defaultValue;
-
-        return this;
-    }
-
-    public TaskProperty defaultValue(TaskParameter... defaultValue) {
-        this.defaultValue = parameter(defaultValue);
-
-        return this;
-    }
-
-    public TaskProperty description(String description) {
+    @SuppressWarnings("unchecked")
+    public T description(String description) {
         this.description = description;
 
-        return this;
+        return (T) this;
     }
 
-    public TaskProperty displayName(String displayName) {
+    @SuppressWarnings("unchecked")
+    public T displayName(String displayName) {
         this.displayName = displayName;
 
-        return this;
+        return (T) this;
     }
 
-    public TaskProperty displayOption(DisplayOption displayOption) {
+    @SuppressWarnings("unchecked")
+    public T displayOption(DisplayOption displayOption) {
         this.displayOption = displayOption;
 
-        return this;
+        return (T) this;
     }
 
-    public TaskProperty name(String name) {
-        this.name = name;
+    @SuppressWarnings("unchecked")
+    public T typeOption(TaskPropertyTypeOption typeOption) {
+        this.typeOption = typeOption;
 
-        return this;
+        return (T) this;
     }
 
-    public TaskProperty placeholder(String placeholder) {
-        this.placeholder = placeholder;
-
-        return this;
-    }
-
-    public TaskProperty options(TaskPropertyOption... options) {
-        this.options = List.of(options);
-
-        return this;
-    }
-
-    public TaskProperty propertyTypeOption(TaskPropertyTypeOption typeOption) {
-        this.propertyTypeOption = typeOption;
-
-        return this;
-    }
-
-    public TaskProperty required(Boolean required) {
+    @SuppressWarnings("unchecked")
+    public T required(Boolean required) {
         this.required = required;
 
-        return this;
-    }
-
-    public TaskProperty type(TaskPropertyType type) {
-        this.type = type;
-
-        return this;
+        return (T) this;
     }
 
     public TaskParameter getDefaultValue() {
@@ -615,16 +564,8 @@ public final class TaskProperty implements TaskPropertyOption {
         return name;
     }
 
-    public List<TaskPropertyOption> getOptions() {
-        return options;
-    }
-
-    public String getPlaceholder() {
-        return placeholder;
-    }
-
-    public TaskPropertyTypeOption getPropertyTypeOption() {
-        return propertyTypeOption;
+    public TaskPropertyTypeOption getTypeOption() {
+        return typeOption;
     }
 
     public Boolean isRequired() {
@@ -633,5 +574,335 @@ public final class TaskProperty implements TaskPropertyOption {
 
     public TaskPropertyType getType() {
         return type;
+    }
+
+    public static final class BooleanTaskProperty extends TaskProperty<BooleanTaskProperty> {
+
+        public BooleanTaskProperty(String name) {
+            this.name = name;
+            this.type = TaskPropertyType.BOOLEAN;
+        }
+
+        public BooleanTaskProperty defaultValue(boolean defaultValue) {
+            this.defaultValue = parameter(defaultValue);
+
+            return this;
+        }
+    }
+
+    public static final class ColorTaskProperty extends TaskProperty<ColorTaskProperty> {
+
+        public ColorTaskProperty(String name) {
+            this.name = name;
+            this.type = TaskPropertyType.COLOR;
+        }
+
+        public ColorTaskProperty defaultValue(String defaultValue) {
+            this.defaultValue = parameter(defaultValue);
+
+            return this;
+        }
+    }
+
+    public static final class DateTimeTaskProperty extends TaskProperty<DateTimeTaskProperty> {
+
+        public DateTimeTaskProperty(String name) {
+            this.name = name;
+            this.type = TaskPropertyType.DATE_TIME;
+        }
+
+        public DateTimeTaskProperty defaultValue(LocalDateTime defaultValue) {
+            this.defaultValue = parameter(defaultValue);
+
+            return this;
+        }
+    }
+
+    public static final class CollectionTaskProperty extends TaskProperty<CollectionTaskProperty> {
+
+        private List<TaskProperty<?>> options;
+        private String placeholder;
+
+        public CollectionTaskProperty(String name) {
+            this.name = name;
+            this.type = TaskPropertyType.COLLECTION;
+        }
+
+        public CollectionTaskProperty defaultValue(int value) {
+            defaultValue = parameter(value);
+
+            return this;
+        }
+
+        public CollectionTaskProperty defaultValue(long value) {
+            defaultValue = parameter(value);
+
+            return this;
+        }
+
+        public CollectionTaskProperty defaultValue(float value) {
+            defaultValue = parameter(value);
+
+            return this;
+        }
+
+        public CollectionTaskProperty defaultValue(double value) {
+            defaultValue = parameter(value);
+
+            return this;
+        }
+
+        public CollectionTaskProperty defaultValue(String value) {
+            defaultValue = parameter(value);
+
+            return this;
+        }
+
+        public CollectionTaskProperty defaultValue(Boolean... values) {
+            defaultValue = parameter(values);
+
+            return this;
+        }
+
+        public CollectionTaskProperty defaultValue(Integer... values) {
+            defaultValue = parameter(values);
+
+            return this;
+        }
+
+        public CollectionTaskProperty defaultValue(Long... values) {
+            defaultValue = parameter(values);
+
+            return this;
+        }
+
+        public CollectionTaskProperty defaultValue(Float... values) {
+            defaultValue = parameter(values);
+
+            return this;
+        }
+
+        public CollectionTaskProperty defaultValue(Double... values) {
+            defaultValue = parameter(values);
+
+            return this;
+        }
+
+        public CollectionTaskProperty defaultValue(String... values) {
+            defaultValue = parameter(values);
+
+            return this;
+        }
+
+        public CollectionTaskProperty defaultValue(TaskParameter defaultValue) {
+            this.defaultValue = defaultValue;
+
+            return this;
+        }
+
+        public CollectionTaskProperty defaultValue(TaskParameter... defaultValue) {
+            this.defaultValue = parameter(defaultValue);
+
+            return this;
+        }
+
+        public List<TaskProperty<?>> getOptions() {
+            return options;
+        }
+
+        public String getPlaceholder() {
+            return placeholder;
+        }
+
+        public CollectionTaskProperty options(TaskProperty<?>... options) {
+            this.options = List.of(options);
+
+            return this;
+        }
+
+        public CollectionTaskProperty placeholder(String placeholder) {
+            this.placeholder = placeholder;
+
+            return this;
+        }
+    }
+
+    public static final class GroupTaskProperty extends TaskProperty<GroupTaskProperty> {
+
+        private List<TaskProperty<?>> fields;
+
+        public GroupTaskProperty(String name) {
+            this.name = name;
+            this.type = TaskPropertyType.COLLECTION;
+        }
+
+        public GroupTaskProperty fields(TaskProperty<?>... fields) {
+            this.fields = List.of(fields);
+
+            return this;
+        }
+
+        public List<TaskProperty<?>> getFields() {
+            return fields;
+        }
+    }
+
+    public static final class JSONTaskProperty extends TaskProperty<JSONTaskProperty> {
+
+        public JSONTaskProperty(String name) {
+            this.name = name;
+            this.type = TaskPropertyType.JSON;
+        }
+
+        public JSONTaskProperty defaultValue(JsonNode defaultValue) {
+            this.defaultValue = parameter(defaultValue);
+
+            return this;
+        }
+    }
+
+    public static final class MultiSelectTaskProperty extends TaskProperty<MultiSelectTaskProperty> {
+
+        private List<TaskPropertyOption> options;
+
+        public MultiSelectTaskProperty(String name) {
+            this.name = name;
+            this.type = TaskPropertyType.MULTI_SELECT;
+        }
+
+        public MultiSelectTaskProperty defaultValue(Integer... value) {
+            this.defaultValue = parameter(value);
+
+            return this;
+        }
+
+        public MultiSelectTaskProperty defaultValue(String... value) {
+            this.defaultValue = parameter(value);
+
+            return this;
+        }
+
+        public MultiSelectTaskProperty options(TaskPropertyOption... options) {
+            this.options = List.of(options);
+
+            return this;
+        }
+
+        public List<TaskPropertyOption> getOptions() {
+            return options;
+        }
+    }
+
+    public static final class NumberTaskProperty extends TaskProperty<NumberTaskProperty> {
+
+        private String placeholder;
+
+        public NumberTaskProperty(String name) {
+            this.name = name;
+            this.type = TaskPropertyType.NUMBER;
+        }
+
+        public NumberTaskProperty defaultValue(int value) {
+            this.defaultValue = parameter(value);
+
+            return this;
+        }
+
+        public NumberTaskProperty defaultValue(long value) {
+            this.defaultValue = parameter(value);
+
+            return this;
+        }
+
+        public NumberTaskProperty defaultValue(float value) {
+            this.defaultValue = parameter(value);
+
+            return this;
+        }
+
+        public NumberTaskProperty defaultValue(double value) {
+            this.defaultValue = parameter(value);
+
+            return this;
+        }
+
+        public NumberTaskProperty placeholder(String placeholder) {
+            this.placeholder = placeholder;
+
+            return this;
+        }
+
+        public String getPlaceholder() {
+            return placeholder;
+        }
+    }
+
+    public static final class SelectTaskProperty extends TaskProperty<SelectTaskProperty> {
+
+        private List<TaskPropertyOption> options;
+        private String placeholder;
+
+        public SelectTaskProperty(String name) {
+            this.name = name;
+            this.type = TaskPropertyType.SELECT;
+        }
+
+        public SelectTaskProperty defaultValue(int defaultValue) {
+            this.defaultValue = parameter(defaultValue);
+
+            return this;
+        }
+
+        public SelectTaskProperty defaultValue(String defaultValue) {
+            this.defaultValue = parameter(defaultValue);
+
+            return this;
+        }
+
+        public SelectTaskProperty options(TaskPropertyOption... options) {
+            this.options = List.of(options);
+
+            return this;
+        }
+
+        public SelectTaskProperty placeholder(String placeholder) {
+            this.placeholder = placeholder;
+
+            return this;
+        }
+
+        public List<TaskPropertyOption> getOptions() {
+            return options;
+        }
+
+        public String getPlaceholder() {
+            return placeholder;
+        }
+    }
+
+    public static final class StringTaskProperty extends TaskProperty<StringTaskProperty> {
+
+        private String placeholder;
+
+        public StringTaskProperty(String name) {
+            this.name = name;
+            this.type = TaskPropertyType.STRING;
+        }
+
+        public StringTaskProperty defaultValue(String... value) {
+            this.defaultValue = parameter(value);
+
+            return this;
+        }
+
+        public StringTaskProperty placeholder(String placeholder) {
+            this.placeholder = placeholder;
+
+            return this;
+        }
+
+        public String getPlaceholder() {
+            return placeholder;
+        }
     }
 }

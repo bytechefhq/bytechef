@@ -19,10 +19,12 @@
 package com.integri.atlas.engine.core.task.description;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,6 +36,8 @@ public sealed interface TaskParameterValue
     extends TaskParameter
     permits
         TaskParameterValue.TaskPropertyValueBoolean,
+        TaskParameterValue.TaskPropertyValueDateTime,
+        TaskParameterValue.TaskPropertyValueJSON,
         TaskParameterValue.TaskPropertyValueNumber,
         TaskParameterValue.TaskPropertyValueString {
     static TaskParameterValue parameterValue(boolean value) {
@@ -44,7 +48,7 @@ public sealed interface TaskParameterValue
         return new TaskPropertyValueNumber(value);
     }
 
-    static TaskParameterValue parameterValue(long value) {
+    static TaskParameterValue parameterValue(double value) {
         return new TaskPropertyValueNumber(value);
     }
 
@@ -52,7 +56,15 @@ public sealed interface TaskParameterValue
         return new TaskPropertyValueNumber(value);
     }
 
-    static TaskParameterValue parameterValue(double value) {
+    static TaskParameterValue parameterValue(JsonNode value) {
+        return new TaskPropertyValueJSON(value);
+    }
+
+    static TaskParameterValue parameterValue(LocalDateTime value) {
+        return new TaskPropertyValueDateTime(value);
+    }
+
+    static TaskParameterValue parameterValue(long value) {
         return new TaskPropertyValueNumber(value);
     }
 
@@ -64,11 +76,11 @@ public sealed interface TaskParameterValue
         return Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList());
     }
 
-    static List<TaskParameterValue> parameterValues(Integer... values) {
+    static List<TaskParameterValue> parameterValues(Double... values) {
         return Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList());
     }
 
-    static List<TaskParameterValue> parameterValues(Long... values) {
+    static List<TaskParameterValue> parameterValues(Integer... values) {
         return Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList());
     }
 
@@ -76,7 +88,15 @@ public sealed interface TaskParameterValue
         return Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList());
     }
 
-    static List<TaskParameterValue> parameterValues(Double... values) {
+    static List<TaskParameterValue> parameterValues(JsonNode... values) {
+        return Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList());
+    }
+
+    static List<TaskParameterValue> parameterValues(LocalDateTime... values) {
+        return Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList());
+    }
+
+    static List<TaskParameterValue> parameterValues(Long... values) {
         return Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList());
     }
 
@@ -112,6 +132,70 @@ public sealed interface TaskParameterValue
                 SerializerProvider serializerProvider
             ) throws IOException {
                 jsonGenerator.writeBoolean(taskPropertyValueTypeBoolean.value);
+            }
+        }
+    }
+
+    @JsonSerialize(using = TaskPropertyValueDateTime.TaskPropertyValueTypeDateTimeSerializer.class)
+    final class TaskPropertyValueDateTime implements TaskParameterValue {
+
+        private LocalDateTime value;
+
+        private TaskPropertyValueDateTime() {}
+
+        private TaskPropertyValueDateTime(LocalDateTime value) {
+            this.value = value;
+        }
+
+        static class TaskPropertyValueTypeDateTimeSerializer extends StdSerializer<TaskPropertyValueDateTime> {
+
+            private TaskPropertyValueTypeDateTimeSerializer() {
+                this(null);
+            }
+
+            private TaskPropertyValueTypeDateTimeSerializer(Class<TaskPropertyValueDateTime> clazz) {
+                super(clazz);
+            }
+
+            @Override
+            public void serialize(
+                TaskPropertyValueDateTime taskPropertyValueDateTime,
+                JsonGenerator jsonGenerator,
+                SerializerProvider serializerProvider
+            ) throws IOException {
+                jsonGenerator.writeString(taskPropertyValueDateTime.value.toString());
+            }
+        }
+    }
+
+    @JsonSerialize(using = TaskPropertyValueJSON.TaskPropertyValueTypeJSONSerializer.class)
+    final class TaskPropertyValueJSON implements TaskParameterValue {
+
+        private JsonNode value;
+
+        private TaskPropertyValueJSON() {}
+
+        private TaskPropertyValueJSON(JsonNode value) {
+            this.value = value;
+        }
+
+        static class TaskPropertyValueTypeJSONSerializer extends StdSerializer<TaskPropertyValueJSON> {
+
+            private TaskPropertyValueTypeJSONSerializer() {
+                this(null);
+            }
+
+            private TaskPropertyValueTypeJSONSerializer(Class<TaskPropertyValueJSON> clazz) {
+                super(clazz);
+            }
+
+            @Override
+            public void serialize(
+                TaskPropertyValueJSON taskPropertyValueJSON,
+                JsonGenerator jsonGenerator,
+                SerializerProvider serializerProvider
+            ) throws IOException {
+                jsonGenerator.writeString(taskPropertyValueJSON.value.toString());
             }
         }
     }

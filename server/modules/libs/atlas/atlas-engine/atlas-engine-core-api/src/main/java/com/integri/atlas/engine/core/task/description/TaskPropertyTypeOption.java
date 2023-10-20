@@ -18,7 +18,6 @@
 
 package com.integri.atlas.engine.core.task.description;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -30,13 +29,13 @@ public class TaskPropertyTypeOption {
     private String loadOptionsMethod;
     private Double maxValue;
     private Double minValue;
-    private Boolean multipleValues;
+    private boolean multipleValues;
     private String multipleValueButtonText;
     private Integer numberPrecision;
 
     private TaskPropertyTypeOption() {}
 
-    public static TaskPropertyTypeOption propertyTypeOption() {
+    static TaskPropertyTypeOption propertyTypeOption() {
         return new TaskPropertyTypeOption();
     }
 
@@ -64,7 +63,7 @@ public class TaskPropertyTypeOption {
         return this;
     }
 
-    public TaskPropertyTypeOption multipleValues(Boolean multipleValues) {
+    public TaskPropertyTypeOption multipleValues(boolean multipleValues) {
         this.multipleValues = multipleValues;
 
         return this;

@@ -26,6 +26,7 @@ public enum TaskPropertyType {
     COLLECTION,
     COLOR,
     DATE_TIME,
+    GROUP,
     JSON,
     MULTI_SELECT,
     NUMBER,

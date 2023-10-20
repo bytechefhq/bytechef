@@ -32,16 +32,12 @@ public class TaskDescription {
     private String displayName;
     private String name;
     private String icon;
-    private List<TaskProperty> properties;
+    private List<TaskProperty<?>> properties;
     private String subtitle;
     private float version = 1;
 
-    public static TaskProperty property(String name) {
-        return TaskProperty.property().name(name);
-    }
-
-    public static TaskDescription description() {
-        return new TaskDescription();
+    public static TaskDescription task(String name) {
+        return new TaskDescription().name(name);
     }
 
     public TaskDescription authentication(TaskAuthentication authentication) {
@@ -112,7 +108,7 @@ public class TaskDescription {
         return icon;
     }
 
-    public List<TaskProperty> getProperties() {
+    public List<TaskProperty<?>> getProperties() {
         return properties;
     }
 
