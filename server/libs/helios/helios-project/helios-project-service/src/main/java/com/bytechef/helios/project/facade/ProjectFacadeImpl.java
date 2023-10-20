@@ -252,13 +252,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
         Job job = jobService.getJob(id);
 
         // TODO improve fetching of one project, we need project instance
-        Project project  = CollectionUtils.getFirst(
+        Project project = CollectionUtils.getFirst(
             projectService.getProjects(),
             curProject -> CollectionUtils.contains(curProject.getWorkflowIds(), job.getWorkflowId()));
         List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(job.getId());
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
-        return  new ProjectExecutionDTO(job.getId(), null, job, project, taskExecutions, workflow);
+        return new ProjectExecutionDTO(job.getId(), null, job, project, taskExecutions, workflow);
     }
 
     @Override
