@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 public class RandomInt implements TaskHandler<Object> {
 
     @Override
-    public Object handle(TaskExecution aTask) throws Exception {
+    public Object handle(TaskExecution aTask) {
         int startInclusive = aTask.getInteger("startInclusive", 0);
         int endInclusive = aTask.getInteger("endInclusive", 100);
         return RandomUtils.nextInt(startInclusive, endInclusive);

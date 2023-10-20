@@ -18,6 +18,7 @@
 
 package com.bytechef.atlas.util;
 
+import com.bytechef.atlas.exception.ProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -29,16 +30,16 @@ public class JsonUtils {
     public static <T> T deserialize(ObjectMapper objectMapper, String value, Class<T> valueClass) {
         try {
             return objectMapper.readValue(value, valueClass);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception exception) {
+            throw new ProcessingException("Unable to read property " + value, exception);
         }
     }
 
     public static String serialize(ObjectMapper objectMapper, Object value) {
         try {
             return objectMapper.writeValueAsString(value);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception exception) {
+            throw new ProcessingException("Unable to write property " + value, exception);
         }
     }
 }

@@ -36,7 +36,7 @@ import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 class S3GetURL implements TaskHandler<String> {
 
     @Override
-    public String handle(TaskExecution aTask) throws Exception {
+    public String handle(TaskExecution aTask) {
         AmazonS3URI s3Uri = new AmazonS3URI(aTask.getRequiredString("uri"));
 
         String bucketName = s3Uri.getBucket();

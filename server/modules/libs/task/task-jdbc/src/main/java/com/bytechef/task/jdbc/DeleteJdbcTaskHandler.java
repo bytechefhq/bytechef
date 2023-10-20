@@ -41,7 +41,7 @@ public class DeleteJdbcTaskHandler extends AbstractJdbcTaskHandler implements Ta
     }
 
     @Override
-    public Map<String, Integer> handle(TaskExecution taskExecution) throws Exception {
+    public Map<String, Integer> handle(TaskExecution taskExecution) {
         Map<String, Integer> result;
 
         String deleteKey = taskExecution.getString(DELETE_KEY, "id");

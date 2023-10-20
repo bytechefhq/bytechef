@@ -20,6 +20,7 @@ package com.bytechef.task.handler.media;
 
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -48,11 +49,12 @@ class Vstitch implements TaskHandler<Object> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public Object handle(TaskExecution aTask) throws Exception {
+    public Object handle(TaskExecution aTask) throws TaskExecutionException {
         List<String> chunks = aTask.getList("chunks", String.class);
         logger.debug("{}", chunks);
-        File tempFile = File.createTempFile("_chunks", ".txt");
+        File tempFile = null;
         try {
+            tempFile = File.createTempFile("_chunks", ".txt");
             try (Writer writer =
                     new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile, true), "UTF-8"))) {
                 for (String chunk : chunks) {
@@ -73,6 +75,8 @@ class Vstitch implements TaskHandler<Object> {
                     aTask.getRequiredString("outputFile"));
             ffmpegTask.set("options", options);
             ffmpeg.handle(ffmpegTask);
+        } catch (Exception exception) {
+            throw new TaskExecutionException("Unable to handle task " + aTask, exception);
         } finally {
             FileUtils.deleteQuietly(tempFile);
         }

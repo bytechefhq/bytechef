@@ -22,6 +22,7 @@ import com.arakelian.jq.ImmutableJqLibrary;
 import com.arakelian.jq.ImmutableJqRequest;
 import com.arakelian.jq.JqResponse;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
@@ -37,16 +38,20 @@ class Dar implements TaskHandler<String> {
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
     @Override
-    public String handle(TaskExecution aTask) throws Exception {
+    public String handle(TaskExecution aTask) throws TaskExecutionException {
         Map<?, ?> mediainfoResult = mediainfo.handle(aTask);
 
-        JqResponse response = ImmutableJqRequest.builder() //
-                .lib(ImmutableJqLibrary.of())
-                .input(jsonMapper.writeValueAsString(mediainfoResult))
-                .filter(".media.track[]  | select(.\"@type\" == \"Video\") | .DisplayAspectRatio")
-                .build()
-                .execute();
+        try {
+            JqResponse response = ImmutableJqRequest.builder() //
+                    .lib(ImmutableJqLibrary.of())
+                    .input(jsonMapper.writeValueAsString(mediainfoResult))
+                    .filter(".media.track[]  | select(.\"@type\" == \"Video\") | .DisplayAspectRatio")
+                    .build()
+                    .execute();
 
-        return response.getOutput();
+            return response.getOutput();
+        } catch (Exception exception) {
+            throw new TaskExecutionException("Unable to handle " + aTask, exception);
+        }
     }
 }

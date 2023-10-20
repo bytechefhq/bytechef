@@ -16,6 +16,7 @@
 
 package com.bytechef.task.commons.xml;
 
+import com.bytechef.task.commons.exception.TaskException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.io.InputStream;
@@ -54,24 +55,24 @@ public class XmlHelper {
     public Map<String, ?> read(String xml) {
         try {
             return XML_MAPPER.convertValue(XML_MAPPER.readTree(xml), new TypeReference<>() {});
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception exception) {
+            throw new TaskException("Unable to convert xml value", exception);
         }
     }
 
     public <T> T read(String xml, Class<T> clazz) {
         try {
             return XML_MAPPER.readValue(xml, clazz);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception exception) {
+            throw new TaskException("Unable to read xml value", exception);
         }
     }
 
     public <T> T read(String xml, TypeReference<T> typeReference) {
         try {
             return XML_MAPPER.readValue(xml, typeReference);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception exception) {
+            throw new TaskException("Unable to read xml", exception);
         }
     }
 
@@ -94,8 +95,8 @@ public class XmlHelper {
     public Stream<Map<String, ?>> stream(InputStream inputStream) {
         try {
             return new XmlStreamReaderStream(inputStream, XML_MAPPER);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception exception) {
+            throw new TaskException("Unable to stream xml", exception);
         }
     }
 
@@ -106,24 +107,24 @@ public class XmlHelper {
     public String write(Object object, String rootName) {
         try {
             return XML_MAPPER.writer().withRootName(rootName).writeValueAsString(object);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception exception) {
+            throw new TaskException("Unable to write xml", exception);
         }
     }
 
     private Document parse(InputStream inputStream, DocumentBuilder documentBuilder) {
         try {
             return documentBuilder.parse(inputStream);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception exception) {
+            throw new TaskException("Unable to parse xml", exception);
         }
     }
 
     private Document parse(String xml, DocumentBuilder documentBuilder) {
         try {
             return documentBuilder.parse(new InputSource(new StringReader(xml)));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception exception) {
+            throw new TaskException("Unable to parse xml", exception);
         }
     }
 
@@ -144,8 +145,8 @@ public class XmlHelper {
             }
 
             sb.append("</root>");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception exception) {
+            throw new TaskException("Unable to parse xml", exception);
         }
 
         return sb.toString();
@@ -160,8 +161,8 @@ public class XmlHelper {
             transformer.transform(new DOMSource(node), new StreamResult(stringWriter));
 
             return stringWriter.toString();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception exception) {
+            throw new TaskException("Unable to transform xml node", exception);
         }
     }
 }

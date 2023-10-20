@@ -22,6 +22,7 @@ import com.bytechef.atlas.data.ResultPage;
 import com.bytechef.atlas.job.JobSummary;
 import com.bytechef.atlas.job.domain.Job;
 import com.bytechef.atlas.job.domain.SimpleJob;
+import com.bytechef.atlas.repository.exception.RepositoryException;
 import com.bytechef.atlas.repository.job.JobRepository;
 import com.bytechef.atlas.util.JsonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,6 +40,7 @@ import org.springframework.util.Assert;
 /**
  * @author Arik Cohe
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class JdbcJobRepository implements JobRepository {
 
@@ -49,23 +51,42 @@ public class JdbcJobRepository implements JobRepository {
 
     @Override
     public int countRunningJobs() {
-        return jdbcTemplate.queryForObject("select count(*) from job where status='STARTED'", Map.of(), Integer.class);
+        Integer count =
+                jdbcTemplate.queryForObject("select count(*) from job where status='STARTED'", Map.of(), Integer.class);
+
+        if (count != null) {
+            return count;
+        }
+
+        throw new RepositoryException("Unable to count jobs with status STARTED");
     }
 
     @Override
     public int countCompletedJobsToday() {
-        return jdbcTemplate.queryForObject(
+        Integer count = jdbcTemplate.queryForObject(
                 "select count(*) from job where status='COMPLETED' and end_time >= current_date",
                 Map.of(),
                 Integer.class);
+
+        if (count != null) {
+            return count;
+        }
+
+        throw new RepositoryException("Unable to count today jobs with status COMPLETED");
     }
 
     @Override
     public int countCompletedJobsYesterday() {
-        return jdbcTemplate.queryForObject(
+        Integer count = jdbcTemplate.queryForObject(
                 "select count(*) from job where status='COMPLETED' and end_time >= current_date-1 and end_time < current_date",
                 Map.of(),
                 Integer.class);
+
+        if (count != null) {
+            return count;
+        }
+
+        throw new RepositoryException("Unable to count yesterday jobs with status COMPLETED");
     }
 
     @Override

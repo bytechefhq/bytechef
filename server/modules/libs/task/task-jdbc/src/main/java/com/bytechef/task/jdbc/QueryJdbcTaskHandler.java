@@ -39,7 +39,7 @@ public class QueryJdbcTaskHandler extends AbstractJdbcTaskHandler implements Tas
     }
 
     @Override
-    public List<Map<String, ?>> handle(TaskExecution taskExecution) throws Exception {
+    public List<Map<String, ?>> handle(TaskExecution taskExecution) {
         String queryStatement = taskExecution.getRequiredString(QUERY);
         Map<String, ?> paramMap = taskExecution.getMap(PARAMETERS, Map.of());
 

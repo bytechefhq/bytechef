@@ -19,6 +19,7 @@
 package com.bytechef.task.handler.io;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,16 +37,20 @@ import org.springframework.stereotype.Component;
 class Ls implements TaskHandler<List<Ls.FileInfo>> {
 
     @Override
-    public List<Ls.FileInfo> handle(TaskExecution aTask) throws IOException {
+    public List<Ls.FileInfo> handle(TaskExecution aTask) throws TaskExecutionException {
         Path root = Paths.get(aTask.getRequiredString("path"));
 
         boolean recursive = aTask.getBoolean("recursive", false);
 
-        return Files.walk(root)
-                .filter(p -> recursive || p.getParent().equals(root))
-                .filter(Files::isRegularFile)
-                .map(p -> new FileInfo(root, p))
-                .collect(Collectors.toList());
+        try {
+            return Files.walk(root)
+                    .filter(p -> recursive || p.getParent().equals(root))
+                    .filter(Files::isRegularFile)
+                    .map(p -> new FileInfo(root, p))
+                    .collect(Collectors.toList());
+        } catch (IOException ioException) {
+            throw new TaskExecutionException("Unable to list directory entries", ioException);
+        }
     }
 
     public static class FileInfo {

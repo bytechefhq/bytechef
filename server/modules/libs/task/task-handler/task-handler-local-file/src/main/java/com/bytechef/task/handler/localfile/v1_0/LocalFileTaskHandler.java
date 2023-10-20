@@ -23,10 +23,12 @@ import static com.bytechef.task.handler.localfile.LocalFileTaskConstants.VERSION
 import static com.bytechef.task.handler.localfile.LocalFileTaskConstants.WRITE;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
 import com.bytechef.task.commons.file.storage.FileStorageHelper;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,9 +51,11 @@ public class LocalFileTaskHandler {
         }
 
         @Override
-        public FileEntry handle(TaskExecution taskExecution) throws Exception {
+        public FileEntry handle(TaskExecution taskExecution) throws TaskExecutionException {
             try (InputStream inputStream = new FileInputStream(taskExecution.getRequiredString(FILE_NAME))) {
                 return fileStorageHelper.storeFileContent(taskExecution, inputStream);
+            } catch (IOException ioException) {
+                throw new TaskExecutionException("Unable to open file " + taskExecution, ioException);
             }
         }
     }
@@ -66,11 +70,13 @@ public class LocalFileTaskHandler {
         }
 
         @Override
-        public Map<String, Long> handle(TaskExecution taskExecution) throws Exception {
+        public Map<String, Long> handle(TaskExecution taskExecution) throws TaskExecutionException {
             String fileName = taskExecution.getRequired(FILE_NAME);
 
             try (InputStream inputStream = fileStorageHelper.getFileContentStream(taskExecution)) {
                 return Map.of("bytes", Files.copy(inputStream, Path.of(fileName), StandardCopyOption.REPLACE_EXISTING));
+            } catch (IOException ioException) {
+                throw new TaskExecutionException("Unable to create file " + taskExecution, ioException);
             }
         }
     }

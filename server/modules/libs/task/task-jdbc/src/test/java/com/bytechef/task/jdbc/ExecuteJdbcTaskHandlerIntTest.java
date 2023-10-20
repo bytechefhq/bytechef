@@ -52,7 +52,7 @@ public class ExecuteJdbcTaskHandlerIntTest {
     }
 
     @Test
-    public void testExecute() throws Exception {
+    public void testExecute() {
         TaskExecution taskExecution = new SimpleTaskExecution(
                 Map.of(
                         "execute",

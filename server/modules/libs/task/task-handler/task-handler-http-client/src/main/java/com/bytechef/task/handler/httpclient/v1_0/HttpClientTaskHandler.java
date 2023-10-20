@@ -19,6 +19,7 @@ package com.bytechef.task.handler.httpclient.v1_0;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.*;
 
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.task.handler.httpclient.v1_0.http.HttpClientHelper;
 import org.springframework.stereotype.Component;
@@ -37,8 +38,12 @@ public class HttpClientTaskHandler {
         }
 
         @Override
-        public Object handle(TaskExecution taskExecution) throws Exception {
-            return httpClientHelper.send(taskExecution, getRequestMethod());
+        public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
+            try {
+                return httpClientHelper.send(taskExecution, getRequestMethod());
+            } catch (Exception exception) {
+                throw new TaskExecutionException("Unable to send payload", exception);
+            }
         }
 
         protected abstract RequestMethod getRequestMethod();

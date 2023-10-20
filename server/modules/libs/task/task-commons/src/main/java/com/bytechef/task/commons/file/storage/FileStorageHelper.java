@@ -22,6 +22,7 @@ import static com.bytechef.hermes.file.storage.FileStorageConstants.FILE_NAME;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.hermes.file.storage.dto.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.task.commons.exception.TaskException;
 import java.io.InputStream;
 import org.springframework.stereotype.Component;
 
@@ -64,8 +65,8 @@ public class FileStorageHelper {
     public FileEntry storeFileContent(String fileName, InputStream inputStream) {
         try {
             return fileStorageService.storeFileContent(fileName, inputStream);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception exception) {
+            throw new TaskException("Unable to store file " + fileName, exception);
         }
     }
 

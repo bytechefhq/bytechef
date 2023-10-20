@@ -19,6 +19,7 @@
 package com.bytechef.atlas.repository.jdbc.counter;
 
 import com.bytechef.atlas.repository.counter.CounterRepository;
+import com.bytechef.atlas.repository.exception.RepositoryException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +52,10 @@ public class JdbcCounterRepository implements CounterRepository {
     public long decrement(String counterName) {
         Long value = jdbcTemplate.queryForObject(
                 "select value from counter where id = ? for update", Long.class, counterName);
+
+        if (value == null) {
+            throw new RepositoryException("Unable to locate counter name " + counterName);
+        }
 
         value = value - 1;
 

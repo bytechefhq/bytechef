@@ -21,6 +21,7 @@ package com.bytechef.task.handler.media;
 import com.arakelian.jq.ImmutableJqLibrary;
 import com.arakelian.jq.ImmutableJqRequest;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
+import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
@@ -37,29 +38,33 @@ class Vduration implements TaskHandler<Double> {
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
     @Override
-    public Double handle(TaskExecution aTask) throws Exception {
+    public Double handle(TaskExecution aTask) throws TaskExecutionException {
         Map<?, ?> ffprobeResult = ffprobe.handle(aTask);
 
-        // attempt to get the duration from the codec_type = video stream
-        String output = ImmutableJqRequest.builder()
-                .lib(ImmutableJqLibrary.of())
-                .input(jsonMapper.writeValueAsString(ffprobeResult))
-                .filter(".streams[] | select (.codec_type==\"video\") | .duration")
-                .build()
-                .execute()
-                .getOutput();
-
-        // fallback to the container's format.duration
-        if (StringUtils.isBlank(output) || output.equals("null")) {
-            output = ImmutableJqRequest.builder()
+        try {
+            // attempt to get the duration from the codec_type = video stream
+            String output = ImmutableJqRequest.builder()
                     .lib(ImmutableJqLibrary.of())
                     .input(jsonMapper.writeValueAsString(ffprobeResult))
-                    .filter(".format.duration")
+                    .filter(".streams[] | select (.codec_type==\"video\") | .duration")
                     .build()
                     .execute()
                     .getOutput();
-        }
 
-        return Double.valueOf(output.replaceAll("[^0-9\\.]", ""));
+            // fallback to the container's format.duration
+            if (StringUtils.isBlank(output) || output.equals("null")) {
+                output = ImmutableJqRequest.builder()
+                        .lib(ImmutableJqLibrary.of())
+                        .input(jsonMapper.writeValueAsString(ffprobeResult))
+                        .filter(".format.duration")
+                        .build()
+                        .execute()
+                        .getOutput();
+            }
+
+            return Double.valueOf(output.replaceAll("[^0-9\\.]", ""));
+        } catch (Exception exception) {
+            throw new TaskExecutionException("Unable to handle task " + aTask, exception);
+        }
     }
 }
