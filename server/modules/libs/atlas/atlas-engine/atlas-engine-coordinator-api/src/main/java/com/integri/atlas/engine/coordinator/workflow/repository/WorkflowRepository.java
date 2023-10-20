@@ -31,4 +31,8 @@ public interface WorkflowRepository {
     Workflow findOne(String aId);
 
     List<Workflow> findAll();
+
+    default Workflow create(String content, String format) {
+        throw new UnsupportedOperationException();
+    }
 }

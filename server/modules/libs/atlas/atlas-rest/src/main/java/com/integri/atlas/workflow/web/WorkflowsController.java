@@ -24,7 +24,13 @@ import com.integri.atlas.engine.coordinator.workflow.repository.WorkflowReposito
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -37,6 +43,13 @@ public class WorkflowsController {
 
     @Autowired
     private WorkflowRepository workflowRepository;
+
+    @PostMapping(path = "/workflows", consumes = { "application/json", "application/yaml" })
+    public ResponseEntity create(@RequestBody String content, @RequestHeader("Content-Type") String contentType) {
+        Workflow workflow = workflowRepository.create(content, contentType.substring(contentType.lastIndexOf('/') + 1));
+
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(workflow);
+    }
 
     @GetMapping("/workflows")
     public List<Workflow> list() {
