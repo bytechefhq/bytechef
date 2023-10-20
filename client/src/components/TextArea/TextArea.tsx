@@ -6,17 +6,21 @@ type TextAreaProps = {
     label: string;
     name: string;
     error?: string | undefined;
+    labelClassName?: string;
 } & React.DetailedHTMLProps<
     React.TextareaHTMLAttributes<HTMLTextAreaElement>,
     HTMLTextAreaElement
 >;
 
 const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
-    ({label, name, error, ...props}, ref) => (
+    ({label, name, error, labelClassName, ...props}, ref) => (
         <fieldset className="mb-3">
             <label
                 htmlFor={name}
-                className="block text-sm font-medium text-gray-700 dark:text-gray-400"
+                className={twMerge(
+                    'block px-2 text-sm font-medium text-gray-700 dark:text-gray-400',
+                    labelClassName
+                )}
             >
                 {label}
             </label>
