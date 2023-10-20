@@ -1,3 +1,5 @@
 src/main/java/com/bytechef/hermes/integration/web/rest/ApiUtil.java
+src/main/java/com/bytechef/hermes/integration/web/rest/IntegrationTagsApi.java
 src/main/java/com/bytechef/hermes/integration/web/rest/IntegrationsApi.java
 src/main/java/com/bytechef/hermes/integration/web/rest/model/IntegrationModel.java
+src/main/java/com/bytechef/hermes/integration/web/rest/model/PutIntegrationTagsRequestModel.java
