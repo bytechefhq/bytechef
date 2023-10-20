@@ -17,7 +17,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task.evaluator;
+package com.bytechef.evaluator;
 
 import java.util.Map;
 import org.springframework.core.convert.TypeDescriptor;

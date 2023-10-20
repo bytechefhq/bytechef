@@ -9,6 +9,7 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-api")
     implementation project(":server:libs:core:message-broker:message-broker-api")
     implementation project(":server:libs:core:commons:commons-util")
+    implementation project(":server:libs:core:evaluator")
 
     testImplementation "com.fasterxml.jackson.core:jackson-databind"
     testImplementation project(":server:libs:atlas:atlas-service")

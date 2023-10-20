@@ -17,19 +17,15 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task.evaluator;
+package com.bytechef.evaluator;
 
-import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.atlas.task.WorkflowTask;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.env.Environment;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.MethodExecutor;
@@ -46,73 +42,46 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
  * Task evaluator implementation which is based on Spring Expression Language for resolving expressions.
  *
  * @author Arik Cohen
+ * @author Ivica Cardic
  * @since Mar 31, 2017
  */
-public class TaskEvaluator {
+public class Evaluator {
 
-    private final transient ExpressionParser parser = new SpelExpressionParser();
+    private static final Logger log = LoggerFactory.getLogger(Evaluator.class);
 
+    private static final ExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
+    private static final Map<String, MethodExecutor> METHOD_EXECUTOR_MAP = new HashMap<>();
     private static final String PREFIX = "${";
     private static final String SUFFIX = "}";
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskEvaluator.class);
-
-    private final transient Map<String, MethodExecutor> methodExecutors;
-
-    private TaskEvaluator(Builder aBuilder) {
-        Map<String, MethodExecutor> map = new HashMap<>();
-
-        map.put("boolean", new Cast<>(Boolean.class));
-        map.put("byte", new Cast<>(Byte.class));
-        map.put("char", new Cast<>(Character.class));
-        map.put("short", new Cast<>(Short.class));
-        map.put("int", new Cast<>(Integer.class));
-        map.put("long", new Cast<>(Long.class));
-        map.put("float", new Cast<>(Float.class));
-        map.put("double", new Cast<>(Double.class));
-        map.put("systemProperty", new SystemProperty());
-        map.put("range", new Range());
-        map.put("join", new Join());
-        map.put("concat", new Concat());
-        map.put("flatten", new Flatten());
-        map.put("uuid", new Uuid());
-        map.put("stringf", new StringFormat());
-        map.put("sort", new Sort());
-        map.put("timestamp", new Timestamp());
-        map.put("now", new Now());
-        map.put("dateFormat", new DateFormat());
-        map.put("config", new Config(aBuilder.environment));
-        map.putAll(aBuilder.methodExecutors);
-
-        methodExecutors = Collections.unmodifiableMap(map);
+    static {
+        METHOD_EXECUTOR_MAP.put("boolean", new Cast<>(Boolean.class));
+        METHOD_EXECUTOR_MAP.put("byte", new Cast<>(Byte.class));
+        METHOD_EXECUTOR_MAP.put("char", new Cast<>(Character.class));
+        METHOD_EXECUTOR_MAP.put("concat", new Concat());
+        METHOD_EXECUTOR_MAP.put("dateFormat", new DateFormat());
+        METHOD_EXECUTOR_MAP.put("flatten", new Flatten());
+        METHOD_EXECUTOR_MAP.put("float", new Cast<>(Float.class));
+        METHOD_EXECUTOR_MAP.put("double", new Cast<>(Double.class));
+        METHOD_EXECUTOR_MAP.put("int", new Cast<>(Integer.class));
+        METHOD_EXECUTOR_MAP.put("join", new Join());
+        METHOD_EXECUTOR_MAP.put("long", new Cast<>(Long.class));
+        METHOD_EXECUTOR_MAP.put("now", new Now());
+        METHOD_EXECUTOR_MAP.put("range", new Range());
+        METHOD_EXECUTOR_MAP.put("short", new Cast<>(Short.class));
+        METHOD_EXECUTOR_MAP.put("sort", new Sort());
+        METHOD_EXECUTOR_MAP.put("stringf", new StringFormat());
+        METHOD_EXECUTOR_MAP.put("systemProperty", new SystemProperty());
+        METHOD_EXECUTOR_MAP.put("tempDir", new TempDir());
+        METHOD_EXECUTOR_MAP.put("timestamp", new Timestamp());
+        METHOD_EXECUTOR_MAP.put("uuid", new Uuid());
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static Map<String, Object> evaluate(Map<String, Object> map, Map<String, Object> context) {
+        return evaluateInternal(map, context);
     }
 
-    public static TaskEvaluator create() {
-        return builder().build();
-    }
-
-    /**
-     * Evaluate the {@link WorkflowTask}
-     *
-     * @param taskExecution The {@link TaskExecution} instance to evaluate
-     * @param context       The context value to evaluate the task against
-     * @return the evaluated {@link TaskExecution} instance.
-     */
-    public TaskExecution evaluate(TaskExecution taskExecution, Map<String, Object> context) {
-        WorkflowTask workflowTask = taskExecution.getWorkflowTask();
-
-        Map<String, Object> map = evaluateInternal(workflowTask.toMap(), context);
-
-        taskExecution.setWorkflowTask(WorkflowTask.of(map));
-
-        return taskExecution;
-    }
-
-    private StandardEvaluationContext createEvaluationContext(Map<String, Object> context) {
+    private static StandardEvaluationContext createEvaluationContext(Map<String, Object> context) {
         StandardEvaluationContext evaluationContext = new StandardEvaluationContext(context);
 
         evaluationContext.addPropertyAccessor(new MapPropertyAccessor());
@@ -121,7 +90,7 @@ public class TaskEvaluator {
         return evaluationContext;
     }
 
-    private String evaluate(CompositeStringExpression compositeStringExpression, Map<String, Object> context) {
+    private static String evaluate(CompositeStringExpression compositeStringExpression, Map<String, Object> context) {
         StringBuilder stringBuilder = new StringBuilder();
         Expression[] subExpressions = compositeStringExpression.getExpressions();
 
@@ -144,9 +113,10 @@ public class TaskEvaluator {
         return stringBuilder.toString();
     }
 
-    private Object evaluate(Object value, Map<String, Object> context) {
+    private static Object evaluate(Object value, Map<String, Object> context) {
         if (value instanceof String) {
-            Expression expression = parser.parseExpression((String) value, new TemplateParserContext(PREFIX, SUFFIX));
+            Expression expression =
+                EXPRESSION_PARSER.parseExpression((String) value, new TemplateParserContext(PREFIX, SUFFIX));
 
             if (expression instanceof CompositeStringExpression) { // attempt partial evaluation
                 return evaluate((CompositeStringExpression) expression, context);
@@ -154,8 +124,8 @@ public class TaskEvaluator {
                 try {
                     return expression.getValue(createEvaluationContext(context));
                 } catch (SpelEvaluationException e) {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace(e.getMessage());
+                    if (log.isTraceEnabled()) {
+                        log.trace(e.getMessage());
                     }
 
                     return value;
@@ -176,7 +146,7 @@ public class TaskEvaluator {
         return value;
     }
 
-    private Map<String, Object> evaluateInternal(Map<?, ?> map, Map<String, Object> context) {
+    private static Map<String, Object> evaluateInternal(Map<?, ?> map, Map<String, Object> context) {
         Map<String, Object> newMap = new HashMap<>();
 
         for (Entry<?, ?> entry : map.entrySet()) {
@@ -186,29 +156,7 @@ public class TaskEvaluator {
         return newMap;
     }
 
-    private MethodResolver methodResolver() {
-        return (ctx, target, name, args) -> methodExecutors.get(name);
-    }
-
-    public static class Builder {
-
-        private final transient Map<String, MethodExecutor> methodExecutors = new HashMap<>();
-        private transient Environment environment;
-
-        public Builder environment(Environment environment) {
-            this.environment = environment;
-
-            return this;
-        }
-
-        public Builder methodExecutor(String methodName, MethodExecutor methodExecutor) {
-            methodExecutors.put(methodName, methodExecutor);
-
-            return this;
-        }
-
-        public TaskEvaluator build() {
-            return new TaskEvaluator(this);
-        }
+    private static MethodResolver methodResolver() {
+        return (ctx, target, name, args) -> METHOD_EXECUTOR_MAP.get(name);
     }
 }

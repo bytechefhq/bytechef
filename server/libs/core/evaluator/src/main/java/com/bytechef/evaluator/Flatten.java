@@ -17,23 +17,30 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task.evaluator;
+package com.bytechef.evaluator;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
 import org.springframework.expression.TypedValue;
 
-import java.util.UUID;
-
 /**
  * @author Arik Cohen
  * @since Feb, 19 2020
  */
-class Uuid implements MethodExecutor {
+class Flatten implements MethodExecutor {
 
     @Override
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
-        return new TypedValue(UUID.randomUUID());
+        @SuppressWarnings("unchecked")
+        List<List<?>> list = (List<List<?>>) arguments[0];
+
+        List<?> flat = list.stream()
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
+
+        return new TypedValue(flat);
     }
 }

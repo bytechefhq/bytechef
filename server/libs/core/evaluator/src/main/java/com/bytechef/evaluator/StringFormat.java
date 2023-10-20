@@ -17,11 +17,8 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task.evaluator;
+package com.bytechef.evaluator;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -29,16 +26,15 @@ import org.springframework.expression.TypedValue;
 
 /**
  * @author Arik Cohen
- * @since Feb, 19 2020
+ * @since Feb, 24 2020
  */
-class Range implements MethodExecutor {
+class StringFormat implements MethodExecutor {
 
     @Override
-    public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        List<Integer> value = IntStream.rangeClosed((int) aArguments[0], (int) aArguments[1])
-            .boxed()
-            .collect(Collectors.toList());
+    public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
+        Object[] args = new Object[arguments.length - 1];
+        System.arraycopy(arguments, 1, args, 0, arguments.length - 1);
 
-        return new TypedValue(value);
+        return new TypedValue(String.format((String) arguments[0], args));
     }
 }

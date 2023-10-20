@@ -17,9 +17,11 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task.evaluator;
+package com.bytechef.evaluator;
 
-import java.util.Date;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -27,12 +29,17 @@ import org.springframework.expression.TypedValue;
 
 /**
  * @author Arik Cohen
- * @since Mar, 03 2020
+ * @since Feb, 25 2020
  */
-class Now implements MethodExecutor {
+class Sort implements MethodExecutor {
 
     @Override
-    public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        return new TypedValue(new Date());
+    public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
+        Collection<?> list = (Collection<?>) arguments[0];
+        List<?> sorted = list.stream()
+            .sorted()
+            .collect(Collectors.toList());
+
+        return new TypedValue(sorted);
     }
 }

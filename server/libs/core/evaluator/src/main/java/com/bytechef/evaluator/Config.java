@@ -17,21 +17,38 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task.evaluator;
+package com.bytechef.evaluator;
 
+import org.springframework.core.env.Environment;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
 import org.springframework.expression.TypedValue;
+import org.springframework.expression.spel.SpelEvaluationException;
+import org.springframework.expression.spel.SpelMessage;
 
 /**
  * @author Arik Cohen
- * @since Feb, 19 2020
+ * @since Mar, 06 2020
  */
-class SystemProperty implements MethodExecutor {
+class Config implements MethodExecutor {
+
+    private final transient Environment environment;
+
+    public Config(Environment environment) {
+        this.environment = environment;
+    }
 
     @Override
-    public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        return new TypedValue(System.getProperty((String) aArguments[0]));
+    public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
+        String propertyName = (String) arguments[0];
+        String value = environment.getProperty(propertyName);
+
+        if (value == null) {
+            throw new SpelEvaluationException(
+                SpelMessage.PROPERTY_OR_FIELD_NOT_READABLE, propertyName, Environment.class);
+        }
+
+        return new TypedValue(value);
     }
 }

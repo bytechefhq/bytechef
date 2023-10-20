@@ -17,10 +17,11 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task.evaluator;
+package com.bytechef.evaluator;
 
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -28,21 +29,15 @@ import org.springframework.expression.TypedValue;
 
 /**
  * @author Arik Cohen
- * @since Feb, 19 2020
+ * @since Mar, 03 2020
  */
-class Cast<T> implements MethodExecutor {
-
-    private static final ConversionService conversionService = DefaultConversionService.getSharedInstance();
-
-    private final transient Class<T> type;
-
-    Cast(Class<T> aType) {
-        type = aType;
-    }
+class DateFormat implements MethodExecutor {
 
     @Override
-    public TypedValue execute(EvaluationContext aContext, Object aTarget, Object... aArguments) throws AccessException {
-        T value = type.cast(conversionService.convert(aArguments[0], type));
-        return new TypedValue(value);
+    public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
+        Date date = (Date) arguments[0];
+        SimpleDateFormat sdf = new SimpleDateFormat((String) arguments[1], Locale.getDefault());
+
+        return new TypedValue(sdf.format(date));
     }
 }
