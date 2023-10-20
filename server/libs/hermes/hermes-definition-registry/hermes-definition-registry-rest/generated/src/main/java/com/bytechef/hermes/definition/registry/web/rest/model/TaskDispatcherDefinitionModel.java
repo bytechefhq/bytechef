@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinition", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-07T12:23:14.195693+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-16T09:53:38.370689+02:00[Europe/Zagreb]")
 public class TaskDispatcherDefinitionModel {
 
   private String description;
@@ -34,8 +34,7 @@ public class TaskDispatcherDefinitionModel {
 
   private String name;
 
-  @Valid
-  private List<@Valid PropertyModel> outputSchema;
+  private PropertyModel outputSchema;
 
   @Valid
   private List<@Valid PropertyModel> properties;
@@ -126,31 +125,23 @@ public class TaskDispatcherDefinitionModel {
     this.name = name;
   }
 
-  public TaskDispatcherDefinitionModel outputSchema(List<@Valid PropertyModel> outputSchema) {
+  public TaskDispatcherDefinitionModel outputSchema(PropertyModel outputSchema) {
     this.outputSchema = outputSchema;
     return this;
   }
 
-  public TaskDispatcherDefinitionModel addOutputSchemaItem(PropertyModel outputSchemaItem) {
-    if (this.outputSchema == null) {
-      this.outputSchema = new ArrayList<>();
-    }
-    this.outputSchema.add(outputSchemaItem);
-    return this;
-  }
-
   /**
-   * The output schema of a task dispatching result.
+   * Get outputSchema
    * @return outputSchema
   */
   @Valid 
-  @Schema(name = "outputSchema", description = "The output schema of a task dispatching result.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "outputSchema", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outputSchema")
-  public List<@Valid PropertyModel> getOutputSchema() {
+  public PropertyModel getOutputSchema() {
     return outputSchema;
   }
 
-  public void setOutputSchema(List<@Valid PropertyModel> outputSchema) {
+  public void setOutputSchema(PropertyModel outputSchema) {
     this.outputSchema = outputSchema;
   }
 

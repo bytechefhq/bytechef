@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-09T06:35:25.755050+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-16T09:53:38.236290+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "connection-oauth2-properties", description = "The Core Connection OAuth2 API")
 public interface ConnectionOauth2PropertiesApi {

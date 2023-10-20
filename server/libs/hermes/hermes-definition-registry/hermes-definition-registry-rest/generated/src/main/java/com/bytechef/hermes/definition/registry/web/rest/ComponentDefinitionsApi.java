@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-07T12:23:14.195693+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-16T09:53:38.370689+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "action-definitions", description = "The Core Action Definitions API")
 public interface ComponentDefinitionsApi {
@@ -84,7 +84,7 @@ public interface ComponentDefinitionsApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"outputSchema\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ], \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"sampleOutput\" : \"{}\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] }";
+                    String exampleString = "{ \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"outputSchema\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"sampleOutput\" : \"{}\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -527,6 +527,54 @@ public interface ComponentDefinitionsApi {
 
 
     /**
+     * GET /component-definitions : Get all component definitions
+     * Get all component definitions.
+     *
+     * @param actionDefinitions Use for filtering components which define action definitions. (optional)
+     * @param connectionDefinitions Use for filtering components which define connection definitions. (optional)
+     * @param connectionInstances Use for filtering components which have connection instances created. (optional)
+     * @param triggerDefinitions Use for filtering components which define trigger definitions. (optional)
+     * @param include The list of component names to include in the result. (optional)
+     * @return Successful operation. (status code 200)
+     */
+    @Operation(
+        operationId = "getComponentDefinitions",
+        summary = "Get all component definitions",
+        description = "Get all component definitions.",
+        tags = { "component-definitions" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ComponentDefinitionBasicModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/component-definitions",
+        produces = { "application/json" }
+    )
+    default ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitions(
+        @Parameter(name = "actionDefinitions", description = "Use for filtering components which define action definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "actionDefinitions", required = false) Boolean actionDefinitions,
+        @Parameter(name = "connectionDefinitions", description = "Use for filtering components which define connection definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionDefinitions", required = false) Boolean connectionDefinitions,
+        @Parameter(name = "connectionInstances", description = "Use for filtering components which have connection instances created.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionInstances", required = false) Boolean connectionInstances,
+        @Parameter(name = "triggerDefinitions", description = "Use for filtering components which define trigger definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "triggerDefinitions", required = false) Boolean triggerDefinitions,
+        @Parameter(name = "include", description = "The list of component names to include in the result.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "include", required = false) List<String> include
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"category\" : \"category\", \"title\" : \"title\", \"tags\" : [ \"tags\", \"tags\" ] }, { \"icon\" : \"icon\", \"name\" : \"name\", \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"category\" : \"category\", \"title\" : \"title\", \"tags\" : [ \"tags\", \"tags\" ] } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
      * GET /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName} : Get a trigger definition of a component.
      * Get a trigger definition of a component.
      *
@@ -559,7 +607,7 @@ public interface ComponentDefinitionsApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"outputSchema\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ], \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"sampleOutput\" : \"{}\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] }";
+                    String exampleString = "{ \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"outputSchema\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"sampleOutput\" : \"{}\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -830,52 +878,6 @@ public interface ComponentDefinitionsApi {
         @Parameter(name = "triggerName", description = "The name of a trigger.", required = true, in = ParameterIn.PATH) @PathVariable("triggerName") String triggerName,
         @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) ComponentOperationRequestModel componentOperationRequestModel
     ) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * GET /component-definitions : Get all component definitions
-     * Get all component definitions.
-     *
-     * @param actionDefinitions Use for filtering components which define action definitions. (optional)
-     * @param connectionDefinitions Use for filtering components which define connection definitions. (optional)
-     * @param connectionInstances Use for filtering components which have connection instances created. (optional)
-     * @param triggerDefinitions Use for filtering components which define trigger definitions. (optional)
-     * @return Successful operation. (status code 200)
-     */
-    @Operation(
-        operationId = "searchComponentDefinitions",
-        summary = "Get all component definitions",
-        description = "Get all component definitions.",
-        tags = { "component-definitions" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ComponentDefinitionBasicModel.class)))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/component-definitions",
-        produces = { "application/json" }
-    )
-    default ResponseEntity<List<ComponentDefinitionBasicModel>> searchComponentDefinitions(
-        @Parameter(name = "actionDefinitions", description = "Use for filtering components which define action definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "actionDefinitions", required = false) Boolean actionDefinitions,
-        @Parameter(name = "connectionDefinitions", description = "Use for filtering components which define connection definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionDefinitions", required = false) Boolean connectionDefinitions,
-        @Parameter(name = "connectionInstances", description = "Use for filtering components which have connection instances created.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionInstances", required = false) Boolean connectionInstances,
-        @Parameter(name = "triggerDefinitions", description = "Use for filtering components which define trigger definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "triggerDefinitions", required = false) Boolean triggerDefinitions
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"category\" : \"category\", \"title\" : \"title\", \"tags\" : [ \"tags\", \"tags\" ] }, { \"icon\" : \"icon\", \"name\" : \"name\", \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"category\" : \"category\", \"title\" : \"title\", \"tags\" : [ \"tags\", \"tags\" ] } ]";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

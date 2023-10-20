@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-08T12:06:03.369320+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-16T09:53:37.311699+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "connections", description = "The Automation Connections API")
 public interface ConnectionsApi {
@@ -43,7 +43,7 @@ public interface ConnectionsApi {
     }
 
     /**
-     * POST /connections/search : Create a new connection
+     * POST /connections : Create a new connection
      * Create a new connection.
      *
      * @param connectionModel  (required)
@@ -62,7 +62,7 @@ public interface ConnectionsApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/connections/search",
+        value = "/connections",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
@@ -194,17 +194,17 @@ public interface ConnectionsApi {
 
 
     /**
-     * GET /connections/search : Search connections
-     * Search connections.
+     * GET /connections : Get all connections
+     * Get all connections.
      *
      * @param componentNames The list of component names used for filtering connections. (optional)
      * @param tagIds The list of tag ids of used for filtering connections. (optional)
      * @return A list of connections. (status code 200)
      */
     @Operation(
-        operationId = "searchConnections",
-        summary = "Search connections",
-        description = "Search connections.",
+        operationId = "getConnections",
+        summary = "Get all connections",
+        description = "Get all connections.",
         tags = { "connections" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of connections.", content = {
@@ -214,10 +214,10 @@ public interface ConnectionsApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connections/search",
+        value = "/connections",
         produces = { "application/json" }
     )
-    default ResponseEntity<List<ConnectionModel>> searchConnections(
+    default ResponseEntity<List<ConnectionModel>> getConnections(
         @Parameter(name = "componentNames", description = "The list of component names used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "componentNames", required = false) List<String> componentNames,
         @Parameter(name = "tagIds", description = "The list of tag ids of used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagIds", required = false) List<Long> tagIds
     ) {

@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-07T12:23:14.195693+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-16T09:53:38.370689+02:00[Europe/Zagreb]")
 public class TriggerDefinitionModel {
 
   private String description;
@@ -38,8 +38,7 @@ public class TriggerDefinitionModel {
 
   private String name;
 
-  @Valid
-  private List<@Valid PropertyModel> outputSchema;
+  private PropertyModel outputSchema;
 
   @Valid
   private List<@Valid PropertyModel> properties;
@@ -145,31 +144,23 @@ public class TriggerDefinitionModel {
     this.name = name;
   }
 
-  public TriggerDefinitionModel outputSchema(List<@Valid PropertyModel> outputSchema) {
+  public TriggerDefinitionModel outputSchema(PropertyModel outputSchema) {
     this.outputSchema = outputSchema;
     return this;
   }
 
-  public TriggerDefinitionModel addOutputSchemaItem(PropertyModel outputSchemaItem) {
-    if (this.outputSchema == null) {
-      this.outputSchema = new ArrayList<>();
-    }
-    this.outputSchema.add(outputSchemaItem);
-    return this;
-  }
-
   /**
-   * The output schema of an execution result.
+   * Get outputSchema
    * @return outputSchema
   */
   @Valid 
-  @Schema(name = "outputSchema", description = "The output schema of an execution result.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "outputSchema", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outputSchema")
-  public List<@Valid PropertyModel> getOutputSchema() {
+  public PropertyModel getOutputSchema() {
     return outputSchema;
   }
 
-  public void setOutputSchema(List<@Valid PropertyModel> outputSchema) {
+  public void setOutputSchema(PropertyModel outputSchema) {
     this.outputSchema = outputSchema;
   }
 
