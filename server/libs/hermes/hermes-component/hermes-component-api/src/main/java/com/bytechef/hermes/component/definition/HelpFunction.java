@@ -19,31 +19,17 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
  */
-public sealed interface ExampleOutputDataSource permits ComponentDSL.ModifiableExampleOutputDataSource {
+interface HelpFunction {
 
-    /**
-     * The function that returns an example output.
-     *
-     * @return The function implementation
-     */
-    ExampleOutputFunction getExampleOutput();
+    HelpOutput apply(Context.Connection connection, InputParameters inputParameters);
 
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface ExampleOutputFunction {
+    @SuppressFBWarnings("EI")
+    record HelpOutput(String body, String learnMoreUrl) {
 
-        /**
-         *
-         * @param connection
-         * @param inputParameters
-         * @return
-         */
-        Object apply(Context.Connection connection, InputParameters inputParameters);
     }
 }

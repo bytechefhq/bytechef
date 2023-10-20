@@ -94,7 +94,7 @@ public class HttpClientUtilsTest {
 
         MultipartBodyPublisher multipartBodyPublisher = (MultipartBodyPublisher) HttpClientUtils.createBodyPublisher(
             context,
-            HttpClientUtils.Payload.of(
+            HttpClientUtils.Body.of(
                 Map.of("key1", "value1", "key2", fileEntry), HttpClientUtils.BodyContentType.FORM_DATA));
 
         Assertions.assertTrue(multipartBodyPublisher.mediaType()
@@ -114,7 +114,7 @@ public class HttpClientUtilsTest {
 
         FormBodyPublisher formBodyPublisher = (FormBodyPublisher) HttpClientUtils.createBodyPublisher(
             context,
-            HttpClientUtils.Payload.of(
+            HttpClientUtils.Body.of(
                 Map.of("key1", "value1", "key2", "value2"), HttpClientUtils.BodyContentType.FORM_URL_ENCODED));
 
         Assertions.assertEquals(MediaType.APPLICATION_FORM_URLENCODED, formBodyPublisher.mediaType());
@@ -128,7 +128,7 @@ public class HttpClientUtilsTest {
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) HttpClientUtils.createBodyPublisher(
             context,
-            HttpClientUtils.Payload.of(Map.of("key1", "value1"), HttpClientUtils.BodyContentType.JSON));
+            HttpClientUtils.Body.of(Map.of("key1", "value1"), HttpClientUtils.BodyContentType.JSON));
 
         Assertions.assertEquals(MediaType.APPLICATION_JSON, mimeBodyPublisherAdapter.mediaType());
 
@@ -136,14 +136,14 @@ public class HttpClientUtilsTest {
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) HttpClientUtils.createBodyPublisher(
             context,
-            HttpClientUtils.Payload.of(Map.of("key1", "value1"), HttpClientUtils.BodyContentType.XML));
+            HttpClientUtils.Body.of(Map.of("key1", "value1"), HttpClientUtils.BodyContentType.XML));
 
         Assertions.assertEquals(MediaType.APPLICATION_XML, mimeBodyPublisherAdapter.mediaType());
 
         //
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) HttpClientUtils.createBodyPublisher(
-            context, HttpClientUtils.Payload.of("text"));
+            context, HttpClientUtils.Body.of("text"));
 
         Assertions.assertEquals(MediaType.TEXT_PLAIN, mimeBodyPublisherAdapter.mediaType());
 
@@ -163,7 +163,7 @@ public class HttpClientUtilsTest {
             .thenReturn("base64:text");
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) HttpClientUtils.createBodyPublisher(
-            context, HttpClientUtils.Payload.of(fileEntry));
+            context, HttpClientUtils.Body.of(fileEntry));
 
         Assertions.assertEquals(MediaType.TEXT_PLAIN, mimeBodyPublisherAdapter.mediaType());
 
@@ -179,7 +179,7 @@ public class HttpClientUtilsTest {
     @SuppressWarnings("checkstyle:methodlengthcheck")
     public void testCreateHTTPClient() {
         HttpClient httpClient = HttpClientUtils.createHttpClient(
-            context, new HashMap<>(), new HashMap<>(), HttpClientUtils.allowUnauthorizedCerts(true));
+            context, null, new HashMap<>(), new HashMap<>(), HttpClientUtils.allowUnauthorizedCerts(true));
 
         Assertions.assertTrue(httpClient.authenticator()
             .isEmpty());
@@ -194,12 +194,13 @@ public class HttpClientUtilsTest {
                 Optional.of(
                     new MockConnection(
                         ComponentDSL.authorization(AuthorizationType.API_KEY.name(), AuthorizationType.API_KEY))
-                        .parameters(
-                            Map.of(Authorization.KEY, Authorization.API_TOKEN, Authorization.VALUE, "token_value"))));
+                            .parameters(
+                                Map.of(Authorization.KEY, Authorization.API_TOKEN, Authorization.VALUE,
+                                    "token_value"))));
 
         Map<String, List<String>> headers = new HashMap<>();
 
-        HttpClientUtils.createHttpClient(context, headers, new HashMap<>(), Configuration.configuration());
+        HttpClientUtils.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), headers);
 
@@ -209,16 +210,16 @@ public class HttpClientUtilsTest {
                 Optional.of(
                     new MockConnection(
                         ComponentDSL.authorization(AuthorizationType.API_KEY.name(), AuthorizationType.API_KEY))
-                        .parameters(
-                            Map.of(
-                                Authorization.KEY, Authorization.API_TOKEN,
-                                Authorization.VALUE, "token_value",
-                                Authorization.ADD_TO, Authorization.ApiTokenLocation.QUERY_PARAMETERS.name()))));
+                            .parameters(
+                                Map.of(
+                                    Authorization.KEY, Authorization.API_TOKEN,
+                                    Authorization.VALUE, "token_value",
+                                    Authorization.ADD_TO, Authorization.ApiTokenLocation.QUERY_PARAMETERS.name()))));
 
         Map<String, List<String>> queryParameters = new HashMap<>();
 
         HttpClientUtils.createHttpClient(
-            context, new HashMap<>(), queryParameters, Configuration.configuration());
+            context, null, new HashMap<>(), queryParameters, Configuration.configuration());
 
         Assertions.assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), queryParameters);
 
@@ -230,12 +231,12 @@ public class HttpClientUtilsTest {
                         ComponentDSL.authorization(
                             Authorization.AuthorizationType.BASIC_AUTH.name(),
                             Authorization.AuthorizationType.BASIC_AUTH))
-                        .parameters(
-                            Map.of(Authorization.USERNAME, "username", Authorization.PASSWORD, "password"))));
+                                .parameters(
+                                    Map.of(Authorization.USERNAME, "username", Authorization.PASSWORD, "password"))));
 
         headers = new HashMap<>();
 
-        HttpClientUtils.createHttpClient(context, headers, new HashMap<>(), Configuration.configuration());
+        HttpClientUtils.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(
             Map.of(
@@ -252,11 +253,11 @@ public class HttpClientUtilsTest {
                         ComponentDSL.authorization(
                             Authorization.AuthorizationType.BEARER_TOKEN.name(),
                             Authorization.AuthorizationType.BEARER_TOKEN))
-                        .parameters(Map.of(Authorization.TOKEN, "token"))));
+                                .parameters(Map.of(Authorization.TOKEN, "token"))));
 
         headers = new HashMap<>();
 
-        HttpClientUtils.createHttpClient(context, headers, new HashMap<>(), Configuration.configuration());
+        HttpClientUtils.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(Map.of("Authorization", List.of("Bearer token")), headers);
 
@@ -268,11 +269,12 @@ public class HttpClientUtilsTest {
                         ComponentDSL.authorization(
                             Authorization.AuthorizationType.DIGEST_AUTH.name(),
                             Authorization.AuthorizationType.DIGEST_AUTH))
-                        .parameters(Map.of(Authorization.USERNAME, "username", Authorization.PASSWORD, "password"))));
+                                .parameters(
+                                    Map.of(Authorization.USERNAME, "username", Authorization.PASSWORD, "password"))));
 
         headers = new HashMap<>();
 
-        HttpClientUtils.createHttpClient(context, headers, new HashMap<>(), Configuration.configuration());
+        HttpClientUtils.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(
             Map.of(
@@ -288,32 +290,32 @@ public class HttpClientUtilsTest {
                         ComponentDSL.authorization(
                             Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE.name(),
                             Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE))
-                        .parameters(Map.of(Authorization.ACCESS_TOKEN, "access_token"))));
+                                .parameters(Map.of(Authorization.ACCESS_TOKEN, "access_token"))));
 
         headers = new HashMap<>();
 
-        HttpClientUtils.createHttpClient(context, headers, new HashMap<>(), Configuration.configuration());
+        HttpClientUtils.createHttpClient(context, null, headers, new HashMap<>(), Configuration.configuration());
 
         Assertions.assertEquals(Map.of("Authorization", List.of("Bearer access_token")), headers);
 
         //
 
         httpClient = HttpClientUtils.createHttpClient(
-            context, new HashMap<>(), new HashMap<>(), HttpClientUtils.followRedirect(true));
+            context, null, new HashMap<>(), new HashMap<>(), HttpClientUtils.followRedirect(true));
 
         Assertions.assertNotNull(httpClient.followRedirects());
 
         //
 
         httpClient = HttpClientUtils.createHttpClient(
-            context, new HashMap<>(), new HashMap<>(), HttpClientUtils.followAllRedirects(true));
+            context, null, new HashMap<>(), new HashMap<>(), HttpClientUtils.followAllRedirects(true));
 
         Assertions.assertNotNull(httpClient.followRedirects());
 
         //
 
         httpClient = HttpClientUtils.createHttpClient(
-            context, new HashMap<>(), new HashMap<>(), HttpClientUtils.proxy("10.11.12.13:30"));
+            context, null, new HashMap<>(), new HashMap<>(), HttpClientUtils.proxy("10.11.12.13:30"));
 
         Assertions.assertTrue(httpClient.proxy()
             .isPresent());
@@ -321,7 +323,7 @@ public class HttpClientUtilsTest {
         //
 
         httpClient = HttpClientUtils.createHttpClient(
-            context, new HashMap<>(), new HashMap<>(), HttpClientUtils.timeout(Duration.ofMillis(2000)));
+            context, null, new HashMap<>(), new HashMap<>(), HttpClientUtils.timeout(Duration.ofMillis(2000)));
 
         Assertions.assertEquals(
             Duration.ofMillis(2000), httpClient.connectTimeout()
@@ -345,7 +347,7 @@ public class HttpClientUtilsTest {
     public void testHandleResponse() throws Exception {
         Assertions.assertNull(
             HttpClientUtils.handleResponse(context, new TestHttpResponse(null), Configuration.configuration())
-                .body());
+                .getBody());
 
         //
 
@@ -359,7 +361,7 @@ public class HttpClientUtilsTest {
             HttpClientUtils.handleResponse(
                 context, new TestHttpResponse(new ByteArrayInputStream("text".getBytes(StandardCharsets.UTF_8))),
                 HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.BINARY))
-                .body());
+                .getBody());
 
         //
 
@@ -374,7 +376,7 @@ public class HttpClientUtilsTest {
                         }
                         """),
                 HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.JSON))
-                .body());
+                .getBody());
 
         //
 
@@ -383,7 +385,7 @@ public class HttpClientUtilsTest {
             HttpClientUtils.handleResponse(
                 context, new TestHttpResponse("text"),
                 HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.TEXT))
-                .body());
+                .getBody());
 
         //
 
@@ -401,12 +403,12 @@ public class HttpClientUtilsTest {
 
                         """),
                 HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.XML))
-                .body());
+                .getBody());
 
         //
 
         Assertions.assertEquals(
-            new HttpClientUtils.Response("text", Map.of(), 200),
+            new HttpClientUtils.Response(Map.of(), "text", 200),
             HttpClientUtils.handleResponse(
                 context, new TestHttpResponse("text"),
                 HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.TEXT)));
@@ -467,6 +469,7 @@ public class HttpClientUtilsTest {
         }
     }
 
+    @SuppressFBWarnings("NP")
     private static class MockConnection implements Context.Connection {
 
         private final Authorization authorization;
@@ -480,7 +483,7 @@ public class HttpClientUtilsTest {
         public void applyAuthorization(AuthorizationContext authorizationContext) {
             authorization.getApply()
                 .accept(
-                    new HttpClientUtilsTest.MockInputParameters(parameters), authorizationContext, null, null);
+                    new MockInputParameters(parameters), authorizationContext, null, null);
         }
 
         @Override
@@ -489,7 +492,217 @@ public class HttpClientUtilsTest {
         }
 
         @Override
-        public InputParameters getParameters() {
+        public String getBaseUri() {
+            return null;
+        }
+
+        @Override
+        public boolean containsKey(String key) {
+            return false;
+        }
+
+        @Override
+        public Object get(String key) {
+            return null;
+        }
+
+        @Override
+        public <T> T get(String key, Class<T> returnType) {
+            return null;
+        }
+
+        @Override
+        public <T> T get(String key, Class<T> returnType, T defaultValue) {
+            return null;
+        }
+
+        @Override
+        public <T> T[] getArray(String key, Class<T> elementType) {
+            return null;
+        }
+
+        @Override
+        public Boolean getBoolean(String key) {
+            return null;
+        }
+
+        @Override
+        public boolean getBoolean(String key, boolean defaultValue) {
+            return false;
+        }
+
+        @Override
+        public Date getDate(String key) {
+            return null;
+        }
+
+        @Override
+        public Date getDate(String key, Date defaultValue) {
+            return null;
+        }
+
+        @Override
+        public Double getDouble(String key) {
+            return null;
+        }
+
+        @Override
+        public double getDouble(String key, double defaultValue) {
+            return 0;
+        }
+
+        @Override
+        public Duration getDuration(String key) {
+            return null;
+        }
+
+        @Override
+        public Duration getDuration(String key, Duration defaultDuration) {
+            return null;
+        }
+
+        @Override
+        public Float getFloat(String key) {
+            return null;
+        }
+
+        @Override
+        public float getFloat(String key, float defaultValue) {
+            return 0;
+        }
+
+        @Override
+        public Integer getInteger(String key) {
+            return null;
+        }
+
+        @Override
+        public int getInteger(String key, int defaultValue) {
+            return 0;
+        }
+
+        @Override
+        public <T> List<T> getList(String key, Class<T> elementType) {
+            return null;
+        }
+
+        @Override
+        public <T> List<T> getList(String key, Class<T> elementType, List<T> defaultValue) {
+            return null;
+        }
+
+        @Override
+        public List<Object> getList(String key, List<Class<?>> elementTypes, List<Object> defaultValue) {
+            return null;
+        }
+
+        @Override
+        public LocalDate getLocalDate(String key) {
+            return null;
+        }
+
+        @Override
+        public LocalDate getLocalDate(String key, LocalDate defaultValue) {
+            return null;
+        }
+
+        @Override
+        public LocalDateTime getLocalDateTime(String key) {
+            return null;
+        }
+
+        @Override
+        public LocalDateTime getLocalDateTime(String key, LocalDateTime defaultValue) {
+            return null;
+        }
+
+        @Override
+        public Long getLong(String key) {
+            return null;
+        }
+
+        @Override
+        public long getLong(String key, long defaultValue) {
+            return 0;
+        }
+
+        @Override
+        public Map<String, Object> getMap() {
+            return null;
+        }
+
+        @Override
+        public <V> Map<String, V> getMap(String key) {
+            return null;
+        }
+
+        @Override
+        public <V> Map<String, V> getMap(String key, Map<String, V> defaultValue) {
+            return null;
+        }
+
+        @Override
+        public Map<String, Object> getMap(String key, List<Class<?>> valueTypes, Map<String, Object> defaultValue) {
+            return null;
+        }
+
+        @Override
+        public <T> T getRequired(String key) {
+            return null;
+        }
+
+        @Override
+        public <T> T getRequired(String key, Class<T> returnType) {
+            return null;
+        }
+
+        @Override
+        public Boolean getRequiredBoolean(String key) {
+            return null;
+        }
+
+        @Override
+        public Date getRequiredDate(String key) {
+            return null;
+        }
+
+        @Override
+        public Double getRequiredDouble(String key) {
+            return null;
+        }
+
+        @Override
+        public Float getRequiredFloat(String key) {
+            return null;
+        }
+
+        @Override
+        public Integer getRequiredInteger(String key) {
+            return null;
+        }
+
+        @Override
+        public LocalDate getRequiredLocalDate(String key) {
+            return null;
+        }
+
+        @Override
+        public LocalDateTime getRequiredLocalDateTime(String key) {
+            return null;
+        }
+
+        @Override
+        public String getRequiredString(String key) {
+            return null;
+        }
+
+        @Override
+        public String getString(String key) {
+            return null;
+        }
+
+        @Override
+        public String getString(String key, String defaultValue) {
             return null;
         }
 
@@ -653,6 +866,11 @@ public class HttpClientUtilsTest {
         @Override
         public Map<String, Object> getMap(String key, List<Class<?>> valueTypes, Map<String, Object> defaultValue) {
             return null;
+        }
+
+        @Override
+        public Map<String, Object> getMap() {
+            return parameters;
         }
 
         @Override

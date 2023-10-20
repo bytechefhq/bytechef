@@ -220,6 +220,8 @@ public interface InputParameters {
      */
     long getLong(String key, long defaultValue);
 
+    Map<String, Object> getMap();
+
     /**
      * Return the {@link Map} value associated with the given key.
      *

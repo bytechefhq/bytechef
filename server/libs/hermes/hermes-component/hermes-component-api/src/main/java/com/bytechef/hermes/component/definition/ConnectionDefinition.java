@@ -69,10 +69,10 @@ public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConn
 
         /**
          *
-         * @param connectionParameters
+         * @param connectionInputParameters
          * @return
          */
-        String apply(InputParameters connectionParameters);
+        String apply(InputParameters connectionInputParameters);
     }
 
     /**
@@ -83,8 +83,8 @@ public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConn
 
         /**
          *
-         * @param connectionParameters
+         * @param connectionInputParameters
          */
-        void accept(InputParameters connectionParameters);
+        void accept(InputParameters connectionInputParameters);
     }
 }

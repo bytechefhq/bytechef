@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
@@ -34,7 +34,7 @@ import java.util.Optional;
 @JsonDeserialize(as = ComponentDSL.ModifiableActionDefinition.class)
 public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDefinition {
 
-    Boolean getBatch();
+    boolean getBatch();
 
     String getComponentName();
 
@@ -43,6 +43,8 @@ public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDe
     Object getExampleOutput();
 
     ExampleOutputDataSource getExampleOutputDataSource();
+
+    Optional<HelpFunction> getHelp();
 
     Map<String, Object> getMetadata();
 
@@ -75,6 +77,6 @@ public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDe
          * @param inputParameters
          * @return
          */
-        Object apply(Context context, InputParameters inputParameters);
+        Object apply(ActionContext context, InputParameters inputParameters);
     }
 }

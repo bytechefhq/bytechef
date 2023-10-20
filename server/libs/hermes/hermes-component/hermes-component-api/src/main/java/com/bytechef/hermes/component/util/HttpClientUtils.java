@@ -19,7 +19,10 @@ package com.bytechef.hermes.component.util;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.ComponentContextThreadLocal.ComponentContext;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.Methanol;
@@ -187,25 +190,25 @@ public final class HttpClientUtils {
         return bodyHandler;
     }
 
-    static HttpRequest.BodyPublisher createBodyPublisher(Context context, Payload payload) {
+    static HttpRequest.BodyPublisher createBodyPublisher(Context context, Body body) {
         HttpRequest.BodyPublisher bodyPublisher;
 
-        if (payload == null) {
+        if (body == null) {
             bodyPublisher = HttpRequest.BodyPublishers.noBody();
         } else {
-            if (payload.bodyContentType == BodyContentType.BINARY
-                && payload.value instanceof Context.FileEntry fileEntry) {
-                bodyPublisher = getBinaryBodyPublisher(context, payload, fileEntry);
-            } else if (payload.bodyContentType == BodyContentType.FORM_DATA) {
-                bodyPublisher = getFormDataBodyPublisher(context, payload);
-            } else if (payload.bodyContentType == BodyContentType.FORM_URL_ENCODED) {
-                bodyPublisher = getFormUrlEncodedBodyPublisher(payload);
-            } else if (payload.bodyContentType == BodyContentType.JSON) {
-                bodyPublisher = getJsonBodyPublisher(payload);
-            } else if (payload.bodyContentType == BodyContentType.XML) {
-                bodyPublisher = getXmlBodyPublisher(payload);
+            if (body.contentType == BodyContentType.BINARY
+                && body.content instanceof Context.FileEntry fileEntry) {
+                bodyPublisher = getBinaryBodyPublisher(context, body, fileEntry);
+            } else if (body.contentType == BodyContentType.FORM_DATA) {
+                bodyPublisher = getFormDataBodyPublisher(context, body);
+            } else if (body.contentType == BodyContentType.FORM_URL_ENCODED) {
+                bodyPublisher = getFormUrlEncodedBodyPublisher(body);
+            } else if (body.contentType == BodyContentType.JSON) {
+                bodyPublisher = getJsonBodyPublisher(body);
+            } else if (body.contentType == BodyContentType.XML) {
+                bodyPublisher = getXmlBodyPublisher(body);
             } else {
-                bodyPublisher = getStringBodyPublisher(payload);
+                bodyPublisher = getStringBodyPublisher(body);
             }
         }
 
@@ -213,8 +216,8 @@ public final class HttpClientUtils {
     }
 
     static HttpClient createHttpClient(
-        Context context, Map<String, List<String>> headers, Map<String, List<String>> queryParameters,
-        Configuration configuration) {
+        Context context, ComponentDefinition componentDefinition, Map<String, List<String>> headers,
+        Map<String, List<String>> queryParameters, Configuration configuration) {
 
         Methanol.Builder builder = Methanol.newBuilder()
             .version(HttpClient.Version.HTTP_1_1);
@@ -233,14 +236,14 @@ public final class HttpClientUtils {
             }
         }
 
-        applyAuthorization(context, headers, queryParameters);
+        applyAuthorization(context, componentDefinition, headers, queryParameters);
 
         if (configuration.isFollowRedirect()) {
-            builder.followRedirects(java.net.http.HttpClient.Redirect.NORMAL);
+            builder.followRedirects(HttpClient.Redirect.NORMAL);
         }
 
         if (configuration.isFollowAllRedirects()) {
-            builder.followRedirects(java.net.http.HttpClient.Redirect.ALWAYS);
+            builder.followRedirects(HttpClient.Redirect.ALWAYS);
         }
 
         String proxy = configuration.getProxy();
@@ -258,11 +261,11 @@ public final class HttpClientUtils {
 
     static HttpRequest createHTTPRequest(
         Context context, String urlString, RequestMethod requestMethod, Map<String, List<String>> headers,
-        Map<String, List<String>> queryParameters, Payload payload) {
+        Map<String, List<String>> queryParameters, Body body) {
 
         HttpRequest.Builder httpRequestBuilder = HttpRequest
             .newBuilder()
-            .method(requestMethod.name(), createBodyPublisher(context, payload));
+            .method(requestMethod.name(), createBodyPublisher(context, body));
 
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             for (String value : entry.getValue()) {
@@ -284,10 +287,10 @@ public final class HttpClientUtils {
         Response response;
         HttpHeaders httpHeaders = httpResponse.headers();
 
-        Map<String, List<String>> headersMap = httpHeaders.map();
+        Map<String, List<String>> headers = httpHeaders.map();
 
         if (configuration.getResponseFormat() == null) {
-            response = new Response(null, headersMap, httpResponse.statusCode());
+            response = new Response(headers, null, httpResponse.statusCode());
         } else {
             Object httpResponseBody = httpResponse.body();
             ResponseFormat responseFormat = configuration.getResponseFormat();
@@ -295,7 +298,7 @@ public final class HttpClientUtils {
             Object body;
 
             if (!ObjectUtils.isEmpty(httpResponseBody) && responseFormat == ResponseFormat.BINARY) {
-                body = storeBinaryResponseBody(context, configuration, headersMap, (InputStream) httpResponseBody);
+                body = storeBinaryResponseBody(context, configuration, headers, (InputStream) httpResponseBody);
             } else if (responseFormat == ResponseFormat.JSON) {
                 body = ObjectUtils.isEmpty(httpResponseBody) ? null : JsonUtils.read(httpResponseBody.toString());
             } else if (responseFormat == ResponseFormat.TEXT) {
@@ -304,30 +307,33 @@ public final class HttpClientUtils {
                 body = ObjectUtils.isEmpty(httpResponseBody) ? null : XmlUtils.read(httpResponseBody.toString());
             }
 
-            response = new Response(body, headersMap, httpResponse.statusCode());
+            response = new Response(headers, body, httpResponse.statusCode());
         }
 
         return response;
     }
 
     private static Response execute(
-        Context context, String urlString, Map<String, List<String>> headers, Map<String, List<String>> queryParameters,
-        Payload payload, Configuration configuration, RequestMethod requestMethod) throws Exception {
+        ComponentContext componentContext, String urlString, Map<String, List<String>> headers,
+        Map<String, List<String>> queryParameters,
+        Body body, Configuration configuration, RequestMethod requestMethod) throws Exception {
 
-        HttpClient httpClient = createHttpClient(context, headers, queryParameters, configuration);
+        HttpClient httpClient = createHttpClient(
+            componentContext.context(), componentContext.componentDefinition(), headers, queryParameters,
+            configuration);
 
         HttpRequest httpRequest = createHTTPRequest(
-            context, urlString, requestMethod, headers, queryParameters, payload);
+            componentContext.context(), urlString, requestMethod, headers, queryParameters, body);
 
         HttpResponse<?> httpResponse = httpClient.send(httpRequest, createBodyHandler(configuration));
 
-        return handleResponse(context, httpResponse, configuration);
+        return handleResponse(componentContext.context(), httpResponse, configuration);
     }
 
     private static void addFileEntry(
         Context context, MultipartBodyPublisher.Builder builder, String name, Context.FileEntry fileEntry) {
 
-        Objects.requireNonNull(context, "'context' must not be null");
+        Objects.requireNonNull(context, "'triggerContext' must not be null");
 
         builder.formPart(
             name, fileEntry.getName(),
@@ -337,18 +343,35 @@ public final class HttpClientUtils {
     }
 
     private static void applyAuthorization(
-        Context context, Map<String, List<String>> headers, Map<String, List<String>> queryParameters) {
+        Context context, ComponentDefinition componentDefinition, Map<String, List<String>> headers,
+        Map<String, List<String>> queryParameters) {
 
         if (context == null) {
             return;
         }
 
-        // TODO Fix payload
-        context
-            .fetchConnection()
-            .ifPresent(
-                connection -> connection.applyAuthorization(
-                    new AuthorizationContext(headers, queryParameters, new HashMap<>())));
+        if (componentDefinition == null) {
+            context
+                .fetchConnection()
+                .ifPresent(
+                    connection -> connection.applyAuthorization(
+                        new AuthorizationContext(headers, queryParameters, new HashMap<>())));
+        } else {
+            ConnectionDefinition connectionDefinition = componentDefinition.getConnection();
+
+            if (connectionDefinition != null && connectionDefinition.isAuthorizationRequired()) {
+                Context.Connection connection = context.getConnection();
+
+                connection.applyAuthorization(
+                    new AuthorizationContext(headers, queryParameters, new HashMap<>()));
+            } else {
+                context
+                    .fetchConnection()
+                    .ifPresent(
+                        connection -> connection.applyAuthorization(
+                            new AuthorizationContext(headers, queryParameters, new HashMap<>())));
+            }
+        }
     }
 
     private static URI createURI(String uriString, @Nonnull Map<String, List<String>> queryParameters) {
@@ -357,14 +380,14 @@ public final class HttpClientUtils {
         if (queryParameters.isEmpty()) {
             uri = URI.create(uriString);
         } else {
-            String queryParametersString = queryParameters.entrySet()
+            String parameter = queryParameters.entrySet()
                 .stream()
                 .flatMap(entry -> entry.getValue()
                     .stream()
                     .map(value -> entry.getKey() + "=" + value))
                 .collect(Collectors.joining("&"));
 
-            uri = URI.create(uriString + '?' + queryParametersString);
+            uri = URI.create(uriString + '?' + parameter);
         }
 
         return uri;
@@ -382,17 +405,17 @@ public final class HttpClientUtils {
     }
 
     private static HttpRequest.BodyPublisher getBinaryBodyPublisher(
-        Context context, Payload payload, Context.FileEntry fileEntry) {
+        Context context, Body body, Context.FileEntry fileEntry) {
 
-        Objects.requireNonNull(context, "'context' must not be null");
+        Objects.requireNonNull(context, "'triggerContext' must not be null");
 
         return MoreBodyPublishers.ofMediaType(
             HttpRequest.BodyPublishers.ofInputStream(() -> context.getFileStream(fileEntry)),
-            MediaType.parse(payload.mimeType == null ? fileEntry.getMimeType() : payload.mimeType));
+            MediaType.parse(body.mimeType == null ? fileEntry.getMimeType() : body.mimeType));
     }
 
-    private static HttpRequest.BodyPublisher getFormDataBodyPublisher(Context context, Payload payload) {
-        Map<?, ?> bodyParameters = (Map<?, ?>) payload.value;
+    private static HttpRequest.BodyPublisher getFormDataBodyPublisher(Context context, Body body) {
+        Map<?, ?> bodyParameters = (Map<?, ?>) body.content;
 
         MultipartBodyPublisher.Builder builder = MultipartBodyPublisher.newBuilder();
 
@@ -407,8 +430,8 @@ public final class HttpClientUtils {
         return builder.build();
     }
 
-    private static HttpRequest.BodyPublisher getFormUrlEncodedBodyPublisher(Payload payload) {
-        Map<?, ?> bodyParameters = (Map<?, ?>) payload.value;
+    private static HttpRequest.BodyPublisher getFormUrlEncodedBodyPublisher(Body body) {
+        Map<?, ?> bodyParameters = (Map<?, ?>) body.content;
 
         FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
 
@@ -421,36 +444,36 @@ public final class HttpClientUtils {
         return builder.build();
     }
 
-    private static HttpRequest.BodyPublisher getJsonBodyPublisher(Payload payload) {
+    private static HttpRequest.BodyPublisher getJsonBodyPublisher(Body body) {
         return MoreBodyPublishers.ofMediaType(
-            HttpRequest.BodyPublishers.ofString(JsonUtils.write(payload.value)),
+            HttpRequest.BodyPublishers.ofString(JsonUtils.write(body.content)),
             MediaType.APPLICATION_JSON);
     }
 
-    private static HttpRequest.BodyPublisher getStringBodyPublisher(Payload payload) {
+    private static HttpRequest.BodyPublisher getStringBodyPublisher(Body body) {
         return MoreBodyPublishers.ofMediaType(
-            HttpRequest.BodyPublishers.ofString(payload.value.toString()),
-            MediaType.parse(payload.mimeType));
+            HttpRequest.BodyPublishers.ofString(body.content.toString()),
+            MediaType.parse(body.mimeType));
     }
 
-    private static HttpRequest.BodyPublisher getXmlBodyPublisher(Payload payload) {
+    private static HttpRequest.BodyPublisher getXmlBodyPublisher(Body body) {
         return MoreBodyPublishers.ofMediaType(
-            HttpRequest.BodyPublishers.ofString(XmlUtils.write(payload.value)),
+            HttpRequest.BodyPublishers.ofString(XmlUtils.write(body.content)),
             MediaType.APPLICATION_XML);
     }
 
     private static Context.FileEntry storeBinaryResponseBody(
-        Context context, Configuration configuration, Map<String, List<String>> headersMap,
+        Context context, Configuration configuration, Map<String, List<String>> headers,
         InputStream httpResponseBody) throws MimeTypeException {
 
-        Objects.requireNonNull(context, "'context' must not be null");
+        Objects.requireNonNull(context, "'triggerContext' must not be null");
 
         String filename = configuration.getFilename();
 
         if (filename == null || filename.length() == 0) {
-            if (headersMap.containsKey("Content-Type")) {
+            if (headers.containsKey("Content-Type")) {
                 MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
-                List<String> values = headersMap.get("Content-Type");
+                List<String> values = headers.get("Content-Type");
 
                 MimeType mimeType = mimeTypes.forName(values.get(0));
 
@@ -466,8 +489,49 @@ public final class HttpClientUtils {
     @SuppressFBWarnings({
         "EI", "EI2"
     })
-    public record Response(Object body, Map<String, List<String>> headers, int statusCode) {
+    public static class Response {
 
+        private final Object body;
+        private final Map<String, List<String>> headers;
+        private final int statusCode;
+
+        public Response(Map<String, List<String>> headers, Object body, int statusCode) {
+            this.body = body;
+            this.headers = headers;
+            this.statusCode = statusCode;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Response response = (Response) o;
+
+            return statusCode == response.statusCode &&
+                Objects.equals(body, response.body) && Objects.equals(headers, response.headers);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(body, headers, statusCode);
+        }
+
+        public Object getBody() {
+            return body;
+        }
+
+        public Map<String, List<String>> getHeaders() {
+            return headers;
+        }
+
+        public int getStatusCode() {
+            return statusCode;
+        }
     }
 
     public static class Configuration {
@@ -563,7 +627,7 @@ public final class HttpClientUtils {
         private Configuration configuration = new Configuration();
         private Map<String, List<String>> headers = Collections.emptyMap();
         private Map<String, List<String>> queryParameters = Collections.emptyMap();
-        private Payload payload;
+        private Body body;
         private RequestMethod requestMethod;
         private String url;
 
@@ -627,8 +691,8 @@ public final class HttpClientUtils {
             return this;
         }
 
-        public Executor payload(Payload payload) {
-            this.payload = payload;
+        public Executor body(Body body) {
+            this.body = body;
 
             return this;
         }
@@ -650,84 +714,85 @@ public final class HttpClientUtils {
         public Response execute() {
             try {
                 return HttpClientUtils.execute(
-                    ContextThreadLocal.get(), url, headers, queryParameters, payload, configuration, requestMethod);
+                    ComponentContextThreadLocal.get(), url, headers, queryParameters, body, configuration,
+                    requestMethod);
             } catch (Exception e) {
                 throw new ComponentExecutionException("Unable to execute HTTP request", e);
             }
         }
     }
 
-    public static class Payload {
+    public static class Body {
 
-        private final BodyContentType bodyContentType;
+        private final BodyContentType contentType;
         private String mimeType;
-        private final Object value;
+        private final Object content;
 
-        private Payload(Object value, BodyContentType bodyContentType) {
-            this.value = value;
-            this.bodyContentType = bodyContentType;
+        private Body(Object content, BodyContentType contentType) {
+            this.content = content;
+            this.contentType = contentType;
         }
 
-        private Payload(Object value, BodyContentType bodyContentType, String mimeType) {
-            this.value = value;
-            this.bodyContentType = bodyContentType;
+        private Body(Object content, BodyContentType contentType, String mimeType) {
+            this.content = content;
+            this.contentType = contentType;
             this.mimeType = mimeType;
         }
 
-        public static Payload of(Context.FileEntry fileEntry) {
-            return new Payload(fileEntry, BodyContentType.BINARY);
+        public static Body of(Context.FileEntry fileEntry) {
+            return new Body(fileEntry, BodyContentType.BINARY);
         }
 
-        public static Payload of(Context.FileEntry fileEntry, String mimeType) {
+        public static Body of(Context.FileEntry fileEntry, String mimeType) {
             Objects.requireNonNull(fileEntry);
 
-            return new Payload(fileEntry, BodyContentType.BINARY, mimeType);
+            return new Body(fileEntry, BodyContentType.BINARY, mimeType);
         }
 
-        public static Payload of(List<?> list) {
+        public static Body of(List<?> list) {
             Objects.requireNonNull(list);
 
-            return new Payload(list, BodyContentType.JSON);
+            return new Body(list, BodyContentType.JSON);
         }
 
-        public static Payload of(List<?> list, BodyContentType bodyContentType) {
+        public static Body of(List<?> list, BodyContentType bodyContentType) {
             Objects.requireNonNull(list);
             Objects.requireNonNull(bodyContentType);
 
-            return new Payload(list, bodyContentType);
+            return new Body(list, bodyContentType);
         }
 
-        public static Payload of(Map<String, Object> map) {
+        public static Body of(Map<String, Object> map) {
             Objects.requireNonNull(map);
 
-            return new Payload(map, BodyContentType.JSON);
+            return new Body(map, BodyContentType.JSON);
         }
 
-        public static Payload of(Map<String, Object> map, BodyContentType bodyContentType) {
-            Objects.requireNonNull(map);
+        public static Body of(Map<String, Object> content, BodyContentType bodyContentType) {
+            Objects.requireNonNull(content);
             Objects.requireNonNull(bodyContentType);
 
-            return new Payload(map, bodyContentType);
+            return new Body(content, bodyContentType);
         }
 
-        public static Payload of(String string) {
+        public static Body of(String string) {
             Objects.requireNonNull(string);
 
-            return new Payload(string, BodyContentType.RAW, "text/plain");
+            return new Body(string, BodyContentType.RAW, "text/plain");
         }
 
-        public static Payload of(String string, String mimeType) {
+        public static Body of(String string, String mimeType) {
             Objects.requireNonNull(string);
             Objects.requireNonNull(mimeType);
 
-            return new Payload(string, BodyContentType.RAW, mimeType);
+            return new Body(string, BodyContentType.RAW, mimeType);
         }
 
-        public static Payload of(String string, BodyContentType bodyContentType) {
+        public static Body of(String string, BodyContentType bodyContentType) {
             Objects.requireNonNull(string);
             Objects.requireNonNull(bodyContentType);
 
-            return new Payload(string, bodyContentType, null);
+            return new Body(string, bodyContentType, null);
         }
     }
 
