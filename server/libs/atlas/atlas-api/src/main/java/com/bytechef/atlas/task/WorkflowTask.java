@@ -47,6 +47,7 @@ public class WorkflowTask implements Task {
     private List<WorkflowTask> finalize = Collections.emptyList();
     private String label;
     private final Map<String, Object> extensions = new HashMap<>();
+    private Map<String, Object> metadata = new HashMap<>();
     private String name;
     private String node;
     private Map<String, Object> parameters = Collections.emptyMap();
@@ -67,6 +68,8 @@ public class WorkflowTask implements Task {
                     WorkflowTask::new);
             } else if (WorkflowConstants.LABEL.equals(entry.getKey())) {
                 this.label = MapValueUtils.getString(source, WorkflowConstants.LABEL);
+            } else if (WorkflowConstants.METADATA.equals(entry.getKey())) {
+                this.metadata = MapValueUtils.getMap(source, WorkflowConstants.METADATA, Collections.emptyMap());
             } else if (WorkflowConstants.NAME.equals(entry.getKey())) {
                 this.name = MapValueUtils.getString(source, WorkflowConstants.NAME);
             } else if (WorkflowConstants.NODE.equals(entry.getKey())) {
@@ -153,6 +156,14 @@ public class WorkflowTask implements Task {
      */
     public String getLabel() {
         return label;
+    }
+
+    /**
+     * Get the metadata.
+     * @return
+     */
+    public Map<String, Object> getMetadata() {
+        return Collections.unmodifiableMap(metadata);
     }
 
     /**
