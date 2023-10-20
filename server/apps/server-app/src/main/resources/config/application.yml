@@ -119,8 +119,8 @@ bytechef:
   workflow:
     context-repository:
       provider: jdbc
-    # Messaging provider between Coordinator and Workers (jms | amqp | kafka) default: jms
     message-broker:
+      # Messaging provider between Coordinator and Workers (jms | amqp | kafka) default: jms
       provider: jms
     persistence:
       provider: jdbc
