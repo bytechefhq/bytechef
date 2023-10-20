@@ -50,9 +50,8 @@ tasks:
     uri: ${apiEndpointUrl}
     responseFormat: JSON
     headerParameters:
-      -
-        key: Authorization
-        value: Basic ${apiToken}
+      Authorization:
+        - Basic ${apiToken}
     bodyContentType: JSON
     sendFile: true
     fileEntry: ${jsonFileEntry}

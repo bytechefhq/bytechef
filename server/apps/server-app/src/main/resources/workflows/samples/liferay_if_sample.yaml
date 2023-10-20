@@ -83,7 +83,8 @@ tasks:
         uri: ${batchEngineEndpointUrl}/com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition
         responseFormat: JSON
         headerParameters:
-          Authorization: Basic ${apiToken}
+          Authorization:
+            - Basic ${apiToken}
         bodyContentType: BINARY
         bodyContent: ${jsonFileEntry1}
 
