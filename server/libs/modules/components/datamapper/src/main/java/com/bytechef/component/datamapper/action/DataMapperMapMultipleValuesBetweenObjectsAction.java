@@ -20,9 +20,15 @@ package com.bytechef.component.datamapper.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 
 import java.util.Map;
 
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.FROM;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.INPUT;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.MAPPINGS;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.TO;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.VALUE;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
@@ -32,12 +38,6 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  * @author Ivica Cardic
  */
 public class DataMapperMapMultipleValuesBetweenObjectsAction {
-
-    private static final String INPUT = "input";
-    private static final String VALUE = "value";
-    private static final String MAPPINGS = "mappings";
-    private static final String FROM = "from";
-    private static final String TO = "to";
 
     public static final ActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapMultipleValuesBetweenObjects")
         .title("Map multiple values between objects\n")
@@ -55,7 +55,7 @@ public class DataMapperMapMultipleValuesBetweenObjectsAction {
             array(MAPPINGS)
                 .label("Mappings")
                 .description(
-                    "In defining mappings, the key \"From\" corresponds to an existing key in the Input, while the key \"To\" is utilized to determine the value to which the \"From\" key should be set, by referring to its key in the Values.")
+                    "The collection of of \"mappings\" where \"From\" corresponds to an existing key in the Input, while the key \"To\" is utilized to determine the value to which the \"From\" key should be set, by referring to its key in the Values.")
                 .items(
                     object().properties(
                         string(FROM)
@@ -63,9 +63,16 @@ public class DataMapperMapMultipleValuesBetweenObjectsAction {
                         string(TO)
                             .label("To")))
                 .required(true))
+        .outputSchema(getOutputSchemaFunction(), object())
         .execute(DataMapperMapMultipleValuesBetweenObjectsAction::execute);
 
     protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
+        // TODO
         return null;
+    }
+
+    protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (connection, inputParameters) -> null;
     }
 }

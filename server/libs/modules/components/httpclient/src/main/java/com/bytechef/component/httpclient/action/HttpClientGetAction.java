@@ -20,20 +20,13 @@ package com.bytechef.component.httpclient.action;
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
 import com.bytechef.component.httpclient.util.HttpClientActionUtils;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 
 import java.util.Map;
 
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.GET;
-import static com.bytechef.component.httpclient.constant.HttpClientConstants.RESPONSE_FORMAT;
 import static com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
-import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.definition.DefinitionDSL.array;
-
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
  * @author Ivica Cardic
@@ -50,19 +43,15 @@ public class HttpClientGetAction {
                 //
 
                 HttpClientConstants.COMMON_PROPERTIES))
-        .outputSchema(
-            oneOf()
-                .types(array(), object())
-                .displayCondition(
-                    "['%s', '%s'].includes('%s')".formatted(
-                        ResponseFormat.JSON.name(),
-                        ResponseFormat.XML.name(),
-                        RESPONSE_FORMAT)),
-            string().displayCondition("%s === '%s'".formatted(RESPONSE_FORMAT, ResponseFormat.TEXT.name())),
-            fileEntry().displayCondition("%s === '%s'".formatted(RESPONSE_FORMAT, ResponseFormat.BINARY.name())))
+        .outputSchema(getOutputSchemaFunction(), HttpClientConstants.OUTPUT_PROPERTIES)
         .execute((actionContext, inputParameters) -> executeGet(inputParameters));
 
     protected static Object executeGet(Map<String, ?> inputParameters) {
         return HttpClientActionUtils.execute(inputParameters, RequestMethod.GET);
+    }
+
+    protected static OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (connection, inputParameters) -> null;
     }
 }

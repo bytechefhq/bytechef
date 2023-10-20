@@ -20,13 +20,25 @@ package com.bytechef.component.datamapper.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 
 import java.util.Map;
 
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.FROM;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.INCLUDE_EMPTY_STRINGS;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.INCLUDE_NULLS;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.INCLUDE_UNMAPPED;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.INPUT;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.MAPPINGS;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.REQUIRED_FIELDS;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.TO;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.TYPE;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 
+import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
+import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -34,25 +46,36 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class DataMapperMapObjectsAction {
 
-    private static final String INPUT = "input";
-    private static final String MAPPING = "mapping";
-    private static final String INCLUDE_UNMAPPED = "includeUnmapped";
-    private static final String INCLUDE_NULLS = "includeNulls";
-    private static final String INCLUDE_EMPTY_STRINGS = "includeEmptyStrings";
-    private static final String REQUIRED_FIELDS = "requiredFields";
-
     public static final ActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapObjects")
         .title("Map objects")
-        .description("Map object fields to new keys.")
+        .description("Transform the fields of an object and assign them new keys.")
         .properties(
+            integer(TYPE)
+                .label("Type")
+                .description("The value type.")
+                .options(
+                    option("Object", 1),
+                    option("Array", 2)),
             object(INPUT)
                 .label("Input")
-                .description("Object containing one or more properties.")
+                .description("The object containing one or more properties.")
+                .displayCondition("type === 1")
                 .required(true),
-            object(MAPPING)
+            array(INPUT)
+                .label("Input")
+                .description("The array containing one or more properties.")
+                .displayCondition("type === 2")
+                .required(true),
+            array(MAPPINGS)
                 .label("Mapping")
                 .description(
-                    "An object that consists of key-value pairs defines the source key as the key and the value as the key that needs mapping. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping.")
+                    "The collection of of \"mappings\"  where the \"From\" key as the key and the value as the key that needs mapping. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping.")
+                .items(
+                    object().properties(
+                        string(FROM)
+                            .label("From"),
+                        string(TO)
+                            .label("To")))
                 .required(true),
             bool(INCLUDE_UNMAPPED)
                 .label("Include Unmapped")
@@ -70,9 +93,19 @@ public class DataMapperMapObjectsAction {
                 .label("Required fields")
                 .description("A list of fields that are required on the mapped object.")
                 .items(string()))
+        .outputSchema(
+            getOutputSchemaFunction(),
+            object().displayCondition("type === 1"),
+            array().displayCondition("type === 2"))
         .execute(DataMapperMapObjectsAction::execute);
 
     protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
+        // TODO
         return null;
+    }
+
+    protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (connection, inputParameters) -> null;
     }
 }

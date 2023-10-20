@@ -26,4 +26,5 @@ public class XmlHelperConstants {
     public static final String XML_HELPER = "xmlHelper";
     public static final String PARSE = "parse";
     public static final String STRINGIFY = "stringify";
+    public static final String TYPE = "type";
 }

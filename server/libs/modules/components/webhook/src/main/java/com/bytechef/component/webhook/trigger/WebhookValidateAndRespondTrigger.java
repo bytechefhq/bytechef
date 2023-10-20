@@ -17,6 +17,7 @@
 
 package com.bytechef.component.webhook.trigger;
 
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
@@ -31,14 +32,12 @@ import static com.bytechef.component.webhook.constant.WebhookConstants.BODY;
 import static com.bytechef.component.webhook.constant.WebhookConstants.CSRF_TOKEN;
 import static com.bytechef.component.webhook.constant.WebhookConstants.HEADERS;
 import static com.bytechef.component.webhook.constant.WebhookConstants.METHOD;
-import static com.bytechef.component.webhook.constant.WebhookConstants.PATH;
 import static com.bytechef.component.webhook.constant.WebhookConstants.PARAMETERS;
 import static com.bytechef.component.webhook.constant.WebhookConstants.X_CRSF_TOKEN;
 import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
-import static com.bytechef.hermes.definition.DefinitionDSL.array;
 
+import static com.bytechef.hermes.definition.DefinitionDSL.any;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -59,9 +58,11 @@ public class WebhookValidateAndRespondTrigger {
         .outputSchema(
             object()
                 .properties(
+                    string(METHOD),
                     object(HEADERS),
                     object(PARAMETERS),
-                    oneOf(BODY).types(array(), object())))
+                    any(BODY)))
+        .outputSchema(getOutputSchemaFunction())
         .staticWebhookRequest(WebhookValidateAndRespondTrigger::staticWebhookRequest)
         .webhookValidate(WebhookValidateAndRespondTrigger::webhookValidate);
 
@@ -73,8 +74,7 @@ public class WebhookValidateAndRespondTrigger {
                 BODY, webhookBody.getContent(),
                 METHOD, context.method(),
                 HEADERS, context.headers(),
-                PARAMETERS, context.parameters(),
-                PATH, context.path()));
+                PARAMETERS, context.parameters()));
     }
 
     protected static boolean webhookValidate(WebhookValidateContext context) {
@@ -82,5 +82,10 @@ public class WebhookValidateAndRespondTrigger {
         Map<String, ?> inputParameters = context.inputParameters();
 
         return Objects.equals(webhookHeaders.getValue(X_CRSF_TOKEN), inputParameters.get(CSRF_TOKEN));
+    }
+
+    protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (connection, inputParameters) -> null;
     }
 }

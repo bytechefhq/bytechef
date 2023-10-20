@@ -26,9 +26,12 @@ import static com.bytechef.component.datastorage.constant.DataStorageConstants.K
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE_OPTIONS;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.TIMEOUT;
+import static com.bytechef.component.datastorage.constant.DataStorageConstants.VALUE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 
+import static com.bytechef.hermes.definition.DefinitionDSL.any;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
+import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -44,7 +47,7 @@ public class DataStorageAwaitGetValueAction {
                 .label("Key")
                 .description("The identifier of a value to wait for.")
                 .required(true),
-            string(SCOPE)
+            integer(SCOPE)
                 .label("Scope")
                 .description("The namespace to obtain a value from.")
                 .options(SCOPE_OPTIONS)
@@ -56,10 +59,15 @@ public class DataStorageAwaitGetValueAction {
                 .minValue(1)
                 .maxValue(300)
                 .required(true))
+        .outputSchema(
+            object()
+                .properties(
+                    any(VALUE),
+                    integer(TIMEOUT)))
         .execute(DataStorageAwaitGetValueAction::execute);
 
     protected static Object execute(ActionContext actionContext, Map<String, ?> inputParameters) {
-        System.out.println(actionContext.toString());
+        // TODO
 
         return null;
     }

@@ -37,13 +37,38 @@
       "placeholder": null,
       "required": true,
       "name": "message",
-      "type": "ONE_OF",
-      "types": null
+      "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
+      "multipleValues": null,
+      "objectType": null,
+      "options": null,
+      "properties": null,
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Send Message",
     "editorDescriptionDataSource": null,
-    "outputSchema": null,
-    "outputSchemaDataSource": null,
+    "outputSchema": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": null,
+      "metadata": { },
+      "placeholder": null,
+      "required": null,
+      "name": null,
+      "type": "ANY",
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": null
+    } ],
+    "outputSchemaDataSource": {
+      "outputSchema": { }
+    },
     "sampleOutputDataSource": null
   } ],
   "category": null,
@@ -86,8 +111,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INPUT_INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INPUT_INTEGER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -199,8 +224,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null

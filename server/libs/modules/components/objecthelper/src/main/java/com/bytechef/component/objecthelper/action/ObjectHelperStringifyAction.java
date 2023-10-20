@@ -26,9 +26,13 @@ import java.util.Map;
 
 import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.SOURCE;
 import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.STRINGIFY;
+import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.TYPE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
+import static com.bytechef.hermes.definition.DefinitionDSL.array;
+import static com.bytechef.hermes.definition.DefinitionDSL.integer;
+import static com.bytechef.hermes.definition.DefinitionDSL.object;
+import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -39,10 +43,23 @@ public class ObjectHelperStringifyAction {
     public static final ActionDefinition ACTION_DEFINITION = action(STRINGIFY)
         .title("Convert to JSON string")
         .description("Writes the object/array to a JSON string.")
-        .properties(oneOf(SOURCE)
-            .label("Source")
-            .description("The data to convert to JSON string.")
-            .required(true))
+        .properties(
+            integer(TYPE)
+                .label("Type")
+                .description("The value type.")
+                .options(
+                    option("Object", 1),
+                    option("Array", 2)),
+            object(SOURCE)
+                .label("Source")
+                .description("The data to convert to JSON string.")
+                .displayCondition("type === 1")
+                .required(true),
+            array(SOURCE)
+                .label("Source")
+                .description("The data to convert to JSON string.")
+                .displayCondition("type === 2")
+                .required(true))
         .outputSchema(string())
         .execute(ObjectHelperStringifyAction::executeStringify);
 

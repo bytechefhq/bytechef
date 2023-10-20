@@ -20,6 +20,7 @@ package com.bytechef.component.xmlfile.action;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.util.MapValueUtils;
 import com.bytechef.hermes.component.util.XmlUtils;
 
@@ -78,6 +79,7 @@ public class XmlFileReadAction {
                 .displayCondition("%s === true".formatted(IS_ARRAY))
                 .advancedOption(true))
         .outputSchema(
+            getOutputSchemaFunction(),
             array().displayCondition("%s === true".formatted(IS_ARRAY)),
             object().displayCondition("%s === false".formatted(IS_ARRAY)))
         .execute(XmlFileReadAction::executeRead);
@@ -122,5 +124,10 @@ public class XmlFileReadAction {
         }
 
         return result;
+    }
+
+    protected static OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (connection, inputParameters) -> null;
     }
 }

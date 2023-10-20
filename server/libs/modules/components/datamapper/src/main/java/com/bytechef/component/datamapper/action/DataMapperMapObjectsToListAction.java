@@ -20,10 +20,18 @@ package com.bytechef.component.datamapper.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 
 import java.util.Map;
 
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.FIELD_KEY;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.INPUT;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.TYPE;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.VALUE_KEY;
+import static com.bytechef.hermes.definition.DefinitionDSL.array;
+import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
+import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -31,27 +39,45 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class DataMapperMapObjectsToListAction {
 
-    private static final String INPUT = "input";
-    private static final String FIELD_KEY = "fieldKey";
-    private static final String VALUE_KEY = "valueKey";
-
     public static final ActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapObjectsToList")
         .title("Map objects to list")
-        .description("Transform an object or an array of objects into an array of key-value pairs.")
+        .description("Transform an object or array of objects into an array of key-value pairs.")
         .properties(
+            integer(TYPE)
+                .label("Type")
+                .description("The value type.")
+                .options(
+                    option("Object", 1),
+                    option("Array", 2)),
             object(INPUT)
                 .label("Input")
-                .description("Object containing one or more properties.")
+                .description("The object containing one or more properties.")
+                .displayCondition("type === 1")
+                .required(true),
+            array(INPUT)
+                .label("Input")
+                .description("The array containing one or more properties.")
+                .displayCondition("type === 1")
                 .required(true),
             string(FIELD_KEY)
                 .label("Field key")
-                .description("The name of the key to map keys to."),
+                .description("The key name to which keys should be mapped."),
             string(VALUE_KEY)
                 .label("Value key")
-                .description("The name of the key to map keys to."))
+                .description("The key name to which values should be mapped."))
+        .outputSchema(
+            getOutputSchemaFunction(),
+            object().displayCondition("type === 1"),
+            array().displayCondition("type === 2"))
         .execute(DataMapperMapObjectsToListAction::execute);
 
     protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
+        // TODO
         return null;
+    }
+
+    protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (connection, inputParameters) -> null;
     }
 }

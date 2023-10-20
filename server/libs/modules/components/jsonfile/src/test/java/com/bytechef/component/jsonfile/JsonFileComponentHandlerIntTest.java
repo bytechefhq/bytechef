@@ -90,7 +90,7 @@ public class JsonFileComponentHandlerIntTest {
 
         Map<String, Object> outputs = job.getOutputs();
 
-        Map<?, ?> fileEntryMap = ((Map<?, ?>) outputs.get("writeJSONFile"));
+        Map<?, ?> fileEntryMap = (Map<?, ?>) outputs.get("writeJSONFile");
 
         Assertions.assertThat(fileEntryMap.get("name"))
             .isEqualTo("file.json");

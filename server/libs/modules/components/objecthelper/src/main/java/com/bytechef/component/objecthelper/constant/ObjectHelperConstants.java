@@ -26,4 +26,5 @@ public class ObjectHelperConstants {
     public static final String PARSE = "parse";
     public static final String STRINGIFY = "stringify";
     public static final String SOURCE = "source";
+    public static final String TYPE = "type";
 }

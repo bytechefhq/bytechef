@@ -20,6 +20,8 @@ package com.bytechef.component.datastorage.constant;
 import com.bytechef.hermes.definition.Option;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.util.List;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 
 /**
@@ -36,12 +38,24 @@ public class DataStorageConstants {
     public static final String VALUE = "value";
     public static final String VALUE_TO_ADD = "valueToAdd";
     public static final String TIMEOUT = "timeout";
+    public static final String TYPE = "type";
 
     @SuppressFBWarnings("MS")
-    public static final Option[] SCOPE_OPTIONS = {
+    public static final List<Option<Integer>> SCOPE_OPTIONS = List.of(
         option("Current Execution", 1),
         option("Workflow Instance", 2),
         option("Workflow", 3),
-        option("Account", 4)
-    };
+        option("Account", 4));
+
+    public static final List<Option<Integer>> TYPE_OPTIONS = List.of(
+        option("Array", 1),
+        option("Boolean", 2),
+        option("Date", 3),
+        option("Date Time", 4),
+        option("Integer", 5),
+        option("Nullable", 6),
+        option("Number", 7),
+        option("Object", 8),
+        option("String", 9),
+        option("Time", 10));
 }

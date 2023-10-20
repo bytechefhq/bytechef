@@ -19,6 +19,7 @@ package com.bytechef.component.datastorage.action;
 
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 
 import java.util.Map;
 
@@ -26,28 +27,47 @@ import static com.bytechef.component.datastorage.constant.DataStorageConstants.S
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE_OPTIONS;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 
+import static com.bytechef.hermes.definition.DefinitionDSL.any;
+import static com.bytechef.hermes.definition.DefinitionDSL.array;
+import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
+import static com.bytechef.hermes.definition.DefinitionDSL.integer;
+import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
  * @author Ivica Cardic
  */
-public class DataStorageGetAllKeysAction {
+public class DataStorageGetAllEntriesAction {
 
-    public static final ActionDefinition ACTION_DEFINITION = action("getAllKeys")
-        .title("Get All Keys")
+    public static final ActionDefinition ACTION_DEFINITION = action("getAllEntries")
+        .title("Get All Entries(Keys and Values)")
         .description(
             "Retrieve all the currently existing keys from storage, along with their values within the provided scope.")
         .properties(
-            string(SCOPE)
+            integer(SCOPE)
                 .label("Scope")
                 .description("The namespace to get keys from.")
                 .options(SCOPE_OPTIONS)
                 .required(true))
-        .execute(DataStorageGetAllKeysAction::execute);
+        .outputSchema(
+            getOutputSchemaFunction(),
+            object()
+                .properties(
+                    array("item")
+                        .items(
+                            dateTime("created"),
+                            string("key"),
+                            any("key"))))
+        .execute(DataStorageGetAllEntriesAction::execute);
 
     protected static Object execute(ActionContext actionContext, Map<String, ?> inputParameters) {
-        System.out.println(actionContext.toString());
+        // TODO
 
         return null;
+    }
+
+    protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (connection, inputParameters) -> null;
     }
 }

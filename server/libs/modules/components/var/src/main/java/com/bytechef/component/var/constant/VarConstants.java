@@ -24,4 +24,5 @@ public class VarConstants {
     public static final String VAR = "var";
     public static final String SET = "set";
     public static final String VALUE = "value";
+    public static final String TYPE = "type";
 }

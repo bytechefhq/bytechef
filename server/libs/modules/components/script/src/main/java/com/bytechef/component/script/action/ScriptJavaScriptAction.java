@@ -20,6 +20,7 @@ package com.bytechef.component.script.action;
 import com.bytechef.component.script.constant.ScriptConstants;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.definition.Property;
 
 import java.util.Map;
@@ -29,9 +30,16 @@ import static com.bytechef.component.script.constant.ScriptConstants.JAVASCRIPT;
 import static com.bytechef.component.script.constant.ScriptConstants.SCRIPT;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 
+import static com.bytechef.hermes.definition.DefinitionDSL.array;
+import static com.bytechef.hermes.definition.DefinitionDSL.bool;
+import static com.bytechef.hermes.definition.DefinitionDSL.date;
+import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
+import static com.bytechef.hermes.definition.DefinitionDSL.integer;
+import static com.bytechef.hermes.definition.DefinitionDSL.nullable;
+import static com.bytechef.hermes.definition.DefinitionDSL.number;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.definition.DefinitionDSL.time;
 
 /**
  * @author Matija Petanjek
@@ -46,16 +54,22 @@ public class ScriptJavaScriptAction {
             object(INPUT)
                 .label("Input")
                 .description("Initialize parameter values used in the custom code.")
-                .additionalProperties(oneOf()),
+                .additionalProperties(
+                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()),
             string(SCRIPT)
                 .label("JavaScript code")
                 .description("Add your JavaScript custom logic here.")
                 .controlType(Property.ControlType.CODE_EDITOR)
                 .required(true))
-        .outputSchema(oneOf())
+        .outputSchema(getOutputSchemaFunction())
         .execute(ScriptJavaScriptAction::executeJavaScript);
 
     protected static Object executeJavaScript(Context context, Map<String, ?> inputParameters) {
         return ScriptConstants.POLYGLOT_ENGINE.execute("js", inputParameters);
+    }
+
+    protected static OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (connection, inputParameters) -> null;
     }
 }

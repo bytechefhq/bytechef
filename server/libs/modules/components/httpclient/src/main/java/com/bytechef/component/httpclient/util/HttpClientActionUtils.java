@@ -24,7 +24,7 @@ import com.bytechef.hermes.component.util.HttpClientUtils.Body;
 import com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import com.bytechef.hermes.component.util.MapValueUtils;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Property.InputProperty;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -58,8 +58,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  */
 public class HttpClientActionUtils {
 
-    public static List<Property<?>> options(boolean includeBodyContentProperties) {
-        List<Property<?>> properties = new ArrayList<>();
+    public static List<InputProperty> options(boolean includeBodyContentProperties) {
+        List<InputProperty> properties = new ArrayList<>();
 
         if (includeBodyContentProperties) {
             properties.add(string(BODY_CONTENT_TYPE)
@@ -154,14 +154,15 @@ public class HttpClientActionUtils {
         }
     }
 
-    public static Property<?>[] toArray(List<Property<?>>... propertiesArray) {
-        List<Property<?>> allProperties = new ArrayList<>();
+    @SafeVarargs
+    public static InputProperty[] toArray(List<InputProperty>... propertiesArray) {
+        List<InputProperty> allProperties = new ArrayList<>();
 
-        for (List<Property<?>> properties : propertiesArray) {
+        for (List<InputProperty> properties : propertiesArray) {
             allProperties.addAll(properties);
         }
 
-        return allProperties.toArray(size -> new Property<?>[size]);
+        return allProperties.toArray(InputProperty[]::new);
     }
 
     private static BodyContentType getBodyContentType(Map<String, ?> inputParameters) {

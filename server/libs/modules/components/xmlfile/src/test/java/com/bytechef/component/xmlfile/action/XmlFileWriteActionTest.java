@@ -45,8 +45,6 @@ public class XmlFileWriteActionTest {
 
     private static final String TEST_XML = "test.xml";
     private static final String FILE_XML = "file.xml";
-    private static final String SAMPLE_ARRAY_XML = "sample_array.xml";
-    private static final String SAMPLE_XML = "sample.xml";
 
     @BeforeEach
     public void beforeEach() {
@@ -57,18 +55,21 @@ public class XmlFileWriteActionTest {
     public void testExecuteWrite() {
         Map<String, Object> source = Map.of(
             "Flower",
-            new LinkedHashMap<>(
-                Map.of(
-                    "id", "45",
-                    "name", "Poppy",
-                    "color", "RED",
-                    "petals", "9",
-                    "Florists",
-                    Map.of(
-                        "Florist",
-                        List.of(
-                            new LinkedHashMap<>(Map.of("name", "Joe")),
-                            new LinkedHashMap<>(Map.of("name", "Mark")))))));
+            new LinkedHashMap<>() {
+                {
+
+                    put("id", "45");
+                    put("name", "Poppy");
+                    put("color", "RED");
+                    put("petals", "9");
+                    put("Florists",
+                        Map.of(
+                            "Florist",
+                            List.of(
+                                new LinkedHashMap<>(Map.of("name", "Joe")),
+                                new LinkedHashMap<>(Map.of("name", "Mark")))));
+                }
+            });
 
         try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
             mockedStatic.when(() -> MapValueUtils.getString(
@@ -91,7 +92,7 @@ public class XmlFileWriteActionTest {
             Assertions.assertThat(new String(byteArrayInputStream.readAllBytes(), StandardCharsets.UTF_8))
                 .isEqualTo(
                     """
-                        <root><Flower><id>45</id><petals>9</petals><color>RED</color><Florists><Florist><name>Joe</name></Florist><Florist><name>Mark</name></Florist></Florists><name>Poppy</name></Flower></root>
+                        <root><Flower><id>45</id><name>Poppy</name><color>RED</color><petals>9</petals><Florists><Florist><name>Joe</name></Florist><Florist><name>Mark</name></Florist></Florists></Flower></root>
                         """);
             Assertions.assertThat(filenameArgumentCaptor.getValue())
                 .isEqualTo(FILE_XML);
@@ -121,8 +122,18 @@ public class XmlFileWriteActionTest {
     @Test
     public void testExecuteWriteArray() {
         List<Map<String, Object>> source = List.of(
-            new LinkedHashMap<>(Map.of("id", "45", "name", "Poppy")),
-            new LinkedHashMap<>(Map.of("id", "50", "name", "Rose")));
+            new LinkedHashMap<>() {
+                {
+                    put("id", "45");
+                    put("name", "Poppy");
+                }
+            },
+            new LinkedHashMap<>() {
+                {
+                    put("id", "50");
+                    put("name", "Rose");
+                }
+            });
 
         try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
             mockedStatic.when(() -> MapValueUtils.getString(
@@ -144,7 +155,7 @@ public class XmlFileWriteActionTest {
 
             Assertions.assertThat(new String(byteArrayInputStream.readAllBytes(), StandardCharsets.UTF_8))
                 .isEqualTo("""
-                    <root><item><name>Poppy</name><id>45</id></item><item><name>Rose</name><id>50</id></item></root>
+                    <root><item><id>45</id><name>Poppy</name></item><item><id>50</id><name>Rose</name></item></root>
                     """);
 
             Assertions.assertThat(filenameArgumentCaptor.getValue())

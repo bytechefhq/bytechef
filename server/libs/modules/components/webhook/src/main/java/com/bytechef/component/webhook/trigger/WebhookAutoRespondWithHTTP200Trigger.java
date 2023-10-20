@@ -17,6 +17,7 @@
 
 package com.bytechef.component.webhook.trigger;
 
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
@@ -28,13 +29,11 @@ import java.util.Map;
 import static com.bytechef.component.webhook.constant.WebhookConstants.BODY;
 import static com.bytechef.component.webhook.constant.WebhookConstants.HEADERS;
 import static com.bytechef.component.webhook.constant.WebhookConstants.METHOD;
-import static com.bytechef.component.webhook.constant.WebhookConstants.PATH;
 import static com.bytechef.component.webhook.constant.WebhookConstants.PARAMETERS;
 import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
-import static com.bytechef.hermes.definition.DefinitionDSL.array;
-
+import static com.bytechef.hermes.definition.DefinitionDSL.any;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
+import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
  * @author Ivica Cardic
@@ -49,9 +48,11 @@ public class WebhookAutoRespondWithHTTP200Trigger {
         .outputSchema(
             object()
                 .properties(
+                    string(METHOD),
                     object(HEADERS),
                     object(PARAMETERS),
-                    oneOf(BODY).types(array(), object())))
+                    any(BODY)))
+        .outputSchema(getOutputSchemaFunction())
         .staticWebhookRequest(WebhookAutoRespondWithHTTP200Trigger::staticWebhookRequest);
 
     protected static WebhookOutput staticWebhookRequest(StaticWebhookRequestContext context) {
@@ -62,7 +63,11 @@ public class WebhookAutoRespondWithHTTP200Trigger {
                 BODY, webhookBody.getContent(),
                 METHOD, context.method(),
                 HEADERS, context.headers(),
-                PARAMETERS, context.parameters(),
-                PATH, context.path()));
+                PARAMETERS, context.parameters()));
+    }
+
+    protected static OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (connection, inputParameters) -> null;
     }
 }

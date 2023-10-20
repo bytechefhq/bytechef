@@ -23,17 +23,25 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 
 import java.util.Map;
 
+import static com.bytechef.component.datastorage.constant.DataStorageConstants.APPEND_LIST_AS_SINGLE_ITEM;
+import static com.bytechef.component.datastorage.constant.DataStorageConstants.CREATE_VALUE_IF_MISSING;
+import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE_OPTIONS;
+import static com.bytechef.component.datastorage.constant.DataStorageConstants.TYPE;
+import static com.bytechef.component.datastorage.constant.DataStorageConstants.TYPE_OPTIONS;
+import static com.bytechef.component.datastorage.constant.DataStorageConstants.VALUE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 
+import static com.bytechef.hermes.definition.DefinitionDSL.date;
+import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.nullable;
 import static com.bytechef.hermes.definition.DefinitionDSL.number;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.definition.DefinitionDSL.time;
 
 /**
  * @author Ivica Cardic
@@ -44,33 +52,82 @@ public class DataStorageAppendValueToListAction {
         .title("Append Value to List")
         .description("Append value to the end of a list. If the list does not exist, it will be created.")
         .properties(
+            integer(SCOPE)
+                .label("Scope")
+                .description("The namespace for appending a value.")
+                .options(SCOPE_OPTIONS)
+                .required(true),
             string(DataStorageConstants.KEY)
                 .label("Key")
                 .description(
                     "The identifier of a list must be unique within the chosen scope, or a new value will overwrite the existing one.")
                 .required(true),
-            string(DataStorageConstants.SCOPE)
-                .label("Scope")
-                .description("The namespace for appending a value.")
-                .options(SCOPE_OPTIONS)
-                .required(true),
-            oneOf(DataStorageConstants.VALUE)
-                .types(array(), bool(), integer(), number(), object(), string(), nullable())
+            integer(TYPE)
+                .label("Type")
+                .description("The value type.")
+                .options(TYPE_OPTIONS),
+            array(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
+                .displayCondition("type === 1")
                 .required(true),
-            bool(DataStorageConstants.CREATE_VALUE_IF_MISSING)
+            bool(VALUE)
+                .label("Value")
+                .description("The value to set under given key.")
+                .displayCondition("type === 2")
+                .required(true),
+            date(VALUE)
+                .label("Value")
+                .description("The value to set under given key.")
+                .displayCondition("type === 3")
+                .required(true),
+            dateTime(VALUE)
+                .label("Value")
+                .description("The value to set under given key.")
+                .displayCondition("type === 4")
+                .required(true),
+            integer(VALUE)
+                .label("Value")
+                .description("The value to set under given key.")
+                .displayCondition("type === 5")
+                .required(true),
+            nullable(VALUE)
+                .label("Value")
+                .description("The value to set under given key.")
+                .displayCondition("type === 6")
+                .required(true),
+            number(VALUE)
+                .label("Value")
+                .description("The value to set under given key.")
+                .displayCondition("type === 7")
+                .required(true),
+            object(VALUE)
+                .label("Value")
+                .description("The value to set under given key.")
+                .displayCondition("type === 8")
+                .required(true),
+            string(VALUE)
+                .label("Value")
+                .description("The value to set under given key.")
+                .displayCondition("type === 9")
+                .required(true),
+            time(VALUE)
+                .label("Value")
+                .description("The value to set under given key.")
+                .displayCondition("type === 10")
+                .required(true),
+            bool(CREATE_VALUE_IF_MISSING)
                 .label("Create value if missing")
                 .description(
                     "When the specified list doesn't exist, it will be created with the provided value during the append operation."),
-            bool(DataStorageConstants.APPEND_LIST_AS_SINGLE_ITEM)
+            bool(APPEND_LIST_AS_SINGLE_ITEM)
                 .label("Append a list as a single item")
                 .description(
                     "When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists."))
         .execute(DataStorageAppendValueToListAction::execute);
 
     protected static Object execute(ActionContext actionContext, Map<String, ?> inputParameters) {
-        System.out.println(actionContext);
+        // TODO
 
         return null;
     }

@@ -99,8 +99,8 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "EXPRESSION"
+      "controlType": "EXPRESSION",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The object input is array?",
@@ -162,8 +162,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER"
+      "controlType": "INPUT_INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -181,8 +181,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INPUT_INTEGER"
+      "controlType": "INPUT_INTEGER",
+      "optionsDataSource": null
     } ],
     "title": "Read from file",
     "editorDescriptionDataSource": null,
@@ -203,8 +203,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": null,
@@ -224,10 +224,12 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
-    "outputSchemaDataSource": null,
+    "outputSchemaDataSource": {
+      "outputSchema": { }
+    },
     "sampleOutputDataSource": null
   }, {
     "batch": null,
@@ -240,8 +242,37 @@
     "name": "write",
     "properties": [ {
       "advancedOption": null,
-      "description": "The data to write to the file.",
+      "description": "The value type.",
       "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Type",
+      "metadata": { },
+      "placeholder": null,
+      "required": null,
+      "name": "type",
+      "type": "INTEGER",
+      "defaultValue": null,
+      "exampleValue": null,
+      "maxValue": null,
+      "minValue": null,
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "Object",
+        "value": 1
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "Array",
+        "value": 2
+      } ],
+      "controlType": "SELECT",
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The object to write to the file.",
+      "displayCondition": "type === 1",
       "expressionEnabled": null,
       "hidden": null,
       "label": "Source",
@@ -249,48 +280,35 @@
       "placeholder": null,
       "required": true,
       "name": "source",
-      "type": "ONE_OF",
-      "types": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "metadata": { },
-        "placeholder": null,
-        "required": null,
-        "name": null,
-        "type": "ARRAY",
-        "defaultValue": null,
-        "exampleValue": null,
-        "items": null,
-        "multipleValues": null,
-        "options": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
-      }, {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "metadata": { },
-        "placeholder": null,
-        "required": null,
-        "name": null,
-        "type": "OBJECT",
-        "defaultValue": null,
-        "exampleValue": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "objectType": null,
-        "options": null,
-        "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
-      } ]
+      "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
+      "multipleValues": null,
+      "objectType": null,
+      "options": null,
+      "properties": null,
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "The aray to write to the file.",
+      "displayCondition": "type === 2",
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Source",
+      "metadata": { },
+      "placeholder": null,
+      "required": true,
+      "name": "source",
+      "type": "ARRAY",
+      "defaultValue": null,
+      "exampleValue": null,
+      "items": null,
+      "multipleValues": null,
+      "options": null,
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.xml\" will be used.",
@@ -403,8 +421,8 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "EXPRESSION"
+      "controlType": "EXPRESSION",
+      "optionsDataSource": null
     } ],
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null

@@ -25,10 +25,12 @@ import java.util.Map;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.KEY;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE_OPTIONS;
+import static com.bytechef.component.datastorage.constant.DataStorageConstants.VALUE;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.VALUE_TO_ADD;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
+import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -45,7 +47,7 @@ public class DataStorageAtomicIncrementAction {
                 .label("Key")
                 .description("The identifier of a value to increment.")
                 .required(true),
-            string(SCOPE)
+            integer(SCOPE)
                 .label("Scope")
                 .description("The namespace to obtain a value from.")
                 .options(SCOPE_OPTIONS)
@@ -55,10 +57,13 @@ public class DataStorageAtomicIncrementAction {
                 .description(
                     "The value that can be added to the existing numeric value, which may have a negative value.")
                 .defaultValue(1))
+        .outputSchema(
+            object()
+                .properties(integer(VALUE)))
         .execute(DataStorageAtomicIncrementAction::execute);
 
     protected static Object execute(ActionContext actionContext, Map<String, ?> inputParameters) {
-        System.out.println(actionContext.toString());
+        // TODO
 
         return null;
     }

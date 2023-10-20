@@ -17,7 +17,9 @@
 
 package com.bytechef.component.httpclient.constant;
 
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Property.InputProperty;
+import com.bytechef.hermes.definition.Property.OutputProperty;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,13 +28,18 @@ import java.util.List;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
 import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import static com.bytechef.hermes.definition.DefinitionDSL.any;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
+import static com.bytechef.hermes.definition.DefinitionDSL.date;
+import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
+import static com.bytechef.hermes.definition.DefinitionDSL.nullable;
+import static com.bytechef.hermes.definition.DefinitionDSL.number;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.definition.DefinitionDSL.time;
 
 /**
  * @author Ivica Cardic
@@ -62,13 +69,14 @@ public class HttpClientConstants {
     public static final String TIMEOUT = "timeout";
     public static final String URI = "uri";
 
-    public static final List<Property<?>> BODY_CONTENT_PROPERTIES = Collections.unmodifiableList(
+    public static final List<InputProperty> BODY_CONTENT_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(
             object(BODY_CONTENT)
                 .label("Body Content - JSON")
                 .description("Body Parameters to send.")
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.JSON.name()))
-                .additionalProperties(oneOf())
+                .additionalProperties(
+                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
                 .placeholder("Add Parameter"),
             object(BODY_CONTENT)
                 .label("Body Content - XML")
@@ -80,7 +88,7 @@ public class HttpClientConstants {
                 .description("Body parameters to send.")
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_DATA.name()))
                 .placeholder("Add Parameter")
-                .additionalProperties(oneOf().types(string(), fileEntry())),
+                .additionalProperties(string(), fileEntry()),
             object(BODY_CONTENT)
                 .label("Body Content - Form URL-Encoded")
                 .description("Body parameters to send.")
@@ -96,41 +104,16 @@ public class HttpClientConstants {
                 .description("The object property which contains a reference to the file to upload.")
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))));
 
-    public static final List<Property<?>> OUTPUT_PROPERTIES = Collections.unmodifiableList(
-        Arrays.asList(
-            object().properties(oneOf("body").types(array(), object()), object("headers"), integer("status"))
-                .displayCondition(
-                    "['%s'].includes('%s') && %s === false".formatted(
-                        ResponseFormat.JSON.name(), RESPONSE_FORMAT, FULL_RESPONSE)),
-            object().properties(object("body"), object("headers"), integer("status"))
-                .displayCondition(
-                    "['%s'].includes('%s') && %s === false".formatted(
-                        ResponseFormat.XML.name(), RESPONSE_FORMAT, FULL_RESPONSE)),
-            oneOf()
-                .types(array(), object())
-                .displayCondition(
-                    "['%s'].includes('%s') && %s === true".formatted(
-                        ResponseFormat.JSON.name(), RESPONSE_FORMAT, FULL_RESPONSE)),
-            object()
-                .displayCondition(
-                    "['%s'].includes('%s') && %s === true".formatted(
-                        ResponseFormat.XML.name(), RESPONSE_FORMAT, FULL_RESPONSE)),
-            string().displayCondition(
-                "%s === '%s' && %s === true".formatted(RESPONSE_FORMAT, ResponseFormat.TEXT.name(), FULL_RESPONSE)),
-            object().properties(string("body"), object("headers"), integer("status"))
-                .displayCondition(
-                    "%s === '%s' && %s === false".formatted(
-                        RESPONSE_FORMAT, ResponseFormat.TEXT.name(), FULL_RESPONSE)),
-            fileEntry()
-                .displayCondition(
-                    "%s === '%s' && %s === true".formatted(
-                        RESPONSE_FORMAT, ResponseFormat.BINARY.name(), FULL_RESPONSE)),
-            object().properties(fileEntry("body"), object("headers"), integer("status"))
-                .displayCondition(
-                    "%s === '%s' && %s === false".formatted(
-                        RESPONSE_FORMAT, ResponseFormat.BINARY.name(), FULL_RESPONSE))));
+    @SuppressFBWarnings("MS_MUTABLE_ARRAY")
+    public static final OutputProperty<?>[] OUTPUT_PROPERTIES = new OutputProperty<?>[] {
+        object()
+            .properties(any("body"), object("headers"), integer("status"))
+            .displayCondition("%s === false".formatted(FULL_RESPONSE)),
+        any()
+            .displayCondition("%s === true".formatted(FULL_RESPONSE))
+    };
 
-    public static final List<Property<?>> COMMON_PROPERTIES = Collections.unmodifiableList(
+    public static final List<InputProperty> COMMON_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(
 
             //

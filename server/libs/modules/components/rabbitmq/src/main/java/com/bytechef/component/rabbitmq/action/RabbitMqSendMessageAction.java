@@ -21,6 +21,7 @@ import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.JsonUtils;
 import com.bytechef.hermes.component.util.MapValueUtils;
@@ -37,7 +38,7 @@ import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.QUEUE;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.USERNAME;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
+import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -52,9 +53,10 @@ public class RabbitMqSendMessageAction {
             string(QUEUE)
                 .description("The name of the queue to read from")
                 .required(true),
-            oneOf(MESSAGE)
+            object(MESSAGE)
                 .description("The name of the queue to read from")
                 .required(true))
+        .outputSchema(getOutputSchemaFunction())
         .execute(RabbitMqSendMessageAction::execute);
 
     protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
@@ -80,5 +82,10 @@ public class RabbitMqSendMessageAction {
         }
 
         return null;
+    }
+
+    protected static OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (connection, inputParameters) -> null;
     }
 }

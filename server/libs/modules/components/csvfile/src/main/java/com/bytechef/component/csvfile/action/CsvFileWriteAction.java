@@ -45,7 +45,6 @@ import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.number;
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -62,8 +61,7 @@ public class CsvFileWriteAction {
                 .description("The array of objects to write to the file.")
                 .required(true)
                 .items(ComponentDSL.object()
-                    .additionalProperties(
-                        oneOf().types(bool(), dateTime(), number(), string()))),
+                    .additionalProperties(bool(), dateTime(), number(), string())),
             string(FILENAME)
                 .label("Filename")
                 .description(

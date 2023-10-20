@@ -44,9 +44,15 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 
+import static com.bytechef.hermes.definition.DefinitionDSL.bool;
+import static com.bytechef.hermes.definition.DefinitionDSL.date;
+import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
+import static com.bytechef.hermes.definition.DefinitionDSL.integer;
+import static com.bytechef.hermes.definition.DefinitionDSL.nullable;
+import static com.bytechef.hermes.definition.DefinitionDSL.number;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.definition.DefinitionDSL.time;
 
 /**
  * @author Ivica Cardic
@@ -61,7 +67,8 @@ public class XlsxFileWriteAction {
                 .label("Rows")
                 .description("The array of objects to write to the file.")
                 .required(true)
-                .items(object().additionalProperties(oneOf())),
+                .items(object().additionalProperties(
+                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())),
             string(FILENAME)
                 .label("Filename")
                 .description(
@@ -77,6 +84,9 @@ public class XlsxFileWriteAction {
         .outputSchema(fileEntry())
         .execute(XlsxFileWriteAction::executeWrite);
 
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
     protected static FileEntry executeWrite(Context context, Map<String, ?> inputParameters) {
         String fileName = MapValueUtils.getString(inputParameters, FILENAME, getaDefaultFileName());
         List<Map<String, ?>> rows = (List) MapValueUtils.getList(inputParameters, ROWS, List.of());

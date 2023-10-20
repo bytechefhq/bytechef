@@ -19,6 +19,7 @@ package com.bytechef.component.objecthelper.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.component.util.JsonUtils;
 import com.bytechef.hermes.component.util.MapValueUtils;
 
@@ -28,7 +29,6 @@ import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants
 import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.SOURCE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 
-import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -43,12 +43,17 @@ public class ObjectHelperParseAction {
             .label("Source")
             .description("The JSON string to convert to the data.")
             .required(true))
-        .outputSchema(oneOf())
+        .outputSchema(getOutputSchemaFunction())
         .execute(ObjectHelperParseAction::executeParse);
 
     protected static Object executeParse(Context context, Map<String, ?> inputParameters) {
         Object input = MapValueUtils.getRequired(inputParameters, SOURCE);
 
         return JsonUtils.read((String) input);
+    }
+
+    protected static OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (connection, inputParameters) -> null;
     }
 }

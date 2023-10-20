@@ -20,21 +20,22 @@ package com.bytechef.component.datamapper.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
 
 import java.util.Map;
 
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.FIELD_KEY;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.FIELD_VALUE;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.INPUT;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 
+import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
  * @author Ivica Cardic
  */
 public class DataMapperMapListToObjectAction {
-
-    private static final String INPUT = "input";
-    private static final String FIELD_KEY = "fieldKey";
-    private static final String FIELD_VALUE = "fieldValue";
 
     public static final ActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapListToObject")
         .title("Map list to object")
@@ -52,9 +53,16 @@ public class DataMapperMapListToObjectAction {
                 .label("Field Key")
                 .description("The value of the key will become the value in the new object.")
                 .required(true))
+        .outputSchema(getOutputSchemaFunction(), object())
         .execute(DataMapperMapListToObjectAction::execute);
 
     protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
+        // TODO
         return null;
+    }
+
+    protected static OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (connection, inputParameters) -> null;
     }
 }

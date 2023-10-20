@@ -20,9 +20,14 @@ package com.bytechef.component.datamapper.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 
 import java.util.Map;
 
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.FROM;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.INPUT;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.MAPPINGS;
+import static com.bytechef.component.datamapper.constant.DataMapperConstants.TO;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
@@ -32,9 +37,6 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
  * @author Ivica Cardic
  */
 public class DataMapperMapKeysAction {
-
-    private static final String INPUT = "input";
-    private static final String MAPPINGS = "mappings";
 
     public static final ActionDefinition ACTION_DEFINITION = ComponentDSL.action("mapKeys")
         .title("Map Keys")
@@ -48,17 +50,24 @@ public class DataMapperMapKeysAction {
             array(MAPPINGS)
                 .label("Mappings")
                 .description(
-                    "Specify the necessary mappings by defining that \"From\" refers to a particular key from the Input, while \"To\" represents the name of a new key that is assigned the corresponding value of the \"From\" key.")
+                    "The collection of of \"mappings\" where \"From\" refers to a particular key from the Input, while \"To\" represents the name of a new key that is assigned the corresponding value of the \"From\" key.")
                 .items(
                     object().properties(
-                        string("from")
+                        string(FROM)
                             .label("From"),
-                        string("to")
+                        string(TO)
                             .label("To")))
                 .required(true))
+        .outputSchema(getOutputSchemaFunction(), object())
         .execute(DataMapperMapKeysAction::execute);
 
     protected static Object execute(ActionContext context, Map<String, ?> inputParameters) {
+        // TODO
         return null;
+    }
+
+    protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (connection, inputParameters) -> null;
     }
 }
