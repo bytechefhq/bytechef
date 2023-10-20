@@ -1,4 +1,5 @@
-import {CalendarIcon, ChevronDownIcon} from '@heroicons/react/24/outline';
+import {CalendarIcon} from '@heroicons/react/24/outline';
+import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
@@ -96,7 +97,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
     return (
         <>
-            <li className="flex items-center rounded border bg-white p-4 hover:bg-gray-50 group-radix-state-open:rounded-b-none group-radix-state-open:border-b-0">
+            <div className="flex items-center">
                 <div className="flex-1 pr-8">
                     <div className="flex items-center justify-between">
                         <div className="relative flex items-center">
@@ -138,35 +139,36 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                     </div>
 
                     <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
-                        <div
-                            className="flex items-center"
-                            onClick={(event) => event.preventDefault()}
-                        >
-                            <div className="mr-4 text-xs font-semibold text-gray-700">
-                                {project.workflowIds?.length === 1
-                                    ? `${project.workflowIds?.length} workflow`
-                                    : `${project.workflowIds?.length} workflows`}
+                        <div className="flex h-[38px] items-center">
+                            <div className="mr-4 flex text-xs font-semibold text-gray-700">
+                                <div className="mr-1">
+                                    {project.workflowIds?.length === 1
+                                        ? `${project.workflowIds?.length} workflow`
+                                        : `${project.workflowIds?.length} workflows`}
+                                </div>
+
+                                <ChevronDownIcon className="duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-180" />
                             </div>
 
-                            {project.tags && (
-                                <TagList
-                                    id={project.id!}
-                                    remainingTags={remainingTags}
-                                    tags={project.tags}
-                                    updateTagsMutation={
-                                        updateProjectTagsMutation
-                                    }
-                                    getRequest={(id, tags) => ({
-                                        id: id!,
-                                        updateTagsRequestModel: {
-                                            tags: tags || [],
-                                        },
-                                    })}
-                                />
-                            )}
+                            <div onClick={(event) => event.preventDefault()}>
+                                {project.tags && (
+                                    <TagList
+                                        id={project.id!}
+                                        remainingTags={remainingTags}
+                                        tags={project.tags}
+                                        updateTagsMutation={
+                                            updateProjectTagsMutation
+                                        }
+                                        getRequest={(id, tags) => ({
+                                            id: id!,
+                                            updateTagsRequestModel: {
+                                                tags: tags || [],
+                                            },
+                                        })}
+                                    />
+                                )}
+                            </div>
                         </div>
-
-                        <ChevronDownIcon className="absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-gray-400 transition-transform duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-180" />
 
                         <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
                             {project.status ===
@@ -189,7 +191,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                 </div>
 
                 <DropdownMenu id={project.id} menuItems={dropdownItems} />
-            </li>
+            </div>
 
             <AlertDialog
                 danger
