@@ -16,7 +16,7 @@ type InputProps = {
 } & React.DetailedHTMLProps<
     React.InputHTMLAttributes<HTMLInputElement>,
     HTMLInputElement
->
+>;
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
     (
