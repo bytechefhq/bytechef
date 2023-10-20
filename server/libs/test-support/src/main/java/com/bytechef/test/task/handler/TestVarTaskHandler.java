@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.test.task.handler;
+package com.bytechef.test.task.handler;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;

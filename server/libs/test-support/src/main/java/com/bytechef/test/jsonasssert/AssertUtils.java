@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.test.definition;
+package com.bytechef.test.jsonasssert;
 
 import com.bytechef.hermes.definition.Definition;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -26,7 +26,7 @@ import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.core.io.ClassPathResource;
 
-public class DefinitionAssert {
+public class AssertUtils {
 
     private static final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -34,11 +34,11 @@ public class DefinitionAssert {
         }
     };
 
-    public static void assertEquals(String taskDescriptorFileName, Definition definition) {
+    public static void assertEquals(String definitionFileName, Definition definition) {
         try {
             JSONAssert.assertEquals(
                     FileUtils.readFileToString(
-                            new ClassPathResource(taskDescriptorFileName).getFile(), StandardCharsets.UTF_8),
+                            new ClassPathResource(definitionFileName).getFile(), StandardCharsets.UTF_8),
                     objectMapper.writeValueAsString(definition),
                     true);
         } catch (IOException | JSONException e) {
