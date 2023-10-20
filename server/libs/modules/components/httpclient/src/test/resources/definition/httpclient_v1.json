@@ -345,23 +345,7 @@
                     ]
                 },
                 {
-                    "description": "Send file instead of body parameters.",
-                    "displayOption": {
-                        "show": {
-                            "bodyContentType": [
-                                "JSON",
-                                "RAW",
-                                "XML"
-                            ]
-                        }
-                    },
-                    "label": "Send File",
-                    "name": "sendFile",
-                    "type": "BOOLEAN",
-                    "defaultValue": false
-                },
-                {
-                    "description": "Body parameters to send.",
+                    "description": "Body Parameters to send.",
                     "displayOption": {
                         "show": {
                             "bodyContentType": [
@@ -370,6 +354,54 @@
                         }
                     },
                     "label": "Body Parameters",
+                    "placeholder": "Add Parameter",
+                    "name": "bodyParameters",
+                    "type": "OBJECT",
+                    "additionalProperties": [
+                        {
+                            "type": "ONE_OF",
+                            "types": [
+                                {
+                                    "type": "ARRAY"
+                                },
+                                {
+                                    "type": "BOOLEAN"
+                                },
+                                {
+                                    "type": "DATE"
+                                },
+                                {
+                                    "type": "DATE_TIME"
+                                },
+                                {
+                                    "type": "INTEGER"
+                                },
+                                {
+                                    "type": "NULL"
+                                },
+                                {
+                                    "type": "NUMBER"
+                                },
+                                {
+                                    "type": "OBJECT"
+                                },
+                                {
+                                    "type": "STRING"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "description": "XML content to send.",
+                    "displayOption": {
+                        "show": {
+                            "bodyContentType": [
+                                "XML"
+                            ]
+                        }
+                    },
+                    "label": "XML",
                     "placeholder": "Add Parameter",
                     "name": "bodyParameters",
                     "type": "OBJECT",
@@ -423,25 +455,6 @@
                     "type": "OBJECT",
                     "additionalProperties": [
                         {
-                            "type": "STRING"
-                        }
-                    ]
-                },
-                {
-                    "description": "Body parameters to send.",
-                    "displayOption": {
-                        "show": {
-                            "bodyContentType": [
-                                "FORM_URLENCODED"
-                            ]
-                        }
-                    },
-                    "label": "Body Parameters",
-                    "placeholder": "Add Parameter",
-                    "name": "bodyParameters",
-                    "type": "OBJECT",
-                    "additionalProperties": [
-                        {
                             "type": "ONE_OF",
                             "types": [
                                 {
@@ -478,6 +491,25 @@
                     ]
                 },
                 {
+                    "description": "Body parameters to send.",
+                    "displayOption": {
+                        "show": {
+                            "bodyContentType": [
+                                "FORM_URLENCODED"
+                            ]
+                        }
+                    },
+                    "label": "Body Parameters",
+                    "placeholder": "Add Parameter",
+                    "name": "bodyParameters",
+                    "type": "OBJECT",
+                    "additionalProperties": [
+                        {
+                            "type": "STRING"
+                        }
+                    ]
+                },
+                {
                     "description": "The raw text to send.",
                     "displayOption": {
                         "show": {
@@ -491,19 +523,11 @@
                     "type": "STRING"
                 },
                 {
-                    "description": "The object property which contains a reference to the file with data to upload.",
+                    "description": "The object property which contains a reference to the file to upload.",
                     "displayOption": {
-                        "hide": {
-                            "sendFile": [
-                                false
-                            ]
-                        },
                         "show": {
                             "bodyContentType": [
-                                "BINARY",
-                                "JSON",
-                                "RAW",
-                                "XML"
+                                "BINARY"
                             ]
                         }
                     },
@@ -540,15 +564,15 @@
                     "label": "Body Content Type",
                     "name": "bodyContentType",
                     "type": "STRING",
-                    "defaultValue": "JSON",
+                    "defaultValue": "NONE",
                     "options": [
+                        {
+                            "name": "None",
+                            "value": ""
+                        },
                         {
                             "name": "JSON",
                             "value": "JSON"
-                        },
-                        {
-                            "name": "Raw",
-                            "value": "RAW"
                         },
                         {
                             "name": "Form-Data",
@@ -559,12 +583,12 @@
                             "value": "FORM_URLENCODED"
                         },
                         {
-                            "name": "Binary",
-                            "value": "BINARY"
+                            "name": "Raw",
+                            "value": "RAW"
                         },
                         {
-                            "name": "XML",
-                            "value": "XML"
+                            "name": "Binary",
+                            "value": "BINARY"
                         }
                     ]
                 },
@@ -578,10 +602,11 @@
                             ]
                         }
                     },
-                    "label": "Mime Type",
-                    "placeholder": "text/xml",
-                    "name": "mimeType",
-                    "type": "STRING"
+                    "label": "Content Type",
+                    "placeholder": "text/plain",
+                    "name": "rawContentMimeType",
+                    "type": "STRING",
+                    "defaultValue": "text/plain"
                 },
                 {
                     "advancedOption": true,
@@ -929,23 +954,7 @@
                     ]
                 },
                 {
-                    "description": "Send file instead of body parameters.",
-                    "displayOption": {
-                        "show": {
-                            "bodyContentType": [
-                                "JSON",
-                                "RAW",
-                                "XML"
-                            ]
-                        }
-                    },
-                    "label": "Send File",
-                    "name": "sendFile",
-                    "type": "BOOLEAN",
-                    "defaultValue": false
-                },
-                {
-                    "description": "Body parameters to send.",
+                    "description": "Body Parameters to send.",
                     "displayOption": {
                         "show": {
                             "bodyContentType": [
@@ -954,6 +963,54 @@
                         }
                     },
                     "label": "Body Parameters",
+                    "placeholder": "Add Parameter",
+                    "name": "bodyParameters",
+                    "type": "OBJECT",
+                    "additionalProperties": [
+                        {
+                            "type": "ONE_OF",
+                            "types": [
+                                {
+                                    "type": "ARRAY"
+                                },
+                                {
+                                    "type": "BOOLEAN"
+                                },
+                                {
+                                    "type": "DATE"
+                                },
+                                {
+                                    "type": "DATE_TIME"
+                                },
+                                {
+                                    "type": "INTEGER"
+                                },
+                                {
+                                    "type": "NULL"
+                                },
+                                {
+                                    "type": "NUMBER"
+                                },
+                                {
+                                    "type": "OBJECT"
+                                },
+                                {
+                                    "type": "STRING"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "description": "XML content to send.",
+                    "displayOption": {
+                        "show": {
+                            "bodyContentType": [
+                                "XML"
+                            ]
+                        }
+                    },
+                    "label": "XML",
                     "placeholder": "Add Parameter",
                     "name": "bodyParameters",
                     "type": "OBJECT",
@@ -1007,25 +1064,6 @@
                     "type": "OBJECT",
                     "additionalProperties": [
                         {
-                            "type": "STRING"
-                        }
-                    ]
-                },
-                {
-                    "description": "Body parameters to send.",
-                    "displayOption": {
-                        "show": {
-                            "bodyContentType": [
-                                "FORM_URLENCODED"
-                            ]
-                        }
-                    },
-                    "label": "Body Parameters",
-                    "placeholder": "Add Parameter",
-                    "name": "bodyParameters",
-                    "type": "OBJECT",
-                    "additionalProperties": [
-                        {
                             "type": "ONE_OF",
                             "types": [
                                 {
@@ -1062,6 +1100,25 @@
                     ]
                 },
                 {
+                    "description": "Body parameters to send.",
+                    "displayOption": {
+                        "show": {
+                            "bodyContentType": [
+                                "FORM_URLENCODED"
+                            ]
+                        }
+                    },
+                    "label": "Body Parameters",
+                    "placeholder": "Add Parameter",
+                    "name": "bodyParameters",
+                    "type": "OBJECT",
+                    "additionalProperties": [
+                        {
+                            "type": "STRING"
+                        }
+                    ]
+                },
+                {
                     "description": "The raw text to send.",
                     "displayOption": {
                         "show": {
@@ -1075,19 +1132,11 @@
                     "type": "STRING"
                 },
                 {
-                    "description": "The object property which contains a reference to the file with data to upload.",
+                    "description": "The object property which contains a reference to the file to upload.",
                     "displayOption": {
-                        "hide": {
-                            "sendFile": [
-                                false
-                            ]
-                        },
                         "show": {
                             "bodyContentType": [
-                                "BINARY",
-                                "JSON",
-                                "RAW",
-                                "XML"
+                                "BINARY"
                             ]
                         }
                     },
@@ -1124,15 +1173,15 @@
                     "label": "Body Content Type",
                     "name": "bodyContentType",
                     "type": "STRING",
-                    "defaultValue": "JSON",
+                    "defaultValue": "NONE",
                     "options": [
+                        {
+                            "name": "None",
+                            "value": ""
+                        },
                         {
                             "name": "JSON",
                             "value": "JSON"
-                        },
-                        {
-                            "name": "Raw",
-                            "value": "RAW"
                         },
                         {
                             "name": "Form-Data",
@@ -1143,12 +1192,12 @@
                             "value": "FORM_URLENCODED"
                         },
                         {
-                            "name": "Binary",
-                            "value": "BINARY"
+                            "name": "Raw",
+                            "value": "RAW"
                         },
                         {
-                            "name": "XML",
-                            "value": "XML"
+                            "name": "Binary",
+                            "value": "BINARY"
                         }
                     ]
                 },
@@ -1162,10 +1211,11 @@
                             ]
                         }
                     },
-                    "label": "Mime Type",
-                    "placeholder": "text/xml",
-                    "name": "mimeType",
-                    "type": "STRING"
+                    "label": "Content Type",
+                    "placeholder": "text/plain",
+                    "name": "rawContentMimeType",
+                    "type": "STRING",
+                    "defaultValue": "text/plain"
                 },
                 {
                     "advancedOption": true,
@@ -1513,23 +1563,7 @@
                     ]
                 },
                 {
-                    "description": "Send file instead of body parameters.",
-                    "displayOption": {
-                        "show": {
-                            "bodyContentType": [
-                                "JSON",
-                                "RAW",
-                                "XML"
-                            ]
-                        }
-                    },
-                    "label": "Send File",
-                    "name": "sendFile",
-                    "type": "BOOLEAN",
-                    "defaultValue": false
-                },
-                {
-                    "description": "Body parameters to send.",
+                    "description": "Body Parameters to send.",
                     "displayOption": {
                         "show": {
                             "bodyContentType": [
@@ -1538,6 +1572,54 @@
                         }
                     },
                     "label": "Body Parameters",
+                    "placeholder": "Add Parameter",
+                    "name": "bodyParameters",
+                    "type": "OBJECT",
+                    "additionalProperties": [
+                        {
+                            "type": "ONE_OF",
+                            "types": [
+                                {
+                                    "type": "ARRAY"
+                                },
+                                {
+                                    "type": "BOOLEAN"
+                                },
+                                {
+                                    "type": "DATE"
+                                },
+                                {
+                                    "type": "DATE_TIME"
+                                },
+                                {
+                                    "type": "INTEGER"
+                                },
+                                {
+                                    "type": "NULL"
+                                },
+                                {
+                                    "type": "NUMBER"
+                                },
+                                {
+                                    "type": "OBJECT"
+                                },
+                                {
+                                    "type": "STRING"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "description": "XML content to send.",
+                    "displayOption": {
+                        "show": {
+                            "bodyContentType": [
+                                "XML"
+                            ]
+                        }
+                    },
+                    "label": "XML",
                     "placeholder": "Add Parameter",
                     "name": "bodyParameters",
                     "type": "OBJECT",
@@ -1591,25 +1673,6 @@
                     "type": "OBJECT",
                     "additionalProperties": [
                         {
-                            "type": "STRING"
-                        }
-                    ]
-                },
-                {
-                    "description": "Body parameters to send.",
-                    "displayOption": {
-                        "show": {
-                            "bodyContentType": [
-                                "FORM_URLENCODED"
-                            ]
-                        }
-                    },
-                    "label": "Body Parameters",
-                    "placeholder": "Add Parameter",
-                    "name": "bodyParameters",
-                    "type": "OBJECT",
-                    "additionalProperties": [
-                        {
                             "type": "ONE_OF",
                             "types": [
                                 {
@@ -1646,6 +1709,25 @@
                     ]
                 },
                 {
+                    "description": "Body parameters to send.",
+                    "displayOption": {
+                        "show": {
+                            "bodyContentType": [
+                                "FORM_URLENCODED"
+                            ]
+                        }
+                    },
+                    "label": "Body Parameters",
+                    "placeholder": "Add Parameter",
+                    "name": "bodyParameters",
+                    "type": "OBJECT",
+                    "additionalProperties": [
+                        {
+                            "type": "STRING"
+                        }
+                    ]
+                },
+                {
                     "description": "The raw text to send.",
                     "displayOption": {
                         "show": {
@@ -1659,19 +1741,11 @@
                     "type": "STRING"
                 },
                 {
-                    "description": "The object property which contains a reference to the file with data to upload.",
+                    "description": "The object property which contains a reference to the file to upload.",
                     "displayOption": {
-                        "hide": {
-                            "sendFile": [
-                                false
-                            ]
-                        },
                         "show": {
                             "bodyContentType": [
-                                "BINARY",
-                                "JSON",
-                                "RAW",
-                                "XML"
+                                "BINARY"
                             ]
                         }
                     },
@@ -1708,15 +1782,15 @@
                     "label": "Body Content Type",
                     "name": "bodyContentType",
                     "type": "STRING",
-                    "defaultValue": "JSON",
+                    "defaultValue": "NONE",
                     "options": [
+                        {
+                            "name": "None",
+                            "value": ""
+                        },
                         {
                             "name": "JSON",
                             "value": "JSON"
-                        },
-                        {
-                            "name": "Raw",
-                            "value": "RAW"
                         },
                         {
                             "name": "Form-Data",
@@ -1727,12 +1801,12 @@
                             "value": "FORM_URLENCODED"
                         },
                         {
-                            "name": "Binary",
-                            "value": "BINARY"
+                            "name": "Raw",
+                            "value": "RAW"
                         },
                         {
-                            "name": "XML",
-                            "value": "XML"
+                            "name": "Binary",
+                            "value": "BINARY"
                         }
                     ]
                 },
@@ -1746,10 +1820,11 @@
                             ]
                         }
                     },
-                    "label": "Mime Type",
-                    "placeholder": "text/xml",
-                    "name": "mimeType",
-                    "type": "STRING"
+                    "label": "Content Type",
+                    "placeholder": "text/plain",
+                    "name": "rawContentMimeType",
+                    "type": "STRING",
+                    "defaultValue": "text/plain"
                 },
                 {
                     "advancedOption": true,
