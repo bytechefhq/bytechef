@@ -29,8 +29,8 @@ import {
 } from 'queries/integration.queries';
 import Input from 'components/Input/Input';
 import {IntegrationModel} from '../../data-access/integration';
-import useRightSlideOverStore from './stores/rightSlideOver.store';
-import useLeftSidebarStore from './stores/leftSidebar.store';
+import useRightSlideOverStore from './stores/rightSlideOver';
+import useLeftSidebarStore from './stores/leftSidebar';
 
 const headerToggleItems: ToggleItem[] = [
     {
