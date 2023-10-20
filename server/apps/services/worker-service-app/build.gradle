@@ -26,6 +26,7 @@ dependencies {
     implementation project(":server:libs:core:rest:rest-impl")
     implementation project(":server:libs:hermes:hermes-component:hermes-component-registrar")
     implementation project(":server:libs:hermes:hermes-component:hermes-component-rest")
+    implementation project(":server:libs:hermes:hermes-component:hermes-component-service:hermes-component-service-local")
 //    implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rsocket-client")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64")

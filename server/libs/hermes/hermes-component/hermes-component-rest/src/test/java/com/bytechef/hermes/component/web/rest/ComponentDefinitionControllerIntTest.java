@@ -17,19 +17,21 @@
 
 package com.bytechef.hermes.component.web.rest;
 
-import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.service.ComponentDefinitionService;
 import com.bytechef.hermes.component.web.rest.config.ComponentDefinitionRestTestConfiguration;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
 
 /**
  * @author Ivica Cardic
@@ -38,14 +40,19 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @WebFluxTest(ComponentDefinitionController.class)
 public class ComponentDefinitionControllerIntTest {
 
-    private static final List<ComponentDefinitionFactory> COMPONENT_FACTORIES = List
-        .of(() -> ComponentDSL.component("component1"), () -> ComponentDSL.component("component2"));
+    @MockBean
+    private ComponentDefinitionService componentDefinitionService;
 
     @Autowired
     private WebTestClient webTestClient;
 
     @Test
     public void testGetComponentDefinitions() {
+        Mockito.when(componentDefinitionService.getComponentDefinitions())
+            .thenReturn(
+                Flux.fromIterable(List.of(ComponentDSL.component("component1"),
+                    (ComponentDefinition) ComponentDSL.component("component2"))));
+
         try {
             webTestClient
                 .get()
@@ -70,15 +77,6 @@ public class ComponentDefinitionControllerIntTest {
                         """);
         } catch (Exception exception) {
             Assertions.fail(exception);
-        }
-    }
-
-    @TestConfiguration
-    static class ComponentFactoryConfiguration {
-
-        @Bean
-        public List<ComponentDefinitionFactory> componentFactories() {
-            return COMPONENT_FACTORIES;
         }
     }
 }
