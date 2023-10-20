@@ -985,6 +985,27 @@ public class DefinitionDSL {
             @SuppressWarnings("rawtypes")
             public ModifiableObjectProperty additionalProperties(List<Property> additionalProperties) {
                 if (additionalProperties != null) {
+                    if (properties.size() > 0) {
+                        Property<?> firstProperty = properties.get(0);
+
+                        String firstName = firstProperty.getName();
+
+                        boolean emptyName = firstName == null || firstName.isEmpty();
+
+                        for (Property<?> property : properties) {
+                            String name = property.getName();
+
+                            if (emptyName && !(name == null || name.isEmpty()) ||
+                                !emptyName && (name == null || name.isEmpty())) {
+
+                                throw new IllegalArgumentException(
+                                    emptyName
+                                        ? "Additional properties defined have to have empty names."
+                                        : "Additional properties defined cannot to have empty names.");
+                            }
+                        }
+                    }
+
                     this.additionalProperties = additionalProperties.stream()
                         .map(property -> (Property<?>) property)
                         .toList();
@@ -1028,6 +1049,14 @@ public class DefinitionDSL {
             @SuppressWarnings("rawtypes")
             public ModifiableObjectProperty properties(List<Property> properties) {
                 if (properties != null) {
+                    for (Property<?> property : properties) {
+                        String name = property.getName();
+
+                        if (name == null || name.isEmpty()) {
+                            throw new IllegalArgumentException("Name cannot be empty for property.");
+                        }
+                    }
+
                     this.properties = properties.stream()
                         .map(property -> (Property<?>) property)
                         .toList();
