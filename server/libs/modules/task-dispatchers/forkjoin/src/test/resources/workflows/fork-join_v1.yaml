@@ -1,7 +1,8 @@
 ---
 label: "Hello fork/join"
 tasks:
-- type: "fork-join/v1"
+- name: "fork-join-1"
+  type: "fork-join/v1"
   parameters:
     branches:
     - - name: "var1"

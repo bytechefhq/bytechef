@@ -61,7 +61,7 @@ public class EachTaskDispatcherTest {
                 taskDispatcher, taskExecutionService, messageBroker, contextService, counterService);
 
             dispatcher.dispatch(TaskExecution.builder()
-                .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
+                .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type")))
                 .build());
         });
     }
@@ -76,9 +76,12 @@ public class EachTaskDispatcherTest {
         TaskExecution taskExecution = TaskExecution.builder().workflowTask(
             WorkflowTask.of(
                 Map.of(
+                    WorkflowConstants.NAME, "name",
                     WorkflowConstants.TYPE, "type",
                     WorkflowConstants.PARAMETERS,
-                    Map.of("list", Arrays.asList(1, 2, 3), "iteratee", Collections.singletonMap("type", "print")))))
+                    Map.of(
+                        "list", Arrays.asList(1, 2, 3),
+                        "iteratee", WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", "type", "print"))))))
             .build();
 
         taskExecution.setId(1L);
@@ -102,9 +105,12 @@ public class EachTaskDispatcherTest {
             .workflowTask(
                 WorkflowTask.of(
                     Map.of(
+                        WorkflowConstants.NAME, "name",
                         WorkflowConstants.TYPE, "type",
                         WorkflowConstants.PARAMETERS,
-                        Map.of("list", List.of(), "iteratee", Collections.singletonMap("type", "print")))))
+                        Map.of(
+                            "list", List.of(),
+                            "iteratee", WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", "type", "print"))))))
             .build();
 
         when(taskExecutionService.update(any())).thenReturn(taskExecution);

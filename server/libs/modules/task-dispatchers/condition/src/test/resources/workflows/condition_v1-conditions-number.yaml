@@ -8,7 +8,8 @@ inputs:
   type: "number"
   required: true
 tasks:
-- type: "condition/v1"
+- name: "condition-1"
+  type: "condition/v1"
   parameters:
     conditions:
     - number:
@@ -26,7 +27,8 @@ tasks:
       type: "var"
       parameters:
         value: "false branch"
-- type: "condition/v1"
+- name: "condition-2"
+  type: "condition/v1"
   parameters:
     conditions:
     - number:
@@ -44,7 +46,8 @@ tasks:
       type: "var"
       parameters:
         value: "false branch"
-- type: "condition/v1"
+- name: "condition-3"
+  type: "condition/v1"
   parameters:
     conditions:
     - number:
@@ -62,7 +65,8 @@ tasks:
       type: "var"
       parameters:
         value: "false branch"
-- type: "condition/v1"
+- name: "condition-4"
+  type: "condition/v1"
   parameters:
     conditions:
     - number:
@@ -80,7 +84,8 @@ tasks:
       type: "var"
       parameters:
         value: "false branch"
-- type: "condition/v1"
+- name: "condition-5"
+  type: "condition/v1"
   parameters:
     conditions:
     - number:
@@ -98,7 +103,8 @@ tasks:
       type: "var"
       parameters:
         value: "false branch"
-- type: "condition/v1"
+- name: "condition-6"
+  type: "condition/v1"
   parameters:
     conditions:
     - number:
