@@ -7,8 +7,8 @@
     {
       "description": "The type of values to compare.",
       "label": "Conditions",
-      "name": "conditions",
       "placeholder": "Add Condition",
+      "name": "conditions",
       "type": "ARRAY",
       "items": [
         {
@@ -137,7 +137,7 @@
             {
               "description": "The number value to compare with the first one.",
               "displayOption": {
-                "hideWhen": {
+                "hide": {
                   "operation": [
                     "EMPTY"
                   ]
@@ -206,7 +206,7 @@
             {
               "description": "The string value to compare with the first one.",
               "displayOption": {
-                "hideWhen": {
+                "hide": {
                   "operation": [
                     "EMPTY",
                     "REGEX"
@@ -221,15 +221,15 @@
             {
               "description": "The regex value to compare with the first one.",
               "displayOption": {
-                "showWhen": {
+                "show": {
                   "operation": [
                     "REGEX"
                   ]
                 }
               },
               "label": "Regex",
-              "name": "value2",
               "placeholder": "/text/i",
+              "name": "value2",
               "type": "STRING",
               "defaultValue": ""
             }
@@ -240,7 +240,7 @@
     {
       "description": "If multiple conditions are set, this setting decides if it is true as soon as ANY condition\n matches or only if ALL are met.\n",
       "displayOption": {
-        "showWhen": {
+        "show": {
           "rawExpression": [
             false
           ]

@@ -41,15 +41,18 @@ public class IfTaskUtils {
     public static boolean resolveCase(TaskExecution ifTaskExecution) {
         Boolean result;
 
-        if (ifTaskExecution.getBoolean(RAW_EXPRESSION, false)) {
+        if (MapUtils.getBoolean(ifTaskExecution.getParameters(), RAW_EXPRESSION, false)) {
             result = expressionParser
-                    .parseExpression(ifTaskExecution.getString(EXPRESSION))
+                    .parseExpression(MapUtils.getString(ifTaskExecution.getParameters(), EXPRESSION))
                     .getValue(Boolean.class);
         } else {
             @SuppressWarnings("unchecked")
-            List<Map<String, Object>> conditions = (List)
-                    ifTaskExecution.getList(IfTaskDispatcherConstants.CONDITIONS, Map.class, Collections.emptyList());
-            String combineOperation = ifTaskExecution.getRequiredString(COMBINE_OPERATION);
+            List<Map<String, Object>> conditions = (List) MapUtils.getList(
+                    ifTaskExecution.getParameters(),
+                    IfTaskDispatcherConstants.CONDITIONS,
+                    Map.class,
+                    Collections.emptyList());
+            String combineOperation = MapUtils.getRequiredString(ifTaskExecution.getParameters(), COMBINE_OPERATION);
 
             result = expressionParser
                     .parseExpression(

@@ -34,7 +34,7 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.LocalDateTimeUtils;
+import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -87,9 +87,11 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         TaskExecution loopTaskExecution =
                 new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 
-        boolean loopForever = loopTaskExecution.getBoolean(LOOP_FOREVER, false);
-        WorkflowTask iterateeWorkflowTask = loopTaskExecution.getWorkflowTask(ITERATEE);
-        List<Object> list = loopTaskExecution.getList(LIST, Object.class, Collections.emptyList());
+        boolean loopForever = MapUtils.getBoolean(loopTaskExecution.getParameters(), LOOP_FOREVER, false);
+        WorkflowTask iterateeWorkflowTask =
+                new WorkflowTask(MapUtils.getMap(loopTaskExecution.getParameters(), ITERATEE));
+        List<Object> list =
+                MapUtils.getList(loopTaskExecution.getParameters(), LIST, Object.class, Collections.emptyList());
 
         if (loopForever || taskExecution.getTaskNumber() < list.size()) {
             TaskExecution subTaskExecution = new TaskExecution(
@@ -102,10 +104,14 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
             Context context = new Context(contextService.peek(loopTaskExecution.getId()));
 
             if (!list.isEmpty()) {
-                context.put(loopTaskExecution.getString(ITEM_VAR, ITEM), list.get(taskExecution.getTaskNumber()));
+                context.put(
+                        MapUtils.getString(loopTaskExecution.getParameters(), ITEM_VAR, ITEM),
+                        list.get(taskExecution.getTaskNumber()));
             }
 
-            context.put(loopTaskExecution.getString(ITEM_INDEX, ITEM_INDEX), taskExecution.getTaskNumber());
+            context.put(
+                    MapUtils.getString(loopTaskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX),
+                    taskExecution.getTaskNumber());
 
             contextService.push(subTaskExecution.getId(), context);
 
@@ -116,8 +122,6 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
             taskDispatcher.dispatch(evaluatedTaskExecution);
         } else {
             loopTaskExecution.setEndTime(LocalDateTime.now());
-            loopTaskExecution.setExecutionTime(LocalDateTimeUtils.getTime(loopTaskExecution.getEndTime())
-                    - LocalDateTimeUtils.getTime(loopTaskExecution.getStartTime()));
 
             taskCompletionHandler.handle(loopTaskExecution);
         }

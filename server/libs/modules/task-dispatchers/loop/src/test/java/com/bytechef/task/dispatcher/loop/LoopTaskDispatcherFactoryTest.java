@@ -16,7 +16,7 @@
 
 package com.bytechef.task.dispatcher.loop;
 
-import com.bytechef.test.jsonasssert.AssertUtils;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -26,6 +26,6 @@ public class LoopTaskDispatcherFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        AssertUtils.assertEquals("definition/loop_v1.json", new LoopTaskDispatcherFactory().getDefinition());
+        JsonFileAssert.assertEquals("definition/loop_v1.json", new LoopTaskDispatcherFactory().getDefinition());
     }
 }

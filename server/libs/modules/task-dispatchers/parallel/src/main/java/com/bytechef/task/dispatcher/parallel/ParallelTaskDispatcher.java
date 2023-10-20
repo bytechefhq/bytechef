@@ -20,6 +20,7 @@ package com.bytechef.task.dispatcher.parallel;
 
 import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants.PARALLEL;
+import static com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants.TASKS;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
@@ -32,9 +33,11 @@ import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.task.dispatcher.parallel.constants.ParallelTaskDispatcherConstants;
+import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.springframework.util.Assert;
 
 /**
@@ -68,7 +71,10 @@ public class ParallelTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        List<WorkflowTask> workflowTasks = taskExecution.getWorkflowTasks(ParallelTaskDispatcherConstants.TASKS);
+        List<WorkflowTask> workflowTasks =
+                MapUtils.getList(taskExecution.getParameters(), TASKS, Map.class, Collections.emptyList()).stream()
+                        .map(WorkflowTask::new)
+                        .toList();
 
         Assert.notNull(workflowTasks, "'tasks' property can't be null");
 

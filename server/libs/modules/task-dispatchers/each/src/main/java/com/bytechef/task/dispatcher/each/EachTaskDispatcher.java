@@ -38,6 +38,7 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
+import com.bytechef.commons.utils.MapUtils;
 import com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -76,8 +77,8 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        WorkflowTask iteratee = taskExecution.getWorkflowTask(ITERATEE);
-        List<Object> list = taskExecution.getList(LIST, Object.class);
+        WorkflowTask iteratee = new WorkflowTask(MapUtils.getMap(taskExecution.getParameters(), ITERATEE));
+        List<Object> list = MapUtils.getList(taskExecution.getParameters(), LIST, Object.class);
 
         Assert.notNull(iteratee, "'iteratee' property can't be null");
         Assert.notNull(list, "'list' property can't be null");
@@ -99,8 +100,8 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
                 Context context = new Context(contextService.peek(taskExecution.getId()));
 
-                context.put(taskExecution.getString(ITEM_VAR, ITEM), item);
-                context.put(taskExecution.getString(ITEM_INDEX, ITEM_INDEX), i);
+                context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
+                context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
 
                 contextService.push(iterateeTaskExecution.getId(), context);
 

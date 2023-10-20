@@ -31,7 +31,9 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
+import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -69,7 +71,8 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
         taskExecutionService.update(sequenceTaskExecution);
 
-        List<WorkflowTask> subWorkflowTasks = sequenceTaskExecution.getWorkflowTasks(TASKS);
+        List<WorkflowTask> subWorkflowTasks = MapUtils.getList(
+                sequenceTaskExecution.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList());
 
         if (subWorkflowTasks.size() > 0) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);

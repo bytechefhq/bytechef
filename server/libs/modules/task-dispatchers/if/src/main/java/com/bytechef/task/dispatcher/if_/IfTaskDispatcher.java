@@ -33,9 +33,12 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
+import com.bytechef.commons.utils.MapUtils;
 import com.bytechef.task.dispatcher.if_.util.IfTaskUtils;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -74,9 +77,17 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
         List<WorkflowTask> subWorkflowTasks;
 
         if (IfTaskUtils.resolveCase(ifTaskExecution)) {
-            subWorkflowTasks = ifTaskExecution.getWorkflowTasks(CASE_TRUE);
+            subWorkflowTasks =
+                    MapUtils.getList(ifTaskExecution.getParameters(), CASE_TRUE, Map.class, Collections.emptyList())
+                            .stream()
+                            .map(WorkflowTask::new)
+                            .toList();
         } else {
-            subWorkflowTasks = ifTaskExecution.getWorkflowTasks(CASE_FALSE);
+            subWorkflowTasks =
+                    MapUtils.getList(ifTaskExecution.getParameters(), CASE_FALSE, Map.class, Collections.emptyList())
+                            .stream()
+                            .map(WorkflowTask::new)
+                            .toList();
         }
 
         if (subWorkflowTasks.size() > 0) {

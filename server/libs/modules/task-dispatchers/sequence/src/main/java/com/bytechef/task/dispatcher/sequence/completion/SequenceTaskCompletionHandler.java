@@ -29,9 +29,11 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.LocalDateTimeUtils;
+import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -92,7 +94,11 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
             contextService.push(sequenceTaskExecution.getId(), newContext);
         }
 
-        List<WorkflowTask> subWorkflowTasks = sequenceTaskExecution.getWorkflowTasks(TASKS);
+        List<WorkflowTask> subWorkflowTasks =
+                MapUtils.getList(sequenceTaskExecution.getParameters(), TASKS, Map.class, Collections.emptyList())
+                        .stream()
+                        .map(WorkflowTask::new)
+                        .toList();
 
         if (taskExecution.getTaskNumber() < subWorkflowTasks.size()) {
             WorkflowTask subWorkflowTask = subWorkflowTasks.get(taskExecution.getTaskNumber());
@@ -115,8 +121,6 @@ public class SequenceTaskCompletionHandler implements TaskCompletionHandler {
             taskDispatcher.dispatch(evaluatedTaskExecution);
         } else {
             sequenceTaskExecution.setEndTime(LocalDateTime.now());
-            sequenceTaskExecution.setExecutionTime(LocalDateTimeUtils.getTime(sequenceTaskExecution.getEndTime())
-                    - LocalDateTimeUtils.getTime(sequenceTaskExecution.getStartTime()));
 
             taskCompletionHandler.handle(sequenceTaskExecution);
         }

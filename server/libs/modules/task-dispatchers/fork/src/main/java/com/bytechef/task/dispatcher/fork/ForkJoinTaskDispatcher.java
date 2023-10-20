@@ -35,7 +35,8 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.uuid.UUIDGenerator;
+import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.UUIDUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -103,10 +104,11 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     @Override
     public void dispatch(TaskExecution taskExecution) {
         @SuppressWarnings("unchecked")
-        List<List<WorkflowTask>> branchesWorkflowTasks = taskExecution.getList(BRANCHES, List.class).stream()
-                .map(curList -> ((List<Map<String, Object>>) curList)
-                        .stream().map(WorkflowTask::new).toList())
-                .toList();
+        List<List<WorkflowTask>> branchesWorkflowTasks =
+                MapUtils.getList(taskExecution.getParameters(), BRANCHES, List.class).stream()
+                        .map(curList -> ((List<Map<String, Object>>) curList)
+                                .stream().map(WorkflowTask::new).toList())
+                        .toList();
 
         Assert.notNull(branchesWorkflowTasks, "'branches' property can't be null");
 
@@ -127,7 +129,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
                 TaskExecution branchTaskExecution = new TaskExecution(branchWorkflowTask.get(0), Map.of("branch", i));
 
-                branchTaskExecution.setId(UUIDGenerator.generate());
+                branchTaskExecution.setId(UUIDUtils.generate());
                 branchTaskExecution.setJobId(taskExecution.getJobId());
                 branchTaskExecution.setParentId(taskExecution.getId());
                 branchTaskExecution.setPriority(taskExecution.getPriority());

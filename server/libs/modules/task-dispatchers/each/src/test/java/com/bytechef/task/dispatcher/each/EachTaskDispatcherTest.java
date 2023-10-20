@@ -32,7 +32,7 @@ import com.bytechef.atlas.service.CounterService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
-import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -60,7 +60,7 @@ public class EachTaskDispatcherTest {
                     messageBroker,
                     contextService,
                     counterService,
-                    SpelTaskEvaluator.create());
+                    TaskEvaluator.create());
             dispatcher.dispatch(new TaskExecution());
         });
     }
@@ -74,7 +74,7 @@ public class EachTaskDispatcherTest {
                 messageBroker,
                 contextService,
                 counterService,
-                SpelTaskEvaluator.create());
+                TaskEvaluator.create());
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                 "list", Arrays.asList(1, 2, 3),
                 "iteratee", Collections.singletonMap("type", "print"))));
@@ -96,7 +96,7 @@ public class EachTaskDispatcherTest {
                 messageBroker,
                 contextService,
                 counterService,
-                SpelTaskEvaluator.create());
+                TaskEvaluator.create());
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
                 "list", List.of(),
                 "iteratee", Collections.singletonMap("type", "print"))));

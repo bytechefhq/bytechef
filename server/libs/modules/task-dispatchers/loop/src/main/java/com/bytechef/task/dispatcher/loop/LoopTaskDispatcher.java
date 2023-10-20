@@ -37,6 +37,7 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
+import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -71,9 +72,10 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        boolean loopForever = taskExecution.getBoolean(LOOP_FOREVER, false);
-        WorkflowTask iteratee = taskExecution.getWorkflowTask(ITERATEE);
-        List<Object> list = taskExecution.getList(LIST, Object.class, Collections.emptyList());
+        boolean loopForever = MapUtils.getBoolean(taskExecution.getParameters(), LOOP_FOREVER, false);
+        WorkflowTask iteratee = new WorkflowTask(MapUtils.getMap(taskExecution.getParameters(), ITERATEE));
+        List<Object> list =
+                MapUtils.getList(taskExecution.getParameters(), LIST, Object.class, Collections.emptyList());
 
         Assert.notNull(iteratee, "'iteratee' property can't be null");
 
@@ -91,10 +93,10 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
             Context context = new Context(contextService.peek(taskExecution.getId()));
 
             if (!list.isEmpty()) {
-                context.put(taskExecution.getString(ITEM_VAR, ITEM), list.get(0));
+                context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), list.get(0));
             }
 
-            context.put(taskExecution.getString(ITEM_INDEX, ITEM_INDEX), 0);
+            context.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), 0);
 
             contextService.push(subTaskExecution.getId(), context);
 
