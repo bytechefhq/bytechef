@@ -326,6 +326,12 @@ paths:
         schema:
           type: "integer"
           format: "int64"
+      - name: "published"
+        description: "Use for filtering published projects."
+        in: "query"
+        required: false
+        schema:
+          type: "boolean"
       responses:
         "200":
           description: "A list of projects."
