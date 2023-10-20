@@ -39,7 +39,7 @@ import com.integri.atlas.engine.core.task.spel.SpelTaskEvaluator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class EachTaskDispatcherTests {
+public class EachTaskDispatcherTest {
 
     private TaskExecutionRepository taskRepo = mock(TaskExecutionRepository.class);
     private TaskDispatcher taskDispatcher = mock(TaskDispatcher.class);

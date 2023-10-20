@@ -27,7 +27,7 @@ import com.integri.atlas.engine.worker.task.map.MapTaskHandlerAdapter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class MapTaskHandlerAdapterTests {
+public class MapTaskHandlerAdapterTest {
 
     @Test
     public void test1() throws Exception {

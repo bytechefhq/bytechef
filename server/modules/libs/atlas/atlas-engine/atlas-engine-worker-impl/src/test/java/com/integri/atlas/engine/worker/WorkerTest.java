@@ -40,7 +40,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class WorkerTests {
+public class WorkerTest {
 
     @Test
     public void test1() {

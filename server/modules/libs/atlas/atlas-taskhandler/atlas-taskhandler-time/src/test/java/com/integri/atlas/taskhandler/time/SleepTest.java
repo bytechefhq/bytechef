@@ -22,7 +22,7 @@ import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class SleepTests {
+public class SleepTest {
 
     @Test
     public void test1() throws InterruptedException {

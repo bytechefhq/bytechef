@@ -24,7 +24,7 @@ import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class WorkTaskExecutorTests {
+public class WorkTaskExecutorTest {
 
     @Test
     public void test1() {

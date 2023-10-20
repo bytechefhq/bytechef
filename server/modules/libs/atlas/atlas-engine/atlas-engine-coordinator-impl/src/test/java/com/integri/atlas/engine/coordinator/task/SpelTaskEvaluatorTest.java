@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.env.Environment;
 
-public class SpelTaskEvaluatorTests {
+public class SpelTaskEvaluatorTest {
 
     @Test
     public void test1() {
