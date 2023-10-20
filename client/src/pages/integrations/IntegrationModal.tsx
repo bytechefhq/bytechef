@@ -176,7 +176,17 @@ const IntegrationModal = () => {
                 />
             )}
 
-            <div className="mt-4 flex justify-end">
+            <div className="mt-4 flex justify-end space-x-1">
+                <Button
+                    displayType="lightBorder"
+                    label="Cancel"
+                    type="button"
+                    onClick={() => {
+                        setIsOpen(false);
+
+                        reset();
+                    }}
+                />
                 <Button
                     label="Create"
                     onClick={handleSubmit(createIntegration)}
