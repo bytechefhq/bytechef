@@ -58,9 +58,15 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.databind.SequenceWriter;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvParser;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +76,8 @@ import org.slf4j.LoggerFactory;
 public class CsvFileComponentHandler implements ComponentHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(CsvFileComponentHandler.class);
+
+    private static final CsvMapper CSV_MAPPER = new CsvMapper();
 
     public final ComponentDefinition componentDefinition = component(CSV_FILE)
         .display(display("CSV File").description("Reads and writes data from a csv file."))
@@ -190,70 +198,78 @@ public class CsvFileComponentHandler implements ComponentHandler {
     protected List<Map<String, Object>> read(InputStream inputStream, ReadConfiguration configuration)
         throws IOException {
         List<Map<String, Object>> rows = new ArrayList<>();
+        int count = 0;
 
         try (BufferedReader bufferedReader = new BufferedReader(
             new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
-            int count = 0;
-            String[] headers = null;
-            long lastColumn = 0;
-            String line;
-            boolean firstRow = false;
 
-            while ((line = bufferedReader.readLine()) != null) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace("row: {}", line);
-                }
+            if (configuration.headerRow()) {
+                CsvSchema headerSchema = CsvSchema.emptySchema()
+                    .withHeader();
 
-                String[] lineValues = line.split(configuration.delimiter());
+                MappingIterator<Map<String, String>> iterator = CSV_MAPPER
+                    .readerForMapOf(String.class)
+                    .with(headerSchema)
+                    .readValues(bufferedReader);
 
-                if (!firstRow) {
-                    firstRow = true;
+                while (iterator.hasNext()) {
+                    Map<String, String> row = iterator.nextValue();
 
-                    if (configuration.headerRow()) {
-                        headers = lineValues;
-                        lastColumn = lineValues.length;
-
-                        continue;
-                    } else {
-                        lastColumn = lineValues.length;
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("row: {}", row);
                     }
-                }
 
-                if (count >= configuration.rangeStartRow() && count < configuration.rangeEndRow()) {
-                    if (configuration.headerRow()) {
-                        Map<String, Object> map = new HashMap<>();
+                    if (count >= configuration.rangeStartRow() && count < configuration.rangeEndRow()) {
+                        Map<String, Object> map = new LinkedHashMap<>();
 
-                        for (int i = 0; i < lastColumn; i++) {
-                            String value = (i == lineValues.length) ? null : lineValues[i];
-
-                            map.computeIfAbsent(
-                                headers[i],
-                                key -> processValue(
-                                    value, configuration.includeEmptyCells(), configuration.readAsString()));
+                        for (Map.Entry<String, String> entry : row.entrySet()) {
+                            map.put(
+                                entry.getKey(),
+                                processValue(
+                                    entry.getValue(), configuration.includeEmptyCells(), configuration.readAsString()));
                         }
 
                         rows.add(map);
                     } else {
-                        Map<String, Object> map = new HashMap<>();
+                        if (count >= configuration.rangeEndRow()) {
+                            break;
+                        }
+                    }
 
-                        for (int i = 0; i < lastColumn; i++) {
+                    count++;
+                }
+            } else {
+                MappingIterator<List<String>> iterator = CSV_MAPPER
+                    .readerForListOf(String.class)
+                    .with(CsvParser.Feature.WRAP_AS_ARRAY)
+                    .readValues(bufferedReader);
+
+                while (iterator.hasNext()) {
+                    List<String> row = iterator.nextValue();
+
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("row: {}", row);
+                    }
+
+                    if (count >= configuration.rangeStartRow() && count < configuration.rangeEndRow()) {
+                        Map<String, Object> map = new LinkedHashMap<>();
+
+                        for (int i = 0; i < row.size(); i++) {
                             map.put(
                                 "column_" + (i + 1),
                                 processValue(
-                                    i == lineValues.length ? null : lineValues[i],
-                                    configuration.includeEmptyCells(),
-                                    configuration.readAsString()));
+                                    row.get(i), configuration.includeEmptyCells(), configuration.readAsString()));
                         }
 
                         rows.add(map);
+                    } else {
+                        if (count >= configuration.rangeEndRow()) {
+                            break;
+                        }
                     }
-                } else {
-                    if (count >= configuration.rangeEndRow()) {
-                        break;
-                    }
-                }
 
-                count++;
+                    count++;
+                }
             }
         }
 
@@ -278,42 +294,25 @@ public class CsvFileComponentHandler implements ComponentHandler {
         return value;
     }
 
-    private byte[] write(List<Map<String, ?>> rows) {
+    private byte[] write(List<Map<String, ?>> rows) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         boolean headerRow = false;
 
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
         try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream, false, StandardCharsets.UTF_8)) {
-            for (Map<String, ?> item : rows) {
-                List<String> fieldNames = new ArrayList<>(item.keySet());
-                StringBuilder sb = new StringBuilder();
+            SequenceWriter sequenceWriter = CSV_MAPPER.writer()
+                .writeValues(printWriter);
 
+            for (Map<String, ?> row : rows) {
                 if (!headerRow) {
                     headerRow = true;
 
-                    for (int j = 0; j < fieldNames.size(); j++) {
-                        sb.append(fieldNames.get(j));
-
-                        if (j < fieldNames.size() - 1) {
-                            sb.append(',');
-                        }
-                    }
-
-                    printWriter.println(sb);
+                    sequenceWriter.write(row.keySet());
                 }
 
-                sb = new StringBuilder();
-
-                for (int j = 0; j < fieldNames.size(); j++) {
-                    sb.append(item.get(fieldNames.get(j)));
-
-                    if (j < fieldNames.size() - 1) {
-                        sb.append(',');
-                    }
-                }
-
-                printWriter.println(sb);
+                sequenceWriter.write(row.values());
             }
+
+            sequenceWriter.close();
         }
 
         return byteArrayOutputStream.toByteArray();

@@ -1,6 +1,5 @@
 version="1.0"
 
 dependencies {
-// TODO use jackson-dataformat-csv for parsing CSV files
-//    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.4"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.14.1"
 }
