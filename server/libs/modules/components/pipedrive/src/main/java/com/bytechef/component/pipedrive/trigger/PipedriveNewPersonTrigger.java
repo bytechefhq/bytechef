@@ -25,7 +25,9 @@ import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
+import com.bytechef.hermes.component.util.MapValueUtils;
 
 import java.util.Map;
 
@@ -222,14 +224,10 @@ public class PipedriveNewPersonTrigger {
         .dynamicWebhookDisable(PipedriveNewPersonTrigger::dynamicWebhookDisable)
         .dynamicWebhookRequest(PipedriveNewPersonTrigger::dynamicWebhookRequest);
 
-    @SuppressWarnings("unchecked")
-    private static WebhookOutput
-        dynamicWebhookRequest(TriggerDefinition.DynamicWebhookRequestContext context) {
+    private static WebhookOutput dynamicWebhookRequest(DynamicWebhookRequestContext context) {
         TriggerDefinition.WebhookBody body = context.body();
 
-        Map<String, Object> content = (Map<String, Object>) body.getContent();
-
-        return WebhookOutput.map((Map<String, Object>) content.get("current"));
+        return WebhookOutput.map(MapValueUtils.getMap(body.getContent(), "current"));
     }
 
     private static void dynamicWebhookDisable(DynamicWebhookDisableContext context) {

@@ -56,18 +56,7 @@ public class ComponentWorkflowTestSupport {
     }
 
     public Job execute(String workflowId, Map<String, Object> inputs) {
-        JobSyncExecutor jobSyncExecutor = JobSyncExecutor.builder()
-            .contextService(contextService)
-            .eventPublisher(eventPublisher)
-            .jobService(jobService)
-            .taskCompletionHandlerFactories(List.of())
-            .taskDispatcherResolverFactories(List.of())
-            .taskExecutionService(taskExecutionService)
-            .taskHandlerRegistry(taskHandlerMap::get)
-            .workflowService(workflowService)
-            .build();
-
-        return jobSyncExecutor.execute(new JobParameters(inputs, workflowId));
+        return execute(workflowId, inputs, Map.of());
     }
 
     public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
