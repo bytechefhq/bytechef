@@ -24,6 +24,8 @@ import com.bytechef.message.broker.redis.serializer.RedisMessageSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oblac.jrsmq.RedisSMQ;
 import com.oblac.jrsmq.RedisSMQConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
@@ -39,6 +41,14 @@ import java.time.Duration;
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef", name = "message-broker.provider", havingValue = "redis")
 public class RedisMessageBrokerConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(RedisMessageBrokerConfiguration.class);
+
+    public RedisMessageBrokerConfiguration() {
+        if (logger.isInfoEnabled()) {
+            logger.info("Message broker provider type enabled: redis");
+        }
+    }
 
     @Bean
     MessageBroker redisMessageBroker(

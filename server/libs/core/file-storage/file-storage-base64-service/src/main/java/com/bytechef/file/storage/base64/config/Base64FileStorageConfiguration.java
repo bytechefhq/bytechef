@@ -20,6 +20,8 @@ package com.bytechef.file.storage.base64.config;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.config.FileStorageProperties;
 import com.bytechef.file.storage.service.FileStorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +34,14 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(FileStorageProperties.class)
 @ConditionalOnProperty(prefix = "bytechef", name = "file-storage.provider", havingValue = "base64")
 public class Base64FileStorageConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(Base64FileStorageConfiguration.class);
+
+    public Base64FileStorageConfiguration() {
+        if (logger.isInfoEnabled()) {
+            logger.info("File storage provider type enabled: base64");
+        }
+    }
 
     @Bean
     FileStorageService base64FileStorageService() {

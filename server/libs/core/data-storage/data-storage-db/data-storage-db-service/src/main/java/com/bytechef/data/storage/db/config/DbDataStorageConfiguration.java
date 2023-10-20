@@ -20,6 +20,8 @@ package com.bytechef.data.storage.db.config;
 import com.bytechef.data.storage.db.repository.DataStorageRepository;
 import com.bytechef.data.storage.db.service.DbDataStorageService;
 import com.bytechef.data.storage.service.DataStorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +34,14 @@ import java.util.Optional;
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef", name = "data-storage.provider", havingValue = "db")
 public class DbDataStorageConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(DbDataStorageConfiguration.class);
+
+    public DbDataStorageConfiguration() {
+        if (logger.isInfoEnabled()) {
+            logger.info("Data storage provider type enabled: db");
+        }
+    }
 
     @Bean
     DbDataStorageService dbDataStorageService(DataStorageRepository dataStorageRepository) {

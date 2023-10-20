@@ -24,6 +24,8 @@ import com.bytechef.file.storage.config.FileStorageProperties;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -35,11 +37,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class WorkflowFileStorageConfiguration {
 
+    private static final Logger logger = LoggerFactory.getLogger(WorkflowFileStorageConfiguration.class);
+
     @Bean
     @ConditionalOnProperty("bytechef.workflow.async.output-storage.provider")
     WorkflowFileStorageFacade workflowAsyncFileStorageFacade(
         FileStorageProperties fileStorageProperties, ObjectMapper objectMapper,
         @Value("${bytechef.workflow.async.output-storage.provider}") String workflowAsyncOutputStorageProvider) {
+
+        if (logger.isInfoEnabled()) {
+            logger.info(
+                "Workflow async output storage provider type enabled: %s"
+                    .formatted(workflowAsyncOutputStorageProvider));
+        }
 
         return new WorkflowFileStorageFacadeImpl(
             getFileStorageService(fileStorageProperties, workflowAsyncOutputStorageProvider), objectMapper);
@@ -49,10 +59,15 @@ public class WorkflowFileStorageConfiguration {
     @ConditionalOnProperty("bytechef.workflow.sync.output-storage.provider")
     WorkflowFileStorageFacade workflowSyncFileStorageFacade(
         FileStorageProperties fileStorageProperties, ObjectMapper objectMapper,
-        @Value("${bytechef.workflow.sync.output-storage.provider}") String workflowAsyncOutputStorageProvider) {
+        @Value("${bytechef.workflow.sync.output-storage.provider}") String workflowSyncOutputStorageProvider) {
+
+        if (logger.isInfoEnabled()) {
+            logger.info(
+                "Workflow sync output storage provider type enabled: %s".formatted(workflowSyncOutputStorageProvider));
+        }
 
         return new WorkflowFileStorageFacadeImpl(
-            getFileStorageService(fileStorageProperties, workflowAsyncOutputStorageProvider), objectMapper);
+            getFileStorageService(fileStorageProperties, workflowSyncOutputStorageProvider), objectMapper);
     }
 
     private static FileStorageService getFileStorageService(
@@ -60,7 +75,7 @@ public class WorkflowFileStorageConfiguration {
 
         return switch (workflowAsyncOutputStorageProvider) {
             case "base64" -> new Base64FileStorageService();
-            case "filesystem" -> new FilesystemFileStorageService(fileStorageProperties.getFilesystemDir());
+            case "filesystem" -> new FilesystemFileStorageService(fileStorageProperties.getFilesystemDirectory());
             default -> throw new IllegalArgumentException(
                 "Output storage %s does not exist".formatted(workflowAsyncOutputStorageProvider));
         };

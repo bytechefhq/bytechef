@@ -21,6 +21,8 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.jms.JmsMessageBroker;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.jms.ConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
@@ -38,6 +40,14 @@ import org.springframework.jms.support.converter.MessageType;
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef", name = "message-broker.provider", havingValue = "jms")
 public class JmsMessageBrokerConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(JmsMessageBrokerConfiguration.class);
+
+    public JmsMessageBrokerConfiguration() {
+        if (logger.isInfoEnabled()) {
+            logger.info("Message broker provider type enabled: jms");
+        }
+    }
 
     @Bean
     MessageConverter jacksonJmsMessageConverter(ObjectMapper objectMapper) {
