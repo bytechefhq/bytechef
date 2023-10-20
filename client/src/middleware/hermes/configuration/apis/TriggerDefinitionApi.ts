@@ -83,6 +83,10 @@ export interface GetComponentTriggerSampleOutputRequest {
     componentOperationRequestModel?: ComponentOperationRequestModel;
 }
 
+export interface GetTriggerDefinitionsRequest {
+    triggerTypes?: Array<string>;
+}
+
 /**
  * 
  */
@@ -392,6 +396,38 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
      */
     async getComponentTriggerSampleOutput(requestParameters: GetComponentTriggerSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
         const response = await this.getComponentTriggerSampleOutputRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get all trigger definitions.
+     * Get all trigger definitions
+     */
+    async getTriggerDefinitionsRaw(requestParameters: GetTriggerDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TriggerDefinitionModel>>> {
+        const queryParameters: any = {};
+
+        if (requestParameters.triggerTypes) {
+            queryParameters['triggerTypes'] = requestParameters.triggerTypes;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/trigger-definitions`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TriggerDefinitionModelFromJSON));
+    }
+
+    /**
+     * Get all trigger definitions.
+     * Get all trigger definitions
+     */
+    async getTriggerDefinitions(requestParameters: GetTriggerDefinitionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TriggerDefinitionModel>> {
+        const response = await this.getTriggerDefinitionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
