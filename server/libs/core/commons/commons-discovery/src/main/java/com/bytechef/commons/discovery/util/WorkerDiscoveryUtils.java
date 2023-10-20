@@ -17,10 +17,11 @@
 
 package com.bytechef.commons.discovery.util;
 
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.MapValueUtils;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,11 +65,15 @@ public class WorkerDiscoveryUtils {
     }
 
     private static List<String> getComponentNames(Map<String, String> metadataMap) {
-        if (metadataMap.containsKey("componentNames")) {
-            String componentNamesString = metadataMap.get("componentNames");
+        if (metadataMap.containsKey("components")) {
+            String componentsString = metadataMap.get("components");
 
-            if (StringUtils.hasText(componentNamesString)) {
-                return Arrays.asList(StringUtils.commaDelimitedListToStringArray(componentNamesString));
+            if (StringUtils.hasText(componentsString)) {
+                List<Map<String, String>> components = JsonUtils.read(componentsString);
+
+                return components.stream()
+                    .map(componentMap -> MapValueUtils.getString(componentMap, "name"))
+                    .toList();
             }
         }
 

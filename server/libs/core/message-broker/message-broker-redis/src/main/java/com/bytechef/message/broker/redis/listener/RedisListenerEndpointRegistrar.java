@@ -60,7 +60,15 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
-        Consumer<String> invokerConsumer = invokerMap.get(new String(message.getChannel(), StandardCharsets.UTF_8));
+        String queueName = new String(message.getChannel(), StandardCharsets.UTF_8);
+
+        Consumer<String> invokerConsumer = invokerMap.get(queueName);
+
+        if (invokerConsumer == null) {
+            logger.error("No message listeners registered for queue=%s".formatted(queueName));
+
+            return;
+        }
 
         invokerConsumer.accept(message.toString());
     }

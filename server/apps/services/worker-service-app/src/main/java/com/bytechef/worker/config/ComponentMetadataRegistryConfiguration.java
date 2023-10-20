@@ -17,6 +17,7 @@
 
 package com.bytechef.worker.config;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.discovery.metadata.ServiceMetadataRegistry;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
@@ -27,7 +28,6 @@ import org.springframework.context.annotation.DependsOn;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
@@ -53,9 +53,10 @@ public class ComponentMetadataRegistryConfiguration implements InitializingBean 
 
         serviceMetadataRegistry.registerMetadata(
             Map.of(
-                "componentNames",
-                componentDefinitions.stream()
-                    .map(ComponentDefinition::getName)
-                    .collect(Collectors.joining(","))));
+                "components",
+                JsonUtils.write(
+                    componentDefinitions.stream()
+                        .map(componentDefinition -> Map.of("name", componentDefinition.getName()))
+                        .toList())));
     }
 }
