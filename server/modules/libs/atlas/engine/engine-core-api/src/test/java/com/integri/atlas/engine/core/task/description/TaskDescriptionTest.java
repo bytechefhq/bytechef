@@ -26,7 +26,6 @@ import static com.integri.atlas.engine.core.task.description.TaskProperty.SELECT
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOptionValue.optionValue;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyTypeOption.propertyTypeOption;
-import static com.integri.atlas.engine.core.task.description.TaskSpecification.create;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -676,8 +675,8 @@ public class TaskDescriptionTest {
     }
 
     @Test
-    public void testTaskDescription() throws JsonProcessingException, JSONException {
-        TaskSpecification taskDescription = create("name")
+    public void testTaskSpecification() throws JsonProcessingException, JSONException {
+        TaskSpecification taskSpecification = TaskSpecification.create("name")
             .displayName("displayName")
             .description("description")
             .subtitle("subtitle")
@@ -702,7 +701,7 @@ public class TaskDescriptionTest {
             "version":1.0
         }
         """,
-            taskDescription
+            taskSpecification
         );
     }
 
