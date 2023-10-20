@@ -103,8 +103,7 @@ public class KafkaMessageBrokerConfiguration
 
         logger.info("Registering Kafka Listener: {} -> {}:{}", queueName, delegateClass.getName(), methodName);
 
-        Method listenerMethod = Stream.of(delegate.getClass()
-            .getMethods())
+        Method listenerMethod = Stream.of(delegateClass.getMethods())
             .filter(it -> methodName.equals(it.getName()))
             .findFirst()
             .orElseThrow(

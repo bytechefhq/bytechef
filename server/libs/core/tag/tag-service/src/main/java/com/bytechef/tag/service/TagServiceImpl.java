@@ -17,6 +17,7 @@
 
 package com.bytechef.tag.service;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.StreamSupport;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -62,8 +64,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Tag getTag(long id) {
-        return tagRepository.findById(id)
-            .orElseThrow(IllegalArgumentException::new);
+        return OptionalUtils.get(tagRepository.findById(id));
     }
 
     @Override
@@ -100,16 +101,21 @@ public class TagServiceImpl implements TagService {
 
         for (Tag tag : tags) {
             if (tag.isNew()) {
-                tagRepository.findByName(tag.getName())
-                    .ifPresentOrElse(resultTags::add, () -> resultTags.add(tagRepository.save(tag)));
+                OptionalUtils.ifPresentOrElse(
+                    tagRepository.findByName(tag.getName()),
+                    resultTags::add,
+                    () -> resultTags.add(tagRepository.save(tag)));
             } else {
-                Tag curTag = tagRepository.findById(tag.getId())
-                    .orElseThrow(IllegalArgumentException::new);
+                Tag curTag = OptionalUtils.get(tagRepository.findById(tag.getId()));
 
-                curTag.setName(tag.getName());
-                curTag.setVersion(tag.getVersion());
+                if (!Objects.equals(tag.getName(), curTag.getName())) {
+                    curTag.setName(tag.getName());
+                    curTag.setVersion(tag.getVersion());
 
-                resultTags.add(tagRepository.save(curTag));
+                    curTag = tagRepository.save(curTag);
+                }
+
+                resultTags.add(curTag);
             }
         }
 

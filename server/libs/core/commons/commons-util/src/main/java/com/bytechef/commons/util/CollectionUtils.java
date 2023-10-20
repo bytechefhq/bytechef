@@ -22,6 +22,7 @@ import org.springframework.util.Assert;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -74,16 +75,60 @@ public final class CollectionUtils {
         return org.springframework.util.CollectionUtils.contains(list.iterator(), item);
     }
 
-    public static <T> List<T> filter(List<T> list, Predicate<? super T> predicate) {
+    public static <T> long count(Iterable<T> iterable) {
+        return StreamSupport.stream(iterable.spliterator(), false)
+            .count();
+    }
+
+    public static <T> List<T> filter(List<T> list, Predicate<? super T> filter) {
         return list.stream()
-            .filter(predicate)
+            .filter(filter)
             .toList();
     }
 
-    public static <T> T findFirst(List<T> list, Predicate<? super T> predicate) {
-        return OptionalUtils.get(list.stream()
-            .filter(predicate)
-            .findFirst());
+    public static <T, U> List<? extends U> filter(
+        List<T> list, Predicate<? super T> filter, Function<? super T, ? extends U> mapper) {
+
+        return list.stream()
+            .filter(filter)
+            .map(mapper)
+            .toList();
+    }
+
+    public static <T> T findFirstOrElse(Collection<T> list, Predicate<? super T> filter, T elseObject) {
+        return OptionalUtils.orElse(
+            list.stream()
+                .filter(filter)
+                .findFirst(),
+            elseObject);
+    }
+
+    public static <T, U, V extends U> U findFirstOrElse(
+        Collection<T> list, Predicate<? super T> filter, Function<? super T, V> mapper, V elseObject) {
+
+        Optional<V> optional = list.stream()
+            .filter(filter)
+            .map(mapper)
+            .findFirst();
+
+        return OptionalUtils.orElse(optional, elseObject);
+    }
+
+    public static <T> T getFirst(Collection<T> list, Predicate<? super T> filter) {
+        return OptionalUtils.get(
+            list.stream()
+                .filter(filter)
+                .findFirst());
+    }
+
+    public static <T, U> U getFirst(
+        Collection<T> list, Predicate<? super T> filter, Function<? super T, ? extends U> mapper) {
+
+        return OptionalUtils.get(
+            list.stream()
+                .filter(filter)
+                .map(mapper)
+                .findFirst());
     }
 
     public static <T, R> List<R> map(List<T> list, Function<? super T, R> mapper) {
@@ -104,6 +149,10 @@ public final class CollectionUtils {
         Assert.notNull(collection, "'collection' must not be null");
 
         return collection.stream();
+    }
+
+    public static <T> Stream<T> stream(Iterable<T> iterable) {
+        return StreamSupport.stream(iterable.spliterator(), false);
     }
 
     public static <K, V> Stream<Map.Entry<K, V>> stream(Map<K, V> map) {

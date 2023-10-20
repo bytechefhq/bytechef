@@ -50,6 +50,17 @@ public class ComponentDefinitionServiceRSocketClient implements ComponentDefinit
     }
 
     @Override
+    public Mono<ComponentDefinition> getComponentDefinitionMono(String name, Integer version) {
+        return rSocketRequesterBuilder
+            .websocket(ServiceInstanceUtils.toWebSocketUri(
+                ServiceInstanceUtils.filterServiceInstance(
+                    discoveryClient.getInstances(WORKER_SERVICE_APP), name)))
+            .route("ComponentDefinitionService.getComponentDefinition")
+            .data(Map.of("name", name, "version", version))
+            .retrieveMono(ComponentDefinition.class);
+    }
+
+    @Override
     public Mono<List<ComponentDefinition>> getComponentDefinitionsMono() {
         return Mono.zip(
             ServiceInstanceUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
@@ -74,16 +85,5 @@ public class ComponentDefinitionServiceRSocketClient implements ComponentDefinit
                     .retrieveMono(new ParameterizedTypeReference<List<ComponentDefinition>>() {}))
                 .toList(),
             ServiceInstanceUtils::toComponentDefinitions);
-    }
-
-    @Override
-    public Mono<ComponentDefinition> getComponentDefinitionMono(String name, Integer version) {
-        return rSocketRequesterBuilder
-            .websocket(ServiceInstanceUtils.toWebSocketUri(
-                ServiceInstanceUtils.filterServiceInstance(
-                    discoveryClient.getInstances(WORKER_SERVICE_APP), name)))
-            .route("ComponentDefinitionService.getComponentDefinition")
-            .data(Map.of("name", name, "version", version))
-            .retrieveMono(ComponentDefinition.class);
     }
 }

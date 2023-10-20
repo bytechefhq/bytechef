@@ -19,6 +19,7 @@ package com.bytechef.category.service;
 
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.repository.CategoryRepository;
+import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ import org.springframework.util.StringUtils;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
@@ -73,8 +75,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category getCategory(long id) {
-        return categoryRepository.findById(id)
-            .orElseThrow(IllegalArgumentException::new);
+        return OptionalUtils.get(categoryRepository.findById(id));
     }
 
     @Override
@@ -84,6 +85,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (ids.isEmpty()) {
             return Collections.emptyList();
         } else {
+
             return StreamSupport.stream(categoryRepository.findAllById(ids)
                 .spliterator(),
                 false)
@@ -99,17 +101,19 @@ public class CategoryServiceImpl implements CategoryService {
             if (StringUtils.hasText(category.getName())) {
                 Category finalCategory = category;
 
-                category = categoryRepository.findByName(category.getName())
-                    .orElseGet(() -> categoryRepository.save(finalCategory));
+                category = OptionalUtils.orElseGet(
+                    categoryRepository.findByName(category.getName()),
+                    () -> categoryRepository.save(finalCategory));
             }
         } else {
-            Category curCategory = categoryRepository.findById(category.getId())
-                .orElseThrow(IllegalArgumentException::new);
+            Category curCategory = OptionalUtils.get(categoryRepository.findById(category.getId()));
 
-            curCategory.setName(category.getName());
-            curCategory.setVersion(category.getVersion());
+            if (!Objects.equals(category.getName(), curCategory.getName())) {
+                curCategory.setName(category.getName());
+                curCategory.setVersion(category.getVersion());
 
-            category = categoryRepository.save(curCategory);
+                category = categoryRepository.save(curCategory);
+            }
         }
 
         return category;

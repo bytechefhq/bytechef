@@ -20,6 +20,8 @@ package com.bytechef.atlas.repository.memory;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.repository.JobRepository;
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -93,9 +95,7 @@ public class InMemoryJobRepository implements JobRepository {
 
     @Override
     public Optional<Job> findById(Long id) {
-        Job job = jobs.get(id);
-
-        return Optional.ofNullable(job);
+        return Optional.ofNullable(jobs.get(id));
     }
 
     @Override
@@ -105,14 +105,11 @@ public class InMemoryJobRepository implements JobRepository {
 
     @Override
     public Job findByTaskExecutionId(Long taskExecutionId) {
-        TaskExecution taskExecution = inMemoryTaskExecutionRepository.findById(taskExecutionId)
-            .orElseThrow(IllegalArgumentException::new);
+        TaskExecution taskExecution = OptionalUtils.get(inMemoryTaskExecutionRepository.findById(taskExecutionId));
 
-        return jobs.values()
-            .stream()
-            .filter(job -> Objects.equals(job.getId(), taskExecution.getJobId()))
-            .findFirst()
-            .orElseThrow(IllegalArgumentException::new);
+        return CollectionUtils.getFirst(
+            jobs.values(),
+            job -> Objects.equals(job.getId(), taskExecution.getJobId()));
     }
 
     @Override

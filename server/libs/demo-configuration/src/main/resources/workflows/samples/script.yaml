@@ -9,8 +9,9 @@ tasks:
 - name: "randomNumber"
   label: "Generate a random number"
   type: "randomHelper/v1/randomInt"
-  startInclusive: 0
-  endInclusive: 5000
+  parameters:
+    startInclusive: 0
+    endInclusive: 5000
 - name: "script1"
   type: "script/v1/javascript"
   parameters:

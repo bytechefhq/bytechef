@@ -41,7 +41,7 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     @Override
     public Mono<TaskDispatcherDefinition> getTaskDispatcherDefinitionMono(String name, Integer version) {
         return Mono.just(
-            CollectionUtils.findFirst(
+            CollectionUtils.getFirst(
                 taskDispatcherDefinitions,
                 taskDispatcherDefinition -> name.equalsIgnoreCase(taskDispatcherDefinition.getName())
                     && version == taskDispatcherDefinition.getVersion()));

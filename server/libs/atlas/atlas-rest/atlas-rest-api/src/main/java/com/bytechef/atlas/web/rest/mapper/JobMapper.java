@@ -29,5 +29,6 @@ import org.springframework.core.convert.converter.Converter;
 @Mapper(config = WorkflowMapperSpringConfig.class)
 public interface JobMapper extends Converter<Job, JobModel> {
 
+    @Override
     JobModel convert(Job job);
 }

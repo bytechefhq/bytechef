@@ -29,5 +29,6 @@ import org.springframework.core.convert.converter.Converter;
 @Mapper(config = WorkflowMapperSpringConfig.class)
 public interface TaskExecutionMapper extends Converter<TaskExecution, TaskExecutionModel> {
 
+    @Override
     TaskExecutionModel convert(TaskExecution taskExecution);
 }

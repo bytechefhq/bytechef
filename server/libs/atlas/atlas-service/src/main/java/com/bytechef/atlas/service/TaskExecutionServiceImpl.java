@@ -20,6 +20,7 @@ package com.bytechef.atlas.service;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.repository.TaskExecutionRepository;
 import com.bytechef.atlas.task.execution.TaskStatus;
+import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
@@ -52,8 +53,7 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     @Override
     @Transactional(readOnly = true)
     public TaskExecution getTaskExecution(long id) {
-        return taskExecutionRepository.findById(id)
-            .orElseThrow(IllegalArgumentException::new);
+        return OptionalUtils.get(taskExecutionRepository.findById(id));
     }
 
     @Override
@@ -78,8 +78,8 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
         Assert.notNull(taskExecution, "'taskExecution' must not be null");
         Assert.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
 
-        TaskExecution currentTaskExecution = taskExecutionRepository.findByIdForUpdate(taskExecution.getId())
-            .orElseThrow(IllegalArgumentException::new);
+        TaskExecution currentTaskExecution = OptionalUtils.get(
+            taskExecutionRepository.findByIdForUpdate(taskExecution.getId()));
 
         TaskStatus currentTaskStatus = currentTaskExecution.getStatus();
         TaskStatus taskStatus = taskExecution.getStatus();
