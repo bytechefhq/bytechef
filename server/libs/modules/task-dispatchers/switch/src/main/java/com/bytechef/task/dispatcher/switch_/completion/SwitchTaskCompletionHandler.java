@@ -37,7 +37,7 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
@@ -135,8 +135,8 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
     }
 
     private List<WorkflowTask> resolveCase(TaskExecution taskExecution) {
-        Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
-        List<WorkflowTask> caseWorkflowTasks = MapUtils
+        Object expression = MapValueUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
+        List<WorkflowTask> caseWorkflowTasks = MapValueUtils
             .getList(taskExecution.getParameters(), CASES, Map.class, Collections.emptyList())
             .stream()
             .map(WorkflowTask::new)
@@ -145,8 +145,8 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
         Assert.notNull(caseWorkflowTasks, "you must specify 'cases' in a switch statement");
 
         for (WorkflowTask caseWorkflowTask : caseWorkflowTasks) {
-            Object key = MapUtils.getRequired(caseWorkflowTask.getParameters(), KEY);
-            List<WorkflowTask> subWorkflowTasks = MapUtils
+            Object key = MapValueUtils.getRequired(caseWorkflowTask.getParameters(), KEY);
+            List<WorkflowTask> subWorkflowTasks = MapValueUtils
                 .getList(caseWorkflowTask.getParameters(), TASKS, Map.class, Collections.emptyList())
                 .stream()
                 .map(WorkflowTask::new)
@@ -157,7 +157,7 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
             }
         }
 
-        return MapUtils.getList(taskExecution.getParameters(), DEFAULT, Map.class, Collections.emptyList())
+        return MapValueUtils.getList(taskExecution.getParameters(), DEFAULT, Map.class, Collections.emptyList())
             .stream()
             .map(WorkflowTask::new)
             .toList();

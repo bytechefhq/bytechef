@@ -25,7 +25,7 @@ import com.bytechef.atlas.task.CancelControlTask;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +99,7 @@ public class WorkerTest {
             .withTaskHandlerResolver(t1 -> {
                 String type = t1.getType();
                 if ("var".equals(type)) {
-                    return t2 -> MapUtils.getRequired(t2.getParameters(), "value");
+                    return t2 -> MapValueUtils.getRequired(t2.getParameters(), "value");
                 } else {
                     throw new IllegalArgumentException("unknown type: " + type);
                 }
@@ -138,12 +138,12 @@ public class WorkerTest {
             .withTaskHandlerResolver(t1 -> {
                 String type = t1.getType();
                 if ("var".equals(type)) {
-                    return t2 -> MapUtils.getRequired(t2.getParameters(), "value");
+                    return t2 -> MapValueUtils.getRequired(t2.getParameters(), "value");
                 } else if ("mkdir".equals(type)) {
-                    return t2 -> (new File(MapUtils.getString(t2.getParameters(), "path")).mkdirs());
+                    return t2 -> (new File(MapValueUtils.getString(t2.getParameters(), "path")).mkdirs());
                 } else if ("rm".equals(type)) {
                     return t2 -> FileSystemUtils
-                        .deleteRecursively((new File(MapUtils.getString(t2.getParameters(), "path"))));
+                        .deleteRecursively((new File(MapValueUtils.getString(t2.getParameters(), "path"))));
                 } else if ("pass".equals(type)) {
                     Assertions.assertTrue(new File(tempDir).exists());
                     return t2 -> null;
@@ -184,12 +184,12 @@ public class WorkerTest {
             .withTaskHandlerResolver(t1 -> {
                 String type = t1.getType();
                 if ("var".equals(type)) {
-                    return t2 -> MapUtils.getRequired(t2.getParameters(), "value");
+                    return t2 -> MapValueUtils.getRequired(t2.getParameters(), "value");
                 } else if ("mkdir".equals(type)) {
-                    return t2 -> (new File(MapUtils.getString(t2.getParameters(), "path")).mkdirs());
+                    return t2 -> (new File(MapValueUtils.getString(t2.getParameters(), "path")).mkdirs());
                 } else if ("rm".equals(type)) {
                     return t2 -> FileSystemUtils
-                        .deleteRecursively((new File(MapUtils.getString(t2.getParameters(), "path"))));
+                        .deleteRecursively((new File(MapValueUtils.getString(t2.getParameters(), "path"))));
                 } else if ("rogue".equals(type)) {
                     Assertions.assertTrue(new File(tempDir).exists());
                     return t2 -> {

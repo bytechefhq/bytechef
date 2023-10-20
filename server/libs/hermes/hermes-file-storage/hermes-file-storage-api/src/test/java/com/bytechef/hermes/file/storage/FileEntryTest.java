@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import com.bytechef.hermes.file.storage.domain.FileEntry;
 import java.util.Collections;
 import org.assertj.core.api.Assertions;
@@ -62,6 +62,6 @@ public class FileEntryTest {
             Collections.singletonMap("fileEntry", new FileEntry("sample.txt", "/tmp/fileName.txt")));
 
         assertEquals(
-            "sample.txt /tmp/fileName.txt", MapUtils.getString(taskExecution.getParameters(), "result"));
+            "sample.txt /tmp/fileName.txt", MapValueUtils.getString(taskExecution.getParameters(), "result"));
     }
 }

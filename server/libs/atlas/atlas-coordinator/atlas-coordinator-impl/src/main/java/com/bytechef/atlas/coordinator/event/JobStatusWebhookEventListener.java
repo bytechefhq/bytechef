@@ -24,7 +24,7 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
 import com.bytechef.atlas.event.WorkflowEvent;
 import com.bytechef.atlas.service.JobService;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -77,7 +77,8 @@ public class JobStatusWebhookEventListener implements EventListener {
         }
 
         for (Map<String, Object> webhook : job.getWebhooks()) {
-            if (JobStatusWorkflowEvent.JOB_STATUS.equals(MapUtils.getRequiredString(webhook, WorkflowConstants.TYPE))) {
+            if (JobStatusWorkflowEvent.JOB_STATUS
+                .equals(MapValueUtils.getRequiredString(webhook, WorkflowConstants.TYPE))) {
                 Map<String, Object> webhookEvent = new HashMap<>(webhook);
 
                 webhookEvent.put(WorkflowConstants.EVENT, workflowEvent);
@@ -88,25 +89,25 @@ public class JobStatusWebhookEventListener implements EventListener {
                     if (context.getRetryCount() == 0) {
                         logger.debug(
                             "Calling webhook {} -> {}",
-                            MapUtils.getRequiredString(webhook, WorkflowConstants.URL),
+                            MapValueUtils.getRequiredString(webhook, WorkflowConstants.URL),
                             webhookEvent);
                     } else {
                         logger.debug(
                             "[Retry: {}] Calling webhook {} -> {}",
                             context.getRetryCount(),
-                            MapUtils.getRequiredString(webhook, WorkflowConstants.URL),
+                            MapValueUtils.getRequiredString(webhook, WorkflowConstants.URL),
                             webhookEvent);
                     }
 
                     return restTemplate.postForObject(
-                        MapUtils.getRequiredString(webhook, WorkflowConstants.URL), webhookEvent, String.class);
+                        MapValueUtils.getRequiredString(webhook, WorkflowConstants.URL), webhookEvent, String.class);
                 });
             }
         }
     }
 
     private RetryTemplate createRetryTemplate(Map<String, Object> webhook) {
-        Map<String, Object> retryParams = MapUtils.get(webhook, "retry", new ParameterizedTypeReference<>() {},
+        Map<String, Object> retryParams = MapValueUtils.get(webhook, "retry", new ParameterizedTypeReference<>() {},
             Collections.emptyMap());
 
         RetryTemplate retryTemplate = new RetryTemplate();
@@ -114,15 +115,15 @@ public class JobStatusWebhookEventListener implements EventListener {
         ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
 
         backOffPolicy.setInitialInterval(
-            MapUtils.getDuration(retryParams, "initialInterval", Duration.of(2, ChronoUnit.SECONDS))
+            MapValueUtils.getDuration(retryParams, "initialInterval", Duration.of(2, ChronoUnit.SECONDS))
                 .toMillis());
         backOffPolicy.setMaxInterval(
-            MapUtils.getDuration(retryParams, "maxInterval", Duration.of(30, ChronoUnit.SECONDS))
+            MapValueUtils.getDuration(retryParams, "maxInterval", Duration.of(30, ChronoUnit.SECONDS))
                 .toMillis());
-        backOffPolicy.setMultiplier(MapUtils.getDouble(retryParams, "multiplier", 2.0));
+        backOffPolicy.setMultiplier(MapValueUtils.getDouble(retryParams, "multiplier", 2.0));
         retryTemplate.setBackOffPolicy(backOffPolicy);
         SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
-        retryPolicy.setMaxAttempts(MapUtils.getInteger(retryParams, "maxAttempts", 5));
+        retryPolicy.setMaxAttempts(MapValueUtils.getInteger(retryParams, "maxAttempts", 5));
         retryTemplate.setRetryPolicy(retryPolicy);
 
         return retryTemplate;

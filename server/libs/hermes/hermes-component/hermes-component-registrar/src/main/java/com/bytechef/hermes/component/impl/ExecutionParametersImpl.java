@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.impl;
 
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import com.bytechef.hermes.component.ExecutionParameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
@@ -46,97 +46,97 @@ public class ExecutionParametersImpl implements ExecutionParameters {
 
     @Override
     public Object get(String key) {
-        return MapUtils.get(parameters, key);
+        return MapValueUtils.get(parameters, key);
     }
 
     @Override
     public <T> T get(String key, Class<T> returnType) {
-        return MapUtils.get(parameters, key, returnType);
+        return MapValueUtils.get(parameters, key, returnType);
     }
 
     @Override
     public <T> T get(String key, Class<T> returnType, T defaultValue) {
-        return MapUtils.get(parameters, key, returnType, defaultValue);
+        return MapValueUtils.get(parameters, key, returnType, defaultValue);
     }
 
     @Override
     public <T> T[] getArray(String key, Class<T> elementType) {
-        return MapUtils.getArray(parameters, key, elementType);
+        return MapValueUtils.getArray(parameters, key, elementType);
     }
 
     @Override
     public Boolean getBoolean(String key) {
-        return MapUtils.getBoolean(parameters, key);
+        return MapValueUtils.getBoolean(parameters, key);
     }
 
     @Override
     public boolean getBoolean(String key, boolean defaultValue) {
-        return MapUtils.getBoolean(parameters, key, defaultValue);
+        return MapValueUtils.getBoolean(parameters, key, defaultValue);
     }
 
     @Override
     public Date getDate(String key) {
-        return MapUtils.getDate(parameters, key);
+        return MapValueUtils.getDate(parameters, key);
     }
 
     @Override
     public Date getDate(String key, Date defaultValue) {
-        return MapUtils.getDate(parameters, key, defaultValue);
+        return MapValueUtils.getDate(parameters, key, defaultValue);
     }
 
     @Override
     public Double getDouble(String key) {
-        return MapUtils.getDouble(parameters, key);
+        return MapValueUtils.getDouble(parameters, key);
     }
 
     @Override
     public double getDouble(String key, double defaultValue) {
-        return MapUtils.getDouble(parameters, key, defaultValue);
+        return MapValueUtils.getDouble(parameters, key, defaultValue);
     }
 
     @Override
     public Float getFloat(String key) {
-        return MapUtils.getFloat(parameters, key);
+        return MapValueUtils.getFloat(parameters, key);
     }
 
     @Override
     public float getFloat(String key, float defaultValue) {
-        return MapUtils.getFloat(parameters, key, defaultValue);
+        return MapValueUtils.getFloat(parameters, key, defaultValue);
     }
 
     @Override
     public Integer getInteger(String key) {
-        return MapUtils.getInteger(parameters, key);
+        return MapValueUtils.getInteger(parameters, key);
     }
 
     @Override
     public int getInteger(String key, int defaultValue) {
-        return MapUtils.getInteger(parameters, key, defaultValue);
+        return MapValueUtils.getInteger(parameters, key, defaultValue);
     }
 
     @Override
     public <T> List<T> getList(String key, Class<T> elementType) {
-        return MapUtils.getList(parameters, key, elementType);
+        return MapValueUtils.getList(parameters, key, elementType);
     }
 
     @Override
     public <T> List<T> getList(String key, Class<T> elementType, List<T> defaultValue) {
-        return MapUtils.getList(parameters, key, elementType, defaultValue);
+        return MapValueUtils.getList(parameters, key, elementType, defaultValue);
     }
 
     @Override
     public List<Object> getList(String key, List<Class<?>> elementTypes, List<Object> defaultValue) {
-        return MapUtils.getList(parameters, key, elementTypes, defaultValue);
+        return MapValueUtils.getList(parameters, key, elementTypes, defaultValue);
     }
 
     @Override
     public Long getLong(String key) {
-        return MapUtils.getLong(parameters, key);
+        return MapValueUtils.getLong(parameters, key);
     }
 
     @Override
     public Duration getDuration(String key) {
-        return MapUtils.getDuration(parameters, key);
+        return MapValueUtils.getDuration(parameters, key);
     }
 
     @Override
@@ -146,102 +146,102 @@ public class ExecutionParametersImpl implements ExecutionParameters {
 
     @Override
     public LocalDate getLocalDate(String key) {
-        return MapUtils.getLocalDate(parameters, key);
+        return MapValueUtils.getLocalDate(parameters, key);
     }
 
     @Override
     public LocalDate getLocalDate(String key, LocalDate defaultValue) {
-        return MapUtils.getLocalDate(parameters, key, defaultValue);
+        return MapValueUtils.getLocalDate(parameters, key, defaultValue);
     }
 
     @Override
     public LocalDateTime getLocalDateTime(String key) {
-        return MapUtils.getLocalDateTime(parameters, key);
+        return MapValueUtils.getLocalDateTime(parameters, key);
     }
 
     @Override
     public LocalDateTime getLocalDateTime(String key, LocalDateTime defaultValue) {
-        return MapUtils.getLocalDateTime(parameters, key, defaultValue);
+        return MapValueUtils.getLocalDateTime(parameters, key, defaultValue);
     }
 
     @Override
     public long getLong(String key, long defaultValue) {
-        return MapUtils.getLong(parameters, key, defaultValue);
+        return MapValueUtils.getLong(parameters, key, defaultValue);
     }
 
     @Override
     public <V> Map<String, V> getMap(String key) {
-        return MapUtils.getMap(parameters, key);
+        return MapValueUtils.getMap(parameters, key);
     }
 
     @Override
     public <V> Map<String, V> getMap(String key, Map<String, V> defaultValue) {
-        return MapUtils.getMap(parameters, key, defaultValue);
+        return MapValueUtils.getMap(parameters, key, defaultValue);
     }
 
     @Override
     public Map<String, Object> getMap(String key, List<Class<?>> valueTypes, Map<String, Object> defaultValue) {
-        return MapUtils.getMap(parameters, key, valueTypes, defaultValue);
+        return MapValueUtils.getMap(parameters, key, valueTypes, defaultValue);
     }
 
     @Override
     public Object getRequired(String key) {
-        return MapUtils.getRequired(parameters, key);
+        return MapValueUtils.getRequired(parameters, key);
     }
 
     @Override
     public <T> T getRequired(String key, Class<T> returnType) {
-        return MapUtils.getRequired(parameters, key, returnType);
+        return MapValueUtils.getRequired(parameters, key, returnType);
     }
 
     @Override
     public Boolean getRequiredBoolean(String key) {
-        return MapUtils.getRequiredBoolean(parameters, key);
+        return MapValueUtils.getRequiredBoolean(parameters, key);
     }
 
     @Override
     public Date getRequiredDate(String key) {
-        return MapUtils.getRequiredDate(parameters, key);
+        return MapValueUtils.getRequiredDate(parameters, key);
     }
 
     @Override
     public Double getRequiredDouble(String key) {
-        return MapUtils.getRequiredDouble(parameters, key);
+        return MapValueUtils.getRequiredDouble(parameters, key);
     }
 
     @Override
     public Float getRequiredFloat(String key) {
-        return MapUtils.getRequiredFloat(parameters, key);
+        return MapValueUtils.getRequiredFloat(parameters, key);
     }
 
     @Override
     public Integer getRequiredInteger(String key) {
-        return MapUtils.getRequiredInteger(parameters, key);
+        return MapValueUtils.getRequiredInteger(parameters, key);
     }
 
     @Override
     public LocalDate getRequiredLocalDate(String key) {
-        return MapUtils.getRequiredLocalDate(parameters, key);
+        return MapValueUtils.getRequiredLocalDate(parameters, key);
     }
 
     @Override
     public LocalDateTime getRequiredLocalDateTime(String key) {
-        return MapUtils.getRequiredLocalDateTime(parameters, key);
+        return MapValueUtils.getRequiredLocalDateTime(parameters, key);
     }
 
     @Override
     public String getRequiredString(String key) {
-        return MapUtils.getRequiredString(parameters, key);
+        return MapValueUtils.getRequiredString(parameters, key);
     }
 
     @Override
     public String getString(String key) {
-        return MapUtils.getString(parameters, key);
+        return MapValueUtils.getString(parameters, key);
     }
 
     @Override
     public String getString(String key, String defaultValue) {
-        return MapUtils.getString(parameters, key, defaultValue);
+        return MapValueUtils.getString(parameters, key, defaultValue);
     }
 
     @Override

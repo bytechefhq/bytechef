@@ -39,7 +39,7 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -88,7 +88,7 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
         Map<String, Object> selectedCase = resolveCase(taskExecution);
 
         if (selectedCase.containsKey(TASKS)) {
-            List<WorkflowTask> subWorkflowTasks = MapUtils.getList(selectedCase, TASKS, WorkflowTask.class,
+            List<WorkflowTask> subWorkflowTasks = MapValueUtils.getList(selectedCase, TASKS, WorkflowTask.class,
                 Collections.emptyList());
 
             if (subWorkflowTasks.isEmpty()) {
@@ -135,20 +135,20 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
     }
 
     private Map<String, Object> resolveCase(TaskExecution taskExecution) {
-        Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
-        List<Map<String, Object>> cases = MapUtils.getList(
+        Object expression = MapValueUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
+        List<Map<String, Object>> cases = MapValueUtils.getList(
             taskExecution.getParameters(), CASES, new ParameterizedTypeReference<>() {});
 
         Assert.notNull(cases, "you must specify 'cases' in a switch statement");
 
         for (Map<String, Object> oneCase : cases) {
-            Object key = MapUtils.getRequired(oneCase, KEY);
+            Object key = MapValueUtils.getRequired(oneCase, KEY);
 
             if (key.equals(expression)) {
                 return oneCase;
             }
         }
 
-        return MapUtils.getMap(taskExecution.getParameters(), DEFAULT, Collections.emptyMap());
+        return MapValueUtils.getMap(taskExecution.getParameters(), DEFAULT, Collections.emptyMap());
     }
 }

@@ -32,7 +32,7 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
@@ -75,7 +75,7 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
         taskExecution = taskExecutionService.update(taskExecution);
 
-        List<WorkflowTask> subWorkflowTasks = MapUtils.getList(
+        List<WorkflowTask> subWorkflowTasks = MapValueUtils.getList(
             taskExecution.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList());
 
         if (subWorkflowTasks.isEmpty()) {

@@ -38,7 +38,7 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.CollectionUtils;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -111,7 +111,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     @Override
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        List<List<Map<String, Object>>> branches = MapUtils.getRequiredList(
+        List<List<Map<String, Object>>> branches = MapValueUtils.getRequiredList(
             taskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()

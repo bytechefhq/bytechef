@@ -38,7 +38,7 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
@@ -78,9 +78,9 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     @Override
     @SuppressFBWarnings("NP")
     public void dispatch(TaskExecution taskExecution) {
-        boolean loopForever = MapUtils.getBoolean(taskExecution.getParameters(), LOOP_FOREVER, false);
-        Map<String, Object> iteratee = MapUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
-        List<Object> list = MapUtils.getList(
+        boolean loopForever = MapValueUtils.getBoolean(taskExecution.getParameters(), LOOP_FOREVER, false);
+        Map<String, Object> iteratee = MapValueUtils.getRequiredMap(taskExecution.getParameters(), ITERATEE);
+        List<Object> list = MapValueUtils.getList(
             taskExecution.getParameters(), LIST, Object.class, Collections.emptyList());
 
         taskExecution.setStartTime(LocalDateTime.now());
@@ -97,10 +97,10 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                 contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
             if (!list.isEmpty()) {
-                newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), list.get(0));
+                newContext.put(MapValueUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), list.get(0));
             }
 
-            newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), 0);
+            newContext.put(MapValueUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), 0);
 
             subTaskExecution = taskEvaluator.evaluate(subTaskExecution, newContext);
 

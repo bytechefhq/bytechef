@@ -25,7 +25,7 @@ import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.repository.JobRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.service.JobService;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Date;
 import java.util.List;
@@ -195,7 +195,7 @@ public class JobServiceImpl implements JobService {
         Map<String, Object> inputs = workflowParameters.getInputs();
 
         for (Map<String, Object> input : workflow.getInputs()) {
-            if (MapUtils.getBoolean(input, WorkflowConstants.REQUIRED, false)) {
+            if (MapValueUtils.getBoolean(input, WorkflowConstants.REQUIRED, false)) {
                 Assert.isTrue(
                     inputs.containsKey(input.get(WorkflowConstants.NAME)),
                     "Missing required param: " + input.get("name"));

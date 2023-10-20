@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.rest;
 
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.RestComponentHandler.PropertyType;
@@ -54,12 +54,12 @@ public class RestClient {
                     .build())
             .exchange(
                 createUri(metadata, taskExecution.getParameters(), actionDefinition.getProperties()),
-                MapUtils.get(metadata, "requestMethod", HttpClientUtils.RequestMethod.class))
+                MapValueUtils.get(metadata, "requestMethod", HttpClientUtils.RequestMethod.class))
             .headers(getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.HEADER))
             .payload(
                 getPayload(
-                    MapUtils.get(metadata, "bodyContentType", BodyContentType.class),
-                    MapUtils.getString(metadata, "mimeType"),
+                    MapValueUtils.get(metadata, "bodyContentType", BodyContentType.class),
+                    MapValueUtils.getString(metadata, "mimeType"),
                     taskExecution.getParameters(), actionDefinition.getProperties()))
             .queryParameters(
                 getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.QUERY))
@@ -72,9 +72,9 @@ public class RestClient {
         String path = (String) metadata.get("path");
 
         for (Property<?> property : properties) {
-            if (MapUtils.get(property.getMetadata(), TYPE, PropertyType.class) == PropertyType.PATH) {
+            if (MapValueUtils.get(property.getMetadata(), TYPE, PropertyType.class) == PropertyType.PATH) {
                 path = path.replace(
-                    "{" + property.getName() + "}", MapUtils.getRequiredString(parameters, property.getName()));
+                    "{" + property.getName() + "}", MapValueUtils.getRequiredString(parameters, property.getName()));
             }
         }
 
@@ -88,25 +88,27 @@ public class RestClient {
 
         if (bodyContentType != null) {
             for (Property<?> property : properties) {
-                if (Objects.equals(MapUtils.get(property.getMetadata(), TYPE, PropertyType.class), PropertyType.BODY)) {
+                if (Objects.equals(MapValueUtils.get(property.getMetadata(), TYPE, PropertyType.class),
+                    PropertyType.BODY)) {
                     payload = switch (bodyContentType) {
                         case BINARY -> Payload.of(
-                            MapUtils.getRequired(parameters, property.getName(), FileEntry.class), mimeType);
+                            MapValueUtils.getRequired(parameters, property.getName(), FileEntry.class), mimeType);
                         case FORM_DATA, FORM_URL_ENCODED -> Payload.of(
-                            MapUtils.getRequiredMap(parameters, property.getName()));
+                            MapValueUtils.getRequiredMap(parameters, property.getName()));
                         case JSON, XML -> {
                             if (property.getType() == Property.Type.ARRAY) {
                                 yield Payload.of(
-                                    MapUtils.getRequiredList(parameters, property.getName(), Object.class));
+                                    MapValueUtils.getRequiredList(parameters, property.getName(), Object.class));
                             } else if (property.getType() == Property.Type.OBJECT) {
                                 yield Payload.of(
-                                    MapUtils.getRequiredMap(parameters, property.getName()));
+                                    MapValueUtils.getRequiredMap(parameters, property.getName()));
                             } else {
                                 yield Payload.of(
-                                    MapUtils.getRequiredString(parameters, property.getName()));
+                                    MapValueUtils.getRequiredString(parameters, property.getName()));
                             }
                         }
-                        case RAW -> Payload.of(MapUtils.getRequiredString(parameters, property.getName()), mimeType);
+                        case RAW -> Payload.of(MapValueUtils.getRequiredString(parameters, property.getName()),
+                            mimeType);
                     };
 
                     break;
@@ -124,7 +126,7 @@ public class RestClient {
         if (outputProperties != null && !outputProperties.isEmpty()) {
             Property<?> property = outputProperties.get(0);
 
-            responseFormat = MapUtils.get(property.getMetadata(), "responseFormat", ResponseFormat.class);
+            responseFormat = MapValueUtils.get(property.getMetadata(), "responseFormat", ResponseFormat.class);
         }
 
         return responseFormat;
@@ -136,8 +138,8 @@ public class RestClient {
         Map<String, List<String>> valuesMap = new HashMap<>();
 
         for (Property<?> property : properties) {
-            if (Objects.equals(MapUtils.get(property.getMetadata(), TYPE, PropertyType.class), propertyType)) {
-                String value = MapUtils.getString(parameters, property.getName());
+            if (Objects.equals(MapValueUtils.get(property.getMetadata(), TYPE, PropertyType.class), propertyType)) {
+                String value = MapValueUtils.getString(parameters, property.getName());
 
                 valuesMap.compute(property.getName(), (key, values) -> {
                     if (StringUtils.hasText(value)) {

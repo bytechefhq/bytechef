@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -68,7 +68,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.singletonMap("name", "arik"));
 
-        Assertions.assertEquals("arik", MapUtils.getString(taskExecution.getParameters(), "hello"));
+        Assertions.assertEquals("arik", MapValueUtils.getString(taskExecution.getParameters(), "hello"));
     }
 
     @Test
@@ -83,7 +83,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, context);
 
-        Assertions.assertEquals("Arik Cohen", MapUtils.getString(taskExecution.getParameters(), "hello"));
+        Assertions.assertEquals("Arik Cohen", MapValueUtils.getString(taskExecution.getParameters(), "hello"));
     }
 
     @Test
@@ -98,7 +98,7 @@ public class TaskEvaluatorTest {
         taskExecution = taskEvaluator.evaluate(taskExecution, context);
 
         Assertions.assertEquals(
-            Integer.valueOf(5), (Integer) MapUtils.get(taskExecution.getParameters(), "hello"));
+            Integer.valueOf(5), (Integer) MapValueUtils.get(taskExecution.getParameters(), "hello"));
     }
 
     @Test
@@ -115,7 +115,7 @@ public class TaskEvaluatorTest {
 
         Assertions.assertEquals(
             Arrays.asList("Arik", "Cohen"),
-            MapUtils.getList(taskExecution.getParameters(), "list", String.class));
+            MapValueUtils.getList(taskExecution.getParameters(), "list", String.class));
     }
 
     @Test
@@ -130,7 +130,7 @@ public class TaskEvaluatorTest {
 
         Assertions.assertEquals(
             Collections.singletonMap("hello", "Arik"),
-            MapUtils.getMap(taskExecution.getParameters(), "map"));
+            MapValueUtils.getMap(taskExecution.getParameters(), "map"));
     }
 
     @Test
@@ -145,7 +145,7 @@ public class TaskEvaluatorTest {
         taskExecution = taskEvaluator.evaluate(taskExecution, context);
 
         Assertions.assertEquals(
-            Integer.valueOf(15), MapUtils.getInteger(taskExecution.getParameters(), "mult"));
+            Integer.valueOf(15), MapValueUtils.getInteger(taskExecution.getParameters(), "mult"));
     }
 
     @Test
@@ -155,7 +155,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
-        Assertions.assertEquals("${name}", MapUtils.getString(taskExecution.getParameters(), "message"));
+        Assertions.assertEquals("${name}", MapValueUtils.getString(taskExecution.getParameters(), "message"));
     }
 
     @Test
@@ -165,7 +165,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
-        Assertions.assertEquals("yo ${name}", MapUtils.getString(taskExecution.getParameters(), "message"));
+        Assertions.assertEquals("yo ${name}", MapValueUtils.getString(taskExecution.getParameters(), "message"));
     }
 
     @Test
@@ -175,7 +175,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.singletonMap("number", 1));
 
-        Assertions.assertEquals(1, MapUtils.get(taskExecution.getParameters(), "thing"));
+        Assertions.assertEquals(1, MapValueUtils.get(taskExecution.getParameters(), "thing"));
     }
 
     @Test
@@ -185,7 +185,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.singletonMap("number", 1));
 
-        Assertions.assertEquals(3, MapUtils.get(taskExecution.getParameters(), "thing"));
+        Assertions.assertEquals(3, MapValueUtils.get(taskExecution.getParameters(), "thing"));
     }
 
     @Test
@@ -195,7 +195,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
-        Assertions.assertEquals("${number*3}", MapUtils.get(taskExecution.getParameters(), "thing"));
+        Assertions.assertEquals("${number*3}", MapValueUtils.get(taskExecution.getParameters(), "thing"));
     }
 
     @Test
@@ -205,7 +205,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
-        Assertions.assertEquals(Arrays.asList(1, 2, 3), MapUtils.get(taskExecution.getParameters(), "list"));
+        Assertions.assertEquals(Arrays.asList(1, 2, 3), MapValueUtils.get(taskExecution.getParameters(), "list"));
     }
 
     @Test
@@ -218,7 +218,7 @@ public class TaskEvaluatorTest {
 
         Assertions.assertEquals(
             Arrays.asList(1, 2, 3),
-            MapUtils.getMap(taskExecution.getParameters(), "sub")
+            MapValueUtils.getMap(taskExecution.getParameters(), "sub")
                 .get("list"));
     }
 
@@ -229,7 +229,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Map.of("item1", "hello", "item2", "world"));
 
-        Assertions.assertEquals("hello-world", MapUtils.get(taskExecution.getParameters(), "message"));
+        Assertions.assertEquals("hello-world", MapValueUtils.get(taskExecution.getParameters(), "message"));
     }
 
     @Test
@@ -239,7 +239,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
-        Assertions.assertEquals(Boolean.TRUE, MapUtils.get(taskExecution.getParameters(), "someBoolean"));
+        Assertions.assertEquals(Boolean.TRUE, MapValueUtils.get(taskExecution.getParameters(), "someBoolean"));
     }
 
     @Test
@@ -250,7 +250,7 @@ public class TaskEvaluatorTest {
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
         Assertions.assertEquals(
-            Byte.MAX_VALUE, MapUtils.get(taskExecution.getParameters(), "someByte"));
+            Byte.MAX_VALUE, MapValueUtils.get(taskExecution.getParameters(), "someByte"));
     }
 
     @Test
@@ -261,7 +261,7 @@ public class TaskEvaluatorTest {
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
         Assertions.assertEquals(
-            'c', MapUtils.get(taskExecution.getParameters(), "someChar"));
+            'c', MapValueUtils.get(taskExecution.getParameters(), "someChar"));
     }
 
     @Test
@@ -272,7 +272,7 @@ public class TaskEvaluatorTest {
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
         Assertions.assertEquals(
-            Short.MAX_VALUE, MapUtils.get(taskExecution.getParameters(), "someShort"));
+            Short.MAX_VALUE, MapValueUtils.get(taskExecution.getParameters(), "someShort"));
     }
 
     @Test
@@ -282,7 +282,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
-        Assertions.assertEquals(1, MapUtils.get(taskExecution.getParameters(), "someInt"));
+        Assertions.assertEquals(1, MapValueUtils.get(taskExecution.getParameters(), "someInt"));
     }
 
     @Test
@@ -292,7 +292,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
-        Assertions.assertEquals(1L, MapUtils.get(taskExecution.getParameters(), "someLong"));
+        Assertions.assertEquals(1L, MapValueUtils.get(taskExecution.getParameters(), "someLong"));
     }
 
     @Test
@@ -303,7 +303,7 @@ public class TaskEvaluatorTest {
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
         Assertions.assertEquals(
-            1.337f, MapUtils.get(taskExecution.getParameters(), "someFloat"));
+            1.337f, MapValueUtils.get(taskExecution.getParameters(), "someFloat"));
     }
 
     @Test
@@ -314,7 +314,7 @@ public class TaskEvaluatorTest {
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
         Assertions.assertEquals(
-            1.337d, MapUtils.get(taskExecution.getParameters(), "someDouble"));
+            1.337d, MapValueUtils.get(taskExecution.getParameters(), "someDouble"));
     }
 
     @Test
@@ -324,7 +324,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
-        Assertions.assertEquals("1,2,3", MapUtils.get(taskExecution.getParameters(), "joined"));
+        Assertions.assertEquals("1,2,3", MapValueUtils.get(taskExecution.getParameters(), "joined"));
     }
 
     @Test
@@ -334,7 +334,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
-        Assertions.assertEquals("1", MapUtils.get(taskExecution.getParameters(), "joined"));
+        Assertions.assertEquals("1", MapValueUtils.get(taskExecution.getParameters(), "joined"));
     }
 
     @Test
@@ -344,7 +344,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
-        Assertions.assertEquals("a and b and c", MapUtils.get(taskExecution.getParameters(), "joined"));
+        Assertions.assertEquals("a and b and c", MapValueUtils.get(taskExecution.getParameters(), "joined"));
     }
 
     @Test
@@ -357,7 +357,7 @@ public class TaskEvaluatorTest {
 
         Assertions.assertEquals(
             Arrays.asList("a", "b", "c", "d", "e", "f"),
-            MapUtils.get(taskExecution.getParameters(), "concatenated"));
+            MapValueUtils.get(taskExecution.getParameters(), "concatenated"));
     }
 
     @Test
@@ -370,7 +370,7 @@ public class TaskEvaluatorTest {
 
         Assertions.assertEquals(
             Arrays.asList("a", "b", "c", 1, 2, 3),
-            MapUtils.get(taskExecution.getParameters(), "concatenated"));
+            MapValueUtils.get(taskExecution.getParameters(), "concatenated"));
     }
 
     @Test
@@ -383,7 +383,7 @@ public class TaskEvaluatorTest {
 
         Assertions.assertEquals(
             Arrays.asList("a", "b", "c", "d", "e", "f"),
-            MapUtils.get(taskExecution.getParameters(), "flattened"));
+            MapValueUtils.get(taskExecution.getParameters(), "flattened"));
     }
 
     @Test
@@ -396,7 +396,7 @@ public class TaskEvaluatorTest {
 
         Assertions.assertEquals(
             Arrays.asList("a", "b", "c", 1, 2, 3),
-            MapUtils.get(taskExecution.getParameters(), "flattened"));
+            MapValueUtils.get(taskExecution.getParameters(), "flattened"));
     }
 
     @Test
@@ -414,7 +414,7 @@ public class TaskEvaluatorTest {
             tmpDir = tmpDir.substring(0, tmpDir.lastIndexOf(File.separator));
         }
 
-        Assertions.assertEquals(tmpDir, MapUtils.get(taskExecution.getParameters(), "tempDir"));
+        Assertions.assertEquals(tmpDir, MapValueUtils.get(taskExecution.getParameters(), "tempDir"));
     }
 
     @Test
@@ -424,7 +424,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
-        Assertions.assertNotNull(MapUtils.get(taskExecution.getParameters(), "uuid"));
+        Assertions.assertNotNull(MapValueUtils.get(taskExecution.getParameters(), "uuid"));
     }
 
     @Test
@@ -438,7 +438,7 @@ public class TaskEvaluatorTest {
         taskExecution = taskEvaluator.evaluate(taskExecution, context);
 
         Assertions.assertEquals(
-            "Arik ${lastName}", MapUtils.getString(taskExecution.getParameters(), "fullName"));
+            "Arik ${lastName}", MapValueUtils.getString(taskExecution.getParameters(), "fullName"));
     }
 
     @Test
@@ -452,7 +452,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, context);
 
-        Assertions.assertEquals(0.5d, MapUtils.getDouble(taskExecution.getParameters(), "result"));
+        Assertions.assertEquals(0.5d, MapValueUtils.getDouble(taskExecution.getParameters(), "result"));
     }
 
     @Test
@@ -463,7 +463,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, context);
 
-        Assertions.assertEquals("005", MapUtils.getString(taskExecution.getParameters(), "number"));
+        Assertions.assertEquals("005", MapValueUtils.getString(taskExecution.getParameters(), "number"));
     }
 
     @Test
@@ -475,7 +475,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, context);
 
-        Assertions.assertEquals("hello world", MapUtils.getString(taskExecution.getParameters(), "number"));
+        Assertions.assertEquals("hello world", MapValueUtils.getString(taskExecution.getParameters(), "number"));
     }
 
     @Test
@@ -488,7 +488,7 @@ public class TaskEvaluatorTest {
 
         Assertions.assertEquals(
             Arrays.asList(1, 2, 3),
-            MapUtils.getList(taskExecution.getParameters(), "sorted", Integer.class));
+            MapValueUtils.getList(taskExecution.getParameters(), "sorted", Integer.class));
     }
 
     @Test
@@ -500,7 +500,7 @@ public class TaskEvaluatorTest {
 
         Assertions.assertEquals(
             Arrays.asList("A", "B", "C"),
-            MapUtils.getList(taskExecution.getParameters(), "sorted", String.class));
+            MapValueUtils.getList(taskExecution.getParameters(), "sorted", String.class));
     }
 
     @Test
@@ -513,7 +513,7 @@ public class TaskEvaluatorTest {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
         Assertions.assertEquals(
-            sdf.format(new Date()), MapUtils.getString(taskExecution.getParameters(), "date"));
+            sdf.format(new Date()), MapValueUtils.getString(taskExecution.getParameters(), "date"));
     }
 
     @Test
@@ -527,7 +527,7 @@ public class TaskEvaluatorTest {
 
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
-        Assertions.assertEquals("something", MapUtils.getString(taskExecution.getParameters(), "myValue"));
+        Assertions.assertEquals("something", MapValueUtils.getString(taskExecution.getParameters(), "myValue"));
     }
 
     @Test
@@ -541,6 +541,6 @@ public class TaskEvaluatorTest {
         taskExecution = taskEvaluator.evaluate(taskExecution, Collections.emptyMap());
 
         Assertions.assertEquals(
-            "${config('no.such.property')}", MapUtils.getString(taskExecution.getParameters(), "myValue"));
+            "${config('no.such.property')}", MapValueUtils.getString(taskExecution.getParameters(), "myValue"));
     }
 }

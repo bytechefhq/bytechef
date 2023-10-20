@@ -27,7 +27,7 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.Worker;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +41,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
 
     @Test
     public void test1() {
-        TaskHandlerResolver resolver = task -> t -> MapUtils.get(t.getParameters(), "value");
+        TaskHandlerResolver resolver = task -> t -> MapValueUtils.get(t.getParameters(), "value");
         MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(resolver,
             TaskEvaluator.create());
 
@@ -101,7 +101,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             String type = t1.getType();
 
             if ("var".equals(type)) {
-                return t2 -> MapUtils.getRequired(t2.getParameters(), "value");
+                return t2 -> MapValueUtils.getRequired(t2.getParameters(), "value");
             }
             if ("pass".equals(type)) {
                 return t2 -> null;

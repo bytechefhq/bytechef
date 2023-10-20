@@ -59,6 +59,12 @@ public final class CollectionUtils {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v2));
     }
 
+    public static boolean containsKey(Map<String, Object> map, String key) {
+        Assert.notNull(map, "'map' must not be null");
+
+        return map.containsKey(key);
+    }
+
     public static <T, R> List<R> map(List<T> list, Function<? super T, R> mapper) {
         Assert.notNull(list, "'list' must not be null");
 

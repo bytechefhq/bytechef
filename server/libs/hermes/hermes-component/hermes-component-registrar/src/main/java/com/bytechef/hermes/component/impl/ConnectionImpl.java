@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.impl;
 
-import com.bytechef.commons.utils.MapUtils;
+import com.bytechef.commons.utils.MapValueUtils;
 import com.bytechef.hermes.component.Connection;
 import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;
@@ -59,7 +59,7 @@ public class ConnectionImpl implements Connection {
 
     @Override
     public <T> T getParameter(String name, T defaultValue) {
-        return MapUtils.get(parameters, name, new ParameterizedTypeReference<>() {}, defaultValue);
+        return MapValueUtils.get(parameters, name, new ParameterizedTypeReference<>() {}, defaultValue);
     }
 
     @Override
