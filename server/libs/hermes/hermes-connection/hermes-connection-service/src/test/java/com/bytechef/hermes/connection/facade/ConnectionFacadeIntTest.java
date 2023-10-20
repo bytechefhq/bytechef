@@ -26,7 +26,6 @@ import com.bytechef.hermes.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.connection.service.ConnectionServiceImpl;
-import com.bytechef.hermes.definition.registry.config.WorkerDefinitionRegistryConfiguration;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
@@ -59,7 +58,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     "spring.application.name=server-app"
 })
 @Import({
-    WorkerDefinitionRegistryConfiguration.class, ConnectionFacadeIntTest.ConnectionFacadeIntTestConfiguration.class
+    ConnectionFacadeIntTest.ConnectionFacadeIntTestConfiguration.class
 })
 public class ConnectionFacadeIntTest {
 

@@ -35,10 +35,8 @@ import com.bytechef.hermes.connection.constant.ConnectionConstants;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.definition.registry.config.WorkerDefinitionRegistryConfiguration;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServiceImpl;
-import com.bytechef.hermes.definition.registry.service.LocalConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.domain.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -64,7 +62,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 import java.nio.charset.StandardCharsets;
@@ -121,7 +118,7 @@ public class OpenApiComponentTaskHandlerIntTest {
     private Connection connection;
 
     @Autowired
-    private LocalConnectionDefinitionService connectionDefinitionService;
+    private ConnectionDefinitionService connectionDefinitionService;
 
     @BeforeEach
     public void beforeEach() {
@@ -830,7 +827,6 @@ public class OpenApiComponentTaskHandlerIntTest {
             "com.bytechef.hermes.connection"
         })
     @EnableAutoConfiguration
-    @Import(WorkerDefinitionRegistryConfiguration.class)
     @Configuration
     public static class OpenApiComponentTaskHandlerIntTestConfiguration {
 

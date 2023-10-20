@@ -3,7 +3,6 @@ dependencies {
 
     implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "org.springframework:spring-context"
-    implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api")
     implementation project(":server:libs:atlas:atlas-event:atlas-event-api")
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-sync")

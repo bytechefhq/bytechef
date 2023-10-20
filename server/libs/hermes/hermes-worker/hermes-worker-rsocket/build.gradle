@@ -2,7 +2,6 @@ dependencies {
     implementation "io.rsocket:rsocket-core"
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-messaging"
-    implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation project(":server:libs:core:commons:commons-util")
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-api")
 }

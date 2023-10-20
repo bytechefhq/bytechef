@@ -28,7 +28,7 @@ import com.bytechef.hermes.component.ContextImpl;
 import com.bytechef.hermes.component.registrar.oas.OpenApiClient;
 import com.bytechef.hermes.component.util.ContextSupplier;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.definition.registry.service.LocalConnectionDefinitionService;
+import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -40,7 +40,7 @@ public class OpenApiComponentTaskHandler implements TaskHandler<Object> {
     private static final OpenApiClient OPEN_API_CLIENT = new OpenApiClient();
 
     private final ActionDefinition actionDefinition;
-    private final LocalConnectionDefinitionService connectionDefinitionService;
+    private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
     private final OpenApiComponentHandler openApiComponentHandler;
 
@@ -49,7 +49,7 @@ public class OpenApiComponentTaskHandler implements TaskHandler<Object> {
 
     @SuppressFBWarnings("EI2")
     public OpenApiComponentTaskHandler(
-        ActionDefinition actionDefinition, LocalConnectionDefinitionService connectionDefinitionService,
+        ActionDefinition actionDefinition, ConnectionDefinitionService connectionDefinitionService,
         ConnectionService connectionService, OpenApiComponentHandler openApiComponentHandler,
         EventPublisher eventPublisher, FileStorageService fileStorageService) {
 

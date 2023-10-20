@@ -20,11 +20,9 @@ package com.bytechef.hermes.definition.registry.rsocket.client.facade;
 import com.bytechef.commons.util.DiscoveryUtils;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
-import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -35,15 +33,13 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-@Component
 public class ComponentDefinitionFacadeRSocketClient implements ComponentDefinitionFacade {
 
     private final DiscoveryClient discoveryClient;
     private final RSocketRequester.Builder rSocketRequesterBuilder;
 
     public ComponentDefinitionFacadeRSocketClient(
-        DiscoveryClient discoveryClient,
-        @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
+        DiscoveryClient discoveryClient, RSocketRequester.Builder rSocketRequesterBuilder) {
 
         this.discoveryClient = discoveryClient;
         this.rSocketRequesterBuilder = rSocketRequesterBuilder;
