@@ -44,6 +44,7 @@ dependencies {
     implementation project(":modules:libs:task:task-handler:task-handler-core")
     implementation project(":modules:libs:task:task-handler:task-handler-csv-file")
     implementation project(":modules:libs:task:task-handler:task-handler-file")
+    implementation project(":modules:libs:task:task-handler:task-handler-function")
     implementation project(":modules:libs:task:task-handler:task-handler-http-client")
     implementation project(":modules:libs:task:task-handler:task-handler-io")
     implementation project(":modules:libs:task:task-handler:task-handler-json-file")

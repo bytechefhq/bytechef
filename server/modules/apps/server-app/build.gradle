@@ -75,6 +75,7 @@ dependencies {
     implementation project(":modules:libs:task:task-handler:task-handler-random")
     implementation project(":modules:libs:task:task-handler:task-handler-s3")
     implementation project(":modules:libs:task:task-handler:task-handler-shell")
+    implementation project(":modules:libs:task:task-handler:task-handler-function")
     implementation project(":modules:libs:task:task-handler:task-handler-time")
     implementation project(":modules:libs:task:task-handler:task-handler-transform-json")
     implementation project(":modules:libs:task:task-handler:task-handler-xlsx-file")
