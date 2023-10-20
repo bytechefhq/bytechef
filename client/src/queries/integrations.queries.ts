@@ -28,19 +28,12 @@ export const IntegrationKeys = {
 export const useGetIntegrationCategoriesQuery = () =>
     useQuery<CategoryModel[], Error>(
         IntegrationKeys.integrationCategories,
-        () => new IntegrationCategoriesApi().getIntegrationCategories(),
-        {
-            staleTime: 1 * 60 * 1000,
-        }
+        () => new IntegrationCategoriesApi().getIntegrationCategories()
     );
 
 export const useGetIntegrationTagsQuery = () =>
-    useQuery<TagModel[], Error>(
-        IntegrationKeys.integrationTags,
-        () => new IntegrationTagsApi().getIntegrationTags(),
-        {
-            staleTime: 1 * 60 * 1000,
-        }
+    useQuery<TagModel[], Error>(IntegrationKeys.integrationTags, () =>
+        new IntegrationTagsApi().getIntegrationTags()
     );
 
 export const useGetIntegrationQuery = (
@@ -51,7 +44,6 @@ export const useGetIntegrationQuery = (
         IntegrationKeys.integration(id),
         () => new IntegrationsApi().getIntegration({id}),
         {
-            staleTime: 1 * 60 * 1000,
             initialData,
         }
     );
@@ -62,17 +54,11 @@ export const useGetIntegrationsQuery = (filters: {
 }) =>
     useQuery<IntegrationModel[], Error>(
         IntegrationKeys.integrationList(filters),
-        () => new IntegrationsApi().getIntegrations(filters),
-        {
-            staleTime: 1 * 60 * 1000,
-        }
+        () => new IntegrationsApi().getIntegrations(filters)
     );
 
 export const useGetIntegrationWorkflowsQuery = (id: number) =>
     useQuery<WorkflowModel[], Error>(
         IntegrationKeys.integrationWorkflows(id),
-        () => new IntegrationsApi().getIntegrationWorkflows({id}),
-        {
-            staleTime: 1 * 60 * 1000,
-        }
+        () => new IntegrationsApi().getIntegrationWorkflows({id})
     );

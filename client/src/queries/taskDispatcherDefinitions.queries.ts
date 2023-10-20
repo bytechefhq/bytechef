@@ -11,8 +11,5 @@ export const TaskDispatcherKeys = {
 export const useGetTaskDispatcherDefinitionsQuery = () =>
     useQuery<TaskDispatcherDefinitionModel[], Error>(
         TaskDispatcherKeys.taskDispatcherDefinitions,
-        () => new TaskDispatcherDefinitionsApi().getTaskDispatcherDefinitions(),
-        {
-            staleTime: 1 * 60 * 1000,
-        }
+        () => new TaskDispatcherDefinitionsApi().getTaskDispatcherDefinitions()
     );

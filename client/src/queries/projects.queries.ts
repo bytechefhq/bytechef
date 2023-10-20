@@ -26,21 +26,13 @@ export const ProjectKeys = {
 };
 
 export const useGetProjectCategoriesQuery = () =>
-    useQuery<CategoryModel[], Error>(
-        ProjectKeys.projectCategories,
-        () => new ProjectCategoriesApi().getProjectCategories(),
-        {
-            staleTime: 1 * 60 * 1000,
-        }
+    useQuery<CategoryModel[], Error>(ProjectKeys.projectCategories, () =>
+        new ProjectCategoriesApi().getProjectCategories()
     );
 
 export const useGetProjectTagsQuery = () =>
-    useQuery<TagModel[], Error>(
-        ProjectKeys.projectTags,
-        () => new ProjectTagsApi().getProjectTags(),
-        {
-            staleTime: 1 * 60 * 1000,
-        }
+    useQuery<TagModel[], Error>(ProjectKeys.projectTags, () =>
+        new ProjectTagsApi().getProjectTags()
     );
 
 export const useGetProjectQuery = (id: number, initialData?: ProjectModel) =>
@@ -48,7 +40,6 @@ export const useGetProjectQuery = (id: number, initialData?: ProjectModel) =>
         ProjectKeys.project(id),
         () => new ProjectsApi().getProject({id}),
         {
-            staleTime: 1 * 60 * 1000,
             initialData,
         }
     );
@@ -57,19 +48,11 @@ export const useGetProjectsQuery = (filters: {
     categoryIds?: number[];
     tagIds?: number[];
 }) =>
-    useQuery<ProjectModel[], Error>(
-        ProjectKeys.projectList(filters),
-        () => new ProjectsApi().getProjects(filters),
-        {
-            staleTime: 1 * 60 * 1000,
-        }
+    useQuery<ProjectModel[], Error>(ProjectKeys.projectList(filters), () =>
+        new ProjectsApi().getProjects(filters)
     );
 
 export const useGetProjectWorkflowsQuery = (id: number) =>
-    useQuery<WorkflowModel[], Error>(
-        ProjectKeys.projectWorkflows(id),
-        () => new ProjectsApi().getProjectWorkflows({id}),
-        {
-            staleTime: 1 * 60 * 1000,
-        }
+    useQuery<WorkflowModel[], Error>(ProjectKeys.projectWorkflows(id), () =>
+        new ProjectsApi().getProjectWorkflows({id})
     );
