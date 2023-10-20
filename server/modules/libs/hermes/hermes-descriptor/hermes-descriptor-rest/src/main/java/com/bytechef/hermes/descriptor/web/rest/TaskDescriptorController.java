@@ -16,10 +16,9 @@
 
 package com.bytechef.hermes.descriptor.web.rest;
 
-import com.bytechef.atlas.annotation.ConditionalOnCoordinator;
-import com.bytechef.hermes.descriptor.domain.TaskDescriptor;
 import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandler;
-import com.bytechef.hermes.descriptor.service.TaskDescriptorHandlerService;
+import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandlerResolver;
+import com.bytechef.hermes.descriptor.model.TaskDescriptor;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.http.MediaType;
@@ -31,26 +30,24 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnCoordinator
 public class TaskDescriptorController {
 
-    private final TaskDescriptorHandlerService taskDescriptorHandlerService;
+    private final TaskDescriptorHandlerResolver taskDescriptorHandlerResolver;
 
-    public TaskDescriptorController(TaskDescriptorHandlerService taskDescriptorHandlerService) {
-        this.taskDescriptorHandlerService = taskDescriptorHandlerService;
+    public TaskDescriptorController(TaskDescriptorHandlerResolver taskDescriptorHandlerResolver) {
+        this.taskDescriptorHandlerResolver = taskDescriptorHandlerResolver;
     }
 
     @GetMapping(value = "/task-descriptors/{name}/{version}", produces = MediaType.APPLICATION_JSON_VALUE)
     public TaskDescriptor getTaskDescriptor(@PathVariable("name") String name, @PathVariable("version") float version) {
-        TaskDescriptorHandler taskDescriptorHandler =
-                taskDescriptorHandlerService.getTaskDescriptorHandler(name, version);
+        TaskDescriptorHandler taskDescriptorHandler = taskDescriptorHandlerResolver.resolve(name, version);
 
         return taskDescriptorHandler.getTaskDescriptor();
     }
 
     @GetMapping(value = "/task-descriptors", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<TaskDescriptor> getTaskDescriptors() {
-        return taskDescriptorHandlerService.getTaskDescriptorHandlers().stream()
+        return taskDescriptorHandlerResolver.getTaskDescriptorHandlers().stream()
                 .map(TaskDescriptorHandler::getTaskDescriptor)
                 .collect(Collectors.toList());
     }

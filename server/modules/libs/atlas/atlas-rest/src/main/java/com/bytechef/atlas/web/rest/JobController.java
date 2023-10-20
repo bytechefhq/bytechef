@@ -18,18 +18,21 @@
 
 package com.bytechef.atlas.web.rest;
 
-import com.bytechef.atlas.annotation.ConditionalOnCoordinator;
-import com.bytechef.atlas.coordinator.Coordinator;
+import com.bytechef.atlas.Constants;
 import com.bytechef.atlas.data.Page;
 import com.bytechef.atlas.job.JobSummary;
 import com.bytechef.atlas.job.domain.Job;
-import com.bytechef.atlas.job.service.JobService;
+import com.bytechef.atlas.message.broker.MessageBroker;
+import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.service.job.JobService;
+import com.bytechef.atlas.uuid.UUIDGenerator;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,15 +47,14 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Arik Cohen
  */
 @RestController
-@ConditionalOnCoordinator
 public class JobController {
 
-    private final Coordinator coordinator;
+    private final MessageBroker messageBroker;
     private final JobService jobService;
 
-    public JobController(Coordinator coordinator, JobService jobService) {
-        this.coordinator = coordinator;
+    public JobController(JobService jobService, MessageBroker messageBroker) {
         this.jobService = jobService;
+        this.messageBroker = messageBroker;
     }
 
     @GetMapping(value = "/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -61,8 +63,14 @@ public class JobController {
     }
 
     @PostMapping(value = "/jobs", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Job create(@RequestBody Map<String, Object> jobRequestMap) {
-        return coordinator.create(jobRequestMap);
+    public String create(@RequestBody Map<String, Object> jobRequestMap) {
+        String id = UUIDGenerator.generate();
+
+        jobRequestMap.put(Constants.ID, id);
+
+        messageBroker.send(Queues.REQUESTS, jobRequestMap);
+
+        return id;
     }
 
     @GetMapping(value = "/jobs/{id}")
@@ -85,12 +93,16 @@ public class JobController {
     }
 
     @PutMapping(value = "/jobs/{id}/restart")
-    public Job restart(@PathVariable("id") String jobId) {
-        return coordinator.resume(jobId);
+    public ResponseEntity<Void> restart(@PathVariable("id") String jobId) {
+        messageBroker.send(Queues.RESTARTS, jobId);
+
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping(value = "/jobs/{id}/stop")
-    public Job stop(@PathVariable("id") String jobId) {
-        return coordinator.stop(jobId);
+    public ResponseEntity<Void> stop(@PathVariable("id") String jobId) {
+        messageBroker.send(Queues.STOPS, jobId);
+
+        return ResponseEntity.ok().build();
     }
 }

@@ -24,13 +24,13 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 public interface AuthenticationService {
-    Authentication create(String name, String type, Map<String, Object> properties);
-
-    void delete(String id);
+    Authentication add(String name, String type, Map<String, Object> properties);
 
     Authentication fetchAuthentication(String id);
 
     List<Authentication> getAuthentications();
+
+    void remove(String id);
 
     Authentication update(String id, String name);
 }

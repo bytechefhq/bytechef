@@ -16,9 +16,9 @@
 
 package com.bytechef.hermes.descriptor.resolver;
 
-import com.bytechef.hermes.descriptor.domain.TaskDescriptor;
 import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandler;
 import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandlerResolver;
+import com.bytechef.hermes.descriptor.model.TaskDescriptor;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.core.annotation.Order;

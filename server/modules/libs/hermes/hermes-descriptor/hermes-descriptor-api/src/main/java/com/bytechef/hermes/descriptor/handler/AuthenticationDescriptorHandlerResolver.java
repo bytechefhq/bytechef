@@ -24,5 +24,5 @@ import java.util.List;
 public interface AuthenticationDescriptorHandlerResolver {
     List<AuthenticationDescriptorHandler> getAuthenticationDescriptorHandlers();
 
-    AuthenticationDescriptorHandler resolve(String taskName);
+    AuthenticationDescriptorHandler resolve(String name);
 }

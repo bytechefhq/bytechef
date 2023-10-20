@@ -1,3 +1,0 @@
-dependencies {
-    api project(":modules:libs:hermes:hermes-descriptor:hermes-descriptor-api")
-}

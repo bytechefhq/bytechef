@@ -2,7 +2,5 @@ dependencies {
     api project(":modules:libs:hermes:hermes-descriptor:hermes-descriptor-api")
 
     implementation "org.springframework:spring-context"
-    implementation project(":modules:libs:hermes:hermes-descriptor:hermes-descriptor-repository:hermes-descriptor-repository-api")
-
-    testImplementation project(":modules:libs:hermes:hermes-descriptor:hermes-descriptor-repository:hermes-descriptor-repository-memory")
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
 }

@@ -9,5 +9,4 @@ dependencies {
     testImplementation "org.springframework:spring-jdbc"
     testImplementation "org.springframework.boot:spring-boot-starter-web"
     testImplementation project(":modules:libs:hermes:hermes-encryption:hermes-encryption-api")
-    testImplementation project(":modules:libs:hermes:hermes-auth:hermes-auth-repository:hermes-auth-repository-api")
 }

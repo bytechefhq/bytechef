@@ -27,10 +27,10 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.error.ErrorObject;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.job.domain.SimpleJob;
-import com.bytechef.atlas.job.service.JobService;
+import com.bytechef.atlas.service.job.JobService;
+import com.bytechef.atlas.service.task.execution.TaskExecutionService;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.task.execution.service.TaskExecutionService;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
 

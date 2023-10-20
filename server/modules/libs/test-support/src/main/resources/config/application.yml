@@ -20,7 +20,15 @@ spring:
     time-zone: UTC
 
 atlas:
-  coordinator:
-    enabled: true
+  persistence:
+    provider: jdbc
   serialization:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+  workflow-repository:
+    classpath:
+      enabled: true
+
+org:
+  jobrunr:
+    background-job-server:
+      enabled: true

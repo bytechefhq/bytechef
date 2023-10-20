@@ -19,10 +19,8 @@ package com.bytechef.task.handler.file.v1_0;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONParser;
 
 /**
  * @author Ivica Cardic
@@ -137,8 +135,7 @@ public class FileTaskDescriptorHandlerTest {
               "version": 1
             }
             """,
-                (JSONObject) JSONParser.parseJSON(
-                        objectMapper.writeValueAsString(new FileTaskDescriptorHandler().getTaskDescriptor())),
+                objectMapper.writeValueAsString(new FileTaskDescriptorHandler().getTaskDescriptor()),
                 true);
     }
 }

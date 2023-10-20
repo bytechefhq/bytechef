@@ -19,10 +19,8 @@ package com.bytechef.task.handler.csvfile.v1_0;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONParser;
 
 /**
  * @author Ivica Cardic
@@ -80,6 +78,7 @@ public class CSVFileTaskDescriptorHandlerTest {
                     {
                       "displayName": "Options",
                       "placeholder": "Add Option",
+                      "type": "OPTION",
                       "options": [
                         {
                           "description": "Delimiter to use when reading a csv file.",
@@ -165,6 +164,7 @@ public class CSVFileTaskDescriptorHandlerTest {
                     {
                       "displayName": "Options",
                       "placeholder": "Add Option",
+                      "type": "OPTION",
                       "options": [
                         {
                           "description": "File name to set for binary data. By default, \\"file.csv\\" will be used.",
@@ -209,8 +209,7 @@ public class CSVFileTaskDescriptorHandlerTest {
               "version": 1
             }
             """,
-                (JSONObject) JSONParser.parseJSON(
-                        objectMapper.writeValueAsString(new CSVFileTaskDescriptorHandler().getTaskDescriptor())),
+                objectMapper.writeValueAsString(new CSVFileTaskDescriptorHandler().getTaskDescriptor()),
                 true);
     }
 }

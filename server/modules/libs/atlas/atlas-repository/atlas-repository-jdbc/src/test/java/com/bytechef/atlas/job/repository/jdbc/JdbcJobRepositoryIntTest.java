@@ -25,7 +25,7 @@ import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.job.JobSummary;
 import com.bytechef.atlas.job.domain.Job;
 import com.bytechef.atlas.job.domain.SimpleJob;
-import com.bytechef.atlas.job.repository.JobRepository;
+import com.bytechef.atlas.repository.job.JobRepository;
 import com.bytechef.atlas.uuid.UUIDGenerator;
 import java.time.Instant;
 import java.util.Date;

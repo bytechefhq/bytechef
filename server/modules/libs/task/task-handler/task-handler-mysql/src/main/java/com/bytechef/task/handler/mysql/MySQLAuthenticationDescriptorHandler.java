@@ -16,17 +16,17 @@
 
 package com.bytechef.task.handler.mysql;
 
-import static com.bytechef.hermes.descriptor.domain.DSL.INTEGER_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.STRING_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.INTEGER_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.STRING_PROPERTY;
 import static com.bytechef.task.jdbc.JdbcTaskConstants.HOST;
 import static com.bytechef.task.jdbc.JdbcTaskConstants.PASSWORD;
 import static com.bytechef.task.jdbc.JdbcTaskConstants.PORT;
 import static com.bytechef.task.jdbc.JdbcTaskConstants.USERNAME;
 
-import com.bytechef.hermes.descriptor.domain.AuthenticationDescriptor;
-import com.bytechef.hermes.descriptor.domain.AuthenticationDescriptors;
-import com.bytechef.hermes.descriptor.domain.DSL;
 import com.bytechef.hermes.descriptor.handler.AuthenticationDescriptorHandler;
+import com.bytechef.hermes.descriptor.model.AuthenticationDescriptor;
+import com.bytechef.hermes.descriptor.model.AuthenticationDescriptors;
+import com.bytechef.hermes.descriptor.model.DSL;
 import java.util.List;
 import org.springframework.stereotype.Component;
 

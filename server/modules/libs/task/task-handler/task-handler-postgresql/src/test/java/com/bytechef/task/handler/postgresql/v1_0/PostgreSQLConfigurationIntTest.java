@@ -48,7 +48,7 @@ public class PostgreSQLConfigurationIntTest {
 
     @Test
     public void testDataSourceFactory() {
-        Authentication authentication = authenticationService.create(
+        Authentication authentication = authenticationService.add(
                 "name",
                 "postgresql",
                 Map.of(HOST, "host", PORT, 1234, DATABASE, "database", USERNAME, "username", PASSWORD, "password"));

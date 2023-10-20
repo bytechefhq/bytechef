@@ -20,12 +20,12 @@ package com.bytechef.task.dispatcher.parallel.completion;
 
 import com.bytechef.atlas.Constants;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
-import com.bytechef.atlas.counter.service.CounterService;
+import com.bytechef.atlas.service.counter.CounterService;
+import com.bytechef.atlas.service.task.execution.TaskExecutionService;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
-import com.bytechef.task.execution.service.TaskExecutionService;
 
 /**
  * A {@link TaskCompletionHandler} implementation which handles completions of parallel construct

@@ -22,13 +22,13 @@ import com.bytechef.atlas.event.Events;
 import com.bytechef.atlas.event.WorkflowEvent;
 import com.bytechef.atlas.job.JobStatus;
 import com.bytechef.atlas.job.domain.Job;
-import com.bytechef.atlas.job.service.JobService;
+import com.bytechef.atlas.service.job.JobService;
+import com.bytechef.atlas.service.task.execution.TaskExecutionService;
 import com.bytechef.atlas.task.CancelTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import com.bytechef.task.execution.service.TaskExecutionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

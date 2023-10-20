@@ -19,13 +19,15 @@
 package com.bytechef.task.handler.map;
 
 import com.bytechef.atlas.context.domain.MapContext;
-import com.bytechef.atlas.context.repository.memory.InMemoryContextRepository;
-import com.bytechef.atlas.context.service.ContextService;
-import com.bytechef.atlas.counter.repository.memory.InMemoryCounterRepository;
-import com.bytechef.atlas.counter.service.CounterService;
 import com.bytechef.atlas.error.Error;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
+import com.bytechef.atlas.repository.memory.context.InMemoryContextRepository;
+import com.bytechef.atlas.repository.memory.counter.InMemoryCounterRepository;
+import com.bytechef.atlas.repository.memory.task.execution.InMemoryTaskExecutionRepository;
+import com.bytechef.atlas.service.context.ContextService;
+import com.bytechef.atlas.service.counter.CounterService;
+import com.bytechef.atlas.service.task.execution.TaskExecutionService;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.Worker;
@@ -33,8 +35,6 @@ import com.bytechef.atlas.worker.concurrency.CurrentThreadExecutorService;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
-import com.bytechef.task.execution.repository.memory.InMemoryTaskExecutionRepository;
-import com.bytechef.task.execution.service.TaskExecutionService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

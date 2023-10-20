@@ -19,10 +19,8 @@ package com.bytechef.task.handler.odsfile.v1_0;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONParser;
 
 /**
  * @author Ivica Cardic
@@ -80,6 +78,7 @@ public class OdsFileTaskDescriptorHandlerTest {
                     {
                       "displayName": "Options",
                       "placeholder": "Add Option",
+                       "type": "OPTION",
                       "options": [
                         {
                           "description": "The first row of the file contains the header names.",
@@ -165,6 +164,7 @@ public class OdsFileTaskDescriptorHandlerTest {
                     {
                       "displayName": "Options",
                       "placeholder": "Add Option",
+                       "type": "OPTION",
                       "options": [
                         {
                           "description": "File name to set for binary data. By default, \\"file.ods\\" will be used.",
@@ -216,8 +216,7 @@ public class OdsFileTaskDescriptorHandlerTest {
               "version": 1
             }
             """,
-                (JSONObject) JSONParser.parseJSON(
-                        objectMapper.writeValueAsString(new OdsFileTaskDescriptorHandler().getTaskDescriptor())),
+                objectMapper.writeValueAsString(new OdsFileTaskDescriptorHandler().getTaskDescriptor()),
                 true);
     }
 }

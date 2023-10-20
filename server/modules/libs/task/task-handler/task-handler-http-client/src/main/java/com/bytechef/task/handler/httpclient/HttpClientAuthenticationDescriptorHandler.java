@@ -16,8 +16,8 @@
 
 package com.bytechef.task.handler.httpclient;
 
-import static com.bytechef.hermes.descriptor.domain.DSL.STRING_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.createAuthenticationDescriptor;
+import static com.bytechef.hermes.descriptor.model.DSL.STRING_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.createAuthenticationDescriptor;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.*;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.ADD_TO;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.KEY;
@@ -26,10 +26,10 @@ import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.TOKEN
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.USERNAME;
 import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.VALUE;
 
-import com.bytechef.hermes.descriptor.domain.AuthenticationDescriptor;
-import com.bytechef.hermes.descriptor.domain.AuthenticationDescriptors;
-import com.bytechef.hermes.descriptor.domain.DSL;
 import com.bytechef.hermes.descriptor.handler.AuthenticationDescriptorHandler;
+import com.bytechef.hermes.descriptor.model.AuthenticationDescriptor;
+import com.bytechef.hermes.descriptor.model.AuthenticationDescriptors;
+import com.bytechef.hermes.descriptor.model.DSL;
 import com.bytechef.task.handler.httpclient.HttpClientTaskConstants.ApiTokenLocation;
 import com.bytechef.task.handler.httpclient.HttpClientTaskConstants.AuthType;
 import java.util.List;

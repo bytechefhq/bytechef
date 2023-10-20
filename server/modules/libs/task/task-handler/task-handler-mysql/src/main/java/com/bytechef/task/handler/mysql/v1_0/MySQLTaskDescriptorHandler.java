@@ -16,11 +16,11 @@
 
 package com.bytechef.task.handler.mysql.v1_0;
 
-import static com.bytechef.hermes.descriptor.domain.DSL.option;
+import static com.bytechef.hermes.descriptor.model.DSL.option;
 
-import com.bytechef.hermes.descriptor.domain.DSL;
-import com.bytechef.hermes.descriptor.domain.TaskDescriptor;
 import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandler;
+import com.bytechef.hermes.descriptor.model.DSL;
+import com.bytechef.hermes.descriptor.model.TaskDescriptor;
 import com.bytechef.task.handler.mysql.MySQLTaskConstants;
 import com.bytechef.task.jdbc.JdbcTaskConstants;
 import org.springframework.stereotype.Component;

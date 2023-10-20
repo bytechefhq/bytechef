@@ -20,11 +20,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.bytechef.hermes.descriptor.domain.DSL;
 import com.bytechef.hermes.descriptor.handler.AuthenticationDescriptorHandler;
-import com.bytechef.hermes.descriptor.repository.ExtAuthenticationDescriptorHandlerRepository;
-import com.bytechef.hermes.descriptor.repository.ExtTaskDescriptorHandlerRepository;
-import com.bytechef.hermes.descriptor.service.AuthenticationDescriptorHandlerService;
+import com.bytechef.hermes.descriptor.handler.AuthenticationDescriptorHandlerResolver;
+import com.bytechef.hermes.descriptor.model.DSL;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -43,32 +41,26 @@ import org.springframework.test.web.servlet.MockMvc;
 public class AuthenticationDescriptorControllerTest {
 
     @MockBean
-    private ExtAuthenticationDescriptorHandlerRepository extAuthenticationDescriptorHandlerRepository;
-
-    @MockBean
-    private ExtTaskDescriptorHandlerRepository extTaskDescriptorHandlerRepository;
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private JdbcTemplate jdbcTemplate;
-
-    @MockBean
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @MockBean
-    private AuthenticationDescriptorHandlerService authenticationDescriptorHandlerService;
+    private AuthenticationDescriptorHandlerResolver authenticationDescriptorHandlerResolver;
 
-    private static final List<AuthenticationDescriptorHandler> TASK_AUTH_DESCRIPTOR_HANDLERS = List.of(
+    private static final List<AuthenticationDescriptorHandler> AUTHENTICATION_DESCRIPTOR_HANDLERS = List.of(
             () -> DSL.createAuthenticationDescriptors("task1", List.of(DSL.createAuthenticationDescriptor("auth1"))),
             () -> DSL.createAuthenticationDescriptors("task2", List.of(DSL.createAuthenticationDescriptor("auth2"))));
 
     @Test
     public void testGetAuthenticationDescriptor() throws Exception {
-        Mockito.doReturn(TASK_AUTH_DESCRIPTOR_HANDLERS.get(0))
-                .when(authenticationDescriptorHandlerService)
-                .getAuthenticationDescriptorHandler(Mockito.anyString());
+        Mockito.doReturn(AUTHENTICATION_DESCRIPTOR_HANDLERS.get(0))
+                .when(authenticationDescriptorHandlerResolver)
+                .resolve(Mockito.anyString());
 
         mockMvc.perform(get("/authentication-descriptors/task1").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -76,14 +68,14 @@ public class AuthenticationDescriptorControllerTest {
                         content()
                                 .json(
                                         """
-                                       {"taskName":"task1","authenticationDescriptors":[{"name":"auth1"}]}
+                                       {"name":"task1","authenticationDescriptors":[{"name":"auth1"}]}
                         """));
     }
 
     @Test
     public void testGetAuthenticationDescriptors() throws Exception {
-        Mockito.doReturn(TASK_AUTH_DESCRIPTOR_HANDLERS)
-                .when(authenticationDescriptorHandlerService)
+        Mockito.doReturn(AUTHENTICATION_DESCRIPTOR_HANDLERS)
+                .when(authenticationDescriptorHandlerResolver)
                 .getAuthenticationDescriptorHandlers();
 
         mockMvc.perform(get("/authentication-descriptors").accept(MediaType.APPLICATION_JSON))
@@ -93,8 +85,8 @@ public class AuthenticationDescriptorControllerTest {
                                 .json(
                                         """
                         [
-                            {"taskName":"task1","authenticationDescriptors":[{"name":"auth1"}]},
-                            {"taskName":"task2","authenticationDescriptors":[{"name":"auth2"}]}
+                            {"name":"task1","authenticationDescriptors":[{"name":"auth1"}]},
+                            {"name":"task2","authenticationDescriptors":[{"name":"auth2"}]}
                         ]
                         """));
     }

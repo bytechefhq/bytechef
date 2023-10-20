@@ -45,12 +45,12 @@ public class AuthenticationDescriptorHandlerResolverChain implements Authenticat
     }
 
     @Override
-    public AuthenticationDescriptorHandler resolve(String taskName) {
+    public AuthenticationDescriptorHandler resolve(String name) {
         AuthenticationDescriptorHandler authenticationDescriptorHandler = null;
 
         for (AuthenticationDescriptorHandlerResolver authenticationDescriptorHandlerResolver :
                 authenticationDescriptorHandlerResolvers) {
-            authenticationDescriptorHandler = authenticationDescriptorHandlerResolver.resolve(taskName);
+            authenticationDescriptorHandler = authenticationDescriptorHandlerResolver.resolve(name);
 
             if (authenticationDescriptorHandler != null) {
                 break;

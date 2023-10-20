@@ -20,8 +20,9 @@ import com.bytechef.atlas.Constants;
 import com.bytechef.atlas.MapObject;
 import com.bytechef.atlas.context.domain.Context;
 import com.bytechef.atlas.context.domain.MapContext;
-import com.bytechef.atlas.context.service.ContextService;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
+import com.bytechef.atlas.service.context.ContextService;
+import com.bytechef.atlas.service.task.execution.TaskExecutionService;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
@@ -30,7 +31,6 @@ import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
 import com.bytechef.atlas.uuid.UUIDGenerator;
 import com.bytechef.task.dispatcher.if_.IfTaskConstants;
 import com.bytechef.task.dispatcher.if_.util.IfTaskUtil;
-import com.bytechef.task.execution.service.TaskExecutionService;
 import java.util.Date;
 import java.util.List;
 

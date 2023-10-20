@@ -16,12 +16,12 @@
 
 package com.bytechef.atlas.coordinator.event;
 
-import com.bytechef.atlas.context.repository.ContextRepository;
-import com.bytechef.atlas.context.service.ContextService;
 import com.bytechef.atlas.coordinator.util.TestConfigurator;
 import com.bytechef.atlas.job.domain.Job;
-import com.bytechef.atlas.job.service.JobService;
-import com.bytechef.atlas.workflow.repository.mapper.JsonWorkflowMapper;
+import com.bytechef.atlas.repository.context.ContextRepository;
+import com.bytechef.atlas.repository.workflow.mapper.JsonWorkflowMapper;
+import com.bytechef.atlas.service.context.ContextService;
+import com.bytechef.atlas.service.job.JobService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

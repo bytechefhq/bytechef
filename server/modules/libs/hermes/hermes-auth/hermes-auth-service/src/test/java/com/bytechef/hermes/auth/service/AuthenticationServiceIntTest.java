@@ -18,7 +18,6 @@ package com.bytechef.hermes.auth.service;
 
 import com.bytechef.atlas.uuid.UUIDGenerator;
 import com.bytechef.hermes.auth.domain.Authentication;
-import com.bytechef.hermes.auth.domain.SimpleAuthentication;
 import com.bytechef.hermes.auth.repository.AuthenticationRepository;
 import java.util.Date;
 import java.util.List;
@@ -52,7 +51,7 @@ public class AuthenticationServiceIntTest {
 
     @Test
     public void testCreate() {
-        Authentication authentication = authenticationService.create("name", "type", Map.of("key1", "value1"));
+        Authentication authentication = authenticationService.add("name", "type", Map.of("key1", "value1"));
 
         Assertions.assertEquals("name", authentication.getName());
         Assertions.assertEquals(Map.of("key1", "value1"), authentication.getProperties());
@@ -67,7 +66,7 @@ public class AuthenticationServiceIntTest {
 
         Assertions.assertEquals(1, authenticationRepository.findAll().size());
 
-        authenticationService.delete(authentication.getId());
+        authenticationService.remove(authentication.getId());
 
         Assertions.assertEquals(0, authenticationRepository.findAll().size());
     }
@@ -101,8 +100,8 @@ public class AuthenticationServiceIntTest {
         Assertions.assertEquals("name2", updatedAuthentication.getName());
     }
 
-    private static SimpleAuthentication getSimpleAuthentication() {
-        SimpleAuthentication authentication = new SimpleAuthentication();
+    private static Authentication getSimpleAuthentication() {
+        Authentication authentication = new Authentication();
 
         authentication.setName("name");
         authentication.setId(UUIDGenerator.generate());

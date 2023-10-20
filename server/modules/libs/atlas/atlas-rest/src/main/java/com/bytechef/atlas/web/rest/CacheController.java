@@ -18,7 +18,6 @@
 
 package com.bytechef.atlas.web.rest;
 
-import com.bytechef.atlas.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.cache.Clearable;
 import java.util.Collections;
 import java.util.List;
@@ -35,7 +34,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
-@ConditionalOnCoordinator
 public class CacheController {
 
     private static final Logger logger = LoggerFactory.getLogger(CacheController.class);

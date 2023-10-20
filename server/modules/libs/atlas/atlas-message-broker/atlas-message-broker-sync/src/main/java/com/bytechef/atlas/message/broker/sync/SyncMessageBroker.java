@@ -37,11 +37,11 @@ public class SyncMessageBroker implements MessageBroker {
     private Map<String, List<Receiver>> listeners = new HashMap<>();
 
     @Override
-    public void send(String aRoutingKey, Object aMessage) {
-        List<Receiver> list = listeners.get(aRoutingKey);
-        Assert.isTrue(list != null && list.size() > 0, "no listeners subscribed for: " + aRoutingKey);
+    public void send(String routingKey, Object message) {
+        List<Receiver> list = listeners.get(routingKey);
+        Assert.isTrue(list != null && list.size() > 0, "no listeners subscribed for: " + routingKey);
         for (Receiver receiver : list) {
-            receiver.receive(aMessage);
+            receiver.receive(message);
         }
     }
 

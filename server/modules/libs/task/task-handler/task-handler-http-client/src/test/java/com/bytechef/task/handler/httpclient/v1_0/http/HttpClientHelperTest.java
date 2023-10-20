@@ -40,7 +40,7 @@ import static com.bytechef.task.handler.httpclient.HttpClientTaskConstants.VALUE
 
 import com.bytechef.atlas.MapObject;
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.hermes.auth.domain.SimpleAuthentication;
+import com.bytechef.hermes.auth.domain.Authentication;
 import com.bytechef.hermes.auth.service.AuthenticationService;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.converter.FileEntryConverter;
@@ -252,7 +252,7 @@ public class HttpClientHelperTest {
 
         taskExecution.put(AUTHENTICATION_ID, "authenticationId");
 
-        SimpleAuthentication authentication = new SimpleAuthentication();
+        Authentication authentication = new Authentication();
 
         authentication.setProperties(Map.of(KEY, "api_token", VALUE, "value"));
         authentication.setType(AuthType.API_KEY.name());

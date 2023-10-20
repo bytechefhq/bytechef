@@ -16,9 +16,9 @@
 
 package com.bytechef.hermes.descriptor.resolver;
 
-import com.bytechef.hermes.descriptor.domain.AuthenticationDescriptors;
 import com.bytechef.hermes.descriptor.handler.AuthenticationDescriptorHandler;
 import com.bytechef.hermes.descriptor.handler.AuthenticationDescriptorHandlerResolver;
+import com.bytechef.hermes.descriptor.model.AuthenticationDescriptors;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.core.annotation.Order;
@@ -44,13 +44,13 @@ public class InMemoryAuthenticationDescriptorHandlerResolver implements Authenti
     }
 
     @Override
-    public AuthenticationDescriptorHandler resolve(String taskName) {
+    public AuthenticationDescriptorHandler resolve(String name) {
         return authenticationDescriptorHandlers.stream()
                 .filter(taskDescriptorHandler -> {
                     AuthenticationDescriptors authenticationDescriptors =
                             taskDescriptorHandler.getAuthenticationDescriptors();
 
-                    return Objects.equals(authenticationDescriptors.getTaskName(), taskName);
+                    return Objects.equals(authenticationDescriptors.getName(), name);
                 })
                 .findFirst()
                 .orElse(null);

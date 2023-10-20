@@ -19,12 +19,12 @@ package com.bytechef.task.dispatcher.loop;
 import com.bytechef.atlas.Constants;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.service.task.execution.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import com.bytechef.task.execution.service.TaskExecutionService;
 import java.util.Date;
 import org.springframework.util.Assert;
 

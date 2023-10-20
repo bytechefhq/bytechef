@@ -16,23 +16,25 @@
 
 package com.bytechef.task.dispatcher.if_;
 
-import static com.bytechef.hermes.descriptor.domain.DSL.ARRAY_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.BOOLEAN_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.DATE_TIME_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.NUMBER_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.OBJECT_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.OPERATION;
-import static com.bytechef.hermes.descriptor.domain.DSL.STRING_PROPERTY;
-import static com.bytechef.hermes.descriptor.domain.DSL.hideWhen;
-import static com.bytechef.hermes.descriptor.domain.DSL.showWhen;
+import static com.bytechef.hermes.descriptor.model.DSL.ARRAY_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.BOOLEAN_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.DATE_TIME_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.NUMBER_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.OBJECT_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.OPERATION;
+import static com.bytechef.hermes.descriptor.model.DSL.STRING_PROPERTY;
+import static com.bytechef.hermes.descriptor.model.DSL.hideWhen;
+import static com.bytechef.hermes.descriptor.model.DSL.showWhen;
 
-import com.bytechef.hermes.descriptor.domain.DSL;
-import com.bytechef.hermes.descriptor.domain.TaskDescriptor;
 import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandler;
+import com.bytechef.hermes.descriptor.model.DSL;
+import com.bytechef.hermes.descriptor.model.TaskDescriptor;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
+@Component
 public class IfTaskDescriptorHandler implements TaskDescriptorHandler {
 
     private static final TaskDescriptor TASK_DESCRIPTOR = DSL.createTaskDescriptor(IfTaskConstants.TASK_IF)

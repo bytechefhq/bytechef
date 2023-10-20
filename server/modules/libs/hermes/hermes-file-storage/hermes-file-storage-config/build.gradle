@@ -1,0 +1,7 @@
+dependencies {
+    implementation "jakarta.annotation:jakarta.annotation-api"
+    implementation "org.springframework:spring-context"
+    implementation "org.springframework.boot:spring-boot-autoconfigure"
+    implementation project(":modules:libs:hermes:hermes-file-storage:hermes-file-storage-base64")
+    implementation project(":modules:libs:hermes:hermes-file-storage:hermes-file-storage-filesystem")
+}

@@ -16,13 +16,15 @@
 
 package com.bytechef.task.dispatcher.loop;
 
-import com.bytechef.hermes.descriptor.domain.DSL;
-import com.bytechef.hermes.descriptor.domain.TaskDescriptor;
 import com.bytechef.hermes.descriptor.handler.TaskDescriptorHandler;
+import com.bytechef.hermes.descriptor.model.DSL;
+import com.bytechef.hermes.descriptor.model.TaskDescriptor;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
+@Component
 public class LoopBreakTaskDescriptorHandler implements TaskDescriptorHandler {
 
     private static final TaskDescriptor TASK_DESCRIPTOR = DSL.createTaskDescriptor(

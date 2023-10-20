@@ -20,10 +20,11 @@ package com.bytechef.task.dispatcher.map;
 
 import com.bytechef.atlas.Constants;
 import com.bytechef.atlas.context.domain.MapContext;
-import com.bytechef.atlas.context.service.ContextService;
-import com.bytechef.atlas.counter.service.CounterService;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
+import com.bytechef.atlas.service.context.ContextService;
+import com.bytechef.atlas.service.counter.CounterService;
+import com.bytechef.atlas.service.task.execution.TaskExecutionService;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
@@ -32,7 +33,6 @@ import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
 import com.bytechef.atlas.uuid.UUIDGenerator;
-import com.bytechef.task.execution.service.TaskExecutionService;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -51,61 +51,74 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
     private final ContextService contextService;
     private final CounterService counterService;
 
-    private MapTaskDispatcher(Builder aBuilder) {
-        taskDispatcher = aBuilder.taskDispatcher;
-        taskExecutionService = aBuilder.taskExecutionService;
-        messageBroker = aBuilder.messageBroker;
-        contextService = aBuilder.contextService;
-        counterService = aBuilder.counterService;
-        taskEvaluator = aBuilder.taskEvaluator;
+    private MapTaskDispatcher(Builder builder) {
+        taskDispatcher = builder.taskDispatcher;
+        taskExecutionService = builder.taskExecutionService;
+        messageBroker = builder.messageBroker;
+        contextService = builder.contextService;
+        counterService = builder.counterService;
+        taskEvaluator = builder.taskEvaluator;
     }
 
     @Override
-    public void dispatch(TaskExecution aTask) {
-        List<Object> list = aTask.getList("list", Object.class);
+    public void dispatch(TaskExecution taskExecution) {
+        List<Object> list = taskExecution.getList("list", Object.class);
+        Map<String, Object> iteratee = taskExecution.getMap("iteratee");
+
         Assert.notNull(list, "'list' property can't be null");
-        Map<String, Object> iteratee = aTask.getMap("iteratee");
         Assert.notNull(iteratee, "'iteratee' property can't be null");
 
-        SimpleTaskExecution parentMapTask = SimpleTaskExecution.of(aTask);
+        SimpleTaskExecution parentMapTask = SimpleTaskExecution.of(taskExecution);
+
         parentMapTask.setStartTime(new Date());
         parentMapTask.setStatus(TaskStatus.STARTED);
+
         taskExecutionService.merge(parentMapTask);
 
         if (list.size() > 0) {
-            counterService.set(aTask.getId(), list.size());
+            counterService.set(taskExecution.getId(), list.size());
+
             for (int i = 0; i < list.size(); i++) {
                 Object item = list.get(i);
                 SimpleTaskExecution mapTask = SimpleTaskExecution.of(iteratee);
+
                 mapTask.setId(UUIDGenerator.generate());
-                mapTask.setParentId(aTask.getId());
+                mapTask.setParentId(taskExecution.getId());
                 mapTask.setStatus(TaskStatus.CREATED);
-                mapTask.setJobId(aTask.getJobId());
+                mapTask.setJobId(taskExecution.getJobId());
                 mapTask.setCreateTime(new Date());
-                mapTask.setPriority(aTask.getPriority());
+                mapTask.setPriority(taskExecution.getPriority());
                 mapTask.setTaskNumber(i + 1);
-                MapContext context = new MapContext(contextService.peek(aTask.getId()));
-                context.set(aTask.getString("itemVar", "item"), item);
-                context.set(aTask.getString("itemIndex", "itemIndex"), i);
+
+                MapContext context = new MapContext(contextService.peek(taskExecution.getId()));
+
+                context.set(taskExecution.getString("itemVar", "item"), item);
+                context.set(taskExecution.getString("itemIndex", "itemIndex"), i);
+
                 contextService.push(mapTask.getId(), context);
+
                 TaskExecution evaluatedEachTask = taskEvaluator.evaluate(mapTask, context);
+
                 taskExecutionService.create(evaluatedEachTask);
                 taskDispatcher.dispatch(evaluatedEachTask);
             }
         } else {
-            SimpleTaskExecution completion = SimpleTaskExecution.of(aTask);
+            SimpleTaskExecution completion = SimpleTaskExecution.of(taskExecution);
+
             completion.setStartTime(new Date());
             completion.setEndTime(new Date());
             completion.setExecutionTime(0);
+
             messageBroker.send(Queues.COMPLETIONS, completion);
         }
     }
 
     @Override
-    public TaskDispatcher<?> resolve(Task aTask) {
-        if (aTask.getType().equals(Constants.MAP)) {
+    public TaskDispatcher<?> resolve(Task task) {
+        if (task.getType().equals(Constants.MAP)) {
             return this;
         }
+
         return null;
     }
 
@@ -122,33 +135,39 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
         private ContextService contextService;
         private CounterService counterService;
 
-        public Builder taskDispatcher(TaskDispatcher<? super TaskExecution> aTaskDispatcher) {
-            taskDispatcher = aTaskDispatcher;
+        public Builder taskDispatcher(TaskDispatcher<? super TaskExecution> taskDispatcher) {
+            this.taskDispatcher = taskDispatcher;
+
             return this;
         }
 
-        public Builder taskEvaluator(TaskEvaluator aTaskEvaluator) {
-            taskEvaluator = aTaskEvaluator;
+        public Builder taskEvaluator(TaskEvaluator taskEvaluator) {
+            this.taskEvaluator = taskEvaluator;
+
             return this;
         }
 
         public Builder taskExecutionService(TaskExecutionService taskExecutionService) {
             this.taskExecutionService = taskExecutionService;
+
             return this;
         }
 
-        public Builder messageBroker(MessageBroker aMessageBroker) {
-            messageBroker = aMessageBroker;
+        public Builder messageBroker(MessageBroker messageBroker) {
+            this.messageBroker = messageBroker;
+
             return this;
         }
 
         public Builder contextService(ContextService contextService) {
             this.contextService = contextService;
+
             return this;
         }
 
         public Builder counterService(CounterService counterService) {
             this.counterService = counterService;
+
             return this;
         }
 

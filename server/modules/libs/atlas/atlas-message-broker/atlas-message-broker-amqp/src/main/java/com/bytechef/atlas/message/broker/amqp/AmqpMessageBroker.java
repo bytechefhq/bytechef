@@ -33,15 +33,15 @@ public class AmqpMessageBroker implements MessageBroker {
     private AmqpTemplate amqpTemplate;
 
     @Override
-    public void send(String aRoutingKey, Object aMessage) {
-        Assert.notNull(aRoutingKey, "routing key can't be null");
-        amqpTemplate.convertAndSend(determineExchange(aRoutingKey), determineRoutingKey(aRoutingKey), aMessage, m -> {
-            if (aMessage instanceof Retryable) {
-                Retryable r = (Retryable) aMessage;
+    public void send(String routingKey, Object message) {
+        Assert.notNull(routingKey, "routing key can't be null");
+        amqpTemplate.convertAndSend(determineExchange(routingKey), determineRoutingKey(routingKey), message, m -> {
+            if (message instanceof Retryable) {
+                Retryable r = (Retryable) message;
                 m.getMessageProperties().setDelay((int) r.getRetryDelayMillis());
             }
-            if (aMessage instanceof Prioritizable) {
-                Prioritizable p = (Prioritizable) aMessage;
+            if (message instanceof Prioritizable) {
+                Prioritizable p = (Prioritizable) message;
                 m.getMessageProperties().setPriority(p.getPriority());
             }
             return m;

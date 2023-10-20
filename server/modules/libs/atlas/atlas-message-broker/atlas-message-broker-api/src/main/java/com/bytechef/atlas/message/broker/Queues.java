@@ -27,10 +27,13 @@ public interface Queues {
     String COMPLETIONS = "completions";
     String ERRORS = "errors";
     String JOBS = "jobs";
+    String STOPS = "stops";
     String SUBFLOWS = "subflows";
     String EXECUTE = "execute";
     String DLQ = "dlq";
     String CONTROL = "x.control." + UUIDGenerator.generate();
+    String RESTARTS = "restarts";
+    String REQUESTS = "requests";
     String TASKS = "tasks";
     String EVENTS = "events";
 }

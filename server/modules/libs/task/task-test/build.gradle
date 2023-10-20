@@ -4,7 +4,7 @@ dependencies {
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-beans"
     implementation project(":modules:libs:atlas:atlas-coordinator:atlas-coordinator-impl")
-    implementation project(":modules:libs:atlas:atlas-event:atlas-event-impl")
+//    implementation project(":modules:libs:atlas:atlas-event:atlas-event-impl")
     implementation project(":modules:libs:atlas:atlas-message-broker:atlas-message-broker-sync")
     implementation project(":modules:libs:atlas:atlas-repository:atlas-repository-jdbc")
     implementation project(":modules:libs:atlas:atlas-worker:atlas-worker-impl")
