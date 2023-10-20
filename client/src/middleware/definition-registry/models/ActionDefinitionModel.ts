@@ -57,7 +57,7 @@ export interface ActionDefinitionModel {
      */
     outputSchema?: Array<PropertyModel>;
     /**
-     * The list of action properties.
+     * A list of action properties.
      * @type {Array<PropertyModel>}
      * @memberof ActionDefinitionModel
      */

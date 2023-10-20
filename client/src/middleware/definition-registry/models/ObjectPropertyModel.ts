@@ -87,7 +87,7 @@ export interface ObjectPropertyModel extends ValuePropertyModel {
      */
     optionsDataSource?: OptionsDataSourceModel;
     /**
-     * The list of valid object property types.
+     * A list of valid object property types.
      * @type {Array<PropertyModel>}
      * @memberof ObjectPropertyModel
      */

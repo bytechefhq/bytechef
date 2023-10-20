@@ -63,7 +63,7 @@ export interface IntegerPropertyModel extends ValuePropertyModel {
      */
     minValue?: number;
     /**
-     * The list of valid property options.
+     * A list of valid property options.
      * @type {Array<OptionModel>}
      * @memberof IntegerPropertyModel
      */

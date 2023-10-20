@@ -51,7 +51,7 @@ import {
  */
 export interface DatePropertyModel extends ValuePropertyModel {
     /**
-     * The list of valid property options.
+     * A list of valid property options.
      * @type {Array<OptionModel>}
      * @memberof DatePropertyModel
      */

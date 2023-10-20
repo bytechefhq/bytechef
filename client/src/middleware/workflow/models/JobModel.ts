@@ -117,7 +117,7 @@ export interface JobModel {
      */
     readonly status: JobModelStatusEnum;
     /**
-     * The list of the webhooks configured.
+     * A list of the webhooks configured.
      * @type {Array<{ [key: string]: object; }>}
      * @memberof JobModel
      */

@@ -33,7 +33,7 @@ import {
  */
 export interface DatePropertyAllOfModel {
     /**
-     * The list of valid property options.
+     * A list of valid property options.
      * @type {Array<OptionModel>}
      * @memberof DatePropertyAllOfModel
      */

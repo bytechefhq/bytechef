@@ -69,7 +69,7 @@ export interface NumberPropertyModel extends ValuePropertyModel {
      */
     numberPrecision?: number;
     /**
-     * The list of valid property options.
+     * A list of valid property options.
      * @type {Array<OptionModel>}
      * @memberof NumberPropertyModel
      */
