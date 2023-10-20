@@ -78,11 +78,13 @@ public class WorkflowTask implements Task {
             } else if (WorkflowConstants.TIMEOUT.equals(entry.getKey())) {
                 this.timeout = MapValueUtils.getString(source, WorkflowConstants.TIMEOUT);
             } else if (WorkflowConstants.TYPE.equals(entry.getKey())) {
-                this.type = MapValueUtils.getRequiredString(source, WorkflowConstants.TYPE);
+                this.type = MapValueUtils.getString(source, WorkflowConstants.TYPE);
             } else {
                 this.extensions.put(entry.getKey(), entry.getValue());
             }
         }
+
+        Assert.notNull(type, "'type' must not be null");
     }
 
     public static WorkflowTask of(Map<String, ?> source) {
