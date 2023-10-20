@@ -118,49 +118,55 @@ const NodeDetailsDialog = () => {
                             </Dialog.Title>
 
                             <div className="flex h-full flex-col">
-                                <div className="border-b border-gray-100 p-4">
-                                    {singleActionComponent && !!firstAction ? (
-                                        <>
-                                            <span className="block px-2 text-sm font-medium leading-6">
-                                                Action
-                                            </span>
-
-                                            <div className="overflow-hidden rounded-md bg-gray-100 py-2">
-                                                <span className="inline-flex px-4 text-sm font-medium">
-                                                    {firstAction.display.title}
+                                {currentComponent?.actions && (
+                                    <div className="border-b border-gray-100 p-4">
+                                        {singleActionComponent &&
+                                        !!firstAction ? (
+                                            <>
+                                                <span className="block px-2 text-sm font-medium leading-6">
+                                                    Action
                                                 </span>
 
-                                                <p className="mt-1 line-clamp-2 w-full overflow-hidden px-4 text-xs text-gray-500">
-                                                    {
-                                                        firstAction.display
-                                                            .description
-                                                    }
-                                                </p>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <Select
-                                            contentClassName="max-w-select-trigger-width max-h-select-content-available-height-1/2"
-                                            label="Actions"
-                                            options={currentComponent.actions!.map(
-                                                (action) => ({
-                                                    label: action.display
-                                                        .title!,
-                                                    value: action.name,
-                                                    description:
-                                                        action.display
-                                                            .description,
-                                                })
-                                            )}
-                                            triggerClassName="w-full bg-gray-100"
-                                            onValueChange={(value) => {
-                                                setCurrentActionName(value);
 
                                                 refetchCurrentAction();
-                                            }}
-                                        />
-                                    )}
-                                </div>
+                                                <div className="overflow-hidden rounded-md bg-gray-100 py-2">
+                                                    <span className="inline-flex px-4 text-sm font-medium">
+                                                        {
+                                                            firstAction.display
+                                                                .title
+                                                        }
+                                                    </span>
+
+                                                    <p className="mt-1 line-clamp-2 w-full overflow-hidden px-4 text-xs text-gray-500">
+                                                        {
+                                                            firstAction.display
+                                                                .description
+                                                        }
+                                                    </p>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <Select
+                                                contentClassName="max-w-select-trigger-width max-h-select-content-available-height-1/2"
+                                                label="Actions"
+                                                options={currentComponent.actions.map(
+                                                    (action) => ({
+                                                        label: action.display
+                                                            .title!,
+                                                        value: action.name,
+                                                        description:
+                                                            action.display
+                                                                .description,
+                                                    })
+                                                )}
+                                                triggerClassName="w-full bg-gray-100"
+                                                onValueChange={(value) => {
+                                                    setCurrentActionName(value);
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                )}
 
                                 <div className="mb-4 flex justify-center pt-4">
                                     {tabs.map((tab) => {
@@ -211,9 +217,14 @@ const NodeDetailsDialog = () => {
                                         />
                                     )}
 
-                                    {activeTab === 'output' && (
-                                        <OutputTab action={currentAction!} />
-                                    )}
+                                    {activeTab === 'output' &&
+                                        currentAction && (
+                                            <OutputTab
+                                                actionDefinition={
+                                                    currentAction!
+                                                }
+                                            />
+                                        )}
                                 </div>
                             </div>
 
