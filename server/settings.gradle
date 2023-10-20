@@ -59,6 +59,7 @@ dependencyResolutionManagement {
 include("modules:apps:cli-app")
 include("modules:apps:controller-app")
 include("modules:apps:coordinator-app")
+include("modules:apps:job-app")
 include("modules:apps:server-app")
 include("modules:apps:worker-app")
 include("modules:libs:hermes:hermes-auth:hermes-auth-api")
