@@ -43,25 +43,20 @@ public abstract class AbstractWorkerClient {
         UriBuilder uriBuilder, String componentName, String path, Object... uriVariables) {
 
         return process(uriBuilder, componentName, path)
-            .path("/api/internal" + path)
             .build(uriVariables);
     }
 
     protected URI toUri(
-        UriBuilder uriBuilder, String componentName, String path, Map<String, ?> uriVariables,
+        UriBuilder uriBuilder, ServiceInstance serviceInstance, String path, Map<String, ?> uriVariables,
         Map<String, List<String>> queryParams) {
 
-        return process(uriBuilder, componentName, path)
+        return process(uriBuilder, serviceInstance, path)
             .queryParams(CollectionUtils.toMultiValueMap(queryParams))
             .build(uriVariables);
     }
 
     protected URI toUri(UriBuilder uriBuilder, ServiceInstance serviceInstance, String path, Object... uriVariables) {
-        return uriBuilder
-            .scheme("http")
-            .host(serviceInstance.getHost())
-            .port(serviceInstance.getPort())
-            .path("/api/internal" + path)
+        return process(uriBuilder, serviceInstance, path)
             .build(uriVariables);
     }
 
@@ -69,6 +64,10 @@ public abstract class AbstractWorkerClient {
         ServiceInstance serviceInstance = WorkerDiscoveryUtils.filterServiceInstance(
             discoveryClient.getInstances(WORKER_SERVICE_APP), componentName);
 
+        return process(uriBuilder, serviceInstance, path);
+    }
+
+    private static UriBuilder process(UriBuilder uriBuilder, ServiceInstance serviceInstance, String path) {
         return uriBuilder
             .scheme("http")
             .host(serviceInstance.getHost())

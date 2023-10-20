@@ -72,9 +72,9 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     TaskDispatcherDefinitionServiceClient taskDispatcherDefinitionServiceClient(
-        @Qualifier("coordinatorWebClientBuilder") WebClient.Builder coordinatorWebClientBuilder) {
+        @Qualifier("loadBalancedWebClientBuilder") WebClient.Builder loadBalancedWebClientBuilder) {
 
-        return new TaskDispatcherDefinitionServiceClient(coordinatorWebClientBuilder);
+        return new TaskDispatcherDefinitionServiceClient(loadBalancedWebClientBuilder);
     }
 
     @Bean

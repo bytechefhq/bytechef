@@ -21,7 +21,6 @@ import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -30,20 +29,15 @@ import java.util.List;
  */
 public class TaskDispatcherDefinitionServiceClient implements TaskDispatcherDefinitionService {
 
-    private final WebClient.Builder coordinatorWebClientBuilder;
+    private final WebClient.Builder loadBalancedWebClientBuilder;
 
-    public TaskDispatcherDefinitionServiceClient(WebClient.Builder coordinatorWebClientBuilder) {
-        this.coordinatorWebClientBuilder = coordinatorWebClientBuilder;
+    public TaskDispatcherDefinitionServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
+        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
     }
 
     @Override
     public TaskDispatcherDefinitionDTO getTaskDispatcherDefinition(String name, Integer version) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Mono<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitionMono(String name, Integer version) {
-        return coordinatorWebClientBuilder
+        return loadBalancedWebClientBuilder
             .build()
             .get()
             .uri(uriBuilder -> uriBuilder
@@ -51,17 +45,13 @@ public class TaskDispatcherDefinitionServiceClient implements TaskDispatcherDefi
                 .path("/api/internal/task-dispatcher-definitions/{name}/{version}")
                 .build(name, version))
             .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<>() {});
+            .bodyToMono(new ParameterizedTypeReference<TaskDispatcherDefinitionDTO>() {})
+            .block();
     }
 
     @Override
     public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitions() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Mono<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitionsMono() {
-        return coordinatorWebClientBuilder
+        return loadBalancedWebClientBuilder
             .build()
             .get()
             .uri(uriBuilder -> uriBuilder
@@ -69,17 +59,13 @@ public class TaskDispatcherDefinitionServiceClient implements TaskDispatcherDefi
                 .path("/api/internal/task-dispatcher-definitions")
                 .build())
             .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<>() {});
+            .bodyToMono(new ParameterizedTypeReference<List<TaskDispatcherDefinitionDTO>>() {})
+            .block();
     }
 
     @Override
     public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitionVersions(String name) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Mono<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitionVersionsMono(String name) {
-        return coordinatorWebClientBuilder
+        return loadBalancedWebClientBuilder
             .build()
             .get()
             .uri(uriBuilder -> uriBuilder
@@ -87,6 +73,7 @@ public class TaskDispatcherDefinitionServiceClient implements TaskDispatcherDefi
                 .path("/api/internal/task-dispatcher-definitions/{name}/versions")
                 .build(name))
             .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<>() {});
+            .bodyToMono(new ParameterizedTypeReference<List<TaskDispatcherDefinitionDTO>>() {})
+            .block();
     }
 }

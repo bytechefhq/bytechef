@@ -23,11 +23,11 @@ import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerAccessor;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 /**
  * @author Ivica Cardic
@@ -51,16 +51,17 @@ public class TriggerHandlerController {
         produces = {
             "application/json"
         })
-    public Mono<Object> handle(@Valid @RequestBody TriggerHandlerHandleRequest triggerHandlerHandleRequest) {
+    public ResponseEntity<Object> handle(@Valid @RequestBody TriggerHandlerHandleRequest triggerHandlerHandleRequest) {
         TriggerHandler<?> triggerHandler = triggerHandlerAccessor.getTriggerHandler(triggerHandlerHandleRequest.type());
 
         try {
             Object output = triggerHandler.handle(triggerHandlerHandleRequest.triggerExecution());
 
             if (output == null) {
-                return Mono.empty();
+                return ResponseEntity.noContent()
+                    .build();
             } else {
-                return Mono.just(output);
+                return ResponseEntity.ok(output);
             }
         } catch (TriggerExecutionException e) {
             throw new RuntimeException(e);

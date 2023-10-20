@@ -20,11 +20,11 @@ package com.bytechef.hermes.definition.registry.service.web.rest.service;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -43,34 +43,34 @@ public class ComponentDefinitionServiceController {
     }
 
     @RequestMapping(
-        method = RequestMethod.POST,
+        method = RequestMethod.GET,
         value = "/component-definitions",
         produces = {
             "application/json"
         })
-    public Mono<List<ComponentDefinitionDTO>> getComponentDefinitions() {
-        return Mono.just(componentDefinitionService.getComponentDefinitions());
+    public ResponseEntity<List<ComponentDefinitionDTO>> getComponentDefinitions() {
+        return ResponseEntity.ok(componentDefinitionService.getComponentDefinitions());
     }
 
     @RequestMapping(
-        method = RequestMethod.POST,
+        method = RequestMethod.GET,
         value = "/component-definitions/{name}",
         produces = {
             "application/json"
         })
-    public Mono<List<ComponentDefinitionDTO>> getComponentDefinitions(@PathVariable("name") String name) {
-        return Mono.just(componentDefinitionService.getComponentDefinitions(name));
+    public ResponseEntity<List<ComponentDefinitionDTO>> getComponentDefinitions(@PathVariable("name") String name) {
+        return ResponseEntity.ok(componentDefinitionService.getComponentDefinitions(name));
     }
 
     @RequestMapping(
-        method = RequestMethod.POST,
+        method = RequestMethod.GET,
         value = "/component-definitions/{name}/{version}",
         produces = {
             "application/json"
         })
-    public Mono<ComponentDefinitionDTO> getComponentDefinition(
+    public ResponseEntity<ComponentDefinitionDTO> getComponentDefinition(
         @PathVariable("name") String name, @PathVariable("version") Integer version) {
 
-        return Mono.just(componentDefinitionService.getComponentDefinition(name, version));
+        return ResponseEntity.ok(componentDefinitionService.getComponentDefinition(name, version));
     }
 }

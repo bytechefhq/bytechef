@@ -25,9 +25,8 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
  * Controller advice to translate the server side exceptions to client-friendly json structures. The error response
@@ -44,15 +43,13 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     private static final String MESSAGE_KEY = "message";
 
     @ExceptionHandler
-    public Mono<ResponseEntity<ProblemDetail>> handleConcurrencyFailure(
-        ConcurrencyFailureException concurrencyFailureException, ServerWebExchange serverWebExchange) {
+    public ResponseEntity<ProblemDetail> handleConcurrencyFailure(
+        ConcurrencyFailureException concurrencyFailureException, WebRequest request) {
 
-        return Mono.just(
-            ResponseEntity
-                .of(
-                    createProblemDetail(
-                        concurrencyFailureException, HttpStatus.CONFLICT, "Concurrency Failure", MESSAGE_KEY,
-                        DETAIL_MESSAGE_ARGUMENTS, serverWebExchange))
-                .build());
+        return ResponseEntity.of(
+            createProblemDetail(
+                concurrencyFailureException, HttpStatus.CONFLICT, "Concurrency Failure", MESSAGE_KEY,
+                DETAIL_MESSAGE_ARGUMENTS, request))
+            .build();
     }
 }

@@ -18,7 +18,6 @@
 package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -29,14 +28,7 @@ public interface TaskDispatcherDefinitionService {
 
     TaskDispatcherDefinitionDTO getTaskDispatcherDefinition(String name, Integer version);
 
-    Mono<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitionMono(String name, Integer version);
-
     List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitions();
 
-    Mono<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitionsMono();
-
     List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitionVersions(String name);
-
-    Mono<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitionVersionsMono(String name);
-
 }

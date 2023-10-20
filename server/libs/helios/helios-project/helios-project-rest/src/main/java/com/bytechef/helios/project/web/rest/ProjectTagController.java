@@ -24,9 +24,8 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -46,13 +45,10 @@ public class ProjectTagController implements ProjectTagsApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<TagModel>>> getProjectTags(ServerWebExchange exchange) {
-        return Mono.just(
-            Flux.fromIterable(
-                projectFacade.getProjectTags()
-                    .stream()
-                    .map(tag -> conversionService.convert(tag, TagModel.class))
-                    .toList()))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<List<TagModel>> getProjectTags() {
+        return ResponseEntity.ok(projectFacade.getProjectTags()
+            .stream()
+            .map(tag -> conversionService.convert(tag, TagModel.class))
+            .toList());
     }
 }

@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.definition.registry.service.web.rest.client.service;
 
-import com.bytechef.commons.reactor.util.MonoUtils;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
@@ -83,29 +82,29 @@ public class ActionDefinitionServiceClient extends AbstractWorkerClient
     public ActionDefinitionDTO getComponentActionDefinition(
         String actionName, String componentName, int componentVersion) {
 
-        return MonoUtils.get(
-            WORKER_WEB_CLIENT
-                .get()
-                .uri(uriBuilder -> toUri(
-                    uriBuilder, componentName,
-                    "/component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}",
-                    componentName, componentVersion, actionName))
-                .retrieve()
-                .bodyToMono(ActionDefinitionDTO.class));
+        return WORKER_WEB_CLIENT
+            .get()
+            .uri(uriBuilder -> toUri(
+                uriBuilder, componentName,
+                "/component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}",
+                componentName, componentVersion, actionName))
+            .retrieve()
+            .bodyToMono(ActionDefinitionDTO.class)
+            .block();
     }
 
     @Override
     public List<ActionDefinitionDTO> getComponentActionDefinitions(
         String componentName, int componentVersion) {
 
-        return MonoUtils.get(
-            WORKER_WEB_CLIENT
-                .get()
-                .uri(uriBuilder -> toUri(
-                    uriBuilder, componentName,
-                    "/component-definitions/{componentName}/{componentVersion}/action-definitions}", componentName,
-                    componentVersion))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<>() {}));
+        return WORKER_WEB_CLIENT
+            .get()
+            .uri(uriBuilder -> toUri(
+                uriBuilder, componentName,
+                "/component-definitions/{componentName}/{componentVersion}/action-definitions}", componentName,
+                componentVersion))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<ActionDefinitionDTO>>() {})
+            .block();
     }
 }

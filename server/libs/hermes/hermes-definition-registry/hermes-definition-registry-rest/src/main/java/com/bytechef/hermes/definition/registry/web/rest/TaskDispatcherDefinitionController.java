@@ -21,14 +21,12 @@ import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionS
 import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.TaskDispatcherDefinitionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -49,39 +47,35 @@ public class TaskDispatcherDefinitionController implements TaskDispatcherDefinit
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<TaskDispatcherDefinitionModel>> getTaskDispatcherDefinition(
-        String taskDispatcherName, Integer taskDispatcherVersion, ServerWebExchange exchange) {
+    public ResponseEntity<TaskDispatcherDefinitionModel> getTaskDispatcherDefinition(
+        String taskDispatcherName, Integer taskDispatcherVersion) {
 
-        return taskDispatcherDefinitionService
-            .getTaskDispatcherDefinitionMono(taskDispatcherName, taskDispatcherVersion)
-            .map(taskDispatcherDefinitionDTO -> conversionService.convert(
-                taskDispatcherDefinitionDTO, TaskDispatcherDefinitionModel.class))
-            .map(ResponseEntity::ok);
+        return ResponseEntity.ok(
+            conversionService.convert(
+                taskDispatcherDefinitionService
+                    .getTaskDispatcherDefinition(taskDispatcherName, taskDispatcherVersion),
+                TaskDispatcherDefinitionModel.class));
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<TaskDispatcherDefinitionModel>>> getTaskDispatcherDefinitions(
-        @Parameter(hidden = true) ServerWebExchange exchange) {
-
-        return taskDispatcherDefinitionService.getTaskDispatcherDefinitionsMono()
-            .map(taskDispatcherDefinitions -> taskDispatcherDefinitions.stream()
+    public ResponseEntity<List<TaskDispatcherDefinitionModel>> getTaskDispatcherDefinitions() {
+        return ResponseEntity.ok(
+            taskDispatcherDefinitionService.getTaskDispatcherDefinitions()
+                .stream()
                 .map(taskDispatcherDefinition -> conversionService.convert(
                     taskDispatcherDefinition, TaskDispatcherDefinitionModel.class))
-                .toList())
-            .map(Flux::fromIterable)
-            .map(ResponseEntity::ok);
+                .toList());
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<TaskDispatcherDefinitionBasicModel>>> getTaskDispatcherDefinitionVersions(
-        String taskDispatcherName, ServerWebExchange exchange) {
+    public ResponseEntity<List<TaskDispatcherDefinitionBasicModel>> getTaskDispatcherDefinitionVersions(
+        String taskDispatcherName) {
 
-        return taskDispatcherDefinitionService.getTaskDispatcherDefinitionVersionsMono(taskDispatcherName)
-            .map(taskDispatcherDefinitions -> taskDispatcherDefinitions.stream()
+        return ResponseEntity.ok(
+            taskDispatcherDefinitionService.getTaskDispatcherDefinitionVersions(taskDispatcherName)
+                .stream()
                 .map(taskDispatcherDefinition -> conversionService.convert(
                     taskDispatcherDefinition, TaskDispatcherDefinitionBasicModel.class))
-                .toList())
-            .map(Flux::fromIterable)
-            .map(ResponseEntity::ok);
+                .toList());
     }
 }

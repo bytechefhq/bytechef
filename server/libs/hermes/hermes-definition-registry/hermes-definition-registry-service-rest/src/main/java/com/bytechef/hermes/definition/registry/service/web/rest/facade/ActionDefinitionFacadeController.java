@@ -23,11 +23,11 @@ import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -52,11 +52,10 @@ public class ActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public Mono<String> executeEditorDescription(@Valid @RequestBody EditorDescription editorDescription) {
-        return Mono.just(
-            actionDefinitionFacade.executeEditorDescription(
-                editorDescription.actionName, editorDescription.componentName, editorDescription.componentVersion,
-                editorDescription.actionParameters, editorDescription.connectionId));
+    public ResponseEntity<String> executeEditorDescription(@Valid @RequestBody EditorDescription editorDescription) {
+        return ResponseEntity.ok(actionDefinitionFacade.executeEditorDescription(
+            editorDescription.actionName, editorDescription.componentName, editorDescription.componentVersion,
+            editorDescription.actionParameters, editorDescription.connectionId));
     }
 
     @RequestMapping(
@@ -65,9 +64,9 @@ public class ActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public Mono<List<OptionDTO>> executeOptions(@Valid @RequestBody Options options) {
+    public ResponseEntity<List<OptionDTO>> executeOptions(@Valid @RequestBody Options options) {
 
-        return Mono.just(
+        return ResponseEntity.ok(
             actionDefinitionFacade.executeOptions(
                 options.propertyName, options.actionName, options.componentName, options.componentVersion,
                 options.actionParameters, options.connectionId));
@@ -79,9 +78,10 @@ public class ActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public Mono<List<? extends ValuePropertyDTO<?>>> executeProperties(@Valid @RequestBody Properties properties) {
+    public ResponseEntity<List<? extends ValuePropertyDTO<?>>>
+        executeProperties(@Valid @RequestBody Properties properties) {
 
-        return Mono.just(
+        return ResponseEntity.ok(
             actionDefinitionFacade.executeDynamicProperties(
                 properties.propertyName, properties.actionName, properties.componentName, properties.componentVersion,
                 properties.actionParameters, properties.connectionId));
@@ -93,10 +93,10 @@ public class ActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public Mono<List<? extends ValuePropertyDTO<?>>>
+    public ResponseEntity<List<? extends ValuePropertyDTO<?>>>
         executeOutputSchema(@Valid @RequestBody OutputSchema outputSchema) {
 
-        return Mono.just(
+        return ResponseEntity.ok(
             actionDefinitionFacade.executeOutputSchema(
                 outputSchema.actionName, outputSchema.componentName, outputSchema.componentVersion,
                 outputSchema.actionParameters, outputSchema.connectionId));
@@ -108,9 +108,9 @@ public class ActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public Mono<Object> executeSampleOutput(@Valid @RequestBody SampleOutput sampleOutput) {
+    public ResponseEntity<Object> executeSampleOutput(@Valid @RequestBody SampleOutput sampleOutput) {
 
-        return Mono.just(
+        return ResponseEntity.ok(
             actionDefinitionFacade.executeSampleOutput(
                 sampleOutput.actionName, sampleOutput.componentName, sampleOutput.componentVersion,
                 sampleOutput.actionParameters, sampleOutput.connectionId));

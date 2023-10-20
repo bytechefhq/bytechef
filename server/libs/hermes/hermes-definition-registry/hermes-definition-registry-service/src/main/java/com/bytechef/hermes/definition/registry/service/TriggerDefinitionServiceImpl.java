@@ -45,7 +45,6 @@ import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.component.factory.ContextConnectionFactory;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -269,12 +268,6 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public Mono<TriggerDefinitionDTO>
-        getTriggerDefinitionMono(String triggerName, String componentName, int componentVersion) {
-        return Mono.just(getTriggerDefinition(triggerName, componentName, componentVersion));
-    }
-
-    @Override
     public List<TriggerDefinitionDTO> getTriggerDefinitions(String componentName, int componentVersion) {
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
@@ -283,11 +276,6 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             .stream()
             .map(triggerDefinition -> toTriggerDefinitionDTO(triggerDefinition, componentDefinition))
             .toList();
-    }
-
-    @Override
-    public Mono<List<TriggerDefinitionDTO>> getTriggerDefinitionsMono(String componentName, int componentVersion) {
-        return Mono.just(getTriggerDefinitions(componentName, componentVersion));
     }
 
     private TriggerDefinitionDTO toTriggerDefinitionDTO(

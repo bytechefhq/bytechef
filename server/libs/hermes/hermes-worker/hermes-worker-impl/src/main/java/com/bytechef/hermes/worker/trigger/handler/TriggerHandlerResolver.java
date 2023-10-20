@@ -30,7 +30,7 @@ public class TriggerHandlerResolver {
         this.triggerHandlerAccessor = triggerHandlerAccessor;
     }
 
-    public TriggerHandler resolve(Trigger trigger) {
+    public TriggerHandler<?> resolve(Trigger trigger) {
         return triggerHandlerAccessor.getTriggerHandler(trigger.getType());
     }
 }

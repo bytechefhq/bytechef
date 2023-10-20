@@ -27,12 +27,12 @@ import org.springframework.web.reactive.function.client.WebClient;
  * @author Ivica Cardic
  */
 @Configuration
-@LoadBalancerClient(name = "coordinator-service-app")
+@LoadBalancerClient("coordinator-service-app")
 public class WebClientConfiguration {
 
     @LoadBalanced
     @Bean
-    WebClient.Builder coordinatorWebClientBuilder() {
+    WebClient.Builder loadBalancedWebClientBuilder() {
         return WebClient.builder();
     }
 }

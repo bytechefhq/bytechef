@@ -24,9 +24,8 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -46,13 +45,10 @@ public class IntegrationCategoryController implements IntegrationCategoriesApi {
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<CategoryModel>>> getIntegrationCategories(ServerWebExchange exchange) {
-        return Mono.just(
-            Flux.fromIterable(
-                integrationFacade.getIntegrationCategories()
-                    .stream()
-                    .map(category -> conversionService.convert(category, CategoryModel.class))
-                    .toList()))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<List<CategoryModel>> getIntegrationCategories() {
+        return ResponseEntity.ok(integrationFacade.getIntegrationCategories()
+            .stream()
+            .map(category -> conversionService.convert(category, CategoryModel.class))
+            .toList());
     }
 }

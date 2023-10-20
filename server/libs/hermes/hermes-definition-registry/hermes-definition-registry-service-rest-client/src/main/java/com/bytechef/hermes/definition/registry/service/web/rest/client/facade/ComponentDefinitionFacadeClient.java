@@ -18,12 +18,12 @@
 package com.bytechef.hermes.definition.registry.service.web.rest.client.facade;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
-import com.bytechef.commons.reactor.util.MonoUtils;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.web.rest.client.AbstractWorkerClient;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.util.LinkedMultiValueMap;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -45,23 +45,37 @@ public class ComponentDefinitionFacadeClient extends AbstractWorkerClient implem
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
         Boolean triggerDefinitions) {
 
-        return MonoUtils.get(
-            Mono.zip(
-                WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
-                    .stream()
-                    .map(serviceInstance -> WORKER_WEB_CLIENT
-                        .get()
-                        .uri(uriBuilder -> toUri(
-                            uriBuilder, serviceInstance, "/component-definitions/search", null,
-                            Map.of(
-                                "actionDefinitions", List.of(actionDefinitions),
-                                "connectionDefinitions", List.of(connectionDefinitions),
-                                "connectionInstances", List.of(connectionInstances),
-                                "triggerDefinitions", List.of(triggerDefinitions))))
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
-                    .toList(),
-                this::toComponentDefinitions));
+        return Mono.zip(
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))
+                .stream()
+                .map(serviceInstance -> WORKER_WEB_CLIENT
+                    .get()
+                    .uri(uriBuilder -> toUri(
+                        uriBuilder, serviceInstance, "/component-definitions/search", Map.of(),
+                        new LinkedMultiValueMap<>() {
+                            {
+                                if (actionDefinitions != null) {
+                                    put("actionDefinitions", List.of(actionDefinitions.toString()));
+                                }
+
+                                if (connectionDefinitions != null) {
+                                    put("connectionDefinitions", List.of(connectionDefinitions.toString()));
+                                }
+
+                                if (connectionInstances != null) {
+                                    put("connectionInstances", List.of(connectionInstances.toString()));
+                                }
+
+                                if (triggerDefinitions != null) {
+                                    put("triggerDefinitions", List.of(triggerDefinitions.toString()));
+                                }
+                            }
+                        }))
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
+                .toList(),
+            this::toComponentDefinitions)
+            .block();
     }
 
     @SuppressWarnings("unchecked")

@@ -23,11 +23,11 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerAccessor;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 /**
  * @author Ivica Cardic
@@ -51,16 +51,17 @@ public class TaskHandlerController {
         produces = {
             "application/json"
         })
-    public Mono<Object> handle(@Valid @RequestBody TaskHandlerHandleRequest taskHandlerHandleRequest) {
+    public ResponseEntity<Object> handle(@Valid @RequestBody TaskHandlerHandleRequest taskHandlerHandleRequest) {
         TaskHandler<?> taskHandler = taskHandlerAccessor.getTaskHandler(taskHandlerHandleRequest.type());
 
         try {
             Object output = taskHandler.handle(taskHandlerHandleRequest.taskExecution());
 
             if (output == null) {
-                return Mono.empty();
+                return ResponseEntity.noContent()
+                    .build();
             } else {
-                return Mono.just(output);
+                return ResponseEntity.ok(output);
             }
         } catch (TaskExecutionException e) {
             throw new RuntimeException(e);

@@ -7,7 +7,6 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     configOptions = [
         "dateLibrary": "java8-localdatetime",
         "interfaceOnly": "true",
-
         "useSpringBoot3": "true"
     ]
     generatorName = "spring"
@@ -41,6 +40,8 @@ dependencies {
     annotationProcessor libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions
 
     api project(":server:libs:core:oauth2:oauth2-api")
+
+    compileOnly "jakarta.servlet:jakarta.servlet-api:6.0.0"
 
     implementation libs.io.swagger.core.v3.swagger.annotations
     implementation "jakarta.annotation:jakarta.annotation-api"

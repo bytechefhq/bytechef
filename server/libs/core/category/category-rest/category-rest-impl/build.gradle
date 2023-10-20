@@ -34,6 +34,8 @@ tasks.register("generateOpenAPI") {
 dependencies {
     api project(":server:libs:core:category:category-rest:category-rest-api")
 
+    compileOnly "jakarta.servlet:jakarta.servlet-api:6.0.0"
+
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-web"

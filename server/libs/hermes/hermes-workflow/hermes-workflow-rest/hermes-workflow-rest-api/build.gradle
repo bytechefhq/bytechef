@@ -8,6 +8,8 @@ dependencies {
     api project(":server:libs:atlas:atlas-api")
     api project(":server:libs:hermes:hermes-workflow:hermes-workflow-api")
 
+    compileOnly "jakarta.servlet:jakarta.servlet-api:6.0.0"
+
     implementation libs.io.swagger.core.v3.swagger.annotations
     implementation "jakarta.annotation:jakarta.annotation-api"
     implementation "jakarta.validation:jakarta.validation-api"

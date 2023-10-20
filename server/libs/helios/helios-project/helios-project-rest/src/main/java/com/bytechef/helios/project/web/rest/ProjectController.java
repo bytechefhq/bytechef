@@ -30,9 +30,6 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -55,111 +52,87 @@ public class ProjectController implements ProjectsApi {
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<ProjectModel>> createProject(
-        Mono<ProjectModel> projectModelMono, ServerWebExchange exchange) {
+    public ResponseEntity<ProjectModel> createProject(ProjectModel projectModel) {
 
-        return projectModelMono
-            .map(
-                projectModel -> conversionService.convert(
-                    projectFacade.createProject(conversionService.convert(projectModel, ProjectDTO.class)),
-                    ProjectModel.class))
-            .map(ResponseEntity::ok);
+        return ResponseEntity.ok(
+            conversionService.convert(
+                projectFacade.createProject(conversionService.convert(projectModel, ProjectDTO.class)),
+                ProjectModel.class));
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<WorkflowModel>> createProjectWorkflow(
-        Long id, Mono<CreateProjectWorkflowRequestModel> createProjectWorkflowRequestModelMono,
-        ServerWebExchange exchange) {
+    public ResponseEntity<WorkflowModel> createProjectWorkflow(
+        Long id, CreateProjectWorkflowRequestModel createProjectWorkflowRequestModel) {
 
-        return createProjectWorkflowRequestModelMono
-            .map(
-                requestModel -> conversionService.convert(
-                    projectFacade.addProjectWorkflow(
-                        id, requestModel.getLabel(), requestModel.getDescription(), requestModel.getDefinition()),
-                    WorkflowModel.class))
-            .map(ResponseEntity::ok);
+        return ResponseEntity.ok(conversionService.convert(
+            projectFacade.addProjectWorkflow(
+                id, createProjectWorkflowRequestModel.getLabel(), createProjectWorkflowRequestModel.getDescription(),
+                createProjectWorkflowRequestModel.getDefinition()),
+            WorkflowModel.class));
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> deleteProject(Long id, ServerWebExchange exchange) {
+    public ResponseEntity<Void> deleteProject(Long id) {
         projectFacade.deleteProject(id);
 
-        return Mono.just(
-            ResponseEntity
-                .ok()
-                .build());
+        return ResponseEntity
+            .ok()
+            .build();
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<ProjectModel>> duplicateProject(Long id, ServerWebExchange exchange) {
-        return Mono
-            .just(conversionService.convert(projectFacade.duplicateProject(id), ProjectModel.class))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<ProjectModel> duplicateProject(Long id) {
+        return ResponseEntity.ok(conversionService.convert(projectFacade.duplicateProject(id), ProjectModel.class));
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<ProjectModel>> getProject(Long id, ServerWebExchange exchange) {
-        return Mono
-            .just(conversionService.convert(projectFacade.getProject(id), ProjectModel.class))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<ProjectModel> getProject(Long id) {
+        return ResponseEntity.ok(conversionService.convert(projectFacade.getProject(id), ProjectModel.class));
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<ProjectModel>>> getProjects(
-        List<Long> categoryIds, Boolean projectInstances, List<Long> tagIds, ServerWebExchange exchange) {
+    public ResponseEntity<List<ProjectModel>> getProjects(
+        List<Long> categoryIds, Boolean projectInstances, List<Long> tagIds) {
 
-        return Mono.just(
-            Flux.fromIterable(
-                projectFacade.searchProjects(categoryIds, projectInstances != null, tagIds)
-                    .stream()
-                    .map(project -> conversionService.convert(project, ProjectModel.class))
-                    .toList()))
-            .map(ResponseEntity::ok);
+        return ResponseEntity.ok(
+            projectFacade.searchProjects(categoryIds, projectInstances != null, tagIds)
+                .stream()
+                .map(project -> conversionService.convert(project, ProjectModel.class))
+                .toList());
     }
 
     @Override
-    public Mono<ResponseEntity<Flux<WorkflowModel>>> getProjectWorkflows(Long id, ServerWebExchange exchange) {
-        return Mono.just(
-            Flux.fromIterable(
-                projectFacade.getProjectWorkflows(id)
-                    .stream()
-                    .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
-                    .toList()))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<List<WorkflowModel>> getProjectWorkflows(Long id) {
+        return ResponseEntity.ok(
+            projectFacade.getProjectWorkflows(id)
+                .stream()
+                .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
+                .toList());
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public Mono<ResponseEntity<ProjectModel>> updateProject(
-        Long id, Mono<ProjectModel> projectModelMono, ServerWebExchange exchange) {
-
-        return projectModelMono
-            .map(
-                projectModel -> conversionService.convert(
-                    projectFacade.updateProject(conversionService.convert(projectModel.id(id), ProjectDTO.class)),
-                    ProjectModel.class))
-            .map(ResponseEntity::ok);
+    public ResponseEntity<ProjectModel> updateProject(Long id, ProjectModel projectModel) {
+        return ResponseEntity.ok(conversionService.convert(
+            projectFacade.updateProject(conversionService.convert(projectModel.id(id), ProjectDTO.class)),
+            ProjectModel.class));
     }
 
     @Override
-    public Mono<ResponseEntity<Void>> updateProjectTags(
-        Long id, Mono<UpdateTagsRequestModel> updateTagsRequestModelMono, ServerWebExchange exchange) {
+    public ResponseEntity<Void> updateProjectTags(Long id, UpdateTagsRequestModel updateTagsRequestModel) {
+        List<TagModel> tagModels = updateTagsRequestModel.getTags();
 
-        return updateTagsRequestModelMono.map(updateTagsRequestModel -> {
-            List<TagModel> tagModels = updateTagsRequestModel.getTags();
+        projectFacade.updateProjectTags(
+            id,
+            tagModels.stream()
+                .map(tagModel -> conversionService.convert(tagModel, Tag.class))
+                .toList());
 
-            projectFacade.updateProjectTags(
-                id,
-                tagModels.stream()
-                    .map(tagModel -> conversionService.convert(tagModel, Tag.class))
-                    .toList());
-
-            return ResponseEntity
-                .noContent()
-                .build();
-        });
+        return ResponseEntity
+            .noContent()
+            .build();
     }
 }

@@ -21,7 +21,6 @@ import com.bytechef.hermes.definition.registry.dto.TaskDispatcherDefinitionDTO;
 import com.bytechef.hermes.definition.registry.task.dispatcher.TaskDispatcherDefinitionRegistry;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -44,13 +43,6 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     }
 
     @Override
-    public Mono<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitionMono(
-        String name, Integer version) {
-
-        return Mono.just(getTaskDispatcherDefinition(name, version));
-    }
-
-    @Override
     public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitions() {
         return taskDispatcherDefinitionRegistry.getTaskDispatcherDefinitions()
             .stream()
@@ -59,21 +51,11 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     }
 
     @Override
-    public Mono<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitionsMono() {
-        return Mono.just(getTaskDispatcherDefinitions());
-    }
-
-    @Override
     public List<TaskDispatcherDefinitionDTO> getTaskDispatcherDefinitionVersions(String name) {
         return taskDispatcherDefinitionRegistry.getTaskDispatcherDefinitions(name)
             .stream()
             .map(this::toTaskDispatcherDefinitionDTO)
             .toList();
-    }
-
-    @Override
-    public Mono<List<TaskDispatcherDefinitionDTO>> getTaskDispatcherDefinitionVersionsMono(String name) {
-        return Mono.just(getTaskDispatcherDefinitionVersions(name));
     }
 
     private TaskDispatcherDefinitionDTO toTaskDispatcherDefinitionDTO(

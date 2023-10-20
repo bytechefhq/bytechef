@@ -26,12 +26,12 @@ import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServi
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -62,7 +62,7 @@ public class ConnectionDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public Mono<Map<String, Map<String, List<String>>>> executeAuthorizationApply(
+    public ResponseEntity<Map<String, Map<String, List<String>>>> executeAuthorizationApply(
         @Valid @RequestBody Connection connection) {
         Map<String, List<String>> headers = new HashMap<>();
         Map<String, List<String>> queryParameters = new HashMap<>();
@@ -71,7 +71,7 @@ public class ConnectionDefinitionServiceController {
             connection.componentName, connection.connectionVersion, connection.parameters, connection.authorizationName,
             new AuthorizationContextImpl(headers, queryParameters, new HashMap<>()));
 
-        return Mono.just(Map.of("headers", headers, "queryParameters", queryParameters));
+        return ResponseEntity.ok(Map.of("headers", headers, "queryParameters", queryParameters));
     }
 
     @RequestMapping(
@@ -83,25 +83,15 @@ public class ConnectionDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public Mono<AuthorizationCallbackResponse> executeAuthorizationCallback(
+    public ResponseEntity<AuthorizationCallbackResponse> executeAuthorizationCallback(
         @Valid @RequestBody AuthorizationCallbackRequest authorizationCallbackRequest) {
 
         Connection connection = authorizationCallbackRequest.connection();
 
-        return Mono.just(
+        return ResponseEntity.ok(
             connectionDefinitionService.executeAuthorizationCallback(
                 connection.componentName, connection.connectionVersion, connection.parameters,
                 connection.authorizationName, authorizationCallbackRequest.redirectUri()));
-    }
-
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/connection-definitions/base-uri")
-    public Mono<String> fetchBaseUri(Connection connection) {
-        return connectionDefinitionService.fetchBaseUri(
-            connection.componentName, connection.connectionVersion, connection.parameters)
-            .map(Mono::just)
-            .orElse(Mono.empty());
     }
 
     @RequestMapping(
@@ -110,49 +100,60 @@ public class ConnectionDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public Mono<AuthorizationType> getAuthorizationType(
+    public ResponseEntity<AuthorizationType> getAuthorizationType(
         @PathVariable("componentName") String componentName,
         @PathVariable("connectionVersion") Integer connectionVersion,
         @PathVariable("authorizationName") String authorizationName) {
 
-        return Mono.just(
+        return ResponseEntity.ok(
             connectionDefinitionService.getAuthorizationType(authorizationName, componentName, connectionVersion));
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
+        value = "/connection-definitions/base-uri")
+    public ResponseEntity<String> getBaseUri(Connection connection) {
+        return connectionDefinitionService.fetchBaseUri(
+            connection.componentName, connection.connectionVersion, connection.parameters)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.noContent()
+                .build());
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
         value = "/component-definitions/{componentName}/{componentVersion}/connection-definition",
         produces = {
             "application/json"
         })
-    public Mono<ConnectionDefinitionDTO> getComponentConnectionDefinition(
+    public ResponseEntity<ConnectionDefinitionDTO> getComponentConnectionDefinition(
         @PathVariable("componentName") String componentName,
         @PathVariable("componentVersion") Integer componentVersion) {
 
-        return Mono.just(connectionDefinitionService.getConnectionDefinition(componentName, componentVersion));
+        return ResponseEntity.ok(connectionDefinitionService.getConnectionDefinition(componentName, componentVersion));
     }
 
     @RequestMapping(
-        method = RequestMethod.POST,
+        method = RequestMethod.GET,
         value = "/component-definitions/{componentName}/{componentVersion}/connection-definitions",
         produces = {
             "application/json"
         })
-    public Mono<List<ConnectionDefinitionDTO>> getComponentConnectionDefinitions(
+    public ResponseEntity<List<ConnectionDefinitionDTO>> getComponentConnectionDefinitions(
         @PathVariable("componentName") String componentName,
         @PathVariable("componentVersion") Integer componentVersion) {
 
-        return Mono.just(connectionDefinitionService.getConnectionDefinitions(componentName, componentVersion));
+        return ResponseEntity.ok(connectionDefinitionService.getConnectionDefinitions(componentName, componentVersion));
     }
 
     @RequestMapping(
-        method = RequestMethod.POST,
+        method = RequestMethod.GET,
         value = "/connection-definitions",
         produces = {
             "application/json"
         })
-    public Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitions() {
-        return Mono.just(connectionDefinitionService.getConnectionDefinitions());
+    public ResponseEntity<List<ConnectionDefinitionDTO>> getConnectionDefinitions() {
+        return ResponseEntity.ok(connectionDefinitionService.getConnectionDefinitions());
     }
 
     @RequestMapping(
@@ -164,11 +165,12 @@ public class ConnectionDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public Mono<OAuth2AuthorizationParametersDTO> getOAuth2Parameters(@Valid @RequestBody Connection connection) {
-        return Mono.just(
-            connectionDefinitionService.getOAuth2Parameters(
-                connection.componentName, connection.connectionVersion, connection.parameters,
-                connection.authorizationName));
+    public ResponseEntity<OAuth2AuthorizationParametersDTO> getOAuth2Parameters(
+        @Valid @RequestBody Connection connection) {
+
+        return ResponseEntity.ok(connectionDefinitionService.getOAuth2Parameters(
+            connection.componentName, connection.connectionVersion, connection.parameters,
+            connection.authorizationName));
     }
 
     record AuthorizationContextImpl(

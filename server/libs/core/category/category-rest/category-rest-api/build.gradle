@@ -6,6 +6,8 @@ dependencies {
 
     api project(":server:libs:core:category:category-api")
 
+    compileOnly "jakarta.servlet:jakarta.servlet-api:6.0.0"
+
     implementation "org.springframework:spring-context"
     implementation libs.org.openapitools.jackson.databind.nullable
     implementation "jakarta.annotation:jakarta.annotation-api"
