@@ -19,6 +19,7 @@ package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
+import com.bytechef.hermes.definition.registry.web.rest.model.TriggerDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.TriggerDefinitionModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
@@ -34,5 +35,13 @@ public class TriggerDefinitionMapper {
 
         @Override
         TriggerDefinitionModel convert(TriggerDefinitionDTO triggerDefinition);
+    }
+
+    @Mapper(config = DefinitionMapperSpringConfig.class)
+    public interface TriggerDefinitionToTriggerDefinitionBasicModelMapper
+        extends Converter<TriggerDefinitionDTO, TriggerDefinitionBasicModel> {
+
+        @Override
+        TriggerDefinitionBasicModel convert(TriggerDefinitionDTO actionDefinition);
     }
 }

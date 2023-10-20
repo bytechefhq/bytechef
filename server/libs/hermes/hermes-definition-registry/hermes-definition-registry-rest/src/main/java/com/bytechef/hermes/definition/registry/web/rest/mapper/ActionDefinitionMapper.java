@@ -19,6 +19,7 @@ package com.bytechef.hermes.definition.registry.web.rest.mapper;
 
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.web.rest.mapper.config.DefinitionMapperSpringConfig;
+import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ActionDefinitionModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
@@ -34,5 +35,13 @@ public class ActionDefinitionMapper {
 
         @Override
         ActionDefinitionModel convert(ActionDefinitionDTO actionDefinition);
+    }
+
+    @Mapper(config = DefinitionMapperSpringConfig.class)
+    public interface ActionDefinitionToActionDefinitionBasicModelMapper
+        extends Converter<ActionDefinitionDTO, ActionDefinitionBasicModel> {
+
+        @Override
+        ActionDefinitionBasicModel convert(ActionDefinitionDTO actionDefinition);
     }
 }

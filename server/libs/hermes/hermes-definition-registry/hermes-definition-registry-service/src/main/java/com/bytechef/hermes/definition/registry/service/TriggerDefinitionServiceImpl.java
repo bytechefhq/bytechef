@@ -48,7 +48,6 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                     componentVersion == componentDefinition.getVersion())
                 .flatMap(componentDefinition -> CollectionUtils.stream(componentDefinition.getTriggers()))
                 .filter(triggerDefinition -> triggerName.equalsIgnoreCase(triggerDefinition.getName()))
-                .map(actionDefinition -> (TriggerDefinition) actionDefinition)
                 .findFirst()
                 .map(this::toTriggerDefinitionDTO)
                 .orElseThrow(IllegalArgumentException::new));
@@ -61,8 +60,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentDefinitions.stream()
                 .filter(componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
                     componentVersion == componentDefinition.getVersion())
+                .filter(componentDefinition -> componentDefinition.getTriggers() != null)
                 .flatMap(componentDefinition -> CollectionUtils.stream(componentDefinition.getTriggers()))
-                .map(triggerDefinition -> (TriggerDefinition) triggerDefinition)
                 .map(this::toTriggerDefinitionDTO)
                 .toList());
     }
