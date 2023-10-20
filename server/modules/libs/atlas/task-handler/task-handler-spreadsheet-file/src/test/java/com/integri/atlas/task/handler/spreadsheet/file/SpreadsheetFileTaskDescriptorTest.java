@@ -272,7 +272,7 @@ public class SpreadsheetFileTaskDescriptorTest {
             }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(SpreadsheetFileTaskDefinition.TASK_DESCRIPTION)
+                objectMapper.writeValueAsString(SpreadsheetFileTaskDefinition.TASK_SPECIFICATION)
             ),
             true
         );

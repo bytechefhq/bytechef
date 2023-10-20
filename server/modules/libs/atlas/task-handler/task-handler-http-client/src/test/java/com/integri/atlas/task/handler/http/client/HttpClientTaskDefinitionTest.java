@@ -458,7 +458,7 @@ public class HttpClientTaskDefinitionTest {
             }
                 """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(HttpClientTaskDefinition.TASK_DESCRIPTION)
+                objectMapper.writeValueAsString(HttpClientTaskDefinition.TASK_SPECIFICATION)
             ),
             true
         );
