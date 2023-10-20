@@ -44,8 +44,6 @@ public class ContextServiceImpl implements ContextService {
 
         Context context = new Context(stackId, classname, value);
 
-        context.setNew(true);
-
         contextRepository.save(context);
     }
 
@@ -56,8 +54,6 @@ public class ContextServiceImpl implements ContextService {
         Assert.notNull(value, "'value' must not be null.");
 
         Context context = new Context(stackId, subStackId, classname, value);
-
-        context.setNew(true);
 
         contextRepository.save(context);
     }

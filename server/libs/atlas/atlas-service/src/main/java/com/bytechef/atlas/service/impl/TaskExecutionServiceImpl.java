@@ -24,7 +24,6 @@ import com.bytechef.atlas.task.execution.TaskStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.lang.NonNull;
@@ -48,7 +47,7 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     public TaskExecution create(TaskExecution taskExecution) {
         Assert.notNull(taskExecution, "'taskExecution' must not be null.");
 
-        taskExecution.setNew(true);
+        taskExecution.setId(null);
 
         return taskExecutionRepository.save(taskExecution);
     }

@@ -92,9 +92,6 @@ public final class TaskExecution
     @Id
     private Long id;
 
-    @Transient
-    private boolean isNew;
-
     @Column("job_id")
     private AggregateReference<Job, Long> jobRef;
 
@@ -436,7 +433,7 @@ public final class TaskExecution
 
     @Override
     public boolean isNew() {
-        return isNew;
+        return id == null;
     }
 
     public void setEndTime(LocalDateTime endTime) {
@@ -457,10 +454,6 @@ public final class TaskExecution
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public void setNew(boolean isNew) {
-        this.isNew = isNew;
     }
 
     public void setJobRef(AggregateReference<Job, Long> jobRef) {
@@ -531,8 +524,7 @@ public final class TaskExecution
             + endTime + ", error="
             + error + ", executionTime="
             + executionTime + ", id='"
-            + id + '\'' + ", isNew="
-            + isNew + ", job="
+            + id + '\'' + ", job="
             + jobRef + ", lastModifiedBy='"
             + lastModifiedBy + '\'' + ", lastModifiedDate="
             + lastModifiedDate + ", output="
