@@ -44,7 +44,7 @@ import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstan
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.VALUE_1;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.VALUE_2;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
+import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.CombineOperation;
 import com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.Operation;
@@ -55,7 +55,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class IfTaskDispatcherFactory implements TaskDispatcherFactory {
+public class IfTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(IF)
         .display(display("If").description("Directs a stream based on true/false results of comparisons."))

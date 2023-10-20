@@ -23,10 +23,10 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class EachTaskDispatcherFactoryTest {
+public class EachTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals("definition/each_v1.json", new EachTaskDispatcherFactory().getDefinition());
+        JsonFileAssert.assertEquals("definition/each_v1.json", new EachTaskDispatcherDefinitionFactory().getDefinition());
     }
 }

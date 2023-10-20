@@ -23,10 +23,10 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class SequenceTaskDispatcherFactoryTest {
+public class SequenceTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals("definition/sequence_v1.json", new SequenceTaskDispatcherFactory().getDefinition());
+        JsonFileAssert.assertEquals("definition/sequence_v1.json", new SequenceTaskDispatcherDefinitionFactory().getDefinition());
     }
 }

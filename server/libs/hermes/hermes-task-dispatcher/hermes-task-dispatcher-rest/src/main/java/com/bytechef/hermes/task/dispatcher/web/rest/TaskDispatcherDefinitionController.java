@@ -18,7 +18,7 @@
 package com.bytechef.hermes.task.dispatcher.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
+import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,10 +46,10 @@ import reactor.core.publisher.Mono;
 @SuppressFBWarnings("EI")
 @Tag(name = "task-dispatcher-definitions")
 public class TaskDispatcherDefinitionController {
-    private final List<TaskDispatcherFactory> taskDispatcherFactories;
+    private final List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories;
 
-    public TaskDispatcherDefinitionController(List<TaskDispatcherFactory> taskDispatcherFactories) {
-        this.taskDispatcherFactories = taskDispatcherFactories;
+    public TaskDispatcherDefinitionController(List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories) {
+        this.taskDispatcherDefinitionFactories = taskDispatcherDefinitionFactories;
     }
 
     /**
@@ -82,8 +82,8 @@ public class TaskDispatcherDefinitionController {
         })
     public Mono<ResponseEntity<Flux<TaskDispatcherDefinition>>> getTaskDispatcherDefinitions(
         @Parameter(hidden = true) ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(taskDispatcherFactories.stream()
-            .map(TaskDispatcherFactory::getDefinition)
+        return Mono.just(ResponseEntity.ok(Flux.fromIterable(taskDispatcherDefinitionFactories.stream()
+            .map(TaskDispatcherDefinitionFactory::getDefinition)
             .collect(Collectors.toList()))));
     }
 }

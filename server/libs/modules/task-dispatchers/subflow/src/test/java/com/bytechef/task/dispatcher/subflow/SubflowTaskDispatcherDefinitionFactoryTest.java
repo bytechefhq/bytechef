@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.dispatcher.fork;
+package com.bytechef.task.dispatcher.subflow;
 
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
@@ -23,11 +23,10 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class ForkJoinTaskDispatcherFactoryTest {
+public class SubflowTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/fork-join_v1.json", new ForkJoinTaskDispatcherFactory().getDefinition());
+        JsonFileAssert.assertEquals("definition/subflow_v1.json", new SubflowTaskDispatcherDefinitionFactory().getDefinition());
     }
 }

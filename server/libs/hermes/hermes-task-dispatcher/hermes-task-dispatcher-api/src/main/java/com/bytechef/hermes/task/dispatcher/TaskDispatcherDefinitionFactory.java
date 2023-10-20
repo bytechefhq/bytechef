@@ -22,7 +22,7 @@ import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 /**
  * @author Ivica Cardic
  */
-public interface TaskDispatcherFactory {
+public interface TaskDispatcherDefinitionFactory {
 
     TaskDispatcherDefinition getDefinition();
 }
