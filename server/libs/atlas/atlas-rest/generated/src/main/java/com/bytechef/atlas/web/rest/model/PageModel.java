@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Page", description = "A sublist of a list of objects. It allows gain information about the position of it in the containing entire list.")
 @JsonTypeName("Page")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-13T14:42:06.111940+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-18T09:37:42.127301+01:00[Europe/Zagreb]")
 public class PageModel {
 
   @JsonProperty("number")

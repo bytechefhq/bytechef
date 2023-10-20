@@ -23,13 +23,12 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * The lueprint that describe the execution of a job.
+ * PostWorkflowRequestModel
  */
 
-@Schema(name = "Workflow", description = "The lueprint that describe the execution of a job.")
-@JsonTypeName("Workflow")
+@JsonTypeName("postWorkflow_request")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-18T09:37:42.127301+01:00[Europe/Zagreb]")
-public class WorkflowModel {
+public class PostWorkflowRequestModel {
 
   @JsonProperty("definition")
   private String definition;
@@ -98,8 +97,41 @@ public class WorkflowModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastModifiedDate;
 
+  /**
+   * Gets or Sets providerType
+   */
+  public enum ProviderTypeEnum {
+    JDBC("JDBC");
+
+    private String value;
+
+    ProviderTypeEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static ProviderTypeEnum fromValue(String value) {
+      for (ProviderTypeEnum b : ProviderTypeEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
   @JsonProperty("providerType")
-  private String providerType;
+  private ProviderTypeEnum providerType;
 
   @JsonProperty("outputs")
   @Valid
@@ -112,7 +144,7 @@ public class WorkflowModel {
   @Valid
   private List<WorkflowTaskModel> tasks = null;
 
-  public WorkflowModel definition(String definition) {
+  public PostWorkflowRequestModel definition(String definition) {
     this.definition = definition;
     return this;
   }
@@ -131,7 +163,7 @@ public class WorkflowModel {
     this.definition = definition;
   }
 
-  public WorkflowModel createdBy(String createdBy) {
+  public PostWorkflowRequestModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -150,7 +182,7 @@ public class WorkflowModel {
     this.createdBy = createdBy;
   }
 
-  public WorkflowModel createdDate(LocalDateTime createdDate) {
+  public PostWorkflowRequestModel createdDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -169,7 +201,7 @@ public class WorkflowModel {
     this.createdDate = createdDate;
   }
 
-  public WorkflowModel format(FormatEnum format) {
+  public PostWorkflowRequestModel format(FormatEnum format) {
     this.format = format;
     return this;
   }
@@ -188,7 +220,7 @@ public class WorkflowModel {
     this.format = format;
   }
 
-  public WorkflowModel id(String id) {
+  public PostWorkflowRequestModel id(String id) {
     this.id = id;
     return this;
   }
@@ -207,12 +239,12 @@ public class WorkflowModel {
     this.id = id;
   }
 
-  public WorkflowModel inputs(List<Map<String, Object>> inputs) {
+  public PostWorkflowRequestModel inputs(List<Map<String, Object>> inputs) {
     this.inputs = inputs;
     return this;
   }
 
-  public WorkflowModel addInputsItem(Map<String, Object> inputsItem) {
+  public PostWorkflowRequestModel addInputsItem(Map<String, Object> inputsItem) {
     if (this.inputs == null) {
       this.inputs = new ArrayList<>();
     }
@@ -234,7 +266,7 @@ public class WorkflowModel {
     this.inputs = inputs;
   }
 
-  public WorkflowModel label(String label) {
+  public PostWorkflowRequestModel label(String label) {
     this.label = label;
     return this;
   }
@@ -253,7 +285,7 @@ public class WorkflowModel {
     this.label = label;
   }
 
-  public WorkflowModel lastModifiedBy(String lastModifiedBy) {
+  public PostWorkflowRequestModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -272,7 +304,7 @@ public class WorkflowModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public WorkflowModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public PostWorkflowRequestModel lastModifiedDate(LocalDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -291,31 +323,31 @@ public class WorkflowModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public WorkflowModel providerType(String providerType) {
+  public PostWorkflowRequestModel providerType(ProviderTypeEnum providerType) {
     this.providerType = providerType;
     return this;
   }
 
   /**
-   * The type of the provider which stores the workflow definition.
+   * Get providerType
    * @return providerType
   */
   
-  @Schema(name = "providerType", accessMode = Schema.AccessMode.READ_ONLY, description = "The type of the provider which stores the workflow definition.", required = false)
-  public String getProviderType() {
+  @Schema(name = "providerType", required = false)
+  public ProviderTypeEnum getProviderType() {
     return providerType;
   }
 
-  public void setProviderType(String providerType) {
+  public void setProviderType(ProviderTypeEnum providerType) {
     this.providerType = providerType;
   }
 
-  public WorkflowModel outputs(List<Map<String, Object>> outputs) {
+  public PostWorkflowRequestModel outputs(List<Map<String, Object>> outputs) {
     this.outputs = outputs;
     return this;
   }
 
-  public WorkflowModel addOutputsItem(Map<String, Object> outputsItem) {
+  public PostWorkflowRequestModel addOutputsItem(Map<String, Object> outputsItem) {
     if (this.outputs == null) {
       this.outputs = new ArrayList<>();
     }
@@ -337,7 +369,7 @@ public class WorkflowModel {
     this.outputs = outputs;
   }
 
-  public WorkflowModel retry(Integer retry) {
+  public PostWorkflowRequestModel retry(Integer retry) {
     this.retry = retry;
     return this;
   }
@@ -356,12 +388,12 @@ public class WorkflowModel {
     this.retry = retry;
   }
 
-  public WorkflowModel tasks(List<WorkflowTaskModel> tasks) {
+  public PostWorkflowRequestModel tasks(List<WorkflowTaskModel> tasks) {
     this.tasks = tasks;
     return this;
   }
 
-  public WorkflowModel addTasksItem(WorkflowTaskModel tasksItem) {
+  public PostWorkflowRequestModel addTasksItem(WorkflowTaskModel tasksItem) {
     if (this.tasks == null) {
       this.tasks = new ArrayList<>();
     }
@@ -391,20 +423,20 @@ public class WorkflowModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    WorkflowModel workflow = (WorkflowModel) o;
-    return Objects.equals(this.definition, workflow.definition) &&
-        Objects.equals(this.createdBy, workflow.createdBy) &&
-        Objects.equals(this.createdDate, workflow.createdDate) &&
-        Objects.equals(this.format, workflow.format) &&
-        Objects.equals(this.id, workflow.id) &&
-        Objects.equals(this.inputs, workflow.inputs) &&
-        Objects.equals(this.label, workflow.label) &&
-        Objects.equals(this.lastModifiedBy, workflow.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, workflow.lastModifiedDate) &&
-        Objects.equals(this.providerType, workflow.providerType) &&
-        Objects.equals(this.outputs, workflow.outputs) &&
-        Objects.equals(this.retry, workflow.retry) &&
-        Objects.equals(this.tasks, workflow.tasks);
+    PostWorkflowRequestModel postWorkflowRequest = (PostWorkflowRequestModel) o;
+    return Objects.equals(this.definition, postWorkflowRequest.definition) &&
+        Objects.equals(this.createdBy, postWorkflowRequest.createdBy) &&
+        Objects.equals(this.createdDate, postWorkflowRequest.createdDate) &&
+        Objects.equals(this.format, postWorkflowRequest.format) &&
+        Objects.equals(this.id, postWorkflowRequest.id) &&
+        Objects.equals(this.inputs, postWorkflowRequest.inputs) &&
+        Objects.equals(this.label, postWorkflowRequest.label) &&
+        Objects.equals(this.lastModifiedBy, postWorkflowRequest.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, postWorkflowRequest.lastModifiedDate) &&
+        Objects.equals(this.providerType, postWorkflowRequest.providerType) &&
+        Objects.equals(this.outputs, postWorkflowRequest.outputs) &&
+        Objects.equals(this.retry, postWorkflowRequest.retry) &&
+        Objects.equals(this.tasks, postWorkflowRequest.tasks);
   }
 
   @Override
@@ -415,7 +447,7 @@ public class WorkflowModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class WorkflowModel {\n");
+    sb.append("class PostWorkflowRequestModel {\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
