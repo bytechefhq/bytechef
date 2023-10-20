@@ -1,3 +1,11 @@
+application {
+    mainClassName = "com.bytechef.cli.CLIApp"
+}
+
+compileJava {
+    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+}
+
 dependencies {
     annotationProcessor 'info.picocli:picocli-codegen:4.6.3'
 
@@ -5,8 +13,4 @@ dependencies {
     implementation 'ch.qos.logback:logback-classic:1.2.11'
     implementation 'info.picocli:picocli:4.6.3'
     implementation 'org.openapitools:openapi-generator:6.0.0'
-}
-
-compileJava {
-    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
 }
