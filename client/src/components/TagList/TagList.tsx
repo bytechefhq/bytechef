@@ -106,9 +106,7 @@ const TagList = ({
                     className="w-40"
                     name="newTag"
                     options={remainingTags!.map((tag: TagModel) => ({
-                        label: `${tag.name
-                            .charAt(0)
-                            .toUpperCase()}${tag.name.slice(1)}`,
+                        label: `${tag.name}${tag.name.slice(1)}`,
                         value: tag.name.toLowerCase().replace(/\W/g, ''),
                         tag,
                     }))}
