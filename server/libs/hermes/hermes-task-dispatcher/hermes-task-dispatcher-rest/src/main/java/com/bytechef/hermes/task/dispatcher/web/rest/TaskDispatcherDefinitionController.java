@@ -17,13 +17,20 @@
 package com.bytechef.hermes.task.dispatcher.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
-import com.bytechef.hermes.task.dispatcher.web.rest.model.TaskDispatcherDefinitionModel;
+import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
+import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
@@ -34,26 +41,45 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 @ConditionalOnApi
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
 @SuppressFBWarnings("EI")
-public class TaskDispatcherDefinitionController implements TaskDispatcherDefinitionControllerApi {
+@Tag(name = "task-dispatcher-definitions")
+public class TaskDispatcherDefinitionController {
+    private final List<TaskDispatcherFactory> taskDispatcherFactories;
 
-    private final ConversionService conversionService;
-    private final List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories;
-
-    public TaskDispatcherDefinitionController(
-            ConversionService conversionService,
-            List<TaskDispatcherDefinitionFactory> taskDispatcherDefinitionFactories) {
-        this.conversionService = conversionService;
-        this.taskDispatcherDefinitionFactories = taskDispatcherDefinitionFactories;
+    public TaskDispatcherDefinitionController(List<TaskDispatcherFactory> taskDispatcherFactories) {
+        this.taskDispatcherFactories = taskDispatcherFactories;
     }
 
-    @Override
-    public Mono<ResponseEntity<Flux<TaskDispatcherDefinitionModel>>> getTaskDispatcherDefinitions(
-            ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(taskDispatcherDefinitionFactories.stream()
-                .map(TaskDispatcherDefinitionFactory::getDefinition)
-                .map(taskDispatcherDefinition ->
-                        conversionService.convert(taskDispatcherDefinition, TaskDispatcherDefinitionModel.class))
+    /**
+     * GET /definitions/task-dispatchers
+     * Returns all task dispatcher definitions
+     *
+     * @return OK (status code 200)
+     */
+    @Operation(
+            description = "Returns all task dispatcher definitions.",
+            operationId = "getTaskDispatcherDefinitions",
+            summary = "Returns all task dispatcher definitions.",
+            tags = {"task-dispatcher-definitions"},
+            responses = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "OK",
+                        content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = TaskDispatcherDefinition.class))
+                        })
+            })
+    @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/definitions/task-dispatchers",
+            produces = {"application/json"})
+    public Mono<ResponseEntity<Flux<TaskDispatcherDefinition>>> getTaskDispatcherDefinitions(
+            @Parameter(hidden = true) ServerWebExchange exchange) {
+        return Mono.just(ResponseEntity.ok(Flux.fromIterable(taskDispatcherFactories.stream()
+                .map(TaskDispatcherFactory::getDefinition)
                 .collect(Collectors.toList()))));
     }
 }
