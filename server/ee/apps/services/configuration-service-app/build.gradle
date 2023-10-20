@@ -25,6 +25,7 @@ dependencies {
     implementation project(":server:ee:libs:dione:dione-configuration:dione-configuration-service")
     implementation project(":server:ee:libs:helios:helios-configuration:helios-configuration-remote-rest")
     implementation project(":server:ee:libs:hermes:hermes-configuration:hermes-configuration-remote-rest")
+    implementation project(":server:ee:libs:hermes:hermes-connection:hermes-connection-remote-client")
     implementation project(":server:ee:libs:hermes:hermes-definition-registry:hermes-definition-registry-remote-client")
     implementation project(":server:ee:libs:hermes:hermes-execution:hermes-execution-remote-client")
 

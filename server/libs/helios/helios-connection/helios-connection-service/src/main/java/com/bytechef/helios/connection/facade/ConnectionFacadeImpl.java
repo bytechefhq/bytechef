@@ -25,8 +25,8 @@ import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.hermes.configuration.connection.WorkflowConnection;
+import com.bytechef.hermes.connection.service.OAuth2Service;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
-import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.service.ConnectionService;
@@ -54,7 +54,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
-    private final OAuth2Properties oAuth2Properties;
+    private final OAuth2Service oAuth2Service;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final TagService tagService;
     private final WorkflowService workflowService;
@@ -62,12 +62,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
         ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        OAuth2Properties oAuth2Properties, ProjectInstanceWorkflowService projectInstanceWorkflowService,
+        OAuth2Service oAuth2Service, ProjectInstanceWorkflowService projectInstanceWorkflowService,
         TagService tagService, WorkflowService workflowService) {
 
         this.connectionService = connectionService;
         this.connectionDefinitionService = connectionDefinitionService;
-        this.oAuth2Properties = oAuth2Properties;
+        this.oAuth2Service = oAuth2Service;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.tagService = tagService;
         this.workflowService = workflowService;
@@ -92,9 +92,9 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                 AuthorizationCallbackResponse authorizationCallbackResponse = connectionDefinitionService
                     .executeAuthorizationCallback(
                         connection.getComponentName(), connection.getConnectionVersion(),
-                        oAuth2Properties.checkPredefinedApp(
+                        oAuth2Service.checkPredefinedApp(
                             connection.getComponentName(), connection.getParameters()),
-                        connection.getAuthorizationName(), oAuth2Properties.getRedirectUri());
+                        connection.getAuthorizationName(), oAuth2Service.getRedirectUri());
 
                 connection.putAllParameters(authorizationCallbackResponse.toMap());
             }

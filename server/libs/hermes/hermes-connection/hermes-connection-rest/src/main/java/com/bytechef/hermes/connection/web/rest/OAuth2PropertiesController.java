@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.connection.web.rest;
 
-import com.bytechef.hermes.connection.config.OAuth2Properties;
+import com.bytechef.hermes.connection.service.OAuth2Service;
 import com.bytechef.hermes.connection.web.rest.model.OAuth2PropertiesModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +31,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/core")
 public class OAuth2PropertiesController implements Oauth2PropertiesApi {
 
-    private final OAuth2Properties oAuth2Properties;
+    private final OAuth2Service oAuth2Service;
 
     @SuppressFBWarnings("EI")
-    public OAuth2PropertiesController(OAuth2Properties oAuth2Properties) {
-        this.oAuth2Properties = oAuth2Properties;
+    public OAuth2PropertiesController(OAuth2Service oAuth2Service) {
+        this.oAuth2Service = oAuth2Service;
     }
 
     @Override
@@ -43,11 +43,7 @@ public class OAuth2PropertiesController implements Oauth2PropertiesApi {
     public ResponseEntity<OAuth2PropertiesModel> getOAuth2Properties() {
         return ResponseEntity.ok(
             new OAuth2PropertiesModel()
-                .predefinedApps(
-                    oAuth2Properties.getPredefinedApps()
-                        .keySet()
-                        .stream()
-                        .toList())
-                .redirectUri(oAuth2Properties.getRedirectUri()));
+                .predefinedApps(oAuth2Service.getPredefinedApps())
+                .redirectUri(oAuth2Service.getRedirectUri()));
     }
 }
