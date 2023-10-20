@@ -1,0 +1,6 @@
+dependencies {
+    api "org.json:json"
+    api project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
+
+    implementation "commons-io:commons-io"
+}
