@@ -18,21 +18,23 @@
 
 package com.bytechef.task.dispatcher.subflow;
 
-import com.bytechef.atlas.Constants;
+import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.subflow.constants.SubflowTaskDispatcherConstants.SUBFLOW;
+
+import com.bytechef.atlas.constants.WorkflowConstants;
+import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * a {@link TaskDispatcher} implementation which handles the 'subflow' task type. Subflows are
- * essentially isolated job instances started by the parent 'subflow' task which is the owner of the
- * sub-flow.
+ * a {@link TaskDispatcher} implementation which handles the 'subflow' task type. Subflows are essentially isolated job
+ * instances started by the parent 'subflow' task which is the owner of the sub-flow.
  *
  * @author Arik Cohen
  * @since Sep 06, 2018
@@ -41,24 +43,27 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
 
     private final MessageBroker messageBroker;
 
-    public SubflowTaskDispatcher(MessageBroker aMessageBroker) {
-        messageBroker = aMessageBroker;
+    public SubflowTaskDispatcher(MessageBroker messageBroker) {
+        this.messageBroker = messageBroker;
     }
 
     @Override
-    public void dispatch(TaskExecution aTask) {
+    public void dispatch(TaskExecution taskExecution) {
         Map<String, Object> params = new HashMap<>();
-        params.put(Constants.INPUTS, aTask.getMap(Constants.INPUTS, Collections.emptyMap()));
-        params.put(Constants.PARENT_TASK_EXECUTION_ID, aTask.getId());
-        params.put(Constants.WORKFLOW_ID, aTask.getRequiredString(Constants.WORKFLOW_ID));
+
+        params.put(WorkflowConstants.INPUTS, taskExecution.getMap(WorkflowConstants.INPUTS, Collections.emptyMap()));
+        params.put(WorkflowConstants.PARENT_TASK_EXECUTION_ID, taskExecution.getId());
+        params.put(WorkflowConstants.WORKFLOW_ID, taskExecution.getRequiredString(WorkflowConstants.WORKFLOW_ID));
+
         messageBroker.send(Queues.SUBFLOWS, params);
     }
 
     @Override
-    public TaskDispatcher resolve(Task aTask) {
-        if (aTask.getType().equals(Constants.SUBFLOW)) {
+    public TaskDispatcher resolve(Task task) {
+        if (task.getType().equals(SUBFLOW + "/v" + VERSION_1)) {
             return this;
         }
+
         return null;
     }
 }

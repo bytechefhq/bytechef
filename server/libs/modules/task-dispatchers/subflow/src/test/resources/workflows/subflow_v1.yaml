@@ -1,0 +1,16 @@
+label: Subflow demo
+
+outputs:
+  - name: output
+    value: ${output}
+
+tasks:
+  - name: subflowOutput
+    type: subflow/v1
+    pipelineId: demo/random_int
+
+  - name: output
+    type: var
+    value: ${subflowOutput.randomNumber}
+
+
