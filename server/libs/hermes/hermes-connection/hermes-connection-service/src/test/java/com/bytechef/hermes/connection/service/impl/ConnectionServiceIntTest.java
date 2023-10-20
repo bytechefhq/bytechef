@@ -42,8 +42,11 @@ public class ConnectionServiceIntTest {
     private ConnectionRepository connectionRepository;
 
     @Test
-    public void testAdd() {
-        Connection connection = connectionService.add(getConnection());
+    public void testCreate() {
+        Connection connection = getConnection();
+
+        connection = connectionService.create(connection.getName(), connection.getComponentName(),
+            connection.getComponentVersion(), connection.getAuthorizationName(), connection.getParameters());
 
         Assertions.assertEquals("name", connection.getName());
         Assertions.assertEquals(Map.of("key1", "value1"), connection.getParameters());
