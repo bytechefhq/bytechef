@@ -159,12 +159,10 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     }
 
     @PersistenceCreator
-    public Workflow(String definition, String id, Format format) throws Exception {
-        this(definition, format, id, WorkflowReader.readWorkflowMap(
+    public Workflow(String definition, String id, int format) throws Exception {
+        this(definition, Format.valueOf(format), id, WorkflowReader.readWorkflowMap(
             new WorkflowResource(
-                id,
-                new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)),
-                format)));
+                id, new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)), Format.valueOf(format))));
     }
 
     public Workflow(String definition, Format format, String id, Map<String, Object> source) {
@@ -192,11 +190,9 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
                 MapValueUtils.getRequiredString(map, WorkflowConstants.NAME),
                 MapValueUtils.getRequiredString(map, WorkflowConstants.VALUE)));
         this.maxRetries = MapValueUtils.getInteger(source, WorkflowConstants.MAX_RETRIES, 0);
-        this.tasks = MapValueUtils
-            .getList(source, WorkflowConstants.TASKS, Map.class, Collections.emptyList())
-            .stream()
-            .map(WorkflowTask::of)
-            .toList();
+        this.tasks = CollectionUtils.map(
+            MapValueUtils.getList(source, WorkflowConstants.TASKS, Map.class, Collections.emptyList()),
+            WorkflowTask::of);
     }
 
     public Workflow(String definition, Format format) {
@@ -235,6 +231,12 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         return Objects.equals(id, workflow.id);
     }
 
+    public <T> Optional<T> fetchExtension(Class<T> extensionClass) {
+        // TODO
+
+        return Optional.empty();
+    }
+
     @Override
     public int hashCode() {
         return getClass().hashCode();
@@ -259,12 +261,6 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     @Override
     public ExecutionError getError() {
         return error;
-    }
-
-    public <T> T getExtension(Class<T> extensionClass) {
-        // TODO
-
-        return null;
     }
 
     public Format getFormat() {

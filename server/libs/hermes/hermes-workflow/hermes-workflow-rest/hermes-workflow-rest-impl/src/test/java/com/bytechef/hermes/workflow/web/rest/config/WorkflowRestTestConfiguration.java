@@ -17,11 +17,13 @@
 
 package com.bytechef.hermes.workflow.web.rest.config;
 
+import com.bytechef.atlas.facade.TaskExecutionFacade;
 import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.service.WorkflowService;
+import com.bytechef.hermes.workflow.facade.WorkflowFacade;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -43,5 +45,11 @@ public class WorkflowRestTestConfiguration {
     private TaskExecutionService taskExecutionService;
 
     @MockBean
+    private TaskExecutionFacade taskExecutionFacade;
+
+    @MockBean
     private WorkflowService workflowService;
+
+    @MockBean
+    WorkflowFacade workflowFacade;
 }

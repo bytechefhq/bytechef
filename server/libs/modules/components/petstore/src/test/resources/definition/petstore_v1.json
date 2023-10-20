@@ -1487,7 +1487,7 @@
         "type": "BODY"
       },
       "placeholder": "Add",
-      "name": "array",
+      "name": "items",
       "type": "ARRAY",
       "items": [ {
         "type": "OBJECT",

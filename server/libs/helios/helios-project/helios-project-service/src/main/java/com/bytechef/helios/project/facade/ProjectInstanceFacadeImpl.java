@@ -65,6 +65,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public ProjectInstanceDTO createProjectInstance(ProjectInstanceDTO projectInstanceDTO) {
         ProjectInstance projectInstance = projectInstanceDTO.toProjectInstance();
 
@@ -109,6 +110,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public ProjectInstanceDTO getProjectInstance(long projectInstanceId) {
         ProjectInstance projectInstance = projectInstanceService.getProjectInstance(projectInstanceId);
         return new ProjectInstanceDTO(

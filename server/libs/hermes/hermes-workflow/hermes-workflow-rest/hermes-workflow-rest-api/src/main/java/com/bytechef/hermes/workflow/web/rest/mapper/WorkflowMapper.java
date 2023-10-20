@@ -18,7 +18,7 @@
 package com.bytechef.hermes.workflow.web.rest.mapper;
 
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.hermes.workflow.dto.WorkflowDTO;
+import com.bytechef.hermes.workflow.WorkflowDTO;
 import com.bytechef.hermes.workflow.web.rest.mapper.config.WorkflowMapperSpringConfig;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowTaskModel;

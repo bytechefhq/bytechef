@@ -129,6 +129,12 @@ public class WorkflowTask implements Serializable {
             && Objects.equals(type, that.type);
     }
 
+    public <T> Optional<T> fetchExtension(Class<T> extensionClass) {
+        // TODO
+
+        return Optional.empty();
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(finalize, label, name, node, parameters, post, pre, timeout, type);
@@ -143,12 +149,6 @@ public class WorkflowTask implements Serializable {
      */
     public List<WorkflowTask> getFinalize() {
         return Collections.unmodifiableList(finalize);
-    }
-
-    public <T> Optional<T> fetchExtension(Class<T> extensionClass) {
-        // TODO
-
-        return null;
     }
 
     /**

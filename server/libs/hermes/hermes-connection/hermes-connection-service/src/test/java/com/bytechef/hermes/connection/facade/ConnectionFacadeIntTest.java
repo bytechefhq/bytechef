@@ -247,6 +247,9 @@ public class ConnectionFacadeIntTest {
         @MockBean
         ConnectionDefinitionService connectionDefinitionService;
 
+        @MockBean
+        WorkflowService workflowService;
+
         @Bean
         ConnectionFacade connectionFacade(
             ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,

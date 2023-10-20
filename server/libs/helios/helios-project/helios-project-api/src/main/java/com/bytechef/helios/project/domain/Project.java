@@ -121,7 +121,7 @@ public final class Project implements Persistable<Long> {
     public Project(
         AggregateReference<Category, Long> categoryId, String description, Long id, String name,
         Set<ProjectTag> projectTags, int projectVersion, Set<ProjectWorkflow> projectWorkflows,
-        LocalDateTime publishedDate, Status status, int version) {
+        LocalDateTime publishedDate, int status, int version) {
 
         this.categoryId = categoryId;
         this.description = description;
@@ -131,7 +131,7 @@ public final class Project implements Persistable<Long> {
         this.projectVersion = projectVersion;
         this.projectWorkflows.addAll(projectWorkflows);
         this.publishedDate = publishedDate;
-        this.status = status.getId();
+        this.status = status;
         this.version = version;
     }
 

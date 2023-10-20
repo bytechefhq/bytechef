@@ -34,6 +34,7 @@ import com.bytechef.helios.project.dto.ProjectDTO;
 import com.bytechef.helios.project.repository.ProjectRepository;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectService;
+import com.bytechef.hermes.workflow.WorkflowDTO;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.tag.service.TagService;
@@ -97,10 +98,10 @@ public class ProjectFacadeIntTest {
 
         project = projectRepository.save(project);
 
-        Workflow workflow = projectFacade.addWorkflow(project.getId(), "Workflow 1", "Description", null);
+        WorkflowDTO workflowDTO = projectFacade.addWorkflow(project.getId(), "Workflow 1", "Description", null);
 
-        assertThat(workflow.getDescription()).isEqualTo("Description");
-        assertThat(workflow.getLabel()).isEqualTo("Workflow 1");
+        assertThat(workflowDTO.description()).isEqualTo("Description");
+        assertThat(workflowDTO.label()).isEqualTo("Workflow 1");
     }
 
     @Test
@@ -286,9 +287,13 @@ public class ProjectFacadeIntTest {
 
         project = projectRepository.save(project);
 
-        List<Workflow> workflows = projectFacade.getProjectWorkflows(project.getId());
+        List<WorkflowDTO> workflowDTOs = projectFacade.getProjectWorkflows(project.getId());
 
-        assertThat(workflows).contains(workflow);
+        assertThat(
+            workflowDTOs.stream()
+                .map(curWorkflow -> curWorkflow.id())
+                .toList())
+                    .contains(workflow.getId());
     }
 
     @Test

@@ -22,7 +22,9 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
+import com.bytechef.hermes.workflow.WorkflowDTO;
 import com.bytechef.hermes.workflow.executor.WorkflowExecutor;
+import com.bytechef.hermes.workflow.facade.WorkflowFacade;
 import com.bytechef.hermes.workflow.web.rest.config.WorkflowRestTestConfiguration;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowFormatModel;
 import com.bytechef.hermes.workflow.web.rest.model.WorkflowModel;
@@ -30,6 +32,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -66,6 +70,9 @@ public class WorkflowControllerIntTest {
     private WebTestClient webTestClient;
 
     @Autowired
+    private WorkflowFacade workflowFacade;
+
+    @Autowired
     private WorkflowService workflowService;
 
     @MockBean
@@ -94,7 +101,7 @@ public class WorkflowControllerIntTest {
     @Test
     public void testGetWorkflow() {
         try {
-            when(workflowService.getWorkflow("1")).thenReturn(getWorkflow());
+            when(workflowFacade.getWorkflow("1")).thenReturn(new WorkflowDTO(Collections.emptyList(), getWorkflow()));
 
             this.webTestClient
                 .get()
@@ -111,7 +118,8 @@ public class WorkflowControllerIntTest {
 
     @Test
     public void testGetWorkflows() throws JsonProcessingException {
-        when(workflowService.getWorkflows()).thenReturn(List.of(getWorkflow()));
+        when(workflowFacade.getWorkflows()).thenReturn(
+            List.of(new WorkflowDTO(Collections.emptyList(), getWorkflow())));
 
         try {
             this.webTestClient
@@ -137,8 +145,8 @@ public class WorkflowControllerIntTest {
             .sourceType(WorkflowModel.SourceTypeEnum.JDBC)
             .format(WorkflowFormatModel.JSON);
 
-        when(workflowService.create(DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC))
-            .thenReturn(workflow);
+        when(workflowFacade.create(DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC))
+            .thenReturn(new WorkflowDTO(Collections.emptyList(), workflow));
 
         try {
             Workflow.Format format = workflow.getFormat();
@@ -178,7 +186,7 @@ public class WorkflowControllerIntTest {
         WorkflowModel workflowModel = new WorkflowModel()
             .definition(DEFINITION);
 
-        when(workflowService.update("1", DEFINITION)).thenReturn(workflow);
+        when(workflowFacade.update("1", DEFINITION)).thenReturn(new WorkflowDTO(Collections.emptyList(), workflow));
 
         Workflow.Format format = workflow.getFormat();
 

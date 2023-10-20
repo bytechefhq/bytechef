@@ -40,6 +40,7 @@ public class TestWorkflowExecutor implements WorkflowExecutor {
     private final JobSyncExecutor jobSyncExecutor;
     private final TaskExecutionService taskExecutionService;
 
+    @SuppressFBWarnings("EI")
     public TestWorkflowExecutor(
         ContextService contextService, JobSyncExecutor jobSyncExecutor, TaskExecutionService taskExecutionService) {
 
