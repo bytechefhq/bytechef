@@ -1,7 +1,7 @@
 {
   "display": {
-    "label": "Boolean Condition",
-    "description": "Directs a stream based on true/false results of comparisons."
+    "description": "Directs a stream based on true/false results of comparisons.",
+    "label": "Boolean Condition"
   },
   "name": "if",
   "properties": [
@@ -10,17 +10,12 @@
       "label": "Raw expression",
       "name": "rawExpression",
       "type": "BOOLEAN",
-      "defaultValue": false
+      "defaultValue": false,
+      "controlType": "CHECKBOX"
     },
     {
       "description": "The type of values to compare.",
-      "displayOption": {
-        "show": {
-          "rawExpression": [
-            false
-          ]
-        }
-      },
+      "displayCondition": "rawExpression === true",
       "label": "Conditions",
       "placeholder": "Add Condition",
       "name": "conditions",
@@ -30,13 +25,15 @@
           "label": "Boolean",
           "name": "boolean",
           "type": "OBJECT",
+          "multipleValues": true,
           "properties": [
             {
               "description": "The boolean value to compare with the second one.",
               "label": "Value 1",
               "name": "value1",
               "type": "BOOLEAN",
-              "defaultValue": false
+              "defaultValue": false,
+              "controlType": "CHECKBOX"
             },
             {
               "description": "Compare operation to decide where to map data.",
@@ -44,6 +41,7 @@
               "name": "operation",
               "type": "STRING",
               "defaultValue": "EQUALS",
+              "controlType": "SELECT",
               "options": [
                 {
                   "name": "Equals",
@@ -60,20 +58,24 @@
               "label": "Value 2",
               "name": "value2",
               "type": "BOOLEAN",
-              "defaultValue": false
+              "defaultValue": false,
+              "controlType": "CHECKBOX"
             }
-          ]
+          ],
+          "controlType": "JSON_BUILDER"
         },
         {
           "label": "Date & Time",
           "name": "dateTime",
           "type": "OBJECT",
+          "multipleValues": true,
           "properties": [
             {
               "description": "The date & time value to compare with the second one.",
               "label": "Value 1",
               "name": "value1",
-              "type": "DATE_TIME"
+              "type": "DATE_TIME",
+              "controlType": "DATE_TIME"
             },
             {
               "description": "Compare operation to decide where to map data.",
@@ -81,6 +83,7 @@
               "name": "operation",
               "type": "STRING",
               "defaultValue": "AFTER",
+              "controlType": "SELECT",
               "options": [
                 {
                   "name": "After",
@@ -96,21 +99,25 @@
               "description": "The date & time value to compare with the first one.",
               "label": "Value 2",
               "name": "value2",
-              "type": "DATE_TIME"
+              "type": "DATE_TIME",
+              "controlType": "DATE_TIME"
             }
-          ]
+          ],
+          "controlType": "JSON_BUILDER"
         },
         {
           "label": "Number",
           "name": "number",
           "type": "OBJECT",
+          "multipleValues": true,
           "properties": [
             {
               "description": "The number value to compare with the second one.",
               "label": "Value 1",
               "name": "value1",
               "type": "NUMBER",
-              "defaultValue": 0.0
+              "defaultValue": 0.0,
+              "controlType": "INPUT_NUMBER"
             },
             {
               "description": "Compare operation to decide where to map data.",
@@ -118,6 +125,7 @@
               "name": "operation",
               "type": "STRING",
               "defaultValue": "LESS",
+              "controlType": "SELECT",
               "options": [
                 {
                   "name": "Less",
@@ -151,31 +159,29 @@
             },
             {
               "description": "The number value to compare with the first one.",
-              "displayOption": {
-                "hide": {
-                  "operation": [
-                    "EMPTY"
-                  ]
-                }
-              },
+              "displayCondition": "operation !== 'EMPTY'",
               "label": "Value 2",
               "name": "value2",
               "type": "NUMBER",
-              "defaultValue": 0.0
+              "defaultValue": 0.0,
+              "controlType": "INPUT_NUMBER"
             }
-          ]
+          ],
+          "controlType": "JSON_BUILDER"
         },
         {
           "label": "String",
           "name": "string",
           "type": "OBJECT",
+          "multipleValues": true,
           "properties": [
             {
               "description": "The string value to compare with the second one.",
               "label": "Value 1",
               "name": "value1",
               "type": "STRING",
-              "defaultValue": ""
+              "defaultValue": "",
+              "controlType": "INPUT_TEXT"
             },
             {
               "description": "Compare operation to decide where to map data.",
@@ -183,6 +189,7 @@
               "name": "operation",
               "type": "STRING",
               "defaultValue": "EQUALS",
+              "controlType": "SELECT",
               "options": [
                 {
                   "name": "Equals",
@@ -220,51 +227,38 @@
             },
             {
               "description": "The string value to compare with the first one.",
-              "displayOption": {
-                "hide": {
-                  "operation": [
-                    "EMPTY",
-                    "REGEX"
-                  ]
-                }
-              },
+              "displayCondition": "!['EMPTY','REGEX'].includes('operation')",
               "label": "Value 2",
               "name": "value2",
               "type": "STRING",
-              "defaultValue": ""
+              "defaultValue": "",
+              "controlType": "INPUT_TEXT"
             },
             {
               "description": "The regex value to compare with the first one.",
-              "displayOption": {
-                "show": {
-                  "operation": [
-                    "REGEX"
-                  ]
-                }
-              },
+              "displayCondition": "operation === 'REGEX'",
               "label": "Regex",
               "placeholder": "/text/i",
               "name": "value2",
               "type": "STRING",
-              "defaultValue": ""
+              "defaultValue": "",
+              "controlType": "INPUT_TEXT"
             }
-          ]
+          ],
+          "controlType": "JSON_BUILDER"
         }
-      ]
+      ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
     },
     {
       "description": "If multiple conditions are set, this setting decides if it is true as soon as ANY condition\n matches or only if ALL are met.\n",
-      "displayOption": {
-        "show": {
-          "rawExpression": [
-            false
-          ]
-        }
-      },
+      "displayCondition": "rawExpression === false",
       "label": "Combine",
       "name": "combineOperation",
       "type": "STRING",
       "defaultValue": "ALL",
+      "controlType": "SELECT",
       "options": [
         {
           "description": "Only if all conditions are met, the workflow goes into \"true\" branch.",
@@ -282,7 +276,8 @@
       "description": "The raw expression.",
       "label": "Expression",
       "name": "expression",
-      "type": "STRING"
+      "type": "STRING",
+      "controlType": "INPUT_TEXT"
     }
   ],
   "version": 1,
@@ -295,9 +290,13 @@
         {
           "description": "The task or task dispatcher to use.",
           "type": "OBJECT",
-          "objectType": "TASK"
+          "multipleValues": true,
+          "objectType": "TASK",
+          "controlType": "INPUT_TEXT"
         }
-      ]
+      ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
     },
     {
       "description": "The list of tasks to execute sequentially if the result of evaluating expression is false.",
@@ -307,9 +306,13 @@
         {
           "description": "The task or task dispatcher to use.",
           "type": "OBJECT",
-          "objectType": "TASK"
+          "multipleValues": true,
+          "objectType": "TASK",
+          "controlType": "INPUT_TEXT"
         }
-      ]
+      ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
     }
   ]
 }

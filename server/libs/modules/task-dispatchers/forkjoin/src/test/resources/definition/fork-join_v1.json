@@ -18,11 +18,17 @@
             {
               "description": "The task or task dispatcher to use.",
               "type": "OBJECT",
-              "objectType": "TASK"
+              "multipleValues": true,
+              "objectType": "TASK",
+              "controlType": "INPUT_TEXT"
             }
-          ]
+          ],
+          "multipleValues": true,
+          "controlType": "JSON_BUILDER"
         }
-      ]
+      ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
     }
   ]
 }

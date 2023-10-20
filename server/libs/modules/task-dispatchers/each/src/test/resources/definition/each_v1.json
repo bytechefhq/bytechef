@@ -10,34 +10,45 @@
       "type": "ONE_OF",
       "types": [
         {
-          "type": "ARRAY"
+          "type": "ARRAY",
+          "multipleValues": true,
+          "controlType": "JSON_BUILDER"
         },
         {
-          "type": "BOOLEAN"
+          "type": "BOOLEAN",
+          "controlType": "CHECKBOX"
         },
         {
-          "type": "DATE"
+          "type": "DATE",
+          "controlType": "DATE"
         },
         {
-          "type": "DATE_TIME"
+          "type": "DATE_TIME",
+          "controlType": "DATE_TIME"
         },
         {
-          "type": "INTEGER"
+          "type": "INTEGER",
+          "controlType": "INPUT_INTEGER"
         },
         {
-          "type": "NUMBER"
+          "type": "NUMBER",
+          "controlType": "INPUT_NUMBER"
         },
         {
-          "type": "OBJECT"
+          "type": "OBJECT",
+          "multipleValues": true,
+          "controlType": "JSON_BUILDER"
         },
         {
-          "type": "STRING"
+          "type": "STRING",
+          "controlType": "INPUT_TEXT"
         }
       ]
     },
     {
       "name": "itemIndex",
-      "type": "INTEGER"
+      "type": "INTEGER",
+      "controlType": "INPUT_INTEGER"
     }
   ],
   "properties": [
@@ -51,46 +62,60 @@
           "type": "ONE_OF",
           "types": [
             {
-              "type": "ARRAY"
+              "type": "ARRAY",
+              "multipleValues": true,
+              "controlType": "JSON_BUILDER"
             },
             {
-              "type": "BOOLEAN"
+              "type": "BOOLEAN",
+              "controlType": "CHECKBOX"
             },
             {
-              "type": "DATE"
+              "type": "DATE",
+              "controlType": "DATE"
             },
             {
-              "type": "DATE_TIME"
+              "type": "DATE_TIME",
+              "controlType": "DATE_TIME"
             },
             {
-              "type": "INTEGER"
+              "type": "INTEGER",
+              "controlType": "INPUT_INTEGER"
             },
             {
-              "type": "NUMBER"
+              "type": "NUMBER",
+              "controlType": "INPUT_NUMBER"
             },
             {
-              "type": "OBJECT"
+              "type": "OBJECT",
+              "multipleValues": true,
+              "controlType": "JSON_BUILDER"
             },
             {
-              "type": "STRING"
+              "type": "STRING",
+              "controlType": "INPUT_TEXT"
             }
           ]
         }
-      ]
+      ],
+      "multipleValues": true,
+      "controlType": "JSON_BUILDER"
     },
     {
       "description": "The name of the item variable.",
       "label": "Item Var",
       "name": "itemVar",
       "type": "STRING",
-      "defaultValue": "item"
+      "defaultValue": "item",
+      "controlType": "INPUT_TEXT"
     },
     {
       "description": "The name of the index variable.",
       "label": "Item Index",
       "name": "itemIndex",
       "type": "STRING",
-      "defaultValue": "itemIndex"
+      "defaultValue": "itemIndex",
+      "controlType": "INPUT_TEXT"
     }
   ],
   "version": 1,
@@ -99,7 +124,9 @@
       "description": "The task or task dispatcher to use.",
       "name": "iteratee",
       "type": "OBJECT",
-      "objectType": "TASK"
+      "multipleValues": true,
+      "objectType": "TASK",
+      "controlType": "INPUT_TEXT"
     }
   ]
 }
