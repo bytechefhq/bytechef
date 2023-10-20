@@ -46,12 +46,15 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
     public static final class ModifiableTaskDispatcherDefinition implements TaskDispatcherDefinition {
 
         private Display display;
-        private final String name;
+        private String name;
         private List<Property<? extends Property<?>>> output;
         private List<Property<?>> properties;
         private Resources resources;
         private int version = VERSION_1;
         private List<Property<?>> taskProperties;
+
+        private ModifiableTaskDispatcherDefinition() {
+        }
 
         private ModifiableTaskDispatcherDefinition(String name) {
             this.name = name;
