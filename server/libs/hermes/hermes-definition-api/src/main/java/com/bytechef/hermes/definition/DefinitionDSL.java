@@ -1073,13 +1073,10 @@ public class DefinitionDSL {
 
             @Override
             public ControlType getControlType() {
-                if (objectType != null) {
-                    return ControlType.INPUT_TEXT;
-                }
                 if ((options == null || options.isEmpty()) && optionsDataSource == null) {
                     return ControlType.JSON_BUILDER;
                 } else {
-                    return ControlType.MULTI_SELECT;
+                    return ControlType.SELECT;
                 }
             }
 
