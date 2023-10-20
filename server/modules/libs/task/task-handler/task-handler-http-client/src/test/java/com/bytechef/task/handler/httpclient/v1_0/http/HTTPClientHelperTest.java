@@ -17,6 +17,7 @@
 package com.bytechef.task.handler.httpclient.v1_0.http;
 
 import static com.bytechef.hermes.auth.AuthenticationConstants.*;
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.ACCESS_TOKEN;
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.ADD_TO;
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.ALLOW_UNAUTHORIZED_CERTS;
 import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.BODY_CONTENT_TYPE;
@@ -307,6 +308,15 @@ public class HTTPClientHelperTest {
 
         Assertions.assertArrayEquals(passwordAuthentication.getPassword(), "password".toCharArray());
         Assertions.assertEquals(passwordAuthentication.getUserName(), "username");
+
+        authentication.setProperties(Map.of(ACCESS_TOKEN, "access_token"));
+        authentication.setType(AuthType.OAUTH2.name());
+
+        headers = new HashMap<>();
+
+        httpClientHelper.createHTTPClient(taskExecution, headers, Map.of());
+
+        Assertions.assertEquals(Map.of("Authorization", List.of("Bearer access_token")), headers);
 
         //
 

@@ -16,6 +16,9 @@
 
 package com.bytechef.task.handler.httpclient.v1_0.auth;
 
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.ACCESS_TOKEN;
+import static com.bytechef.task.handler.httpclient.HTTPClientTaskConstants.HEADER_PREFIX;
+
 import com.bytechef.hermes.auth.domain.Authentication;
 import com.github.mizosoft.methanol.Methanol;
 import java.util.List;
@@ -32,6 +35,10 @@ public class OAuth2AuthResolver implements AuthResolver {
             Map<String, List<String>> headers,
             Map<String, List<String>> queryParams,
             Authentication authentication) {
-        throw new UnsupportedOperationException();
+
+        headers.put(
+                "Authorization",
+                List.of(authentication.getProperty(HEADER_PREFIX, "Bearer") + " "
+                        + authentication.getProperty(ACCESS_TOKEN)));
     }
 }
