@@ -32,8 +32,8 @@ import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.execution.job.factory.JobFactory;
-import com.bytechef.atlas.execution.job.factory.JobFactoryImpl;
+import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.atlas.execution.facade.JobFacadeImpl;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
 public class JobSyncExecutor {
     private static final Logger logger = LoggerFactory.getLogger(JobSyncExecutor.class);
 
-    private final JobFactory jobFactory;
+    private final JobFacade jobFacade;
     private final JobService jobService;
 
     @SuppressFBWarnings("EI")
@@ -123,7 +123,7 @@ public class JobSyncExecutor {
                         taskCompletionHandlerChain, taskDispatcherChain)),
                 Stream.of(defaultTaskCompletionHandler)));
 
-        jobFactory = new JobFactoryImpl(
+        jobFacade = new JobFacadeImpl(
             builder.contextService, builder.eventPublisher, jobService, syncMessageBroker, builder.workflowService);
 
         TaskCoordinator coordinator = TaskCoordinator.builder()
@@ -145,7 +145,7 @@ public class JobSyncExecutor {
     }
 
     public Job execute(JobParameters jobParameters) {
-        long jobId = jobFactory.createJob(jobParameters);
+        long jobId = jobFacade.createJob(jobParameters);
 
         return jobService.getJob(jobId);
     }

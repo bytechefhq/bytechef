@@ -35,7 +35,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.atlas.execution.job.factory", "com.bytechef.atlas.execution.repository.jdbc",
+        "com.bytechef.atlas.execution.facade", "com.bytechef.atlas.execution.repository.jdbc",
         "com.bytechef.liquibase.config"
     })
 @EnableAutoConfiguration

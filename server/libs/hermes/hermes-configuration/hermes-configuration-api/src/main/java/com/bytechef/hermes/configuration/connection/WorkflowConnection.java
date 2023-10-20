@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
+import org.springframework.core.convert.converter.Converter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +45,8 @@ public class WorkflowConnection {
     private final String operationName;
 
     private WorkflowConnection(
-        String componentName, Long connectionId, Integer componentVersion, String key, String name,
-        String operationName) {
+        String componentName, Integer componentVersion, String key, String name, String operationName,
+        Long connectionId) {
 
         this.componentName = componentName;
         this.connectionId = connectionId;
@@ -81,16 +82,18 @@ public class WorkflowConnection {
         return workflowConnections;
     }
 
-    public static Map<String, WorkflowConnection> toMap(Map<String, Map<String, Object>> source, String taskName) {
+    private static Map<String, WorkflowConnection> toMap(
+        Map<String, Map<String, Object>> source, String operationName) {
+
         return source.entrySet()
             .stream()
             .collect(Collectors.toMap(
                 Map.Entry::getKey,
                 entry -> new WorkflowConnection(
                     MapValueUtils.getString(entry.getValue(), "componentName"),
-                    MapValueUtils.getLong(entry.getValue(), ID),
-                    MapValueUtils.getInteger(entry.getValue(), "componentVersion"), entry.getKey(),
-                    MapValueUtils.getString(entry.getValue(), "name"), taskName)));
+                    MapValueUtils.getInteger(entry.getValue(), "componentVersion"),
+                    entry.getKey(), MapValueUtils.getString(entry.getValue(), "name"), operationName,
+                    MapValueUtils.getLong(entry.getValue(), ID))));
     }
 
     public Optional<String> getComponentName() {
@@ -127,5 +130,18 @@ public class WorkflowConnection {
             ", name='" + name + '\'' +
             ", taskName='" + operationName + '\'' +
             '}';
+    }
+
+    @SuppressWarnings("rawtypes")
+    public static class WorkflowConnectionConverter implements Converter<Map, WorkflowConnection> {
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public WorkflowConnection convert(Map source) {
+            return new WorkflowConnection(
+                MapValueUtils.getString(source, "componentName"), MapValueUtils.getInteger(source, "componentVersion"),
+                MapValueUtils.getString(source, "key"), MapValueUtils.getString(source, "name"),
+                MapValueUtils.getString(source, "operationName"), MapValueUtils.getLong(source, "connectionId"));
+        }
     }
 }

@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.execution.remote.client.job.factory;
+package com.bytechef.atlas.execution.remote.client.facade;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.job.factory.JobFactory;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -27,12 +27,12 @@ import org.springframework.web.reactive.function.client.WebClient;
  * @author Ivica Cardic
  */
 @Component
-public class JobFactoryClient implements JobFactory {
+public class JobFacadeClient implements JobFacade {
 
     private final WebClient.Builder loadBalancedWebClientBuilder;
 
     @SuppressFBWarnings("EI")
-    public JobFactoryClient(WebClient.Builder loadBalancedWebClientBuilder) {
+    public JobFacadeClient(WebClient.Builder loadBalancedWebClientBuilder) {
         this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
     }
 
@@ -44,7 +44,7 @@ public class JobFactoryClient implements JobFactory {
             .post()
             .uri(uriBuilder -> uriBuilder
                 .host("platform-service-app")
-                .path("/api/internal/job-factory/create-job")
+                .path("/api/internal/job-facade/create-job")
                 .build())
             .bodyValue(jobParameters)
             .retrieve()

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.execution.trigger.lifecycle;
+package com.bytechef.hermes.execution.facade;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
@@ -32,14 +32,14 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class TriggerLifecycleManagerImpl implements TriggerLifecycleManager {
+public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
     private final TriggerScheduler triggerScheduler;
     private final TriggerDefinitionService triggerDefinitionService;
     private final TriggerStorageService triggerStorageService;
     private final String webhookUrl;
 
-    public TriggerLifecycleManagerImpl(
+    public TriggerLifecycleFacadeImpl(
         TriggerScheduler triggerScheduler, TriggerDefinitionService triggerDefinitionService,
         TriggerStorageService triggerStorageService, String webhookUrl) {
 
