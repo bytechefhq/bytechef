@@ -68,7 +68,7 @@ const InputProperty = ({
                 />
             )}
 
-            {!mention && (
+            {!dataPills?.length && (
                 <Input
                     description={description}
                     defaultValue={defaultValue as string}
