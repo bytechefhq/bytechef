@@ -33,8 +33,10 @@ public final class ObjectUtils {
         if (object instanceof CharSequence) {
             return ((CharSequence) object).length() == 0;
         }
-        if (object.getClass()
-            .isArray()) {
+
+        Class<?> objectClass = object.getClass();
+
+        if (objectClass.isArray()) {
             return Array.getLength(object) == 0;
         }
         if (object instanceof Collection<?>) {
