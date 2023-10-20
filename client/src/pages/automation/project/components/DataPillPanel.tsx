@@ -103,7 +103,7 @@ const DataPillPanel = () => {
         (action) =>
             action!.workflowAlias !== currentNode.name &&
             action!.component &&
-            (action!.outputSchema as PropertyType).properties
+            (action!.outputSchema as PropertyType)?.properties
     );
 
     return (
