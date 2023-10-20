@@ -64,10 +64,10 @@ export interface ProjectInstanceWorkflowModel {
     projectInstanceId?: number;
     /**
      * The id of a workflow.
-     * @type {number}
+     * @type {string}
      * @memberof ProjectInstanceWorkflowModel
      */
-    workflowId?: number;
+    workflowId?: string;
     /**
      * 
      * @type {number}

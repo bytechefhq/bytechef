@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/AutomationProjectApi.ts
 apis/AutomationProjectCategoryApi.ts
 apis/AutomationProjectInstanceApi.ts
