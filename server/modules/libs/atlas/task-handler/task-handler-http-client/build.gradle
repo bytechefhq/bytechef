@@ -1,3 +1,4 @@
 dependencies {
-    implementation "org.apache.tika:tika-core"
+    implementation 'com.github.mizosoft.methanol:methanol:1.7.0'
+    implementation 'org.apache.tika:tika-core'
 }
