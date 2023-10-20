@@ -31,7 +31,8 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectio
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.task.handler.OpenApiComponentTaskHandler;
-import com.bytechef.hermes.component.util.HttpClientUtils.HttpResponseEntry;
+import com.bytechef.hermes.component.util.HttpClientUtils;
+import com.bytechef.hermes.component.util.HttpClientUtils.Response;
 import com.bytechef.hermes.connection.constant.ConnectionConstants;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
@@ -142,9 +143,9 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         TaskExecution taskExecution = getTaskExecution(Map.of("petId", 1));
 
-        HttpResponseEntry httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        HttpClientUtils.Response response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
+        Assertions.assertEquals(200, response.statusCode());
 
         //
 
@@ -154,9 +155,9 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         taskExecution = getTaskExecution(Map.of("orderId", 1));
 
-        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
+        Assertions.assertEquals(200, response.statusCode());
 
         //
 
@@ -166,9 +167,9 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         taskExecution = getTaskExecution(Map.of("username", "user1"));
 
-        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
+        Assertions.assertEquals(200, response.statusCode());
     }
 
     @Test
@@ -237,10 +238,10 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         TaskExecution taskExecution = getTaskExecution(Map.of("status", "available"));
 
-        HttpResponseEntry httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        Response response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
-        JSONAssert.assertEquals(json, new JSONArray((List<?>) httpResponseEntry.body()), true);
+        Assertions.assertEquals(200, response.statusCode());
+        JSONAssert.assertEquals(json, new JSONArray((List<?>) response.body()), true);
 
         //
 
@@ -261,15 +262,15 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         taskExecution = getTaskExecution(Map.of("status", "unknown"));
 
-        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(400, httpResponseEntry.statusCode());
+        Assertions.assertEquals(400, response.statusCode());
         Assertions.assertEquals(
             Map.of(
                 "code", 400,
                 "message", "Input error: query parameter `status value `unknown` is not in the allowable values " +
                     "`[available, pending, sold]`"),
-            httpResponseEntry.body());
+            response.body());
 
         //
 
@@ -285,10 +286,10 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         taskExecution = getTaskExecution(Map.of("tags", List.of("tag1")));
 
-        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
-        JSONAssert.assertEquals(json, new JSONArray((List<?>) httpResponseEntry.body()), true);
+        Assertions.assertEquals(200, response.statusCode());
+        JSONAssert.assertEquals(json, new JSONArray((List<?>) response.body()), true);
 
         //
 
@@ -329,10 +330,10 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         taskExecution = getTaskExecution(Map.of("petId", 7));
 
-        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
+        Assertions.assertEquals(200, response.statusCode());
+        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.body()), true);
 
         //
 
@@ -354,10 +355,10 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         taskExecution = getTaskExecution(Collections.emptyMap());
 
-        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
+        Assertions.assertEquals(200, response.statusCode());
+        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.body()), true);
 
         //
 
@@ -383,10 +384,10 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         taskExecution = getTaskExecution(Map.of("orderId", 3));
 
-        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
+        Assertions.assertEquals(200, response.statusCode());
+        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.body()), true);
 
         //
 
@@ -402,10 +403,10 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         taskExecution = getTaskExecution(Map.of());
 
-        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
-        Assertions.assertEquals("Logged in user session: 7284289668658063360", httpResponseEntry.body());
+        Assertions.assertEquals(200, response.statusCode());
+        Assertions.assertEquals("Logged in user session: 7284289668658063360", response.body());
 
         //
 
@@ -415,10 +416,10 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         taskExecution = getTaskExecution(Map.of());
 
-        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
-        Assertions.assertNull(httpResponseEntry.body());
+        Assertions.assertEquals(200, response.statusCode());
+        Assertions.assertNull(response.body());
 
         //
 
@@ -446,10 +447,10 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         taskExecution = getTaskExecution(Map.of("username", "user1"));
 
-        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
+        Assertions.assertEquals(200, response.statusCode());
+        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.body()), true);
     }
 
     @Test
@@ -497,10 +498,10 @@ public class OpenApiComponentTaskHandlerIntTest {
                     }
                 }));
 
-        HttpResponseEntry httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        Response response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
+        Assertions.assertEquals(200, response.statusCode());
+        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.body()), true);
 
         //
 
@@ -554,10 +555,10 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         taskExecution = getTaskExecution(Map.of("petId", 10, "fileEntry", fileEntry.toComponentFileEntry()));
 
-        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
+        Assertions.assertEquals(200, response.statusCode());
+        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.body()), true);
 
         //
 
@@ -595,10 +596,10 @@ public class OpenApiComponentTaskHandlerIntTest {
                     }
                 }));
 
-        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
+        Assertions.assertEquals(200, response.statusCode());
+        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.body()), true);
 
         //
 
@@ -640,10 +641,10 @@ public class OpenApiComponentTaskHandlerIntTest {
                     }
                 }));
 
-        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
+        Assertions.assertEquals(200, response.statusCode());
+        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.body()), true);
 
         //
 
@@ -688,10 +689,10 @@ public class OpenApiComponentTaskHandlerIntTest {
                         }
                     })));
 
-        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
-        JSONAssert.assertEquals(json, new JSONArray((List<?>) httpResponseEntry.body()), true);
+        Assertions.assertEquals(200, response.statusCode());
+        JSONAssert.assertEquals(json, new JSONArray((List<?>) response.body()), true);
     }
 
     @Test
@@ -738,10 +739,10 @@ public class OpenApiComponentTaskHandlerIntTest {
                     }
                 }));
 
-        HttpResponseEntry httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        HttpClientUtils.Response response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
+        Assertions.assertEquals(200, response.statusCode());
+        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.body()), true);
 
         //
 
@@ -784,10 +785,10 @@ public class OpenApiComponentTaskHandlerIntTest {
                     }
                 }));
 
-        httpResponseEntry = (HttpResponseEntry) openApiComponentTaskHandler.handle(taskExecution);
+        response = (HttpClientUtils.Response) openApiComponentTaskHandler.handle(taskExecution);
 
-        Assertions.assertEquals(200, httpResponseEntry.statusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) httpResponseEntry.body()), true);
+        Assertions.assertEquals(200, response.statusCode());
+        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.body()), true);
     }
 
     private OpenApiComponentTaskHandler createRestComponentHandler(String actionName) {
