@@ -95,7 +95,7 @@ public class TestExecutorConfiguration {
             componentDefinitionService, contextService,
             JobSyncExecutor.builder()
                 .contextService(contextService)
-                .eventPublisher(createEventPublisher(jobService, syncMessageBroker, taskExecutionService))
+                .eventPublisher(getEventPublisher(jobService, syncMessageBroker, taskExecutionService))
                 .jobService(jobService)
                 .syncMessageBroker(syncMessageBroker)
                 .taskCompletionHandlerFactories(
@@ -111,7 +111,7 @@ public class TestExecutorConfiguration {
             taskExecutionService);
     }
 
-    private EventPublisher createEventPublisher(
+    private EventPublisher getEventPublisher(
         JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
 
         List<EventListener> eventListeners = List.of(

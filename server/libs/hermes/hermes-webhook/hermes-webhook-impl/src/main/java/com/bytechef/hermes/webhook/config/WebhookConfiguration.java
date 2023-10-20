@@ -71,7 +71,7 @@ import java.util.List;
 public class WebhookConfiguration {
 
     @Bean
-    WebhookExecutor webhookSyncExecutor(
+    WebhookExecutor webhookExecutor(
         ContextService contextService, CounterService counterService,
         InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry, JobFacade jobFacade,
         JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService,
@@ -84,7 +84,7 @@ public class WebhookConfiguration {
             instanceWorkflowAccessorRegistry,
             jobFacade, JobSyncExecutor.builder()
                 .contextService(contextService)
-                .eventPublisher(createEventPublisher(jobService, syncMessageBroker, taskExecutionService))
+                .eventPublisher(getEventPublisher(jobService, syncMessageBroker, taskExecutionService))
                 .jobService(jobService)
                 .syncMessageBroker(syncMessageBroker)
                 .taskCompletionHandlerFactories(
@@ -100,7 +100,7 @@ public class WebhookConfiguration {
             messageBroker, triggerSyncExecutor);
     }
 
-    private EventPublisher createEventPublisher(
+    private EventPublisher getEventPublisher(
         JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
 
         List<EventListener> eventListeners = List.of(

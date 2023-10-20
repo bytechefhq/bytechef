@@ -79,14 +79,7 @@ public class WorkerApplication {
                 \tExternal: \t{}://{}:{}{}
                 \tProfile(s): \t{}
                 ----------------------------------------------------------""",
-            environment.getProperty("spring.application.name"),
-            protocol,
-            serverPort,
-            contextPath,
-            protocol,
-            hostAddress,
-            serverPort,
-            contextPath,
-            environment.getActiveProfiles());
+            environment.getProperty("spring.application.name"), protocol, serverPort, contextPath, protocol,
+            hostAddress, serverPort, contextPath, environment.getActiveProfiles());
     }
 }

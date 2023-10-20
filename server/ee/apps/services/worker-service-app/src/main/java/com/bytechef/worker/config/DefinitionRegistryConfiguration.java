@@ -134,9 +134,7 @@ public class DefinitionRegistryConfiguration {
         ConnectionService connectionService, TriggerDefinitionService triggerDefinitionService,
         @Value("bytechef.webhookUrl") String webhookUrl) {
 
-        return new TriggerDefinitionFacadeImpl(
-            connectionService, triggerDefinitionService,
-            webhookUrl);
+        return new TriggerDefinitionFacadeImpl(connectionService, triggerDefinitionService, webhookUrl);
     }
 
     @Bean
