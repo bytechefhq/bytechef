@@ -3,6 +3,7 @@ package com.bytechef.atlas.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.atlas.web.rest.model.ExecutionErrorModel;
+import com.bytechef.atlas.web.rest.model.WebhookModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -29,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T20:58:15.589763+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-30T10:41:01.469662+02:00[Europe/Zagreb]")
 public class JobModel {
 
   @JsonProperty("createdBy")
@@ -126,7 +127,7 @@ public class JobModel {
 
   @JsonProperty("webhooks")
   @Valid
-  private List<Map<String, Object>> webhooks = null;
+  private List<WebhookModel> webhooks = null;
 
   @JsonProperty("workflowId")
   private String workflowId;
@@ -432,12 +433,12 @@ public class JobModel {
     this.status = status;
   }
 
-  public JobModel webhooks(List<Map<String, Object>> webhooks) {
+  public JobModel webhooks(List<WebhookModel> webhooks) {
     this.webhooks = webhooks;
     return this;
   }
 
-  public JobModel addWebhooksItem(Map<String, Object> webhooksItem) {
+  public JobModel addWebhooksItem(WebhookModel webhooksItem) {
     if (this.webhooks == null) {
       this.webhooks = new ArrayList<>();
     }
@@ -451,11 +452,11 @@ public class JobModel {
   */
   @Valid 
   @Schema(name = "webhooks", accessMode = Schema.AccessMode.READ_ONLY, description = "The list of the webhooks configured.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<Map<String, Object>> getWebhooks() {
+  public List<WebhookModel> getWebhooks() {
     return webhooks;
   }
 
-  public void setWebhooks(List<Map<String, Object>> webhooks) {
+  public void setWebhooks(List<WebhookModel> webhooks) {
     this.webhooks = webhooks;
   }
 

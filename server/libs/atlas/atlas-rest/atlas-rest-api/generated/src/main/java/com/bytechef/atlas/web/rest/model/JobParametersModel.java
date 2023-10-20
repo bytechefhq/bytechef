@@ -2,6 +2,7 @@ package com.bytechef.atlas.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.atlas.web.rest.model.WebhookModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -25,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobParameters", description = "Defines parameters used to execute a job.")
 @JsonTypeName("JobParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T20:58:15.589763+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-30T10:41:01.469662+02:00[Europe/Zagreb]")
 public class JobParametersModel {
 
   @JsonProperty("inputs")
@@ -46,7 +47,7 @@ public class JobParametersModel {
 
   @JsonProperty("webhooks")
   @Valid
-  private List<Map<String, Object>> webhooks = null;
+  private List<WebhookModel> webhooks = null;
 
   public JobParametersModel inputs(Map<String, Object> inputs) {
     this.inputs = inputs;
@@ -151,12 +152,12 @@ public class JobParametersModel {
     this.workflowId = workflowId;
   }
 
-  public JobParametersModel webhooks(List<Map<String, Object>> webhooks) {
+  public JobParametersModel webhooks(List<WebhookModel> webhooks) {
     this.webhooks = webhooks;
     return this;
   }
 
-  public JobParametersModel addWebhooksItem(Map<String, Object> webhooksItem) {
+  public JobParametersModel addWebhooksItem(WebhookModel webhooksItem) {
     if (this.webhooks == null) {
       this.webhooks = new ArrayList<>();
     }
@@ -170,11 +171,11 @@ public class JobParametersModel {
   */
   @Valid 
   @Schema(name = "webhooks", description = "The list of webhooks to register to receive notifications for certain events.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<Map<String, Object>> getWebhooks() {
+  public List<WebhookModel> getWebhooks() {
     return webhooks;
   }
 
-  public void setWebhooks(List<Map<String, Object>> webhooks) {
+  public void setWebhooks(List<WebhookModel> webhooks) {
     this.webhooks = webhooks;
   }
 
