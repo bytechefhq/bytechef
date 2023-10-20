@@ -29,10 +29,6 @@ public interface Context {
 
     Optional<Connection> fetchConnection();
 
-    void applyConnectionAuthorization(Authorization.AuthorizationContext authorizationContext);
-
-    Optional<String> fetchConnectionBaseUri();
-
     InputStream getFileStream(FileEntry fileEntry);
 
     void publishProgressEvent(int progress);
@@ -45,7 +41,11 @@ public interface Context {
 
     interface Connection {
 
+        void applyAuthorization(Authorization.AuthorizationContext authorizationContext);
+
         boolean containsParameter(String name);
+
+        Optional<String> fetchBaseUri();
 
         <T> T getParameter(String name);
 

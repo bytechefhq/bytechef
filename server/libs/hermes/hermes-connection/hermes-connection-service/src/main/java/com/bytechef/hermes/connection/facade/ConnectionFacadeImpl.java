@@ -22,7 +22,7 @@ import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.definition.registry.service.LocalConnectionDefinitionService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -41,14 +41,14 @@ import java.util.Objects;
 @Transactional
 public class ConnectionFacadeImpl implements ConnectionFacade {
 
-    private final ConnectionDefinitionService connectionDefinitionService;
+    private final LocalConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
     private final OAuth2Properties oAuth2Properties;
     private final TagService tagService;
 
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
-        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
+        LocalConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
         OAuth2Properties oAuth2Properties, TagService tagService) {
 
         this.connectionService = connectionService;
@@ -65,12 +65,10 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         if (StringUtils.hasText(connection.getAuthorizationName()) &&
             connection.containsParameter(Authorization.CODE)) {
 
-            Authorization authorization = connectionDefinitionService.getAuthorization(
-                connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion());
-
             // TODO add support for OAUTH2_AUTHORIZATION_CODE_PKCE
 
-            Authorization.AuthorizationType authorizationType = authorization.getType();
+            Authorization.AuthorizationType authorizationType = connectionDefinitionService.getAuthorizationType(
+                connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion());
 
             if (authorizationType == Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
                 authorizationType == Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {

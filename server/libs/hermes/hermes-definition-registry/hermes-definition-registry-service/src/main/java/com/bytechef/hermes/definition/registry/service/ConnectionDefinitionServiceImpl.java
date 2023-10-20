@@ -18,6 +18,7 @@
 package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
@@ -25,17 +26,19 @@ import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionService {
+public class ConnectionDefinitionServiceImpl implements LocalConnectionDefinitionService {
 
     private final List<ComponentDefinition> componentDefinitions;
     private final List<ConnectionDefinition> connectionDefinitions;
@@ -51,6 +54,17 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
+    public boolean connectionExists(String componentName, int connectionVersion) {
+        return componentDefinitions.stream()
+            .anyMatch(componentDefinition -> {
+                ConnectionDefinition connectionDefinition = componentDefinition.getConnection();
+
+                return componentName.equalsIgnoreCase(componentDefinition.getName()) &&
+                    connectionDefinition.getVersion() == connectionVersion;
+            });
+    }
+
+    @Override
     public void executeAuthorizationApply(
         Connection connection, Authorization.AuthorizationContext authorizationContext) {
 
@@ -58,10 +72,9 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             Authorization authorization = getAuthorization(
                 connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion());
 
-            BiConsumer<Authorization.AuthorizationContext, Context.Connection> applyConsumer = authorization
-                .getApplyConsumer();
+            Authorization.ApplyConsumer applyConsumer = authorization.getApply();
 
-            applyConsumer.accept(authorizationContext, connection.toContextConnection());
+            applyConsumer.accept(authorizationContext, this.toContextConnection(connection));
         }
     }
 
@@ -72,13 +85,11 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Authorization authorization = getAuthorization(
             connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion());
 
-        Authorization.QuadFunction<Context.Connection, String, String, String, Authorization.AuthorizationCallbackResponse> authorizationCallbackFunction = authorization
-            .getAuthorizationCallbackFunction();
+        Authorization.AuthorizationCallbackFunction authorizationCallbackFunction = authorization
+            .getAuthorizationCallback();
 
         return authorizationCallbackFunction.apply(
-            connection.toContextConnection(),
-            connection.getParameter(Authorization.CODE),
-            redirectUri,
+            this.toContextConnection(connection), connection.getParameter(Authorization.CODE), redirectUri,
             null // TODO pkce verifier
         );
     }
@@ -88,30 +99,39 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         ConnectionDefinition connectionDefinition = getComponentConnectionDefinition(
             connection.getComponentName(), connection.getConnectionVersion());
 
-        return Optional.ofNullable(
-            connectionDefinition.getBaseUriFunction()
-                .apply(connection.toContextConnection()));
+        ConnectionDefinition.BaseUriFunction baseUriFunction = connectionDefinition.getBaseUri();
+
+        return Optional.ofNullable(baseUriFunction.apply(this.toContextConnection(connection)));
     }
 
     @Override
-    public Authorization getAuthorization(String authorizationName, String componentName, int connectionVersion) {
-        ConnectionDefinition connectionDefinition = getComponentConnectionDefinition(componentName, connectionVersion);
+    public Authorization.AuthorizationType getAuthorizationType(
+        String authorizationName, String componentName, int connectionVersion) {
 
-        return connectionDefinition.getAuthorization(authorizationName);
+        Authorization authorization = getAuthorization(authorizationName, componentName, connectionVersion);
+
+        return authorization.getType();
     }
 
-    @Override
-    public ConnectionDefinition getComponentConnectionDefinition(String componentName, int componentVersion) {
+    public ConnectionDefinition getComponentConnectionDefinition(String componentName, int connectionVersion) {
         return CollectionUtils.getFirst(
             componentDefinitions,
-            componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
-                componentDefinition.getVersion() == componentVersion,
+            componentDefinition -> {
+                ConnectionDefinition connectionDefinition = componentDefinition.getConnection();
+
+                return componentName.equalsIgnoreCase(componentDefinition.getName()) &&
+                    connectionDefinition.getVersion() == connectionVersion;
+            },
             ComponentDefinition::getConnection);
     }
 
     @Override
     public Mono<ConnectionDefinition> getComponentConnectionDefinitionMono(String componentName, int componentVersion) {
-        return Mono.just(getComponentConnectionDefinition(componentName, componentVersion));
+        return Mono.just(CollectionUtils.getFirst(
+            componentDefinitions,
+            componentDefinition -> componentName.equalsIgnoreCase(componentDefinition.getName()) &&
+                componentDefinition.getVersion() == componentVersion,
+            ComponentDefinition::getConnection));
     }
 
     @Override
@@ -149,5 +169,62 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 componentDefinition.applyFilterCompatibleConnectionDefinitions(
                     componentDefinition, connectionDefinitions),
                 List.of(componentDefinition.getConnection())));
+    }
+
+    @Override
+    public Context.Connection toContextConnection(Connection connection) {
+        return new ContextConnection(connection);
+    }
+
+    private Authorization getAuthorization(String authorizationName, String componentName, int connectionVersion) {
+        ConnectionDefinition connectionDefinition = getComponentConnectionDefinition(componentName, connectionVersion);
+
+        return connectionDefinition.getAuthorization(authorizationName);
+    }
+
+    private class ContextConnection implements Context.Connection {
+
+        private Connection connection;
+        private final Map<String, Object> parameters;
+
+        public ContextConnection(Connection connection) {
+            this.connection = connection;
+            this.parameters = connection.getParameters();
+        }
+
+        @Override
+        public void applyAuthorization(Authorization.AuthorizationContext authorizationContext) {
+            executeAuthorizationApply(this.connection, authorizationContext);
+        }
+
+        @Override
+        public boolean containsParameter(String name) {
+            connection.getParameters();
+
+            return parameters.containsKey(name);
+        }
+
+        @Override
+        public Optional<String> fetchBaseUri() {
+            return ConnectionDefinitionServiceImpl.this.fetchBaseUri(connection);
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> T getParameter(String name) {
+            return (T) MapValueUtils.get(parameters, name);
+        }
+
+        @Override
+        public <T> T getParameter(String name, T defaultValue) {
+            return MapValueUtils.get(parameters, name, new ParameterizedTypeReference<>() {}, defaultValue);
+        }
+
+        @Override
+        public String toString() {
+            return "ContextConnection{" +
+                ", connection=" + connection +
+                '}';
+        }
     }
 }

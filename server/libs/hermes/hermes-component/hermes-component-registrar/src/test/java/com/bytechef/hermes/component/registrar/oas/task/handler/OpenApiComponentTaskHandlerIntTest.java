@@ -38,6 +38,7 @@ import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.config.WorkerDefinitionRegistryConfiguration;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServiceImpl;
+import com.bytechef.hermes.definition.registry.service.LocalConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.domain.FileEntry;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -120,7 +121,7 @@ public class OpenApiComponentTaskHandlerIntTest {
     private Connection connection;
 
     @Autowired
-    private ConnectionDefinitionService connectionDefinitionService;
+    private LocalConnectionDefinitionService connectionDefinitionService;
 
     @BeforeEach
     public void beforeEach() {

@@ -80,10 +80,10 @@ public class ConnectionDefinitionServiceRSocketController {
                 authorizationCallbackRequest.connection(), authorizationCallbackRequest.redirectUri()));
     }
 
-    @MessageMapping("ConnectionDefinitionService.getAuthorization")
-    public Mono<Authorization> getAuthorization(Map<String, Object> map) {
+    @MessageMapping("ConnectionDefinitionService.getAuthorizationType")
+    public Mono<Authorization.AuthorizationType> getAuthorizationType(Map<String, Object> map) {
         return Mono.just(
-            connectionDefinitionService.getAuthorization(
+            connectionDefinitionService.getAuthorizationType(
                 (String) map.get("authorizationName"), (String) map.get("componentName"),
                 (Integer) map.get("connectionVersion")));
     }

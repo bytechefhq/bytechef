@@ -29,6 +29,7 @@ dependencies {
 //    implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rsocket-client")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-rsocket")
+    implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-rsocket-client")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-filesystem")
