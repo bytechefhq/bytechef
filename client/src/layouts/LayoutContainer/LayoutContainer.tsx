@@ -134,7 +134,7 @@ const LayoutContainer = ({
                         {footer}
                     </div>
 
-                    {rightToolbarOpen && rightToolbarBody && (
+                    {rightToolbarOpen && !!rightToolbarBody && (
                         <aside className="flex">
                             <nav className="flex h-full flex-col border-l border-gray-100 bg-gray-100 dark:border-l dark:border-l-gray-700 dark:bg-gray-800">
                                 <div className="overflow-y-auto">
