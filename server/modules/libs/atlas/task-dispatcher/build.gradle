@@ -1,0 +1,10 @@
+subprojects {
+    dependencies {
+        compileOnly "org.springframework:spring-core"
+        compileOnly project(":modules:libs:atlas:engine:engine-core-api")
+        compileOnly project(":modules:libs:atlas:engine:engine-coordinator-api")
+
+        testImplementation "com.google.guava:guava"
+        testImplementation project(":modules:libs:atlas:engine:engine-core-impl")
+    }
+}

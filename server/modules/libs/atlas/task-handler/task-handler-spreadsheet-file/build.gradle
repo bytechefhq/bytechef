@@ -1,11 +1,4 @@
 dependencies {
-    compileOnly 'org.apache.commons:commons-lang3'
-    compileOnly "org.slf4j:slf4j-api"
-    compileOnly "org.springframework:spring-core"
-    compileOnly "org.springframework:spring-context"
-    compileOnly project(":modules:libs:atlas:engine:engine-worker-api")
-    compileOnly project(":modules:libs:atlas:file-storage:file-storage-api")
-
     implementation "com.github.miachm.sods:SODS"
     implementation "org.apache.poi:poi-ooxml"
 }
