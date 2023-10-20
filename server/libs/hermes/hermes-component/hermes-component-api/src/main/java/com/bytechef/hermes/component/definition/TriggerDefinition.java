@@ -69,6 +69,12 @@ public interface TriggerDefinition {
      *
      * @return
      */
+    Optional<Boolean> getDeprecated();
+
+    /**
+     *
+     * @return
+     */
     String getDescription();
 
     /**

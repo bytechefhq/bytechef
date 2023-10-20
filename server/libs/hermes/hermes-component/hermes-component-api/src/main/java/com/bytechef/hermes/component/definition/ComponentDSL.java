@@ -125,6 +125,7 @@ public final class ComponentDSL extends DefinitionDSL {
 
         private Boolean batch;
         private String componentName;
+        private Boolean deprecated;
         private String description;
         private String exampleOutput;
 
@@ -154,6 +155,12 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableActionDefinition batch(boolean batch) {
             this.batch = batch;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition deprecated(Boolean deprecated) {
+            this.deprecated = deprecated;
 
             return this;
         }
@@ -321,6 +328,11 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public Optional<Boolean> getBatch() {
             return Optional.ofNullable(batch);
+        }
+
+        @Override
+        public Optional<Boolean> getDeprecated() {
+            return Optional.ofNullable(deprecated);
         }
 
         private ModifiableActionDefinition componentName(String componentName) {
@@ -1310,6 +1322,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private Boolean batch;
         private String componentName;
         private DeduplicateFunction deduplicate;
+        private Boolean deprecated;
         private String description;
         private DynamicWebhookDisableConsumer dynamicWebhookDisable;
         private DynamicWebhookEnableFunction dynamicWebhookEnable;
@@ -1349,6 +1362,12 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableTriggerDefinition deduplicate(DeduplicateFunction deduplicate) {
             this.deduplicate = deduplicate;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition deprecated(Boolean deprecated) {
+            this.deprecated = deprecated;
 
             return this;
         }
@@ -1516,6 +1535,11 @@ public final class ComponentDSL extends DefinitionDSL {
         @JsonIgnore
         public String getComponentName() {
             return componentName;
+        }
+
+        @Override
+        public Optional<Boolean> getDeprecated() {
+            return Optional.ofNullable(deprecated);
         }
 
         @Override
