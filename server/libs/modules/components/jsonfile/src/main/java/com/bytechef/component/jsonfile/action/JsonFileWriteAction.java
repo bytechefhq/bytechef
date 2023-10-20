@@ -19,6 +19,7 @@ package com.bytechef.component.jsonfile.action;
 
 import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
@@ -79,7 +80,7 @@ public class JsonFileWriteAction {
         .execute(JsonFileWriteAction::executeWrite);
 
     @SuppressWarnings("unchecked")
-    public static Context.FileEntry executeWrite(Context context, InputParameters inputParameters)
+    protected static FileEntry executeWrite(Context context, InputParameters inputParameters)
         throws ComponentExecutionException {
         JsonFileTaskConstants.FileType fileType = JsonFileReadAction.getFileType(inputParameters);
         Object source = inputParameters.getRequired(SOURCE);

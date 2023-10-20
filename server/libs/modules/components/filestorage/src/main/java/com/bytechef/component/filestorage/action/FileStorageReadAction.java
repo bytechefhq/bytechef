@@ -44,7 +44,7 @@ public class FileStorageReadAction {
         .outputSchema(string())
         .execute(FileStorageReadAction::executeRead);
 
-    public static String executeRead(Context context, InputParameters inputParameters) {
+    protected static String executeRead(Context context, InputParameters inputParameters) {
         return context.readFileToString(inputParameters.get(FILE_ENTRY, Context.FileEntry.class));
     }
 }

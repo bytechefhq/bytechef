@@ -46,7 +46,7 @@ public class AwsS3GetUrlAction {
         .outputSchema(string())
         .execute(AwsS3GetUrlAction::executeGetUrl);
 
-    public static String executeGetUrl(Context context, InputParameters inputParameters) {
+    protected static String executeGetUrl(Context context, InputParameters inputParameters) {
         AmazonS3Uri amazonS3Uri = new AmazonS3Uri(inputParameters.getRequiredString(URI));
 
         String bucketName = amazonS3Uri.getBucket();

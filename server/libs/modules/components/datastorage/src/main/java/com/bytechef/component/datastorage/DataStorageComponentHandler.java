@@ -50,7 +50,7 @@ public class DataStorageComponentHandler implements ComponentHandler {
             DataStorageGetAllKeysAction.ACTION_DEFINITION,
             DataStorageGetValueAction.ACTION_DEFINITION,
             DataStorageSetValueAction.ACTION_DEFINITION,
-            DataStorageSetValueInListAction.ACTION_DEFINITION);;
+            DataStorageSetValueInListAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

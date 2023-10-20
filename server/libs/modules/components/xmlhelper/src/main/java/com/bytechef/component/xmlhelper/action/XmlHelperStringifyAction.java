@@ -47,7 +47,7 @@ public class XmlHelperStringifyAction {
         .outputSchema(string())
         .execute(XmlHelperStringifyAction::executeStringify);
 
-    public static String executeStringify(Context context, InputParameters inputParameters) {
+    protected static String executeStringify(Context context, InputParameters inputParameters) {
         Object source = inputParameters.getRequired(SOURCE);
 
         return XmlUtils.write(source);

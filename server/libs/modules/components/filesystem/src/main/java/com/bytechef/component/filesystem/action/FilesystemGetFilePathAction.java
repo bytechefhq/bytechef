@@ -55,7 +55,7 @@ public class FilesystemGetFilePathAction {
      * This method will handle a file in either Unix or Windows format. The method is entirely text based and returns
      * the text before the last forward or backslash.
      */
-    public static String executeGetFilePath(Context context, InputParameters inputParameters) {
+    protected static String executeGetFilePath(Context context, InputParameters inputParameters) {
         String filename = inputParameters.getRequiredString("filename");
 
         return filename.substring(0, filename.lastIndexOf(File.separator));

@@ -156,7 +156,7 @@ public class JsonFileReadAction {
         return result;
     }
 
-    public static JsonFileTaskConstants.FileType getFileType(InputParameters inputParameters) {
+    protected static JsonFileTaskConstants.FileType getFileType(InputParameters inputParameters) {
         String fileType = inputParameters.getString(FILE_TYPE, JsonFileTaskConstants.FileType.JSON.name());
 
         return JsonFileTaskConstants.FileType.valueOf(fileType.toUpperCase());

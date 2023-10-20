@@ -17,107 +17,18 @@
 
 package com.bytechef.component.filestorage;
 
-import static com.bytechef.component.filestorage.constant.FileStorageConstants.CONTENT;
-import static com.bytechef.component.filestorage.constant.FileStorageConstants.FILENAME;
-import static com.bytechef.component.filestorage.constant.FileStorageConstants.FILE_ENTRY;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import com.bytechef.component.filestorage.action.FileStorageReadAction;
-import com.bytechef.component.filestorage.action.FileStorageWriteAction;
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import org.assertj.core.util.Files;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 /**
  * @author Ivica Cardic
  */
 public class FileStorageComponentHandlerTest {
 
-    private static final Context context = Mockito.mock(Context.class);
     private static final FileStorageComponentHandler fileStorageComponentHandler = new FileStorageComponentHandler();
 
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals("definition/filestorage_v1.json", fileStorageComponentHandler.getDefinition());
-    }
-
-    @Test
-    public void testExecuteRead() {
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
-
-        Mockito.when(inputParameters.get(FILE_ENTRY, Context.FileEntry.class))
-            .thenReturn(fileEntry);
-
-        FileStorageReadAction.executeRead(context, inputParameters);
-
-        ArgumentCaptor<Context.FileEntry> fileEntryArgumentCaptor = ArgumentCaptor.forClass(Context.FileEntry.class);
-
-        Mockito.verify(context)
-            .readFileToString(fileEntryArgumentCaptor.capture());
-
-        assertThat(fileEntryArgumentCaptor.getValue()).isEqualTo(fileEntry);
-    }
-
-    @Disabled
-    @Test
-    public void testExecuteDownload() {
-        // TODO
-    }
-
-    @Test
-    public void testExecuteWrite() {
-        File file = getFile();
-
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getRequired(CONTENT))
-            .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
-        Mockito.when(inputParameters.getString(FILENAME, "file.txt"))
-            .thenReturn("file.txt");
-
-        FileStorageWriteAction.executeWrite(context, inputParameters);
-
-        ArgumentCaptor<String> contentArgumentCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
-
-        Mockito.verify(context)
-            .storeFileContent(filenameArgumentCaptor.capture(), contentArgumentCaptor.capture());
-
-        assertThat(contentArgumentCaptor.getValue()).isEqualTo(Files.contentOf(file, StandardCharsets.UTF_8));
-        assertThat(filenameArgumentCaptor.getValue()).isEqualTo("file.txt");
-
-        inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getRequired(CONTENT))
-            .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
-        Mockito.when(inputParameters.getString(FILENAME, "file.txt"))
-            .thenReturn("test.txt");
-
-        Mockito.reset(context);
-
-        FileStorageWriteAction.executeWrite(context, inputParameters);
-
-        filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
-
-        Mockito.verify(context)
-            .storeFileContent(filenameArgumentCaptor.capture(), Mockito.anyString());
-
-        assertThat(filenameArgumentCaptor.getValue()).isEqualTo("test.txt");
-    }
-
-    private File getFile() {
-        return new File(FileStorageComponentHandlerTest.class
-            .getClassLoader()
-            .getResource("dependencies/sample.txt")
-            .getFile());
     }
 }

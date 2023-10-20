@@ -44,7 +44,7 @@ public class ObjectHelperStringifyAction {
         .outputSchema(string())
         .execute(ObjectHelperStringifyAction::executeStringify);
 
-    public static String executeStringify(Context context, InputParameters inputParameters) {
+    protected static String executeStringify(Context context, InputParameters inputParameters) {
         Object input = inputParameters.getRequired(SOURCE);
 
         return JsonUtils.write(input);

@@ -40,7 +40,7 @@ public class FilesystemCreateTempDirAction {
         .description("Creates a temporary directory oon the filesystem.")
         .execute(FilesystemCreateTempDirAction::executeCreateTempDir);
 
-    public static String executeCreateTempDir(Context context, InputParameters inputParameters) {
+    protected static String executeCreateTempDir(Context context, InputParameters inputParameters) {
         try {
             Path path = Files.createTempDirectory("createTempDir_");
 

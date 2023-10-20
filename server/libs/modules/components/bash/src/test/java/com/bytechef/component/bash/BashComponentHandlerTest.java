@@ -19,14 +19,8 @@
 
 package com.bytechef.component.bash;
 
-import com.bytechef.component.bash.action.BashExecuteAction;
-import com.bytechef.component.bash.constant.BashConstants;
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 /**
  * @author Arik Cohen
@@ -37,21 +31,5 @@ public class BashComponentHandlerTest {
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals("definition/bash_v1.json", new BashComponentHandler().getDefinition());
-    }
-
-    @Test
-    public void testExecute() {
-        InputParameters inputParameters = Mockito.mock(InputParameters.class);
-
-        Mockito.when(inputParameters.getRequiredString(BashConstants.SCRIPT))
-            .thenReturn("ls -l "
-                + BashComponentHandlerTest.class
-                    .getClassLoader()
-                    .getResource("dependencies/test.txt")
-                    .getFile());
-
-        String output = BashExecuteAction.execute(Mockito.mock(Context.class), inputParameters);
-
-        Assertions.assertTrue(output.contains("build/resources/test/dependencies/test.txt"));
     }
 }

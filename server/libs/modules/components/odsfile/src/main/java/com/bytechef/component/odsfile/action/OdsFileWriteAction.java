@@ -18,6 +18,7 @@
 package com.bytechef.component.odsfile.action;
 
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.FileEntry;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
@@ -75,7 +76,7 @@ public class OdsFileWriteAction {
         .outputSchema(fileEntry())
         .execute(OdsFileWriteAction::executeWrite);
 
-    public static Context.FileEntry executeWrite(Context context, InputParameters inputParameters) {
+    protected static FileEntry executeWrite(Context context, InputParameters inputParameters) {
         String fileName = inputParameters.getString(FILENAME, "file.ods");
         @SuppressWarnings("unchecked")
         List<Map<String, ?>> rows = (List) inputParameters.getList(ROWS, Map.class, List.of());

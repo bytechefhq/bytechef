@@ -61,9 +61,9 @@ public class AwsS3PutObjectAction {
             string(ACL).label("ACL")
                 .description("The canned ACL to apply to the object."))
         .outputSchema(string())
-        .execute(AwsS3PutObjectAction::performPutObject);
+        .execute(AwsS3PutObjectAction::executePutObject);
 
-    public static Object performPutObject(Context context, InputParameters inputParameters) {
+    protected static Object executePutObject(Context context, InputParameters inputParameters) {
         AmazonS3Uri amazonS3Uri = new AmazonS3Uri(inputParameters.getRequiredString(URI));
 
         String bucketName = amazonS3Uri.getBucket();
