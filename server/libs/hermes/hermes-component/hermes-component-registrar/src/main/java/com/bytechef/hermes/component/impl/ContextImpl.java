@@ -66,6 +66,7 @@ public class ContextImpl implements Context {
         EventPublisher eventPublisher,
         FileStorageService fileStorageService,
         TaskExecution taskExecution) {
+
         this.connectionDefinition = connectionDefinition;
         this.connectionService = connectionService;
         this.eventPublisher = eventPublisher;
@@ -127,7 +128,6 @@ public class ContextImpl implements Context {
     }
 
     private static FileEntry getFileEntry(com.bytechef.hermes.file.storage.domain.FileEntry fileEntry) {
-        return new FileEntryImpl(
-            fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getName(), fileEntry.getUrl());
+        return new FileEntryImpl(fileEntry);
     }
 }

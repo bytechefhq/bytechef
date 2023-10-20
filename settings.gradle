@@ -35,7 +35,6 @@ dependencyResolutionManagement {
     versionCatalogs {
         libs {
             library("awssdk-s3", "software.amazon.awssdk:s3:2.19.26")
-            library("swagger-parser", "io.swagger.parser.v3:swagger-parser:2.1.11")
             library("jackson-databind-nullable", "org.openapitools:jackson-databind-nullable:0.2.4")
             library("jackson-dataformat-xml", "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.2")
             library("jackson-dataformat-yaml", "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.2")
@@ -60,11 +59,13 @@ dependencyResolutionManagement {
             library("spotbugs-annotations", "com.github.spotbugs:spotbugs-annotations:4.7.3")
             library("springdoc-openapi-starter-webflux-ui", "org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.2")
             library("swagger-annotations", "io.swagger.core.v3:swagger-annotations:2.2.8")
+            library("swagger-parser", "io.swagger.parser.v3:swagger-parser:2.1.11")
             library("zt-exec", "org.zeroturnaround:zt-exec:1.12")
             library("testcontainers", "org.testcontainers:testcontainers:1.17.6")
             library("testcontainers-postgresql", "org.testcontainers:postgresql:1.17.6")
             library("testcontainers-junit-jupiter", "org.testcontainers:junit-jupiter:1.17.6")
             library("tika-core", "org.apache.tika:tika-core:2.6.0")
+            library("wiremock", "com.github.tomakehurst:wiremock:3.0.0-beta-2")
         }
     }
 }

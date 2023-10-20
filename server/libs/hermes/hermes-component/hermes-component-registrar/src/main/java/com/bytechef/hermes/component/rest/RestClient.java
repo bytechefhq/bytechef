@@ -18,27 +18,143 @@
 package com.bytechef.hermes.component.rest;
 
 import com.bytechef.atlas.domain.TaskExecution;
+import com.bytechef.commons.utils.MapUtils;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.FileEntry;
+import com.bytechef.hermes.component.RestComponentHandler.PropertyType;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.utils.HttpClientUtils;
+import com.bytechef.hermes.component.utils.HttpClientUtils.BodyContentType;
+import com.bytechef.hermes.component.utils.HttpClientUtils.Payload;
+import com.bytechef.hermes.component.utils.HttpClientUtils.ResponseFormat;
+import com.bytechef.hermes.definition.Property;
+import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
 public class RestClient {
 
+    private static final String TYPE = "type";
+
     public Object execute(ActionDefinition actionDefinition, Context context, TaskExecution taskExecution) {
         Map<String, Object> metadata = actionDefinition.getMetadata();
 
-        // Map<String, Object> parameters = taskExecution.getParameters();
-
         return HttpClientUtils.executor()
-            .exchange((String) metadata.get("path"), getRequestMethod(metadata))
+            .configuration(
+                HttpClientUtils.Configuration.builder()
+                    .responseFormat(getResponseFormat(actionDefinition))
+                    .fullResponse(true)
+                    .build())
+            .exchange(
+                createUri(metadata, taskExecution.getParameters(), actionDefinition.getProperties()),
+                MapUtils.get(metadata, "requestMethod", HttpClientUtils.RequestMethod.class))
+            .headers(getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.HEADER))
+            .payload(
+                getPayload(
+                    MapUtils.get(metadata, "bodyContentType", BodyContentType.class),
+                    MapUtils.getString(metadata, "mimeType"),
+                    taskExecution.getParameters(), actionDefinition.getProperties()))
+            .queryParameters(
+                getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.QUERY))
             .execute(context);
     }
 
-    private static HttpClientUtils.RequestMethod getRequestMethod(Map<String, Object> metadata) {
-        return HttpClientUtils.RequestMethod.valueOf((String) metadata.get("requestMethod"));
+    private String createUri(
+        Map<String, Object> metadata, Map<String, Object> parameters, List<Property<?>> properties) {
+
+        String path = (String) metadata.get("path");
+
+        for (Property<?> property : properties) {
+            if (MapUtils.get(property.getMetadata(), TYPE, PropertyType.class) == PropertyType.PATH) {
+                path = path.replace(
+                    "{" + property.getName() + "}", MapUtils.getRequiredString(parameters, property.getName()));
+            }
+        }
+
+        return path;
+    }
+
+    private Payload getPayload(
+        BodyContentType bodyContentType, String mimeType, Map<String, Object> parameters,
+        List<Property<?>> properties) {
+        Payload payload = null;
+
+        if (bodyContentType != null) {
+            for (Property<?> property : properties) {
+                if (Objects.equals(MapUtils.get(property.getMetadata(), TYPE, PropertyType.class), PropertyType.BODY)) {
+                    payload = switch (bodyContentType) {
+                        case BINARY -> Payload.of(
+                            MapUtils.getRequired(parameters, property.getName(), FileEntry.class), mimeType);
+                        case FORM_DATA, FORM_URL_ENCODED -> Payload.of(
+                            MapUtils.getRequiredMap(parameters, property.getName()));
+                        case JSON, XML -> {
+                            if (property.getType() == Property.Type.ARRAY) {
+                                yield Payload.of(
+                                    MapUtils.getRequiredList(parameters, property.getName(), Object.class));
+                            } else if (property.getType() == Property.Type.OBJECT) {
+                                yield Payload.of(
+                                    MapUtils.getRequiredMap(parameters, property.getName()));
+                            } else {
+                                yield Payload.of(
+                                    MapUtils.getRequiredString(parameters, property.getName()));
+                            }
+                        }
+                        case RAW -> Payload.of(MapUtils.getRequiredString(parameters, property.getName()), mimeType);
+                    };
+
+                    break;
+                }
+            }
+        }
+
+        return payload;
+    }
+
+    private ResponseFormat getResponseFormat(ActionDefinition actionDefinition) {
+        ResponseFormat responseFormat = null;
+        List<Property<?>> outputProperties = actionDefinition.getOutput();
+
+        if (outputProperties != null && !outputProperties.isEmpty()) {
+            Property<?> property = outputProperties.get(0);
+
+            responseFormat = MapUtils.get(property.getMetadata(), "responseFormat", ResponseFormat.class);
+        }
+
+        return responseFormat;
+    }
+
+    private Map<String, List<String>> getValuesMap(
+        Map<String, Object> parameters, List<Property<?>> properties, PropertyType propertyType) {
+
+        Map<String, List<String>> valuesMap = new HashMap<>();
+
+        for (Property<?> property : properties) {
+            if (Objects.equals(MapUtils.get(property.getMetadata(), TYPE, PropertyType.class), propertyType)) {
+                String value = MapUtils.getString(parameters, property.getName());
+
+                valuesMap.compute(property.getName(), (key, values) -> {
+                    if (StringUtils.hasText(value)) {
+                        if (values == null) {
+                            values = new ArrayList<>();
+                        }
+
+                        if (!values.contains(value)) {
+                            values.add(value);
+                        }
+                    }
+
+                    return values;
+                });
+            }
+        }
+
+        return valuesMap;
     }
 }
