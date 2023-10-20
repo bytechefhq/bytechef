@@ -2141,18 +2141,18 @@
       "name": "oauth2_client_credentials",
       "type": "OAUTH2_CLIENT_CREDENTIALS"
     } ],
-    "componentDisplay": {
+    "display": {
       "description": "Makes an HTTP request and returns the response data.",
       "title": "HTTP Client"
     },
-    "componentName": "httpClient",
-    "connectionVersion": 1,
+    "name": "httpClient",
     "properties": [ {
       "label": "Base URI",
       "name": "baseUri",
       "type": "STRING",
       "controlType": "INPUT_TEXT"
-    } ]
+    } ],
+    "version": 1
   },
   "display": {
     "description": "Makes an HTTP request and returns the response data.",

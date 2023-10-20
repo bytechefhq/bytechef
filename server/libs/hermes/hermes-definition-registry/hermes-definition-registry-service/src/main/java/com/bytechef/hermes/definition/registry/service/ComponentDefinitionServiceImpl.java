@@ -19,12 +19,10 @@ package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionBasicDTO;
-import com.bytechef.hermes.definition.registry.dto.AuthorizationDTO;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionBasicDTO;
 import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionBasicDTO;
@@ -48,12 +46,21 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
 
     @Override
     public Mono<ComponentDefinitionDTO> getComponentDefinitionMono(String name, Integer version) {
-        return Mono.just(
-            toComponentDefinitionDTO(
-                CollectionUtils.getFirst(
-                    componentDefinitions,
-                    componentDefinition -> name.equalsIgnoreCase(componentDefinition.getName()) &&
-                        version == componentDefinition.getVersion())));
+        ComponentDefinition componentDefinition;
+
+        List<ComponentDefinition> filteredComponentDefinitions = CollectionUtils.filter(
+            componentDefinitions,
+            curComponentDefinition -> name.equalsIgnoreCase(curComponentDefinition.getName()));
+
+        if (version == null) {
+            componentDefinition = filteredComponentDefinitions.get(filteredComponentDefinitions.size() - 1);
+        } else {
+            componentDefinition = CollectionUtils.getFirst(
+                filteredComponentDefinitions,
+                curComponentDefinition -> version == curComponentDefinition.getVersion());
+        }
+
+        return Mono.just(toComponentDefinitionDTO(componentDefinition));
     }
 
     @Override
@@ -73,10 +80,14 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
 
     private ComponentDefinitionDTO toComponentDefinitionDTO(ComponentDefinition componentDefinition) {
         return new ComponentDefinitionDTO(
-            CollectionUtils.map(componentDefinition.getActions(), this::toActionDefinitionBasicDTO),
+            componentDefinition.getActions() == null
+                ? null
+                : CollectionUtils.map(componentDefinition.getActions(), this::toActionDefinitionBasicDTO),
             toConnectionDefinitionDTO(componentDefinition.getConnection()),
             componentDefinition.getDisplay(), componentDefinition.getName(), componentDefinition.getResources(),
-            CollectionUtils.map(componentDefinition.getTriggers(), this::toTriggerDefinitionBasicDTO),
+            componentDefinition.getTriggers() == null
+                ? null
+                : CollectionUtils.map(componentDefinition.getTriggers(), this::toTriggerDefinitionBasicDTO),
             componentDefinition.getVersion());
     }
 
@@ -86,17 +97,14 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
             actionDefinition.getResources());
     }
 
-    private List<AuthorizationDTO> toAuthorizationDTOs(List<? extends Authorization> authorizations) {
-        return CollectionUtils.map(
-            authorizations,
-            authorization -> new AuthorizationDTO(
-                authorization.getDisplay(), authorization.getName(), authorization.getProperties(),
-                authorization.getType()));
-    }
-
     private ConnectionDefinitionBasicDTO toConnectionDefinitionDTO(ConnectionDefinition connectionDefinition) {
+        if (connectionDefinition == null) {
+            return null;
+        }
+
         return new ConnectionDefinitionBasicDTO(
-            connectionDefinition.getDisplay(), connectionDefinition.getName(), connectionDefinition.getResources());
+            connectionDefinition.getDisplay(), connectionDefinition.getName(), connectionDefinition.getResources(),
+            connectionDefinition.getVersion());
     }
 
     private TriggerDefinitionBasicDTO toTriggerDefinitionBasicDTO(TriggerDefinition triggerDefinition) {

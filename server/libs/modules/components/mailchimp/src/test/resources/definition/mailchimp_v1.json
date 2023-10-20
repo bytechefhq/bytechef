@@ -700,12 +700,12 @@
       "name": "oauth2_authorization_code",
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
-    "componentDisplay": {
+    "display": {
       "description": "Mailchimp REST API documentation",
       "title": "Mailchimp"
     },
-    "componentName": "mailchimp",
-    "connectionVersion": 1
+    "name": "mailchimp",
+    "version": 1
   },
   "display": {
     "description": "Mailchimp REST API documentation",

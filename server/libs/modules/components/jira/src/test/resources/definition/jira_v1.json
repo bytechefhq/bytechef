@@ -3733,12 +3733,12 @@
       "name": "oauth2_authorization_code",
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
-    "componentDisplay": {
+    "display": {
       "description": "Jira Cloud platform REST API documentation",
       "title": "Jira"
     },
-    "componentName": "jira",
-    "connectionVersion": 1
+    "name": "jira",
+    "version": 1
   },
   "display": {
     "description": "Jira Cloud platform REST API documentation",

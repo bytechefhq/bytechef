@@ -23,21 +23,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.bytechef.commons.util.MapValueUtils;
-import com.bytechef.hermes.component.Context;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.tika.Tika;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
  */
 public class FileEntry {
-
-    static {
-        MapValueUtils.addConverter(new FileEntryConverter());
-    }
 
     private final String extension;
     private final String mimeType;
@@ -118,10 +111,6 @@ public class FileEntry {
         return Objects.hash(extension, mimeType, name, url);
     }
 
-    public Context.FileEntry toContextFileEntry() {
-        return new ContextFileEntry(this);
-    }
-
     public Map<String, String> toMap() {
         return Map.of(
             "extension", getExtension(),
@@ -137,66 +126,5 @@ public class FileEntry {
             + mimeType + '\'' + ", name='"
             + name + '\'' + ", url='"
             + url + '\'' + '}';
-    }
-
-    private static class ContextFileEntry implements Context.FileEntry {
-
-        private final String extension;
-        private final String mimeType;
-        private final String name;
-        private final String url;
-
-        public ContextFileEntry(String extension, String mimeType, String name, String url) {
-            this.extension = extension;
-            this.mimeType = mimeType;
-            this.name = name;
-            this.url = url;
-        }
-
-        public ContextFileEntry(com.bytechef.hermes.file.storage.domain.FileEntry fileEntry) {
-            this(fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getName(), fileEntry.getUrl());
-        }
-
-        @Override
-        public String getExtension() {
-            return extension;
-        }
-
-        @Override
-        public String getMimeType() {
-            return mimeType;
-        }
-
-        @Override
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public String getUrl() {
-            return url;
-        }
-
-        @Override
-        public String toString() {
-            return "ContextFileEntry{" +
-                "extension='" + extension + '\'' +
-                ", mimeType='" + mimeType + '\'' +
-                ", name='" + name + '\'' +
-                ", url='" + url + '\'' +
-                '}';
-        }
-    }
-
-    private static class FileEntryConverter implements Converter<Map<?, ?>, Context.FileEntry> {
-
-        @Override
-        public Context.FileEntry convert(Map<?, ?> source) {
-            return new ContextFileEntry(
-                (String) source.get("extension"),
-                (String) source.get("mimeType"),
-                (String) source.get("name"),
-                (String) source.get("url"));
-        }
     }
 }

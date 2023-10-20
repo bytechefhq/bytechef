@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.Context.Connection;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -54,46 +54,77 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
     String USERNAME = "username";
     String VALUE = "value";
 
+    enum HttpVerb {
+        DELETE, GET, PATCH, POST, PUT
+    }
+
     enum AuthorizationType {
-        API_KEY((AuthorizationContext authorizationContext, Connection connection) -> {
-            String addTo = connection.getParameter(ADD_TO, ApiTokenLocation.HEADER.name());
+        API_KEY((
+            InputParameters connectionParameters, AuthorizationContext authorizationContext, String url,
+            HttpVerb httpVerb) -> {
+
+            String addTo = connectionParameters.getString(ADD_TO, ApiTokenLocation.HEADER.name());
 
             if (ApiTokenLocation.valueOf(addTo.toUpperCase()) == ApiTokenLocation.HEADER) {
                 authorizationContext.setHeaders(
-                    Map.of(connection.getParameter(KEY, API_TOKEN), List.of(connection.getParameter(VALUE, ""))));
+                    Map.of(
+                        connectionParameters.getString(KEY, API_TOKEN),
+                        List.of(connectionParameters.getString(VALUE, ""))));
             } else {
                 authorizationContext.setQueryParameters(
-                    Map.of(connection.getParameter(KEY, API_TOKEN), List.of(connection.getParameter(VALUE, ""))));
+                    Map.of(
+                        connectionParameters.getString(KEY, API_TOKEN),
+                        List.of(connectionParameters.getString(VALUE, ""))));
             }
         }),
-        BASIC_AUTH((AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
-            .setHeaders(
-                getBasicAuthorizationHeader(connection.getParameter(USERNAME), connection.getParameter(PASSWORD)))),
+        BASIC_AUTH(
+            (
+                InputParameters connectionParameters, AuthorizationContext authorizationContext, String url,
+                HttpVerb httpVerb) -> authorizationContext
+                    .setUsernamePassword(
+                        connectionParameters.getString(USERNAME),
+                        connectionParameters.getString(PASSWORD))),
         BEARER_TOKEN(
-            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
-                .setHeaders(
-                    Map.of(Constants.AUTHORIZATION, List.of(Constants.BEARER + " " + connection.getParameter(TOKEN))))),
+            (
+                InputParameters connectionParameters, AuthorizationContext authorizationContext, String url,
+                HttpVerb httpVerb) -> authorizationContext
+                    .setHeaders(
+                        Map.of(
+                            Constants.AUTHORIZATION,
+                            List.of(Constants.BEARER + " " + connectionParameters.getString(TOKEN))))),
         CUSTOM(null),
-        DIGEST_AUTH((AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
-            .setHeaders(
-                getBasicAuthorizationHeader(connection.getParameter(USERNAME), connection.getParameter(PASSWORD)))),
+        DIGEST_AUTH(
+            (
+                InputParameters connectionParameters, AuthorizationContext authorizationContext, String url,
+                HttpVerb httpVerb) -> authorizationContext
+                    .setUsernamePassword(
+                        connectionParameters.getString(USERNAME),
+                        connectionParameters.getString(PASSWORD))),
         OAUTH2_AUTHORIZATION_CODE(
-            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
-                .setHeaders(getOAuth2Headers(connection))),
+            (
+                InputParameters connectionParameters, AuthorizationContext authorizationContext, String url,
+                HttpVerb httpVerb) -> authorizationContext
+                    .setHeaders(getOAuth2Headers(connectionParameters))),
         OAUTH2_AUTHORIZATION_CODE_PKCE(
-            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
-                .setHeaders(getOAuth2Headers(connection))),
+            (
+                InputParameters connectionParameters, AuthorizationContext authorizationContext, String url,
+                HttpVerb httpVerb) -> authorizationContext
+                    .setHeaders(getOAuth2Headers(connectionParameters))),
         OAUTH2_CLIENT_CREDENTIALS(
-            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
-                .setHeaders(getOAuth2Headers(connection))),
+            (
+                InputParameters connectionParameters, AuthorizationContext authorizationContext, String url,
+                HttpVerb httpVerb) -> authorizationContext
+                    .setHeaders(getOAuth2Headers(connectionParameters))),
         OAUTH2_IMPLICIT_CODE(
-            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
-                .setHeaders(getOAuth2Headers(connection))),
+            (
+                InputParameters connectionParameters, AuthorizationContext authorizationContext, String url,
+                HttpVerb httpVerb) -> authorizationContext
+                    .setHeaders(getOAuth2Headers(connectionParameters))),
         OAUTH2_RESOURCE_OWNER_PASSWORD(
-            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
-                .setHeaders(getOAuth2Headers(connection)));
-
-        private static final Base64.Encoder ENCODER = Base64.getEncoder();
+            (
+                InputParameters connectionParameters, AuthorizationContext authorizationContext, String url,
+                HttpVerb httpVerb) -> authorizationContext
+                    .setHeaders(getOAuth2Headers(connectionParameters)));
 
         private final ApplyConsumer defaultApplyConsumer;
 
@@ -110,20 +141,12 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
             private static final String BEARER = "Bearer";
         }
 
-        private static Map<String, List<String>> getBasicAuthorizationHeader(Object username, Object password) {
-            String valueToEncode = username + ":" + password;
-
-            return Map.of(
-                "Authorization",
-                List.of("Basic " + ENCODER.encodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8))));
-        }
-
-        private static Map<String, List<String>> getOAuth2Headers(Connection connection) {
+        private static Map<String, List<String>> getOAuth2Headers(InputParameters connectionParameters) {
             return Map.of(
                 Constants.AUTHORIZATION,
                 List.of(
-                    connection.getParameter(HEADER_PREFIX, Constants.BEARER) + " " +
-                        connection.getParameter(ACCESS_TOKEN)));
+                    connectionParameters.getString(HEADER_PREFIX, Constants.BEARER) + " " +
+                        connectionParameters.getString(ACCESS_TOKEN)));
         }
     }
 
@@ -174,10 +197,10 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
         /**
          *
-         * @param connection
+         * @param connectionParameters
          * @return
          */
-        String apply(Connection connection);
+        String apply(InputParameters connectionParameters);
     }
 
     @FunctionalInterface
@@ -185,10 +208,12 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
         /**
          *
+         * @param connectionParameters
          * @param authorizationContext
-         * @param connection
          */
-        void accept(AuthorizationContext authorizationContext, Connection connection);
+        void accept(
+            InputParameters connectionParameters, AuthorizationContext authorizationContext, String url,
+            HttpVerb httpVerb);
     }
 
     /**
@@ -199,21 +224,41 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
         /**
          *
-         * @param connection
+         * @param connectionParameters
          * @param code
          * @param redirectUri
          * @param codeVerifier
          * @return
          */
         AuthorizationCallbackResponse apply(
-            Connection connection, String code, String redirectUri, String codeVerifier);
+            InputParameters connectionParameters, String code, String redirectUri, String codeVerifier);
     }
 
-    interface AuthorizationContext {
+    @SuppressFBWarnings("EI")
+    record AuthorizationContext(
+        Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Map<String, String> payload) {
 
-        void setHeaders(Map<String, List<String>> headers);
+        private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
-        void setQueryParameters(Map<String, List<String>> queryParameters);
+        public void setHeaders(Map<String, List<String>> headers) {
+            this.headers.putAll(headers);
+        }
+
+        public void setQueryParameters(Map<String, List<String>> queryParameters) {
+            this.queryParameters.putAll(queryParameters);
+        }
+
+        public void setPayload(Map<String, String> payload) {
+            this.payload.putAll(payload);
+        }
+
+        public void setUsernamePassword(String username, String password) {
+            String valueToEncode = username + ":" + password;
+
+            headers.put(
+                "Authorization",
+                List.of("Basic " + ENCODER.encodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8))));
+        }
     }
 
     /**
@@ -224,10 +269,10 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
         /**
          *
-         * @param connection
+         * @param connectionParameters
          * @return
          */
-        String apply(Connection connection);
+        String apply(InputParameters connectionParameters);
     }
 
     /**
@@ -238,10 +283,10 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
         /**
          *
-         * @param connection
+         * @param connectionParameters
          * @return
          */
-        String apply(Connection connection);
+        String apply(InputParameters connectionParameters);
     }
 
     /**
@@ -252,10 +297,10 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
         /**
          *
-         * @param connection
+         * @param connectionParameters
          * @return
          */
-        String apply(Connection connection);
+        String apply(InputParameters connectionParameters);
     }
 
     /**
@@ -275,10 +320,10 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
         /**
          *
-         * @param connection
+         * @param connectionParameters
          * @return
          */
-        String apply(Connection connection);
+        String apply(InputParameters connectionParameters);
     }
 
     /**
@@ -289,10 +334,10 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
         /**
          *
-         * @param connection
+         * @param connectionParameters
          * @return
          */
-        String apply(Connection connection);
+        String apply(InputParameters connectionParameters);
     }
 
     /**
@@ -303,10 +348,10 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
         /**
          *
-         * @param connection
+         * @param connectionParameters
          * @return
          */
-        List<String> apply(Connection connection);
+        List<String> apply(InputParameters connectionParameters);
     }
 
     /**
@@ -317,10 +362,10 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
         /**
          *
-         * @param connection
+         * @param connectionParameters
          * @return
          */
-        String apply(Connection connection);
+        String apply(InputParameters connectionParameters);
     }
 
     /**

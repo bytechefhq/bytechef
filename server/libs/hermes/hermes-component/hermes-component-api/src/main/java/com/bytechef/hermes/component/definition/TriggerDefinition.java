@@ -24,6 +24,7 @@ import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -277,6 +278,7 @@ public interface TriggerDefinition {
      * @param closureParameters
      * @param pollImmediately
      */
+    @SuppressFBWarnings("EI")
     record PollOutput(Object result, Map<String, Object> closureParameters, boolean pollImmediately) {
     }
 
@@ -285,6 +287,7 @@ public interface TriggerDefinition {
      * @param parameters
      * @param webhookExpirationDate
      */
+    @SuppressFBWarnings("EI")
     record WebhookEnableOutput(Map<String, Object> parameters, LocalDateTime webhookExpirationDate) {
     }
 }

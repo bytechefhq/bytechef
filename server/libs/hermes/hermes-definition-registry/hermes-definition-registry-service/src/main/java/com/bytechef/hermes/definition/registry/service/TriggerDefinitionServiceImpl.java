@@ -39,7 +39,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public Mono<TriggerDefinitionDTO> getComponentDefinitionTriggerMono(
+    public Mono<TriggerDefinitionDTO> getComponentTriggerDefinitionMono(
         String componentName, int componentVersion, String triggerName) {
 
         return Mono.just(
@@ -55,7 +55,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public Mono<List<TriggerDefinitionDTO>> getComponentDefinitionTriggersMono(
+    public Mono<List<TriggerDefinitionDTO>> getComponentTriggerDefinitions(
         String componentName, int componentVersion) {
         return Mono.just(
             componentDefinitions.stream()

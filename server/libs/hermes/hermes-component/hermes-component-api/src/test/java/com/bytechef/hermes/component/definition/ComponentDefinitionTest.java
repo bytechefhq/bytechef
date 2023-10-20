@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.component.definition;
 
-import static com.bytechef.hermes.component.constant.Version.VERSION_1;
 import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.hermes.definition.Option;
@@ -305,7 +304,7 @@ public class ComponentDefinitionTest {
                 .description("description")
                 .subtitle("subtitle")
                 .icon("icon"))
-            .version(VERSION_1);
+            .version(1);
 
         jsonAssertEquals(
             """

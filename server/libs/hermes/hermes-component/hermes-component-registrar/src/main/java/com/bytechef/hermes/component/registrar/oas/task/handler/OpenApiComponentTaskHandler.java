@@ -42,23 +42,22 @@ public class OpenApiComponentTaskHandler implements TaskHandler<Object> {
     private final ActionDefinition actionDefinition;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
-    private final OpenApiComponentHandler openApiComponentHandler;
-
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
+    private final OpenApiComponentHandler openApiComponentHandler;
 
     @SuppressFBWarnings("EI2")
     public OpenApiComponentTaskHandler(
         ActionDefinition actionDefinition, ConnectionDefinitionService connectionDefinitionService,
-        ConnectionService connectionService, OpenApiComponentHandler openApiComponentHandler,
-        EventPublisher eventPublisher, FileStorageService fileStorageService) {
+        ConnectionService connectionService, EventPublisher eventPublisher, FileStorageService fileStorageService,
+        OpenApiComponentHandler openApiComponentHandler) {
 
         this.actionDefinition = actionDefinition;
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
-        this.openApiComponentHandler = openApiComponentHandler;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
+        this.openApiComponentHandler = openApiComponentHandler;
     }
 
     @Override

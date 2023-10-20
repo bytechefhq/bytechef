@@ -27,8 +27,8 @@ import java.util.List;
  */
 public interface ActionDefinitionService {
 
-    Mono<ActionDefinitionDTO> getComponentDefinitionActionMono(
+    Mono<ActionDefinitionDTO> getComponentActionDefinitionMono(
         String componentName, int componentVersion, String actionName);
 
-    Mono<List<ActionDefinitionDTO>> getComponentDefinitionActionsMono(String componentName, int componentVersion);
+    Mono<List<ActionDefinitionDTO>> getComponentActionDefinitionsMono(String componentName, int componentVersion);
 }

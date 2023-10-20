@@ -17,10 +17,9 @@
 
 package com.bytechef.worker.config;
 
-import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
@@ -47,6 +46,7 @@ import org.springframework.messaging.rsocket.RSocketRequester;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Configuration
@@ -93,13 +93,18 @@ public class DefinitionRegistryConfiguration {
     }
 
     @Bean
+    ConnectionDefinitionService connectionDefinitionService(List<ComponentDefinition> componentDefinitions) {
+        return new ConnectionDefinitionServiceImpl(componentDefinitions);
+    }
+
+    @Bean
     @Primary
-    WorkerConnectionDefinitionService connectionDefinitionService(
-        List<ComponentDefinition> componentDefinitions,
+    ConnectionDefinitionService connectionDefinitionServiceDecorator(
+        ConnectionDefinitionService connectionDefinitionService,
         ConnectionDefinitionServiceRSocketClient connectionDefinitionServiceRSocketClient) {
 
         return new WorkerConnectionDefinitionService(
-            new ConnectionDefinitionServiceImpl(componentDefinitions), connectionDefinitionServiceRSocketClient);
+            connectionDefinitionService, connectionDefinitionServiceRSocketClient);
     }
 
     @Bean
@@ -139,51 +144,45 @@ public class DefinitionRegistryConfiguration {
 
         /**
          * Called from the Context.Connection instance.
-         *
-         * @param connection
-         * @param authorizationContext
          */
         @Override
         public void executeAuthorizationApply(
-            Connection connection, Authorization.AuthorizationContext authorizationContext) {
+            String componentName, int connectionVersion, Map<String, Object> connectionParameters,
+            String authorizationName, AuthorizationContext authorizationContext) {
 
-            if (connectionDefinitionService.connectionExists(
-                connection.getComponentName(), connection.getConnectionVersion())) {
-
-                connectionDefinitionService.executeAuthorizationApply(connection, authorizationContext);
+            if (connectionDefinitionService.connectionExists(componentName, connectionVersion)) {
+                connectionDefinitionService.executeAuthorizationApply(
+                    componentName, connectionVersion, connectionParameters, authorizationName, authorizationContext);
             } else {
-                connectionDefinitionServiceRSocketClient.executeAuthorizationApply(connection, authorizationContext);
+                connectionDefinitionServiceRSocketClient.executeAuthorizationApply(
+                    componentName, connectionVersion, connectionParameters, authorizationName, authorizationContext);
             }
         }
 
         /**
          * Called from the ConnectionFacade instance.
-         *
-         * @param connection
-         * @param redirectUri
-         * @return
          */
         @Override
         public Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
-            Connection connection, String redirectUri) {
+            String componentName, int connectionVersion, Map<String, Object> connectionParameters,
+            String authorizationName, String redirectUri) {
 
-            return connectionDefinitionService.executeAuthorizationCallback(connection, redirectUri);
+            return connectionDefinitionService.executeAuthorizationCallback(
+                componentName, connectionVersion, connectionParameters, authorizationName, redirectUri);
         }
 
         /**
          * Called from the Context.Connection instance.
-         *
-         * @param connection
-         * @return
          */
         @Override
-        public Optional<String> fetchBaseUri(Connection connection) {
-            if (connectionDefinitionService.connectionExists(
-                connection.getComponentName(), connection.getConnectionVersion())) {
-
-                return connectionDefinitionService.fetchBaseUri(connection);
+        public Optional<String> fetchBaseUri(
+            String componentName, int connectionVersion, Map<String, Object> connectionParameters) {
+            if (connectionDefinitionService.connectionExists(componentName, connectionVersion)) {
+                return connectionDefinitionService.fetchBaseUri(
+                    componentName, connectionVersion, connectionParameters);
             } else {
-                return connectionDefinitionServiceRSocketClient.fetchBaseUri(connection);
+                return connectionDefinitionServiceRSocketClient.fetchBaseUri(
+                    componentName, connectionVersion, connectionParameters);
             }
         }
 
@@ -216,13 +215,11 @@ public class DefinitionRegistryConfiguration {
         }
 
         @Override
-        public OAuth2AuthorizationParametersDTO getOAuth2Parameters(Connection connection) {
-            return connectionDefinitionService.getOAuth2Parameters(connection);
-        }
-
-        @Override
-        public Context.Connection toContextConnection(Connection connection) {
-            return connectionDefinitionService.toContextConnection(connection);
+        public OAuth2AuthorizationParametersDTO getOAuth2Parameters(
+            String componentName, int connectionVersion, Map<String, Object> connectionParameters,
+            String authorizationName) {
+            return connectionDefinitionService.getOAuth2Parameters(
+                componentName, connectionVersion, connectionParameters, authorizationName);
         }
     }
 }

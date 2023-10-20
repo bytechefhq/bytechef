@@ -27,8 +27,8 @@ import java.util.List;
  */
 public interface TriggerDefinitionService {
 
-    Mono<TriggerDefinitionDTO> getComponentDefinitionTriggerMono(
+    Mono<TriggerDefinitionDTO> getComponentTriggerDefinitionMono(
         String componentName, int componentVersion, String triggerName);
 
-    Mono<List<TriggerDefinitionDTO>> getComponentDefinitionTriggersMono(String componentName, int componentVersion);
+    Mono<List<TriggerDefinitionDTO>> getComponentTriggerDefinitions(String componentName, int componentVersion);
 }

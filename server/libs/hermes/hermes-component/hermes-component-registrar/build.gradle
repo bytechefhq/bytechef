@@ -1,17 +1,18 @@
 dependencies {
-    api project(":server:libs:atlas:atlas-worker:atlas-worker-api")
-
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-jdbc"
     implementation "org.springframework.boot:spring-boot"
+    implementation project(":server:libs:atlas:atlas-worker:atlas-worker-api")
     implementation project(":server:libs:core:commons:commons-util")
-    implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
+    implementation project(":server:libs:hermes:hermes-component:hermes-component-impl")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-api")
+    implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-api")
 
     testImplementation "com.fasterxml.jackson.core:jackson-databind"
     testImplementation libs.com.github.tomakehurst.wiremock
     testImplementation project(":server:libs:core:encryption:encryption-api")
+    testImplementation project(":server:libs:core:commons:commons-data")
     testImplementation project(":server:libs:core:tag:tag-api")
     testImplementation project(":server:libs:db-migration")
     testImplementation project(":server:libs:hermes:hermes-connection:hermes-connection-service")

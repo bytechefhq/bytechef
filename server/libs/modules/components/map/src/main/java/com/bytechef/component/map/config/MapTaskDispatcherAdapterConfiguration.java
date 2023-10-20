@@ -26,8 +26,6 @@ import com.bytechef.component.map.constant.MapConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static com.bytechef.hermes.component.constant.Version.VERSION_1;
-
 /**
  * @author Ivica Cardic
  */
@@ -45,7 +43,7 @@ public class MapTaskDispatcherAdapterConfiguration {
 
             @Override
             public String getName() {
-                return MapConstants.MAP + "/v" + VERSION_1;
+                return MapConstants.MAP + "/v1";
             }
         };
     }

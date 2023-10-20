@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.rsocket.controller.service;
 
-import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
-import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
+import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionDTO;
+import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
@@ -32,23 +32,23 @@ import java.util.Map;
  */
 @Controller
 @ConditionalOnProperty(prefix = "spring", name = "application.name", havingValue = "worker-service-app")
-public class ActionDefinitionServiceRSocketController {
+public class TriggerDefinitionServiceRSocketController {
 
-    private final ActionDefinitionService actionDefinitionService;
+    private final TriggerDefinitionService triggerDefinitionService;
 
-    public ActionDefinitionServiceRSocketController(ActionDefinitionService actionDefinitionService) {
-        this.actionDefinitionService = actionDefinitionService;
+    public TriggerDefinitionServiceRSocketController(TriggerDefinitionService triggerDefinitionService) {
+        this.triggerDefinitionService = triggerDefinitionService;
     }
 
-    @MessageMapping("ActionDefinitionService.getComponentActionDefinition")
-    public Mono<ActionDefinitionDTO> getComponentActionDefinition(Map<String, Object> map) {
-        return actionDefinitionService.getComponentActionDefinitionMono(
+    @MessageMapping("TriggerDefinitionService.getComponentTriggerDefinition")
+    public Mono<TriggerDefinitionDTO> getComponentTriggerDefinition(Map<String, Object> map) {
+        return triggerDefinitionService.getComponentTriggerDefinitionMono(
             (String) map.get("componentName"), (Integer) map.get("componentVersion"), (String) map.get("actionName"));
     }
 
-    @MessageMapping("ActionDefinitionService.getComponentActionDefinitions")
-    public Mono<List<ActionDefinitionDTO>> getComponentActionDefinitions(Map<String, Object> map) {
-        return actionDefinitionService.getComponentActionDefinitionsMono(
+    @MessageMapping("TriggerDefinitionService.getComponentTriggerDefinitions")
+    public Mono<List<TriggerDefinitionDTO>> getComponentTriggerDefinitions(Map<String, Object> map) {
+        return triggerDefinitionService.getComponentTriggerDefinitions(
             (String) map.get("componentName"), (Integer) map.get("componentVersion"));
     }
 }

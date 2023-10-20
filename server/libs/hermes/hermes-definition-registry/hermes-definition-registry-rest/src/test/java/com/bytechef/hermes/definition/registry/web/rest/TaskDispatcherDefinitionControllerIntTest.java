@@ -22,6 +22,7 @@ import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.definition.registry.web.rest.config.RegistryDefinitionRestTestConfiguration;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import java.util.List;
@@ -58,6 +59,9 @@ public class TaskDispatcherDefinitionControllerIntTest {
     @MockBean
     private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
 
+    @MockBean
+    private TriggerDefinitionService triggerDefinitionService;
+
     @Autowired
     private WebTestClient webTestClient;
 
@@ -83,12 +87,10 @@ public class TaskDispatcherDefinitionControllerIntTest {
                     """
                         [
                             {
-                                "name":"task-dispatcher1",
-                                "version":1.0
+                                "name":"task-dispatcher1"
                             },
                             {
-                                "name":"task-dispatcher2",
-                                "version":1.0
+                                "name":"task-dispatcher2"
                             }
                         ]
                         """);

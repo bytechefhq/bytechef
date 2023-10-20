@@ -110,7 +110,9 @@ public class ConnectionController implements ConnectionsApi {
             .map(connectionModel -> conversionService.convert(connectionModel, ConnectionDTO.class))
             .map(ConnectionDTO::toConnection)
             .map(connection -> connectionDefinitionService.getOAuth2Parameters(
-                oAuth2Properties.checkPredefinedApp(connection)))
+                connection.getComponentName(), connection.getConnectionVersion(),
+                oAuth2Properties.checkPredefinedApp(connection.getComponentName(), connection.getParameters()),
+                connection.getAuthorizationName()))
             .map(oAuth2AuthorizationParametersDTO -> conversionService.convert(
                 oAuth2AuthorizationParametersDTO, OAuth2AuthorizationParametersModel.class))
             .map(ResponseEntity::ok);

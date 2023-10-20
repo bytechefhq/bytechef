@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.util;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
@@ -343,10 +343,12 @@ public final class HttpClientUtils {
             return;
         }
 
+        // TODO Fix payload
         context
             .fetchConnection()
             .ifPresent(
-                connection -> connection.applyAuthorization(new AuthorizationContextImpl(headers, queryParameters)));
+                connection -> connection.applyAuthorization(
+                    new AuthorizationContext(headers, queryParameters, new HashMap<>())));
     }
 
     private static URI createURI(String uriString, @Nonnull Map<String, List<String>> queryParameters) {
@@ -374,7 +376,7 @@ public final class HttpClientUtils {
         }
 
         return context.fetchConnection()
-            .map(Context.Connection::fetchBaseUri)
+            .flatMap(Context.Connection::fetchBaseUri)
             .map(baseUri -> baseUri + uriString)
             .orElse(uriString);
     }
@@ -726,21 +728,6 @@ public final class HttpClientUtils {
             Objects.requireNonNull(bodyContentType);
 
             return new Payload(string, bodyContentType, null);
-        }
-    }
-
-    private record AuthorizationContextImpl(
-        Map<String, List<String>> headers, Map<String, List<String>> queryParameters)
-        implements Authorization.AuthorizationContext {
-
-        @Override
-        public void setHeaders(Map<String, List<String>> headers) {
-            this.headers.putAll(headers);
-        }
-
-        @Override
-        public void setQueryParameters(Map<String, List<String>> queryParameters) {
-            this.queryParameters.putAll(queryParameters);
         }
     }
 

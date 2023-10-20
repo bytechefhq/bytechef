@@ -1,6 +1,5 @@
 dependencies {
     api "io.projectreactor:reactor-core"
     api project(":server:libs:hermes:hermes-component:hermes-component-api")
-    api project(":server:libs:hermes:hermes-connection:hermes-connection-api")
     api project(":server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-api")
 }

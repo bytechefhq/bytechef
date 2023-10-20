@@ -26,12 +26,13 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.petstore.PetstoreComponentHandler;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
+import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.Response;
-import com.bytechef.hermes.connection.constant.ConnectionConstants;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
@@ -126,6 +127,7 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         connection = new Connection();
 
+        connection.setAuthorizationName("api_key");
         connection.setComponentName("petstore");
         connection.setKey("key");
         connection.setName("PetShop Connection");
@@ -551,7 +553,7 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         FileEntry fileEntry = FILE_STORAGE_SERVICE.storeFileContent("text.txt", "This is text");
 
-        taskExecution = getTaskExecution(Map.of("petId", 10, "fileEntry", fileEntry.toContextFileEntry()));
+        taskExecution = getTaskExecution(Map.of("petId", 10, "fileEntry", new MockContextFileEntry(fileEntry)));
 
         response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
@@ -792,7 +794,7 @@ public class OpenApiComponentTaskHandlerIntTest {
     private OpenApiComponentTaskHandler createOpenApiComponentHandler(String actionName) {
         return new OpenApiComponentTaskHandler(
             getActionDefinition(actionName), connectionDefinitionService, connectionService,
-            PETSTORE_COMPONENT_HANDLER, null, FILE_STORAGE_SERVICE);
+            null, FILE_STORAGE_SERVICE, PETSTORE_COMPONENT_HANDLER);
     }
 
     private ActionDefinition getActionDefinition(String actionName) {
@@ -817,7 +819,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                         WorkflowConstants.PARAMETERS,
                         Stream
                             .concat(
-                                CollectionUtils.stream(Map.of(ConnectionConstants.CONNECTION_ID, connection.getId())),
+                                CollectionUtils.stream(Map.of(ConnectionDefinition.CONNECTION_ID, connection.getId())),
                                 CollectionUtils.stream(parameters.entrySet()))
                             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))));
     }
@@ -878,6 +880,35 @@ public class OpenApiComponentTaskHandlerIntTest {
                     new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
                     new EncryptedStringToMapWrapperConverter(encryption, objectMapper));
             }
+        }
+    }
+
+    private static class MockContextFileEntry implements Context.FileEntry {
+
+        private final FileEntry fileEntry;
+
+        public MockContextFileEntry(FileEntry fileEntry) {
+            this.fileEntry = fileEntry;
+        }
+
+        @Override
+        public String getExtension() {
+            return fileEntry.getExtension();
+        }
+
+        @Override
+        public String getMimeType() {
+            return fileEntry.getMimeType();
+        }
+
+        @Override
+        public String getName() {
+            return fileEntry.getName();
+        }
+
+        @Override
+        public String getUrl() {
+            return fileEntry.getUrl();
         }
     }
 }

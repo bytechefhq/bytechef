@@ -10057,12 +10057,12 @@
       "name": "oauth2_authorization_code",
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
-    "componentDisplay": {
+    "display": {
       "description": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",
       "title": "Pipedrive"
     },
-    "componentName": "pipedrive",
-    "connectionVersion": 1
+    "name": "pipedrive",
+    "version": 1
   },
   "display": {
     "description": "The first CRM designed by salespeople, for salespeople. Do more to grow your business.",

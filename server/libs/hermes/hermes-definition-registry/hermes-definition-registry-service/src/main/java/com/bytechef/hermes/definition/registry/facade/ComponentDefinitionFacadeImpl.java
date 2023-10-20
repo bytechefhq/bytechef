@@ -45,7 +45,7 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
     }
 
     @Override
-    public Mono<List<ComponentDefinitionDTO>> getComponentDefinitions(
+    public Mono<List<ComponentDefinitionDTO>> getComponentDefinitionsMono(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
         Boolean triggerDefinitions) {
 

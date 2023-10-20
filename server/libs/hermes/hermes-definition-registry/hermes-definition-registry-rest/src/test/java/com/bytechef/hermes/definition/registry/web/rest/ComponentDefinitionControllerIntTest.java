@@ -23,6 +23,7 @@ import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
+import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.definition.registry.web.rest.config.RegistryDefinitionRestTestConfiguration;
 
 import java.util.List;
@@ -60,14 +61,18 @@ public class ComponentDefinitionControllerIntTest {
     @MockBean
     private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
 
+    @MockBean
+    private TriggerDefinitionService triggerDefinitionService;
+
     @Autowired
     private WebTestClient webTestClient;
 
     @Test
     public void testGetComponentDefinitions() {
-        Mockito.when(componentDefinitionFacade.getComponentDefinitions(null, null, null, null))
+        Mockito.when(componentDefinitionFacade.getComponentDefinitionsMono(null, null, null, null))
             .thenReturn(
-                Mono.just(List.of(new ComponentDefinitionDTO("component1"), new ComponentDefinitionDTO("component2"))));
+                Mono.just(
+                    List.of(new ComponentDefinitionDTO("component1"), new ComponentDefinitionDTO("component2"))));
 
         try {
             webTestClient
@@ -82,12 +87,10 @@ public class ComponentDefinitionControllerIntTest {
                     """
                         [
                             {
-                                "name":"component1",
-                                "version":1.0
+                                "name":"component1"
                             },
                             {
-                                "name":"component2",
-                                "version":1.0
+                                "name":"component2"
                             }
                         ]
                         """);

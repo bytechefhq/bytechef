@@ -17,14 +17,15 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -34,11 +35,16 @@ public interface ConnectionDefinitionService {
 
     boolean connectionExists(String componentName, int connectionVersion);
 
-    void executeAuthorizationApply(Connection connection, Authorization.AuthorizationContext authorizationContext);
+    void executeAuthorizationApply(
+        String componentName, int connectionVersion, Map<String, Object> connectionParameters, String authorizationName,
+        AuthorizationContext authorizationContext);
 
-    Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(Connection connection, String redirectUri);
+    AuthorizationCallbackResponse executeAuthorizationCallback(
+        String componentName, int connectionVersion, Map<String, Object> connectionParameters, String authorizationName,
+        String redirectUri);
 
-    Optional<String> fetchBaseUri(Connection connection);
+    Optional<String> fetchBaseUri(
+        String componentName, int connectionVersion, Map<String, Object> connectionParameters);
 
     Authorization.AuthorizationType getAuthorizationType(
         String authorizationName, String componentName, int connectionVersion);
@@ -49,7 +55,7 @@ public interface ConnectionDefinitionService {
 
     Mono<List<ConnectionDefinitionDTO>> getConnectionDefinitionsMono();
 
-    OAuth2AuthorizationParametersDTO getOAuth2Parameters(Connection connection);
-
-    Context.Connection toContextConnection(Connection connection);
+    OAuth2AuthorizationParametersDTO getOAuth2Parameters(
+        String componentName, int connectionVersion, Map<String, Object> connectionParameters,
+        String authorizationName);
 }

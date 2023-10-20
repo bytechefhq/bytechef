@@ -20,7 +20,6 @@
 package com.bytechef.hermes.connection.config;
 
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.connection.domain.Connection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -40,22 +39,24 @@ public class OAuth2Properties {
     private Map<String, OAuth2App> predefinedApps = new HashMap<>();
     private String redirectUri;
 
-    public Connection checkPredefinedApp(Connection connection) {
-        if (!StringUtils.hasText(connection.getParameter(Authorization.CLIENT_ID))) {
-            if (predefinedApps.containsKey(connection.getComponentName())) {
-                OAuth2Properties.OAuth2App oAuth2App = predefinedApps.get(connection.getComponentName());
+    public Map<String, Object> checkPredefinedApp(String componentName, Map<String, Object> connectionParameters) {
+        if (!StringUtils.hasText((String) connectionParameters.get(Authorization.CLIENT_ID))) {
+            connectionParameters = new HashMap<>(connectionParameters);
 
-                connection.putAllParameters(
+            if (predefinedApps.containsKey(componentName)) {
+                OAuth2Properties.OAuth2App oAuth2App = predefinedApps.get(componentName);
+
+                connectionParameters.putAll(
                     Map.of(
                         Authorization.CLIENT_ID, oAuth2App.clientId(),
                         Authorization.CLIENT_SECRET, oAuth2App.clientSecret()));
             } else {
                 throw new IllegalStateException(
-                    "Component definition %s does not exist".formatted(connection.getComponentName()));
+                    "Component definition %s does not exist".formatted(componentName));
             }
         }
 
-        return connection;
+        return connectionParameters;
     }
 
     public Map<String, OAuth2App> getPredefinedApps() {

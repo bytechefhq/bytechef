@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.Context.Connection;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
@@ -35,6 +35,7 @@ import java.util.Optional;
 public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConnectionDefinition {
 
     String BASE_URI = "baseUri";
+    String CONNECTION_ID = "connectionId";
 
     boolean containsAuthorizations();
 
@@ -68,10 +69,10 @@ public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConn
 
         /**
          *
-         * @param connection
+         * @param connectionParameters
          * @return
          */
-        String apply(Connection connection);
+        String apply(InputParameters connectionParameters);
     }
 
     /**
@@ -82,8 +83,8 @@ public sealed interface ConnectionDefinition permits ComponentDSL.ModifiableConn
 
         /**
          *
-         * @param connection
+         * @param connectionParameters
          */
-        void accept(Connection connection);
+        void accept(InputParameters connectionParameters);
     }
 }
