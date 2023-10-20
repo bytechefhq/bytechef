@@ -1,10 +1,14 @@
 plugins {
+    id "org.sonarqube"
     id "org.springframework.boot" version "${springBootVersion}" apply false
 }
 
 subprojects {
     apply plugin: "com.integri.java-library-conventions"
     apply plugin: "io.spring.dependency-management"
+    apply plugin: "org.sonarqube"
+
+    apply from: "${rootDir}/gradle/sonar.gradle"
 
     dependencyManagement {
         imports {

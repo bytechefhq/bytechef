@@ -1,10 +1,19 @@
 plugins {
     id "com.diffplug.spotless"
+    id "com.github.ben-manes.versions"
+    id "com.github.spotbugs"
     id "com.integri.java-common-conventions"
+    id "io.spring.nohttp"
+}
+
+allprojects {
+    apply plugin: "com.github.ben-manes.versions"
 }
 
 subprojects {
     apply plugin: "com.diffplug.spotless"
+    apply plugin: "com.github.spotbugs"
+    apply plugin: "io.spring.nohttp"
 
     eclipse {
         sourceSets {
@@ -20,6 +29,16 @@ subprojects {
         module {
             excludeDirs += files("node_modules")
         }
+    }
+
+    checkstyle {
+        toolVersion "${checkstyleVersion}"
+        configFile file("checkstyle.xml")
+        checkstyleTest.enabled = false
+    }
+
+    nohttp {
+        source.include "build.gradle", "README.md"
     }
 
     spotless {
