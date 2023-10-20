@@ -22,7 +22,7 @@ package com.bytechef.atlas.configuration.repository.config.contributor;
  */
 public interface ResourceWorkflowRepositoryPropertiesContributor {
 
-    String getBasePath();
+    String getLocationPattern();
 
     int getType();
 }

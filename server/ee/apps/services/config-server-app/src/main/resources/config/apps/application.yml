@@ -128,11 +128,11 @@ bytechef:
       classpath:
         enabled: false
         projects:
-          base-path: workflows/projects
+          location-pattern: workflows/projects/**/*.{json|yml|yaml}
       filesystem:
         enabled: true
         projects:
-          base-path: ${user.home}/bytechef
+          location-pattern: ${user.home}/bytechef/data/workflows/projects/**/*.{json|yml|yaml}
         watch: true
       git:
         # Enable a git-based workflow repository

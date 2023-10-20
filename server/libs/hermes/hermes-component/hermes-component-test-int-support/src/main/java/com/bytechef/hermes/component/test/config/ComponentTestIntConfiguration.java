@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.component.test.config;
 
-import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
 import com.bytechef.atlas.configuration.repository.resource.config.ResourceWorkflowRepositoryProperties;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -133,7 +132,7 @@ public class ComponentTestIntConfiguration {
 
             return new ClassPathResourceWorkflowRepository(
                 resourcePatternResolver, new ResourceWorkflowRepositoryProperties(
-                    Map.of(0, "workflows"), "classpath", WorkflowConstants.RESOURCE_WORKFLOW_LOCATION_PATTERN));
+                    Map.of(0, "workflows/**/*.{json|yml|yaml}"), "classpath"));
         }
 
         @Bean

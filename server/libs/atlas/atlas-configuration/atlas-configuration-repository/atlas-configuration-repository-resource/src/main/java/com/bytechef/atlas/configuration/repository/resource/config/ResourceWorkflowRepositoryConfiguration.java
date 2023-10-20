@@ -17,7 +17,6 @@
 
 package com.bytechef.atlas.configuration.repository.resource.config;
 
-import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.repository.config.contributor.ClasspathResourceWorkflowRepositoryPropertiesContributor;
 import com.bytechef.atlas.configuration.repository.config.contributor.FilesystemResourceWorkflowRepositoryPropertiesContributor;
 import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
@@ -61,20 +60,19 @@ public class ResourceWorkflowRepositoryConfiguration {
         Map<Integer, String> propertiesMap = new HashMap<>();
 
         for (ClasspathResourceWorkflowRepositoryPropertiesContributor accessor : accessors) {
-            propertiesMap.put(accessor.getType(), accessor.getBasePath());
+            propertiesMap.put(accessor.getType(), accessor.getLocationPattern());
         }
 
         return new ClassPathResourceWorkflowRepository(
             resourcePatternResolver,
-            new ResourceWorkflowRepositoryProperties(propertiesMap, "classpath",
-                WorkflowConstants.RESOURCE_WORKFLOW_LOCATION_PATTERN));
+            new ResourceWorkflowRepositoryProperties(propertiesMap, "classpath"));
     }
 
     @Bean
     @Order(2)
     @ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.filesystem.enabled", havingValue = "true")
     FilesystemResourceWorkflowRepository filesystemResourceWorkflowRepository(
-        List<FilesystemResourceWorkflowRepositoryPropertiesContributor> accessors) {
+        List<FilesystemResourceWorkflowRepositoryPropertiesContributor> contributors) {
 
         if (logger.isInfoEnabled()) {
             logger.info("Workflow repository type enabled: filesystem");
@@ -82,12 +80,11 @@ public class ResourceWorkflowRepositoryConfiguration {
 
         Map<Integer, String> propertiesMap = new HashMap<>();
 
-        for (FilesystemResourceWorkflowRepositoryPropertiesContributor accessor : accessors) {
-            propertiesMap.put(accessor.getType(), accessor.getBasePath());
+        for (FilesystemResourceWorkflowRepositoryPropertiesContributor contributor : contributors) {
+            propertiesMap.put(contributor.getType(), contributor.getLocationPattern());
         }
 
         return new FilesystemResourceWorkflowRepository(
-            resourcePatternResolver, new ResourceWorkflowRepositoryProperties(propertiesMap, "file",
-                WorkflowConstants.RESOURCE_WORKFLOW_LOCATION_PATTERN));
+            resourcePatternResolver, new ResourceWorkflowRepositoryProperties(propertiesMap, "file"));
     }
 }

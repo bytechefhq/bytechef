@@ -25,10 +25,9 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record ResourceWorkflowRepositoryProperties(
-    Map<Integer, String> properties, String urlPrefix, String locationPattern) {
+public record ResourceWorkflowRepositoryProperties(Map<Integer, String> properties, String protocol) {
 
-    public String getBasePath(int type) {
+    public String getLocationPattern(int type) {
         return properties.get(type);
     }
 }

@@ -27,20 +27,18 @@ import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
@@ -51,19 +49,16 @@ import java.util.List;
     """)
 public class ProjectOrphanFilesystemWorkflowChecker {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProjectOrphanFilesystemWorkflowChecker.class);
+    private static final String WORKFLOWS = "Workflows";
 
-    private final String basePath;
     private final ProjectService projectService;
     private final TagService tagService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public ProjectOrphanFilesystemWorkflowChecker(
-        @Value("${bytechef.workflow.repository.filesystem.projects.base-path:}") String basePath,
         ProjectService projectService, TagService tagService, WorkflowService workflowService) {
 
-        this.basePath = basePath;
         this.projectService = projectService;
         this.tagService = tagService;
         this.workflowService = workflowService;
@@ -88,23 +83,20 @@ public class ProjectOrphanFilesystemWorkflowChecker {
 
         if (!orphanWorkflows.isEmpty()) {
             for (Workflow workflow : orphanWorkflows) {
-                String path = (String) workflow.getMetadata(WorkflowConstants.PATH);
                 String projectName;
 
-                path = path.replace("file:" + basePath + (basePath.endsWith(File.separator) ? "" : File.separator), "");
+                if (StringUtils.isNotBlank((String) workflow.getMetadata(WorkflowConstants.PATH))) {
+                    String path = (String) workflow.getMetadata(WorkflowConstants.PATH);
 
-                String[] items = StringUtils.splitByWholeSeparator(path, File.separator);
+                    String[] items = path.split("/");
 
-                if (items.length == 2) {
-                    projectName = getProjectName(items[0]);
-                } else {
-                    if (logger.isWarnEnabled()) {
-                        logger.warn(
-                            "Workflow id={} is in the wrong location, cannot be assigned to any project",
-                            workflow.getId());
+                    if (items.length > 1) {
+                        projectName = getProjectName(items[items.length - 2]);
+                    } else {
+                        projectName = WORKFLOWS;
                     }
-
-                    continue;
+                } else {
+                    projectName = WORKFLOWS;
                 }
 
                 Project project = projectService.fetchProject(projectName)
@@ -115,13 +107,15 @@ public class ProjectOrphanFilesystemWorkflowChecker {
                             .tagIds(getTagIds(workflow.getSourceType()))
                             .build()));
 
-                projectService.addWorkflow(Validate.notNull(project.getId(), "id"), workflow.getId());
+                projectService.addWorkflow(Objects.requireNonNull(project.getId()), workflow.getId());
             }
         }
     }
 
     private String getProjectName(String name) {
-        return String.join(" ", name.split("_"));
+        return Arrays.stream(name.split("_"))
+            .map(org.springframework.util.StringUtils::capitalize)
+            .collect(Collectors.joining(" "));
     }
 
     private List<Long> getTagIds(Workflow.SourceType sourceType) {
