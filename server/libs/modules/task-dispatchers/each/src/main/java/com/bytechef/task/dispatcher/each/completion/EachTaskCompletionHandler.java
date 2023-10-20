@@ -63,15 +63,15 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
 
     @Override
     public void handle(TaskExecution taskExecution) {
-        TaskExecution completedSubtaskExecution = new TaskExecution(taskExecution);
+        TaskExecution completedSubTaskExecution = new TaskExecution(taskExecution);
 
-        completedSubtaskExecution.setStatus(TaskStatus.COMPLETED);
+        completedSubTaskExecution.setStatus(TaskStatus.COMPLETED);
 
-        taskExecutionService.update(completedSubtaskExecution);
+        taskExecutionService.update(completedSubTaskExecution);
 
-        long subtasksLeft = counterService.decrement(taskExecution.getParentId());
+        long subTasksLeft = counterService.decrement(taskExecution.getParentId());
 
-        if (subtasksLeft == 0) {
+        if (subTasksLeft == 0) {
             TaskExecution eachTaskExecution =
                     new TaskExecution(taskExecutionService.getTaskExecution(taskExecution.getParentId()));
 

@@ -16,17 +16,16 @@
 
 package com.bytechef.task.dispatcher.each;
 
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class EachTaskDispatcherDefinitionFactoryTest {
+public class EachTaskDispatcherFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        DefinitionAssert.assertEquals(
-                "definition/each_v1.json", new EachTaskDispatcherDefinitionFactory().getDefinition());
+        AssertUtils.assertEquals("definition/each_v1.json", new EachTaskDispatcherFactory().getDefinition());
     }
 }

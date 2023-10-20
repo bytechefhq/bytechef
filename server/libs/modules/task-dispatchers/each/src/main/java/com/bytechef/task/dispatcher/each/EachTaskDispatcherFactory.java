@@ -16,17 +16,21 @@
 
 package com.bytechef.task.dispatcher.each;
 
+import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.any;
 import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.array;
 import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.create;
 import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.display;
+import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.integer;
 import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.string;
+import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.task;
 import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.EACH;
+import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITEM;
 import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITEM_INDEX;
 import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITEM_VAR;
+import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITERATEE;
 import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.LIST;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL;
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.springframework.stereotype.Component;
 
@@ -34,26 +38,28 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
+public class EachTaskDispatcherFactory implements TaskDispatcherFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = create(EACH)
             .display(
                     display("Each")
                             .description(
                                     "Iterates over each item in `list`, in parallel. Note, that since it iterates over each item in parallel, there is no guarantee of completion order."))
-            .inputs(
+            .properties(
                     array(LIST)
                             .label("List of items")
                             .description("List of items to iterate over.")
-                            .items(TaskDispatcherDSL.any()),
+                            .items(any()),
                     string(ITEM_VAR)
                             .label("Item Var")
                             .description("The name of the item variable.")
-                            .defaultValue("item"),
+                            .defaultValue(ITEM),
                     string(ITEM_INDEX)
                             .label("Item Index")
                             .description("The name of the index variable.")
-                            .defaultValue("itemIndex"));
+                            .defaultValue(ITEM_INDEX))
+            .output(any("item"), integer("itemIndex"))
+            .taskProperties(task(ITERATEE));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
