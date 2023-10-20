@@ -16,17 +16,16 @@
 
 package com.bytechef.task.dispatcher.loop;
 
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class LoopBreakTaskDispatcherDefinitionFactoryTest {
+public class LoopTaskDispatcherFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        DefinitionAssert.assertEquals(
-                "definition/loop-break_v1.json", new LoopBreakTaskDispatcherDefinitionFactory().getDefinition());
+        AssertUtils.assertEquals("definition/loop_v1.json", new LoopTaskDispatcherFactory().getDefinition());
     }
 }

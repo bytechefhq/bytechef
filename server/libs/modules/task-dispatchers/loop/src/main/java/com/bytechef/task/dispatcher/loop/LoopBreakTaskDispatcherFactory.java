@@ -20,7 +20,7 @@ import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.create;
 import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.display;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.LOOP_BREAK;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.hermes.task.dispatcher.TaskDispatcherFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class LoopBreakTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
+public class LoopBreakTaskDispatcherFactory implements TaskDispatcherFactory {
 
     private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION =
             create(LOOP_BREAK).display(display("Loop Break").description("Breaks the loop execution."));

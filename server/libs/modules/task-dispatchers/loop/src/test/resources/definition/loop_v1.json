@@ -4,7 +4,17 @@
     "label": "Loop"
   },
   "name": "loop",
-  "inputs": [
+  "output": [
+    {
+      "name": "item",
+      "type": "ANY"
+    },
+    {
+      "name": "itemIndex",
+      "type": "INTEGER"
+    }
+  ],
+  "properties": [
     {
       "description": "List of items to iterate over.",
       "label": "List of items",
@@ -33,5 +43,13 @@
       "defaultValue": false
     }
   ],
-  "version": 1
+  "version": 1,
+  "taskProperties": [
+    {
+      "description": "The task or task dispatcher to use.",
+      "name": "iteratee",
+      "type": "OBJECT",
+      "objectType": "TASK"
+    }
+  ]
 }

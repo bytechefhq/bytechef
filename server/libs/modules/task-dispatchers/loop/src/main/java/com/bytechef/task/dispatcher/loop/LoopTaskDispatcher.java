@@ -17,6 +17,7 @@
 package com.bytechef.task.dispatcher.loop;
 
 import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM_INDEX;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM_VAR;
 import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITERATEE;
@@ -36,7 +37,6 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -91,7 +91,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
             Context context = new Context(contextService.peek(taskExecution.getId()));
 
             if (!list.isEmpty()) {
-                context.put(taskExecution.getString(ITEM_VAR, LoopTaskConstants.ITEM), list.get(0));
+                context.put(taskExecution.getString(ITEM_VAR, ITEM), list.get(0));
             }
 
             context.put(taskExecution.getString(ITEM_INDEX, ITEM_INDEX), 0);
