@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.connection.facade;
 
+import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
@@ -249,10 +250,10 @@ public class ConnectionFacadeIntTest {
         @Bean
         ConnectionFacade connectionFacade(
             ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-            OAuth2Properties oAuth2Properties, TagService tagService) {
+            OAuth2Properties oAuth2Properties, TagService tagService, WorkflowService workflowService) {
 
             return new ConnectionFacadeImpl(
-                connectionDefinitionService, connectionService, oAuth2Properties, tagService);
+                connectionDefinitionService, connectionService, oAuth2Properties, tagService, workflowService);
         }
 
         @Bean

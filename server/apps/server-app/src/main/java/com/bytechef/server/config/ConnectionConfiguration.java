@@ -17,6 +17,7 @@
 
 package com.bytechef.server.config;
 
+import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.facade.ConnectionFacade;
 import com.bytechef.hermes.connection.facade.ConnectionFacadeImpl;
@@ -35,8 +36,9 @@ public class ConnectionConfiguration {
     @Bean
     ConnectionFacade connectionFacade(
         ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        OAuth2Properties oAuth2Properties, TagService tagService) {
+        OAuth2Properties oAuth2Properties, TagService tagService, WorkflowService workflowService) {
 
-        return new ConnectionFacadeImpl(connectionDefinitionService, connectionService, oAuth2Properties, tagService);
+        return new ConnectionFacadeImpl(
+            connectionDefinitionService, connectionService, oAuth2Properties, tagService, workflowService);
     }
 }

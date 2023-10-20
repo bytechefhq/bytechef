@@ -17,7 +17,11 @@
 
 package com.bytechef.hermes.connection.facade;
 
+import com.bytechef.atlas.domain.Workflow;
+import com.bytechef.atlas.service.WorkflowService;
+import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.hermes.connection.WorkflowConnection;
 import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.dto.ConnectionDTO;
@@ -45,16 +49,18 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private final ConnectionService connectionService;
     private final OAuth2Properties oAuth2Properties;
     private final TagService tagService;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
         ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        OAuth2Properties oAuth2Properties, TagService tagService) {
+        OAuth2Properties oAuth2Properties, TagService tagService, WorkflowService workflowService) {
 
         this.connectionService = connectionService;
         this.connectionDefinitionService = connectionDefinitionService;
         this.oAuth2Properties = oAuth2Properties;
         this.tagService = tagService;
+        this.workflowService = workflowService;
     }
 
     @Override
@@ -92,7 +98,9 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             connection.setTags(tags);
         }
 
-        return new ConnectionDTO(connectionService.create(connection), tags);
+        return new ConnectionDTO(
+            isConnectionActive(connection.getComponentName(), connection.getConnectionVersion()),
+            connectionService.create(connection), tags);
     }
 
     @Override
@@ -111,7 +119,9 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     public ConnectionDTO getConnection(Long id) {
         Connection connection = connectionService.getConnection(id);
 
-        return new ConnectionDTO(connection, tagService.getTags(connection.getTagIds()));
+        return new ConnectionDTO(
+            isConnectionActive(connection.getComponentName(), connection.getConnectionVersion()),
+            connection, tagService.getTags(connection.getTagIds()));
     }
 
     @Override
@@ -128,6 +138,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return com.bytechef.commons.util.CollectionUtils.map(
             connections,
             connection -> new ConnectionDTO(
+                isConnectionActive(connection.getComponentName(), connection.getConnectionVersion()),
                 connection,
                 com.bytechef.commons.util.CollectionUtils.filter(
                     tags,
@@ -153,8 +164,11 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     public ConnectionDTO update(Long id, List<Tag> tags) {
         tags = CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
 
+        Connection connection = connectionService.update(
+            id, com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId));
+
         return new ConnectionDTO(
-            connectionService.update(id, com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId)), tags);
+            isConnectionActive(connection.getComponentName(), connection.getConnectionVersion()), connection, tags);
     }
 
     @Override
@@ -164,9 +178,27 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             : tagService.save(connectionDTO.tags());
 
         return new ConnectionDTO(
+            isConnectionActive(connectionDTO.componentName(), connectionDTO.connectionVersion()),
             connectionService.update(
                 connectionDTO.id(), connectionDTO.name(),
                 com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId), connectionDTO.version()),
             tags);
+    }
+
+    private boolean isConnectionActive(String componentName, int connectionVersion) {
+        List<Workflow> workflows = workflowService.getWorkflows();
+
+        for (Workflow workflow : workflows) {
+            for (WorkflowTask workflowTask : workflow.getTasks()) {
+                WorkflowConnection workflowConnection = workflowTask.getExtension(WorkflowConnection.class);
+
+                if (Objects.equals(workflowConnection.componentName(), componentName) &&
+                    workflowConnection.connectionVersion() == connectionVersion) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
