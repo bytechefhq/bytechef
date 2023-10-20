@@ -30,6 +30,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
@@ -92,10 +93,10 @@ public class JobServiceImpl implements JobService {
         String workflowId = jobParameters.getWorkflowId();
 
         Workflow workflow = workflowRepositories.stream()
-            .map(workflowRepository -> workflowRepository.findById(workflowId))
+            .flatMap(workflowRepository -> StreamSupport.stream(workflowRepository.findAll()
+                .spliterator(), false))
+            .filter(curWorkflow -> Objects.equals(workflowId, curWorkflow.getId()))
             .findFirst()
-            .filter(Optional::isPresent)
-            .map(Optional::get)
             .orElseThrow();
 
         Assert.notNull(workflow, String.format("Unknown workflow: %s", workflowId));
