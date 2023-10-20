@@ -1,20 +1,6 @@
 /// <reference types="vite-plugin-svgr/client" />
 
-import {
-    ActionDefinitionModel,
-    ArrayPropertyModel,
-    BooleanPropertyModel,
-    DatePropertyModel,
-    DateTimePropertyModel,
-    DynamicPropertiesPropertyModel,
-    IntegerPropertyModel,
-    NullPropertyModel,
-    NumberPropertyModel,
-    ObjectPropertyModel,
-    OneOfPropertyModel,
-    StringPropertyModel,
-    TimePropertyModel,
-} from 'middleware/definition-registry';
+import {PropertyModel} from 'middleware/definition-registry';
 
 import {ReactComponent as ArrayIcon} from '../../../../../assets/array.svg';
 import {ReactComponent as BooleanIcon} from '../../../../../assets/boolean.svg';
@@ -29,6 +15,7 @@ import {ReactComponent as OneOfIcon} from '../../../../../assets/oneof.svg';
 import {ReactComponent as StringIcon} from '../../../../../assets/string.svg';
 import {ReactComponent as TimeIcon} from '../../../../../assets/time.svg';
 import {useNodeDetailsDialogStore} from '../../stores/useNodeDetailsDialogStore';
+import {PropertyType} from '../../types/projectTypes';
 
 const TYPE_ICONS = {
     ARRAY: <ArrayIcon className="h-5 w-5 text-gray-600" />,
@@ -45,20 +32,7 @@ const TYPE_ICONS = {
     TIME: <TimeIcon className="h-5 w-5 text-gray-600" />,
 };
 
-type Property = ArrayPropertyModel &
-    BooleanPropertyModel &
-    DatePropertyModel &
-    DateTimePropertyModel &
-    DynamicPropertiesPropertyModel &
-    IntegerPropertyModel &
-    NumberPropertyModel &
-    NullPropertyModel &
-    ObjectPropertyModel &
-    OneOfPropertyModel &
-    StringPropertyModel &
-    TimePropertyModel;
-
-const PropertyField = ({data, label}: {data: Property; label: string}) => (
+const PropertyField = ({data, label}: {data: PropertyType; label: string}) => (
     <div className="inline-flex rounded-md p-2 text-sm hover:bg-gray-100">
         <span>{TYPE_ICONS[data.type as keyof typeof TYPE_ICONS]}</span>
 
@@ -66,9 +40,9 @@ const PropertyField = ({data, label}: {data: Property; label: string}) => (
     </div>
 );
 
-const SchemaProperties = ({properties}: {properties: Property[]}) => (
+const SchemaProperties = ({properties}: {properties: PropertyType[]}) => (
     <ul className="ml-2 h-full">
-        {properties.map((property: Property, index: number) => {
+        {properties.map((property: PropertyType, index: number) => {
             return (
                 <li className="flex flex-col" key={`${property.name}_${index}`}>
                     <PropertyField data={property} label={property.name!} />
@@ -89,11 +63,7 @@ const SchemaProperties = ({properties}: {properties: Property[]}) => (
     </ul>
 );
 
-const OutputTab = ({
-    actionDefinition,
-}: {
-    actionDefinition: ActionDefinitionModel;
-}) => {
+const OutputTab = ({outputSchema}: {outputSchema: PropertyModel[]}) => {
     const {currentNode} = useNodeDetailsDialogStore();
 
     return (
@@ -106,7 +76,7 @@ const OutputTab = ({
                 </span>
             </div>
 
-            {actionDefinition.outputSchema?.map((schema: Property, index) =>
+            {outputSchema.map((schema: PropertyType, index) =>
                 schema.properties ? (
                     <SchemaProperties
                         key={`${schema.name}_${index}`}
