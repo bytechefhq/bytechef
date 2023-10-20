@@ -34,7 +34,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @EmbeddedSql
 @SpringBootTest(
     classes = WorkflowRepositoryIntTestConfiguration.class,
-    properties = "bytechef.workflow.workflow-repository.jdbc.enabled=true")
+    properties = "bytechef.workflow-repository.jdbc.enabled=true")
 public class JdbcWorkflowRepositoryIntTest {
 
     @Autowired

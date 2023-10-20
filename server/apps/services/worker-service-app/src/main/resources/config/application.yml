@@ -64,7 +64,7 @@ spring:
     serialization:
       write-dates-as-timestamps: false
       write-null-map-values: false
-    date-format: ${bytechef.workflow.serialization.date-format}
+    date-format: ${bytechef.serialization.date-format}
     time-zone: UTC
   profiles:
     active: #spring.profiles.active#
@@ -99,19 +99,16 @@ spring:
 bytechef:
   discovery-service:
     provider: redis
-
   file-storage:
     provider: filesystem
     file-storage-dir: /tmp/bytechef/files
-
-  workflow:
-    message-broker:
-      # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
-      provider: redis
-    persistence:
-      provider: jdbc
-    serialization:
-      date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
-    worker:
-      subscriptions:
-        tasks: "10"
+  message-broker:
+    # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
+    provider: redis
+  persistence:
+    provider: jdbc
+  serialization:
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+  worker:
+    subscriptions:
+      tasks: "10"

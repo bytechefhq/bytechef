@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
  */
 @Order(5)
 @Repository
-@ConditionalOnProperty(prefix = "bytechef.workflow", name = "workflow-repository.jdbc.enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef", name = "workflow-repository.jdbc.enabled", havingValue = "true")
 public interface JdbcWorkflowRepository
     extends PagingAndSortingRepository<Workflow, String>, WorkflowRepository, WorkflowCrudRepository {
 

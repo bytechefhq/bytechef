@@ -64,7 +64,7 @@ import org.springframework.messaging.handler.annotation.support.MessageHandlerMe
  * @author Arik Cohen
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef.workflow", name = "message-broker.provider", havingValue = "kafka")
+@ConditionalOnProperty(prefix = "bytechef", name = "message-broker.provider", havingValue = "kafka")
 public class KafkaMessageBrokerConfiguration
     implements KafkaListenerConfigurer, MessageBrokerListenerRegistrar<KafkaListenerEndpointRegistrar> {
 

@@ -2,6 +2,5 @@ server:
   port: 9999
 
 bytechef:
-  workflow:
-    message-broker:
-      provider: jms
+  message-broker:
+    provider: jms

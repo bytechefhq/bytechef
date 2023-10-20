@@ -56,7 +56,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Arik Cohen
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef.workflow", name = "message-broker.provider", havingValue = "amqp")
+@ConditionalOnProperty(prefix = "bytechef", name = "message-broker.provider", havingValue = "amqp")
 public class AmqpMessageBrokerConfiguration
     implements RabbitListenerConfigurer, MessageBrokerListenerRegistrar<RabbitListenerEndpointRegistrar> {
 

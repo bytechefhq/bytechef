@@ -38,7 +38,7 @@ public class DiscoveryServiceProviderEnvironmentPostProcessor implements Environ
         processDiscoveryServiceProvider(
             environment.getProperty("bytechef.discovery-service.provider", String.class), source);
         processWorkflowMessageBrokerProvider(
-            environment.getProperty("bytechef.workflow.message-broker.provider", String.class), source);
+            environment.getProperty("bytechef.message-broker.provider", String.class), source);
 
         MapPropertySource mapPropertySource = new MapPropertySource("Custom Spring Cloud Config", source);
 

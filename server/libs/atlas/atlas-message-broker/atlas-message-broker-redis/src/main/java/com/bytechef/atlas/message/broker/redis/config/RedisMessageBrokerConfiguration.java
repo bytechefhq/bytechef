@@ -53,7 +53,7 @@ import java.util.concurrent.TimeUnit;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef.workflow", name = "message-broker.provider", havingValue = "redis")
+@ConditionalOnProperty(prefix = "bytechef", name = "message-broker.provider", havingValue = "redis")
 public class RedisMessageBrokerConfiguration implements SmartInitializingSingleton, DisposableBean,
     MessageBrokerListenerRegistrar<RedisListenerEndpointRegistrar> {
 
