@@ -73,9 +73,10 @@ public class XMLFileTaskHandlerTest {
 
         taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("operation", "READ");
-        taskExecution.put("range", Map.of("startIndex", 1, "endIndex", 2));
+        taskExecution.put("pageNumber", 1);
+        taskExecution.put("pageSize", 2);
 
-        assertThat(((List<?>) xmlFileTaskHandler.handle(taskExecution)).size()).isEqualTo(1);
+        assertThat(((List<?>) xmlFileTaskHandler.handle(taskExecution)).size()).isEqualTo(2);
     }
 
     @Test

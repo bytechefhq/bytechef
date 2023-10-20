@@ -76,14 +76,14 @@ public class XMLFileTaskDeclaration implements TaskDeclaration {
                         .description("File name to set for binary data. By default, \"file.xml\" will be used.")
                         .displayOption(show("operation", "WRITE"))
                         .defaultValue(""),
-                    GROUP_PROPERTY("range")
-                        .displayName("Range")
-                        .description("The range to read from the XML array.")
+                    NUMBER_PROPERTY("pageSize")
+                        .displayName("Page Size")
+                        .description("The amount of child elements to return in a page.")
+                        .displayOption(show("operation", parameterValues("READ"), "isArray", parameterValues(true))),
+                    NUMBER_PROPERTY("pageNumber")
+                        .displayName("Page Number")
+                        .description("The page number to get.")
                         .displayOption(show("operation", parameterValues("READ"), "isArray", parameterValues(true)))
-                        .groupProperties(
-                            NUMBER_PROPERTY("startIndex").displayName("The start index of the XML array"),
-                            NUMBER_PROPERTY("endIndex").displayName("The end index of the XML array")
-                        )
                 )
         );
 

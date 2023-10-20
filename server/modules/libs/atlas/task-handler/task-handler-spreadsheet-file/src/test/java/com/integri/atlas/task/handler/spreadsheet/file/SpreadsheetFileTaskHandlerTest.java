@@ -273,14 +273,16 @@ public class SpreadsheetFileTaskHandlerTest {
     private SimpleTaskExecution getReadSimpleTaskExecution(
         boolean headerRow,
         boolean includeEmptyCells,
-        Map<String, Integer> range,
+        Integer pageNumber,
+        Integer pageSize,
         boolean readAsString,
         File file
     ) throws FileNotFoundException {
         return getReadSimpleTaskExecution(
             headerRow,
             includeEmptyCells,
-            range,
+            pageNumber,
+            pageSize,
             readAsString,
             file == null ? null : fileStorageService.storeFileContent(file.getName(), new FileInputStream(file))
         );
@@ -289,7 +291,8 @@ public class SpreadsheetFileTaskHandlerTest {
     private SimpleTaskExecution getReadSimpleTaskExecution(
         boolean headerRow,
         boolean includeEmptyCells,
-        Map<String, Integer> range,
+        Integer pageNumber,
+        Integer pageSize,
         boolean readAsString,
         FileEntry fileEntry
     ) {
@@ -299,7 +302,8 @@ public class SpreadsheetFileTaskHandlerTest {
         taskExecution.put("headerRow", headerRow);
         taskExecution.put("includeEmptyCells", includeEmptyCells);
         taskExecution.put("operation", "READ");
-        taskExecution.put("range", range);
+        taskExecution.put("pageNumber", pageNumber);
+        taskExecution.put("pageSize", pageSize);
         taskExecution.put("readAsString", readAsString);
 
         return taskExecution;
@@ -322,7 +326,7 @@ public class SpreadsheetFileTaskHandlerTest {
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(false, false)),
             JSONArrayUtil.of(
                 (List<?>) spreadsheetFileTaskHandler.handle(
-                    getReadSimpleTaskExecution(true, false, null, false, getFile("sample_header." + extension))
+                    getReadSimpleTaskExecution(true, false, null, null, false, getFile("sample_header." + extension))
                 )
             ),
             true
@@ -334,7 +338,7 @@ public class SpreadsheetFileTaskHandlerTest {
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(true, false)),
             JSONArrayUtil.of(
                 (List<?>) spreadsheetFileTaskHandler.handle(
-                    getReadSimpleTaskExecution(true, true, null, false, getFile("sample_header." + extension))
+                    getReadSimpleTaskExecution(true, true, null, null, false, getFile("sample_header." + extension))
                 )
             ),
             true
@@ -346,7 +350,7 @@ public class SpreadsheetFileTaskHandlerTest {
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(false, true)),
             JSONArrayUtil.of(
                 (List<?>) spreadsheetFileTaskHandler.handle(
-                    getReadSimpleTaskExecution(true, false, null, true, getFile("sample_header." + extension))
+                    getReadSimpleTaskExecution(true, false, null, null, true, getFile("sample_header." + extension))
                 )
             ),
             true
@@ -358,7 +362,7 @@ public class SpreadsheetFileTaskHandlerTest {
             JSONArrayUtil.of(getJSONObjectsWithNamedColumns(true, true)),
             JSONArrayUtil.of(
                 (List<?>) spreadsheetFileTaskHandler.handle(
-                    getReadSimpleTaskExecution(true, true, null, true, getFile("sample_header." + extension))
+                    getReadSimpleTaskExecution(true, true, null, null, true, getFile("sample_header." + extension))
                 )
             ),
             true
@@ -370,7 +374,14 @@ public class SpreadsheetFileTaskHandlerTest {
             JSONArrayUtil.of(getJSONArrayWithoutNamedColumns(false, false)),
             JSONArrayUtil.of(
                 (List<?>) spreadsheetFileTaskHandler.handle(
-                    getReadSimpleTaskExecution(false, false, null, false, getFile("sample_no_header." + extension))
+                    getReadSimpleTaskExecution(
+                        false,
+                        false,
+                        null,
+                        null,
+                        false,
+                        getFile("sample_no_header." + extension)
+                    )
                 )
             ),
             true
@@ -382,7 +393,7 @@ public class SpreadsheetFileTaskHandlerTest {
             JSONArrayUtil.of(getJSONArrayWithoutNamedColumns(false, true)),
             JSONArrayUtil.of(
                 (List<?>) spreadsheetFileTaskHandler.handle(
-                    getReadSimpleTaskExecution(false, false, null, true, getFile("sample_no_header." + extension))
+                    getReadSimpleTaskExecution(false, false, null, null, true, getFile("sample_no_header." + extension))
                 )
             ),
             true
@@ -394,7 +405,7 @@ public class SpreadsheetFileTaskHandlerTest {
             JSONArrayUtil.of(getJSONArrayWithoutNamedColumns(true, false)),
             JSONArrayUtil.of(
                 (List<?>) spreadsheetFileTaskHandler.handle(
-                    getReadSimpleTaskExecution(false, true, null, false, getFile("sample_no_header." + extension))
+                    getReadSimpleTaskExecution(false, true, null, null, false, getFile("sample_no_header." + extension))
                 )
             ),
             true
@@ -406,25 +417,19 @@ public class SpreadsheetFileTaskHandlerTest {
             JSONArrayUtil.of(getJSONArrayWithoutNamedColumns(true, true)),
             JSONArrayUtil.of(
                 (List<?>) spreadsheetFileTaskHandler.handle(
-                    getReadSimpleTaskExecution(false, true, null, true, getFile("sample_no_header." + extension))
+                    getReadSimpleTaskExecution(false, true, null, null, true, getFile("sample_no_header." + extension))
                 )
             ),
             true
         );
 
-        //range
+        //paging
 
         assertEquals(
-            JSONArrayUtil.of(getJSONObjectsWithNamedColumns(false, false).subList(1, 3)),
+            JSONArrayUtil.of(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
             JSONArrayUtil.of(
                 (List<?>) spreadsheetFileTaskHandler.handle(
-                    getReadSimpleTaskExecution(
-                        true,
-                        false,
-                        Map.of("startRow", 1, "endRow", 3),
-                        false,
-                        getFile("sample_header." + extension)
-                    )
+                    getReadSimpleTaskExecution(true, false, 1, 3, false, getFile("sample_header." + extension))
                 )
             ),
             true
@@ -443,7 +448,7 @@ public class SpreadsheetFileTaskHandlerTest {
             JSONArrayUtil.of(Files.contentOf(getFile("sample.json"), Charset.defaultCharset())),
             JSONArrayUtil.of(
                 (List<?>) spreadsheetFileTaskHandler.handle(
-                    getReadSimpleTaskExecution(true, true, null, false, fileEntry)
+                    getReadSimpleTaskExecution(true, true, null, null, false, fileEntry)
                 )
             ),
             true

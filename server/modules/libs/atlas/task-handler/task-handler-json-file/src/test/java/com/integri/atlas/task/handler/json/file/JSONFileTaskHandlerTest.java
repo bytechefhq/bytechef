@@ -89,7 +89,8 @@ public class JSONFileTaskHandlerTest {
         taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("fileType", "JSON");
         taskExecution.put("operation", "READ");
-        taskExecution.put("range", Map.of("startIndex", 1, "endIndex", 3));
+        taskExecution.put("pageNumber", 1);
+        taskExecution.put("pageSize", 2);
 
         Assertions.assertThat(((List<?>) jsonFileTaskHandler.handle(taskExecution)).size()).isEqualTo(2);
     }
@@ -115,7 +116,8 @@ public class JSONFileTaskHandlerTest {
         taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("fileType", "JSONL");
         taskExecution.put("operation", "READ");
-        taskExecution.put("range", Map.of("startIndex", 1, "endIndex", 3));
+        taskExecution.put("pageNumber", 1);
+        taskExecution.put("pageSize", 2);
 
         Assertions.assertThat(((List<?>) jsonFileTaskHandler.handle(taskExecution)).size()).isEqualTo(2);
     }

@@ -194,28 +194,28 @@ public class SpreadsheetFileTaskDeclarationTest {
                                 ],
                                 "type":"SELECT"
                             },
-                            {
-                                "description":"The range to read from the table.",
-                                "displayName":"Range",
+                                                        {
+                                "description":"The amount of child elements to return in a page.",
+                                "displayName":"Page Size",
                                 "displayOption":{
                                     "show":{
                                         "operation":["READ"]
                                     }
                                 },
-                                "name":"range",
-                                "type":"GROUP",
-                                "groupProperties":[
-                                    {
-                                        "displayName":"The start row index",
-                                        "name":"startRow",
-                                        "type":"NUMBER"
-                                    },
-                                    {
-                                        "displayName":"The end row index",
-                                        "name":"endRow","type":"NUMBER"
-                                    }
-                                ]
+                                "name":"pageSize",
+                                "type":"NUMBER"
                             },
+                            {
+                                "description":"The page number to get.",
+                                "displayName":"Page Number",
+                                "displayOption":{
+                                    "show":{
+                                        "operation":["READ"]
+                                    }
+                                },
+                                "name":"pageNumber",
+                                "type":"NUMBER"
+                            },,
                             {
                                 "defaultValue":false,
                                 "description":"In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
