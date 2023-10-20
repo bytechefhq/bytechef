@@ -47,7 +47,7 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
             .uri(
                 uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-editor-description"))
             .bodyValue(
-                new EditorDescription(
+                new EditorDescriptionRequest(
                     actionName, actionParameters, componentName, componentVersion, connectionId))
             .retrieve()
             .bodyToMono(String.class)
@@ -63,7 +63,7 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
             .post()
             .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-options"))
             .bodyValue(
-                new Options(
+                new OptionsRequest(
                     actionName, propertyName, actionParameters, componentName, componentVersion, connectionId,
                     searchText))
             .retrieve()
@@ -80,7 +80,7 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
             .post()
             .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-output-schema"))
             .bodyValue(
-                new OutputSchema(
+                new OutputSchemaRequest(
                     actionName, actionParameters, componentName, componentVersion, connectionId))
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {})
@@ -96,7 +96,7 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
             .post()
             .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-properties"))
             .bodyValue(
-                new Properties(
+                new PropertiesRequest(
                     actionName, actionParameters, componentName, componentVersion, connectionId, propertyName))
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {})
@@ -112,34 +112,34 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
             .post()
             .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-sample-output"))
             .bodyValue(
-                new SampleOutput(
+                new SampleOutputRequest(
                     actionName, actionParameters, componentName, componentVersion, connectionId))
             .retrieve()
             .bodyToMono(Object.class)
             .block();
     }
 
-    private record EditorDescription(
+    private record EditorDescriptionRequest(
         String actionName, Map<String, Object> actionParameters, String componentName, int componentVersion,
         long connectionId) {
     }
 
-    private record Options(
+    private record OptionsRequest(
         String actionName, String propertyName, Map<String, Object> actionParameters, String componentName,
         int componentVersion, long connectionId, String searchText) {
     }
 
-    private record OutputSchema(
+    private record OutputSchemaRequest(
         String actionName, Map<String, Object> actionParameters, String componentName, int componentVersion,
         long connectionId) {
     }
 
-    private record Properties(
+    private record PropertiesRequest(
         String actionName, Map<String, Object> actionParameters, String componentName, int componentVersion,
         long connectionId, String propertyName) {
     }
 
-    private record SampleOutput(
+    private record SampleOutputRequest(
         String actionName, Map<String, Object> actionParameters, String componentName, int componentVersion,
         long connectionId) {
     }
