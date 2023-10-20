@@ -1,0 +1,71 @@
+label: Liferay Object Maintenance
+
+inputs:
+  - name: apiToken
+    label: Token generated with Basic Auth Algorithm
+    type: string
+    required: true
+  - name: apiEndpointUrl1
+    label: API Endpoint URL 1
+    type: string
+    required: true
+  - name: sourceFileUrl1
+    label: Full path of file in local file system that contains data bytes for API endpoint 1
+    type: string
+    required: true
+  - name: apiEndpointUrl2
+    label: API Endpoint URL 2
+    type: string
+    required: true
+  - name: sourceFileUrl2
+    label: Full path of file in local file system that contains data bytes for API endpoint 2
+    type: string
+    required: true
+
+outputs:
+  - name: jobResult
+    value: This would be the exit value
+
+tasks:
+  - type: logger/v1/info
+    name: loggInputs
+    description: Print received input arguments in log with INFO log level
+    text: Received ${apiEndpointUrl1} to post payload in ${sourceFileUrl1}
+
+  - type: filesystem/v1/readFile
+    name: jsonFileEntry1
+    description: Read file at `filename` location on local file system and create `jsonFileEntry1` object in memory
+    filename: ${sourceFileUrl1}
+
+  - type: jsonFile/v1/read
+    name: jsonObject1
+    description: Create Json object `jsonObject1` by reading bytes of fileEntry `jsonFileEntry1`
+    fileEntry: ${jsonFileEntry1}
+    isArray: false
+
+  - type: logger/v1/info
+    name: loggJsonObject1
+    description: Print created Json object `jsonObject1` in log with INFO log level
+    text: Payload in the file ${jsonObject1}
+
+  - type: httpClient/v1/post
+    name: liferayApiPost1
+    description: >
+      Post content of `jsonFileEntry1` to Liferay `apiEndpointUrl1`. `sendFile` is
+      set to `true` to tell processor to seek content bytes in fileEntry `jsonFileEntry1`
+      and bodyContentType `JSON` creates request's `ContentType` header value application/json
+    label: Post content to Liferay REST endpoint
+    uri: ${apiEndpointUrl1}
+    responseFormat: JSON
+    headerParameters:
+      -
+        key: Authorization
+        value: Basic ${apiToken}
+    bodyContentType: JSON
+    sendFile: true
+    fileEntry: ${jsonFileEntry1}
+
+  - type: logger/v1/info
+    name: loggEndpointResponse1
+    description: Print received response content in log with INFO log level
+    text: Result ${liferayApiPost1}
