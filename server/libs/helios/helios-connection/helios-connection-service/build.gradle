@@ -1,13 +1,12 @@
 dependencies {
-    api project(":server:libs:atlas:atlas-configuration:atlas-configuration-api")
-    api project(":server:libs:helios:helios-connection:helios-connection-api")
-    api project(":server:libs:helios:helios-configuration:helios-configuration-api")
-    api project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
-
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-tx"
     implementation project(":server:libs:core:commons:commons-util")
+    implementation project(":server:libs:helios:helios-connection:helios-connection-api")
+    implementation project(":server:libs:helios:helios-configuration:helios-configuration-api")
+    implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
 
+    testImplementation "org.springframework.data:spring-data-jdbc"
     testImplementation project(":server:libs:configs:liquibase-config")
     testImplementation project(":server:libs:core:category:category-service")
     testImplementation project(":server:libs:core:commons:commons-data")
