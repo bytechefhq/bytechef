@@ -130,7 +130,7 @@ const RightSlideOver = ({open, closeSidebar}: SidebarProps) => {
                                                                 </select>
                                                             </div>
 
-                                                            <div className="flex space-x-1">
+                                                            <div className="flex justify-center space-x-1">
                                                                 <Button label="Description" />
 
                                                                 <Button label="Auth" />
