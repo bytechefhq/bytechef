@@ -26,17 +26,25 @@ import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.encryption.Encryption;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.auditing.CurrentDateTimeProvider;
+import org.springframework.data.auditing.DateTimeProvider;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
+import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
-//@ConditionalOnProperty(prefix = "bytechef.workflow", name = "persistence.provider", havingValue = "jdbc")
+@EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
+@EnableJdbcRepositories(basePackages = "com.bytechef")
 public class JdbcConfiguration extends AbstractJdbcConfiguration {
 
     private final Encryption encryption;
@@ -46,6 +54,16 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
     public JdbcConfiguration(Encryption encryption, ObjectMapper objectMapper) {
         this.encryption = encryption;
         this.objectMapper = objectMapper;
+    }
+
+    @Bean
+    AuditorAware<String> auditorProvider() {
+        return () -> Optional.of("system");
+    }
+
+    @Bean
+    public DateTimeProvider auditingDateTimeProvider() {
+        return CurrentDateTimeProvider.INSTANCE;
     }
 
     @Override

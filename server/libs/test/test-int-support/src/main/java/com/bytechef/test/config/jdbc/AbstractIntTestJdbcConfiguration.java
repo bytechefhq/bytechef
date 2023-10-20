@@ -15,25 +15,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.worker.config;
+package com.bytechef.test.config.jdbc;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import java.util.Optional;
 import org.springframework.data.auditing.CurrentDateTimeProvider;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 
-import java.util.Optional;
-
-/**
- * @author Ivica Cardic
- */
-@Configuration
-@EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
-@EnableJdbcRepositories(basePackages = "com.bytechef")
-public class JdbcRepositoriesConfiguration {
+@EnableJdbcAuditing
+@TestConfiguration
+public abstract class AbstractIntTestJdbcConfiguration extends AbstractJdbcConfiguration {
 
     @Bean
     AuditorAware<String> auditorProvider() {

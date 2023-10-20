@@ -25,7 +25,7 @@ import com.bytechef.atlas.service.impl.WorkflowServiceImpl;
 
 import java.util.List;
 
-import com.bytechef.test.config.jdbc.JdbcRepositoriesIntTestConfiguration;
+import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -68,6 +68,6 @@ public class IntegrationIntTestConfiguration {
             "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration.repository",
             "com.bytechef.tag.repository"
         })
-    public static class IntegrationJdbcRepositoriesIntTestConfiguration extends JdbcRepositoriesIntTestConfiguration {
+    public static class IntegrationJdbcIntTestConfiguration extends AbstractIntTestJdbcConfiguration {
     }
 }

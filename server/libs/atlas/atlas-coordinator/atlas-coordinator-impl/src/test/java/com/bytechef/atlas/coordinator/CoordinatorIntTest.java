@@ -59,7 +59,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bytechef.test.config.jdbc.JdbcRepositoriesIntTestConfiguration;
+import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Assertions;
@@ -213,7 +213,7 @@ public class CoordinatorIntTest {
         }
 
         @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.repository.jdbc")
-        public static class CoordinatorIntJdbcRepositoriesConfiguration extends JdbcRepositoriesIntTestConfiguration {
+        public static class CoordinatorIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
         }
 
         @Configuration

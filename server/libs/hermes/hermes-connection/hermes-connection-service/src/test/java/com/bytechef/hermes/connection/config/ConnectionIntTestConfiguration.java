@@ -21,7 +21,7 @@ import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConve
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
-import com.bytechef.test.config.jdbc.JdbcRepositoriesIntTestConfiguration;
+import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.SpringBootConfiguration;
@@ -68,13 +68,13 @@ public class ConnectionIntTestConfiguration {
     @EnableJdbcRepositories(basePackages = {
         "com.bytechef.hermes.connection.repository", "com.bytechef.tag.repository"
     })
-    public static class ConnectionJdbcRepositoriesIntTestConfiguration extends JdbcRepositoriesIntTestConfiguration {
+    public static class ConnectionJdbcIntTestConfiguration extends AbstractIntTestJdbcConfiguration {
 
         private final Encryption encryption;
         private final ObjectMapper objectMapper;
 
         @SuppressFBWarnings("EI2")
-        public ConnectionJdbcRepositoriesIntTestConfiguration(Encryption encryption, ObjectMapper objectMapper) {
+        public ConnectionJdbcIntTestConfiguration(Encryption encryption, ObjectMapper objectMapper) {
             this.encryption = encryption;
             this.objectMapper = objectMapper;
         }
