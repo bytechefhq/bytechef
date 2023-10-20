@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS integration (
     name                     VARCHAR(256) NOT NULL,
     description              TEXT         NULL,
     integration_version      INT          NOT NULL,
-    status                   VARCHAR(256) NOT NULL,
+    status                   INT          NOT NULL,
     published_date           TIMESTAMP    NULL,
     category_id              BIGINT       NULL,
     created_date             TIMESTAMP    NOT NULL,

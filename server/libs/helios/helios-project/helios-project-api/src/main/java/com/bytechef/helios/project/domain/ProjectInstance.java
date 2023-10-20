@@ -45,7 +45,25 @@ import java.util.Set;
 public class ProjectInstance implements Persistable<Long> {
 
     public enum Status {
-        DISABLED, ENABLED
+        DISABLED(0), ENABLED(1);
+
+        private final int id;
+
+        Status(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public static Status valueOf(int id) {
+            return switch (id) {
+                case 0 -> Status.DISABLED;
+                case 1 -> Status.ENABLED;
+                default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
+            };
+        }
     }
 
     @CreatedBy
@@ -60,7 +78,7 @@ public class ProjectInstance implements Persistable<Long> {
     private String description;
 
     @Column
-    private Status status;
+    private int status;
 
     @Id
     private Long id;
@@ -142,7 +160,7 @@ public class ProjectInstance implements Persistable<Long> {
     }
 
     public Status getStatus() {
-        return status;
+        return Status.valueOf(status);
     }
 
     public List<Long> getTagIds() {
@@ -178,7 +196,7 @@ public class ProjectInstance implements Persistable<Long> {
     }
 
     public void setStatus(Status status) {
-        this.status = status;
+        this.status = status.getId();
     }
 
     public void setTagIds(List<Long> tagIds) {

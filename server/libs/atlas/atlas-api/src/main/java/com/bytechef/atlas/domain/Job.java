@@ -53,11 +53,32 @@ import org.springframework.data.relational.core.mapping.Table;
 public final class Job implements Errorable, Persistable<Long>, Prioritizable {
 
     public enum Status {
-        COMPLETED,
-        CREATED,
-        FAILED,
-        STOPPED,
-        STARTED,
+        COMPLETED(3),
+        CREATED(1),
+        FAILED(5),
+        STOPPED(4),
+        STARTED(2);
+
+        private final int id;
+
+        Status(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public static Status valueOf(int id) {
+            return switch (id) {
+                case 1 -> Status.CREATED;
+                case 2 -> Status.STARTED;
+                case 3 -> Status.COMPLETED;
+                case 4 -> Status.STOPPED;
+                case 5 -> Status.FAILED;
+                default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
+            };
+        }
     }
 
     @CreatedBy
@@ -106,7 +127,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     private LocalDateTime startDate;
 
     @Column
-    private Status status;
+    private int status;
 
     @Version
     private int version;
@@ -218,7 +239,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
      * @return The job's status.
      */
     public Status getStatus() {
-        return status;
+        return Status.valueOf(status);
     }
 
     /**
@@ -322,7 +343,7 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     }
 
     public void setStatus(Status status) {
-        this.status = status;
+        this.status = status.getId();
     }
 
     public void setWebhooks(List<Webhook> webhooks) {

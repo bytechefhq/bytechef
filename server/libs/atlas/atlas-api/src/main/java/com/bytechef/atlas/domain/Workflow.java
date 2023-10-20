@@ -63,8 +63,18 @@ import org.springframework.util.Assert;
 public final class Workflow implements Errorable, Persistable<String>, Serializable {
 
     public enum Format {
-        JSON,
-        YAML;
+        JSON(1),
+        YAML(2);
+
+        private final int id;
+
+        Format(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
 
         public static Format parse(String filename) {
             Assert.notNull(filename, "Filename '%s' can not be null".formatted(filename));
@@ -77,10 +87,17 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
             return Objects.equals(extension.toLowerCase(), "json") ? JSON : YAML;
         }
 
+        public static Format valueOf(int id) {
+            return switch (id) {
+                case 1 -> Format.JSON;
+                case 2 -> Format.YAML;
+                default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
+            };
+        }
     }
 
     public enum SourceType {
-        CLASSPATH, FILESYSTEM, GIT, JDBC;
+        CLASSPATH, FILESYSTEM, GIT, JDBC
     }
 
     @Column
@@ -101,7 +118,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     private ExecutionError error;
 
     @Column
-    private Format format;
+    private int format;
 
     @Id
     private String id;
@@ -157,7 +174,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         Assert.notNull(source, "'source' must not be null");
 
         this.definition = definition;
-        this.format = format;
+        this.format = format.getId();
         this.description = MapValueUtils.getString(source, WorkflowConstants.DESCRIPTION);
         this.id = id;
         this.inputs = CollectionUtils.map(
@@ -184,12 +201,12 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
 
     public Workflow(String definition, Format format) {
         this.definition = definition;
-        this.format = format;
+        this.format = format.getId();
     }
 
     public Workflow(String definition, Format format, SourceType sourceType) {
         this.definition = definition;
-        this.format = format;
+        this.format = format.getId();
         this.sourceType = sourceType;
     }
 
@@ -251,7 +268,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     }
 
     public Format getFormat() {
-        return format;
+        return Format.valueOf(format);
     }
 
     /** Returns the unique identifier of the workflow. */
