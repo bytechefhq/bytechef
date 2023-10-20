@@ -130,7 +130,6 @@ public class OpenApiComponentTaskHandlerIntTest {
         connection.setComponentName("petshop");
         connection.setConnectionVersion(1);
         connection.setName("PetShop Connection");
-        connection.setParameters(Map.of());
 
         connection = connectionRepository.save(connection);
     }

@@ -82,14 +82,13 @@ schemas:
 #        additionalProperties:
 #          type: object
       name:
-        description: The component name.
+        description: The name.
         type: string
       resources:
         $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Resources'
       version:
-        description: The component version.
-        type: number
-        format: double
+        description: The version of a component.
+        type: integer
   ConnectionDefinition:
     description: Definition of a connection to an outside service.
     type: object
@@ -104,9 +103,6 @@ schemas:
       componentName:
         description: The name of a component this connection can be used for.
         type: string
-      connectionVersion:
-        description: The connection version.
-        type: string
       display:
         $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
       properties:
@@ -117,8 +113,8 @@ schemas:
       resources:
         $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Resources'
       version:
-        type: number
-        format: double
+        description: The version of a connection.
+        type: integer
   JdbcComponentDefinition:
     description: A definition of component used for building JDBC based components. The definition is transformed into fully component definition.
     type: object
@@ -137,5 +133,4 @@ schemas:
       resources:
         $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Resources'
       version:
-        type: number
-        format: double
+        type: integer
