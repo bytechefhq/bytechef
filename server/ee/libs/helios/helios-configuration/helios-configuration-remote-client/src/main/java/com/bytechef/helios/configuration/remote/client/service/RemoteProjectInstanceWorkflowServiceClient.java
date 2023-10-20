@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RemoteProjectInstanceWorkflowServiceClient implements RemoteProjectInstanceWorkflowService {
 
-    private static final String CONFIGURATION_SERVICE_APP = "configuration-service-app";
+    private static final String CONFIGURATION_APP = "configuration-app";
     private static final String PROJECT_INSTANCE_WORKFLOW_SERVICE = "/remote/project-instance-workflow-service";
     private final LoadBalancedWebClient loadBalancedWebClient;
 
@@ -43,7 +43,7 @@ public class RemoteProjectInstanceWorkflowServiceClient implements RemoteProject
     public ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(CONFIGURATION_SERVICE_APP)
+                .host(CONFIGURATION_APP)
                 .path(
                     PROJECT_INSTANCE_WORKFLOW_SERVICE +
                         "/get-project-instance-workflow/{projectInstanceId}/{workflowId}")
@@ -57,7 +57,7 @@ public class RemoteProjectInstanceWorkflowServiceClient implements RemoteProject
 
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(CONFIGURATION_SERVICE_APP)
+                .host(CONFIGURATION_APP)
                 .path(
                     PROJECT_INSTANCE_WORKFLOW_SERVICE +
                         "/get-project-instance-workflow-connection/{workflowConnectionOperationName}" +
@@ -73,7 +73,7 @@ public class RemoteProjectInstanceWorkflowServiceClient implements RemoteProject
 
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(CONFIGURATION_SERVICE_APP)
+                .host(CONFIGURATION_APP)
                 .path(
                     PROJECT_INSTANCE_WORKFLOW_SERVICE + "/get-project-instance-workflow-connection-id" +
                         "/{operationName}/{key}")

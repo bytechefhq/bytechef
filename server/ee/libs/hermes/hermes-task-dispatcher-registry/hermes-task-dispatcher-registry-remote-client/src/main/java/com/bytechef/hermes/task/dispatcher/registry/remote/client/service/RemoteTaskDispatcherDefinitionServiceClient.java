@@ -32,7 +32,7 @@ import java.util.List;
 @Component
 public class RemoteTaskDispatcherDefinitionServiceClient implements RemoteTaskDispatcherDefinitionService {
 
-    private static final String COORDINATOR_SERVICE_APP = "coordinator-service-app";
+    private static final String COORDINATOR_APP = "coordinator-app";
     private static final String TASK_DISPATCHER_DEFINITION_SERVICE = "/remote/task-dispatcher-definition-service";
 
     private final LoadBalancedWebClient loadBalancedWebClient;
@@ -46,7 +46,7 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements RemoteTaskDi
     public TaskDispatcherDefinition getTaskDispatcherDefinition(String name, Integer version) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(COORDINATOR_SERVICE_APP)
+                .host(COORDINATOR_APP)
                 .path(
                     TASK_DISPATCHER_DEFINITION_SERVICE + "/get-task-dispatcher-definition/{name}/{version}")
                 .build(name, version),
@@ -57,7 +57,7 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements RemoteTaskDi
     public List<TaskDispatcherDefinition> getTaskDispatcherDefinitions() {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(COORDINATOR_SERVICE_APP)
+                .host(COORDINATOR_APP)
                 .path(TASK_DISPATCHER_DEFINITION_SERVICE + "/get-task-dispatcher-definitions")
                 .build(),
             new ParameterizedTypeReference<>() {});
@@ -67,7 +67,7 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements RemoteTaskDi
     public List<TaskDispatcherDefinition> getTaskDispatcherDefinitionVersions(String name) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(COORDINATOR_SERVICE_APP)
+                .host(COORDINATOR_APP)
                 .path(TASK_DISPATCHER_DEFINITION_SERVICE + "/get-task-dispatcher-definition-versions/{name}")
                 .build(name),
             new ParameterizedTypeReference<>() {});

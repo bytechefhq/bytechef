@@ -1,4 +1,0 @@
-spring:
-  task:
-    execution:
-      thread-name-prefix: worker-service-app-task-

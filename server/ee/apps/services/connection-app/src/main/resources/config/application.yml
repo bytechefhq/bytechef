@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: connection-app
+  config:
+    import: optional:configserver:http://localhost:6111
+  profiles:
+    active: #spring.profiles.active#

@@ -31,7 +31,7 @@ import java.util.Map;
 public class RemoteTriggerLifecycleFacadeClient implements RemoteTriggerLifecycleFacade {
 
     private static final String TRIGGER_LIFECYCLE_FACADE = "/remote/trigger-lifecycle-facade";
-    private static final String EXECUTION_SERVICE_APP = "execution-service-app";
+    private static final String EXECUTION_APP = "execution-app";
 
     private final LoadBalancedWebClient loadBalancedWebClient;
 
@@ -67,7 +67,7 @@ public class RemoteTriggerLifecycleFacadeClient implements RemoteTriggerLifecycl
     private void post(String path, TriggerRequest workflowExecutionId) {
         loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(path)
                 .build(),
             workflowExecutionId);

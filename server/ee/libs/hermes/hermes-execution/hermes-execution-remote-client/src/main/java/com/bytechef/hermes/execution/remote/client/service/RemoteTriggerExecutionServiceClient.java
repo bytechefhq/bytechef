@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RemoteTriggerExecutionServiceClient implements RemoteTriggerExecutionService {
 
-    private static final String EXECUTION_SERVICE_APP = "execution-service-app";
+    private static final String EXECUTION_APP = "execution-app";
     private static final String TRIGGER_EXECUTION_SERVICE = "/remote/trigger-execution-service";
 
     private final LoadBalancedWebClient loadBalancedWebClient;
@@ -43,7 +43,7 @@ public class RemoteTriggerExecutionServiceClient implements RemoteTriggerExecuti
     public TriggerExecution create(TriggerExecution triggerExecution) {
         return loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(TRIGGER_EXECUTION_SERVICE + "/create")
                 .build(),
             triggerExecution, TriggerExecution.class);
@@ -53,7 +53,7 @@ public class RemoteTriggerExecutionServiceClient implements RemoteTriggerExecuti
     public TriggerExecution getTriggerExecution(long id) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(TRIGGER_EXECUTION_SERVICE + "/get-trigger-execution/{id}")
                 .build(id),
             TriggerExecution.class);
@@ -63,7 +63,7 @@ public class RemoteTriggerExecutionServiceClient implements RemoteTriggerExecuti
     public TriggerExecution update(TriggerExecution triggerExecution) {
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
-                .host(EXECUTION_SERVICE_APP)
+                .host(EXECUTION_APP)
                 .path(TRIGGER_EXECUTION_SERVICE + "/update")
                 .build(),
             triggerExecution, TriggerExecution.class);

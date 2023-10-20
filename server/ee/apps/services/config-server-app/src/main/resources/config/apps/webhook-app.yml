@@ -1,0 +1,4 @@
+spring:
+  task:
+    execution:
+      thread-name-prefix: webhook-app-task-

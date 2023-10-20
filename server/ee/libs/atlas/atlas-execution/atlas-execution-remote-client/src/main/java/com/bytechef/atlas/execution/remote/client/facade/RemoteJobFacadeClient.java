@@ -41,7 +41,7 @@ public class RemoteJobFacadeClient implements RemoteJobFacade {
     public long createJob(JobParameters jobParameters) {
         return loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
-                .host("execution-service-app")
+                .host("execution-app")
                 .path("/remote/job-facade/create-job")
                 .build(),
             jobParameters, Long.class);

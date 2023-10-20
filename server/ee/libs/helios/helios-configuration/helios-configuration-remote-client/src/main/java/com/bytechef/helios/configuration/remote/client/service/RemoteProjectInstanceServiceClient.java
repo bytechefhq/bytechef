@@ -31,7 +31,7 @@ import java.util.Optional;
 @Component
 public class RemoteProjectInstanceServiceClient implements RemoteProjectInstanceService {
 
-    private static final String CONFIGURATION_SERVICE_APP = "configuration-service-app";
+    private static final String CONFIGURATION_APP = "configuration-app";
     private static final String PROJECT_INSTANCE_SERVICE = "/remote/project-instance-service";
     private final LoadBalancedWebClient loadBalancedWebClient;
 
@@ -45,7 +45,7 @@ public class RemoteProjectInstanceServiceClient implements RemoteProjectInstance
         return Optional.ofNullable(
             loadBalancedWebClient.get(
                 uriBuilder -> uriBuilder
-                    .host(CONFIGURATION_SERVICE_APP)
+                    .host(CONFIGURATION_APP)
                     .path(PROJECT_INSTANCE_SERVICE + "/fetch-workflow-project-instance/{workflowId}")
                     .build(workflowId),
                 ProjectInstance.class));

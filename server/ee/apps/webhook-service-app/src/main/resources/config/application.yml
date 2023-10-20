@@ -1,7 +1,0 @@
-spring:
-  application:
-    name: webhook-service-app
-  config:
-    import: optional:configserver:http://localhost:6111
-  profiles:
-    active: #spring.profiles.active#
