@@ -32,17 +32,17 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T14:11:27.142264+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-13T08:57:16.452294+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "connection-oauth2", description = "The Core Connection OAuth2 API")
-public interface ConnectionOauth2PropertiesApi {
+public interface Oauth2PropertiesApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * GET /connection-oauth2-properties : Get OAuth2 properties
+     * GET /oauth2-properties : Get OAuth2 properties
      * Get OAuth2 properties.
      *
      * @return The OAuth2Properties object. (status code 200)
@@ -60,7 +60,7 @@ public interface ConnectionOauth2PropertiesApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connection-oauth2-properties",
+        value = "/oauth2-properties",
         produces = { "application/json" }
     )
     default ResponseEntity<OAuth2PropertiesModel> getOAuth2Properties(
