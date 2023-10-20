@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.server.config;
+package com.bytechef.platform.config;
 
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.scheduler.TriggerScheduler;

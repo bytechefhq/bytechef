@@ -1,0 +1,84 @@
+group = "com.bytechef.worker"
+description = ""
+
+springBoot {
+    mainClassName = "com.bytechef.worker.WorkerApplication"
+}
+
+dependencies {
+    implementation libs.org.openapitools.jackson.databind.nullable
+    implementation "org.springframework:spring-webflux"
+    implementation "org.springframework.boot:spring-boot-starter-amqp"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-data-jdbc"
+    implementation "org.springframework.boot:spring-boot-starter-data-redis"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation libs.org.springframework.cloud.spring.cloud.starter.loadbalancer
+    implementation "org.springframework.kafka:spring-kafka"
+    implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+
+    implementation project(":server:ee:libs:atlas:atlas-worker:atlas-worker-remote-rest")
+    implementation project(":server:ee:libs:core:discovery:discovery-redis")
+    implementation project(":server:ee:libs:hermes:hermes-connection:hermes-connection-remote-client")
+    implementation project(":server:ee:libs:hermes:hermes-definition-registry:hermes-definition-registry-remote-rest")
+    implementation project(":server:ee:libs:hermes:hermes-definition-registry:hermes-definition-registry-remote-client")
+    implementation project(":server:ee:libs:hermes:hermes-execution:hermes-execution-remote-client")
+    implementation project(":server:ee:libs:hermes:hermes-scheduler:hermes-scheduler-remote-client")
+    implementation project(":server:ee:libs:hermes:hermes-worker:hermes-worker-remote-rest")
+
+    implementation project(":server:libs:atlas:atlas-worker:atlas-worker-config")
+    implementation project(":server:libs:configs:liquibase-config")
+    implementation project(":server:libs:core:message-broker:message-broker-amqp")
+    implementation project(":server:libs:core:message-broker:message-broker-kafka")
+    implementation project(":server:libs:core:message-broker:message-broker-redis")
+    implementation project(":server:libs:core:commons:commons-data")
+    implementation project(":server:libs:core:commons:commons-util")
+    implementation project(":server:libs:core:config-post-processor")
+    implementation project(":server:libs:core:event:event-impl")
+    implementation project(":server:libs:core:rest:rest-impl")
+    implementation project(":server:libs:hermes:hermes-component:hermes-component-context:hermes-component-context-impl")
+    implementation project(":server:libs:hermes:hermes-component:hermes-component-impl")
+    implementation project(":server:libs:hermes:hermes-data-storage:hermes-data-storage-db-service")
+    implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
+    implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64-service")
+    implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-filesystem-service")
+    implementation project(":server:libs:hermes:hermes-worker:hermes-worker-impl")
+
+    implementation project(":server:libs:modules:components:airtable")
+    implementation project(":server:libs:modules:components:aws:aws-s3")
+    implementation project(":server:libs:modules:components:bash")
+    implementation project(":server:libs:modules:components:csvfile")
+    implementation project(":server:libs:modules:components:datamapper")
+    implementation project(":server:libs:modules:components:datastorage")
+    implementation project(":server:libs:modules:components:delay")
+    implementation project(":server:libs:modules:components:filestorage")
+    implementation project(":server:libs:modules:components:httpclient")
+    implementation project(":server:libs:modules:components:hubspot")
+    implementation project(":server:libs:modules:components:jira")
+    implementation project(":server:libs:modules:components:jsonfile")
+    implementation project(":server:libs:modules:components:logger")
+    implementation project(":server:libs:modules:components:filesystem")
+    implementation project(":server:libs:modules:components:map")
+    implementation project(":server:libs:modules:components:mailchimp")
+    implementation project(":server:libs:modules:components:mysql")
+    implementation project(":server:libs:modules:components:objecthelper")
+    implementation project(":server:libs:modules:components:odsfile")
+    implementation project(":server:libs:modules:components:petstore")
+    implementation project(":server:libs:modules:components:pipedrive")
+    implementation project(":server:libs:modules:components:postgresql")
+    implementation project(":server:libs:modules:components:rabbitmq")
+    implementation project(":server:libs:modules:components:randomhelper")
+    implementation project(":server:libs:modules:components:schedule")
+    implementation project(":server:libs:modules:components:script")
+//    implementation project(":server:libs:modules:components:shopify")
+    implementation project(":server:libs:modules:components:var")
+    implementation project(":server:libs:modules:components:xlsxfile")
+    implementation project(":server:libs:modules:components:xmlfile")
+    implementation project(":server:libs:modules:components:xmlhelper")
+    implementation project(":server:libs:modules:components:webhook")
+
+    testImplementation "org.apache.activemq:artemis-jakarta-server"
+    testImplementation "org.springframework.boot:spring-boot-starter-artemis"
+    testImplementation project(":server:libs:core:message-broker:message-broker-jms")
+    testImplementation project(":server:libs:test:test-int-support")
+}
