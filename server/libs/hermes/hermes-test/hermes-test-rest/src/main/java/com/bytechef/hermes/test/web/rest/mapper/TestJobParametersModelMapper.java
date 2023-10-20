@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.execution.web.rest.mapper;
+package com.bytechef.hermes.test.web.rest.mapper;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.hermes.configuration.connection.WorkflowConnection;
-import com.bytechef.hermes.execution.web.rest.mapper.config.WorkflowExecutionMapperSpringConfig;
-import com.bytechef.hermes.execution.web.rest.model.JobParametersModel;
-import com.bytechef.hermes.execution.web.rest.model.JobConnectionModel;
+import com.bytechef.hermes.test.web.rest.mapper.config.WorkflowTestMapperSpringConfig;
+import com.bytechef.hermes.test.web.rest.model.JobConnectionModel;
+import com.bytechef.hermes.test.web.rest.model.JobParametersModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -33,11 +33,14 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = WorkflowExecutionMapperSpringConfig.class)
-public interface JobParametersModelMapper extends Converter<JobParametersModel, JobParameters> {
+@Mapper(config = WorkflowTestMapperSpringConfig.class)
+public interface TestJobParametersModelMapper extends Converter<JobParametersModel, JobParameters> {
 
     @Override
     @Mapping(target = "metadata", qualifiedByName = "metadata", source = ".")
+    @Mapping(target = "parentTaskExecutionId", ignore = true)
+    @Mapping(target = "priority", ignore = true)
+    @Mapping(target = "webhooks", ignore = true)
     JobParameters convert(JobParametersModel jobParametersModel);
 
     @Named("metadata")

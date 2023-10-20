@@ -60,7 +60,6 @@ dependencies {
     implementation project(":server:libs:hermes:hermes-coordinator:hermes-coordinator-impl")
     implementation project(":server:libs:hermes:hermes-data-storage:hermes-data-storage-db-service")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-service")
-    implementation project(":server:libs:hermes:hermes-execution:hermes-execution-rest:hermes-execution-rest-impl")
     implementation project(":server:libs:hermes:hermes-execution:hermes-execution-service")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64-service")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-filesystem-service")

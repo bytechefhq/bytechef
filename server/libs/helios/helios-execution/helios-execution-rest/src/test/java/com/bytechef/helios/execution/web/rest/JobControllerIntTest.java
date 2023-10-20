@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.execution.web.rest;
+package com.bytechef.helios.execution.web.rest;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

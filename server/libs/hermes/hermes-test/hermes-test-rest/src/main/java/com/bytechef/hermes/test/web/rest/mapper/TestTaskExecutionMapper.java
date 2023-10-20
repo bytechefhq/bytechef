@@ -15,19 +15,26 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.configuration.web.rest.mapper;
+package com.bytechef.hermes.test.web.rest.mapper;
 
-import com.bytechef.category.domain.Category;
-import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
-import com.bytechef.helios.configuration.web.rest.model.CategoryModel;
+import com.bytechef.hermes.execution.dto.TaskExecutionDTO;
+import com.bytechef.hermes.test.web.rest.mapper.config.WorkflowTestMapperSpringConfig;
+import com.bytechef.hermes.test.web.rest.model.TaskExecutionModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
+
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ProjectConfigurationMapperSpringConfig.class)
-public interface ProjectCategoryMapper extends Converter<Category, CategoryModel> {
+@Mapper(config = WorkflowTestMapperSpringConfig.class)
+public interface TestTaskExecutionMapper extends Converter<TaskExecutionDTO, TaskExecutionModel> {
 
-    CategoryModel convert(Category category);
+    @Override
+    TaskExecutionModel convert(TaskExecutionDTO taskExecutionDTO);
+
+    default String map(Optional<String> optional) {
+        return optional.orElse(null);
+    }
 }

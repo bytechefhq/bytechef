@@ -15,20 +15,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.execution.web.rest.mapper;
+package com.bytechef.helios.execution.web.rest.mapper;
 
+import com.bytechef.helios.configuration.web.rest.model.JobModel;
+import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
 import com.bytechef.hermes.execution.dto.JobDTO;
-import com.bytechef.hermes.execution.web.rest.mapper.config.WorkflowExecutionMapperSpringConfig;
-import com.bytechef.hermes.execution.web.rest.model.JobModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = WorkflowExecutionMapperSpringConfig.class)
-public interface JobMapper extends Converter<JobDTO, JobModel> {
+@Mapper(config = ProjectExecutionMapperSpringConfig.class)
+public interface ProjectJobMapper extends Converter<JobDTO, JobModel> {
 
     @Override
-    JobModel convert(JobDTO job);
+    JobModel convert(JobDTO jobDTO);
 }

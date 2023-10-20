@@ -11,18 +11,11 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
         "useTags": "true"
     ]
     generatorName = "spring"
-    importMappings = [
-        "TaskExecutionModel": "com.bytechef.hermes.execution.web.rest.model.TaskExecutionModel"
-    ]
     inputSpec = "$projectDir/openapi.yaml".toString()
     modelNameSuffix = "Model"
     modelPackage = "com.bytechef.helios.configuration.web.rest.model"
     outputDir = "$projectDir/generated".toString()
     schemaMappings = [
-        ComponentDefinition: "com.bytechef.helios.configuration.web.rest.model.ComponentDefinitionModel",
-        ExecutionError: "com.bytechef.hermes.execution.web.rest.model.ExecutionErrorModel",
-        Job: "com.bytechef.hermes.execution.web.rest.model.JobModel",
-        JobBasic: "com.bytechef.hermes.execution.web.rest.model.JobBasicModel",
         Page: "org.springframework.data.domain.Page",
         ProjectBasic: "com.bytechef.helios.configuration.web.rest.model.ProjectBasicModel",
         ProjectInstanceBasic: "com.bytechef.helios.configuration.web.rest.model.ProjectInstanceBasicModel",
@@ -31,9 +24,6 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
         ProjectInstanceWorkflowConnection: "com.bytechef.helios.configuration.web.rest.model.ProjectInstanceWorkflowConnectionModel",
         ProjectInstanceWorkflow: "com.bytechef.helios.configuration.web.rest.model.ProjectInstanceWorkflowModel",
         Project: "com.bytechef.helios.configuration.web.rest.model.ProjectModel",
-        TaskExecution: "TaskExecutionModel",
-        Webhook: "com.bytechef.hermes.execution.web.rest.model.WebhookModel",
-        Webhook_retry: "com.bytechef.hermes.execution.web.rest.model.WebhookRetryModel",
         WorkflowFormat: "com.bytechef.hermes.configuration.web.rest.model.WorkflowFormatModel",
         WorkflowTask: "com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel"
     ]
@@ -61,7 +51,6 @@ dependencies {
 
     api project(":server:libs:helios:helios-configuration:helios-configuration-rest:helios-configuration-rest-api")
     api project(":server:libs:helios:helios-execution:helios-execution-api")
-    api project(":server:libs:hermes:hermes-execution:hermes-execution-rest:hermes-execution-rest-api")
 
     compileOnly "jakarta.servlet:jakarta.servlet-api:6.0.0"
 
@@ -74,6 +63,7 @@ dependencies {
     implementation "org.slf4j:slf4j-api"
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-web"
+    implementation project(":server:libs:core:commons:commons-util")
 
     testImplementation "org.springframework:spring-webflux"
     testImplementation "org.springframework.boot:spring-boot-starter-web"

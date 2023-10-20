@@ -37,7 +37,6 @@ dependencies {
     implementation project(":server:libs:helios:helios-execution:helios-execution-rest")
     implementation project(":server:libs:helios:helios-execution:helios-execution-service")
     implementation project(":server:ee:libs:hermes:hermes-configuration:hermes-configuration-remote-client")
-    implementation project(":server:libs:hermes:hermes-execution:hermes-execution-rest:hermes-execution-rest-impl")
     implementation project(":server:libs:hermes:hermes-execution:hermes-execution-service")
 
     testImplementation project(":server:libs:test:test-int-support")
