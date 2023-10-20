@@ -16,7 +16,7 @@
 
 package com.integri.atlas.task.handler.spreadsheet.file;
 
-import static com.integri.atlas.engine.core.task.description.TaskDescription.task;
+import static com.integri.atlas.engine.core.task.description.TaskSpecification.task;
 import static com.integri.atlas.engine.core.task.description.TaskParameterValue.parameterValues;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
@@ -28,17 +28,17 @@ import static com.integri.atlas.engine.core.task.description.TaskProperty.STRING
 import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
 
-import com.integri.atlas.engine.core.task.TaskDescriptor;
-import com.integri.atlas.engine.core.task.description.TaskDescription;
+import com.integri.atlas.engine.core.task.TaskDefinition;
+import com.integri.atlas.engine.core.task.description.TaskSpecification;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class SpreadsheetFileTaskDescriptor implements TaskDescriptor {
+public class SpreadsheetFileTaskDefinition implements TaskDefinition {
 
-    public static final TaskDescription TASK_DESCRIPTION = task("spreadsheetFile")
+    public static final TaskSpecification TASK_DESCRIPTION = task("spreadsheetFile")
         .displayName("Spreadsheet File")
         .description("Reads and writes data from a spreadsheet file")
         .properties(
@@ -142,7 +142,7 @@ public class SpreadsheetFileTaskDescriptor implements TaskDescriptor {
         );
 
     @Override
-    public TaskDescription getDescription() {
+    public TaskSpecification getSpecification() {
         return TASK_DESCRIPTION;
     }
 }

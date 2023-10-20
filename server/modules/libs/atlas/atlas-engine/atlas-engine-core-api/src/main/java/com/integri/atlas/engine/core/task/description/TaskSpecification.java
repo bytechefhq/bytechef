@@ -23,7 +23,7 @@ import java.util.List;
  *
  * Used for describing a task type.
  */
-public class TaskDescription {
+public class TaskSpecification {
 
     private TaskAuthentication authentication;
     private String description;
@@ -34,53 +34,53 @@ public class TaskDescription {
     private String subtitle;
     private float version = 1;
 
-    public static TaskDescription task(String name) {
-        return new TaskDescription().name(name);
+    public static TaskSpecification task(String name) {
+        return new TaskSpecification().name(name);
     }
 
-    public TaskDescription authentication(TaskAuthentication authentication) {
+    public TaskSpecification authentication(TaskAuthentication authentication) {
         this.authentication = authentication;
 
         return this;
     }
 
-    public TaskDescription description(String description) {
+    public TaskSpecification description(String description) {
         this.description = description;
 
         return this;
     }
 
-    public TaskDescription displayName(String displayName) {
+    public TaskSpecification displayName(String displayName) {
         this.displayName = displayName;
 
         return this;
     }
 
-    public TaskDescription name(String name) {
+    public TaskSpecification name(String name) {
         this.name = name;
 
         return this;
     }
 
-    public TaskDescription icon(String icon) {
+    public TaskSpecification icon(String icon) {
         this.icon = icon;
 
         return this;
     }
 
-    public TaskDescription properties(TaskProperty... properties) {
+    public TaskSpecification properties(TaskProperty... properties) {
         this.properties = List.of(properties);
 
         return this;
     }
 
-    public TaskDescription subtitle(String subtitle) {
+    public TaskSpecification subtitle(String subtitle) {
         this.subtitle = subtitle;
 
         return this;
     }
 
-    public TaskDescription version(float version) {
+    public TaskSpecification version(float version) {
         this.version = version;
 
         return this;

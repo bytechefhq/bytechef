@@ -107,7 +107,7 @@ public class LocalFileTaskDescriptorTest {
                 }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(LocalFileTaskDescriptor.TASK_DESCRIPTION)
+                objectMapper.writeValueAsString(LocalFileTaskDefinition.TASK_DESCRIPTION)
             ),
             true
         );

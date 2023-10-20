@@ -16,7 +16,7 @@
 
 package com.integri.atlas.task.dispatcher.if_;
 
-import static com.integri.atlas.engine.core.task.description.TaskDescription.task;
+import static com.integri.atlas.engine.core.task.description.TaskSpecification.task;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.BOOLEAN_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.COLLECTION_PROPERTY;
 import static com.integri.atlas.engine.core.task.description.TaskProperty.DATE_TIME_PROPERTY;
@@ -29,15 +29,15 @@ import static com.integri.atlas.engine.core.task.description.TaskProperty.multip
 import static com.integri.atlas.engine.core.task.description.TaskProperty.show;
 import static com.integri.atlas.engine.core.task.description.TaskPropertyOption.option;
 
-import com.integri.atlas.engine.core.task.TaskDescriptor;
-import com.integri.atlas.engine.core.task.description.TaskDescription;
+import com.integri.atlas.engine.core.task.TaskDefinition;
+import com.integri.atlas.engine.core.task.description.TaskSpecification;
 
 /**
  * @author Ivica Cardic
  */
-public class IfTaskDescriptor implements TaskDescriptor {
+public class IfTaskDefinition implements TaskDefinition {
 
-    private static final TaskDescription TASK_DESCRIPTION = task("if")
+    private static final TaskSpecification TASK_DESCRIPTION = task("if")
         .displayName("IF")
         .description("Directs a stream based on true/false results of comparisons")
         .properties(
@@ -165,7 +165,7 @@ public class IfTaskDescriptor implements TaskDescriptor {
         );
 
     @Override
-    public TaskDescription getDescription() {
+    public TaskSpecification getSpecification() {
         return TASK_DESCRIPTION;
     }
 }

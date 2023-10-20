@@ -16,11 +16,11 @@
 
 package com.integri.atlas.engine.core.task;
 
-import com.integri.atlas.engine.core.task.description.TaskDescription;
+import com.integri.atlas.engine.core.task.description.TaskSpecification;
 
 /**
  * @author Ivica Cardic
  */
-public interface TaskDescriptor {
-    TaskDescription getDescription();
+public interface TaskDefinition {
+    TaskSpecification getSpecification();
 }
