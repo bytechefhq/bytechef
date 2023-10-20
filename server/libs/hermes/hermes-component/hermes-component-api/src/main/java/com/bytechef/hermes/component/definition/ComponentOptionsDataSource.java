@@ -27,8 +27,7 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-public sealed interface ComponentOptionsDataSource
-    extends OptionsDataSource permits ComponentDSL.ModifiableComponentOptionsDataSource {
+public interface ComponentOptionsDataSource extends OptionsDataSource {
 
     /**
      * The function that returns options.

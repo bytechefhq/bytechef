@@ -24,6 +24,7 @@ import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.Response;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import com.bytechef.hermes.definition.DefinitionDSL;
+import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableObjectProperty;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -74,11 +75,11 @@ public final class ComponentDSL extends DefinitionDSL {
             List.of(propertiesDependOnPropertyNames));
     }
 
-    public static ModifiableProperty.ModifiableObjectProperty fileEntry() {
+    public static ModifiableObjectProperty fileEntry() {
         return fileEntry(null);
     }
 
-    public static ModifiableProperty.ModifiableObjectProperty fileEntry(String name) {
+    public static ModifiableObjectProperty fileEntry(String name) {
         return buildObject(
             name, null, "FILE_ENTRY", string("extension").required(true), string("mimeType").required(true),
             string("name").required(true), string("url").required(true));
@@ -982,6 +983,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        @JsonIgnore
         public OptionsFunction getOptions() {
             return options;
         }
@@ -1002,6 +1004,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        @JsonIgnore
         public DynamicPropertiesFunction getDynamicProperties() {
             return dynamicProperties;
         }
@@ -1204,6 +1207,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        @JsonIgnore
         public SampleOutputFunction getSampleOutput() {
             return sampleOutput;
         }
@@ -1318,6 +1322,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
+        @JsonIgnore
         public OutputSchemaFunction getOutputSchema() {
             return outputSchema;
         }

@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableJdbcComponentDefinition;
 import com.bytechef.hermes.definition.Resources;
 
 import java.util.Optional;
@@ -24,7 +25,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public sealed interface JdbcComponentDefinition permits ComponentDSL.ModifiableJdbcComponentDefinition {
+public sealed interface JdbcComponentDefinition permits ModifiableJdbcComponentDefinition {
 
     /**
      *

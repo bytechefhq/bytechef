@@ -18,6 +18,7 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.InputParameters;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableAuthorization;
 import com.bytechef.hermes.definition.Property;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -32,8 +33,8 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-@JsonDeserialize(as = ComponentDSL.ModifiableAuthorization.class)
-public sealed interface Authorization permits ComponentDSL.ModifiableAuthorization {
+@JsonDeserialize(as = ModifiableAuthorization.class)
+public sealed interface Authorization permits ModifiableAuthorization {
 
     String ACCESS_TOKEN = "access_token";
     String ADD_TO = "addTo";
