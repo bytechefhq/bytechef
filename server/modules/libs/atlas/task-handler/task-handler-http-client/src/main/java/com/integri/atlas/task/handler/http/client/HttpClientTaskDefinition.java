@@ -42,14 +42,14 @@ import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_FOLLOW_REDIRECT;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_FULL_RESPONSE;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_HEADER_PARAMETERS;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_HTTP_API_KEY;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_HTTP_BASIC_AUTH;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_HTTP_BEARER_TOKEN;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_HTTP_DIGEST_AUTH;
-import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_HTTP_HEADER_AUTH;
-import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_HTTP_QUERY_AUTH;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_IGNORE_RESPONSE_CODE;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_MIME_TYPE;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_NAME;
-import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_O_AUTH_2_AUTH;
+import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_OAUTH2;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_PARAMETER;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_PROPERTY_URI;
 import static com.integri.atlas.task.handler.http.client.HttpClientTaskConstants.PROPERTY_PROXY;
@@ -76,25 +76,25 @@ public class HttpClientTaskDefinition implements TaskDefinition {
         .description("Makes an HTTP request and returns the response data.")
         .authentication(
             credentials(
+                credential(PROPERTY_HTTP_API_KEY)
+                    .displayOption(show(PROPERTY_AUTHENTICATION_TYPE, AuthenticationType.HTTP_API_KEY.name())),
                 credential(PROPERTY_HTTP_BASIC_AUTH)
                     .displayOption(show(PROPERTY_AUTHENTICATION_TYPE, AuthenticationType.HTTP_BASIC_AUTH.name())),
-                credential(PROPERTY_HTTP_HEADER_AUTH)
-                    .displayOption(show(PROPERTY_AUTHENTICATION_TYPE, AuthenticationType.HTTP_HEADER_AUTH.name())),
-                credential(PROPERTY_HTTP_QUERY_AUTH)
-                    .displayOption(show(PROPERTY_AUTHENTICATION_TYPE, AuthenticationType.HTTP_QUERY_AUTH.name())),
+                credential(PROPERTY_HTTP_BEARER_TOKEN)
+                    .displayOption(show(PROPERTY_AUTHENTICATION_TYPE, AuthenticationType.HTTP_BEARER_TOKEN.name())),
                 credential(PROPERTY_HTTP_DIGEST_AUTH)
                     .displayOption(show(PROPERTY_AUTHENTICATION_TYPE, AuthenticationType.HTTP_DIGEST_AUTH.name())),
-                credential(PROPERTY_O_AUTH_2_AUTH)
+                credential(PROPERTY_OAUTH2)
                     .displayOption(show(PROPERTY_AUTHENTICATION_TYPE, AuthenticationType.OAUTH2.name()))
             )
                 .properties(
                     SELECT_PROPERTY(PROPERTY_AUTHENTICATION_TYPE)
                         .displayName("Authentication Type")
                         .options(
+                            option("API Key", AuthenticationType.HTTP_API_KEY.name()),
+                            option("Bearer Token", AuthenticationType.HTTP_BEARER_TOKEN.name()),
                             option("Basic Auth", AuthenticationType.HTTP_BASIC_AUTH.name()),
                             option("Digest Auth", AuthenticationType.HTTP_DIGEST_AUTH.name()),
-                            option("Header Auth", AuthenticationType.HTTP_HEADER_AUTH.name()),
-                            option("Query Auth", AuthenticationType.HTTP_QUERY_AUTH.name()),
                             option("OAuth2", AuthenticationType.OAUTH2.name()),
                             option("None", "")
                         )
