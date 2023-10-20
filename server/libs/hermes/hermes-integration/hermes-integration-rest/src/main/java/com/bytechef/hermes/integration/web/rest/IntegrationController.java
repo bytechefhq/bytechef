@@ -108,9 +108,10 @@ public class IntegrationController implements IntegrationsApi, IntegrationTagsAp
         Long id, Mono<PostIntegrationWorkflowRequestModel> postIntegrationWorkflowRequestModelMono,
         ServerWebExchange exchange) {
 
-        return postIntegrationWorkflowRequestModelMono.map(postIntegrationWorkflowRequestModel -> ResponseEntity.ok(
+        return postIntegrationWorkflowRequestModelMono.map(requestModel -> ResponseEntity.ok(
             conversionService.convert(
-                integrationFacade.addWorkflow(id, postIntegrationWorkflowRequestModel.getWorkflowName()),
+                integrationFacade.addWorkflow(
+                    id, requestModel.getWorkflowName(), requestModel.getWorkflowDescription()),
                 IntegrationModel.class)));
     }
 

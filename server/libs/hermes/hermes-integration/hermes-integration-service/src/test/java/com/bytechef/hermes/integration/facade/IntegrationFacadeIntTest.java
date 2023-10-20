@@ -75,7 +75,7 @@ public class IntegrationFacadeIntTest {
     public void testAddWorkflow() {
         Integration integration = integrationRepository.save(new Integration("name"));
 
-        integration = integrationFacade.addWorkflow(integration.getId(), "Workflow 1");
+        integration = integrationFacade.addWorkflow(integration.getId(), "Workflow 1", "Description");
 
         Set<String> workflowIds = integration.getWorkflowIds();
 
@@ -83,6 +83,7 @@ public class IntegrationFacadeIntTest {
             .next())
             .orElseThrow();
 
+        assertThat(workflow.getDescription()).isEqualTo("Description");
         assertThat(workflow.getLabel()).isEqualTo("Workflow 1");
     }
 

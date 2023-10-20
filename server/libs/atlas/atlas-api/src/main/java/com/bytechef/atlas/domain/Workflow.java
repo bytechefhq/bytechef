@@ -87,6 +87,9 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
     private LocalDateTime createdDate;
 
     @Transient
+    private String description;
+
+    @Transient
     private ExecutionError error;
 
     @Column
@@ -138,6 +141,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
         this.id = id;
         this.format = format;
         this.definition = definition;
+        this.description = MapUtils.getString(source, WorkflowConstants.DESCRIPTION);
         this.inputs = MapUtils.getList(
             source, WorkflowConstants.INPUTS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
         this.label = MapUtils.getString(source, WorkflowConstants.LABEL);
@@ -194,6 +198,10 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
 
     public String getDefinition() {
         return definition;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public String getCreatedBy() {

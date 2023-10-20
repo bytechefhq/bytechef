@@ -32,6 +32,8 @@ public class WorkflowConstants {
 
     public static final String JOB_ID = "jobId";
 
+    public static final String DESCRIPTION = "description";
+
     public static final String LABEL = "label";
 
     public static final String NODE = "node";
