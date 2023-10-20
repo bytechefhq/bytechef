@@ -18,7 +18,7 @@ package com.integri.atlas.task.handler.httpclient.v1_0.auth;
 
 import com.integri.atlas.task.auth.TaskAuth;
 import com.integri.atlas.task.handler.httpclient.v1_0.header.HttpHeader;
-import com.integri.atlas.task.handler.httpclient.v1_0.params.HttpQueryParam;
+import com.integri.atlas.task.handler.httpclient.v1_0.param.HttpQueryParam;
 
 import java.util.List;
 

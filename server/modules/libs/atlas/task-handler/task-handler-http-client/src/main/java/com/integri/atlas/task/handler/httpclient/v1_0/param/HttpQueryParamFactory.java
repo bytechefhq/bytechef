@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.httpclient.v1_0.params;
+package com.integri.atlas.task.handler.httpclient.v1_0.param;
 
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.KEY;
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.PROPERTY_QUERY_PARAMETERS;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  * @author Matija Petanjek
  */
 @Component
-public class HttpQueryParamsFactory {
+public class HttpQueryParamFactory {
 
     @SuppressWarnings("unchecked")
     public List<HttpQueryParam> getQueryParams(TaskExecution taskExecution) {

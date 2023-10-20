@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.httpclient.v1_0.params;
+package com.integri.atlas.task.handler.httpclient.v1_0.param;
 
 import org.apache.commons.lang3.StringUtils;
 
