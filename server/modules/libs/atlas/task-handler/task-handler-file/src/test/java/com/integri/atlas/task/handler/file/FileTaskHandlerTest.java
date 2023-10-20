@@ -36,7 +36,8 @@ import org.springframework.core.io.ClassPathResource;
 public class FileTaskHandlerTest {
 
     private static final FileStorageService fileStorageService = new Base64FileStorageService();
-    private static final FileTaskHandler fileFileTaskHandler = new FileTaskHandler(fileStorageService);
+    private static final FileReadTaskHandler fileFileReadTaskHandler = new FileReadTaskHandler(fileStorageService);
+    private static final FileWriteTaskHandler fileWriteTaskHandler = new FileWriteTaskHandler(fileStorageService);
 
     @Test
     public void testRead() throws Exception {
@@ -47,7 +48,7 @@ public class FileTaskHandlerTest {
         taskExecution.put("fileEntry", fileStorageService.storeFileContent(file.getName(), new FileInputStream(file)));
         taskExecution.put("operation", "READ");
 
-        assertThat(fileFileTaskHandler.handle(taskExecution))
+        assertThat(fileFileReadTaskHandler.handle(taskExecution))
             .isEqualTo(Files.contentOf(file, Charset.defaultCharset()));
     }
 
@@ -60,7 +61,7 @@ public class FileTaskHandlerTest {
         taskExecution.put("content", Files.contentOf(file, Charset.defaultCharset()));
         taskExecution.put("operation", "WRITE");
 
-        FileEntry fileEntry = (FileEntry) fileFileTaskHandler.handle(taskExecution);
+        FileEntry fileEntry = fileWriteTaskHandler.handle(taskExecution);
 
         assertThat(fileStorageService.readFileContent(fileEntry.getUrl()))
             .isEqualTo(Files.contentOf(file, Charset.defaultCharset()));
@@ -71,7 +72,7 @@ public class FileTaskHandlerTest {
         taskExecution.put("content", Files.contentOf(file, Charset.defaultCharset()));
         taskExecution.put("operation", "WRITE");
 
-        fileEntry = (FileEntry) fileFileTaskHandler.handle(taskExecution);
+        fileEntry = fileWriteTaskHandler.handle(taskExecution);
 
         assertThat(fileEntry.getName()).isEqualTo("test.txt");
     }

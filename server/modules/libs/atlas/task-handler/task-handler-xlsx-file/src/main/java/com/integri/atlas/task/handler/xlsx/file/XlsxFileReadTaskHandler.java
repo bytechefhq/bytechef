@@ -17,9 +17,7 @@
 package com.integri.atlas.task.handler.xlsx.file;
 
 import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.*;
-import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.Operation;
 import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.PROPERTY_FILE_ENTRY;
-import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.PROPERTY_FILE_NAME;
 import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.PROPERTY_HEADER_ROW;
 import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.PROPERTY_INCLUDE_EMPTY_CELLS;
 import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.PROPERTY_PAGE_NUMBER;
@@ -34,11 +32,8 @@ import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.service.FileStorageService;
 import com.integri.atlas.task.handler.util.MapUtils;
 import com.integri.atlas.task.handler.util.ValueUtils;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,8 +55,8 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ivica Cardic
  */
-@Component(TASK_XLSX_FILE)
-public class XlsxFileTaskHandler implements TaskHandler<Object> {
+@Component(TASK_XLSX_FILE + "/read")
+public class XlsxFileReadTaskHandler implements TaskHandler<List<Map<String, ?>>> {
 
     private enum FileFormat {
         XLS,
@@ -70,66 +65,47 @@ public class XlsxFileTaskHandler implements TaskHandler<Object> {
 
     private final FileStorageService fileStorageService;
 
-    public XlsxFileTaskHandler(FileStorageService fileStorageService) {
+    public XlsxFileReadTaskHandler(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
     }
 
     @Override
-    public Object handle(TaskExecution taskExecution) throws Exception {
-        Object result;
+    public List<Map<String, ?>> handle(TaskExecution taskExecution) throws Exception {
+        FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
+        boolean headerRow = taskExecution.getBoolean(PROPERTY_HEADER_ROW, true);
+        boolean includeEmptyCells = taskExecution.getBoolean(PROPERTY_INCLUDE_EMPTY_CELLS, false);
+        Integer pageSize = taskExecution.getInteger(PROPERTY_PAGE_SIZE);
+        Integer pageNumber = taskExecution.getInteger(PROPERTY_PAGE_NUMBER);
+        boolean readAsString = taskExecution.getBoolean(PROPERTY_READ_AS_STRING, false);
+        String sheetName = taskExecution.get(PROPERTY_SHEET_NAME, null);
 
-        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
+        try (InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl())) {
+            String extension = fileEntry.getExtension();
 
-        if (operation == Operation.READ) {
-            FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
-            boolean headerRow = taskExecution.getBoolean(PROPERTY_HEADER_ROW, true);
-            boolean includeEmptyCells = taskExecution.getBoolean(PROPERTY_INCLUDE_EMPTY_CELLS, false);
-            Integer pageSize = taskExecution.getInteger(PROPERTY_PAGE_SIZE);
-            Integer pageNumber = taskExecution.getInteger(PROPERTY_PAGE_NUMBER);
-            boolean readAsString = taskExecution.getBoolean(PROPERTY_READ_AS_STRING, false);
-            String sheetName = taskExecution.get(PROPERTY_SHEET_NAME, null);
+            FileFormat fileFormat = FileFormat.valueOf(extension.toUpperCase());
 
-            try (InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl())) {
-                String extension = fileEntry.getExtension();
+            Integer rangeStartRow = null;
+            Integer rangeEndRow = null;
 
-                FileFormat fileFormat = FileFormat.valueOf(extension.toUpperCase());
+            if (pageSize != null && pageNumber != null) {
+                rangeStartRow = pageSize * pageNumber - pageSize;
 
-                Integer rangeStartRow = null;
-                Integer rangeEndRow = null;
-
-                if (pageSize != null && pageNumber != null) {
-                    rangeStartRow = pageSize * pageNumber - pageSize;
-
-                    rangeEndRow = rangeStartRow + pageSize;
-                }
-
-                result =
-                    read(
-                        fileFormat,
-                        inputStream,
-                        new ReadConfiguration(
-                            headerRow,
-                            includeEmptyCells,
-                            rangeStartRow == null ? 0 : rangeStartRow,
-                            rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
-                            readAsString,
-                            sheetName
-                        )
-                    );
+                rangeEndRow = rangeStartRow + pageSize;
             }
-        } else {
-            String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, getaDefaultFileName());
-            List<Map<String, ?>> rows = taskExecution.getRequired(PROPERTY_ROWS);
 
-            String sheetName = taskExecution.get(PROPERTY_SHEET_NAME, String.class, "Sheet");
-
-            return fileStorageService.storeFileContent(
-                fileName,
-                new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName)))
+            return read(
+                fileFormat,
+                inputStream,
+                new ReadConfiguration(
+                    headerRow,
+                    includeEmptyCells,
+                    rangeStartRow == null ? 0 : rangeStartRow,
+                    rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
+                    readAsString,
+                    sheetName
+                )
             );
         }
-
-        return result;
     }
 
     private String getaDefaultFileName() {
@@ -264,61 +240,6 @@ public class XlsxFileTaskHandler implements TaskHandler<Object> {
         return rows;
     }
 
-    private byte[] write(List<Map<String, ?>> rows, WriteConfiguration configuration) throws IOException {
-        boolean headerRow = false;
-        Workbook workbook = getWorkbook();
-
-        Sheet sheet = workbook.createSheet(configuration.sheetName());
-
-        for (int i = 0; i < rows.size(); i++) {
-            Map<String, ?> item = rows.get(i);
-
-            if (!headerRow) {
-                headerRow = true;
-
-                int columnCount = 0;
-                Row row = sheet.createRow(0);
-
-                for (String fieldName : item.keySet()) {
-                    Cell cell = row.createCell(columnCount++);
-
-                    cell.setCellValue(fieldName);
-                }
-            }
-
-            int columnCount = 0;
-            Row row = sheet.createRow(i + 1);
-
-            for (String key : item.keySet()) {
-                Object value = item.get(key);
-
-                Cell cell = row.createCell(columnCount++);
-
-                if (value instanceof Boolean) {
-                    cell.setCellValue((Boolean) value);
-                } else if (value instanceof Integer) {
-                    cell.setCellValue((Integer) value);
-                } else if (value instanceof Long) {
-                    cell.setCellValue((Long) value);
-                } else if (value instanceof Double) {
-                    cell.setCellValue((Double) value);
-                } else if (value instanceof BigDecimal) {
-                    cell.setCellValue(((BigDecimal) value).doubleValue());
-                } else {
-                    cell.setCellValue((String) value);
-                }
-            }
-        }
-
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-        workbook.write(byteArrayOutputStream);
-
-        workbook.close();
-
-        return byteArrayOutputStream.toByteArray();
-    }
-
     private record ReadConfiguration(
         boolean headerRow,
         boolean includeEmptyCells,
@@ -327,6 +248,4 @@ public class XlsxFileTaskHandler implements TaskHandler<Object> {
         boolean readAsString,
         String sheetName
     ) {}
-
-    private record WriteConfiguration(String fileName, String sheetName) {}
 }

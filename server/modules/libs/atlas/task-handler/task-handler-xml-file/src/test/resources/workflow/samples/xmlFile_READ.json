@@ -18,8 +18,7 @@
     {
       "name": "readXMLFile",
       "label": "Read from the XML file",
-      "type": "xmlFile",
-      "operation": "READ",
+      "type": "xmlFile/read",
       "fileEntry": "${fileEntry}",
       "includeEmptyCells": true
     }

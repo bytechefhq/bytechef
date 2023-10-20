@@ -29,9 +29,4 @@ public class XmlFileTaskConstants {
     public static final String PROPERTY_PAGE_NUMBER = "pageNumber";
     public static final String PROPERTY_SOURCE = "source";
     static final String TASK_XML_FILE = "xmlFile";
-
-    enum Operation {
-        READ,
-        WRITE,
-    }
 }

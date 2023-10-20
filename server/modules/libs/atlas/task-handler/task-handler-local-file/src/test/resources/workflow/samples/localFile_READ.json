@@ -18,8 +18,7 @@
     {
       "name": "readLocalFile",
       "label": "Read from local file",
-      "type": "localFile",
-      "operation": "READ",
+      "type": "localFile/read",
       "fileName": "${fileName}"
     }
   ]

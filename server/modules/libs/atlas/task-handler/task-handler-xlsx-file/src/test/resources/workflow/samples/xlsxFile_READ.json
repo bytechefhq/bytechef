@@ -18,8 +18,7 @@
     {
       "name": "readXlsxFile",
       "label": "Read from the XLSX file",
-      "type": "xlsxFile",
-      "operation": "READ",
+      "type": "xlsxFile/read",
       "fileEntry": "${fileEntry}",
       "includeEmptyCells": true
     }

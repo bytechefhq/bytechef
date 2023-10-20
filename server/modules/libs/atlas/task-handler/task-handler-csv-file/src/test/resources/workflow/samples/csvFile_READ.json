@@ -18,8 +18,7 @@
     {
       "name": "readCsvFile",
       "label": "Read from the csv file",
-      "type": "csvFile",
-      "operation": "READ",
+      "type": "csvFile/read",
       "fileEntry": "${fileEntry}",
       "includeEmptyCells": true
     }

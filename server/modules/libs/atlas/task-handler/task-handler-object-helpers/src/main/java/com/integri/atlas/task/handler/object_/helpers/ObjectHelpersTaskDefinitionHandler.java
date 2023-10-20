@@ -20,9 +20,8 @@ import static com.integri.atlas.task.definition.dsl.DSL.ARRAY_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.DSL.OBJECT_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.DSL.OPERATION;
 import static com.integri.atlas.task.definition.dsl.DSL.STRING_PROPERTY;
-import static com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskConstants.*;
-import static com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskConstants.Operation;
 import static com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskConstants.PROPERTY_SOURCE;
+import static com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskConstants.TASK_OBJECT_HELPERS;
 
 import com.integri.atlas.task.definition.TaskDefinitionHandler;
 import com.integri.atlas.task.definition.dsl.DSL;
@@ -40,7 +39,7 @@ public class ObjectHelpersTaskDefinitionHandler implements TaskDefinitionHandler
         .displayName("Object Helpers")
         .description("Converts between JSON string and object/array.")
         .operations(
-            OPERATION(Operation.JSON_PARSE.name())
+            OPERATION("parse")
                 .displayName("Convert from JSON string")
                 .description("Converts the JSON string to object/array.")
                 .inputs(
@@ -50,7 +49,7 @@ public class ObjectHelpersTaskDefinitionHandler implements TaskDefinitionHandler
                         .required(true)
                 )
                 .outputs(ARRAY_PROPERTY(), OBJECT_PROPERTY()),
-            OPERATION(Operation.JSON_STRINGIFY.name())
+            OPERATION("stringify")
                 .displayName("Convert to JSON string")
                 .description("Writes the object/array to a JSON string.")
                 .inputs(

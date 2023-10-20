@@ -16,15 +16,12 @@
 
 package com.integri.atlas.task.handler.ods.file;
 
-import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.Operation;
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_FILE_ENTRY;
-import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_FILE_NAME;
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_HEADER_ROW;
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_INCLUDE_EMPTY_CELLS;
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_PAGE_NUMBER;
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_PAGE_SIZE;
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_READ_AS_STRING;
-import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_ROWS;
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.PROPERTY_SHEET_NAME;
 import static com.integri.atlas.task.handler.ods.file.OdsFileTaskConstants.TASK_ODS_FILE;
 
@@ -36,8 +33,6 @@ import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.service.FileStorageService;
 import com.integri.atlas.task.handler.util.MapUtils;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -45,74 +40,53 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component(TASK_ODS_FILE)
-public class OdsFileTaskHandler implements TaskHandler<Object> {
+@Component(TASK_ODS_FILE + "/read")
+public class OdsFileReadTaskHandler implements TaskHandler<List<Map<String, ?>>> {
 
     private final FileStorageService fileStorageService;
 
-    public OdsFileTaskHandler(FileStorageService fileStorageService) {
+    public OdsFileReadTaskHandler(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
     }
 
     @Override
-    public Object handle(TaskExecution taskExecution) throws Exception {
-        Object result;
+    public List<Map<String, ?>> handle(TaskExecution taskExecution) throws Exception {
+        FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
+        boolean headerRow = taskExecution.getBoolean(PROPERTY_HEADER_ROW, true);
+        boolean includeEmptyCells = taskExecution.getBoolean(PROPERTY_INCLUDE_EMPTY_CELLS, false);
+        Integer pageSize = taskExecution.getInteger(PROPERTY_PAGE_SIZE);
+        Integer pageNumber = taskExecution.getInteger(PROPERTY_PAGE_NUMBER);
+        boolean readAsString = taskExecution.getBoolean(PROPERTY_READ_AS_STRING, false);
+        String sheetName = taskExecution.get(PROPERTY_SHEET_NAME, null);
 
-        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
+        try (InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl())) {
+            Integer rangeStartRow = null;
+            Integer rangeEndRow = null;
 
-        if (operation == Operation.READ) {
-            FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
-            boolean headerRow = taskExecution.getBoolean(PROPERTY_HEADER_ROW, true);
-            boolean includeEmptyCells = taskExecution.getBoolean(PROPERTY_INCLUDE_EMPTY_CELLS, false);
-            Integer pageSize = taskExecution.getInteger(PROPERTY_PAGE_SIZE);
-            Integer pageNumber = taskExecution.getInteger(PROPERTY_PAGE_NUMBER);
-            boolean readAsString = taskExecution.getBoolean(PROPERTY_READ_AS_STRING, false);
-            String sheetName = taskExecution.get(PROPERTY_SHEET_NAME, null);
+            if (pageSize != null && pageNumber != null) {
+                rangeStartRow = pageSize * pageNumber - pageSize;
 
-            try (InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl())) {
-                Integer rangeStartRow = null;
-                Integer rangeEndRow = null;
-
-                if (pageSize != null && pageNumber != null) {
-                    rangeStartRow = pageSize * pageNumber - pageSize;
-
-                    rangeEndRow = rangeStartRow + pageSize;
-                }
-
-                result =
-                    read(
-                        inputStream,
-                        new ReadConfiguration(
-                            headerRow,
-                            includeEmptyCells,
-                            rangeStartRow == null ? 0 : rangeStartRow,
-                            rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
-                            readAsString,
-                            sheetName
-                        )
-                    );
+                rangeEndRow = rangeStartRow + pageSize;
             }
-        } else {
-            String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, "file.ods");
-            List<Map<String, ?>> rows = taskExecution.getRequired(PROPERTY_ROWS);
 
-            String sheetName = taskExecution.get(PROPERTY_SHEET_NAME, String.class, "Sheet");
-
-            return fileStorageService.storeFileContent(
-                fileName,
-                new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName)))
+            return read(
+                inputStream,
+                new ReadConfiguration(
+                    headerRow,
+                    includeEmptyCells,
+                    rangeStartRow == null ? 0 : rangeStartRow,
+                    rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
+                    readAsString,
+                    sheetName
+                )
             );
         }
-
-        return result;
     }
 
     private List<Map<String, ?>> read(InputStream inputStream, ReadConfiguration configuration) throws IOException {
@@ -203,57 +177,6 @@ public class OdsFileTaskHandler implements TaskHandler<Object> {
         return rows;
     }
 
-    private byte[] write(List<Map<String, ?>> rows, WriteConfiguration configuration) throws IOException {
-        boolean headerRow = false;
-
-        int columnCount;
-        Sheet sheet = null;
-        SpreadSheet spreadSheet = new SpreadSheet();
-        Object[][] values = null;
-
-        for (int i = 0; i < rows.size(); i++) {
-            Map<String, ?> item = rows.get(i);
-
-            Set<String> fieldNames = item.keySet();
-
-            if (!headerRow) {
-                headerRow = true;
-
-                columnCount = fieldNames.size();
-
-                sheet = new Sheet(configuration.sheetName(), rows.size() + 1, columnCount);
-
-                spreadSheet.appendSheet(sheet);
-
-                values = new Object[rows.size() + 1][columnCount];
-
-                int column = 0;
-
-                for (String fieldName : fieldNames) {
-                    values[0][column++] = fieldName;
-                }
-            }
-
-            int column = 0;
-
-            for (String fieldName : fieldNames) {
-                values[i + 1][column++] = item.get(fieldName);
-            }
-        }
-
-        if (sheet != null) {
-            Range range = sheet.getDataRange();
-
-            range.setValues(values);
-        }
-
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-        spreadSheet.save(byteArrayOutputStream);
-
-        return byteArrayOutputStream.toByteArray();
-    }
-
     private Object processValue(Object value, boolean includeEmptyCells, boolean readAsString) {
         if (ObjectUtils.isEmpty(value)) {
             if (includeEmptyCells) {
@@ -280,6 +203,4 @@ public class OdsFileTaskHandler implements TaskHandler<Object> {
         boolean readAsString,
         String sheetName
     ) {}
-
-    private record WriteConfiguration(String fileName, String sheetName) {}
 }

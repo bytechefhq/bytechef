@@ -45,7 +45,7 @@ public class LocalFileTaskDefinitionTest {
               "name": "localFile",
               "operations": [
                 {
-                  "name": "READ",
+                  "name": "read",
                   "inputs": [
                     {
                       "description": "The path of the file to read.",
@@ -86,7 +86,7 @@ public class LocalFileTaskDefinitionTest {
                   "displayName": "Read to file"
                 },
                 {
-                  "name": "WRITE",
+                  "name": "write",
                   "inputs": [
                     {
                       "description": "The object property which contains a reference to the file to be written.",

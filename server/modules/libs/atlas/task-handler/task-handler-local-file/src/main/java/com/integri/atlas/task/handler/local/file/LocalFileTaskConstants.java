@@ -24,9 +24,4 @@ public class LocalFileTaskConstants {
     public static final String PROPERTY_FILE_ENTRY = "fileEntry";
     public static final String PROPERTY_FILE_NAME = "fileName";
     static final String TASK_LOCAL_FILE = "localFile";
-
-    enum Operation {
-        READ,
-        WRITE,
-    }
 }

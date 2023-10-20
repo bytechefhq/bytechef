@@ -200,7 +200,7 @@ public class HttpClientTaskDefinitionHandler implements TaskDefinitionHandler {
             option("OAuth2", AuthenticationType.OAUTH2.name())
         )
         .operations(
-            OPERATION(RequestMethod.GET.name())
+            OPERATION("get")
                 .displayName("GET")
                 .description("The request method to use.")
                 .inputs(
@@ -220,7 +220,7 @@ public class HttpClientTaskDefinitionHandler implements TaskDefinitionHandler {
                     FILE_ENTRY_PROPERTY()
                         .displayOption(showWhen(PROPERTY_RESPONSE_FORMAT).in(ResponseFormat.FILE.name()))
                 ),
-            OPERATION(RequestMethod.POST.name())
+            OPERATION("post")
                 .displayName("POST")
                 .description("The request method to use.")
                 .inputs(
@@ -254,7 +254,7 @@ public class HttpClientTaskDefinitionHandler implements TaskDefinitionHandler {
                     FILE_ENTRY_PROPERTY()
                         .displayOption(showWhen(PROPERTY_RESPONSE_FORMAT).in(ResponseFormat.FILE.name()))
                 ),
-            OPERATION(RequestMethod.PUT.name())
+            OPERATION("put")
                 .displayName("PUT")
                 .description("The request method to use.")
                 .inputs(
@@ -279,7 +279,7 @@ public class HttpClientTaskDefinitionHandler implements TaskDefinitionHandler {
                     )
                 )
                 .outputs(OUTPUTS_PROPERTIES),
-            OPERATION(RequestMethod.PATCH.name())
+            OPERATION("patch")
                 .displayName("PATCH")
                 .description("The request method to use.")
                 .inputs(
@@ -304,7 +304,7 @@ public class HttpClientTaskDefinitionHandler implements TaskDefinitionHandler {
                     )
                 )
                 .outputs(OUTPUTS_PROPERTIES),
-            OPERATION(RequestMethod.DELETE.name())
+            OPERATION("delete")
                 .displayName("DELETE")
                 .description("The request method to use.")
                 .inputs(
@@ -322,7 +322,7 @@ public class HttpClientTaskDefinitionHandler implements TaskDefinitionHandler {
                     )
                 )
                 .outputs(OUTPUTS_PROPERTIES),
-            OPERATION(RequestMethod.HEAD.name())
+            OPERATION("head")
                 .displayName("HEAD")
                 .description("The request method to use.")
                 .inputs(

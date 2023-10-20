@@ -24,8 +24,7 @@
     {
       "name": "writeLocalFile",
       "label": "Write to the local file",
-      "type": "localFile",
-      "operation": "WRITE",
+      "type": "localFile/write",
       "fileEntry": "${fileEntry}",
       "fileName": "${fileName}"
     }

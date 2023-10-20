@@ -18,8 +18,7 @@
     {
       "name": "writeCsvFile",
       "label": "Write to the csv file",
-      "type": "csvFile",
-      "operation": "WRITE",
+      "type": "csvFile/write",
       "rows": "${rows}"
     }
   ]

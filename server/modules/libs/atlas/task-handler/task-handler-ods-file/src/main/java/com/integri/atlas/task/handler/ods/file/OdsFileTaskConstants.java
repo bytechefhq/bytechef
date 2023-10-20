@@ -31,9 +31,4 @@ public class OdsFileTaskConstants {
     public static final String PROPERTY_SHEET_NAME = "sheetName";
     public static final String PROPERTY_INCLUDE_EMPTY_CELLS = "includeEmptyCells";
     public static final String TASK_ODS_FILE = "odsFile";
-
-    enum Operation {
-        READ,
-        WRITE,
-    }
 }

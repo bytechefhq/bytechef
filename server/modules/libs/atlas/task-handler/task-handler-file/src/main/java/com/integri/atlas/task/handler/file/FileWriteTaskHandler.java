@@ -17,7 +17,6 @@
 package com.integri.atlas.task.handler.file;
 
 import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_CONTENT;
-import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_FILE_ENTRY;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_FILE_NAME;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.TASK_FILE;
 
@@ -25,43 +24,28 @@ import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.dto.FileEntry;
 import com.integri.atlas.file.storage.service.FileStorageService;
-import com.integri.atlas.task.handler.file.FileTaskConstants.Operation;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component(TASK_FILE)
-public class FileTaskHandler implements TaskHandler<Object> {
+@Component(TASK_FILE + "/write")
+public class FileWriteTaskHandler implements TaskHandler<Object> {
 
     private final FileStorageService fileStorageService;
 
-    public FileTaskHandler(FileStorageService fileStorageService) {
+    public FileWriteTaskHandler(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
     }
 
     @Override
-    public Object handle(TaskExecution taskExecution) {
-        Object result;
+    public FileEntry handle(TaskExecution taskExecution) {
+        Object content = taskExecution.getRequired(PROPERTY_CONTENT);
+        String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, "file.txt");
 
-        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
-
-        if (operation == Operation.READ) {
-            FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
-
-            result = fileStorageService.readFileContent(fileEntry.getUrl());
-        } else {
-            Object content = taskExecution.getRequired(PROPERTY_CONTENT);
-            String fileName = taskExecution.get(PROPERTY_FILE_NAME, String.class, "file.txt");
-
-            result =
-                fileStorageService.storeFileContent(
-                    fileName,
-                    content instanceof String ? (String) content : content.toString()
-                );
-        }
-
-        return result;
+        return fileStorageService.storeFileContent(
+            fileName,
+            content instanceof String ? (String) content : content.toString()
+        );
     }
 }

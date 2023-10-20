@@ -22,31 +22,24 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.integri.atlas.engine.task.execution.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.handler.json.helper.JsonHelper;
-import com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskConstants.Operation;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component(TASK_OBJECT_HELPERS)
-public class ObjectHelpersTaskHandler implements TaskHandler<Object> {
+@Component(TASK_OBJECT_HELPERS + "/parse")
+public class ObjectHelpersParseTaskHandler implements TaskHandler<Object> {
 
     private final JsonHelper jsonHelper;
 
-    public ObjectHelpersTaskHandler(JsonHelper jsonHelper) {
+    public ObjectHelpersParseTaskHandler(JsonHelper jsonHelper) {
         this.jsonHelper = jsonHelper;
     }
 
     @Override
     public Object handle(TaskExecution taskExecution) {
-        Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
         Object input = taskExecution.getRequired("input");
 
-        if (operation == Operation.JSON_PARSE) {
-            return jsonHelper.read((String) input, new TypeReference<>() {});
-        } else {
-            return jsonHelper.write(input);
-        }
+        return jsonHelper.read((String) input, new TypeReference<>() {});
     }
 }

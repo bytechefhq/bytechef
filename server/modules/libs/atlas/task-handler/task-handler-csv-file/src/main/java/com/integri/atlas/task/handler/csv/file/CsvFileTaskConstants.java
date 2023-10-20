@@ -31,9 +31,4 @@ public class CsvFileTaskConstants {
     public static final String PROPERTY_READ_AS_STRING = "readAsString";
     public static final String PROPERTY_INCLUDE_EMPTY_CELLS = "includeEmptyCells";
     public static final String TASK_CSV_FILE = "csvFile";
-
-    enum Operation {
-        READ,
-        WRITE,
-    }
 }

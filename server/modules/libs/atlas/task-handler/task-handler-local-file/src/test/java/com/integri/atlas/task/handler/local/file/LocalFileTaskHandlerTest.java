@@ -37,20 +37,25 @@ import org.springframework.core.io.ClassPathResource;
 public class LocalFileTaskHandlerTest {
 
     private static final FileStorageService fileStorageService = new Base64FileStorageService();
-    private static final LocalFileTaskHandler localFileTaskHandler = new LocalFileTaskHandler(fileStorageService);
+    private static final LocalFileReadTaskHandler localFileReadTaskHandler = new LocalFileReadTaskHandler(
+        fileStorageService
+    );
+    private static final LocalFileWriteTaskHandler localFileWriteTaskHandler = new LocalFileWriteTaskHandler(
+        fileStorageService
+    );
 
     @Test
     public void testReadOperation() throws Exception {
         File file = getFile();
 
-        SimpleTaskExecution taskExecution = getSimpleTaskExecution(file.getAbsolutePath(), "READ", null);
+        SimpleTaskExecution taskExecution = getSimpleTaskExecution(file.getAbsolutePath(), null);
 
         FileEntry fileEntry = fileStorageService.storeFileContent(
             file.getName(),
             Files.contentOf(file, Charset.defaultCharset())
         );
 
-        assertThat(localFileTaskHandler.handle(taskExecution))
+        assertThat(localFileReadTaskHandler.handle(taskExecution))
             .hasFieldOrPropertyWithValue("extension", FilenameUtils.getExtension(file.getAbsolutePath()))
             .hasFieldOrPropertyWithValue("mimeType", "text/plain")
             .hasFieldOrPropertyWithValue("name", FilenameUtils.getName(file.getAbsolutePath()))
@@ -63,11 +68,10 @@ public class LocalFileTaskHandlerTest {
 
         SimpleTaskExecution taskExecution = getSimpleTaskExecution(
             file.getAbsolutePath(),
-            "WRITE",
             fileStorageService.storeFileContent(file.getName(), new FileInputStream(file))
         );
 
-        assertThat(localFileTaskHandler.handle(taskExecution)).hasFieldOrPropertyWithValue("bytes", 5L);
+        assertThat(localFileWriteTaskHandler.handle(taskExecution)).hasFieldOrPropertyWithValue("bytes", 5L);
     }
 
     private File getFile() throws IOException {
@@ -76,12 +80,11 @@ public class LocalFileTaskHandlerTest {
         return classPathResource.getFile();
     }
 
-    private SimpleTaskExecution getSimpleTaskExecution(String fileName, String operation, FileEntry fileEntry) {
+    private SimpleTaskExecution getSimpleTaskExecution(String fileName, FileEntry fileEntry) {
         SimpleTaskExecution taskExecution = new SimpleTaskExecution();
 
         taskExecution.put("fileEntry", fileEntry);
         taskExecution.put("fileName", fileName);
-        taskExecution.put("operation", operation);
 
         return taskExecution;
     }

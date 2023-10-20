@@ -46,7 +46,7 @@ public class CsvFileTaskDefinitionTest {
               "operations": [
                 {
                   "description": "Reads data from a csv file.",
-                  "name": "READ",
+                  "name": "read",
                   "inputs": [
                     {
                       "description": "The object property which contains a reference to the csv file to read from.",
@@ -133,7 +133,7 @@ public class CsvFileTaskDefinitionTest {
                 },
                 {
                   "description": "Writes the data to a csv file.",
-                  "name": "WRITE",
+                  "name": "write",
                   "inputs": [
                     {
                       "description": "The array of objects to write to the file.",

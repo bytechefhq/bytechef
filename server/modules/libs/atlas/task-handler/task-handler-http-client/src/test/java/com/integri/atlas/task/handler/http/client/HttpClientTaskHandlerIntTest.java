@@ -75,8 +75,48 @@ public class HttpClientTaskHandlerIntTest extends BaseTaskIntTest {
     @Override
     protected Map<String, TaskHandler<?>> getTaskHandlerResolverMap() {
         return Map.of(
-            "httpClient",
-            new HttpClientTaskHandler(
+            "httpClient/delete",
+            new HttpClientDeleteTaskHandler(
+                new HttpBodyFactory(fileStorageService),
+                new HttpAuthenticationFactory(),
+                new HttpHeadersFactory(),
+                new HttpResponseHandler(fileStorageService, jsonHelper),
+                new HttpQueryParamsFactory()
+            ),
+            "httpClient/head",
+            new HttpClientHeadTaskHandler(
+                new HttpBodyFactory(fileStorageService),
+                new HttpAuthenticationFactory(),
+                new HttpHeadersFactory(),
+                new HttpResponseHandler(fileStorageService, jsonHelper),
+                new HttpQueryParamsFactory()
+            ),
+            "httpClient/get",
+            new HttpClientHeadTaskHandler(
+                new HttpBodyFactory(fileStorageService),
+                new HttpAuthenticationFactory(),
+                new HttpHeadersFactory(),
+                new HttpResponseHandler(fileStorageService, jsonHelper),
+                new HttpQueryParamsFactory()
+            ),
+            "httpClient/patch",
+            new HttpClientPatchTaskHandler(
+                new HttpBodyFactory(fileStorageService),
+                new HttpAuthenticationFactory(),
+                new HttpHeadersFactory(),
+                new HttpResponseHandler(fileStorageService, jsonHelper),
+                new HttpQueryParamsFactory()
+            ),
+            "httpClient/post",
+            new HttpClientPostTaskHandler(
+                new HttpBodyFactory(fileStorageService),
+                new HttpAuthenticationFactory(),
+                new HttpHeadersFactory(),
+                new HttpResponseHandler(fileStorageService, jsonHelper),
+                new HttpQueryParamsFactory()
+            ),
+            "httpClient/put",
+            new HttpClientPutTaskHandler(
                 new HttpBodyFactory(fileStorageService),
                 new HttpAuthenticationFactory(),
                 new HttpHeadersFactory(),

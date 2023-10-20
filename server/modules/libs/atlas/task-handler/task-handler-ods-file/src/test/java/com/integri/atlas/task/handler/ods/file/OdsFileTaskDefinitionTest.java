@@ -46,7 +46,7 @@ public class OdsFileTaskDefinitionTest {
               "operations": [
                 {
                   "description": "Reads data from a ODS file.",
-                  "name": "READ",
+                  "name": "read",
                   "inputs": [
                     {
                       "description": "The object property which contains a reference to the ODS file to read from.",
@@ -133,7 +133,7 @@ public class OdsFileTaskDefinitionTest {
                 },
                 {
                   "description": "Writes the data to a ODS file.",
-                  "name": "WRITE",
+                  "name": "write",
                   "inputs": [
                     {
                       "description": "The array of objects to write to the file.",

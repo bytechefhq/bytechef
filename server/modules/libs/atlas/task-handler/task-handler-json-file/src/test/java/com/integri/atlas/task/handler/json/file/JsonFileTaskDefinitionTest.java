@@ -46,7 +46,7 @@ public class JsonFileTaskDefinitionTest {
               "operations": [
                 {
                   "description": "Reads data from a JSON file.",
-                  "name": "READ",
+                  "name": "read",
                   "inputs": [
                     {
                       "description": "The file type to choose.",
@@ -166,7 +166,7 @@ public class JsonFileTaskDefinitionTest {
                 },
                 {
                   "description": "Writes the data to a JSON file.",
-                  "name": "WRITE",
+                  "name": "write",
                   "inputs": [
                     {
                       "description": "The file type to choose.",

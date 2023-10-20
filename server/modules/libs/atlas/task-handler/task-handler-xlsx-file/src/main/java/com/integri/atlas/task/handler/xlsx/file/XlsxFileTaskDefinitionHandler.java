@@ -26,7 +26,6 @@ import static com.integri.atlas.task.definition.dsl.DSL.OBJECT_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.DSL.OPERATION;
 import static com.integri.atlas.task.definition.dsl.DSL.OPTIONS;
 import static com.integri.atlas.task.definition.dsl.DSL.STRING_PROPERTY;
-import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.Operation;
 import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.PROPERTY_FILE_ENTRY;
 import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.PROPERTY_FILE_NAME;
 import static com.integri.atlas.task.handler.xlsx.file.XlsxFileTaskConstants.PROPERTY_HEADER_ROW;
@@ -54,7 +53,7 @@ public class XlsxFileTaskDefinitionHandler implements TaskDefinitionHandler {
         .displayName("XLSX File")
         .description("Reads and writes data from a XLS/XLSX file.")
         .operations(
-            OPERATION(Operation.READ.name())
+            OPERATION("read")
                 .displayName("Read from file")
                 .description("Reads data from a XLS/XLSX file.")
                 .inputs(
@@ -99,7 +98,7 @@ public class XlsxFileTaskDefinitionHandler implements TaskDefinitionHandler {
                         )
                 )
                 .outputs(ARRAY_PROPERTY()),
-            OPERATION(Operation.WRITE.name())
+            OPERATION("write")
                 .displayName("Write to file")
                 .description("Writes the data to a XLS/XLSX file.")
                 .inputs(

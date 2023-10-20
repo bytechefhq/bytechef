@@ -19,7 +19,6 @@ package com.integri.atlas.task.handler.file;
 import static com.integri.atlas.task.definition.dsl.DSL.FILE_ENTRY_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.DSL.OPERATION;
 import static com.integri.atlas.task.definition.dsl.DSL.STRING_PROPERTY;
-import static com.integri.atlas.task.handler.file.FileTaskConstants.Operation;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_CONTENT;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_FILE_ENTRY;
 import static com.integri.atlas.task.handler.file.FileTaskConstants.PROPERTY_FILE_NAME;
@@ -41,7 +40,7 @@ public class FileTaskDefinitionHandler implements TaskDefinitionHandler {
         .displayName("File")
         .description("Reads and writes data from a file")
         .operations(
-            OPERATION(Operation.READ.name())
+            OPERATION("read")
                 .displayName("Read from file")
                 .description("Reads data from a csv file.")
                 .inputs(
@@ -51,7 +50,7 @@ public class FileTaskDefinitionHandler implements TaskDefinitionHandler {
                         .required(true)
                 )
                 .outputs(STRING_PROPERTY()),
-            OPERATION(Operation.WRITE.name())
+            OPERATION("write")
                 .displayName("Write to file")
                 .description("Writes the data to a csv file.")
                 .inputs(

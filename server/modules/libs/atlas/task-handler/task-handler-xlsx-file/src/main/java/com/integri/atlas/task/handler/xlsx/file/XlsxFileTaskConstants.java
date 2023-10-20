@@ -31,9 +31,4 @@ public class XlsxFileTaskConstants {
     public static final String PROPERTY_SHEET_NAME = "sheetName";
     public static final String PROPERTY_INCLUDE_EMPTY_CELLS = "includeEmptyCells";
     public static final String TASK_XLSX_FILE = "xlsxFile";
-
-    enum Operation {
-        READ,
-        WRITE,
-    }
 }
