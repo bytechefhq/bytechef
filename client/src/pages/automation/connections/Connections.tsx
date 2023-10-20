@@ -20,7 +20,7 @@ const Connections = () => {
 
     const defaultCurrentState = {
         id: searchParams.get('componentName')
-            ? parseInt(searchParams.get('componentName')!)
+            ? searchParams.get('componentName')!
             : searchParams.get('tagId')
             ? parseInt(searchParams.get('tagId')!)
             : undefined,
@@ -37,31 +37,14 @@ const Connections = () => {
 
     const {data: tags, isLoading: tagsLoading} = useGetConnectionTagsQuery();
 
-    const title: string = getTitle();
+    let pageTitle: string | undefined;
 
-    function getTitle(): string {
-        if (
-            !componentsLoading &&
-            filterData.type === Type.Component &&
-            filterData.id &&
-            components &&
-            components.length > 0
-        ) {
-            return components.filter(
-                (component) => component.name === filterData.id
-            )[0].name!;
-        } else if (
-            !tagsLoading &&
-            filterData.type === Type.Tag &&
-            tags &&
-            tags.length > 0
-        ) {
-            return (
-                tags && tags.filter((tag) => tag.id === filterData.id)[0].name!
-            );
-        } else {
-            return 'All Components';
-        }
+    if (filterData.type === Type.Component) {
+        pageTitle = components?.find(
+            (component) => component.name === filterData.id
+        )?.title;
+    } else {
+        pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
     }
 
     return (
@@ -70,7 +53,9 @@ const Connections = () => {
                 <PageHeader
                     position="main"
                     right={<ConnectionDialog />}
-                    title={title}
+                    title={`${
+                        searchParams.get('tagId') ? 'Tags' : 'Components'
+                    }: ${pageTitle || 'All'}`}
                 />
             }
             leftSidebarHeader={
