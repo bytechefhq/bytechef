@@ -13,8 +13,8 @@ import PageHeader from 'components/PageHeader/PageHeader';
 import LayoutContainer from 'layouts/LayoutContainer/LayoutContainer';
 import {
     JobModel,
-    ProjectExecutionBasicModelFromJSON,
     ProjectExecutionModel,
+    ProjectExecutionModelFromJSON,
 } from 'middleware/project';
 import {GetProjectExecutionsJobStatusEnum} from 'middleware/project/apis/ProjectExecutionsApi';
 import {
@@ -354,8 +354,10 @@ export const Executions = () => {
                             ) : (
                                 <Table
                                     data={projectExecutionsPage.content.map(
-                                        (projectExecution) =>
-                                            ProjectExecutionBasicModelFromJSON(
+                                        (
+                                            projectExecution: ProjectExecutionModel
+                                        ) =>
+                                            ProjectExecutionModelFromJSON(
                                                 projectExecution
                                             )
                                     )}
