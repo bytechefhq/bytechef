@@ -27,6 +27,4 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableCaching
 @EnableConfigurationProperties(CacheProperties.class)
-public class CacheConfiguration {
-
-}
+public class CacheConfiguration {}
