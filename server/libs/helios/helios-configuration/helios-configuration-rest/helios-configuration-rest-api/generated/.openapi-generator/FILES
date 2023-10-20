@@ -25,3 +25,4 @@ src/main/java/com/bytechef/helios/configuration/web/rest/model/WorkflowConnectio
 src/main/java/com/bytechef/helios/configuration/web/rest/model/WorkflowFormatModel.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/WorkflowModel.java
 src/main/java/com/bytechef/helios/configuration/web/rest/model/WorkflowTaskModel.java
+src/main/java/com/bytechef/helios/configuration/web/rest/model/WorkflowTriggerModel.java
