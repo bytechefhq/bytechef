@@ -22,11 +22,12 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
-import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 
 import com.bytechef.component.hubspot.property.HubspotSimplePublicObjectInputProperties;
 import com.bytechef.component.hubspot.property.HubspotSimplePublicObjectProperties;
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.util.HttpClientUtils;
+
 import java.util.Map;
 
 /**
@@ -60,5 +61,5 @@ public class HubspotUpdateContactAction {
         .outputSchema(object().properties(HubspotSimplePublicObjectProperties.PROPERTIES)
             .metadata(
                 Map.of(
-                    "responseFormat", ResponseFormat.JSON)));
+                    "responseType", HttpClientUtils.ResponseType.JSON)));
 }

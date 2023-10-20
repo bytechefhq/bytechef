@@ -37,7 +37,7 @@ tasks:
   label: "Post content to Liferay REST endpoint"
   parameters:
     uri: "${apiEndpointUrl}"
-    responseFormat: "JSON"
+    responseType: "JSON"
     headerParameters:
       Authorization:
       - "Basic ${apiToken}"

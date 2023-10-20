@@ -47,7 +47,7 @@ Post file content to REST API endpoint and print response status in log.
           and bodyContentType `TXT` creates request's `ContentType` header value application/text
         label: Post content to Liferay REST endpoint
         uri: ${apiEndpointUrl}
-        responseFormat: JSON
+        responseType: JSON
         headerParameters:
           Authorization:
             - Basic ${apiToken}
@@ -71,7 +71,7 @@ Execution flow performs three steps in `tasks` list. The last step `logger/v1/in
     name: restApiResponseContent
     label: Post content to Liferay REST endpoint
     uri: ${apiEndpointUrl}
-    responseFormat: JSON
+    responseType: JSON
     headerParameters:
       Authorization:
         - Basic ${apiToken}

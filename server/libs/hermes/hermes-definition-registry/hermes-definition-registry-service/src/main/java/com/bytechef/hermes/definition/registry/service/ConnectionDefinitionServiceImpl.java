@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.responseType;
 
 /**
  * @author Ivica Cardic
@@ -213,7 +213,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
             Response response = HttpClientUtils.post(tokenUrlFunction.apply(connectionParameters))
                 .body(Body.of(payload, BodyContentType.FORM_URL_ENCODED))
-                .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
+                .configuration(responseType(HttpClientUtils.ResponseType.JSON))
                 .execute();
 
             if (response.statusCode() != 200) {

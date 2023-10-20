@@ -81,12 +81,12 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
 
     HttpResponse.BodyHandler<?> createBodyHandler(Configuration configuration) {
         HttpResponse.BodyHandler<?> bodyHandler;
-        HttpClientUtils.ResponseFormat responseFormat = configuration.getResponseFormat();
+        HttpClientUtils.ResponseType responseType = configuration.getResponseType();
 
-        if (responseFormat == null) {
+        if (responseType == null) {
             bodyHandler = HttpResponse.BodyHandlers.discarding();
         } else {
-            if (responseFormat == HttpClientUtils.ResponseFormat.BINARY) {
+            if (responseType == HttpClientUtils.ResponseType.BINARY) {
                 bodyHandler = HttpResponse.BodyHandlers.ofInputStream();
             } else {
                 bodyHandler = HttpResponse.BodyHandlers.ofString();
@@ -194,19 +194,19 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
 
         Map<String, List<String>> headers = httpHeaders.map();
 
-        if (configuration.getResponseFormat() == null) {
+        if (configuration.getResponseType() == null) {
             response = new Response(headers, null, httpResponse.statusCode());
         } else {
             Object httpResponseBody = httpResponse.body();
-            HttpClientUtils.ResponseFormat responseFormat = configuration.getResponseFormat();
+            HttpClientUtils.ResponseType responseType = configuration.getResponseType();
 
             Object body;
 
-            if (!isEmpty(httpResponseBody) && responseFormat == HttpClientUtils.ResponseFormat.BINARY) {
+            if (!isEmpty(httpResponseBody) && responseType == HttpClientUtils.ResponseType.BINARY) {
                 body = storeBinaryResponseBody(context, configuration, headers, (InputStream) httpResponseBody);
-            } else if (responseFormat == HttpClientUtils.ResponseFormat.JSON) {
+            } else if (responseType == HttpClientUtils.ResponseType.JSON) {
                 body = isEmpty(httpResponseBody) ? null : JsonUtils.read(httpResponseBody.toString());
-            } else if (responseFormat == HttpClientUtils.ResponseFormat.TEXT) {
+            } else if (responseType == HttpClientUtils.ResponseType.TEXT) {
                 body = isEmpty(httpResponseBody) ? null : httpResponseBody.toString();
             } else {
                 body = isEmpty(httpResponseBody) ? null : XmlUtils.read(httpResponseBody.toString());

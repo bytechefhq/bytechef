@@ -34,7 +34,7 @@ Get response from REST API endpoint and print response content in log.
       name: httpGetContentFromLiferay
       label: Get web content from Liferay DXP
       uri: ${apiEndpointUrl}
-      responseFormat: JSON
+      responseType: JSON
       headerParameters:
         Authorization: Basic ${apiToken}
 
@@ -63,7 +63,7 @@ Execution flow performs two steps in `tasks` list. The later step is `logger/v1/
     name: restApiResponseContent
     label: Get web content from Liferay DXP
     uri: ${apiEndpointUrl}
-    responseFormat: JSON
+    responseType: JSON
     headerParameters:
       Authorization:
         - Basic ${apiToken}

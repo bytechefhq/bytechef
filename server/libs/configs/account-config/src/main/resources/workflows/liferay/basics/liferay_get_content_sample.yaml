@@ -15,7 +15,7 @@ tasks:
   label: "Get web content from Liferay DXP"
   parameters:
     uri: "${apiEndpointUrl}"
-    responseFormat: "JSON"
+    responseType: "JSON"
     headerParameters:
       Authorization:
       - "Basic ${apiToken}"

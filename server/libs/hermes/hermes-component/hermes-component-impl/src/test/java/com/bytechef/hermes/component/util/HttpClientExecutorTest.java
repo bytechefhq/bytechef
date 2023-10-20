@@ -76,14 +76,14 @@ public class HttpClientExecutorTest {
         //
 
         bodyHandler = HTTP_CLIENT_EXECUTOR.createBodyHandler(
-            HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.BINARY));
+            HttpClientUtils.responseType(HttpClientUtils.ResponseType.BINARY));
 
         Assertions.assertEquals(bodyHandler, HttpResponse.BodyHandlers.ofInputStream());
 
         //
 
         bodyHandler = HTTP_CLIENT_EXECUTOR.createBodyHandler(
-            HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.XML));
+            HttpClientUtils.responseType(HttpClientUtils.ResponseType.XML));
 
         Assertions.assertEquals(bodyHandler, HttpResponse.BodyHandlers.ofString());
     }
@@ -368,7 +368,7 @@ public class HttpClientExecutorTest {
             fileEntry,
             HTTP_CLIENT_EXECUTOR.handleResponse(
                 context, new TestHttpResponse(new ByteArrayInputStream("text".getBytes(StandardCharsets.UTF_8))),
-                HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.BINARY))
+                HttpClientUtils.responseType(HttpClientUtils.ResponseType.BINARY))
                 .body());
 
         //
@@ -383,7 +383,7 @@ public class HttpClientExecutorTest {
                             "key1": "value1"
                         }
                         """),
-                HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.JSON))
+                HttpClientUtils.responseType(HttpClientUtils.ResponseType.JSON))
                 .body());
 
         //
@@ -392,7 +392,7 @@ public class HttpClientExecutorTest {
             "text",
             HTTP_CLIENT_EXECUTOR.handleResponse(
                 context, new TestHttpResponse("text"),
-                HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.TEXT))
+                HttpClientUtils.responseType(HttpClientUtils.ResponseType.TEXT))
                 .body());
 
         //
@@ -410,7 +410,7 @@ public class HttpClientExecutorTest {
                         </root>
 
                         """),
-                HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.XML))
+                HttpClientUtils.responseType(HttpClientUtils.ResponseType.XML))
                 .body());
 
         //
@@ -419,7 +419,7 @@ public class HttpClientExecutorTest {
             new HttpClientUtils.Response(Map.of(), "text", 200),
             HTTP_CLIENT_EXECUTOR.handleResponse(
                 context, new TestHttpResponse("text"),
-                HttpClientUtils.responseFormat(HttpClientUtils.ResponseFormat.TEXT)));
+                HttpClientUtils.responseType(HttpClientUtils.ResponseType.TEXT)));
     }
 
     private static class TestHttpResponse implements HttpResponse<Object> {

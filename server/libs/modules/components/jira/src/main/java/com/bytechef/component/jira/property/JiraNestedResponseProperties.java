@@ -17,16 +17,8 @@
 
 package com.bytechef.component.jira.property;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
-import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
-import static com.bytechef.hermes.component.definition.ComponentDSL.date;
-import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.nullable;
-import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 
 import com.bytechef.hermes.definition.DefinitionDSL;
 import java.util.List;
@@ -41,8 +33,6 @@ public class JiraNestedResponseProperties {
         integer("status").label("Status")
             .required(false),
         object("errorCollection").properties(JiraErrorCollectionProperties.PROPERTIES)
-            .additionalProperties(
-                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
             .placeholder("Add to Error Collection")
             .label("Error Collection")
             .description("Error messages from an operation.")

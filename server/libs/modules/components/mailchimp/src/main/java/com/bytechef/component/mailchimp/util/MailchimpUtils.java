@@ -30,7 +30,7 @@ import java.util.Map;
 
 import static com.bytechef.hermes.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.hermes.component.definition.Authorization.AUTHORIZATION;
-import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.responseType;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 
 /**
@@ -43,7 +43,7 @@ public class MailchimpUtils {
     public static String getMailChimpServer(String accessToken) {
         Map<?, ?> response = (Map<?, ?>) HttpClientUtils
             .get("https://login.mailchimp.com/oauth2/metadata")
-            .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
+            .configuration(responseType(HttpClientUtils.ResponseType.JSON))
             .header(AUTHORIZATION, "OAuth " + accessToken)
             .execute()
             .body();
@@ -63,7 +63,7 @@ public class MailchimpUtils {
                     Map.of(
                         "fields", List.of("lists.id,lists.name,total_items"),
                         "count", List.of("1000")))
-                .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
+                .configuration(responseType(HttpClientUtils.ResponseType.JSON))
                 .execute()
                 .getBody();
 

@@ -30,7 +30,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Map;
 
-import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.responseType;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
@@ -163,7 +163,7 @@ public class HubspotSubscribeTrigger {
                         "period", "SECONDLY",
                         "maxConcurrentRequests", 10),
                     "targetUrl", context.webhookUrl())))
-            .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
+            .configuration(responseType(HttpClientUtils.ResponseType.JSON))
             .execute()
             .body();
 
@@ -174,7 +174,7 @@ public class HubspotSubscribeTrigger {
                     "eventType", MapValueUtils.getString(context.inputParameters(), EVENT_TYPE),
                     "propertyName", MapValueUtils.getString(context.inputParameters(), PROPERTY_NAME, ""),
                     "active", true)))
-            .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
+            .configuration(responseType(HttpClientUtils.ResponseType.JSON))
             .execute()
             .body();
 

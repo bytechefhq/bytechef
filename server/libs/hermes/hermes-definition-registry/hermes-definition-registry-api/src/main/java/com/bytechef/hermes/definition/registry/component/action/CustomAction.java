@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.responseType;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.date;
@@ -208,7 +208,7 @@ public class CustomAction {
         return HttpClientUtils.exchange(
             MapValueUtils.getRequiredString(inputParameters, PATH),
             MapValueUtils.getRequired(inputParameters, METHOD, HttpClientUtils.RequestMethod.class))
-            .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
+            .configuration(responseType(HttpClientUtils.ResponseType.JSON))
             .body(getBody(
                 MapValueUtils.get(inputParameters, BODY_CONTENT_TYPE, BodyContentType.class), inputParameters))
             .headers(

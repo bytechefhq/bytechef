@@ -20,7 +20,7 @@ package com.bytechef.component.airtable.trigger;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.util.HttpClientUtils;
-import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
 import com.bytechef.hermes.component.util.MapValueUtils;
 
 import java.time.LocalDateTime;
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
-import static com.bytechef.hermes.component.util.HttpClientUtils.responseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.responseType;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
@@ -83,7 +83,7 @@ public class AirtableNewRecordTrigger {
                             .formatted(
                                 MapValueUtils.getRequiredString(inputParameters, TRIGGER_FIELD),
                                 startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))))
-            .configuration(responseFormat(ResponseFormat.JSON))
+            .configuration(responseType(ResponseType.JSON))
             .execute()
             .body();
 

@@ -26,10 +26,9 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
+import static com.bytechef.hermes.component.util.HttpClientUtils.ResponseType;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
-import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 
@@ -202,7 +201,7 @@ public class PipedriveSearchDealsAction {
                         .required(false))
                 .metadata(
                     Map.of(
-                        "responseFormat", ResponseFormat.JSON)))
+                        "responseType", ResponseType.JSON)))
         .sampleOutput(Map.<String, Object>ofEntries(Map.entry("success", true),
             Map.entry("data", Map.<String, Object>ofEntries(Map.entry("items", List.of(Map.<String, Object>ofEntries(
                 Map.entry("result_score", 1.22),
@@ -213,7 +212,7 @@ public class PipedriveSearchDealsAction {
                     Map.entry("stage", Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("name", "Lead In"))),
                     Map.entry("person",
                         Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("name", "Jane Doe"))),
-                    new AbstractMap.SimpleEntry<>("organization", null), Map.entry("custom_fields", List.of()),
+                    Map.entry("organization", ""), Map.entry("custom_fields", List.of()),
                     Map.entry("notes", List.of())))))))),
             Map.entry("additional_data",
                 Map.<String, Object>ofEntries(Map.entry("description", "The additional data of the list"),
