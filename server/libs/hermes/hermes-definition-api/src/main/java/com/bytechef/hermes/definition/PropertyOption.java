@@ -23,40 +23,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author Ivica Cardic
  */
 @Schema(name = "PropertyOption", description = "Defines valid property value.")
-public sealed class PropertyOption permits DefinitionDSL.ModifiablePropertyOption {
-
-    protected String description;
-    protected DisplayOption displayOption;
-    protected String name;
-    protected Object value;
-
-    protected PropertyOption(String name, Object value) {
-        this.name = name;
-        this.value = value;
-    }
-
-    protected PropertyOption(String name, Object value, String description) {
-        this.name = name;
-        this.value = value;
-        this.description = description;
-    }
+public sealed interface PropertyOption permits DefinitionDSL.ModifiablePropertyOption {
 
     @Schema(name = "description", description = "Description of the option.")
-    public String getDescription() {
-        return description;
-    }
+    String getDescription();
 
-    public DisplayOption getDisplayOption() {
-        return displayOption;
-    }
+    DisplayOption getDisplayOption();
 
     @Schema(name = "name", description = "Name of the option.")
-    public String getName() {
-        return name;
-    }
+    String getName();
 
     @Schema(name = "value", description = "Value of the option")
-    public Object getValue() {
-        return value;
-    }
+    Object getValue();
 }

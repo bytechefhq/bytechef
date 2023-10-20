@@ -23,46 +23,23 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author Ivica Cardic
  */
 @Schema(name = "Display", description = "A display information.")
-public sealed class Display permits DefinitionDSL.ModifiableDisplay {
-
-    protected String category;
-    protected String description;
-    protected String icon;
-    protected String label;
-    protected String subtitle;
-    protected String[] tags;
-
-    protected Display(String label) {
-        this.label = label;
-    }
+public sealed interface Display permits DefinitionDSL.ModifiableDisplay {
 
     @Schema(name = "category", description = "The category of the component.")
-    public String getCategory() {
-        return category;
-    }
+    String getCategory();
 
     @Schema(name = "description", description = "The description.")
-    public String getDescription() {
-        return description;
-    }
+    String getDescription();
 
     @Schema(name = "icon", description = " The icon.")
-    public String getIcon() {
-        return icon;
-    }
+    String getIcon();
 
     @Schema(name = "label", description = "The label.")
-    public String getLabel() {
-        return label;
-    }
+    String getLabel();
 
     @Schema(name = "subtitle", description = "Additional explanation.")
-    public String getSubtitle() {
-        return subtitle;
-    }
+    String getSubtitle();
 
     @Schema(name = "tags", description = "Tags for the component.")
-    public String[] getTags() {
-        return tags == null ? null : tags.clone();
-    }
+    String[] getTags();
 }
