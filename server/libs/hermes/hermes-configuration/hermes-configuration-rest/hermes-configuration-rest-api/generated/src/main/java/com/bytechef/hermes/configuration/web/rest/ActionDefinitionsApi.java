@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-20T08:46:20.056455+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-20T12:12:25.798021+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "action-definitions", description = "The Core Action Definitions API")
 public interface ActionDefinitionsApi {
@@ -45,7 +45,7 @@ public interface ActionDefinitionsApi {
      * GET /action-definitions : Get all component definitions
      * Get all component definitions.
      *
-     * @param types The list of action types defiened in worrkflows. (required)
+     * @param taskTypes The list of task types defined in workflows. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -65,7 +65,7 @@ public interface ActionDefinitionsApi {
         produces = { "application/json" }
     )
     default ResponseEntity<List<ActionDefinitionModel>> getActionDefinitions(
-        @Parameter(name = "types", description = "The list of action types defiened in worrkflows.", required = true, in = ParameterIn.PATH) @PathVariable("types") List<String> types
+        @Parameter(name = "taskTypes", description = "The list of task types defined in workflows.", required = true, in = ParameterIn.PATH) @PathVariable("taskTypes") List<String> taskTypes
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
