@@ -287,6 +287,25 @@ components:
           type: "array"
           items:
             type: "string"
+    Input:
+      type: "object"
+      required:
+      - "name"
+      - "value"
+      properties:
+        label:
+          description: "The string of an input"
+          type: "string"
+        name:
+          description: "The name of an output"
+          type: "string"
+        required:
+          description: "If an input is required, or not"
+          type: "boolean"
+          default: false
+        type:
+          description: "The type of an input, for example \\\"string\\\""
+          type: "string"
     Job:
       description: "Represents an execution of a workflow."
       type: "object"
@@ -412,6 +431,18 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Webhook"
+    Output:
+      type: "object"
+      required:
+      - "name"
+      - "value"
+      properties:
+        name:
+          description: "The name of an output"
+          type: "string"
+        value:
+          description: "The value of an output"
+          type: "object"
     Page:
       description: "A sublist of a list of objects. It allows gain information about\
         \ the position of it in the containing entire list."
@@ -620,9 +651,7 @@ components:
           description: "The workflow's expected list of inputs."
           type: "array"
           items:
-            type: "object"
-            additionalProperties:
-              type: "object"
+            $ref: "#/components/schemas/Input"
           readOnly: true
         label:
           description: "The descriptive name for the workflow"
@@ -641,9 +670,7 @@ components:
           description: "The workflow's list of expected outputs."
           type: "array"
           items:
-            type: "object"
-            additionalProperties:
-              type: "object"
+            $ref: "#/components/schemas/Output"
           readOnly: true
         sourceType:
           description: "The type of the source which stores the workflow definition."
