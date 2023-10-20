@@ -85,7 +85,7 @@ paths:
           format: "int64"
       responses:
         "200":
-          description: "The job."
+          description: "The job object."
           content:
             application/json:
               schema:
@@ -143,7 +143,7 @@ paths:
           format: "int64"
       responses:
         "200":
-          description: "List of task executions."
+          description: "A list of task executions."
           content:
             application/json:
               schema:
@@ -167,7 +167,7 @@ paths:
           format: "int64"
       responses:
         "200":
-          description: "The task execution."
+          description: "The task execution object."
           content:
             application/json:
               schema:
@@ -181,7 +181,7 @@ paths:
       operationId: "getWorkflows"
       responses:
         "200":
-          description: "The list of workflows."
+          description: "A list of workflows."
           content:
             application/json:
               schema:
@@ -373,7 +373,7 @@ components:
           - "COMPLETED"
           readOnly: true
         webhooks:
-          description: "The list of the webhooks configured."
+          description: "A list of the webhooks configured."
           type: "array"
           items:
             type: "object"
@@ -441,7 +441,7 @@ components:
           description: "The total number of elements."
           type: "integer"
         content:
-          description: "List of elements."
+          description: "A list of elements."
           type: "array"
           items:
             type: "object"

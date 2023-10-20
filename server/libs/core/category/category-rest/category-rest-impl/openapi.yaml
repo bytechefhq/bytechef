@@ -15,7 +15,7 @@ paths:
       operationId: "getCategories"
       responses:
         "200":
-          description: "The list of categories."
+          description: "A list of categories."
           content:
             application/json:
               schema:

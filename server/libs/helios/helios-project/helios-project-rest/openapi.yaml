@@ -15,7 +15,7 @@ paths:
       operationId: "getProjectCategories"
       responses:
         "200":
-          description: "The list of categories."
+          description: "A list of categories."
           content:
             application/json:
               schema:
@@ -76,8 +76,7 @@ paths:
         in: "query"
         required: false
         schema:
-          type: "integer"
-          format: "int64"
+          type: "string"
       - name: "pageNumber"
         description: "The number of the page to return."
         in: "query"
@@ -102,7 +101,7 @@ paths:
       operationId: "getProjectInstances"
       parameters:
       - name: "projectIds"
-        description: "The list of the project ids used for filtering project instances."
+        description: "A list of the project ids used for filtering project instances."
         in: "query"
         required: false
         schema:
@@ -111,7 +110,7 @@ paths:
             type: "integer"
             format: "int64"
       - name: "tagIds"
-        description: "The list of tag ids of used for filtering project instances."
+        description: "A list of tag ids of used for filtering project instances."
         in: "query"
         required: false
         schema:
@@ -121,7 +120,7 @@ paths:
             format: "int64"
       responses:
         "200":
-          description: "The list of project instances."
+          description: "A list of project instances."
           content:
             application/json:
               schema:
@@ -137,7 +136,7 @@ paths:
       operationId: "getProjectTags"
       responses:
         "200":
-          description: "The list of project tags."
+          description: "A list of project tags."
           content:
             application/json:
               schema:
@@ -154,7 +153,7 @@ paths:
       operationId: "getProjects"
       parameters:
       - name: "categoryIds"
-        description: "The list of the category ids used for filtering projects."
+        description: "A list of the category ids used for filtering projects."
         in: "query"
         required: false
         schema:
@@ -163,7 +162,7 @@ paths:
             type: "integer"
             format: "int64"
       - name: "tagIds"
-        description: "The list of tag ids of used for filtering projects."
+        description: "A list of tag ids of used for filtering projects."
         in: "query"
         required: false
         schema:
@@ -173,7 +172,7 @@ paths:
             format: "int64"
       responses:
         "200":
-          description: "The list of projects."
+          description: "A list of projects."
           content:
             application/json:
               schema:
@@ -403,7 +402,7 @@ components:
           description: "The total number of elements."
           type: "integer"
         content:
-          description: "List of elements."
+          description: "A list of elements."
           type: "array"
           items:
             type: "object"
@@ -444,8 +443,8 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
-        lastPublishedDate:
-          description: "The last published date."
+        publishedDate:
+          description: "The published date."
           type: "string"
           format: "date-time"
         projectVersion:
