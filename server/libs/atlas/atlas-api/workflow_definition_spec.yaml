@@ -16,10 +16,10 @@ schemas:
           additionalProperties:
             type: "object"
       label:
-        description: "A descriptive name for the workflow"
+        description: "The descriptive name for a workflow."
         type: "string"
       outputs:
-        description: "The workflow's expected outputs"
+        description: "The workflow's expected outputs."
         type: "array"
         items:
           type: "object"
@@ -42,6 +42,9 @@ schemas:
     required:
     - "type"
     properties:
+      description:
+        description: "The human-readable description of the task."
+        type: "string"
       finalize:
         description: "The (optional) list of tasks that are to be executed after execution\
           \ of this task -- regardless of whether it had failed or not."
@@ -49,7 +52,7 @@ schemas:
         items:
           $ref: "#/schemas/Task"
       label:
-        description: "The human-readable description of the task."
+        description: "The human-readable name description of the task."
         type: "string"
       name:
         description: "The identifier name of the task. Task names are used for assigning\
@@ -90,8 +93,13 @@ schemas:
     required:
     - "type"
     properties:
+      description:
+        description: "The human-readable description of the task dispatcher."
+        type: "string"
       type:
-        description: null
+        description: "The type of the task dispatcher. Type strings are mapped to\
+          \ \"TaskDispatcher\" implementations designed to handle that type of task\
+          \ dispatcher."
         type: "string"
       additionalProperties:
         description: "The additional properties defined by particular task dispatcher."
