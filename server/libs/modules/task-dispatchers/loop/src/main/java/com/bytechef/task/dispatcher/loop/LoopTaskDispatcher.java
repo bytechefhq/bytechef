@@ -85,7 +85,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
         taskExecutionService.update(loopTaskExecution);
 
         if (loopForever || !list.isEmpty()) {
-            TaskExecution subTaskExecution = TaskExecution.of(
+            TaskExecution subTaskExecution = new TaskExecution(
                     iteratee, taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1);
 
             Context context = new Context(contextService.peek(taskExecution.getId()));

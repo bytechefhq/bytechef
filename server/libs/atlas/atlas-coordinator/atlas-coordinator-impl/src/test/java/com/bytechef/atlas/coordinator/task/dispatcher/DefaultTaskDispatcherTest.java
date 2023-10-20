@@ -42,7 +42,7 @@ public class DefaultTaskDispatcherTest {
 
     @Test
     public void test2() {
-        TaskExecution taskExecution = TaskExecution.of(WorkflowTask.of("node", "encoder"));
+        TaskExecution taskExecution = new TaskExecution(WorkflowTask.of("node", "encoder"));
 
         DefaultTaskDispatcher defaultTaskDispatcher =
                 new DefaultTaskDispatcher((k, m) -> Assertions.assertEquals("encoder", k), List.of());
@@ -52,7 +52,7 @@ public class DefaultTaskDispatcherTest {
 
     @Test
     public void test3() {
-        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of("node", "encoder.xlarge")));
+        TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of("node", "encoder.xlarge")));
 
         DefaultTaskDispatcher defaultTaskDispatcher =
                 new DefaultTaskDispatcher((k, m) -> Assertions.assertEquals("encoder.xlarge", k), List.of());

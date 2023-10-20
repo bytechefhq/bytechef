@@ -92,7 +92,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         List<Object> list = loopTaskExecution.getList(LIST, Object.class, Collections.emptyList());
 
         if (loopForever || taskExecution.getTaskNumber() < list.size()) {
-            TaskExecution subTaskExecution = TaskExecution.of(
+            TaskExecution subTaskExecution = new TaskExecution(
                     iterateeWorkflowTask,
                     loopTaskExecution.getJobId(),
                     loopTaskExecution.getId(),

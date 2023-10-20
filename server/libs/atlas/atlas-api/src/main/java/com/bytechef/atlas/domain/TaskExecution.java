@@ -171,23 +171,19 @@ public final class TaskExecution
         this.workflowTask = new WorkflowTask(taskExecution.workflowTask);
     }
 
-    public static TaskExecution of(TaskExecution taskExecution, WorkflowTask workflowTask) {
-        taskExecution = new TaskExecution(taskExecution);
+    public TaskExecution(TaskExecution taskExecution, WorkflowTask workflowTask) {
+        this(taskExecution);
 
-        taskExecution.workflowTask = workflowTask;
-
-        return taskExecution;
+        this.workflowTask = workflowTask;
     }
 
-    public static TaskExecution of(WorkflowTask workflowTask) {
-        TaskExecution taskExecution = new TaskExecution();
+    public TaskExecution(WorkflowTask workflowTask) {
+        Assert.notNull(workflowTask, "workflowTask cannot be null");
 
-        taskExecution.workflowTask = new WorkflowTask(workflowTask);
-
-        return taskExecution;
+        this.workflowTask = new WorkflowTask(workflowTask);
     }
 
-    public static TaskExecution of(WorkflowTask workflowTask, Map<String, Object> source) {
+    public TaskExecution(WorkflowTask workflowTask, Map<String, Object> source) {
         Assert.notNull(workflowTask, "workflowTask cannot be null");
         Assert.notNull(source, "source cannot be null");
 
@@ -196,68 +192,56 @@ public final class TaskExecution
         map.putAll(workflowTask.asMap());
         map.putAll(source);
 
-        return of(new WorkflowTask(map));
+        this.workflowTask = new WorkflowTask(map);
     }
 
-    public static TaskExecution of(WorkflowTask workflowTask, String jobId) {
+    public TaskExecution(WorkflowTask workflowTask, String jobId) {
         Assert.notNull(workflowTask, "workflowTask cannot be null");
         Assert.notNull(jobId, "jobId cannot be null");
 
-        TaskExecution taskExecution = of(workflowTask);
-
-        taskExecution.setId(UUIDGenerator.generate());
-        taskExecution.setJobId(jobId);
-        taskExecution.setStatus(TaskStatus.CREATED);
-
-        return taskExecution;
+        this.id = UUIDGenerator.generate();
+        this.job = new AggregateReference.IdOnlyAggregateReference<>(jobId);
+        this.status = TaskStatus.CREATED;
+        this.workflowTask = new WorkflowTask(workflowTask);
     }
 
-    public static TaskExecution of(WorkflowTask workflowTask, String jobId, int priority) {
+    public TaskExecution(WorkflowTask workflowTask, String jobId, int priority) {
         Assert.notNull(workflowTask, "workflowTask cannot be null");
         Assert.notNull(jobId, "jobId cannot be null");
 
-        TaskExecution taskExecution = of(workflowTask);
-
-        taskExecution.setId(UUIDGenerator.generate());
-        taskExecution.setJobId(jobId);
-        taskExecution.setPriority(priority);
-        taskExecution.setStatus(TaskStatus.CREATED);
-
-        return taskExecution;
+        this.id = UUIDGenerator.generate();
+        this.job = new AggregateReference.IdOnlyAggregateReference<>(jobId);
+        this.priority = priority;
+        this.status = TaskStatus.CREATED;
+        this.workflowTask = new WorkflowTask(workflowTask);
     }
 
-    public static TaskExecution of(WorkflowTask workflowTask, String jobId, String parentId, int priority) {
+    public TaskExecution(WorkflowTask workflowTask, String jobId, String parentId, int priority) {
         Assert.notNull(workflowTask, "workflowTask cannot be null");
         Assert.notNull(jobId, "jobId cannot be null");
         Assert.notNull(parentId, "parentId cannot be null");
 
-        TaskExecution taskExecution = of(workflowTask);
-
-        taskExecution.setId(UUIDGenerator.generate());
-        taskExecution.setJobId(jobId);
-        taskExecution.setParentId(parentId);
-        taskExecution.setPriority(priority);
-        taskExecution.setStatus(TaskStatus.CREATED);
-
-        return taskExecution;
+        this.id = UUIDGenerator.generate();
+        this.job = new AggregateReference.IdOnlyAggregateReference<>(jobId);
+        this.parent = new AggregateReference.IdOnlyAggregateReference<>(parentId);
+        this.priority = priority;
+        this.status = TaskStatus.CREATED;
+        this.workflowTask = new WorkflowTask(workflowTask);
     }
 
-    public static TaskExecution of(
-            WorkflowTask workflowTask, String jobId, String parentId, int priority, int taskNumber) {
-        TaskExecution taskExecution = of(workflowTask);
+    public TaskExecution(WorkflowTask workflowTask, String jobId, String parentId, int priority, int taskNumber) {
 
         Assert.notNull(workflowTask, "workflowTask cannot be null");
         Assert.notNull(jobId, "jobId cannot be null");
         Assert.notNull(parentId, "parentId cannot be null");
 
-        taskExecution.setId(UUIDGenerator.generate());
-        taskExecution.setJobId(jobId);
-        taskExecution.setParentId(parentId);
-        taskExecution.setPriority(priority);
-        taskExecution.setStatus(TaskStatus.CREATED);
-        taskExecution.setTaskNumber(taskNumber);
-
-        return taskExecution;
+        this.id = UUIDGenerator.generate();
+        this.job = new AggregateReference.IdOnlyAggregateReference<>(jobId);
+        this.parent = new AggregateReference.IdOnlyAggregateReference<>(parentId);
+        this.priority = priority;
+        this.status = TaskStatus.CREATED;
+        this.taskNumber = taskNumber;
+        this.workflowTask = new WorkflowTask(workflowTask);
     }
 
     @Override

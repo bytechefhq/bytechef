@@ -90,7 +90,7 @@ public class SwitchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
             if (!subWorkflowTasks.isEmpty()) {
                 WorkflowTask subWorkflowTask = subWorkflowTasks.get(0);
 
-                TaskExecution subTaskExecution = TaskExecution.of(
+                TaskExecution subTaskExecution = new TaskExecution(
                         subWorkflowTask,
                         switchTaskExecution.getJobId(),
                         switchTaskExecution.getId(),
