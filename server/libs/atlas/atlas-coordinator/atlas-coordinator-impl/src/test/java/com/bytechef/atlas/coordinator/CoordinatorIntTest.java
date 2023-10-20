@@ -20,7 +20,6 @@
 package com.bytechef.atlas.coordinator;
 
 import com.bytechef.atlas.config.WorkflowConfiguration;
-import com.bytechef.atlas.coordinator.config.CoordinatorIntTestConfiguration;
 import com.bytechef.atlas.coordinator.job.executor.JobExecutor;
 import com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
@@ -28,11 +27,13 @@ import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.error.ExecutionError;
+import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.facade.JobFacade;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
 import com.bytechef.atlas.repository.config.WorkflowMapperConfiguration;
 import com.bytechef.atlas.repository.jdbc.config.WorkflowRepositoryJdbcConfiguration;
+import com.bytechef.atlas.repository.resource.config.ResourceWorkflowRepositoryConfiguration;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
@@ -49,15 +50,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bytechef.test.config.jdbc.JdbcRepositoriesIntTestConfiguration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
  * @author Arik Cohen
@@ -65,7 +73,6 @@ import org.springframework.context.annotation.Import;
  */
 @EmbeddedSql
 @SpringBootTest(
-    classes = CoordinatorIntTestConfiguration.class,
     properties = {
         "bytechef.workflow.context-repository.provider=jdbc",
         "bytechef.workflow.persistence.provider=jdbc",
@@ -169,16 +176,33 @@ public class CoordinatorIntTest {
         return jobService.getJob(jobId);
     }
 
+    @EmbeddedSql
+    @ComponentScan(basePackages = "com.bytechef.atlas")
+    @EnableAutoConfiguration
     @Import({
+        ResourceWorkflowRepositoryConfiguration.class,
         WorkflowConfiguration.class,
+        WorkflowMapperConfiguration.class,
         WorkflowRepositoryJdbcConfiguration.class,
-        WorkflowMapperConfiguration.class
     })
-    @ComponentScan(
-        basePackages = {
-            "com.bytechef.atlas.repository.resource", "com.bytechef.atlas.repository.jdbc.event"
-        })
-    @TestConfiguration
-    static class CoordinatorIntTestConfiguration {
+    @Configuration
+    public static class CoordinatorIntTestConfiguration {
+
+        @MockBean
+        private EventPublisher eventPublisher;
+
+        @Bean
+        SyncMessageBroker messageBroker() {
+            return new SyncMessageBroker();
+        }
+
+        @EnableCaching
+        @TestConfiguration
+        public static class CacheConfiguration {
+        }
+
+        @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.repository.jdbc")
+        public static class CoordinatorIntJdbcRepositoriesConfiguration extends JdbcRepositoriesIntTestConfiguration {
+        }
     }
 }
