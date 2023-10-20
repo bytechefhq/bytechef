@@ -59,7 +59,7 @@ public final class Context implements Persistable<Long> {
             return switch (id) {
                 case 1 -> Classname.JOB;
                 case 2 -> Classname.TASK_EXECUTION;
-                default -> throw new IllegalStateException("Unexpected value: " + id);
+                default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
             };
         }
     }

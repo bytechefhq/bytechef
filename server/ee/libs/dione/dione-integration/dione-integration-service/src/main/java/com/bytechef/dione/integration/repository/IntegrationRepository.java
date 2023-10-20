@@ -33,7 +33,7 @@ import java.util.List;
 public interface IntegrationRepository
     extends PagingAndSortingRepository<Integration, Long>, CrudRepository<Integration, Long> {
 
-    Iterable<Integration> findByCategoryIdInOrderByName(List<Long> categoryIds);
+    List<Integration> findAllByCategoryIdInOrderByName(List<Long> categoryIds);
 
     @Query("""
             SELECT integration.* FROM integration
@@ -41,7 +41,7 @@ public interface IntegrationRepository
             WHERE integration_tag.tag_id in (:tagIds)
             ORDER BY name
         """)
-    Iterable<Integration> findByTagIdInOrderByName(@Param("tagIds") List<Long> tagIds);
+    List<Integration> findAllByTagIdInOrderByName(@Param("tagIds") List<Long> tagIds);
 
     @Query("""
             SELECT integration.* FROM integration
@@ -50,6 +50,6 @@ public interface IntegrationRepository
             AND integration_tag.tag_id IN (:tagId)
             ORDER BY name
         """)
-    Iterable<Integration> findByCategoryIdsAndTagIdsOrderByName(
+    List<Integration> findAllByCategoryIdsAndTagIdsOrderByName(
         @Param("categoryIds") List<Long> categoryIds, @Param("tagIds") List<Long> tagIds);
 }

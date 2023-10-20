@@ -45,6 +45,12 @@ public class JobServiceRSocketController {
         return Mono.create(sink -> sink.success(jobService.create(jobParameters)));
     }
 
+    @MessageMapping("fetchLatestJob")
+    public Mono<Job> fetchLatestJob() {
+        return Mono.create(sink -> sink.success(jobService.fetchLatestJob()
+            .orElse(null)));
+    }
+
     @MessageMapping("getJob")
     public Mono<Job> getJob(Long id) {
         return Mono.create(sink -> sink.success(jobService.getJob(id)));
@@ -58,12 +64,6 @@ public class JobServiceRSocketController {
     @MessageMapping("getJobsPage")
     public Mono<Page<Job>> getJobsPage(int pageNumber) {
         return Mono.create(sink -> sink.success(jobService.getJobs(pageNumber)));
-    }
-
-    @MessageMapping("fetchLatestJob")
-    public Mono<Job> fetchLatestJob() {
-        return Mono.create(sink -> sink.success(jobService.fetchLatestJob()
-            .orElse(null)));
     }
 
     @MessageMapping("getTaskExecutionJob")

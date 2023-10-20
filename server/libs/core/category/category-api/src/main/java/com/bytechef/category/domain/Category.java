@@ -31,7 +31,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Table
-public class Category implements Persistable<Long> {
+public final class Category implements Persistable<Long> {
 
     @CreatedBy
     @Column("created_by")
