@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/ConnectionOauth2Api.ts
 apis/index.ts
 index.ts
