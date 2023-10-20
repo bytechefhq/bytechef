@@ -41,6 +41,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -215,7 +216,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     }
 
     public Map<String, Object> getMetadata() {
-        return new HashMap<>(metadata);
+        return Collections.unmodifiableMap(metadata);
     }
 
     @JsonIgnore

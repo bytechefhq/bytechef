@@ -340,7 +340,7 @@ public final class Workflow implements Errorable, Persistable<String> {
 
     /** Returns the steps that make up the workflow. */
     public List<WorkflowTask> getTasks() {
-        return new ArrayList<>(tasks);
+        return Collections.unmodifiableList(tasks);
     }
 
     public int getVersion() {

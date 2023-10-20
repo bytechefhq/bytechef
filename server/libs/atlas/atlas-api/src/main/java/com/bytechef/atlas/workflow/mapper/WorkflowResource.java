@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -120,6 +121,6 @@ public class WorkflowResource implements Resource {
     }
 
     public Map<String, Object> getMetadata() {
-        return new HashMap<>(metadata);
+        return Collections.unmodifiableMap(metadata);
     }
 }

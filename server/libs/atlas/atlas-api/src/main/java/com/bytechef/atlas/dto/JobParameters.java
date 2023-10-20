@@ -81,7 +81,7 @@ public class JobParameters {
     }
 
     public Map<String, Object> getInputs() {
-        return new HashMap<>(inputs);
+        return Collections.unmodifiableMap(inputs);
     }
 
     public String getLabel() {
@@ -101,7 +101,7 @@ public class JobParameters {
     }
 
     public List<Job.Webhook> getWebhooks() {
-        return new ArrayList<>(webhooks);
+        return Collections.unmodifiableList(webhooks);
     }
 
     @Override
@@ -140,6 +140,9 @@ public class JobParameters {
             '}';
     }
 
+    /**
+     * Used by MapStruct.
+     */
     public @interface Default {
     }
 }

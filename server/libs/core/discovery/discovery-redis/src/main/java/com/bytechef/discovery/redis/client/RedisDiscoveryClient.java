@@ -20,6 +20,7 @@ package com.bytechef.discovery.redis.client;
 import com.bytechef.discovery.redis.registry.RedisRegistration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -60,6 +61,6 @@ public class RedisDiscoveryClient implements DiscoveryClient {
     @Override
     @SuppressFBWarnings("NP")
     public List<String> getServices() {
-        return new ArrayList<>(Objects.requireNonNull(redisTemplate.keys("*")));
+        return List.copyOf(Objects.requireNonNull(redisTemplate.keys("*")));
     }
 }

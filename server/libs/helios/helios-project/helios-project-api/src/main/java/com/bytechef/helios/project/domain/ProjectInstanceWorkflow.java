@@ -116,7 +116,7 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
     }
 
     public List<ProjectInstanceWorkflowConnection> getConnections() {
-        return new ArrayList<>(projectInstanceWorkflowConnections);
+        return List.copyOf(projectInstanceWorkflowConnections);
     }
 
     public String getCreatedBy() {
