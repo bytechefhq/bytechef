@@ -10,10 +10,6 @@ compileJava {
     options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
 }
 
-jar {
-    archiveBaseName = "bytechef-${project.name}"
-}
-
 dependencies {
     implementation project(":cli:commands:component")
 }
