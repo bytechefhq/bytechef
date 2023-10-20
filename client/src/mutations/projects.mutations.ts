@@ -1,11 +1,13 @@
-import {useMutation} from '@tanstack/react-query';
+import {QueryClient, useMutation} from '@tanstack/react-query';
 import {
     CreateProjectWorkflowRequest,
     DeleteProjectRequest,
     ProjectModel,
     ProjectsApi,
     UpdateProjectTagsRequest,
+    WorkflowModel,
 } from 'middleware/project';
+import {ProjectKeys} from 'queries/projects.queries';
 
 type CreateProjectMutationProps = {
     onSuccess?: (result: ProjectModel, variables: ProjectModel) => void;
@@ -25,9 +27,13 @@ export const useCreateProjectMutation = (
         onError: mutationProps?.onError,
     });
 
+export interface IProjectWithWorkflows extends ProjectModel {
+    workflows: WorkflowModel[];
+}
+
 type CreateProjectWorkflowRequestMutationProps = {
     onSuccess?: (
-        result: ProjectModel,
+        result: IProjectWithWorkflows,
         variables: CreateProjectWorkflowRequest
     ) => void;
     onError?: (error: object, variables: CreateProjectWorkflowRequest) => void;
@@ -35,14 +41,30 @@ type CreateProjectWorkflowRequestMutationProps = {
 
 export const useCreateProjectWorkflowRequestMutation = (
     mutationProps?: CreateProjectWorkflowRequestMutationProps
-) =>
-    useMutation({
-        mutationFn: (request: CreateProjectWorkflowRequest) => {
-            return new ProjectsApi().createProjectWorkflow(request);
+) => {
+    const queryClient = new QueryClient();
+
+    return useMutation({
+        mutationFn: async (request: CreateProjectWorkflowRequest) => {
+            const project = await new ProjectsApi().createProjectWorkflow(
+                request
+            );
+
+            const workflows = await new ProjectsApi().getProjectWorkflows({
+                id: project.id,
+            });
+
+            queryClient.setQueryData(
+                [ProjectKeys.projectWorkflows, {projectId: project.id}],
+                workflows
+            );
+
+            return {...project, workflows};
         },
         onSuccess: mutationProps?.onSuccess,
         onError: mutationProps?.onError,
     });
+};
 
 type DeleteProjectMutationProps = {
     onSuccess?: (result: void, variables: DeleteProjectRequest) => void;
