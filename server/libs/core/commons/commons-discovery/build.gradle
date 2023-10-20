@@ -1,5 +1,6 @@
 dependencies {
+    api libs.org.springframework.cloud.spring.cloud.commons
+
     implementation "org.springframework:spring-core"
-    implementation libs.org.springframework.cloud.spring.cloud.commons
     implementation project(":server:libs:core:commons:commons-util")
 }

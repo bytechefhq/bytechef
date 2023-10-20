@@ -8,13 +8,14 @@ springBoot {
 dependencies {
     implementation libs.com.github.kagkarlsson.db.scheduler.spring.boot.starter
     implementation libs.org.openapitools.jackson.databind.nullable
+    implementation libs.org.springdoc.springdoc.openapi.starter.webflux.ui
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-cache"
     implementation "org.springframework.boot:spring-boot-starter-data-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
     implementation "org.springframework.boot:spring-boot-starter-rsocket"
     implementation "org.springframework.boot:spring-boot-starter-webflux"
-    implementation libs.org.springdoc.springdoc.openapi.starter.webflux.ui
+    implementation libs.org.springframework.cloud.spring.cloud.starter.loadbalancer
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
     implementation project(":server:ee:libs:dione:dione-integration:dione-integration-rest")
     implementation project(":server:ee:libs:dione:dione-integration:dione-integration-service")
