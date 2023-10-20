@@ -69,6 +69,12 @@ export interface TaskExecutionModel {
      */
     readonly id?: string;
     /**
+     * The input parameters for this task.
+     * @type {{ [key: string]: any; }}
+     * @memberof TaskExecutionModel
+     */
+    readonly input?: { [key: string]: any; };
+    /**
      * The id of the job for which this task belongs to.
      * @type {string}
      * @memberof TaskExecutionModel
@@ -215,6 +221,7 @@ export function TaskExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: 
         'error': !exists(json, 'error') ? undefined : ExecutionErrorModelFromJSON(json['error']),
         'executionTime': !exists(json, 'executionTime') ? undefined : json['executionTime'],
         'id': !exists(json, 'id') ? undefined : json['id'],
+        'input': !exists(json, 'input') ? undefined : json['input'],
         'jobId': json['jobId'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
