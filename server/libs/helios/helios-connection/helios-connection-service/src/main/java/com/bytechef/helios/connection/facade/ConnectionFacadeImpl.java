@@ -145,16 +145,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                 connectionDefinitionDTO.componentName(), connectionDefinitionDTO.version()));
         }
 
-        List<Tag> tags = tagService.getTags(connections.stream()
-            .flatMap(connection -> connection.getTagIds()
-                .stream())
-            .filter(Objects::nonNull)
-            .toList());
-
-        return connections.stream()
-            .map(connection -> new ConnectionDTO(
-                isConnectionUsed(Objects.requireNonNull(connection.getId())), connection, filterTags(tags, connection)))
-            .toList();
+        return getConnectionDTOs(connections);
     }
 
     @Override
@@ -162,16 +153,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     public List<ConnectionDTO> getConnections(List<String> componentNames, List<Long> tagIds) {
         List<Connection> connections = connectionService.getConnections(componentNames, tagIds);
 
-        List<Tag> tags = tagService.getTags(connections.stream()
-            .flatMap(connection -> connection.getTagIds()
-                .stream())
-            .filter(Objects::nonNull)
-            .toList());
-
-        return connections.stream()
-            .map(connection -> new ConnectionDTO(
-                isConnectionUsed(Objects.requireNonNull(connection.getId())), connection, filterTags(tags, connection)))
-            .toList();
+        return getConnectionDTOs(connections);
     }
 
     @Override
@@ -201,17 +183,11 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         List<Tag> tags = checkTags(connectionDTO.tags());
 
         return new ConnectionDTO(
-            isConnectionUsed(connectionDTO.id()),
-            connectionService.update(
-                connectionDTO.id(), connectionDTO.name(),
-                com.bytechef.commons.util.CollectionUtils.map(tags, Tag::getId), connectionDTO.version()),
-            tags);
+            isConnectionUsed(connectionDTO.id()), connectionService.update(connectionDTO.toConnection()), tags);
     }
 
     private List<Tag> checkTags(List<Tag> tags) {
-        return CollectionUtils.isEmpty(tags)
-            ? Collections.emptyList()
-            : tagService.save(tags);
+        return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
     }
 
     private boolean isConnectionUsed(long id) {
@@ -260,5 +236,17 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(key, taskName);
 
         return connectionService.getConnection(projectInstanceWorkflowConnection.getConnectionId());
+    }
+
+    private List<ConnectionDTO> getConnectionDTOs(List<Connection> connections) {
+        List<Tag> tags = tagService.getTags(connections.stream()
+            .flatMap(connection -> com.bytechef.commons.util.CollectionUtils.stream(connection.getTagIds()))
+            .filter(Objects::nonNull)
+            .toList());
+
+        return connections.stream()
+            .map(connection -> new ConnectionDTO(
+                isConnectionUsed(Objects.requireNonNull(connection.getId())), connection, filterTags(tags, connection)))
+            .toList();
     }
 }

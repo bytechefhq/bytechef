@@ -26,15 +26,15 @@ import java.util.Map;
 public interface ActionDefinitionFacade {
 
     String executeEditorDescription(
-        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
+        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         long connectionId);
 
     List<OptionDTO> executeOptions(
-        String propertyName, String actionName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, long connectionId);
 
     List<? extends ValuePropertyDTO<?>> executeOutputSchema(
-        String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
+        String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         long connectionId);
 
     Object executeSampleOutput(
@@ -42,6 +42,6 @@ public interface ActionDefinitionFacade {
         long connectionId);
 
     List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
-        String propertyName, String actionName, String componentName, int componentVersion,
+        String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, long connectionId);
 }

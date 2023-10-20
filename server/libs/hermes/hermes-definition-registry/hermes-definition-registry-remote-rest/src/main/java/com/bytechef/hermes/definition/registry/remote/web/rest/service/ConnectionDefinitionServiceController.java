@@ -55,7 +55,7 @@ public class ConnectionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/connection-definitions/authorization-apply",
+        value = "/connection-definition-service/execute-authorization-apply",
         consumes = {
             "application/json"
         },
@@ -76,7 +76,7 @@ public class ConnectionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/connection-definitions/authorization-callback",
+        value = "/connection-definition-service/execute-authorization-callback",
         consumes = {
             "application/json"
         },
@@ -95,8 +95,19 @@ public class ConnectionDefinitionServiceController {
     }
 
     @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/connection-definition-service/fetch-base-uri")
+    public ResponseEntity<String> fetchBaseUri(Connection connection) {
+        return connectionDefinitionService.fetchBaseUri(
+            connection.componentName, connection.connectionVersion, connection.parameters)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.noContent()
+                .build());
+    }
+
+    @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions/{componentName}/connection-definitions/{connectionVersion}/authorizations/{authorizationName}/authorization-type",
+        value = "/connection-definition-service/get-authorization-type/{componentName}/{connectionVersion}/{authorizationName}",
         produces = {
             "application/json"
         })
@@ -110,23 +121,12 @@ public class ConnectionDefinitionServiceController {
     }
 
     @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/connection-definitions/base-uri")
-    public ResponseEntity<String> getBaseUri(Connection connection) {
-        return connectionDefinitionService.fetchBaseUri(
-            connection.componentName, connection.connectionVersion, connection.parameters)
-            .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity.noContent()
-                .build());
-    }
-
-    @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions/{componentName}/{componentVersion}/connection-definition",
+        value = "/connection-definition-service/get-connection-definition/{componentName}/{componentVersion}",
         produces = {
             "application/json"
         })
-    public ResponseEntity<ConnectionDefinitionDTO> getComponentConnectionDefinition(
+    public ResponseEntity<ConnectionDefinitionDTO> getConnectionDefinition(
         @PathVariable("componentName") String componentName,
         @PathVariable("componentVersion") Integer componentVersion) {
 
@@ -135,11 +135,11 @@ public class ConnectionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions/{componentName}/{componentVersion}/connection-definitions",
+        value = "/connection-definition-service/get-connection-definitions/{componentName}/{componentVersion}",
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<ConnectionDefinitionDTO>> getComponentConnectionDefinitions(
+    public ResponseEntity<List<ConnectionDefinitionDTO>> getConnectionDefinitions(
         @PathVariable("componentName") String componentName,
         @PathVariable("componentVersion") Integer componentVersion) {
 
@@ -148,7 +148,7 @@ public class ConnectionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/connection-definitions",
+        value = "/connection-definition-service/get-connection-definitions",
         produces = {
             "application/json"
         })
@@ -158,7 +158,7 @@ public class ConnectionDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/connection-definitions/oauth2-parameters",
+        value = "/connection-definition-service/get-oauth2-parameters",
         consumes = {
             "application/json"
         },

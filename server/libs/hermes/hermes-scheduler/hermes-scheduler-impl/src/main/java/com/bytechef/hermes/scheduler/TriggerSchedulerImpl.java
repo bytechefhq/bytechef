@@ -18,8 +18,8 @@
 package com.bytechef.hermes.scheduler;
 
 import com.bytechef.commons.util.InstantUtils;
-import com.bytechef.hermes.scheduler.data.PollTriggerScheduleAndData;
-import com.bytechef.hermes.scheduler.data.TriggerWorkflowScheduleAndData;
+import com.bytechef.hermes.scheduler.data.PollScheduleAndData;
+import com.bytechef.hermes.scheduler.data.ExecuteWorkflowScheduleAndData;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import com.github.kagkarlsson.scheduler.SchedulerClient;
 import com.github.kagkarlsson.scheduler.task.TaskInstanceId;
@@ -33,67 +33,68 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Map;
 
-import static com.bytechef.hermes.scheduler.constant.SchedulerConstants.REFRESH_DYNAMIC_WEBHOOK_TRIGGER_ONE_TIME_TASK;
-import static com.bytechef.hermes.scheduler.constant.SchedulerConstants.POLL_TRIGGER_RECURRING_TASK;
-import static com.bytechef.hermes.scheduler.constant.SchedulerConstants.TRIGGER_WORKFLOW_RECURRING_TASK;
+import static com.bytechef.hermes.scheduler.constant.TriggerSchedulerConstants.TRIGGER_REFRESH_DYNAMIC_WEBHOOK_ONE_TIME_TASK;
+import static com.bytechef.hermes.scheduler.constant.TriggerSchedulerConstants.TRIGGER_POLL_RECURRING_TASK;
+import static com.bytechef.hermes.scheduler.constant.TriggerSchedulerConstants.TRIGGER_EXECUTE_WORKFLOW_RECURRING_TASK;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class TaskSchedulerImpl implements TaskScheduler {
+public class TriggerSchedulerImpl implements TriggerScheduler {
 
     private final SchedulerClient schedulerClient;
 
-    public TaskSchedulerImpl(SchedulerClient schedulerClient) {
+    public TriggerSchedulerImpl(SchedulerClient schedulerClient) {
         this.schedulerClient = schedulerClient;
     }
 
-    public void cancelRefreshDynamicWebhookTriggerTask(String workflowExecutionId) {
+    public void cancelDynamicWebhookRefreshTask(String workflowExecutionId) {
         schedulerClient.cancel(
-            TaskInstanceId.of(REFRESH_DYNAMIC_WEBHOOK_TRIGGER_ONE_TIME_TASK.getTaskName(), workflowExecutionId));
+            TaskInstanceId.of(TRIGGER_REFRESH_DYNAMIC_WEBHOOK_ONE_TIME_TASK.getTaskName(), workflowExecutionId));
     }
 
     @Override
-    public void cancelPollTriggerTask(String workflowExecutionId) {
-        schedulerClient.cancel(TaskInstanceId.of(POLL_TRIGGER_RECURRING_TASK.getTaskName(), workflowExecutionId));
+    public void cancelExecuteWorkflowTask(String workflowExecutionId) {
+        schedulerClient
+            .cancel(TaskInstanceId.of(TRIGGER_EXECUTE_WORKFLOW_RECURRING_TASK.getTaskName(), workflowExecutionId));
     }
 
     @Override
-    public void cancelTriggerWorkflowTask(String workflowExecutionId) {
-        schedulerClient.cancel(TaskInstanceId.of(TRIGGER_WORKFLOW_RECURRING_TASK.getTaskName(), workflowExecutionId));
+    public void cancelPollTask(String workflowExecutionId) {
+        schedulerClient.cancel(TaskInstanceId.of(TRIGGER_POLL_RECURRING_TASK.getTaskName(), workflowExecutionId));
     }
 
     @Override
-    public void scheduleRefreshDynamicWebhookTriggerTask(
+    public void scheduleDynamicWebhookRefreshTask(
         WorkflowExecutionId workflowExecutionId, LocalDateTime webhookExpirationDate, String componentName,
         int componentVersion) {
 
         schedulerClient.schedule(
-            REFRESH_DYNAMIC_WEBHOOK_TRIGGER_ONE_TIME_TASK.instance(workflowExecutionId.toString(), workflowExecutionId),
+            TRIGGER_REFRESH_DYNAMIC_WEBHOOK_ONE_TIME_TASK.instance(workflowExecutionId.toString(), workflowExecutionId),
             InstantUtils.getInstant(webhookExpirationDate));
     }
 
     @Override
-    public void schedulePollTriggerTask(WorkflowExecutionId workflowExecutionId) {
-        Schedule schedule = FixedDelay.ofMinutes(5);
-
-        schedulerClient.schedule(
-            POLL_TRIGGER_RECURRING_TASK.instance(
-                workflowExecutionId.toString(), new PollTriggerScheduleAndData(schedule, workflowExecutionId)),
-            schedule.getInitialExecutionTime(Instant.now()));
-    }
-
-    @Override
-    public void scheduleTriggerWorkflowTask(
+    public void scheduleExecuteWorkflowTask(
         String workflowExecutionId, String pattern, String zoneId, Map<String, Object> output) {
 
         CronSchedule cronSchedule = new CronSchedule(pattern, ZoneId.of(zoneId));
 
         schedulerClient.schedule(
-            TRIGGER_WORKFLOW_RECURRING_TASK.instance(
+            TRIGGER_EXECUTE_WORKFLOW_RECURRING_TASK.instance(
                 workflowExecutionId,
-                new TriggerWorkflowScheduleAndData(cronSchedule, workflowExecutionId, output)),
+                new ExecuteWorkflowScheduleAndData(cronSchedule, workflowExecutionId, output)),
             cronSchedule.getInitialExecutionTime(Instant.now()));
+    }
+
+    @Override
+    public void schedulePollTask(WorkflowExecutionId workflowExecutionId) {
+        Schedule schedule = FixedDelay.ofMinutes(5);
+
+        schedulerClient.schedule(
+            TRIGGER_POLL_RECURRING_TASK.instance(
+                workflowExecutionId.toString(), new PollScheduleAndData(schedule, workflowExecutionId)),
+            schedule.getInitialExecutionTime(Instant.now()));
     }
 }

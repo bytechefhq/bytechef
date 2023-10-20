@@ -122,7 +122,7 @@ public class TestWorkflowExecutorConfiguration {
                     getTaskDispatcherResolverFactories(
                         contextService, counterService, jobFactory, syncMessageBroker, taskExecutionService))
                 .taskExecutionService(taskExecutionService)
-                .taskHandlerAccessor(taskHandlerRegistry)
+                .taskHandlerRegistry(taskHandlerRegistry)
                 .workflowService(workflowService)
                 .build(),
             taskExecutionService);

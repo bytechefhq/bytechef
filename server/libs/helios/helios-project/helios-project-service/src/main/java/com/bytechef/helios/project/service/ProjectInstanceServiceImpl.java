@@ -46,11 +46,11 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
 
     @Override
     public ProjectInstance create(ProjectInstance projectInstance) {
-        Assert.notNull(projectInstance, "'projectInstance' must not be empty");
+        Assert.notNull(projectInstance, "'projectInstance' must not be notNull");
 
-        Assert.isNull(projectInstance.getId(), "'id' must not be empty");
-        Assert.notNull(projectInstance.getProjectId(), "'projectId' must not be empty");
-        Assert.notNull(projectInstance.getName(), "'projectId' must not be empty");
+        Assert.isNull(projectInstance.getId(), "'id' must be notNull");
+        Assert.notNull(projectInstance.getProjectId(), "'projectId' must not be notNull");
+        Assert.notNull(projectInstance.getName(), "'projectId' must not be notNull");
 
         projectInstance.setStatus(Status.DISABLED);
 
@@ -128,17 +128,21 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     }
 
     @Override
-    public ProjectInstance update(
-        long id, String description, String name, Status status, List<Long> tagIds, int version) {
+    public ProjectInstance update(ProjectInstance projectInstance) {
+        Assert.notNull(projectInstance, "'projectInstance' must not be notNull");
 
-        ProjectInstance projectInstance = getProjectInstance(id);
+        Assert.notNull(projectInstance.getId(), "'id' must not be null");
+        Assert.notNull(projectInstance.getProjectId(), "'projectId' must not be null");
+        Assert.notNull(projectInstance.getName(), "'projectId' must not be null");
 
-        projectInstance.setDescription(description);
-        projectInstance.setName(name);
-        projectInstance.setStatus(status);
-        projectInstance.setTagIds(tagIds);
-        projectInstance.setVersion(version);
+        ProjectInstance curProjectInstance = getProjectInstance(projectInstance.getId());
 
-        return projectInstanceRepository.save(projectInstance);
+        curProjectInstance.setDescription(projectInstance.getDescription());
+        curProjectInstance.setName(projectInstance.getName());
+        curProjectInstance.setStatus(projectInstance.getStatus());
+        curProjectInstance.setTagIds(projectInstance.getTagIds());
+        curProjectInstance.setVersion(projectInstance.getVersion());
+
+        return projectInstanceRepository.save(curProjectInstance);
     }
 }

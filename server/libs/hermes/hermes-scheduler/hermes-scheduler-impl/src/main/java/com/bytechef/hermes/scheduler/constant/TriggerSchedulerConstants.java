@@ -17,24 +17,25 @@
 
 package com.bytechef.hermes.scheduler.constant;
 
-import com.bytechef.hermes.scheduler.data.PollTriggerScheduleAndData;
-import com.bytechef.hermes.scheduler.data.TriggerWorkflowScheduleAndData;
+import com.bytechef.hermes.scheduler.data.PollScheduleAndData;
+import com.bytechef.hermes.scheduler.data.ExecuteWorkflowScheduleAndData;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import com.github.kagkarlsson.scheduler.task.TaskWithDataDescriptor;
 
 /**
  * @author Ivica Cardic
  */
-public class SchedulerConstants {
+public class TriggerSchedulerConstants {
 
-    public static final TaskWithDataDescriptor<PollTriggerScheduleAndData> POLL_TRIGGER_RECURRING_TASK =
+    public static final TaskWithDataDescriptor<PollScheduleAndData> TRIGGER_POLL_RECURRING_TASK =
         new TaskWithDataDescriptor<>(
-            "poll-trigger-recurring-task", PollTriggerScheduleAndData.class);
+            "trigger-poll-recurring-task", PollScheduleAndData.class);
 
-    public static final TaskWithDataDescriptor<WorkflowExecutionId> REFRESH_DYNAMIC_WEBHOOK_TRIGGER_ONE_TIME_TASK =
+    public static final TaskWithDataDescriptor<WorkflowExecutionId> TRIGGER_REFRESH_DYNAMIC_WEBHOOK_ONE_TIME_TASK =
         new TaskWithDataDescriptor<>(
-            "dynamic-webhook-trigger-refresh-recurring-task", WorkflowExecutionId.class);
+            "trigger-refresh-dynamic-webhook-recurring-task", WorkflowExecutionId.class);
 
-    public static final TaskWithDataDescriptor<TriggerWorkflowScheduleAndData> TRIGGER_WORKFLOW_RECURRING_TASK =
-        new TaskWithDataDescriptor<>("trigger-workflow-recurring-task", TriggerWorkflowScheduleAndData.class);
+    public static final TaskWithDataDescriptor<ExecuteWorkflowScheduleAndData> TRIGGER_EXECUTE_WORKFLOW_RECURRING_TASK =
+        new TaskWithDataDescriptor<>(
+            "trigger-execute-workflow-recurring-task", ExecuteWorkflowScheduleAndData.class);
 }

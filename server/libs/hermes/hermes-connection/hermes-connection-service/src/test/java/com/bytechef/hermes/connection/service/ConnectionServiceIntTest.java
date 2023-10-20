@@ -119,8 +119,7 @@ public class ConnectionServiceIntTest {
 
         connection.setName("name2");
 
-        Connection updatedConnection = connectionService.update(
-            connection.getId(), "name2", List.of(), connection.getVersion());
+        Connection updatedConnection = connectionService.update(connection);
 
         assertThat(updatedConnection.getName()).isEqualTo("name2");
     }

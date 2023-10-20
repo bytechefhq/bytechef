@@ -87,7 +87,7 @@ public class TaskDispatcherWorkflowTestSupport {
                 taskDispatcherResolverFactoriesFunction
                     .apply(contextService, counterService, syncMessageBroker, taskExecutionService))
             .taskExecutionService(taskExecutionService)
-            .taskHandlerAccessor(taskHandlerMapSupplier.get()::get)
+            .taskHandlerRegistry(taskHandlerMapSupplier.get()::get)
             .workflowService(workflowService)
             .build();
 

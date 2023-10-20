@@ -202,7 +202,7 @@ public class JobSyncExecutor {
             return this;
         }
 
-        public Builder taskHandlerAccessor(TaskHandlerRegistry taskHandlerRegistry) {
+        public Builder taskHandlerRegistry(TaskHandlerRegistry taskHandlerRegistry) {
             this.taskHandlerRegistry = taskHandlerRegistry;
             return this;
         }

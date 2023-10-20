@@ -48,5 +48,5 @@ public interface ProjectInstanceService {
 
     ProjectInstance update(long id, Status status);
 
-    ProjectInstance update(long id, String description, String name, Status status, List<Long> tagIds, int version);
+    ProjectInstance update(ProjectInstance projectInstance);
 }

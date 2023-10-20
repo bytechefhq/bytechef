@@ -167,14 +167,22 @@ public class ProjectServiceIntTest {
 
         Tag tag = tagRepository.save(new Tag("tag2"));
 
-        project = projectService.update(
-            project.getId(), project.getCategoryId(), "description2", "name2", List.of(tag.getId()),
-            List.of("workflow2"));
+        project.setDescription("description2");
+        project.setName("name2");
+        project.setTagIds(List.of(tag.getId()));
+        project.setWorkflowIds(List.of("workflow2"));
+
+        project = projectService.update(project);
 
         Category category2 = categoryRepository.save(new Category("name2"));
 
-        project = projectService.update(
-            project.getId(), category2.getId(), "description2", "name2", List.of(tag.getId()), List.of("workflow2"));
+        project.setCategory(category2);
+        project.setDescription("description2");
+        project.setName("name2");
+        project.setTagIds(List.of(tag.getId()));
+        project.setWorkflowIds(List.of("workflow2"));
+
+        project = projectService.update(project);
 
         assertThat(project)
             .hasFieldOrPropertyWithValue("categoryId", category2.getId())

@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class ScheduledTaskExecutorTest {
+public class TriggerSchedulerExecutorTest {
 
     @Disabled
     @Test

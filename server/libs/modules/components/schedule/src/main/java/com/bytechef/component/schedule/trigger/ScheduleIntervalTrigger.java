@@ -22,7 +22,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.MapValueUtils;
-import com.bytechef.hermes.scheduler.TaskScheduler;
+import com.bytechef.hermes.scheduler.TriggerScheduler;
 
 import java.time.ZoneId;
 import java.util.Map;
@@ -71,10 +71,10 @@ public class ScheduleIntervalTrigger {
         .listenerEnable(this::listenerEnable)
         .listenerDisable(this::listenerDisable);
 
-    private final TaskScheduler taskScheduler;
+    private final TriggerScheduler triggerScheduler;
 
-    public ScheduleIntervalTrigger(TaskScheduler taskScheduler) {
-        this.taskScheduler = taskScheduler;
+    public ScheduleIntervalTrigger(TriggerScheduler triggerScheduler) {
+        this.triggerScheduler = triggerScheduler;
     }
 
     protected void listenerEnable(
@@ -83,7 +83,7 @@ public class ScheduleIntervalTrigger {
         int interval = MapValueUtils.getInteger(inputParameters, INTERVAL);
         ZoneId zoneId = ZoneId.systemDefault();
 
-        taskScheduler.scheduleTriggerWorkflowTask(
+        triggerScheduler.scheduleExecuteWorkflowTask(
             workflowExecutionId,
             switch (MapValueUtils.getInteger(inputParameters, TIME_UNIT)) {
                 case 1 -> "0 */%s * ? * *".formatted(interval);
@@ -102,6 +102,6 @@ public class ScheduleIntervalTrigger {
     protected void listenerDisable(
         Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
-        taskScheduler.cancelTriggerWorkflowTask(workflowExecutionId);
+        triggerScheduler.cancelExecuteWorkflowTask(workflowExecutionId);
     }
 }

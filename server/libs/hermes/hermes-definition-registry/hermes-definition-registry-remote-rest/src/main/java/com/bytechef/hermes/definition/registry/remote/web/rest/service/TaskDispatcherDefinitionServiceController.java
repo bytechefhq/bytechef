@@ -44,7 +44,7 @@ public class TaskDispatcherDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/task-dispatcher-definitions/{name}/{version}",
+        value = "/task-dispatcher-definition-service/get-task-dispatcher-definition/{name}/{version}",
         produces = {
             "application/json"
         })
@@ -56,7 +56,7 @@ public class TaskDispatcherDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/task-dispatcher-definitions",
+        value = "/task-dispatcher-definition-service/get-task-dispatcher-definitions",
         produces = {
             "application/json"
         })
@@ -66,7 +66,7 @@ public class TaskDispatcherDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/task-dispatcher-definitions/{name}/versions",
+        value = "/task-dispatcher-definition-service/get-task-dispatcher-definition-versions/{name}",
         produces = {
             "application/json"
         })

@@ -112,9 +112,11 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
                     MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
                     MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
                     MapValueUtils.getRequired(triggerExecution.getParameters(), METHOD, WebhookMethod.class),
-                    dataStorageService.fetchValue(
-                        Context.DataStorageScope.INSTANCE, workflowExecutionId.getInstanceId(),
-                        workflowExecutionId.toString(), null),
+                    OptionalUtils.orElse(
+                        dataStorageService.fetchValue(
+                            Context.DataStorageScope.INSTANCE, workflowExecutionId.getInstanceId(),
+                            workflowExecutionId.toString()),
+                        null),
                     triggerContext));
 
             output = webhookOutput.getValue();
@@ -138,9 +140,11 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
             PollOutput pollOutput = pollFunction.apply(
                 new PollContext(
                     triggerExecution.getParameters(),
-                    dataStorageService.fetchValue(
-                        Context.DataStorageScope.INSTANCE, workflowExecutionId.getInstanceId(),
-                        workflowExecutionId.toString(), null),
+                    OptionalUtils.orElse(
+                        dataStorageService.fetchValue(
+                            Context.DataStorageScope.INSTANCE, workflowExecutionId.getInstanceId(),
+                            workflowExecutionId.toString()),
+                        null),
                     triggerContext));
 
             List<Map<?, ?>> records = new ArrayList<>(

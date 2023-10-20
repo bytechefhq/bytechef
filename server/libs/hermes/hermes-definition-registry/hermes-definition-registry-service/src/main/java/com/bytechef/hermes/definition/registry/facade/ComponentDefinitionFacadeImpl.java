@@ -46,7 +46,7 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
     }
 
     @Override
-    public List<ComponentDefinitionDTO> searchComponentDefinitions(
+    public List<ComponentDefinitionDTO> search(
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
         Boolean triggerDefinitions) {
 

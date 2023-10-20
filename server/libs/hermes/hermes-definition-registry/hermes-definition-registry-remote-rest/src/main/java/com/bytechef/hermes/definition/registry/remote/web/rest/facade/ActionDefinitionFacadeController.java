@@ -48,19 +48,19 @@ public class ActionDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/action-definitions/editor-description",
+        value = "/action-definition-service/execute-editor-description",
         consumes = {
             "application/json"
         })
     public ResponseEntity<String> executeEditorDescription(@Valid @RequestBody EditorDescription editorDescription) {
         return ResponseEntity.ok(actionDefinitionFacade.executeEditorDescription(
-            editorDescription.actionName, editorDescription.componentName, editorDescription.componentVersion,
+            editorDescription.componentName, editorDescription.componentVersion, editorDescription.actionName,
             editorDescription.actionParameters, editorDescription.connectionId));
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/action-definitions/options",
+        value = "/action-definition-service/execute-options",
         consumes = {
             "application/json"
         })
@@ -68,13 +68,13 @@ public class ActionDefinitionFacadeController {
 
         return ResponseEntity.ok(
             actionDefinitionFacade.executeOptions(
-                options.propertyName, options.actionName, options.componentName, options.componentVersion,
+                options.componentName, options.componentVersion, options.actionName, options.propertyName,
                 options.actionParameters, options.connectionId));
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/action-definitions/properties",
+        value = "/action-definition-service/execute-properties",
         consumes = {
             "application/json"
         })
@@ -83,13 +83,13 @@ public class ActionDefinitionFacadeController {
 
         return ResponseEntity.ok(
             actionDefinitionFacade.executeDynamicProperties(
-                properties.propertyName, properties.actionName, properties.componentName, properties.componentVersion,
+                properties.componentName, properties.componentVersion, properties.actionName, properties.propertyName,
                 properties.actionParameters, properties.connectionId));
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/action-definitions/output-schema",
+        value = "/action-definition-service/execute-output-schema",
         consumes = {
             "application/json"
         })
@@ -98,18 +98,17 @@ public class ActionDefinitionFacadeController {
 
         return ResponseEntity.ok(
             actionDefinitionFacade.executeOutputSchema(
-                outputSchema.actionName, outputSchema.componentName, outputSchema.componentVersion,
+                outputSchema.componentName, outputSchema.componentVersion, outputSchema.actionName,
                 outputSchema.actionParameters, outputSchema.connectionId));
     }
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/action-definitions/sample-output",
+        value = "/action-definition-service/execute-sample-output",
         consumes = {
             "application/json"
         })
     public ResponseEntity<Object> executeSampleOutput(@Valid @RequestBody SampleOutput sampleOutput) {
-
         return ResponseEntity.ok(
             actionDefinitionFacade.executeSampleOutput(
                 sampleOutput.actionName, sampleOutput.componentName, sampleOutput.componentVersion,
@@ -117,27 +116,28 @@ public class ActionDefinitionFacadeController {
     }
 
     private record EditorDescription(
-        @NotNull String actionName, Map<String, Object> actionParameters, @NotNull String componentName,
-        int componentVersion, long connectionId) {
+        @NotNull String componentName, int componentVersion, @NotNull String actionName,
+        Map<String, Object> actionParameters, long connectionId) {
     }
 
     private record Options(
-        @NotNull String actionName, Map<String, Object> actionParameters, @NotNull String componentName,
-        int componentVersion, long connectionId, @NotNull String propertyName) {
+        @NotNull String componentName, int componentVersion, @NotNull String actionName, @NotNull String propertyName,
+        Map<String, Object> actionParameters,
+        long connectionId) {
     }
 
     private record OutputSchema(
-        @NotNull String actionName, Map<String, Object> actionParameters, @NotNull String componentName,
-        int componentVersion, long connectionId) {
+        @NotNull String componentName, int componentVersion, @NotNull String actionName,
+        Map<String, Object> actionParameters, long connectionId) {
     }
 
     private record Properties(
-        @NotNull String actionName, Map<String, Object> actionParameters, @NotNull String componentName,
-        int componentVersion, long connectionId, @NotNull String propertyName) {
+        @NotNull String componentName, int componentVersion, @NotNull String actionName,
+        @NotNull String propertyName, Map<String, Object> actionParameters, long connectionId) {
     }
 
     private record SampleOutput(
-        @NotNull String actionName, Map<String, Object> actionParameters, @NotNull String componentName,
-        int componentVersion, long connectionId) {
+        @NotNull String componentName, int componentVersion, @NotNull String actionName,
+        Map<String, Object> actionParameters, long connectionId) {
     }
 }
