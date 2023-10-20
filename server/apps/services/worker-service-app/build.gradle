@@ -22,16 +22,12 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-jms")
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-kafka")
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-config")
-    implementation project(":server:libs:atlas:atlas-task-evaluator-impl")
-    implementation project(":server:libs:core:commons:commons-utils")
     implementation project(":server:libs:core:discovery:discovery-config")
     implementation project(":server:libs:core:discovery:discovery-redis")
     implementation project(":server:libs:core:encryption:encryption-filesystem")
     implementation project(":server:libs:core:rest:rest-impl")
     implementation project(":server:libs:hermes:hermes-connection:hermes-connection-rsocket-client")
-    implementation project(":server:libs:hermes:hermes-component:hermes-component-registrar:hermes-component-registrar-default")
-    implementation project(":server:libs:hermes:hermes-component:hermes-component-registrar:hermes-component-registrar-jdbc")
-    implementation project(":server:libs:hermes:hermes-component:hermes-component-registrar:hermes-component-registrar-rest")
+    implementation project(":server:libs:hermes:hermes-component:hermes-component-registrar")
     implementation project(":server:libs:hermes:hermes-component:hermes-component-rest")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-filesystem")
@@ -58,5 +54,5 @@ dependencies {
 
     testImplementation "org.springframework.boot:spring-boot-starter-activemq"
     testImplementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-jms")
-    testImplementation project(":server:libs:test-support")
+    testImplementation project(":server:libs:test:test-support")
 }
