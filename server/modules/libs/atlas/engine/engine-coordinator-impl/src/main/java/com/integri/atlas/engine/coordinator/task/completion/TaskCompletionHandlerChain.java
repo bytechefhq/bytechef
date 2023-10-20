@@ -18,7 +18,6 @@
 
 package com.integri.atlas.engine.coordinator.task.completion;
 
-import com.integri.atlas.engine.coordinator.task.completion.TaskCompletionHandler;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +30,10 @@ public class TaskCompletionHandlerChain implements TaskCompletionHandler {
     private List<TaskCompletionHandler> taskCompletionHandlers = new ArrayList<>();
 
     @Override
-    public void handle(TaskExecution aJobTask) {
-        for (TaskCompletionHandler handler : taskCompletionHandlers) {
-            if (handler.canHandle(aJobTask)) {
-                handler.handle(aJobTask);
+    public void handle(TaskExecution taskExecution) {
+        for (TaskCompletionHandler taskCompletionHandler : taskCompletionHandlers) {
+            if (taskCompletionHandler.canHandle(taskExecution)) {
+                taskCompletionHandler.handle(taskExecution);
             }
         }
     }
@@ -44,7 +43,7 @@ public class TaskCompletionHandlerChain implements TaskCompletionHandler {
         return true;
     }
 
-    public void setTaskCompletionHandlers(List<TaskCompletionHandler> aTaskCompletionHandlers) {
-        taskCompletionHandlers = aTaskCompletionHandlers;
+    public void setTaskCompletionHandlers(List<TaskCompletionHandler> taskCompletionHandlers) {
+        this.taskCompletionHandlers = taskCompletionHandlers;
     }
 }

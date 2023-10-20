@@ -38,63 +38,77 @@ import java.util.List;
  */
 public class IfTaskCompletionHandler implements TaskCompletionHandler {
 
-    private final TaskExecutionRepository taskExecutionRepo;
+    private final TaskExecutionRepository taskExecutionRepository;
     private final TaskCompletionHandler taskCompletionHandler;
     private final TaskDispatcher taskDispatcher;
     private final ContextRepository contextRepository;
     private final TaskEvaluator taskEvaluator;
 
     public IfTaskCompletionHandler(
-        TaskExecutionRepository aTaskExecutionRepo,
-        TaskCompletionHandler aTaskCompletionHandler,
-        TaskDispatcher aTaskDispatcher,
-        ContextRepository aContextRepository,
-        TaskEvaluator aTaskEvaluator
+        TaskExecutionRepository taskExecutionRepository,
+        TaskCompletionHandler taskCompletionHandler,
+        TaskDispatcher taskDispatcher,
+        ContextRepository contextRepository,
+        TaskEvaluator taskEvaluator
     ) {
-        taskExecutionRepo = aTaskExecutionRepo;
-        taskCompletionHandler = aTaskCompletionHandler;
-        taskDispatcher = aTaskDispatcher;
-        contextRepository = aContextRepository;
-        taskEvaluator = aTaskEvaluator;
+        this.taskExecutionRepository = taskExecutionRepository;
+        this.taskCompletionHandler = taskCompletionHandler;
+        this.taskDispatcher = taskDispatcher;
+        this.contextRepository = contextRepository;
+        this.taskEvaluator = taskEvaluator;
     }
 
     @Override
-    public void handle(TaskExecution aTaskExecution) {
-        SimpleTaskExecution completedTask = SimpleTaskExecution.of(aTaskExecution);
-        completedTask.setStatus(TaskStatus.COMPLETED);
-        taskExecutionRepo.merge(completedTask);
+    public void handle(TaskExecution taskExecution) {
+        SimpleTaskExecution completedSubtaskExecution = SimpleTaskExecution.of(taskExecution);
 
-        SimpleTaskExecution ifTask = SimpleTaskExecution.of(taskExecutionRepo.findOne(aTaskExecution.getParentId()));
+        completedSubtaskExecution.setStatus(TaskStatus.COMPLETED);
 
-        if (aTaskExecution.getOutput() != null && aTaskExecution.getName() != null) {
-            Context context = contextRepository.peek(ifTask.getId());
+        taskExecutionRepository.merge(completedSubtaskExecution);
+
+        SimpleTaskExecution ifTaskExecution = SimpleTaskExecution.of(
+            taskExecutionRepository.findOne(taskExecution.getParentId())
+        );
+
+        if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
+            Context context = contextRepository.peek(ifTaskExecution.getId());
+
             MapContext newContext = new MapContext(context.asMap());
-            newContext.put(aTaskExecution.getName(), aTaskExecution.getOutput());
-            contextRepository.push(ifTask.getId(), newContext);
+
+            newContext.put(taskExecution.getName(), taskExecution.getOutput());
+
+            contextRepository.push(ifTaskExecution.getId(), newContext);
         }
 
-        List<MapObject> tasks;
+        List<MapObject> subtaskDefinitions;
 
-        if (IfTaskUtil.resolveCase(taskEvaluator, ifTask)) {
-            tasks = ifTask.getList("caseTrue", MapObject.class);
+        if (IfTaskUtil.resolveCase(taskEvaluator, ifTaskExecution)) {
+            subtaskDefinitions = ifTaskExecution.getList("caseTrue", MapObject.class);
         } else {
-            tasks = ifTask.getList("caseFalse", MapObject.class);
+            subtaskDefinitions = ifTaskExecution.getList("caseFalse", MapObject.class);
         }
 
-        if (aTaskExecution.getTaskNumber() < tasks.size()) {
-            MapObject task = tasks.get(aTaskExecution.getTaskNumber());
-            SimpleTaskExecution taskExecution = SimpleTaskExecution.of(task);
-            taskExecution.setId(UUIDGenerator.generate());
-            taskExecution.setStatus(TaskStatus.CREATED);
-            taskExecution.setCreateTime(new Date());
-            taskExecution.setTaskNumber(aTaskExecution.getTaskNumber() + 1);
-            taskExecution.setJobId(ifTask.getJobId());
-            taskExecution.setParentId(ifTask.getId());
-            taskExecution.setPriority(ifTask.getPriority());
-            MapContext context = new MapContext(contextRepository.peek(ifTask.getId()));
-            contextRepository.push(taskExecution.getId(), context);
-            TaskExecution evaluatedExecution = taskEvaluator.evaluate(taskExecution, context);
-            taskExecutionRepo.create(evaluatedExecution);
+        if (taskExecution.getTaskNumber() < subtaskDefinitions.size()) {
+            MapObject subtaskDefinition = subtaskDefinitions.get(taskExecution.getTaskNumber());
+
+            SimpleTaskExecution subtaskExecution = SimpleTaskExecution.of(subtaskDefinition);
+
+            subtaskExecution.setId(UUIDGenerator.generate());
+            subtaskExecution.setStatus(TaskStatus.CREATED);
+            subtaskExecution.setCreateTime(new Date());
+            subtaskExecution.setTaskNumber(taskExecution.getTaskNumber() + 1);
+            subtaskExecution.setJobId(ifTaskExecution.getJobId());
+            subtaskExecution.setParentId(ifTaskExecution.getId());
+            subtaskExecution.setPriority(ifTaskExecution.getPriority());
+
+            MapContext context = new MapContext(contextRepository.peek(ifTaskExecution.getId()));
+
+            contextRepository.push(subtaskExecution.getId(), context);
+
+            TaskExecution evaluatedExecution = taskEvaluator.evaluate(subtaskExecution, context);
+
+            taskExecutionRepository.create(evaluatedExecution);
+
             taskDispatcher.dispatch(evaluatedExecution);
         }
         // no more tasks to execute -- complete the If
@@ -102,30 +116,38 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
             Context parentContext;
 
             // If is root level, get the job's context
-            if (ifTask.getParentId() == null) {
-                parentContext = contextRepository.peek(ifTask.getJobId());
+            if (ifTaskExecution.getParentId() == null) {
+                parentContext = contextRepository.peek(ifTaskExecution.getJobId());
             }
             // otherwise get its parent's context
             else {
-                parentContext = contextRepository.peek(ifTask.getParentId());
+                parentContext = contextRepository.peek(ifTaskExecution.getParentId());
             }
 
-            Context thisContext = contextRepository.peek(ifTask.getId());
+            Context thisContext = contextRepository.peek(ifTaskExecution.getId());
             MapContext newContext = new MapContext(parentContext);
+
             newContext.putAll(thisContext.asMap());
-            contextRepository.push(aTaskExecution.getJobId(), newContext);
-            ifTask.setEndTime(new Date());
-            ifTask.setExecutionTime(ifTask.getEndTime().getTime() - ifTask.getStartTime().getTime());
-            taskCompletionHandler.handle(ifTask);
+
+            contextRepository.push(taskExecution.getJobId(), newContext);
+
+            ifTaskExecution.setEndTime(new Date());
+            ifTaskExecution.setExecutionTime(
+                ifTaskExecution.getEndTime().getTime() - ifTaskExecution.getStartTime().getTime()
+            );
+
+            taskCompletionHandler.handle(ifTaskExecution);
         }
     }
 
     @Override
     public boolean canHandle(TaskExecution aTaskExecution) {
         String parentId = aTaskExecution.getParentId();
+
         if (parentId != null) {
-            TaskExecution parentExecution = taskExecutionRepo.findOne(parentId);
-            return parentExecution.getType().equals(DSL.IF);
+            TaskExecution parentTaskExecution = taskExecutionRepository.findOne(parentId);
+
+            return parentTaskExecution.getType().equals(DSL.IF);
         }
         return false;
     }

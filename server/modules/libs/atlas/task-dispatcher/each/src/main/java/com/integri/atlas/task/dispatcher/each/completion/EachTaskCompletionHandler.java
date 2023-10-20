@@ -34,46 +34,56 @@ import java.util.Date;
  */
 public class EachTaskCompletionHandler implements TaskCompletionHandler {
 
-    private final TaskExecutionRepository taskExecutionRepo;
+    private final TaskExecutionRepository taskExecutionRepository;
     private final TaskCompletionHandler taskCompletionHandler;
     private final CounterRepository counterRepository;
 
     public EachTaskCompletionHandler(
-        TaskExecutionRepository aTaskExecutionRepo,
-        TaskCompletionHandler aTaskCompletionHandler,
-        CounterRepository aCounterRepository
+        TaskExecutionRepository taskExecutionRepository,
+        TaskCompletionHandler taskCompletionHandler,
+        CounterRepository counterRepository
     ) {
-        taskExecutionRepo = aTaskExecutionRepo;
-        taskCompletionHandler = aTaskCompletionHandler;
-        counterRepository = aCounterRepository;
+        this.taskExecutionRepository = taskExecutionRepository;
+        this.taskCompletionHandler = taskCompletionHandler;
+        this.counterRepository = counterRepository;
     }
 
     @Override
-    public void handle(TaskExecution aTaskExecution) {
-        SimpleTaskExecution mtask = SimpleTaskExecution.of(aTaskExecution);
-        mtask.setStatus(TaskStatus.COMPLETED);
-        taskExecutionRepo.merge(mtask);
-        long subtasksLeft = counterRepository.decrement(aTaskExecution.getParentId());
+    public void handle(TaskExecution taskExecution) {
+        SimpleTaskExecution completedSubtaskExecution = SimpleTaskExecution.of(taskExecution);
+
+        completedSubtaskExecution.setStatus(TaskStatus.COMPLETED);
+
+        taskExecutionRepository.merge(completedSubtaskExecution);
+
+        long subtasksLeft = counterRepository.decrement(taskExecution.getParentId());
+
         if (subtasksLeft == 0) {
-            SimpleTaskExecution parentExecution = SimpleTaskExecution.of(
-                taskExecutionRepo.findOne(aTaskExecution.getParentId())
+            SimpleTaskExecution eachTaskExecution = SimpleTaskExecution.of(
+                taskExecutionRepository.findOne(taskExecution.getParentId())
             );
-            parentExecution.setEndTime(new Date());
-            parentExecution.setExecutionTime(
-                parentExecution.getEndTime().getTime() - parentExecution.getStartTime().getTime()
+
+            eachTaskExecution.setEndTime(new Date());
+            eachTaskExecution.setExecutionTime(
+                eachTaskExecution.getEndTime().getTime() - eachTaskExecution.getStartTime().getTime()
             );
-            taskCompletionHandler.handle(parentExecution);
-            counterRepository.delete(aTaskExecution.getParentId());
+
+            taskCompletionHandler.handle(eachTaskExecution);
+
+            counterRepository.delete(taskExecution.getParentId());
         }
     }
 
     @Override
     public boolean canHandle(TaskExecution aTaskExecution) {
         String parentId = aTaskExecution.getParentId();
+
         if (parentId != null) {
-            TaskExecution parentExecution = taskExecutionRepo.findOne(parentId);
+            TaskExecution parentExecution = taskExecutionRepository.findOne(parentId);
+
             return parentExecution.getType().equals(DSL.EACH);
         }
+
         return false;
     }
 }
