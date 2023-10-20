@@ -19,8 +19,8 @@ package com.bytechef.helios.execution.web.rest.mapper;
 
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.domain.ProjectInstance;
-import com.bytechef.helios.execution.dto.ExecutionDTO;
-import com.bytechef.helios.execution.web.rest.model.ExecutionModel;
+import com.bytechef.helios.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.helios.execution.web.rest.model.WorkflowExecutionModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
 import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
@@ -35,10 +35,10 @@ import java.util.Optional;
  */
 @Mapper(config = ProjectExecutionMapperSpringConfig.class)
 public interface ProjectWorkflowExecutionMapper
-    extends Converter<ExecutionDTO, ExecutionModel> {
+    extends Converter<WorkflowExecutionDTO, WorkflowExecutionModel> {
 
     @Override
-    ExecutionModel convert(ExecutionDTO executionDTO);
+    WorkflowExecutionModel convert(WorkflowExecutionDTO workflowExecutionDTO);
 
     @Mapping(target = "lastExecutionDate", ignore = true)
     @Mapping(target = "project", ignore = true)
