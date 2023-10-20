@@ -16,6 +16,7 @@
 
 package com.integri.atlas.task.dispatcher.if_;
 
+import com.integri.atlas.engine.core.DSL;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.message.broker.MessageBroker;
 import com.integri.atlas.engine.core.task.Task;
@@ -37,7 +38,9 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
     private TaskExecutionRepository taskExecutionRepo;
 
     @Override
-    public void dispatch(TaskExecution aTask) {}
+    public void dispatch(TaskExecution aTask) {
+
+    }
 
     public void setCounterRepository(CounterRepository aCounterRepository) {
         counterRepository = aCounterRepository;
@@ -61,6 +64,9 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
 
     @Override
     public TaskDispatcher resolve(Task aTask) {
+        if (aTask.getType().equals(DSL.IF)) {
+            return this;
+        }
         return null;
     }
 }

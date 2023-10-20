@@ -79,6 +79,8 @@ public class DSL {
 
     public static final String PRIORITY = "priority";
 
+    public static final String IF = "if";
+
     public static final String SWITCH = "switch";
 
     public static final String EACH = "each";
