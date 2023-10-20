@@ -36,7 +36,7 @@ import org.springframework.util.Assert;
  * @author Arik Cohen
  */
 @Table
-public final class Context implements Persistable<String> {
+public final class Context implements Persistable<Long> {
 
     @CreatedBy
     @Column("created_by")
@@ -47,7 +47,7 @@ public final class Context implements Persistable<String> {
     private LocalDateTime createdDate;
 
     @Id
-    private String id;
+    private Long id;
 
     @Column("stack_id")
     private String stackId;
@@ -97,7 +97,7 @@ public final class Context implements Persistable<String> {
         return createdDate;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
@@ -126,7 +126,7 @@ public final class Context implements Persistable<String> {
         this.createdDate = createdDate;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

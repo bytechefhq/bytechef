@@ -28,7 +28,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @ConditionalOnProperty(prefix = "bytechef.workflow", name = "context-repository.provider", havingValue = "jdbc")
-public interface JdbcContextRepository extends PagingAndSortingRepository<Context, String>, ContextRepository {
+public interface JdbcContextRepository extends PagingAndSortingRepository<Context, Long>, ContextRepository {
 
     @Override
     Context findTop1ByStackIdOrderByCreatedDateDesc(String stackId);
