@@ -7,13 +7,13 @@ import {
 
 type CreateConnectionMutationProps = {
     onSuccess?: (result: ConnectionModel, variables: ConnectionModel) => void;
-    onError?: (error: object, variables: ConnectionModel) => void;
+    onError?: (error: Error, variables: ConnectionModel) => void;
 };
 
 export const useCreateConnectionMutation = (
     mutationProps?: CreateConnectionMutationProps
 ) =>
-    useMutation({
+    useMutation<ConnectionModel, Error, ConnectionModel>({
         mutationFn: (connectionModel: ConnectionModel) => {
             return new ConnectionsApi().createConnection({
                 connectionModel,
@@ -25,16 +25,35 @@ export const useCreateConnectionMutation = (
 
 type DeleteConnectionMutationProps = {
     onSuccess?: () => void;
-    onError?: (error: object, id: number) => void;
+    onError?: (error: Error, id: number) => void;
 };
 
 export const useDeleteConnectionMutation = (
     mutationProps?: DeleteConnectionMutationProps
 ) =>
-    useMutation({
+    useMutation<void, Error, number>({
         mutationFn: (id: number) => {
             return new ConnectionsApi().deleteConnection({
                 id,
+            });
+        },
+        onSuccess: mutationProps?.onSuccess,
+        onError: mutationProps?.onError,
+    });
+
+type UpdateConnectionMutationProps = {
+    onSuccess?: (result: ConnectionModel, variables: ConnectionModel) => void;
+    onError?: (error: Error, variables: ConnectionModel) => void;
+};
+
+export const useUpdateConnectionMutation = (
+    mutationProps?: UpdateConnectionMutationProps
+) =>
+    useMutation<ConnectionModel, Error, ConnectionModel>({
+        mutationFn: (connection: ConnectionModel) => {
+            return new ConnectionsApi().updateConnection({
+                connectionModel: connection,
+                id: connection.id!,
             });
         },
         onSuccess: mutationProps?.onSuccess,
@@ -49,7 +68,7 @@ type UpdateConnectionTagsMutationProps = {
 export const useUpdateConnectionTagsMutation = (
     mutationProps?: UpdateConnectionTagsMutationProps
 ) =>
-    useMutation({
+    useMutation<void, Error, UpdateConnectionTagsRequest>({
         mutationFn: (request: UpdateConnectionTagsRequest) => {
             return new ConnectionsApi().updateConnectionTags(request);
         },
