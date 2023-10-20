@@ -2562,7 +2562,7 @@
       },
       {
         "display": {
-          "label": "OAuth2 Authorization code"
+          "label": "OAuth2 Authorization Code"
         },
         "properties": [
           {

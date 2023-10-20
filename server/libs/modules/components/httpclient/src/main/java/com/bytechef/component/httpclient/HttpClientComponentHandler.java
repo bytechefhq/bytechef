@@ -268,7 +268,7 @@ public class HttpClientComponentHandler implements ComponentHandler {
                         .name()
                         .toLowerCase(),
                     AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                        .display(display("OAuth2 Authorization code"))
+                        .display(display("OAuth2 Authorization Code"))
                         .properties(
                             string(AUTHORIZATION_URL)
                                 .label("Authorization URL")
