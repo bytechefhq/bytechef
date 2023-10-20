@@ -19,12 +19,11 @@
 package com.integri.atlas.task.handler.csv;
 
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
+import com.integri.atlas.task.handler.csv.ReadLines;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.integri.atlas.task.handler.csv.ReadLines;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;

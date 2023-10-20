@@ -21,9 +21,9 @@ package com.integri.atlas.engine.coordinator.task.dispatcher;
 import com.integri.atlas.engine.core.message.broker.MessageBroker;
 import com.integri.atlas.engine.core.message.broker.Queues;
 import com.integri.atlas.engine.core.task.Task;
+import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.core.task.dispatcher.TaskDispatcherResolver;
-import com.integri.atlas.engine.core.task.TaskExecution;
 import java.util.Objects;
 import org.springframework.util.Assert;
 

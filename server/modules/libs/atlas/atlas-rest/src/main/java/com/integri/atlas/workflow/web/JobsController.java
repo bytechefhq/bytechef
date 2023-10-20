@@ -19,8 +19,8 @@
 package com.integri.atlas.workflow.web;
 
 import com.integri.atlas.engine.coordinator.Coordinator;
-import com.integri.atlas.engine.coordinator.data.Page;
 import com.integri.atlas.engine.coordinator.annotation.ConditionalOnCoordinator;
+import com.integri.atlas.engine.coordinator.data.Page;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobSummary;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
