@@ -24,7 +24,7 @@ import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.connection.service.RemoteConnectionService;
+import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -38,15 +38,15 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Service("triggerDefinitionFacade")
-public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade, RemoteTriggerDefinitionFacade {
+public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
-    private final RemoteConnectionService connectionService;
+    private final ConnectionService connectionService;
     private final ContextFactory contextFactory;
     private final TriggerDefinitionService triggerDefinitionService;
 
     @SuppressFBWarnings("EI")
     public TriggerDefinitionFacadeImpl(
-        RemoteConnectionService connectionService, ContextFactory contextFactory,
+        ConnectionService connectionService, ContextFactory contextFactory,
         TriggerDefinitionService triggerDefinitionService) {
 
         this.connectionService = connectionService;

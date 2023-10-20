@@ -17,9 +17,11 @@
 
 package com.bytechef.worker.config;
 
+import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.remote.client.facade.RemoteConnectionDefinitionFacadeClient;
@@ -30,6 +32,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.lang.NonNull;
 
+import java.util.List;
 import java.util.Optional;
 
 @Configuration
@@ -103,6 +106,28 @@ public class DefinitionRegistryConfiguration {
             @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
 
             return connectionDefinitionService.getOAuth2AuthorizationParameters(componentName, connection, context);
+        }
+
+        @Override
+        public Authorization.AuthorizationType getAuthorizationType(
+            String componentName, int connectionVersion, String authorizationName) {
+
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public ConnectionDefinition getConnectionDefinition(String componentName, int componentVersion) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public List<ConnectionDefinition> getConnectionDefinitions() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public List<ConnectionDefinition> getConnectionDefinitions(String componentName, Integer componentVersion) {
+            throw new UnsupportedOperationException();
         }
     }
 }

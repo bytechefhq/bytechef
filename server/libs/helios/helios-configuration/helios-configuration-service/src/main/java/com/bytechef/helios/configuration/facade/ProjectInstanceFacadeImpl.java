@@ -18,9 +18,9 @@
 package com.bytechef.helios.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.facade.RemoteJobFacade;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.Project;
@@ -33,7 +33,7 @@ import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.helios.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
-import com.bytechef.hermes.execution.facade.RemoteTriggerLifecycleFacade;
+import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -54,21 +54,21 @@ import java.util.Objects;
 @Service
 public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
-    private final RemoteJobFacade jobFacade;
+    private final JobFacade jobFacade;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final ProjectService projectService;
     private final TagService tagService;
-    private final RemoteTriggerLifecycleFacade triggerLifecycleFacade;
+    private final TriggerLifecycleFacade triggerLifecycleFacade;
     private final String webhookUrl;
-    private final RemoteWorkflowService workflowService;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceFacadeImpl(
-        RemoteJobFacade jobFacade, ProjectInstanceService projectInstanceService,
+        JobFacade jobFacade, ProjectInstanceService projectInstanceService,
         ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
-        TagService tagService, RemoteTriggerLifecycleFacade triggerLifecycleFacade,
-        @Value("bytechef.webhookUrl") String webhookUrl, RemoteWorkflowService workflowService) {
+        TagService tagService, TriggerLifecycleFacade triggerLifecycleFacade,
+        @Value("bytechef.webhookUrl") String webhookUrl, WorkflowService workflowService) {
 
         this.jobFacade = jobFacade;
         this.projectInstanceService = projectInstanceService;

@@ -19,7 +19,7 @@ package com.bytechef.hermes.execution.remote.web.rest.service;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.execution.service.RemoteTriggerStateService;
+import com.bytechef.hermes.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
@@ -37,10 +37,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/remote/trigger-state-service")
 public class RemoteTriggerStateServiceController {
 
-    private final RemoteTriggerStateService triggerStateService;
+    private final TriggerStateService triggerStateService;
 
     @SuppressFBWarnings("EI")
-    public RemoteTriggerStateServiceController(RemoteTriggerStateService triggerStateService) {
+    public RemoteTriggerStateServiceController(TriggerStateService triggerStateService) {
         this.triggerStateService = triggerStateService;
     }
 

@@ -19,7 +19,7 @@ package com.bytechef.helios.coordinator.instance;
 
 import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
-import com.bytechef.helios.configuration.service.RemoteProjectInstanceWorkflowService;
+import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
@@ -32,10 +32,10 @@ import java.util.Map;
 @Component
 public class ProjectInstanceWorkflowAccessor implements InstanceWorkflowAccessor {
 
-    private final RemoteProjectInstanceWorkflowService projectInstanceWorkflowService;
+    private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
 
     @SuppressFBWarnings("EI")
-    public ProjectInstanceWorkflowAccessor(RemoteProjectInstanceWorkflowService projectInstanceWorkflowService) {
+    public ProjectInstanceWorkflowAccessor(ProjectInstanceWorkflowService projectInstanceWorkflowService) {
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
     }
 

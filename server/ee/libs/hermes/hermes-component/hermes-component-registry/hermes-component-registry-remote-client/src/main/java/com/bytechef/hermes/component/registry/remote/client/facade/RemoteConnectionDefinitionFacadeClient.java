@@ -21,7 +21,7 @@ import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
-import com.bytechef.hermes.component.registry.facade.RemoteConnectionDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -35,7 +35,7 @@ import java.util.Optional;
  */
 @Component
 public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
-    implements RemoteConnectionDefinitionFacade {
+    implements ConnectionDefinitionFacade {
 
     private static final String CONNECTION_DEFINITION_FACADE = "/connection-definition-facade";
 

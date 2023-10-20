@@ -24,8 +24,8 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.domain.TaskExecution.Status;
 import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
-import com.bytechef.atlas.execution.service.RemoteJobService;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.task.CancelControlTask;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
@@ -45,14 +45,14 @@ public class TaskStartedApplicationEventListener implements ApplicationEventList
 
     private static final Logger logger = LoggerFactory.getLogger(TaskStartedApplicationEventListener.class);
 
-    private final RemoteTaskExecutionService taskExecutionService;
+    private final TaskExecutionService taskExecutionService;
     private final TaskDispatcher<? super Task> taskDispatcher;
-    private final RemoteJobService jobService;
+    private final JobService jobService;
 
     @SuppressFBWarnings("EI2")
     public TaskStartedApplicationEventListener(
-        RemoteTaskExecutionService taskExecutionService, TaskDispatcher<? super Task> taskDispatcher,
-        RemoteJobService jobService) {
+        TaskExecutionService taskExecutionService, TaskDispatcher<? super Task> taskDispatcher,
+        JobService jobService) {
         this.taskExecutionService = taskExecutionService;
         this.taskDispatcher = taskDispatcher;
         this.jobService = jobService;

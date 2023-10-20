@@ -18,7 +18,7 @@
 package com.bytechef.hermes.execution.remote.web.rest.service;
 
 import com.bytechef.hermes.execution.domain.TriggerExecution;
-import com.bytechef.hermes.execution.service.RemoteTriggerExecutionService;
+import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
@@ -36,10 +36,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/remote/trigger-execution-service")
 public class RemoteTriggerExecutionServiceController {
 
-    private final RemoteTriggerExecutionService triggerExecutionService;
+    private final TriggerExecutionService triggerExecutionService;
 
     @SuppressFBWarnings("EI")
-    public RemoteTriggerExecutionServiceController(RemoteTriggerExecutionService triggerExecutionService) {
+    public RemoteTriggerExecutionServiceController(TriggerExecutionService triggerExecutionService) {
         this.triggerExecutionService = triggerExecutionService;
     }
 

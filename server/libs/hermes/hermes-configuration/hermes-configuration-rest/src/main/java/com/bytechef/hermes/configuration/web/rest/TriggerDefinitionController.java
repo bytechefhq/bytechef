@@ -19,8 +19,8 @@ package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.component.registry.ComponentOperation;
-import com.bytechef.hermes.component.registry.facade.RemoteTriggerDefinitionFacade;
-import com.bytechef.hermes.component.registry.service.RemoteTriggerDefinitionService;
+import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
+import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentOperationRequestModel;
 import com.bytechef.hermes.configuration.web.rest.model.OptionModel;
 import com.bytechef.hermes.configuration.web.rest.model.PropertyModel;
@@ -44,12 +44,12 @@ import java.util.List;
 public class TriggerDefinitionController implements TriggerDefinitionApi {
 
     private final ConversionService conversionService;
-    private final RemoteTriggerDefinitionFacade triggerDefinitionFacade;
-    private final RemoteTriggerDefinitionService triggerDefinitionService;
+    private final TriggerDefinitionFacade triggerDefinitionFacade;
+    private final TriggerDefinitionService triggerDefinitionService;
 
     public TriggerDefinitionController(
-        ConversionService conversionService, RemoteTriggerDefinitionFacade triggerDefinitionFacade,
-        RemoteTriggerDefinitionService triggerDefinitionService) {
+        ConversionService conversionService, TriggerDefinitionFacade triggerDefinitionFacade,
+        TriggerDefinitionService triggerDefinitionService) {
 
         this.conversionService = conversionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;

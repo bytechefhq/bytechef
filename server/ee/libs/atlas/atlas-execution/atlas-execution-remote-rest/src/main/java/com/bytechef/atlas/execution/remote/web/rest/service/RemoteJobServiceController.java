@@ -20,7 +20,7 @@ package com.bytechef.atlas.execution.remote.web.rest.service;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.service.RemoteJobService;
+import com.bytechef.atlas.execution.service.JobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
@@ -38,10 +38,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/remote/job-service")
 public class RemoteJobServiceController {
 
-    private final RemoteJobService jobService;
+    private final JobService jobService;
 
     @SuppressFBWarnings("EI")
-    public RemoteJobServiceController(RemoteJobService jobService) {
+    public RemoteJobServiceController(JobService jobService) {
         this.jobService = jobService;
     }
 

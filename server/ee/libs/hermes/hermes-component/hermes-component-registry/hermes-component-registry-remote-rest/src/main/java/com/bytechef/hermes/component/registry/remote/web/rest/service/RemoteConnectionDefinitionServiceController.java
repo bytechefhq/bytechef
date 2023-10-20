@@ -19,7 +19,7 @@ package com.bytechef.hermes.component.registry.remote.web.rest.service;
 
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
-import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
@@ -38,11 +38,11 @@ import java.util.List;
 @RequestMapping("/remote/connection-definition-service")
 public class RemoteConnectionDefinitionServiceController {
 
-    private final RemoteConnectionDefinitionService connectionDefinitionService;
+    private final ConnectionDefinitionService connectionDefinitionService;
 
     @SuppressFBWarnings("EI")
     public RemoteConnectionDefinitionServiceController(
-        RemoteConnectionDefinitionService connectionDefinitionService) {
+        ConnectionDefinitionService connectionDefinitionService) {
 
         this.connectionDefinitionService = connectionDefinitionService;
     }

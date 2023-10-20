@@ -15,18 +15,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.data.storage.db.service;
-
-import java.util.Optional;
+package com.bytechef.atlas.execution.service;
 
 /**
  * @author Ivica Cardic
  */
-public interface RemoteDbDataStorageService {
+public interface CounterService {
 
-    <T> Optional<T> fetch(String context, int scope, long scopeId, String key);
+    void delete(long id);
 
-    <T> T get(String context, int scope, long scopeId, String key);
+    long decrement(long id);
 
-    void put(String context, int scope, long scopeId, String key, Object value);
+    void set(long id, long value);
 }

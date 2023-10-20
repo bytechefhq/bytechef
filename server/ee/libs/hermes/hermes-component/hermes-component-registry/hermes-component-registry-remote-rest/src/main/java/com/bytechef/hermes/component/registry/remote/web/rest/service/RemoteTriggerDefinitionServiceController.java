@@ -19,7 +19,7 @@ package com.bytechef.hermes.component.registry.remote.web.rest.service;
 
 import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
 import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
-import com.bytechef.hermes.component.registry.service.RemoteTriggerDefinitionService;
+import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,9 +37,9 @@ import java.util.List;
 @RequestMapping("/remote/trigger-definition-service")
 public class RemoteTriggerDefinitionServiceController {
 
-    private final RemoteTriggerDefinitionService triggerDefinitionService;
+    private final TriggerDefinitionService triggerDefinitionService;
 
-    public RemoteTriggerDefinitionServiceController(RemoteTriggerDefinitionService triggerDefinitionService) {
+    public RemoteTriggerDefinitionServiceController(TriggerDefinitionService triggerDefinitionService) {
         this.triggerDefinitionService = triggerDefinitionService;
     }
 

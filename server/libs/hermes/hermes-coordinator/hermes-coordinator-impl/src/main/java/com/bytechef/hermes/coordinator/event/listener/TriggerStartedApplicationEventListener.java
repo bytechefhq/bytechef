@@ -22,7 +22,7 @@ import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
 import com.bytechef.hermes.worker.trigger.event.CancelControlTriggerEvent;
 import com.bytechef.hermes.coordinator.event.TriggerStartedApplicationEvent;
-import com.bytechef.hermes.execution.service.RemoteTriggerExecutionService;
+import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.configuration.trigger.CancelControlTrigger;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
@@ -39,11 +39,11 @@ public class TriggerStartedApplicationEventListener implements ApplicationEventL
     private static final Logger logger = LoggerFactory.getLogger(TriggerStartedApplicationEventListener.class);
 
     private final ApplicationEventPublisher eventPublisher;
-    private final RemoteTriggerExecutionService triggerExecutionService;
+    private final TriggerExecutionService triggerExecutionService;
 
     @SuppressFBWarnings("EI2")
     public TriggerStartedApplicationEventListener(
-        ApplicationEventPublisher eventPublisher, RemoteTriggerExecutionService triggerExecutionService) {
+        ApplicationEventPublisher eventPublisher, TriggerExecutionService triggerExecutionService) {
 
         this.eventPublisher = eventPublisher;
         this.triggerExecutionService = triggerExecutionService;

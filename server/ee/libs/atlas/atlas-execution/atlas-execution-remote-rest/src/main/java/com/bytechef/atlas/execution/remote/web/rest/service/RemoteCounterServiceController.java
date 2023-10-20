@@ -17,7 +17,7 @@
 
 package com.bytechef.atlas.execution.remote.web.rest.service;
 
-import com.bytechef.atlas.execution.service.RemoteCounterService;
+import com.bytechef.atlas.execution.service.CounterService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
@@ -34,10 +34,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/remote/counter-service")
 public class RemoteCounterServiceController {
 
-    private final RemoteCounterService counterService;
+    private final CounterService counterService;
 
     @SuppressFBWarnings("EI")
-    public RemoteCounterServiceController(RemoteCounterService counterService) {
+    public RemoteCounterServiceController(CounterService counterService) {
         this.counterService = counterService;
     }
 

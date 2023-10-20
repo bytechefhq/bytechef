@@ -28,7 +28,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public interface RemoteConnectionDefinitionFacade {
+public interface ConnectionDefinitionFacade {
 
     ApplyResponse executeAuthorizationApply(
         @NonNull String componentName, @NonNull ComponentConnection connection);

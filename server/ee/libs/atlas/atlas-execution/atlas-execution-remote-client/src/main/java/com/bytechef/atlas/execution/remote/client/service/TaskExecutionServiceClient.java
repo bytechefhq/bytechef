@@ -18,7 +18,7 @@
 package com.bytechef.atlas.execution.remote.client.service;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
@@ -30,7 +30,7 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @Component
-public class TaskExecutionServiceClient implements RemoteTaskExecutionService {
+public class TaskExecutionServiceClient implements TaskExecutionService {
 
     private static final String EXECUTION_APP = "execution-app";
     private static final String TASK_EXECUTION_SERVICE = "/remote/task-execution-service";

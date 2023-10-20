@@ -18,7 +18,7 @@
 package com.bytechef.hermes.connection.remote.web.rest.service;
 
 import com.bytechef.hermes.connection.domain.Connection;
-import com.bytechef.hermes.connection.service.RemoteConnectionService;
+import com.bytechef.hermes.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
@@ -37,10 +37,10 @@ import java.util.List;
 @RequestMapping("/remote/connection-service")
 public class RemoteConnectionServiceController {
 
-    private final RemoteConnectionService connectionService;
+    private final ConnectionService connectionService;
 
     @SuppressFBWarnings("EI")
-    public RemoteConnectionServiceController(RemoteConnectionService connectionService) {
+    public RemoteConnectionServiceController(ConnectionService connectionService) {
         this.connectionService = connectionService;
     }
 

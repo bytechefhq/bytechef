@@ -19,7 +19,7 @@ package com.bytechef.data.storage.db.remote.client.config;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.data.storage.db.remote.client.service.RemoteDbDataStorageServiceClient;
-import com.bytechef.data.storage.db.service.RemoteDbDataStorageService;
+import com.bytechef.data.storage.db.service.DbDataStorageService;
 import com.bytechef.data.storage.service.DataStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,31 +45,31 @@ public class RemoteDbDataStorageClientConfiguration {
     }
 
     @Bean
-    DataStorageService dataStorageService(RemoteDbDataStorageService remoteDbDataStorageService) {
-        return new DataStorageServiceImpl(remoteDbDataStorageService);
+    DataStorageService dataStorageService(DbDataStorageService DbDataStorageService) {
+        return new DataStorageServiceImpl(DbDataStorageService);
     }
 
     @Bean
-    RemoteDbDataStorageService dbDataStorageService(LoadBalancedWebClient loadBalancedWebClient) {
+    DbDataStorageService dbDataStorageService(LoadBalancedWebClient loadBalancedWebClient) {
         return new RemoteDbDataStorageServiceClient(loadBalancedWebClient);
     }
 
-    private record DataStorageServiceImpl(RemoteDbDataStorageService remoteDbDataStorageService)
+    private record DataStorageServiceImpl(DbDataStorageService DbDataStorageService)
         implements DataStorageService {
 
         @Override
         public <T> Optional<T> fetch(String context, int scope, long scopeId, String key) {
-            return remoteDbDataStorageService.fetch(context, scope, scopeId, key);
+            return DbDataStorageService.fetch(context, scope, scopeId, key);
         }
 
         @Override
         public <T> T get(String context, int scope, long scopeId, String key) {
-            return remoteDbDataStorageService.get(context, scope, scopeId, key);
+            return DbDataStorageService.get(context, scope, scopeId, key);
         }
 
         @Override
         public void put(String context, int scope, long scopeId, String key, Object value) {
-            remoteDbDataStorageService.put(context, scope, scopeId, key, value);
+            DbDataStorageService.put(context, scope, scopeId, key, value);
         }
     }
 }

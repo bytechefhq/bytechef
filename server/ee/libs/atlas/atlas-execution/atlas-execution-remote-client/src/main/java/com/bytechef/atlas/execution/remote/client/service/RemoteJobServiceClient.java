@@ -20,16 +20,21 @@ package com.bytechef.atlas.execution.remote.client.service;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.service.RemoteJobService;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 @Component
-public class RemoteJobServiceClient implements RemoteJobService {
+public class RemoteJobServiceClient implements JobService {
 
     private static final String EXECUTION_APP = "execution-app";
     private static final String JOB_SERVICE = "/remote/job-service";
@@ -51,6 +56,11 @@ public class RemoteJobServiceClient implements RemoteJobService {
     }
 
     @Override
+    public Optional<Job> fetchLatestJob() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Job getJob(long id) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
@@ -61,6 +71,11 @@ public class RemoteJobServiceClient implements RemoteJobService {
     }
 
     @Override
+    public Page<Job> getJobs(int pageNumber) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Job getTaskExecutionJob(long taskExecutionId) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
@@ -68,6 +83,13 @@ public class RemoteJobServiceClient implements RemoteJobService {
                 .path(JOB_SERVICE + "/get-task-execution-job/{taskExecutionId}")
                 .build(taskExecutionId),
             Job.class);
+    }
+
+    @Override
+    public Page<Job> getJobs(
+        String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
+        Integer pageNumber) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

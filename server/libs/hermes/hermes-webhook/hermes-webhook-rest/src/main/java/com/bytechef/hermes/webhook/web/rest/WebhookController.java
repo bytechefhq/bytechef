@@ -18,7 +18,7 @@
 package com.bytechef.hermes.webhook.web.rest;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
@@ -27,7 +27,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody.Co
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
-import com.bytechef.hermes.component.registry.service.RemoteTriggerDefinitionService;
+import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest.WebhookBodyImpl;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
@@ -70,16 +70,16 @@ public class WebhookController {
 
     private final FileStorageService fileStorageService;
     private final ObjectMapper objectMapper;
-    private final RemoteTriggerDefinitionService triggerDefinitionService;
+    private final TriggerDefinitionService triggerDefinitionService;
     private final WebhookExecutor webhookExecutor;
-    private final RemoteWorkflowService workflowService;
+    private final WorkflowService workflowService;
     private final XmlMapper xmlMapper;
 
     @SuppressFBWarnings("EI")
     public WebhookController(
         FileStorageService fileStorageService, ObjectMapper objectMapper,
-        RemoteTriggerDefinitionService triggerDefinitionService, WebhookExecutor webhookExecutor,
-        RemoteWorkflowService workflowService, XmlMapper xmlMapper) {
+        TriggerDefinitionService triggerDefinitionService, WebhookExecutor webhookExecutor,
+        WorkflowService workflowService, XmlMapper xmlMapper) {
 
         this.fileStorageService = fileStorageService;
         this.objectMapper = objectMapper;

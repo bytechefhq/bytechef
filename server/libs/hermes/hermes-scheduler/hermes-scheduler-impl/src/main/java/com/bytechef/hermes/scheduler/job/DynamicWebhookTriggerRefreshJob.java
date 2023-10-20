@@ -18,12 +18,12 @@
 package com.bytechef.hermes.scheduler.job;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.DateUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.registry.ComponentOperation;
-import com.bytechef.hermes.component.registry.facade.RemoteTriggerDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.service.TriggerStateService;
@@ -45,9 +45,9 @@ import java.time.LocalDateTime;
  */
 public class DynamicWebhookTriggerRefreshJob implements Job {
 
-    private RemoteTriggerDefinitionFacade remoteTriggerDefinitionFacade;
+    private TriggerDefinitionFacade remoteTriggerDefinitionFacade;
     private TriggerStateService triggerStateService;
-    private RemoteWorkflowService workflowService;
+    private WorkflowService workflowService;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -77,7 +77,7 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
     }
 
     @Autowired
-    public void setRemoteTriggerDefinitionFacade(RemoteTriggerDefinitionFacade triggerDefinitionService) {
+    public void setRemoteTriggerDefinitionFacade(TriggerDefinitionFacade triggerDefinitionService) {
         this.remoteTriggerDefinitionFacade = triggerDefinitionService;
     }
 
@@ -88,7 +88,7 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
 
     @Autowired
     @SuppressFBWarnings("EI")
-    public void setWorkflowService(RemoteWorkflowService workflowService) {
+    public void setWorkflowService(WorkflowService workflowService) {
         this.workflowService = workflowService;
     }
 

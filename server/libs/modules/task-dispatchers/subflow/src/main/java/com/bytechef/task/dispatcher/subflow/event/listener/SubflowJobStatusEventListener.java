@@ -29,8 +29,8 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
-import com.bytechef.atlas.execution.service.RemoteJobService;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -50,14 +50,14 @@ import java.util.Objects;
 public class SubflowJobStatusEventListener implements ApplicationEventListener {
 
     private final ApplicationEventPublisher eventPublisher;
-    private final RemoteJobService jobService;
-    private final RemoteTaskExecutionService taskExecutionService;
+    private final JobService jobService;
+    private final TaskExecutionService taskExecutionService;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI2")
     public SubflowJobStatusEventListener(
-        ApplicationEventPublisher eventPublisher, RemoteJobService jobService,
-        RemoteTaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
+        ApplicationEventPublisher eventPublisher, JobService jobService,
+        TaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.eventPublisher = eventPublisher;
         this.jobService = jobService;

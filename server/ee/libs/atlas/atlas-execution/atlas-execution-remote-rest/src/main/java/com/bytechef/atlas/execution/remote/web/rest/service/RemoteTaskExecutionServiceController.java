@@ -18,7 +18,7 @@
 package com.bytechef.atlas.execution.remote.web.rest.service;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
@@ -38,10 +38,10 @@ import java.util.List;
 @RequestMapping("/remote/task-execution-service")
 public class RemoteTaskExecutionServiceController {
 
-    private final RemoteTaskExecutionService taskExecutionService;
+    private final TaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI")
-    public RemoteTaskExecutionServiceController(RemoteTaskExecutionService taskExecutionService) {
+    public RemoteTaskExecutionServiceController(TaskExecutionService taskExecutionService) {
         this.taskExecutionService = taskExecutionService;
     }
 

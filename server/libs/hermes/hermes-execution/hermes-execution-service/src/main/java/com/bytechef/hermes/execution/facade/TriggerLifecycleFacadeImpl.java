@@ -21,11 +21,11 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
-import com.bytechef.hermes.component.registry.facade.RemoteTriggerDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.component.registry.service.RemoteTriggerDefinitionService;
+import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
-import com.bytechef.hermes.scheduler.RemoteTriggerScheduler;
+import com.bytechef.hermes.scheduler.TriggerScheduler;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -34,16 +34,16 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Service
-public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade, RemoteTriggerLifecycleFacade {
+public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
-    private final RemoteTriggerScheduler triggerScheduler;
-    private final RemoteTriggerDefinitionFacade triggerDefinitionFacade;
-    private final RemoteTriggerDefinitionService triggerDefinitionService;
+    private final TriggerScheduler triggerScheduler;
+    private final TriggerDefinitionFacade triggerDefinitionFacade;
+    private final TriggerDefinitionService triggerDefinitionService;
     private final TriggerStateService triggerStateService;
 
     public TriggerLifecycleFacadeImpl(
-        RemoteTriggerScheduler triggerScheduler, RemoteTriggerDefinitionFacade triggerDefinitionFacade,
-        RemoteTriggerDefinitionService triggerDefinitionService, TriggerStateService triggerStateService) {
+        TriggerScheduler triggerScheduler, TriggerDefinitionFacade triggerDefinitionFacade,
+        TriggerDefinitionService triggerDefinitionService, TriggerStateService triggerStateService) {
 
         this.triggerScheduler = triggerScheduler;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
@@ -82,6 +82,8 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade, Remot
                 componentOperation.operationName(), triggerParameters,
                 workflowExecutionId.toString(), connectionId);
             case POLLING -> triggerScheduler.cancelPollingTrigger(workflowExecutionId.toString());
+            default -> {
+            }
         }
     }
 
@@ -121,6 +123,8 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade, Remot
                 componentOperation.componentName(), componentOperation.componentVersion(),
                 componentOperation.operationName(), triggerParameters, workflowExecutionId.toString(), connectionId);
             case POLLING -> triggerScheduler.schedulePollingTrigger(workflowExecutionId);
+            default -> {
+            }
         }
     }
 }

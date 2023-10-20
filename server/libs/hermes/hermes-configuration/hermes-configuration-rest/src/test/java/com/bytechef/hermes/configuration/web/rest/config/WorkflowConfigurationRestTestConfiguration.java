@@ -20,12 +20,12 @@ package com.bytechef.hermes.configuration.web.rest.config;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
-import com.bytechef.hermes.component.registry.service.RemoteActionDefinitionService;
+import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.configuration.facade.OAuth2ParameterFacade;
 import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
-import com.bytechef.hermes.component.registry.service.RemoteTriggerDefinitionService;
+import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -43,13 +43,13 @@ public class WorkflowConfigurationRestTestConfiguration {
     private ActionDefinitionFacade actionDefinitionFacade;
 
     @MockBean
-    private RemoteActionDefinitionService actionDefinitionService;
+    private ActionDefinitionService actionDefinitionService;
 
     @MockBean
     private ComponentDefinitionService componentDefinitionService;
 
     @MockBean
-    private RemoteConnectionDefinitionService connectionDefinitionService;
+    private ConnectionDefinitionService connectionDefinitionService;
 
     @MockBean
     private OAuth2ParameterFacade oAuth2ParameterFacade;
@@ -61,7 +61,7 @@ public class WorkflowConfigurationRestTestConfiguration {
     private TriggerDefinitionFacade triggerDefinitionFacade;
 
     @MockBean
-    private RemoteTriggerDefinitionService triggerDefinitionService;
+    private TriggerDefinitionService triggerDefinitionService;
 
     @MockBean
     private WorkflowService workflowService;

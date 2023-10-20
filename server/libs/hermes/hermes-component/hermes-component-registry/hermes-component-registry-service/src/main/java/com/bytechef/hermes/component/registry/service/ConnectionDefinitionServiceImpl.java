@@ -69,7 +69,7 @@ import static com.bytechef.hermes.component.definition.constant.AuthorizationCon
  * @author Ivica Cardic
  */
 @Service("connectionDefinitionService")
-public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionService, RemoteConnectionDefinitionService {
+public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionService {
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ObjectMapper objectMapper;

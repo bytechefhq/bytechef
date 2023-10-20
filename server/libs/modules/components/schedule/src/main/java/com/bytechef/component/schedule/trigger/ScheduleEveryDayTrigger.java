@@ -25,7 +25,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.scheduler.RemoteTriggerScheduler;
+import com.bytechef.hermes.scheduler.TriggerScheduler;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -108,9 +108,9 @@ public class ScheduleEveryDayTrigger {
         .listenerDisable(this::listenerDisable)
         .listenerEnable(this::listenerEnable);
 
-    private final RemoteTriggerScheduler triggerScheduler;
+    private final TriggerScheduler triggerScheduler;
 
-    public ScheduleEveryDayTrigger(RemoteTriggerScheduler triggerScheduler) {
+    public ScheduleEveryDayTrigger(TriggerScheduler triggerScheduler) {
         this.triggerScheduler = triggerScheduler;
     }
 

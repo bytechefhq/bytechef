@@ -31,15 +31,25 @@ import java.util.Optional;
  */
 public interface JobService {
 
-    Job getJob(long id);
-
-    Page<Job> getJobs(int pageNumber);
-
     Job create(JobParameters jobParameters, Workflow workflow);
 
     Optional<Job> fetchLatestJob();
 
+    Job getJob(long id);
+
+    Page<Job> getJobs(int pageNumber);
+
+    Job getTaskExecutionJob(long taskExecutionId);
+
     Page<Job> getJobs(
         String status, LocalDateTime startDate, LocalDateTime endDate, String workflowId, List<String> workflowIds,
         Integer pageNumber);
+
+    Job resumeToStatusStarted(long id);
+
+    Job setStatusToStarted(long id);
+
+    Job setStatusToStopped(long id);
+
+    Job update(Job job);
 }

@@ -18,7 +18,7 @@
 package com.bytechef.atlas.execution.remote.client.service;
 
 import com.bytechef.atlas.execution.domain.Context.Classname;
-import com.bytechef.atlas.execution.service.RemoteContextService;
+import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -31,7 +31,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteContextServiceClient implements RemoteContextService {
+public class RemoteContextServiceClient implements ContextService {
 
     private static final String EXECUTION_APP = "execution-app";
     private static final String INTERNAL_CONTEXT_SERVICE = "/remote/context-service";

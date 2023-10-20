@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.scheduler.remote.web.rest;
 
-import com.bytechef.hermes.scheduler.RemoteTriggerScheduler;
+import com.bytechef.hermes.scheduler.TriggerScheduler;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
@@ -36,9 +36,9 @@ import java.util.Map;
 @RequestMapping("/remote/trigger-scheduler")
 public class RemoteTriggerSchedulerController {
 
-    private final RemoteTriggerScheduler triggerScheduler;
+    private final TriggerScheduler triggerScheduler;
 
-    public RemoteTriggerSchedulerController(RemoteTriggerScheduler triggerScheduler) {
+    public RemoteTriggerSchedulerController(TriggerScheduler triggerScheduler) {
         this.triggerScheduler = triggerScheduler;
     }
 

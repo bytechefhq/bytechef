@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.configuration.web.rest;
 
-import com.bytechef.hermes.component.registry.facade.RemoteComponentDefinitionFacade;
-import com.bytechef.hermes.component.registry.service.RemoteComponentDefinitionService;
+import com.bytechef.hermes.component.registry.facade.ComponentDefinitionFacade;
+import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentDefinitionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -40,13 +40,13 @@ import java.util.List;
 public class ComponentDefinitionController implements ComponentDefinitionApi {
 
     private final ConversionService conversionService;
-    private final RemoteComponentDefinitionFacade componentDefinitionFacade;
-    private final RemoteComponentDefinitionService componentDefinitionService;
+    private final ComponentDefinitionFacade componentDefinitionFacade;
+    private final ComponentDefinitionService componentDefinitionService;
 
     @SuppressFBWarnings("EI")
     public ComponentDefinitionController(
-        ConversionService conversionService, RemoteComponentDefinitionFacade componentDefinitionFacade,
-        RemoteComponentDefinitionService componentDefinitionService) {
+        ConversionService conversionService, ComponentDefinitionFacade componentDefinitionFacade,
+        ComponentDefinitionService componentDefinitionService) {
 
         this.componentDefinitionFacade = componentDefinitionFacade;
         this.conversionService = conversionService;

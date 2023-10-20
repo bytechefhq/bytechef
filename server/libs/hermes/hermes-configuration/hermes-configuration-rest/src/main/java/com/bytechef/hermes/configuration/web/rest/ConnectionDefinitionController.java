@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.configuration.web.rest;
 
-import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -37,11 +37,11 @@ import java.util.List;
 @ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
 public class ConnectionDefinitionController implements ConnectionDefinitionApi {
 
-    private final RemoteConnectionDefinitionService connectionDefinitionService;
+    private final ConnectionDefinitionService connectionDefinitionService;
     private final ConversionService conversionService;
 
     public ConnectionDefinitionController(
-        RemoteConnectionDefinitionService connectionDefinitionService, ConversionService conversionService) {
+        ConnectionDefinitionService connectionDefinitionService, ConversionService conversionService) {
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.conversionService = conversionService;

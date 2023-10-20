@@ -17,7 +17,7 @@
 
 package com.bytechef.atlas.execution.facade;
 
-import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
@@ -40,7 +40,7 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-public class JobFacadeImpl implements JobFacade, RemoteJobFacade {
+public class JobFacadeImpl implements JobFacade {
 
     private static final Logger logger = LoggerFactory.getLogger(JobFacadeImpl.class);
 
@@ -48,12 +48,12 @@ public class JobFacadeImpl implements JobFacade, RemoteJobFacade {
     private final ContextService contextService;
     private final JobService jobService;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
-    private final RemoteWorkflowService workflowService;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public JobFacadeImpl(
         ApplicationEventPublisher eventPublisher, ContextService contextService, JobService jobService,
-        WorkflowFileStorageFacade workflowFileStorageFacade, RemoteWorkflowService workflowService) {
+        WorkflowFileStorageFacade workflowFileStorageFacade, WorkflowService workflowService) {
 
         this.eventPublisher = eventPublisher;
         this.contextService = contextService;

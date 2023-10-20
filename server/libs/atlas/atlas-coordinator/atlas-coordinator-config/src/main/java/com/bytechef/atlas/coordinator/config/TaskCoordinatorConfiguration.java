@@ -37,12 +37,12 @@ import com.bytechef.atlas.coordinator.task.dispatcher.ControlTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
+import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.service.RemoteContextService;
 
-import com.bytechef.atlas.execution.service.RemoteJobService;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
-import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
@@ -73,10 +73,10 @@ public class TaskCoordinatorConfiguration {
     private ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    private RemoteContextService contextService;
+    private ContextService contextService;
 
     @Autowired
-    private RemoteJobService jobService;
+    private JobService jobService;
 
     @Autowired(required = false)
     private List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories = Collections.emptyList();
@@ -88,14 +88,14 @@ public class TaskCoordinatorConfiguration {
     private List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors = Collections.emptyList();
 
     @Autowired
-    private RemoteTaskExecutionService taskExecutionService;
+    private TaskExecutionService taskExecutionService;
 
     @Autowired
     @Qualifier("workflowAsyncFileStorageFacade")
     private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @Autowired
-    private RemoteWorkflowService workflowService;
+    private WorkflowService workflowService;
 
     @Bean
     ControlTaskDispatcher controlTaskDispatcher() {

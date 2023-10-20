@@ -19,9 +19,9 @@ package com.bytechef.task.dispatcher.forkjoin.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.service.RemoteContextService;
-import com.bytechef.atlas.execution.service.RemoteCounterService;
-import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.task.dispatcher.forkjoin.ForkJoinTaskDispatcher;
 import com.bytechef.task.dispatcher.forkjoin.completion.ForkJoinTaskCompletionHandler;
@@ -41,17 +41,17 @@ public class ForkJoinTaskDispatcherConfiguration {
     private ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    private RemoteContextService contextService;
+    private ContextService contextService;
 
     @Autowired
-    private RemoteCounterService counterService;
+    private CounterService counterService;
 
     @Autowired
     @Qualifier("workflowAsyncFileStorageFacade")
     private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @Autowired
-    private RemoteTaskExecutionService taskExecutionService;
+    private TaskExecutionService taskExecutionService;
 
     @Bean("forkJoinTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory forkTaskCompletionHandlerFactory() {

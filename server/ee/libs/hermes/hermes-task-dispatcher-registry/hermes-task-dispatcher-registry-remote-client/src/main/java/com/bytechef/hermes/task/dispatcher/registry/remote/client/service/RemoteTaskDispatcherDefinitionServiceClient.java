@@ -19,7 +19,7 @@ package com.bytechef.hermes.task.dispatcher.registry.remote.client.service;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.hermes.task.dispatcher.registry.domain.TaskDispatcherDefinition;
-import com.bytechef.hermes.task.dispatcher.registry.service.RemoteTaskDispatcherDefinitionService;
+import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -30,7 +30,7 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteTaskDispatcherDefinitionServiceClient implements RemoteTaskDispatcherDefinitionService {
+public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatcherDefinitionService {
 
     private static final String COORDINATOR_APP = "coordinator-app";
     private static final String TASK_DISPATCHER_DEFINITION_SERVICE = "/remote/task-dispatcher-definition-service";

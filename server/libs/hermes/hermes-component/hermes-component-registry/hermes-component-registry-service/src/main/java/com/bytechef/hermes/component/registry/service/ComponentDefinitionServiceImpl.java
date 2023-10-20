@@ -28,7 +28,7 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @Service("componentDefinitionService")
-public class ComponentDefinitionServiceImpl implements ComponentDefinitionService, RemoteComponentDefinitionService {
+public class ComponentDefinitionServiceImpl implements ComponentDefinitionService {
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
 
