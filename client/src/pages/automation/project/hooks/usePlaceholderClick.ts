@@ -6,7 +6,9 @@ import {useGetTaskDispatcherDefinitionsQuery} from '../../../../queries/taskDisp
 export default function usePlaceholderClick(id: NodeProps['id']) {
     const {getNode, setNodes, setEdges} = useReactFlow();
 
-    const {data: components} = useGetComponentDefinitionsQuery();
+    const {data: components} = useGetComponentDefinitionsQuery({
+        actionDefinitions: true,
+    });
 
     const {data: flowControls} = useGetTaskDispatcherDefinitionsQuery();
 

@@ -62,7 +62,7 @@ const Project: React.FC = () => {
         data: components,
         isLoading: componentsLoading,
         error: componentsError,
-    } = useGetComponentDefinitionsQuery();
+    } = useGetComponentDefinitionsQuery({actionDefinitions: true});
 
     const {
         data: flowControls,

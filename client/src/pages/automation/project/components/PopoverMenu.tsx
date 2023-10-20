@@ -12,7 +12,9 @@ interface PopoverMenuProps {
 }
 
 const PopoverMenu = ({children, id, edge = false}: PopoverMenuProps) => {
-    const {data: components} = useGetComponentDefinitionsQuery();
+    const {data: components} = useGetComponentDefinitionsQuery({
+        actionDefinitions: true,
+    });
 
     const {data: flowControls} = useGetTaskDispatcherDefinitionsQuery();
 
