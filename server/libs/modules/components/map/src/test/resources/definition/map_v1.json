@@ -7,7 +7,7 @@
   "actions": [
     {
       "name": "map",
-      "inputs": [
+      "properties": [
         {
           "description": "List of items to iterate over.",
           "label": "List of items",

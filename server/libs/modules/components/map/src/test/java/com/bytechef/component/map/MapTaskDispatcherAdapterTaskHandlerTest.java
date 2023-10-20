@@ -23,6 +23,7 @@ import static com.bytechef.hermes.component.definition.Action.ACTION;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
+import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
 import com.bytechef.atlas.worker.Worker;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
@@ -43,8 +44,8 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         MapTaskDispatcherAdapterTaskHandler taskHandler =
                 new MapTaskDispatcherAdapterTaskHandler(resolver, SpelTaskEvaluator.create());
 
-        TaskExecution taskExecution = new TaskExecution(
-                Map.of("list", List.of(1, 2, 3), "iteratee", Map.of("type", "var", "value", "${item}"), ACTION, "map"));
+        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
+                "list", List.of(1, 2, 3), "iteratee", Map.of("type", "var", "value", "${item}"), ACTION, "map")));
 
         taskExecution.setId("1234");
         taskExecution.setJobId("4567");
@@ -63,9 +64,9 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             MapTaskDispatcherAdapterTaskHandler taskHandler =
                     new MapTaskDispatcherAdapterTaskHandler(resolver, SpelTaskEvaluator.create());
 
-            TaskExecution taskExecution = new TaskExecution(Map.of(
+            TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
                     "list", List.of(1, 2, 3),
-                    "iteratee", Map.of("type", "rogue")));
+                    "iteratee", Map.of("type", "rogue"))));
 
             taskExecution.setId("1234");
             taskExecution.setJobId("4567");
@@ -120,7 +121,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
         mapAdapterTaskHandlerRefs[0] =
                 new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver, SpelTaskEvaluator.create());
 
-        TaskExecution taskExecution = new TaskExecution(Map.of(
+        TaskExecution taskExecution = TaskExecution.of(new WorkflowTask(Map.of(
                 "finalize",
                 List.of(Map.of(
                         "name",
@@ -158,7 +159,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                         ACTION,
                         "map")),
                 "type",
-                "pass"));
+                "pass")));
 
         taskExecution.setId("1234");
         taskExecution.setJobId("4567");
