@@ -3,6 +3,5 @@ dependencies {
 
     implementation "org.springframework:spring-context"
     implementation "org.springframework.boot:spring-boot-autoconfigure"
-    implementation project(":server:libs:hermes:hermes-component:hermes-component-registrar")
-    implementation project(":server:libs:hermes:hermes-connection:hermes-connection-api")
+    implementation project(":server:libs:core:commons:commons-util")
 }

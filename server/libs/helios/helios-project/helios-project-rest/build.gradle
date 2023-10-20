@@ -51,7 +51,6 @@ dependencies {
     api project(":server:libs:atlas:atlas-rest:atlas-rest-api")
     api project(":server:libs:core:category:category-rest:category-rest-api")
     api project(":server:libs:core:tag:tag-rest:tag-rest-api")
-    api project(":server:libs:helios:helios-project:helios-project-api")
 
     implementation libs.org.openapitools.jackson.databind.nullable
     implementation "jakarta.annotation:jakarta.annotation-api"
@@ -63,6 +62,7 @@ dependencies {
     implementation "org.springframework:spring-webflux"
     implementation libs.io.swagger.core.v3.swagger.annotations
     implementation project(":server:libs:core:autoconfigure-annotations")
+    implementation project(":server:libs:helios:helios-project:helios-project-api")
 
     testImplementation "org.springframework.boot:spring-boot-starter-webflux"
 }

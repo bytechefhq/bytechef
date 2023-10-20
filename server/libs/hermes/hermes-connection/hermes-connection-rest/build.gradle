@@ -40,9 +40,6 @@ dependencies {
     annotationProcessor libs.org.mapstruct.mapstruct.processor
     annotationProcessor libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions
 
-    api project(":server:libs:core:tag:tag-rest:tag-rest-api")
-    api project(":server:libs:hermes:hermes-connection:hermes-connection-api")
-
     implementation libs.org.openapitools.jackson.databind.nullable
     implementation "jakarta.annotation:jakarta.annotation-api"
     implementation "jakarta.validation:jakarta.validation-api"
@@ -53,6 +50,9 @@ dependencies {
     implementation "org.springframework:spring-webflux"
     implementation libs.io.swagger.core.v3.swagger.annotations
     implementation project(":server:libs:core:autoconfigure-annotations")
+    implementation project(":server:libs:core:tag:tag-rest:tag-rest-api")
+    implementation project(":server:libs:hermes:hermes-connection:hermes-connection-api")
+    implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
 
     testImplementation "org.springframework.boot:spring-boot-starter-webflux"
     testImplementation project(":server:libs:core:encryption:encryption-api")
