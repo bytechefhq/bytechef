@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS connection (
     name                     VARCHAR(256) NOT NULL,
     key                      VARCHAR(256) NOT NULL,
     component_name           VARCHAR(256) NOT NULL,
+    connection_version       VARCHAR(256) NOT NULL,
     authorization_name       VARCHAR(256) NULL,
     parameters               TEXT         NOT NULL,
     created_date             TIMESTAMP    NOT NULL,

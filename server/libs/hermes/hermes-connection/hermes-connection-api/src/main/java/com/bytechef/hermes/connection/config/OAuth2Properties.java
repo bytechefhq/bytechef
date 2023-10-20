@@ -19,12 +19,14 @@
 
 package com.bytechef.hermes.connection.config;
 
+import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.hermes.connection.domain.Connection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -35,14 +37,41 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public class OAuth2Properties {
 
-    private List<Map<String, OAuth2App>> apps = new ArrayList<>();
+    private Map<String, OAuth2App> predefinedApps = new HashMap<>();
+    private String redirectUri;
 
-    public List<Map<String, OAuth2App>> getApps() {
-        return apps;
+    public Connection checkPredefinedApp(Connection connection) {
+        if (!StringUtils.hasText(connection.getParameter(Authorization.CLIENT_ID))) {
+            if (predefinedApps.containsKey(connection.getComponentName())) {
+                OAuth2Properties.OAuth2App oAuth2App = predefinedApps.get(connection.getComponentName());
+
+                connection.putAllParameters(
+                    Map.of(
+                        Authorization.CLIENT_ID, oAuth2App.clientId(),
+                        Authorization.CLIENT_SECRET, oAuth2App.clientSecret()));
+            } else {
+                throw new IllegalStateException(
+                    "Component definition %s does not exist".formatted(connection.getComponentName()));
+            }
+        }
+
+        return connection;
     }
 
-    public void setApps(List<Map<String, OAuth2App>> apps) {
-        this.apps = apps;
+    public Map<String, OAuth2App> getPredefinedApps() {
+        return predefinedApps;
+    }
+
+    public void setPredefinedApps(Map<String, OAuth2App> predefinedApps) {
+        this.predefinedApps = predefinedApps;
+    }
+
+    public String getRedirectUri() {
+        return redirectUri;
+    }
+
+    public void setRedirectUri(String redirectUri) {
+        this.redirectUri = redirectUri;
     }
 
     public record OAuth2App(String clientId, String clientSecret) {

@@ -17,10 +17,8 @@
 
 package com.bytechef.hermes.connection.facade;
 
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.constant.ComponentConstants;
 import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
+import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
@@ -43,15 +41,17 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
+    private final OAuth2Properties oAuth2Properties;
     private final TagService tagService;
 
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
         ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        TagService tagService) {
+        OAuth2Properties oAuth2Properties, TagService tagService) {
 
         this.connectionService = connectionService;
         this.connectionDefinitionService = connectionDefinitionService;
+        this.oAuth2Properties = oAuth2Properties;
         this.tagService = tagService;
     }
 
@@ -62,21 +62,9 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             connection.setTags(tagService.save(connection.getTags()));
         }
 
-        if (connection.getAuthorizationName() != null &&
-            connection.containsParameter(ComponentConstants.AUTHORIZATION_CODE)) {
-
-            ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionDefinitions(
-                connection.getComponentName())
-                .stream()
-                .findFirst()
-                .orElseThrow(IllegalStateException::new);
-
-            Authorization authorization = connectionDefinition.getAuthorizations()
-                .stream()
-                .filter(
-                    curAuthorization -> Objects.equals(curAuthorization.getName(), connection.getAuthorizationName()))
-                .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+        if (connection.getAuthorizationName() != null && connection.containsParameter(Authorization.CODE)) {
+            Authorization authorization = connectionDefinitionService.getAuthorization(
+                connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion());
 
             // TODO add support for OAUTH2_AUTHORIZATION_CODE_PKCE
 
@@ -85,16 +73,11 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             if (authorizationType == Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE ||
                 authorizationType == Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
 
-                Authorization.FourFunction<Context.Connection, String, String, String, Authorization.AuthorizationCallbackResponse> authorizationCallbackFunction = authorization
-                    .getAuthorizationCallbackFunction();
+                oAuth2Properties.checkPredefinedApp(connection);
 
-                Authorization.AuthorizationCallbackResponse authorizationCallbackResponse = authorizationCallbackFunction
-                    .apply(
-                        connection.toContextConnection(),
-                        connection.getParameter(ComponentConstants.AUTHORIZATION_CODE),
-                        null, // TODO redirectUri
-                        null // TODO pkce verifier
-                    );
+                Authorization.AuthorizationCallbackResponse authorizationCallbackResponse = connectionDefinitionService
+                    .executeAuthorizationCallback(
+                        connection, oAuth2Properties.getRedirectUri());
 
                 connection.putAllParameters(authorizationCallbackResponse.toMap());
             }
@@ -152,7 +135,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     @Override
     @Transactional(readOnly = true)
     public List<Tag> getConnectionTags() {
-        List<Connection> connections = connectionService.getConnections(null, null);
+        List<Connection> connections = connectionService.getConnections();
 
         return tagService.getTags(connections.stream()
             .map(Connection::getTagIds)

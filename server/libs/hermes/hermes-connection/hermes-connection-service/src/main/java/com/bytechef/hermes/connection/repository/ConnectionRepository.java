@@ -33,21 +33,23 @@ import java.util.List;
 public interface ConnectionRepository
     extends PagingAndSortingRepository<Connection, Long>, CrudRepository<Connection, Long> {
 
-    Iterable<Connection> findByComponentNameIn(List<String> componentNames);
+    List<Connection> findAllByComponentNameInOrderByName(List<String> componentNames);
 
     @Query("""
             SELECT connection.* FROM connection
             JOIN connection_tag ON connection.id = connection_tag.connection_id
             WHERE connection_tag.tag_id IN (:tagIds)
+            ORDER BY connection.name
         """)
-    Iterable<Connection> findByTagIdIn(@Param("tagIds") List<Long> tagIds);
+    List<Connection> findAllByTagIdIn(@Param("tagIds") List<Long> tagIds);
 
     @Query("""
             SELECT connection.* FROM connection
             JOIN connection_tag ON connection.id = connection_tag.connection_id
             WHERE connection.component_name IN (:componentNames)
             AND connection_tag.tag_id IN (:tagIds)
+            ORDER BY connection.name
         """)
-    Iterable<Connection> findByComponentNamesAndTagIds(
+    List<Connection> findAllByComponentNamesAndTagIds(
         @Param("componentNames") List<String> componentNames, @Param("tagIds") List<Long> tagIds);
 }

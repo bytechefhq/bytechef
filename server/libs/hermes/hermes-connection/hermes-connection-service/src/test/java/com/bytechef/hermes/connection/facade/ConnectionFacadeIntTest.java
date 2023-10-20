@@ -18,6 +18,7 @@
 package com.bytechef.hermes.connection.facade;
 
 import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
+import com.bytechef.hermes.connection.config.OAuth2Properties;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
@@ -246,14 +247,20 @@ public class ConnectionFacadeIntTest {
         @Bean
         ConnectionFacade connectionFacade(
             ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-            TagService tagService) {
+            OAuth2Properties oAuth2Properties, TagService tagService) {
 
-            return new ConnectionFacadeImpl(connectionDefinitionService, connectionService, tagService);
+            return new ConnectionFacadeImpl(connectionDefinitionService, connectionService, oAuth2Properties,
+                tagService);
         }
 
         @Bean
         ConnectionService connectionService(ConnectionRepository connectionRepository) {
             return new ConnectionServiceImpl(connectionRepository);
+        }
+
+        @Bean
+        OAuth2Properties oAuth2Properties() {
+            return new OAuth2Properties();
         }
     }
 }
