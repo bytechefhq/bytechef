@@ -24,7 +24,6 @@
             <Class name="com.bytechef.hermes.registry.DefinitionRegistryChain" />
             <Class name="com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain" />
             <Class name="com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain" />
-            <Class name="com.bytechef.atlas.repository.WorkflowRepositoryChain" />
             <Class name="com.bytechef.atlas.repository.jdbc.JdbcWorkflowRepository" />
             <Class name="com.bytechef.atlas.coordinator.event.EventListenerChain" />
             <Class name="com.bytechef.atlas.coordinator.job.executor.DefaultJobExecutor" />
@@ -170,7 +169,6 @@
         <Or>
             <Class name="com.bytechef.atlas.repository.git.workflow.JGitWorkflowOperations" />
             <Class name="com.bytechef.atlas.repository.resource.AbstractResourceWorkflowRepository" />
-            <Class name="com.bytechef.atlas.repository.WorkflowRepositoryChain" />
             <Class name="com.bytechef.atlas.repository.workflow.mapper.AbstractWorkflowMapper" />
             <Class name="com.bytechef.atlas.worker.Worker" />
             <Class name="com.bytechef.cli.command.componentDefinition.subcomand.InitSubcommand" />
@@ -186,7 +184,6 @@
         <!-- TODO Review this issues -->
         <Bug code="NP" />
         <Or>
-            <Class name="com.bytechef.atlas.repository.WorkflowRepositoryChain" />
             <Class name="com.bytechef.atlas.repository.jdbc.JdbcJobRepository" />
             <Class name="com.bytechef.atlas.repository.jdbc.JdbcTaskExecutionRepository" />
             <Class name="com.bytechef.atlas.repository.workflow.mapper.AbstractWorkflowMapper" />
