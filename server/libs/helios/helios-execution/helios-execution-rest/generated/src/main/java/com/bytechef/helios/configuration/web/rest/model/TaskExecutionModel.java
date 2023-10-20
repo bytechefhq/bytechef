@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to the task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-06T09:23:29.411054+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-07-12T14:11:26.537654+02:00[Europe/Zagreb]")
 public class TaskExecutionModel {
 
   private ComponentDefinitionModel component;
