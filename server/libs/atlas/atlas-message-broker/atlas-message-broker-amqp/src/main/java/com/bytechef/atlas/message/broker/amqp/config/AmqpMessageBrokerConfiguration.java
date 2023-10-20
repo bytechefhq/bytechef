@@ -102,6 +102,7 @@ public class AmqpMessageBrokerConfiguration
             exchange = tasksExchange();
 
             Map<String, Object> args = new HashMap<String, Object>();
+
             args.put("x-dead-letter-exchange", "");
             args.put("x-dead-letter-routing-key", Queues.DLQ);
 
@@ -142,14 +143,16 @@ public class AmqpMessageBrokerConfiguration
 
     @Bean
     Exchange tasksExchange() {
-        return ExchangeBuilder.directExchange(Exchanges.TASKS)
+        return ExchangeBuilder.directExchange(Exchanges.TASKS.toString())
             .durable(true)
             .build();
     }
 
     @Bean
     Exchange controlExchange() {
-        return ExchangeBuilder.fanoutExchange(Exchanges.CONTROL)
+        // TODO It should probably be topic exchange: https://www.baeldung.com/java-rabbitmq-exchanges-queues-bindings
+
+        return ExchangeBuilder.fanoutExchange(Exchanges.CONTROL.toString())
             .durable(true)
             .build();
     }

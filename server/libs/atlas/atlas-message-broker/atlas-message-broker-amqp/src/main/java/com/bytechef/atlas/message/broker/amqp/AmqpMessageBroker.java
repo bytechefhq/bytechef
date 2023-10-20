@@ -36,10 +36,10 @@ public class AmqpMessageBroker implements MessageBroker {
     private AmqpTemplate amqpTemplate;
 
     @Override
-    public void send(String routingKey, Object message) {
-        Assert.notNull(routingKey, "'routingKey' must not be null");
+    public void send(String queueName, Object message) {
+        Assert.notNull(queueName, "'queueName' must not be null");
 
-        amqpTemplate.convertAndSend(determineExchange(routingKey), determineRoutingKey(routingKey), message,
+        amqpTemplate.convertAndSend(determineExchange(queueName), determineRoutingKey(queueName), message,
             amqpMessage -> {
                 if (message instanceof Retryable) {
                     Retryable retryable = (Retryable) message;
@@ -61,20 +61,20 @@ public class AmqpMessageBroker implements MessageBroker {
             });
     }
 
-    private String determineExchange(String routingKey) {
-        String[] routingKeyItems = routingKey.split("/");
+    private String determineExchange(String queueName) {
+        String[] routingKeyItems = queueName.split("/");
 
-        Assert.isTrue(routingKeyItems.length <= 2, "Invalid routing key: " + routingKey);
+        Assert.isTrue(routingKeyItems.length <= 2, "Invalid routing key: " + queueName);
 
-        return routingKeyItems.length == 2 ? routingKeyItems[0] : Exchanges.TASKS;
+        return routingKeyItems.length == 2 ? routingKeyItems[0] : Exchanges.TASKS.toString();
     }
 
-    private String determineRoutingKey(String routingKey) {
-        String[] routingKeyItems = routingKey.split("/");
+    private String determineRoutingKey(String queueName) {
+        String[] routingKeyItems = queueName.split("/");
 
-        Assert.isTrue(routingKeyItems.length <= 2, "Invalid routing key: " + routingKey);
+        Assert.isTrue(routingKeyItems.length <= 2, "Invalid routing key: " + queueName);
 
-        return routingKeyItems.length == 2 ? routingKeyItems[1] : routingKey;
+        return routingKeyItems.length == 2 ? routingKeyItems[1] : queueName;
     }
 
     public void setAmqpTemplate(AmqpTemplate amqpTemplate) {

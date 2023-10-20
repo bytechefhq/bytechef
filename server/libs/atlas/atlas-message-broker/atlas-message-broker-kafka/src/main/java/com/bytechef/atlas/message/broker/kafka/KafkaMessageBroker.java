@@ -35,8 +35,8 @@ public class KafkaMessageBroker implements MessageBroker {
     private KafkaTemplate<Integer, Object> kafkaTemplate;
 
     @Override
-    public void send(String routingKey, Object message) {
-        Assert.notNull(routingKey, "'routingKey' key must not be null");
+    public void send(String queueName, Object message) {
+        Assert.notNull(queueName, "'queueName' key must not be null");
 
         if (message instanceof Retryable) {
             Retryable retryable = (Retryable) message;
@@ -44,10 +44,11 @@ public class KafkaMessageBroker implements MessageBroker {
             delay(retryable.getRetryDelayMillis());
         }
 
+        Class<?> messageClass = message.getClass();
+
         kafkaTemplate.send(MessageBuilder.withPayload(message)
-            .setHeader(KafkaHeaders.TOPIC, routingKey)
-            .setHeader("_type", message.getClass()
-                .getName())
+            .setHeader(KafkaHeaders.TOPIC, queueName)
+            .setHeader("_type", messageClass.getName())
             .build());
     }
 

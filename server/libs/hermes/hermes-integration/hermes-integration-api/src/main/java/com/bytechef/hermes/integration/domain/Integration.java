@@ -264,11 +264,11 @@ public final class Integration implements Persistable<Long> {
     public String toString() {
         return "Integration{" +
             "id=" + id +
+            ", name='" + name + '\'' +
             ", categoryId=" + getCategoryId() +
             ", description='" + description + '\'' +
             ", integrationTags=" + integrationTags +
             ", integrationWorkflows=" + integrationWorkflows +
-            ", name='" + name + '\'' +
             ", version=" + version +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +

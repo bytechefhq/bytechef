@@ -29,5 +29,6 @@ import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
  * @since Jun 12, 2016
  */
 public interface TaskHandler<O> {
+
     O handle(TaskExecution taskExecution) throws TaskExecutionException;
 }

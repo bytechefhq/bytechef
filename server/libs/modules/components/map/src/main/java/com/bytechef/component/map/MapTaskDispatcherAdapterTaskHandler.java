@@ -86,7 +86,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
             .withTaskHandlerResolver(taskHandlerResolver)
             .withMessageBroker(messageBroker)
             .withEventPublisher(e -> {})
-            .withExecutors(new CurrentThreadExecutorService())
+            .withExecutorService(new CurrentThreadExecutorService())
             .withTaskEvaluator(taskEvaluator)
             .build();
 

@@ -24,6 +24,7 @@ package com.bytechef.atlas.priority;
  * @since Jun 2, 2017
  */
 public interface Prioritizable {
+
     int DEFAULT_PRIORITY = 0;
 
     /**

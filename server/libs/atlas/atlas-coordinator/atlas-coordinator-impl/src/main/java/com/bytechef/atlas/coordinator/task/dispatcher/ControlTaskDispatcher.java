@@ -35,8 +35,8 @@ public class ControlTaskDispatcher implements TaskDispatcher<ControlTask>, TaskD
 
     private final MessageBroker messageBroker;
 
-    public ControlTaskDispatcher(MessageBroker aMessageBroker) {
-        messageBroker = Objects.requireNonNull(aMessageBroker);
+    public ControlTaskDispatcher(MessageBroker messageBroker) {
+        this.messageBroker = Objects.requireNonNull(messageBroker);
     }
 
     @Override

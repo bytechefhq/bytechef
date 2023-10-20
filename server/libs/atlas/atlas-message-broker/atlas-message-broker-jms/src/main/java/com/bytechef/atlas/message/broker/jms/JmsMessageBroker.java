@@ -37,8 +37,8 @@ public class JmsMessageBroker implements MessageBroker {
     }
 
     @Override
-    public void send(String routingKey, Object message) {
-        Assert.notNull(routingKey, "'routingKey' must not be null");
+    public void send(String queueName, Object message) {
+        Assert.notNull(queueName, "'queueName' must not be null");
 
         if (message instanceof Retryable) {
             Retryable retryable = (Retryable) message;
@@ -46,7 +46,7 @@ public class JmsMessageBroker implements MessageBroker {
             delay(retryable.getRetryDelayMillis());
         }
 
-        jmsTemplate.convertAndSend(routingKey, message);
+        jmsTemplate.convertAndSend(queueName, message);
     }
 
     private void delay(long value) {
