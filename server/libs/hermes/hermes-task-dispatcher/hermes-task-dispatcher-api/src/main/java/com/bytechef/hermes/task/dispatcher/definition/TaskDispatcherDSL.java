@@ -26,6 +26,7 @@ import com.bytechef.hermes.definition.Property.InputProperty;
 import com.bytechef.hermes.definition.Property.OutputProperty;
 import com.bytechef.hermes.definition.Property.ValueProperty;
 import com.bytechef.hermes.definition.Resources;
+import com.bytechef.hermes.task.dispatcher.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -55,6 +56,7 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         private String icon;
         private final String name;
         private ModifiableOutputProperty<?> outputSchemaProperty;
+        private OutputSchemaFunction outputSchemaFunction;
         private List<? extends ModifiableInputProperty> properties;
         private Resources resources;
         private List<? extends ModifiableValueProperty<?, ?>> taskProperties;
@@ -87,6 +89,12 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
             P property) {
 
             this.outputSchemaProperty = Objects.requireNonNull(property);
+
+            return this;
+        }
+
+        public ModifiableTaskDispatcherDefinition outputSchema(OutputSchemaFunction outputSchema) {
+            this.outputSchemaFunction = outputSchema;
 
             return this;
         }
@@ -169,6 +177,12 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         }
 
         @Override
+        public Optional<OutputSchemaDataSource> getOutputSchemaDataSource() {
+            return Optional.ofNullable(
+                outputSchemaFunction == null ? null : new OutputSchemaDataSourceImpl(outputSchemaFunction));
+        }
+
+        @Override
         public Optional<List<? extends InputProperty>> getProperties() {
             return Optional.ofNullable(properties);
         }
@@ -191,6 +205,14 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         @Override
         public Optional<List<? extends ValueProperty<?>>> getTaskProperties() {
             return Optional.ofNullable(taskProperties);
+        }
+    }
+
+    private record OutputSchemaDataSourceImpl(OutputSchemaFunction outputSchema) implements OutputSchemaDataSource {
+
+        @Override
+        public OutputSchemaFunction getOutputSchema() {
+            return outputSchema;
         }
     }
 }

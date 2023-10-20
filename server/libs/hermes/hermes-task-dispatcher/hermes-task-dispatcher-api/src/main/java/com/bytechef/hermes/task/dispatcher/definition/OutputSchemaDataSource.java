@@ -14,33 +14,33 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.registry.domain;
+package com.bytechef.hermes.task.dispatcher.definition;
 
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.Property.OutputProperty;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public class AnyProperty extends ValueProperty<Object> {
+public interface OutputSchemaDataSource {
 
-    private AnyProperty() {
-    }
+    /**
+     * The function that returns output schema.
+     *
+     * @return The function implementation
+     */
+    OutputSchemaFunction getOutputSchema();
 
-    public AnyProperty(Property.AnyProperty anyProperty) {
-        super(anyProperty);
-    }
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface OutputSchemaFunction {
 
-    @Override
-    public Object accept(PropertyVisitor propertyVisitor) {
-        return propertyVisitor.visit(this);
-    }
-
-    @Override
-    public String toString() {
-        return "AnyProperty{" +
-            "controlType=" + controlType +
-            ", defaultValue=" + defaultValue +
-            ", exampleValue=" + exampleValue +
-            "} ";
+        /**
+         * @param inputParameters
+         * @return
+         */
+        OutputProperty<?> apply(Map<String, ?> inputParameters);
     }
 }

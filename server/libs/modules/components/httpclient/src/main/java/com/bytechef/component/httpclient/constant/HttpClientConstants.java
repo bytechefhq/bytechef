@@ -19,7 +19,6 @@ package com.bytechef.component.httpclient.constant;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.hermes.component.definition.Context.Http.ResponseType;
-import static com.bytechef.hermes.definition.DefinitionDSL.any;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.date;

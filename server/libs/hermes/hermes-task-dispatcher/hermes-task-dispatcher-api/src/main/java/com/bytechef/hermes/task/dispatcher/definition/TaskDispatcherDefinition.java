@@ -67,6 +67,12 @@ public interface TaskDispatcherDefinition {
      *
      * @return
      */
+    Optional<OutputSchemaDataSource> getOutputSchemaDataSource();
+
+    /**
+     *
+     * @return
+     */
     Optional<List<? extends InputProperty>> getProperties();
 
     /**

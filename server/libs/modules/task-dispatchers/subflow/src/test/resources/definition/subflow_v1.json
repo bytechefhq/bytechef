@@ -3,7 +3,6 @@
   "help": null,
   "icon": "path:assets/subflow.svg",
   "name": "subflow",
-  "outputSchema": null,
   "properties": [ {
     "advancedOption": null,
     "description": "The id of sub-workflow to execute.",
@@ -26,5 +25,7 @@
   "resources": null,
   "taskProperties": null,
   "title": "Subflow",
-  "version": 1
+  "version": 1,
+  "outputSchema": null,
+  "outputSchemaDataSource": null
 }

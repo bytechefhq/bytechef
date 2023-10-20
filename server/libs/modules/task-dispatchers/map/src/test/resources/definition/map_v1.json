@@ -3,7 +3,6 @@
   "help": null,
   "icon": "path:assets/map.svg",
   "name": "map",
-  "outputSchema": null,
   "properties": [ {
     "advancedOption": null,
     "description": "List of items to iterate over.",
@@ -21,8 +20,8 @@
     "items": null,
     "multipleValues": null,
     "options": null,
-    "optionsDataSource": null,
-    "controlType": "OBJECT_BUILDER"
+    "controlType": "OBJECT_BUILDER",
+    "optionsDataSource": null
   }, {
     "advancedOption": null,
     "description": "The name of the item variable.",
@@ -80,9 +79,11 @@
     "objectType": "TASK",
     "options": null,
     "properties": null,
-    "optionsDataSource": null,
-    "controlType": "EXPRESSION"
+    "controlType": "EXPRESSION",
+    "optionsDataSource": null
   } ],
   "title": "Map",
-  "version": 1
+  "version": 1,
+  "outputSchema": null,
+  "outputSchemaDataSource": null
 }

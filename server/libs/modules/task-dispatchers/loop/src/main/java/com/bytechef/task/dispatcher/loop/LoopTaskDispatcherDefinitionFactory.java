@@ -16,11 +16,8 @@
 
 package com.bytechef.task.dispatcher.loop;
 
-import static com.bytechef.hermes.definition.DefinitionDSL.any;
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.bool;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.integer;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITERATEE;
@@ -29,6 +26,7 @@ import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConst
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP_FOREVER;
 
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.hermes.task.dispatcher.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.springframework.stereotype.Component;
 
@@ -49,13 +47,18 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
                 .label("Loop Forever")
                 .description("Should loop iterate until condition set by 'Loop Break' statement is met.")
                 .defaultValue(false))
-        .outputSchema(
-            object()
-                .properties(any("item"), integer("itemIndex")))
+        .outputSchema(getOutputSchemaFunction())
         .taskProperties(task(ITERATEE));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
         return TASK_DISPATCHER_DEFINITION;
+    }
+
+    protected static OutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (inputParameters) -> null;
+//        object()
+//            .properties(any(ITEM), integer(ITEM_INDEX))
     }
 }
