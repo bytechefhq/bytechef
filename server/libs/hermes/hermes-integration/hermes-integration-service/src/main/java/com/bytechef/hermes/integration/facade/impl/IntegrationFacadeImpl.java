@@ -41,7 +41,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public Integration create(Integration integration) {
+    public Integration initialize(Integration integration) {
         if (!integration.containsWorkflows()) {
             Workflow workflow = new Workflow();
 
