@@ -79,26 +79,26 @@ public class CronTrigger {
     }
 
     protected void listenerEnable(
-        Connection connection, InputParameters inputParameters, String workflowInstanceId) {
+        Connection connection, InputParameters inputParameters, String workflowExecutionId) {
 
         CronSchedule cron = new CronSchedule(
             "0 " + inputParameters.getString(EXPRESSION), ZoneId.of(inputParameters.getString(TIMEZONE)));
 
         schedulerClient.schedule(
             SCHEDULE_RECURRING_TASK.instance(
-                workflowInstanceId,
+                workflowExecutionId,
                 new WorkflowScheduleAndData(
                     cron,
                     Map.of(
                         EXPRESSION, inputParameters.getString(EXPRESSION),
                         TIMEZONE, inputParameters.getString(TIMEZONE)),
-                    workflowInstanceId)),
+                    workflowExecutionId)),
             cron.getInitialExecutionTime(Instant.now()));
     }
 
     protected void listenerDisable(
-        Connection connection, InputParameters inputParameters, String workflowInstanceId) {
+        Connection connection, InputParameters inputParameters, String workflowExecutionId) {
 
-        schedulerClient.cancel(TaskInstanceId.of(SCHEDULE_RECURRING_TASK.getTaskName(), workflowInstanceId));
+        schedulerClient.cancel(TaskInstanceId.of(SCHEDULE_RECURRING_TASK.getTaskName(), workflowExecutionId));
     }
 }

@@ -65,20 +65,20 @@ public class ScheduleConfiguration {
 
         private final Map<String, Object> output;
         private final Schedule schedule;
-        private final String workflowInstanceId;
+        private final String workflowExecutionId;
 
         @SuppressFBWarnings("EI")
         public WorkflowScheduleAndData(
-            Schedule schedule, Map<String, Object> output, String workflowInstanceId) {
+            Schedule schedule, Map<String, Object> output, String workflowExecutionId) {
 
             this.output = output;
             this.schedule = schedule;
-            this.workflowInstanceId = workflowInstanceId;
+            this.workflowExecutionId = workflowExecutionId;
         }
 
         @Override
         public String getData() {
-            return workflowInstanceId;
+            return workflowExecutionId;
         }
 
         public Map<String, Object> getOutput() {

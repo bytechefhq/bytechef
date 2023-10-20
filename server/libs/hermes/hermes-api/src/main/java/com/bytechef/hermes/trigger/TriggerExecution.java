@@ -17,21 +17,22 @@
 
 package com.bytechef.hermes.trigger;
 
-import com.bytechef.hermes.workflow.WorkflowInstanceId;
+import com.bytechef.hermes.workflow.WorkflowExecutionId;
 
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public record TriggerExecution(WorkflowInstanceId workflowInstanceId, WorkflowTrigger workflowTrigger, Object output) {
+public record TriggerExecution(WorkflowExecutionId workflowExecutionId, WorkflowTrigger workflowTrigger,
+    Object output) {
 
-    public TriggerExecution(WorkflowInstanceId workflowInstanceId, Object output) {
-        this(workflowInstanceId, null, output);
+    public TriggerExecution(WorkflowExecutionId workflowExecutionId, Object output) {
+        this(workflowExecutionId, null, output);
     }
 
-    public TriggerExecution(WorkflowInstanceId workflowInstanceId, WorkflowTrigger workflowTrigger) {
-        this(workflowInstanceId, workflowTrigger, null);
+    public TriggerExecution(WorkflowExecutionId workflowExecutionId, WorkflowTrigger workflowTrigger) {
+        this(workflowExecutionId, workflowTrigger, null);
     }
 
     public Map<String, Object> getParameters() {

@@ -1,3 +1,5 @@
 dependencies {
     api project(":server:libs:hermes:hermes-component:hermes-component-api")
+
+    implementation "org.springframework:spring-core"
 }

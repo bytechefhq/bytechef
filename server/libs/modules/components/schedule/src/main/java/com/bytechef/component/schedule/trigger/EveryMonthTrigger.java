@@ -98,7 +98,7 @@ public class EveryMonthTrigger {
     }
 
     protected void listenerEnable(
-        Connection connection, InputParameters inputParameters, String workflowInstanceId) {
+        Connection connection, InputParameters inputParameters, String workflowExecutionId) {
 
         CronSchedule cron = new CronSchedule(
             "0 %s %s %s * ?".formatted(
@@ -108,7 +108,7 @@ public class EveryMonthTrigger {
 
         schedulerClient.schedule(
             SCHEDULE_RECURRING_TASK.instance(
-                workflowInstanceId,
+                workflowExecutionId,
                 new ScheduleConfiguration.WorkflowScheduleAndData(
                     cron,
                     Map.of(
@@ -116,13 +116,13 @@ public class EveryMonthTrigger {
                         MINUTE, inputParameters.getInteger(MINUTE),
                         DAY_OF_MONTH, inputParameters.getInteger(DAY_OF_MONTH),
                         TIMEZONE, inputParameters.getString(TIMEZONE)),
-                    workflowInstanceId)),
+                    workflowExecutionId)),
             cron.getInitialExecutionTime(Instant.now()));
     }
 
     protected void listenerDisable(
-        Connection connection, InputParameters inputParameters, String workflowInstanceId) {
+        Connection connection, InputParameters inputParameters, String workflowExecutionId) {
 
-        schedulerClient.cancel(TaskInstanceId.of(SCHEDULE_RECURRING_TASK.getTaskName(), workflowInstanceId));
+        schedulerClient.cancel(TaskInstanceId.of(SCHEDULE_RECURRING_TASK.getTaskName(), workflowExecutionId));
     }
 }

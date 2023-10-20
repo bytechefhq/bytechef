@@ -239,10 +239,10 @@ public interface TriggerDefinition {
      * @param connection
      * @param inputParameters
      * @param webhookUrl
-     * @param workflowInstanceId
+     * @param workflowExecutionId
      */
     record DynamicWebhookEnableContext(
-        Connection connection, InputParameters inputParameters, String webhookUrl, String workflowInstanceId) {
+        Connection connection, InputParameters inputParameters, String webhookUrl, String workflowExecutionId) {
     }
 
     /**
@@ -320,9 +320,9 @@ public interface TriggerDefinition {
         /**
          * @param connection
          * @param inputParameters
-         * @param workflowInstanceId
+         * @param workflowExecutionId
          */
-        void accept(Connection connection, InputParameters inputParameters, String workflowInstanceId);
+        void accept(Connection connection, InputParameters inputParameters, String workflowExecutionId);
     }
 
     /**
@@ -336,7 +336,7 @@ public interface TriggerDefinition {
          * @param connection
          * @param inputParameters
          */
-        void accept(Connection connection, InputParameters inputParameters, String workflowInstanceId);
+        void accept(Connection connection, InputParameters inputParameters, String workflowExecutionId);
     }
 
     /**

@@ -121,7 +121,7 @@ public class EveryDayTrigger {
     }
 
     protected void listenerEnable(
-        Connection connection, InputParameters inputParameters, String workflowInstanceId) {
+        Connection connection, InputParameters inputParameters, String workflowExecutionId) {
 
         CronSchedule cron = new CronSchedule(
             "0 %s %s ? * %s".formatted(
@@ -136,7 +136,7 @@ public class EveryDayTrigger {
 
         schedulerClient.schedule(
             SCHEDULE_RECURRING_TASK.instance(
-                workflowInstanceId,
+                workflowExecutionId,
                 new ScheduleConfiguration.WorkflowScheduleAndData(
                     cron,
                     Map.of(
@@ -144,13 +144,13 @@ public class EveryDayTrigger {
                         MINUTE, inputParameters.getInteger(MINUTE),
                         DAY_OF_WEEK, inputParameters.getMap(DAY_OF_WEEK),
                         TIMEZONE, inputParameters.getString(TIMEZONE)),
-                    workflowInstanceId)),
+                    workflowExecutionId)),
             cron.getInitialExecutionTime(Instant.now()));
     }
 
     protected void listenerDisable(
-        Connection connection, InputParameters inputParameters, String workflowInstanceId) {
+        Connection connection, InputParameters inputParameters, String workflowExecutionId) {
 
-        schedulerClient.cancel(TaskInstanceId.of(SCHEDULE_RECURRING_TASK.getTaskName(), workflowInstanceId));
+        schedulerClient.cancel(TaskInstanceId.of(SCHEDULE_RECURRING_TASK.getTaskName(), workflowExecutionId));
     }
 }

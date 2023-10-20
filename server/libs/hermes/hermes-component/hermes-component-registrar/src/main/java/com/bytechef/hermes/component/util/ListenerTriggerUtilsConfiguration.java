@@ -20,7 +20,7 @@ package com.bytechef.hermes.component.util;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.TaskQueues;
 import com.bytechef.hermes.trigger.TriggerExecution;
-import com.bytechef.hermes.workflow.WorkflowInstanceId;
+import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Configuration;
@@ -40,10 +40,10 @@ public class ListenerTriggerUtilsConfiguration implements InitializingBean {
     @Override
     @SuppressFBWarnings("ST")
     public void afterPropertiesSet() {
-        ListenerTriggerUtils.listenerEmitter = (workflowInstanceId, output) -> {
+        ListenerTriggerUtils.listenerEmitter = (workflowExecutionId, output) -> {
 
             TriggerExecution triggerExecution = new TriggerExecution(
-                WorkflowInstanceId.of(workflowInstanceId), output);
+                WorkflowExecutionId.parse(workflowExecutionId), output);
 
             messageBroker.send(TaskQueues.COMPLETIONS, triggerExecution);
         };

@@ -81,7 +81,7 @@ public class IntervalTrigger {
     }
 
     protected void listenerEnable(
-        Connection connection, InputParameters inputParameters, String workflowInstanceId) {
+        Connection connection, InputParameters inputParameters, String workflowExecutionId) {
 
         int interval = inputParameters.getInteger(INTERVAL);
 
@@ -96,20 +96,20 @@ public class IntervalTrigger {
 
         schedulerClient.schedule(
             SCHEDULE_RECURRING_TASK.instance(
-                workflowInstanceId,
+                workflowExecutionId,
                 new ScheduleConfiguration.WorkflowScheduleAndData(
                     cron,
                     Map.of(
                         INTERVAL, inputParameters.getInteger(INTERVAL),
                         TIME_UNIT, inputParameters.getInteger(TIME_UNIT)),
-                    workflowInstanceId)),
+                    workflowExecutionId)),
             cron.getInitialExecutionTime(Instant.now()));
 
     }
 
     protected void listenerDisable(
-        Connection connection, InputParameters inputParameters, String workflowInstanceId) {
+        Connection connection, InputParameters inputParameters, String workflowExecutionId) {
 
-        schedulerClient.cancel(TaskInstanceId.of(SCHEDULE_RECURRING_TASK.getTaskName(), workflowInstanceId));
+        schedulerClient.cancel(TaskInstanceId.of(SCHEDULE_RECURRING_TASK.getTaskName(), workflowExecutionId));
     }
 }
