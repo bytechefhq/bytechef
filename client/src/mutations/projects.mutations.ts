@@ -1,6 +1,7 @@
 import {useMutation} from '@tanstack/react-query';
 import {
     CreateProjectWorkflowRequest,
+    EnableProjectInstanceRequest,
     ProjectInstanceModel,
     ProjectInstanceTagsApi,
     ProjectInstancesApi,
@@ -197,6 +198,22 @@ export const useUpdateProjectInstanceTagsMutation = (
             return new ProjectInstanceTagsApi().updateProjectInstanceTags(
                 request
             );
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+type EnableProjectInstanceMutationProps = {
+    onSuccess?: (result: void, variables: EnableProjectInstanceRequest) => void;
+    onError?: (error: object, variables: EnableProjectInstanceRequest) => void;
+};
+
+export const useEnableProjectInstanceMutation = (
+    mutationProps: EnableProjectInstanceMutationProps
+) =>
+    useMutation({
+        mutationFn: (request: EnableProjectInstanceRequest) => {
+            return new ProjectInstancesApi().enableProjectInstance(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,

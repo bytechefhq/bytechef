@@ -80,9 +80,10 @@ const InstanceDialogBasicStep = ({
                                     if (selectedOption) {
                                         setValue(
                                             'projectId',
-                                            parseInt(selectedOption.value)
+                                            parseInt(
+                                                selectedOption.value.toString()
+                                            )
                                         );
-
                                         setValue('project', selectedOption);
                                     }
                                 }}
@@ -93,6 +94,14 @@ const InstanceDialogBasicStep = ({
                                 }))}
                                 placeholder="Select..."
                                 required
+                                value={
+                                    (projectInstance?.project && {
+                                        label: projectInstance.project.name,
+                                        name: projectInstance.project.name,
+                                        value: projectInstance.project.id!.toString(),
+                                    }) ||
+                                    undefined
+                                }
                             />
                         )}
                         shouldUnregister={false}
@@ -106,6 +115,9 @@ const InstanceDialogBasicStep = ({
                         {...register('name', {
                             required: true,
                         })}
+                        onChange={(e) => {
+                            setValue('name', e.target.value);
+                        }}
                     />
 
                     <TextArea
@@ -123,26 +135,28 @@ const InstanceDialogBasicStep = ({
                                     field={field}
                                     isMulti
                                     label="Tags"
-                                    options={remainingTags.map((tag) => ({
-                                        label: tag.name,
-                                        value: tag.name,
-                                        ...tag,
-                                    }))}
-                                    onCreateOption={(inputValue) => {
-                                        if (getValues('tags')?.length) {
-                                            setValue('tags', [
-                                                ...getValues('tags')!,
-                                                {
-                                                    name: inputValue,
-                                                },
-                                            ]);
-                                        } else {
-                                            setValue('tags', [
-                                                {
-                                                    name: inputValue,
-                                                },
-                                            ]);
-                                        }
+                                    options={remainingTags.map((tag) => {
+                                        return {
+                                            label: `${tag.name
+                                                .charAt(0)
+                                                .toUpperCase()}${tag.name.slice(
+                                                1
+                                            )}`,
+                                            value: tag.name
+                                                .toLowerCase()
+                                                .replace(/\W/g, ''),
+                                            ...tag,
+                                        };
+                                    })}
+                                    onCreateOption={(inputValue: string) => {
+                                        setValue('tags', [
+                                            ...getValues().tags!,
+                                            {
+                                                label: inputValue,
+                                                name: inputValue,
+                                                value: inputValue,
+                                            },
+                                        ] as never[]);
                                     }}
                                 />
                             )}
