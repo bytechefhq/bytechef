@@ -16,15 +16,13 @@
 
 package com.bytechef.atlas.worker;
 
-import com.bytechef.atlas.Constants;
+import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
-import com.bytechef.atlas.task.CancelTask;
-import com.bytechef.atlas.task.execution.domain.SimpleTaskExecution;
-import com.bytechef.atlas.task.execution.domain.TaskExecution;
-import com.bytechef.atlas.task.execution.evaluator.spel.SpelTaskEvaluator;
-import com.bytechef.atlas.uuid.UUIDGenerator;
+import com.bytechef.atlas.task.CancelControlTask;
+import com.bytechef.atlas.task.evaluator.spel.SpelTaskEvaluator;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
+import com.bytechef.commons.uuid.UUIDGenerator;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -45,14 +43,14 @@ public class WorkerTest {
                 t -> Assertions.assertTrue(((TaskExecution) t).getOutput().equals("done")));
         messageBroker.receive(Queues.EVENTS, t -> {});
 
-        Worker worker = WorkerImpl.builder()
+        Worker worker = Worker.builder()
                 .withTaskHandlerResolver(jt -> t -> "done")
                 .withMessageBroker(messageBroker)
                 .withEventPublisher(e -> {})
                 .withTaskEvaluator(SpelTaskEvaluator.create())
                 .build();
 
-        SimpleTaskExecution task = new SimpleTaskExecution();
+        TaskExecution task = new TaskExecution();
         task.setId("1234");
         task.setJobId("4567");
         worker.handle(task);
@@ -66,7 +64,7 @@ public class WorkerTest {
                 t -> Assertions.assertTrue(
                         ((TaskExecution) t).getError().getMessage().equals("bad input")));
         messageBroker.receive(Queues.EVENTS, t -> {});
-        Worker worker = WorkerImpl.builder()
+        Worker worker = Worker.builder()
                 .withTaskHandlerResolver(jt -> t -> {
                     throw new IllegalArgumentException("bad input");
                 })
@@ -74,7 +72,7 @@ public class WorkerTest {
                 .withEventPublisher(e -> {})
                 .withTaskEvaluator(SpelTaskEvaluator.create())
                 .build();
-        SimpleTaskExecution task = new SimpleTaskExecution();
+        TaskExecution task = new TaskExecution();
         task.setId("1234");
         task.setJobId("4567");
         worker.handle(task);
@@ -83,10 +81,17 @@ public class WorkerTest {
     @Test
     public void test3() {
         SyncMessageBroker messageBroker = new SyncMessageBroker();
+
         messageBroker.receive(
                 Queues.COMPLETIONS, t -> Assertions.assertEquals("done", (((TaskExecution) t).getOutput())));
+        messageBroker.receive(Queues.ERRORS, t -> {
+            TaskExecution taskExecution = (TaskExecution) t;
+
+            Assertions.assertNull(taskExecution.getError());
+        });
         messageBroker.receive(Queues.EVENTS, t -> {});
-        Worker worker = WorkerImpl.builder()
+
+        Worker worker = Worker.builder()
                 .withTaskHandlerResolver(t1 -> {
                     String type = t1.getType();
                     if ("var".equals(type)) {
@@ -99,12 +104,15 @@ public class WorkerTest {
                 .withTaskEvaluator(SpelTaskEvaluator.create())
                 .withEventPublisher(e -> {})
                 .build();
-        SimpleTaskExecution task = new SimpleTaskExecution();
+
+        TaskExecution task = new TaskExecution(Map.of(
+                "pre", List.of(Map.of("name", "myVar", "type", "var", "value", "done")),
+                "type", "var",
+                "value", "${myVar}"));
+
         task.setId("1234");
         task.setJobId("4567");
-        task.set(Constants.TYPE, "var");
-        task.set("value", "${myVar}");
-        task.set("pre", List.of(Map.of("name", "myVar", "type", "var", "value", "done")));
+
         worker.handle(task);
     }
 
@@ -119,7 +127,7 @@ public class WorkerTest {
         });
         messageBroker.receive(Queues.EVENTS, t -> {});
 
-        Worker worker = WorkerImpl.builder()
+        Worker worker = Worker.builder()
                 .withTaskHandlerResolver(t1 -> {
                     String type = t1.getType();
                     if ("var".equals(type)) {
@@ -140,15 +148,15 @@ public class WorkerTest {
                 .withTaskEvaluator(SpelTaskEvaluator.create())
                 .build();
 
-        SimpleTaskExecution task = new SimpleTaskExecution();
+        TaskExecution taskExecution = new TaskExecution(Map.of(
+                "post", List.of(Map.of("type", "rm", "path", tempDir)),
+                "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
+                "type", "pass"));
 
-        task.setId("1234");
-        task.setJobId("4567");
-        task.set("type", "pass");
-        task.set("pre", List.of(Map.of("type", "mkdir", "path", tempDir)));
-        task.set("post", List.of(Map.of("type", "rm", "path", tempDir)));
+        taskExecution.setId("1234");
+        taskExecution.setJobId("4567");
 
-        worker.handle(task);
+        worker.handle(taskExecution);
     }
 
     @Test
@@ -162,7 +170,7 @@ public class WorkerTest {
         });
         messageBroker.receive(Queues.EVENTS, t -> {});
 
-        Worker worker = WorkerImpl.builder()
+        Worker worker = Worker.builder()
                 .withTaskHandlerResolver(t1 -> {
                     String type = t1.getType();
                     if ("var".equals(type)) {
@@ -185,15 +193,15 @@ public class WorkerTest {
                 .withTaskEvaluator(SpelTaskEvaluator.create())
                 .build();
 
-        SimpleTaskExecution task = new SimpleTaskExecution();
+        TaskExecution taskExecution = new TaskExecution(Map.of(
+                "finalize", List.of(Map.of("type", "rm", "path", tempDir)),
+                "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
+                "type", "rogue"));
 
-        task.setId("1234");
-        task.setJobId("4567");
-        task.set("type", "rogue");
-        task.set("pre", List.of(Map.of("type", "mkdir", "path", tempDir)));
-        task.set("finalize", List.of(Map.of("type", "rm", "path", tempDir)));
+        taskExecution.setId("1234");
+        taskExecution.setJobId("4567");
 
-        worker.handle(task);
+        worker.handle(taskExecution);
     }
 
     @Test
@@ -201,7 +209,7 @@ public class WorkerTest {
         ExecutorService executors = Executors.newSingleThreadExecutor();
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
-        WorkerImpl worker = (WorkerImpl) WorkerImpl.builder()
+        Worker worker = Worker.builder()
                 .withTaskHandlerResolver(jt -> t -> {
                     try {
                         TimeUnit.SECONDS.sleep(5);
@@ -216,7 +224,7 @@ public class WorkerTest {
                 .withTaskEvaluator(SpelTaskEvaluator.create())
                 .build();
 
-        SimpleTaskExecution task = new SimpleTaskExecution();
+        TaskExecution task = new TaskExecution();
         task.setId("1234");
         task.setJobId("4567");
         // execute the task
@@ -225,7 +233,7 @@ public class WorkerTest {
         TimeUnit.SECONDS.sleep(1);
         Assertions.assertEquals(1, worker.getTaskExecutions().size());
         // cancel the execution of the task
-        worker.handle(new CancelTask(task.getJobId(), task.getId()));
+        worker.handle(new CancelControlTask(task.getJobId(), task.getId()));
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
         Assertions.assertEquals(0, worker.getTaskExecutions().size());
@@ -236,7 +244,7 @@ public class WorkerTest {
         ExecutorService executors = Executors.newFixedThreadPool(2);
         SyncMessageBroker messageBroker = new SyncMessageBroker();
 
-        WorkerImpl worker = (WorkerImpl) WorkerImpl.builder()
+        Worker worker = (Worker) Worker.builder()
                 .withTaskHandlerResolver(jt -> t -> {
                     try {
                         TimeUnit.SECONDS.sleep(5);
@@ -251,13 +259,13 @@ public class WorkerTest {
                 .withTaskEvaluator(SpelTaskEvaluator.create())
                 .build();
 
-        SimpleTaskExecution task1 = new SimpleTaskExecution();
+        TaskExecution task1 = new TaskExecution();
         task1.setId("1111");
         task1.setJobId("2222");
         // execute the task
         executors.submit(() -> worker.handle(task1));
 
-        SimpleTaskExecution task2 = new SimpleTaskExecution();
+        TaskExecution task2 = new TaskExecution();
         task2.setId("3333");
         task2.setJobId("4444");
         // execute the task
@@ -268,7 +276,7 @@ public class WorkerTest {
 
         Assertions.assertEquals(2, worker.getTaskExecutions().size());
         // cancel the execution of the task
-        worker.handle(new CancelTask(task1.getJobId(), task1.getId()));
+        worker.handle(new CancelControlTask(task1.getJobId(), task1.getId()));
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
         Assertions.assertEquals(1, worker.getTaskExecutions().size());
@@ -278,7 +286,7 @@ public class WorkerTest {
     public void test8() throws InterruptedException {
         ExecutorService executors = Executors.newFixedThreadPool(2);
         SyncMessageBroker messageBroker = new SyncMessageBroker();
-        WorkerImpl worker = (WorkerImpl) WorkerImpl.builder()
+        Worker worker = (Worker) Worker.builder()
                 .withTaskHandlerResolver(jt -> t -> {
                     try {
                         TimeUnit.SECONDS.sleep(5);
@@ -293,13 +301,13 @@ public class WorkerTest {
                 .withTaskEvaluator(SpelTaskEvaluator.create())
                 .build();
 
-        SimpleTaskExecution task1 = new SimpleTaskExecution();
+        TaskExecution task1 = new TaskExecution();
         task1.setId("1111");
         task1.setJobId("2222");
         // execute the task
         executors.submit(() -> worker.handle(task1));
 
-        SimpleTaskExecution task2 = new SimpleTaskExecution();
+        TaskExecution task2 = new TaskExecution();
         task2.setId("3333");
         task2.setJobId("2222");
         task2.setParentId(task1.getId());
@@ -311,7 +319,7 @@ public class WorkerTest {
 
         Assertions.assertEquals(2, worker.getTaskExecutions().size());
         // cancel the execution of the task
-        worker.handle(new CancelTask(task1.getJobId(), task1.getId()));
+        worker.handle(new CancelControlTask(task1.getJobId(), task1.getId()));
         // give it a second to cancel
         TimeUnit.SECONDS.sleep(1);
         Assertions.assertEquals(0, worker.getTaskExecutions().size());
