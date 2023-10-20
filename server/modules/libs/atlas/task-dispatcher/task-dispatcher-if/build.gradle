@@ -1,4 +1,0 @@
-dependencies {
-    testImplementation project(":modules:libs:atlas:task-handler:task-handler-core")
-    testImplementation project(":modules:libs:atlas:test-support")
-}
