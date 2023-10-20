@@ -81,11 +81,11 @@ public class FilesystemFileStorageServiceTest {
         String path = fileEntry.getUrl();
 
         Assertions.assertThat(path)
-            .startsWith("file:///tmp/test/bytechef/files/");
+            .startsWith("file:/tmp/test/bytechef/files/");
 
         String url = fileEntry.getUrl();
 
-        Assertions.assertThat(Files.contentOf(new File(url.replace("file://", "")), StandardCharsets.UTF_8))
+        Assertions.assertThat(Files.contentOf(new File(url.replace("file:", "")), StandardCharsets.UTF_8))
             .isEqualTo(TEST_STRING);
     }
 }
