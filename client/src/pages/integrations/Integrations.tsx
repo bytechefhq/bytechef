@@ -19,29 +19,49 @@ export enum Type {
 
 const Integrations = () => {
     const [searchParams] = useSearchParams();
-    const [current, setCurrent] = useState<{id?: number; type: Type}>({
+
+    const defaultCurrentState = {
         id: searchParams.get('categoryId')
             ? +searchParams.get('categoryId')!
             : searchParams.get('tagId')
             ? +searchParams.get('tagId')!
             : undefined,
         type: searchParams.get('tagId') ? Type.Tag : Type.Category,
-    });
+    };
+
+    const [current, setCurrent] = useState<{id?: number; type: Type}>(
+        defaultCurrentState
+    );
     const {isLoading: categoriesIsLoading, data: categories} =
         useGetIntegrationCategoriesQuery();
     const {isLoading: tagsIsLoading, data: tags} = useGetIntegrationTagsQuery();
+
+    const title =
+        !categoriesIsLoading &&
+        current.type === Type.Category &&
+        current.id &&
+        categories &&
+        categories.length > 0
+            ? categories.filter((category) => category.id === current.id)[0]
+                  .name!
+            : !tagsIsLoading &&
+              current.type === Type.Tag &&
+              tags &&
+              tags.length > 0
+            ? tags && tags.filter((tag) => tag.id === current.id)[0].name!
+            : 'All Integrations';
 
     return (
         <LayoutContainer
             header={
                 <PageHeader
-                    position={'main'}
+                    position="main"
                     right={<IntegrationModal />}
-                    title="All Integrations"
+                    title={title}
                 />
             }
             leftSidebarHeader={
-                <PageHeader leftSidebar={true} title="Categories" />
+                <PageHeader leftSidebar={true} title="Integrations" />
             }
             leftSidebarBody={
                 <LeftSidebarMenu
@@ -69,8 +89,8 @@ const Integrations = () => {
                                     <LeftSidebarMenuItem
                                         key={item.name}
                                         item={{
-                                            id: item.name!,
-                                            name: item.name!,
+                                            id: item.id,
+                                            name: item.name,
                                             current:
                                                 current?.id === item.id &&
                                                 current.type === Type.Category,
@@ -83,7 +103,7 @@ const Integrations = () => {
                                                 });
                                             },
                                         }}
-                                        toLink={`?componentName=${item.name}`}
+                                        toLink={`?categoryId=${item.id}`}
                                     />
                                 ))}
                         </>
