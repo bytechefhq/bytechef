@@ -133,7 +133,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private ExecuteFunction execute;
 
         @JsonIgnore
-        private SampleOutputDataSource sampleOutputDataSource;
+        private EditorDescriptionFunction editorDescription;
 
         private Help help;
 
@@ -143,7 +143,13 @@ public final class ComponentDSL extends DefinitionDSL {
         private List<? extends Property<?>> outputSchema;
         private String outputSchemaProperty;
         private List<? extends Property<?>> properties;
+
+        @JsonIgnore
+        private SampleOutputDataSource sampleOutputDataSource;
+
+        @JsonIgnore
         private OutputSchemaDataSource outputSchemaDataSource;
+
         private String title;
 
         private ModifiableActionDefinition() {
@@ -171,14 +177,8 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableActionDefinition sampleOutput(Object sampleOutput) {
-            this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableActionDefinition sampleOutputDataSource(SampleOutputDataSource sampleOutputDataSource) {
-            this.sampleOutputDataSource = sampleOutputDataSource;
+        public ModifiableActionDefinition editorDescription(EditorDescriptionFunction editorDescription) {
+            this.editorDescription = editorDescription;
 
             return this;
         }
@@ -238,6 +238,18 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
+        public ModifiableActionDefinition sampleOutput(Object sampleOutput) {
+            this.sampleOutput = sampleOutput;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition sampleOutputDataSource(SampleOutputDataSource sampleOutputDataSource) {
+            this.sampleOutputDataSource = sampleOutputDataSource;
+
+            return this;
+        }
+
         public ModifiableActionDefinition title(String title) {
             this.title = title;
 
@@ -271,18 +283,13 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<Object> getSampleOutput() {
-            return Optional.ofNullable(sampleOutput);
+        public EditorDescriptionFunction getEditorDescription() {
+            return editorDescription;
         }
 
         @Override
         public Optional<ExecuteFunction> getExecute() {
             return Optional.ofNullable(execute);
-        }
-
-        @Override
-        public Optional<SampleOutputDataSource> getExampleOutputDataSource() {
-            return Optional.ofNullable(sampleOutputDataSource);
         }
 
         @Override
@@ -318,6 +325,16 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public Optional<List<? extends Property<?>>> getProperties() {
             return Optional.ofNullable(properties);
+        }
+
+        @Override
+        public Optional<Object> getSampleOutput() {
+            return Optional.ofNullable(sampleOutput);
+        }
+
+        @Override
+        public Optional<SampleOutputDataSource> getSampleOutputDataSource() {
+            return Optional.ofNullable(sampleOutputDataSource);
         }
 
         @Override
@@ -702,10 +719,6 @@ public final class ComponentDSL extends DefinitionDSL {
         private String title;
         private List<? extends TriggerDefinition> triggers;
 
-        // TODO
-        @JsonIgnore
-        private NodeDescriptionFunction nodeDescription;;
-
         private ModifiableComponentDefinition() {
         }
 
@@ -802,12 +815,6 @@ public final class ComponentDSL extends DefinitionDSL {
         @SuppressFBWarnings("EI2")
         public ModifiableComponentDefinition metadata(Map<String, Object> metadata) {
             this.metadata = metadata;
-
-            return this;
-        }
-
-        public ModifiableComponentDefinition nodeDescription(NodeDescriptionFunction nodeDescription) {
-            this.nodeDescription = nodeDescription;
 
             return this;
         }
@@ -937,11 +944,6 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public String getName() {
             return name;
-        }
-
-        @Override
-        public NodeDescriptionFunction getNodeDescription() {
-            return nodeDescription;
         }
 
         @Override
@@ -1324,27 +1326,56 @@ public final class ComponentDSL extends DefinitionDSL {
         private DeduplicateFunction deduplicate;
         private Boolean deprecated;
         private String description;
+
+        @JsonIgnore
         private DynamicWebhookDisableConsumer dynamicWebhookDisable;
+
+        @JsonIgnore
         private DynamicWebhookEnableFunction dynamicWebhookEnable;
+
+        @JsonIgnore
         private DynamicWebhookRefreshFunction dynamicWebhookRefresh;
+
+        @JsonIgnore
         private DynamicWebhookRequestFunction dynamicWebhookRequest;
+
         private Object sampleOutput;
-        private SampleOutputDataSource sampleOutputDataSource;
         private Help help;
+
+        @JsonIgnore
         private ListenerEnableConsumer listenerEnable;
+
+        @JsonIgnore
         private ListenerDisableConsumer listenerDisable;
+
         private String name;
-        // TODO
-        private NodeDescriptionFunction nodeDescription;
+
+        @JsonIgnore
+        private EditorDescriptionFunction editorDescription;
+
         private List<? extends Property<?>> outputSchema;
+
+        @JsonIgnore
         private OutputSchemaDataSource outputSchemaDataSource;
+
+        @JsonIgnore
         private PollFunction poll;
+
         private List<? extends Property<?>> properties;
+
+        @JsonIgnore
+        private SampleOutputDataSource sampleOutputDataSource;
+
+        @JsonIgnore
         private StaticWebhookRequestFunction staticWebhookRequest;
+
         private String title;
         private TriggerType type;
         private Boolean webhookBodyRaw;
+
+        @JsonIgnore
         private WebhookValidateFunction webhookValidate;
+
         private Boolean workflowSyncExecution;
 
         private ModifiableTriggerDefinition() {
@@ -1380,12 +1411,6 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableTriggerDefinition sampleOutput(Object sampleOutput) {
             this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition sampleOutputDataSource(SampleOutputDataSource sampleOutputDataSource) {
-            this.sampleOutputDataSource = sampleOutputDataSource;
 
             return this;
         }
@@ -1438,8 +1463,8 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition nodeDescription(NodeDescriptionFunction nodeDescription) {
-            this.nodeDescription = nodeDescription;
+        public ModifiableTriggerDefinition editorDescription(EditorDescriptionFunction editorDescription) {
+            this.editorDescription = editorDescription;
 
             return this;
         }
@@ -1466,6 +1491,12 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public <P extends Property<?>> ModifiableTriggerDefinition properties(P... properties) {
             this.properties = List.of(properties);
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition sampleOutputDataSource(SampleOutputDataSource sampleOutputDataSource) {
+            this.sampleOutputDataSource = sampleOutputDataSource;
 
             return this;
         }
@@ -1573,16 +1604,6 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Object getSampleOutput() {
-            return sampleOutput;
-        }
-
-        @Override
-        public Optional<SampleOutputDataSource> getExampleOutputDataSource() {
-            return Optional.ofNullable(sampleOutputDataSource);
-        }
-
-        @Override
         public Optional<Help> getHelp() {
             return Optional.ofNullable(help);
         }
@@ -1603,8 +1624,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public NodeDescriptionFunction getNodeDescription() {
-            return nodeDescription;
+        public EditorDescriptionFunction getEditorDescription() {
+            return editorDescription;
         }
 
         @Override
@@ -1625,6 +1646,16 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public Optional<List<? extends Property<?>>> getProperties() {
             return Optional.ofNullable(properties);
+        }
+
+        @Override
+        public Object getSampleOutput() {
+            return sampleOutput;
+        }
+
+        @Override
+        public Optional<SampleOutputDataSource> getSampleOutputDataSource() {
+            return Optional.ofNullable(sampleOutputDataSource);
         }
 
         @Override

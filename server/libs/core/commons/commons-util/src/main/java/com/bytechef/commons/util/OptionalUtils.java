@@ -33,6 +33,8 @@ public final class OptionalUtils {
     }
 
     public static <T> T get(Optional<T> optional) {
+        Assert.notNull(optional, "'optional' must not be null");
+
         return optional.orElseThrow(IllegalArgumentException::new);
     }
 

@@ -20,8 +20,19 @@ package com.bytechef.hermes.definition.registry.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.definition.ComponentOptionsDataSource;
+import com.bytechef.hermes.component.definition.ComponentOptionsDataSource.OptionsFunction;
+import com.bytechef.hermes.component.definition.ComponentPropertiesDataSource;
+import com.bytechef.hermes.component.definition.EditorDescriptionFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource;
+import com.bytechef.hermes.definition.Option;
+import com.bytechef.hermes.definition.OptionsProperty;
 import com.bytechef.hermes.definition.Property;
-import com.bytechef.hermes.definition.registry.ComponentDefinitionRegistry;
+import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
+import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
+import com.bytechef.hermes.definition.registry.component.InputParametersImpl;
+import com.bytechef.hermes.definition.registry.component.factory.ContextConnectionFactory;
 import com.bytechef.hermes.definition.registry.dto.ActionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.component.action.CustomAction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -30,6 +41,7 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -37,59 +49,139 @@ import java.util.Objects;
  */
 public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
-    private final List<ComponentDefinition> componentDefinitions;
+    private final ComponentDefinitionRegistry componentDefinitionRegistry;
+    private final ContextConnectionFactory contextConnectionFactory;
 
     @SuppressFBWarnings("EI2")
-    public ActionDefinitionServiceImpl(ComponentDefinitionRegistry componentDefinitionRegistry) {
-        this.componentDefinitions = componentDefinitionRegistry.getComponentDefinitions();
+    public ActionDefinitionServiceImpl(
+        ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory) {
+
+        this.componentDefinitionRegistry = componentDefinitionRegistry;
+        this.contextConnectionFactory = contextConnectionFactory;
+    }
+
+    @Override
+    public String executeEditorDescription(
+        String actionName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
+        String authorizationName, Map<String, Object> actionParameters) {
+
+        ActionDefinition actionDefinition = componentDefinitionRegistry.getActionDefinition(
+            actionName, componentName, componentVersion);
+
+        EditorDescriptionFunction editorDescriptionFunction = actionDefinition.getEditorDescription();
+
+        return editorDescriptionFunction.apply(
+            contextConnectionFactory.createConnection(
+                componentName, componentVersion, connectionParameters, authorizationName),
+            new InputParametersImpl(actionParameters));
+    }
+
+    @Override
+    public List<Option<?>> executeOptions(
+        String propertyName, String actionName, String componentName, int componentVersion,
+        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> actionParameters) {
+
+        OptionsProperty property = (OptionsProperty) componentDefinitionRegistry.getActionProperty(
+            propertyName, actionName, componentName, componentVersion);
+
+        ComponentOptionsDataSource optionsDataSource = (ComponentOptionsDataSource) OptionalUtils.get(
+            property.getOptionsDataSource());
+
+        OptionsFunction optionsFunction = optionsDataSource.getOptions();
+
+        return optionsFunction.apply(
+            contextConnectionFactory.createConnection(
+                componentName, componentVersion, connectionParameters, authorizationName),
+            new InputParametersImpl(actionParameters));
+    }
+
+    @Override
+    public List<? extends Property<?>> executeOutputSchema(
+        String actionName, String componentName, int componentVersion,
+        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> actionParameters) {
+
+        ActionDefinition actionDefinition = componentDefinitionRegistry.getActionDefinition(
+            actionName, componentName, componentVersion);
+
+        OutputSchemaDataSource outputSchemaDataSource = OptionalUtils.get(actionDefinition.getOutputSchemaDataSource());
+
+        OutputSchemaDataSource.OutputSchemaFunction outputSchemaFunction = outputSchemaDataSource.getOutputSchema();
+
+        return outputSchemaFunction.apply(
+            contextConnectionFactory.createConnection(
+                componentName, componentVersion, connectionParameters, authorizationName),
+            new InputParametersImpl(actionParameters));
+    }
+
+    @Override
+    public Object executeSampleOutput(
+        String actionName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
+        String authorizationName, Map<String, Object> actionParameters) {
+
+        ActionDefinition actionDefinition = componentDefinitionRegistry.getActionDefinition(
+            actionName, componentName, componentVersion);
+
+        SampleOutputDataSource sampleOutputDataSource = OptionalUtils.get(
+            actionDefinition.getSampleOutputDataSource());
+
+        SampleOutputDataSource.SampleOutputFunction sampleOutputFunction = sampleOutputDataSource.getSampleOutput();
+
+        return sampleOutputFunction.apply(
+            contextConnectionFactory.createConnection(
+                componentName, componentVersion, connectionParameters, authorizationName),
+            new InputParametersImpl(actionParameters));
+    }
+
+    @Override
+    public List<? extends Property<?>> executeProperties(
+        String propertyName, String actionName, String componentName, int componentVersion,
+        Map<String, Object> connectionParameters, String authorizationName, Map<String, Object> actionParameters) {
+
+        DynamicPropertiesProperty property = (DynamicPropertiesProperty) componentDefinitionRegistry.getActionProperty(
+            propertyName, actionName, componentName, componentVersion);
+
+        ComponentPropertiesDataSource optionsDataSource =
+            (ComponentPropertiesDataSource) property.getPropertiesDataSource();
+
+        ComponentPropertiesDataSource.PropertiesFunction propertiesFunction = optionsDataSource.getProperties();
+
+        return propertiesFunction.apply(
+            contextConnectionFactory.createConnection(
+                componentName, componentVersion, connectionParameters, authorizationName),
+            new InputParametersImpl(actionParameters));
     }
 
     @Override
     public Mono<ActionDefinitionDTO> getComponentActionDefinitionMono(
-        String componentName, int componentVersion, String actionName) {
+        String actionName, String componentName, int componentVersion) {
 
-        ComponentDefinition componentDefinition = componentDefinitions.stream()
-            .filter(curComponentDefinition -> componentName.equalsIgnoreCase(curComponentDefinition.getName()) &&
-                componentVersion == curComponentDefinition.getVersion())
-            .findFirst()
-            .orElseThrow();
-
-        ActionDefinitionDTO actionDefinitionDTO;
+        ActionDefinition actionDefinition;
 
         if (Objects.equals(actionName, CustomAction.CUSTOM)) {
-            actionDefinitionDTO = toActionDefinitionDTO(CustomAction.getCustomActionDefinition(componentDefinition));
+            ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+                componentName, componentVersion);
+
+            actionDefinition = CustomAction.getCustomActionDefinition(componentDefinition);
         } else {
-            actionDefinitionDTO =
-                OptionalUtils.orElse(componentDefinition.getActions(), Collections.emptyList())
-                    .stream()
-                    .filter(actionDefinition -> actionName.equalsIgnoreCase(actionDefinition.getName()))
-                    .findFirst()
-                    .map(this::toActionDefinitionDTO)
-                    .orElseThrow(
-                        () -> new IllegalArgumentException(
-                            "The component '%s' does not contain the '%s' action.".formatted(
-                                componentName, actionName)));
+            actionDefinition = componentDefinitionRegistry.getActionDefinition(
+                actionName, componentName, componentVersion);
         }
 
-        return Mono.just(actionDefinitionDTO);
+        return Mono.just(toActionDefinitionDTO(actionDefinition));
     }
 
     @Override
     public Mono<List<ActionDefinitionDTO>> getComponentActionDefinitionsMono(
         String componentName, int componentVersion) {
 
-        ComponentDefinition componentDefinition =
-            componentDefinitions.stream()
-                .filter(curComponentDefinition -> componentName.equalsIgnoreCase(curComponentDefinition.getName()) &&
-                    componentVersion == curComponentDefinition.getVersion())
-                .findFirst()
-                .orElseThrow();
-
         List<ActionDefinitionDTO> actionDefinitionDTOs =
-            OptionalUtils.orElse(componentDefinition.getActions(), Collections.emptyList())
+            componentDefinitionRegistry.getActionDefinitions(componentName, componentVersion)
                 .stream()
                 .map(this::toActionDefinitionDTO)
                 .toList();
+
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
 
         if (OptionalUtils.orElse(componentDefinition.getCustomAction(), false)) {
             actionDefinitionDTOs = new ArrayList<>(actionDefinitionDTOs);
