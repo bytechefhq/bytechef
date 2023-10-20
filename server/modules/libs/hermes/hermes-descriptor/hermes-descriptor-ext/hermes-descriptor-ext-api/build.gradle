@@ -1,4 +1,0 @@
-dependencies {
-    api project(":modules:libs:atlas:atlas-api")
-    api project(":modules:libs:hermes:hermes-descriptor:hermes-descriptor-api")
-}
