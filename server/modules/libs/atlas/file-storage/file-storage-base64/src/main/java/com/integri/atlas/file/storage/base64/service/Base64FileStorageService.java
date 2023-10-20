@@ -42,11 +42,6 @@ public class Base64FileStorageService implements FileStorageService {
     }
 
     @Override
-    public String getFilename(String url) {
-        return null;
-    }
-
-    @Override
     public FileEntry storeFileContent(String fileName, String content) throws FileStorageException {
         Base64.Encoder encoder = Base64.getEncoder();
 
