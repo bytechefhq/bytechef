@@ -259,7 +259,7 @@ const NodeDetailsDialog = () => {
                                     !!currentAction?.properties?.length && (
                                         <Properties
                                             actionName={currentActionName}
-                                            customClassName="p-4"
+                                            customClassName="p-4 overflow-auto"
                                             properties={
                                                 currentAction.properties
                                             }

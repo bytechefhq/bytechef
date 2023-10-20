@@ -21,6 +21,7 @@ import {
     Viewport,
 } from '@radix-ui/react-select';
 import Tooltip from 'components/Tooltip/Tooltip';
+import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import Button from '../Button/Button';
@@ -39,6 +40,7 @@ type SelectProps = {
     description?: string;
     fieldsetClassName?: string;
     label?: string;
+    leadingIcon?: ReactNode;
     onValueChange?(value: string): void;
     triggerClassName?: string;
     value?: string;
@@ -51,6 +53,7 @@ const Select = ({
     description,
     fieldsetClassName,
     label,
+    leadingIcon,
     options,
     onValueChange,
     triggerClassName,
@@ -80,11 +83,25 @@ const Select = ({
             value={value}
         >
             <Trigger asChild aria-label="Select">
-                <Button className={triggerClassName} displayType="light">
+                <Button
+                    className={twMerge(
+                        leadingIcon && 'relative pl-10',
+                        triggerClassName
+                    )}
+                    displayType="light"
+                >
                     {customValueComponent ? (
                         <Value aria-label={value}>{customValueComponent}</Value>
                     ) : (
-                        <Value />
+                        <>
+                            {leadingIcon && (
+                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r border-gray-300 px-2">
+                                    {leadingIcon}
+                                </div>
+                            )}
+
+                            <Value />
+                        </>
                     )}
 
                     <Icon className="ml-auto pl-2">
