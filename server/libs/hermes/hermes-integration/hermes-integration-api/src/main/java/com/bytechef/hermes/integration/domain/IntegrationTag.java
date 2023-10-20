@@ -37,14 +37,14 @@ public final class IntegrationTag implements Persistable<Long> {
     private Long id;
 
     @Column("tag_id")
-    private AggregateReference<Tag, Long> tagRef;
+    private AggregateReference<Tag, Long> tagId;
 
     public IntegrationTag() {
     }
 
     @SuppressFBWarnings("NP")
     public IntegrationTag(Tag tag) {
-        this.tagRef = tag.isNew() ? null : AggregateReference.to(tag.getId());
+        this.tagId = tag.isNew() ? null : AggregateReference.to(tag.getId());
     }
 
     @Override
@@ -58,7 +58,7 @@ public final class IntegrationTag implements Persistable<Long> {
 
         IntegrationTag that = (IntegrationTag) o;
 
-        return Objects.equals(id, that.id) && Objects.equals(tagRef, that.tagRef);
+        return Objects.equals(id, that.id) && Objects.equals(tagId, that.tagId);
     }
 
     @Override
@@ -72,7 +72,7 @@ public final class IntegrationTag implements Persistable<Long> {
     }
 
     public Long getTagId() {
-        return tagRef.getId();
+        return tagId.getId();
     }
 
     @Override

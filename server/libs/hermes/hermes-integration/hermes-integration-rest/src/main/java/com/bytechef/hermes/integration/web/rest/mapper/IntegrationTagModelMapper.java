@@ -27,7 +27,7 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = IntegrationMapperSpringConfig.class)
-public interface TagModelMapper extends Converter<TagModel, Tag> {
+public interface IntegrationTagModelMapper extends Converter<TagModel, Tag> {
 
     Tag convert(TagModel tagModel);
 }

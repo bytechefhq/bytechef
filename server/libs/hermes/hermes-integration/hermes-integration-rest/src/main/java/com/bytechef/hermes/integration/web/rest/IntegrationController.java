@@ -90,11 +90,11 @@ public class IntegrationController implements IntegrationsApi {
 
     @Override
     public Mono<ResponseEntity<Flux<IntegrationModel>>> getIntegrations(
-        Long categoryId, Long tagId, ServerWebExchange exchange) {
+        List<Long> categoryIds, List<Long> tagIds, ServerWebExchange exchange) {
         return Mono.just(
             ResponseEntity.ok(
                 Flux.fromIterable(
-                    integrationFacade.getIntegrations(categoryId, tagId)
+                    integrationFacade.getIntegrations(categoryIds, tagIds)
                         .stream()
                         .map(integration -> conversionService.convert(integration, IntegrationModel.class))
                         .toList())));
@@ -158,10 +158,10 @@ public class IntegrationController implements IntegrationsApi {
 
     @Override
     public Mono<ResponseEntity<Void>> putIntegrationTags(
-        Long id, Mono<PutIntegrationTagsRequestModel> tagsRequestModelMono, ServerWebExchange exchange) {
+        Long id, Mono<PutIntegrationTagsRequestModel> putConnectionTagsRequestModelMono, ServerWebExchange exchange) {
 
-        return tagsRequestModelMono.map(tagsRequestModel -> {
-            List<TagModel> tagModels = tagsRequestModel.getTags();
+        return putConnectionTagsRequestModelMono.map(putIntegrationTagsRequestModel -> {
+            List<TagModel> tagModels = putIntegrationTagsRequestModel.getTags();
 
             integrationFacade.update(
                 id,
