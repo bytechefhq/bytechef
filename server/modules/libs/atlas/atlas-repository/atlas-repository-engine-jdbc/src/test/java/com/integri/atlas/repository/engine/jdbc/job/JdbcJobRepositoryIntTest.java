@@ -16,11 +16,15 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.engine.coordinator.job;
+package com.integri.atlas.repository.engine.jdbc.job;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
 import com.integri.atlas.engine.coordinator.Page;
+import com.integri.atlas.engine.coordinator.job.Job;
+import com.integri.atlas.engine.coordinator.job.JobStatus;
+import com.integri.atlas.engine.coordinator.job.JobSummary;
+import com.integri.atlas.engine.coordinator.job.SimpleJob;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
 import java.time.Instant;

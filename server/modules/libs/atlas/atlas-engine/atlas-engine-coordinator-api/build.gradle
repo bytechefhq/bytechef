@@ -1,6 +1,7 @@
 dependencies {
+    api project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
+
     implementation 'com.google.guava:guava'
     implementation 'org.apache.commons:commons-lang3'
     implementation "org.springframework.boot:spring-boot-autoconfigure"
-    implementation project(":modules:libs:atlas:atlas-engine:atlas-engine-core-api")
 }
