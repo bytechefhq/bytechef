@@ -3,7 +3,6 @@ package com.bytechef.helios.project.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.helios.project.web.rest.model.ProjectInstanceWorkflowConnectionModel;
-import com.bytechef.helios.project.web.rest.model.ProjectInstanceWorkflowProjectInstanceModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -29,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T12:16:52.208086+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-04T12:27:26.489882+02:00[Europe/Zagreb]")
 public class ProjectInstanceWorkflowModel {
 
   @Valid
@@ -38,11 +37,6 @@ public class ProjectInstanceWorkflowModel {
   @Valid
   private List<@Valid ProjectInstanceWorkflowConnectionModel> connections;
 
-  private String createdBy;
-
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime createdDate;
-
   private Boolean enabled;
 
   private Long id;
@@ -50,18 +44,7 @@ public class ProjectInstanceWorkflowModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastExecutionDate;
 
-  private String lastModifiedBy;
-
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastModifiedDate;
-
-  private ProjectInstanceWorkflowProjectInstanceModel projectInstance;
-
-  private Long projectInstanceId;
-
   private Integer workflowId;
-
-  private Integer version;
 
   public ProjectInstanceWorkflowModel inputs(Map<String, Object> inputs) {
     this.inputs = inputs;
@@ -117,46 +100,6 @@ public class ProjectInstanceWorkflowModel {
 
   public void setConnections(List<@Valid ProjectInstanceWorkflowConnectionModel> connections) {
     this.connections = connections;
-  }
-
-  public ProjectInstanceWorkflowModel createdBy(String createdBy) {
-    this.createdBy = createdBy;
-    return this;
-  }
-
-  /**
-   * The created by.
-   * @return createdBy
-  */
-  
-  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("createdBy")
-  public String getCreatedBy() {
-    return createdBy;
-  }
-
-  public void setCreatedBy(String createdBy) {
-    this.createdBy = createdBy;
-  }
-
-  public ProjectInstanceWorkflowModel createdDate(LocalDateTime createdDate) {
-    this.createdDate = createdDate;
-    return this;
-  }
-
-  /**
-   * The created date.
-   * @return createdDate
-  */
-  @Valid 
-  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("createdDate")
-  public LocalDateTime getCreatedDate() {
-    return createdDate;
-  }
-
-  public void setCreatedDate(LocalDateTime createdDate) {
-    this.createdDate = createdDate;
   }
 
   public ProjectInstanceWorkflowModel enabled(Boolean enabled) {
@@ -219,86 +162,6 @@ public class ProjectInstanceWorkflowModel {
     this.lastExecutionDate = lastExecutionDate;
   }
 
-  public ProjectInstanceWorkflowModel lastModifiedBy(String lastModifiedBy) {
-    this.lastModifiedBy = lastModifiedBy;
-    return this;
-  }
-
-  /**
-   * The last modified by.
-   * @return lastModifiedBy
-  */
-  
-  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("lastModifiedBy")
-  public String getLastModifiedBy() {
-    return lastModifiedBy;
-  }
-
-  public void setLastModifiedBy(String lastModifiedBy) {
-    this.lastModifiedBy = lastModifiedBy;
-  }
-
-  public ProjectInstanceWorkflowModel lastModifiedDate(LocalDateTime lastModifiedDate) {
-    this.lastModifiedDate = lastModifiedDate;
-    return this;
-  }
-
-  /**
-   * The last modified date.
-   * @return lastModifiedDate
-  */
-  @Valid 
-  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("lastModifiedDate")
-  public LocalDateTime getLastModifiedDate() {
-    return lastModifiedDate;
-  }
-
-  public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
-    this.lastModifiedDate = lastModifiedDate;
-  }
-
-  public ProjectInstanceWorkflowModel projectInstance(ProjectInstanceWorkflowProjectInstanceModel projectInstance) {
-    this.projectInstance = projectInstance;
-    return this;
-  }
-
-  /**
-   * Get projectInstance
-   * @return projectInstance
-  */
-  @Valid 
-  @Schema(name = "projectInstance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("projectInstance")
-  public ProjectInstanceWorkflowProjectInstanceModel getProjectInstance() {
-    return projectInstance;
-  }
-
-  public void setProjectInstance(ProjectInstanceWorkflowProjectInstanceModel projectInstance) {
-    this.projectInstance = projectInstance;
-  }
-
-  public ProjectInstanceWorkflowModel projectInstanceId(Long projectInstanceId) {
-    this.projectInstanceId = projectInstanceId;
-    return this;
-  }
-
-  /**
-   * Th id of a project instance.
-   * @return projectInstanceId
-  */
-  
-  @Schema(name = "projectInstanceId", description = "Th id of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("projectInstanceId")
-  public Long getProjectInstanceId() {
-    return projectInstanceId;
-  }
-
-  public void setProjectInstanceId(Long projectInstanceId) {
-    this.projectInstanceId = projectInstanceId;
-  }
-
   public ProjectInstanceWorkflowModel workflowId(Integer workflowId) {
     this.workflowId = workflowId;
     return this;
@@ -319,26 +182,6 @@ public class ProjectInstanceWorkflowModel {
     this.workflowId = workflowId;
   }
 
-  public ProjectInstanceWorkflowModel version(Integer version) {
-    this.version = version;
-    return this;
-  }
-
-  /**
-   * Get version
-   * @return version
-  */
-  
-  @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("__version")
-  public Integer getVersion() {
-    return version;
-  }
-
-  public void setVersion(Integer version) {
-    this.version = version;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -350,22 +193,15 @@ public class ProjectInstanceWorkflowModel {
     ProjectInstanceWorkflowModel projectInstanceWorkflow = (ProjectInstanceWorkflowModel) o;
     return Objects.equals(this.inputs, projectInstanceWorkflow.inputs) &&
         Objects.equals(this.connections, projectInstanceWorkflow.connections) &&
-        Objects.equals(this.createdBy, projectInstanceWorkflow.createdBy) &&
-        Objects.equals(this.createdDate, projectInstanceWorkflow.createdDate) &&
         Objects.equals(this.enabled, projectInstanceWorkflow.enabled) &&
         Objects.equals(this.id, projectInstanceWorkflow.id) &&
         Objects.equals(this.lastExecutionDate, projectInstanceWorkflow.lastExecutionDate) &&
-        Objects.equals(this.lastModifiedBy, projectInstanceWorkflow.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, projectInstanceWorkflow.lastModifiedDate) &&
-        Objects.equals(this.projectInstance, projectInstanceWorkflow.projectInstance) &&
-        Objects.equals(this.projectInstanceId, projectInstanceWorkflow.projectInstanceId) &&
-        Objects.equals(this.workflowId, projectInstanceWorkflow.workflowId) &&
-        Objects.equals(this.version, projectInstanceWorkflow.version);
+        Objects.equals(this.workflowId, projectInstanceWorkflow.workflowId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(inputs, connections, createdBy, createdDate, enabled, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, projectInstance, projectInstanceId, workflowId, version);
+    return Objects.hash(inputs, connections, enabled, id, lastExecutionDate, workflowId);
   }
 
   @Override
@@ -374,17 +210,10 @@ public class ProjectInstanceWorkflowModel {
     sb.append("class ProjectInstanceWorkflowModel {\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
-    sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
-    sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
-    sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
-    sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
-    sb.append("    projectInstance: ").append(toIndentedString(projectInstance)).append("\n");
-    sb.append("    projectInstanceId: ").append(toIndentedString(projectInstanceId)).append("\n");
     sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
-    sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
   }
