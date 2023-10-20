@@ -67,7 +67,7 @@ const ConnectionDialog = () => {
     } = useGetConnectionDefinitionQuery(
         componentDefinition
             ? {
-                  componentName: componentDefinition.name,
+                  name: componentDefinition.name,
               }
             : undefined
     );

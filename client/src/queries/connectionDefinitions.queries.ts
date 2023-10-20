@@ -21,9 +21,9 @@ export const useGetConnectionDefinitionQuery = (request?: Request) =>
     useQuery<ConnectionDefinitionModel, Error>(
         ConnectDefinitionKeys.connectionDefinitionDetails(request),
         () =>
-            new ConnectionDefinitionsApi().getComponentConnectionDefinition({
-                name: request!.componentName,
-            }),
+            new ConnectionDefinitionsApi().getComponentConnectionDefinition(
+                request!
+            ),
         {
             enabled: !!request?.componentName,
         }
