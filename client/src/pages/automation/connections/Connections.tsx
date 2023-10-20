@@ -86,7 +86,7 @@ const Connections = () => {
                                         setCurrent({id, type: Type.Component});
                                     },
                                 }}
-                                toLink={''}
+                                toLink=""
                             />
 
                             {!componentsLoading &&

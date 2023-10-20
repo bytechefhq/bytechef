@@ -16,11 +16,11 @@ export function DesktopSidebar({
     }[];
 }) {
     return (
-        <div className="hidden border-r border-gray-200 lg:flex lg:shrink-0 ">
+        <div className="hidden border-r border-gray-200 lg:flex lg:shrink-0">
             <div className="flex w-[64px]">
                 <div className="flex min-h-0 flex-1 flex-col overflow-y-auto dark:bg-gray-800">
                     <div className="flex-1">
-                        <Link to={''}>
+                        <Link to="">
                             <div className="flex items-center justify-center py-4">
                                 <img
                                     className="h-8 w-auto"
@@ -54,7 +54,7 @@ export function DesktopSidebar({
                     </div>
 
                     <div className="flex shrink-0 justify-center py-4">
-                        <Link className="flex" to={'/settings'}>
+                        <Link className="flex" to="/settings">
                             <Avatar size="small" />
                         </Link>
                     </div>

@@ -69,8 +69,13 @@ const ConnectionDialog = ({
     const [componentDefinition, setComponentDefinition] =
         useState<ComponentDefinitionBasicModel>();
 
-    const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] =
-        useState<boolean>(true);
+    useEffect(() => {
+        if (component) {
+            setComponentDefinition(component);
+        }
+    }, [component]);
+
+    const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
     const {
         control,

@@ -66,7 +66,7 @@ const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
             {showConnectionNote && (
                 <div className="mt-4 flex flex-col rounded-md bg-amber-100 p-4 text-gray-800">
                     <div className="flex pb-2">
-                        <span className="font-medium ">Note</span>
+                        <span className="font-medium">Note</span>
 
                         <Button
                             className="ml-auto p-0"
