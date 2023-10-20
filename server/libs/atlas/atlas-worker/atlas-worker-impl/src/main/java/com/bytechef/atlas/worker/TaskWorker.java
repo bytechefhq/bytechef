@@ -21,7 +21,7 @@ package com.bytechef.atlas.worker;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.domain.TaskExecution.Status;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.event.EventPublisher;
@@ -79,27 +79,27 @@ public class TaskWorker {
     private final MessageBroker messageBroker;
     private final TaskHandlerResolver taskHandlerResolver;
     private final Map<Long, TaskExecutionFuture<?>> taskExecutions = new ConcurrentHashMap<>();
-    private final WorkflowFileStorage workflowFileStorage;
+    private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     public TaskWorker(
         EventPublisher eventPublisher, MessageBroker messageBroker,
-        TaskHandlerResolver taskHandlerResolver, WorkflowFileStorage workflowFileStorage) {
+        TaskHandlerResolver taskHandlerResolver, WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.eventPublisher = eventPublisher;
         this.messageBroker = messageBroker;
         this.taskHandlerResolver = taskHandlerResolver;
-        this.workflowFileStorage = workflowFileStorage;
+        this.workflowFileStorageFacade = workflowFileStorageFacade;
     }
 
     public TaskWorker(
         EventPublisher eventPublisher, ExecutorService executorService, MessageBroker messageBroker,
-        TaskHandlerResolver taskHandlerResolver, WorkflowFileStorage workflowFileStorage) {
+        TaskHandlerResolver taskHandlerResolver, WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.eventPublisher = eventPublisher;
         this.executorService = executorService;
         this.messageBroker = messageBroker;
         this.taskHandlerResolver = taskHandlerResolver;
-        this.workflowFileStorage = workflowFileStorage;
+        this.workflowFileStorageFacade = workflowFileStorageFacade;
     }
 
     /**
@@ -116,7 +116,9 @@ public class TaskWorker {
         Future<?> future = executorService.submit(() -> {
             try {
                 eventPublisher.publishEvent(
-                    new TaskStartedEvent(taskExecution.getJobId(), taskExecution.getId()));
+                    new TaskStartedEvent(
+                        Objects.requireNonNull(taskExecution.getJobId()),
+                        Objects.requireNonNull(taskExecution.getId())));
 
                 TaskExecution completedTaskExecution = doExecuteTask(taskExecution);
 
@@ -179,6 +181,7 @@ public class TaskWorker {
         return Collections.unmodifiableMap(taskExecutions);
     }
 
+    @SuppressFBWarnings("NP")
     private TaskExecution doExecuteTask(TaskExecution taskExecution) throws Exception {
         Map<String, Object> context = new HashMap<>();
 
@@ -186,7 +189,7 @@ public class TaskWorker {
             long startTime = System.currentTimeMillis();
 
             // pre tasks
-            executeSubTasks(taskExecution, taskExecution.getPre(), context);
+            executeSubTasks(Objects.requireNonNull(taskExecution.getJobId()), taskExecution.getPre(), context);
 
             taskExecution.evaluate(context);
 
@@ -195,8 +198,9 @@ public class TaskWorker {
             Object output = taskHandler.handle(taskExecution.clone());
 
             if (output != null) {
-                taskExecution.setOutput(workflowFileStorage.storeTaskExecutionOutput(
-                    taskExecution.getId(), output));
+                taskExecution.setOutput(
+                    workflowFileStorageFacade.storeTaskExecutionOutput(
+                        Objects.requireNonNull(taskExecution.getId()), output));
             }
 
             taskExecution.setEndDate(LocalDateTime.now());
@@ -205,33 +209,62 @@ public class TaskWorker {
             taskExecution.setStatus(Status.COMPLETED);
 
             // post tasks
-            executeSubTasks(taskExecution, taskExecution.getPost(), context);
+            executeSubTasks(taskExecution.getJobId(), taskExecution.getPost(), context);
 
             return taskExecution;
         } finally {
             // finalize tasks
-            executeSubTasks(taskExecution, taskExecution.getFinalize(), context);
+            executeSubTasks(Objects.requireNonNull(taskExecution.getJobId()), taskExecution.getFinalize(), context);
+        }
+    }
+
+    @SuppressFBWarnings("NP")
+    private Object doExecuteSubTask(TaskExecution taskExecution) throws Exception {
+        Map<String, Object> context = new HashMap<>();
+
+        try {
+            long startTime = System.currentTimeMillis();
+
+            // pre tasks
+            executeSubTasks(Objects.requireNonNull(taskExecution.getJobId()), taskExecution.getPre(), context);
+
+            taskExecution.evaluate(context);
+
+            TaskHandler<?> taskHandler = taskHandlerResolver.resolve(taskExecution);
+
+            Object output = taskHandler.handle(taskExecution.clone());
+
+            taskExecution.setEndDate(LocalDateTime.now());
+            taskExecution.setExecutionTime(System.currentTimeMillis() - startTime);
+            taskExecution.setProgress(100);
+            taskExecution.setStatus(Status.COMPLETED);
+
+            // post tasks
+            executeSubTasks(taskExecution.getJobId(), taskExecution.getPost(), context);
+
+            return output;
+        } finally {
+            // finalize tasks
+            executeSubTasks(Objects.requireNonNull(taskExecution.getJobId()), taskExecution.getFinalize(), context);
         }
     }
 
     private void executeSubTasks(
-        TaskExecution taskExecution, List<WorkflowTask> subWorkflowTasks, Map<String, Object> context)
+        long jobId, List<WorkflowTask> subWorkflowTasks, Map<String, Object> context)
         throws Exception {
 
         for (WorkflowTask subWorkflowTask : subWorkflowTasks) {
             TaskExecution subTaskExecution = TaskExecution.builder()
-                .jobId(taskExecution.getJobId())
+                .jobId(jobId)
                 .workflowTask(subWorkflowTask)
                 .build();
 
             subTaskExecution.evaluate(context);
 
-            TaskExecution completionTaskExecution = doExecuteTask(subTaskExecution);
+            Object output = doExecuteSubTask(subTaskExecution);
 
-            if (completionTaskExecution.getName() != null) {
-                context.put(
-                    completionTaskExecution.getName(),
-                    workflowFileStorage.readTaskExecutionOutput(completionTaskExecution.getOutput()));
+            if (subTaskExecution.getName() != null && output != null) {
+                context.put(subTaskExecution.getName(), output);
             }
         }
     }

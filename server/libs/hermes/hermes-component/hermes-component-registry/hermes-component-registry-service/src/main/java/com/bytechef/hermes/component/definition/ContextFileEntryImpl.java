@@ -25,36 +25,54 @@ import java.util.Map;
 
 public class ContextFileEntryImpl implements Context.FileEntry {
 
-    private final FileEntry fileEntry;
+    private final String extension;
+    private final String mimeType;
+    private final String name;
+    private final String url;
 
     public ContextFileEntryImpl(FileEntry fileEntry) {
-        this.fileEntry = fileEntry;
+        this(fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getName(), fileEntry.getUrl());
+    }
+
+    public ContextFileEntryImpl(String extension, String mimeType, String name, String url) {
+        this.extension = extension;
+        this.mimeType = mimeType;
+        this.name = name;
+        this.url = url;
     }
 
     @Override
+
     public String getExtension() {
-        return fileEntry.getExtension();
+        return extension;
+    }
+
+    public FileEntry getFileEntry() {
+        return new FileEntry(name, url);
     }
 
     @Override
     public String getMimeType() {
-        return fileEntry.getMimeType();
+        return mimeType;
     }
 
     @Override
     public String getName() {
-        return fileEntry.getName();
+        return name;
     }
 
     @Override
     public String getUrl() {
-        return fileEntry.getUrl();
+        return url;
     }
 
     @Override
     public String toString() {
         return "ContextFileEntryImpl{" +
-            "fileEntry=" + fileEntry +
+            "extension='" + extension + '\'' +
+            ", mimeType='" + mimeType + '\'' +
+            ", name='" + name + '\'' +
+            ", url='" + url + '\'' +
             '}';
     }
 
@@ -65,17 +83,9 @@ public class ContextFileEntryImpl implements Context.FileEntry {
 
         @Override
         public Context.FileEntry convert(Map source) {
-            FileEntry fileEntry;
-
-            if (source.containsKey("fileEntry")) {
-                fileEntry = MapUtils.getRequired(source, "fileEntry", FileEntry.class);
-            } else {
-                fileEntry = new FileEntry(
-                    MapUtils.getRequiredString(source, "context"), MapUtils.getRequiredString(source, "name"),
-                    MapUtils.getRequiredString(source, "url"));
-            }
-
-            return new ContextFileEntryImpl(fileEntry);
+            return new ContextFileEntryImpl(
+                MapUtils.getRequiredString(source, "extension"), MapUtils.getRequiredString(source, "mimeType"),
+                MapUtils.getRequiredString(source, "name"), MapUtils.getRequiredString(source, "url"));
         }
     }
 }

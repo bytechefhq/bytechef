@@ -17,7 +17,7 @@
 
 package com.bytechef.execution.config;
 
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.facade.JobFacadeImpl;
@@ -57,11 +57,11 @@ public class WorkflowExecutionConfiguration {
     @Bean
     JobFacade jobFacade(
         ContextService contextService, EventPublisher eventPublisher, JobService jobService,
-        MessageBroker messageBroker, WorkflowFileStorage workflowFileStorage,
+        MessageBroker messageBroker, WorkflowFileStorageFacade workflowFileStorageFacade,
         WorkflowService workflowService) {
 
         return new JobFacadeImpl(
-            contextService, eventPublisher, jobService, messageBroker, workflowFileStorage, workflowService);
+            contextService, eventPublisher, jobService, messageBroker, workflowFileStorageFacade, workflowService);
     }
 
     @Bean

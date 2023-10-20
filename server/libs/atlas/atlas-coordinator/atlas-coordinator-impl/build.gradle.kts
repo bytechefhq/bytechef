@@ -13,12 +13,13 @@ dependencies {
     implementation(project(":server:libs:core:evaluator"))
 
     testImplementation("com.fasterxml.jackson.core:jackson-databind")
+    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
+    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-converter"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-resource"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
-    testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-converter"))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-jdbc"))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))
     testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))
@@ -28,6 +29,5 @@ dependencies {
     testImplementation(project(":server:libs:core:message-broker:message-broker-sync"))
     testImplementation(project(":server:libs:core:commons:commons-data"))
     testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
-    testImplementation(project(":server:libs:core:file-storage:file-storage-converter"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

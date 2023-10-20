@@ -21,7 +21,7 @@ import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -60,14 +60,14 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     private final ProjectInstanceService projectInstanceService;
     private final ProjectService projectService;
     private final TaskExecutionService taskExecutionService;
-    private final WorkflowFileStorage workflowFileStorage;
+    private final WorkflowFileStorageFacade workflowFileStorageFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public WorkflowExecutionFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService, JobService jobService,
         ProjectInstanceService projectInstanceService, ProjectService projectService,
-        TaskExecutionService taskExecutionService, WorkflowFileStorage workflowFileStorage,
+        TaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade,
         WorkflowService workflowService) {
 
         this.componentDefinitionService = componentDefinitionService;
@@ -76,7 +76,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         this.projectInstanceService = projectInstanceService;
         this.projectService = projectService;
         this.taskExecutionService = taskExecutionService;
-        this.workflowFileStorage = workflowFileStorage;
+        this.workflowFileStorageFacade = workflowFileStorageFacade;
         this.workflowService = workflowService;
     }
 
@@ -87,7 +87,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         Job job = jobService.getJob(id);
 
         JobDTO jobDTO = new JobDTO(
-            job, workflowFileStorage.readJobOutputs(job.getOutputs()), getJobTaskExecutions(id));
+            job, workflowFileStorageFacade.readJobOutputs(job.getOutputs()), getJobTaskExecutions(id));
 
         return new WorkflowExecutionDTO(
             Objects.requireNonNull(jobDTO.id()),
@@ -141,10 +141,10 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             .stream()
             .map(taskExecution -> new TaskExecutionDTO(
                 getComponentDefinition(taskExecution),
-                workflowFileStorage.readContextValue(
+                workflowFileStorageFacade.readContextValue(
                     contextService.peek(
                         Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION)),
-                workflowFileStorage.readTaskExecutionOutput(taskExecution.getOutput()),
+                workflowFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()),
                 taskExecutionService.getTaskExecution(taskExecution.getId())))
             .toList();
     }

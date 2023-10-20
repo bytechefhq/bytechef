@@ -28,7 +28,7 @@ import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstan
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -58,20 +58,20 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
     private final MessageBroker messageBroker;
     private final ContextService contextService;
     private final CounterService counterService;
-    private final WorkflowFileStorage workflowFileStorage;
+    private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public MapTaskDispatcher(
         ContextService contextService, CounterService counterService, MessageBroker messageBroker,
         TaskDispatcher<? super TaskExecution> taskDispatcher, TaskExecutionService taskExecutionService,
-        WorkflowFileStorage workflowFileStorage) {
+        WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.contextService = contextService;
         this.counterService = counterService;
         this.messageBroker = messageBroker;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
-        this.workflowFileStorage = workflowFileStorage;
+        this.workflowFileStorageFacade = workflowFileStorageFacade;
     }
 
     @Override
@@ -105,7 +105,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
                     .build();
 
                 Map<String, Object> newContext = new HashMap<>(
-                    workflowFileStorage.readContextValue(
+                    workflowFileStorageFacade.readContextValue(
                         contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION)));
 
                 newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
@@ -117,7 +117,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
 
                 contextService.push(
                     Objects.requireNonNull(iterateeTaskExecution.getId()), Context.Classname.TASK_EXECUTION,
-                    workflowFileStorage.storeTaskExecutionOutput(iterateeTaskExecution.getId(), newContext));
+                    workflowFileStorageFacade.storeTaskExecutionOutput(iterateeTaskExecution.getId(), newContext));
 
                 taskDispatcher.dispatch(iterateeTaskExecution);
             }

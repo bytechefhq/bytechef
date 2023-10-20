@@ -17,9 +17,9 @@
 
 package com.bytechef.hermes.component.definition.factory;
 
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
 import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.event.EventPublisher;
+import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ContextImpl;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
@@ -40,18 +40,18 @@ public class ContextFactory {
     private final ConnectionService connectionService;
     private final DataStorageService dataStorageService;
     private final EventPublisher eventPublisher;
-    private final WorkflowFileStorage workflowFileStorage;
+    private final FileStorageService fileStorageService;
 
     @SuppressFBWarnings("EI")
     public ContextFactory(
         ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        DataStorageService dataStorageService, EventPublisher eventPublisher, WorkflowFileStorage workflowFileStorage) {
+        DataStorageService dataStorageService, EventPublisher eventPublisher, FileStorageService fileStorageService) {
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
         this.dataStorageService = dataStorageService;
         this.eventPublisher = eventPublisher;
-        this.workflowFileStorage = workflowFileStorage;
+        this.fileStorageService = fileStorageService;
     }
 
     public ActionContext createActionContext(Map<String, Long> connectionIdMap, Long taskExecutionId) {
@@ -68,8 +68,7 @@ public class ContextFactory {
 
     private ContextImpl createContextImpl(Map<String, Long> connectionIdMap, Long taskExecutionId) {
         return new ContextImpl(
-            connectionIdMap, connectionDefinitionService, connectionService, dataStorageService, eventPublisher,
-            taskExecutionId,
-            workflowFileStorage);
+            connectionDefinitionService, connectionIdMap, connectionService, dataStorageService, eventPublisher,
+            fileStorageService, taskExecutionId);
     }
 }

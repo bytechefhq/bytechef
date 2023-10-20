@@ -13,5 +13,7 @@ dependencies {
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     implementation(project(":server:libs:modules:task-dispatchers:map"))
 
+    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
+    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     testImplementation(project(":server:libs:core:commons:commons-util"))
 }

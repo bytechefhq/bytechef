@@ -25,8 +25,9 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.domain.TaskExecution.Status;
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.execution.event.JobStatusEvent;
 import com.bytechef.atlas.execution.service.JobService;
@@ -61,13 +62,13 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private final JobExecutor jobExecutor;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
-    private final WorkflowFileStorage workflowFileStorage;
+    private final WorkflowFileStorageFacade workflowFileStorageFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public DefaultTaskCompletionHandler(
         ContextService contextService, EventPublisher eventPublisher, JobExecutor jobExecutor, JobService jobService,
-        TaskExecutionService taskExecutionService, WorkflowFileStorage workflowFileStorage,
+        TaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade,
         WorkflowService workflowService) {
 
         this.contextService = contextService;
@@ -75,7 +76,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         this.jobExecutor = jobExecutor;
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
-        this.workflowFileStorage = workflowFileStorage;
+        this.workflowFileStorageFacade = workflowFileStorageFacade;
         this.workflowService = workflowService;
     }
 
@@ -111,16 +112,16 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
             if (taskExecution.getOutput() != null && taskExecution.getName() != null) {
                 Map<String, Object> newContext = new HashMap<>(
-                    workflowFileStorage.readContextValue(
+                    workflowFileStorageFacade.readContextValue(
                         contextService.peek(Objects.requireNonNull(job.getId()), Context.Classname.JOB)));
 
                 newContext.put(
                     taskExecution.getName(),
-                    workflowFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
+                    workflowFileStorageFacade.readTaskExecutionOutput(taskExecution.getOutput()));
 
                 contextService.push(
                     job.getId(), Context.Classname.JOB,
-                    workflowFileStorage.storeContextValue(job.getId(), Context.Classname.JOB, newContext));
+                    workflowFileStorageFacade.storeContextValue(job.getId(), Context.Classname.JOB, newContext));
             }
 
             if (hasMoreTasks(job)) {
@@ -139,20 +140,17 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private void complete(Job job) {
         Assert.notNull(job.getId(), "'job.id' must not be null");
 
-        Map<String, ?> context = workflowFileStorage.readContextValue(
+        Map<String, ?> context = workflowFileStorageFacade.readContextValue(
             contextService.peek(job.getId(), Context.Classname.JOB));
         Workflow workflow = workflowService.getWorkflow(job.getWorkflowId());
 
-        Map<String, Object> source = new HashMap<>();
-
-        for (Workflow.Output output : workflow.getOutputs()) {
-            source.put(output.name(), output.value());
-        }
+        Map<String, Object> source = MapUtils.toMap(
+            workflow.getOutputs(), Workflow.Output::name, Workflow.Output::value);
 
         job.setCurrentTask(-1);
         job.setEndDate(LocalDateTime.now());
         job.setStatus(Job.Status.COMPLETED);
-        job.setOutputs(workflowFileStorage.storeJobOutputs(job.getId(), Evaluator.evaluate(source, context)));
+        job.setOutputs(workflowFileStorageFacade.storeJobOutputs(job.getId(), Evaluator.evaluate(source, context)));
 
         job = jobService.update(job);
 

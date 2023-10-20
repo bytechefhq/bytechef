@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.registry.trigger;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.hermes.component.definition.Context.FileEntry;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
@@ -46,8 +46,7 @@ public record WebhookRequest(
         public WebhookRequest convert(Map<String, Object> source) {
             WebhookRequest.WebhookBodyImpl webhookBody = null;
 
-            if (MapUtils.containsKey(source,
-                BODY)) {
+            if (MapUtils.containsKey(source, BODY)) {
                 Map<String, ?> bodyMap = MapUtils.getRequiredMap(source, BODY);
 
                 Object content;

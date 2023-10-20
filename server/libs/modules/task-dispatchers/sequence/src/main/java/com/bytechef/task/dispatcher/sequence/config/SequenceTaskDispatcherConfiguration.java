@@ -18,7 +18,7 @@
 package com.bytechef.task.dispatcher.sequence.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -45,17 +45,17 @@ public class SequenceTaskDispatcherConfiguration {
     private TaskExecutionService taskExecutionService;
 
     @Autowired
-    private WorkflowFileStorage workflowFileStorage;
+    private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @Bean("sequenceTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory sequenceTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new SequenceTaskCompletionHandler(
-            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, workflowFileStorage);
+            contextService, taskCompletionHandler, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
     }
 
     @Bean("sequenceTaskDispatcherResolverFactory_v1")
     TaskDispatcherResolverFactory sequenceTaskDispatcherResolverFactory() {
         return (taskDispatcher) -> new SequenceTaskDispatcher(
-            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorage);
+            contextService, messageBroker, taskDispatcher, taskExecutionService, workflowFileStorageFacade);
     }
 }

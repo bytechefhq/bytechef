@@ -17,8 +17,8 @@
 
 package com.bytechef.atlas.file.storage.config;
 
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
-import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.config.FileStorageProperties;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
@@ -34,11 +34,11 @@ import org.springframework.context.annotation.Configuration;
 public class WorkflowFileStorageConfiguration {
 
     @Bean
-    WorkflowFileStorage workflowFileStorageFacade(
+    WorkflowFileStorageFacade workflowFileStorageFacade(
         FileStorageProperties fileStorageProperties, ObjectMapper objectMapper,
         @Value("${bytechef.workflow.output-storage.provider}") String workflowOutputStorageProvider) {
 
-        return new WorkflowFileStorageImpl(
+        return new WorkflowFileStorageFacadeImpl(
             switch (workflowOutputStorageProvider) {
                 case "base64" -> new Base64FileStorageService();
                 case "filesystem" -> new FilesystemFileStorageService(fileStorageProperties.getFileStorageDir());

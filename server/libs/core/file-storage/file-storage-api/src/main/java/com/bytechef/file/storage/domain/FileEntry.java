@@ -17,41 +17,44 @@
 
 package com.bytechef.file.storage.domain;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.MimeTypeUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.util.Assert;
+
 import java.util.Map;
 import java.util.Objects;
-
-import com.bytechef.commons.util.MimeTypeUtils;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
  */
 public class FileEntry {
 
-    private String context;
+    private static final char UNIX_NAME_SEPARATOR = '/';
+    private static final char WINDOWS_NAME_SEPARATOR = '\\';
+
+    private String extension;
+    private String mimeType;
     private String name;
     private String url;
 
-    private FileEntry() {
+    protected FileEntry() {
     }
 
     @SuppressFBWarnings("NP")
-    public FileEntry(String context, String filename, String url) {
-        Assert.notNull(context, "'context' must not be null");
+    public FileEntry(String filename, String url) {
         Assert.notNull(filename, "'filename' must not be null");
         Assert.notNull(url, "'url' must not be null");
 
-        this.context = context;
+        this.name = filename.substring(indexOfLastSeparator(filename) + 1);
 
-        Path path = Paths.get(filename);
+        if (name.contains(".")) {
+            this.extension = name.substring(name.lastIndexOf(".") + 1);
 
-        Path fileNamePath = Objects.requireNonNull(path.getFileName());
+            this.mimeType = MimeTypeUtils.getMimeType(extension);
+        }
 
-        this.name = fileNamePath.toString();
         this.url = url;
     }
 
@@ -74,24 +77,12 @@ public class FileEntry {
         return Objects.hash(name, url);
     }
 
-    public String getContext() {
-        return context;
-    }
-
-    @JsonIgnore
     public String getExtension() {
-        String extension = null;
-
-        if (name.contains(".")) {
-            extension = name.substring(name.lastIndexOf(".") + 1);
-        }
-
         return extension;
     }
 
-    @JsonIgnore
     public String getMimeType() {
-        return MimeTypeUtils.getMimeType(getExtension());
+        return mimeType;
     }
 
     public String getName() {
@@ -102,16 +93,30 @@ public class FileEntry {
         return url;
     }
 
-    public Map<String, String> toMap() {
-        return Map.of("context", context, "name", name, "url", url);
-    }
-
     @Override
     public String toString() {
         return "FileEntry{" +
-            "context='" + context + '\'' +
-            ", name='" + name + '\'' +
+            "name='" + name + '\'' +
             ", url='" + url + '\'' +
             '}';
+    }
+
+    private int indexOfLastSeparator(final String fileName) {
+        int lastUnixPos = fileName.lastIndexOf(UNIX_NAME_SEPARATOR);
+        int lastWindowsPos = fileName.lastIndexOf(WINDOWS_NAME_SEPARATOR);
+
+        return Math.max(lastUnixPos, lastWindowsPos);
+    }
+
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    public static class FileEntryConverter implements Converter<Map, FileEntry> {
+
+        @Override
+        public FileEntry convert(Map source) {
+            return new FileEntry(
+                MapUtils.getRequiredString(source, "name"), MapUtils.getRequiredString(source, "url"));
+        }
     }
 }

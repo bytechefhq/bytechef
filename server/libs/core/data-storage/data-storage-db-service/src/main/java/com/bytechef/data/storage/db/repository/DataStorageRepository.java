@@ -17,7 +17,7 @@
 
 package com.bytechef.data.storage.db.repository;
 
-import com.bytechef.data.storage.domain.DataEntry;
+import com.bytechef.data.storage.db.domain.DataEntry;
 import org.springframework.data.relational.core.sql.LockMode;
 import org.springframework.data.relational.repository.Lock;
 import org.springframework.data.repository.ListCrudRepository;

@@ -24,7 +24,7 @@ import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConst
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -61,20 +61,20 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     private final MessageBroker messageBroker;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
-    private final WorkflowFileStorage workflowFileStorage;
+    private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public EachTaskDispatcher(
         MessageBroker messageBroker, ContextService contextService, CounterService counterService,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
-        WorkflowFileStorage workflowFileStorage) {
+        WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
         this.messageBroker = messageBroker;
         this.contextService = contextService;
         this.counterService = counterService;
-        this.workflowFileStorage = workflowFileStorage;
+        this.workflowFileStorageFacade = workflowFileStorageFacade;
     }
 
     @Override
@@ -108,7 +108,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
                     .build();
 
                 Map<String, Object> newContext = new HashMap<>(
-                    workflowFileStorage.readContextValue(
+                    workflowFileStorageFacade.readContextValue(
                         contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION)));
 
                 WorkflowTask workflowTask = taskExecution.getWorkflowTask();
@@ -119,7 +119,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
                 contextService.push(
                     Objects.requireNonNull(iterateeTaskExecution.getId()), Context.Classname.TASK_EXECUTION,
-                    workflowFileStorage.storeContextValue(
+                    workflowFileStorageFacade.storeContextValue(
                         iterateeTaskExecution.getId(), Context.Classname.TASK_EXECUTION, newContext));
 
                 taskDispatcher.dispatch(iterateeTaskExecution);

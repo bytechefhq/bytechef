@@ -17,8 +17,8 @@
 
 package com.bytechef.hermes.task.dispatcher.test.config;
 
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
-import com.bytechef.atlas.file.storage.WorkflowFileStorageImpl;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
@@ -100,12 +100,12 @@ public class TaskDispatcherIntTestConfiguration {
         @Bean
         TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport(
             ContextService contextService, CounterService counterService, EventPublisher eventPublisher,
-            JobService jobService, TaskExecutionService taskExecutionService,
-            WorkflowFileStorage workflowFileStorage, WorkflowService workflowService) {
+            JobService jobService, ObjectMapper objectMapper, TaskExecutionService taskExecutionService,
+            WorkflowFileStorageFacade workflowFileStorageFacade, WorkflowService workflowService) {
 
             return new TaskDispatcherWorkflowTestSupport(
-                contextService, counterService, jobService, eventPublisher, taskExecutionService,
-                workflowFileStorage, workflowService);
+                contextService, counterService, jobService, eventPublisher, objectMapper, taskExecutionService,
+                workflowFileStorageFacade, workflowService);
         }
 
         @Bean
@@ -129,8 +129,8 @@ public class TaskDispatcherIntTestConfiguration {
     public static class WorkflowFileStorageConfiguration {
 
         @Bean
-        WorkflowFileStorage workflowFileStorageFacade(ObjectMapper objectMapper) {
-            return new WorkflowFileStorageImpl(new Base64FileStorageService(), objectMapper);
+        WorkflowFileStorageFacade workflowFileStorageFacade(ObjectMapper objectMapper) {
+            return new WorkflowFileStorageFacadeImpl(new Base64FileStorageService(), objectMapper);
         }
     }
 }

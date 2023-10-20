@@ -39,23 +39,32 @@ public class DataStorageServiceClient implements DataStorageService {
     }
 
     @Override
-    public <T> Optional<T> fetchData(String context, int scope, long scopeId, String key) {
-        return Optional.ofNullable(
-            loadBalancedWebClient.get(
-                uriBuilder -> uriBuilder
-                    .host("execution-service-app")
-                    .path("/internal/data-storage-service/fetch-value/{scope}/{scopeId}/{key}")
-                    .build(scope, scopeId, key),
-                new ParameterizedTypeReference<T>() {}));
+    public <T> Optional<T> fetch(String context, int scope, long scopeId, String key) {
+        return Optional.ofNullable(get(scope, scopeId, key, new ParameterizedTypeReference<T>() {}));
     }
 
     @Override
-    public void save(String context, int scope, long scopeId, String key, Object data) {
+    public <T> T get(String context, int scope, long scopeId, String key) {
+        return Optional.ofNullable(get(scope, scopeId, key, new ParameterizedTypeReference<T>() {}))
+            .orElseThrow();
+    }
+
+    @Override
+    public void put(String context, int scope, long scopeId, String key, Object value) {
         loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/internal/data-storage-service/save/{context}/{scope}/{scopeId}/{key}")
                 .build(context, scope, scope, key),
-            data);
+            value);
+    }
+
+    private <T> T get(int scope, long scopeId, String key, ParameterizedTypeReference<T> responseTypeRef) {
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
+                .host("execution-service-app")
+                .path("/internal/data-storage-service/fetch-value/{scope}/{scopeId}/{key}")
+                .build(scope, scopeId, key),
+            responseTypeRef);
     }
 }
