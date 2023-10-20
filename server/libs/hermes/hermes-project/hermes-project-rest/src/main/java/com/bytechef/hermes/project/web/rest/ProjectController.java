@@ -57,6 +57,29 @@ public class ProjectController implements ProjectsApi {
     }
 
     @Override
+    @Transactional
+    public Mono<ResponseEntity<ProjectModel>> createProject(
+        Mono<ProjectModel> projectModelMono, ServerWebExchange exchange) {
+
+        return projectModelMono.map(projectModel -> ResponseEntity.ok(
+            conversionService.convert(
+                projectFacade.create(conversionService.convert(projectModel, Project.class)),
+                ProjectModel.class)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<ProjectModel>> createProjectWorkflow(
+        Long id, Mono<CreateProjectWorkflowRequestModel> createProjectWorkflowRequestModelMono,
+        ServerWebExchange exchange) {
+
+        return createProjectWorkflowRequestModelMono.map(requestModel -> ResponseEntity.ok(
+            conversionService.convert(
+                projectFacade.addWorkflow(
+                    id, requestModel.getName(), requestModel.getDescription(), requestModel.getDefinition()),
+                ProjectModel.class)));
+    }
+
+    @Override
     public Mono<ResponseEntity<Void>> deleteProject(Long id, ServerWebExchange exchange) {
         projectFacade.delete(id);
 
@@ -123,29 +146,6 @@ public class ProjectController implements ProjectsApi {
                         .stream()
                         .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
                         .toList())));
-    }
-
-    @Override
-    @Transactional
-    public Mono<ResponseEntity<ProjectModel>> createProject(
-        Mono<ProjectModel> projectModelMono, ServerWebExchange exchange) {
-
-        return projectModelMono.map(projectModel -> ResponseEntity.ok(
-            conversionService.convert(
-                projectFacade.create(conversionService.convert(projectModel, Project.class)),
-                ProjectModel.class)));
-    }
-
-    @Override
-    public Mono<ResponseEntity<ProjectModel>> createProjectWorkflow(
-        Long id, Mono<CreateProjectWorkflowRequestModel> createProjectWorkflowRequestModelMono,
-        ServerWebExchange exchange) {
-
-        return createProjectWorkflowRequestModelMono.map(requestModel -> ResponseEntity.ok(
-            conversionService.convert(
-                projectFacade.addWorkflow(
-                    id, requestModel.getName(), requestModel.getDescription(), requestModel.getDefinition()),
-                ProjectModel.class)));
     }
 
     @Override
