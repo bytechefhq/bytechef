@@ -27,29 +27,29 @@ You can provide a configuration file for ByteChef. For more details check [Confi
 
 | Variable                                   | Type                                | Default                                              | Description                                          |
 |:-------------------------------------------|:------------------------------------|:-----------------------------------------------------|:-----------------------------------------------------|
-| ATLAS_MESSAGE-BROKER_PROVIDER              | enum: `jms`, `amqp`, `kafka`, `jms` | jms  | Messaging provider between Coordinator and Workers.
+| WORKFLOW_MESSAGE-BROKER_PROVIDER              | enum: `jms`, `amqp`, `kafka`, `jms` | jms  | Messaging provider between Coordinator and Workers.
 
 ## Workflow Repository
 
 | Variable                                   | Type    | Default                                              | Description                                                                         |
 |:-------------------------------------------|:--------|:-----------------------------------------------------|:------------------------------------------------------------------------------------|
-| ATLAS_WORKFLOW-REPOSITORY_GIT_ENABLED      | boolean | false                                                |                                                                                     |
-| ATLAS_WORKFLOW-REPOSITORY_GIT_URL          | string  | https://github.com/bytechefhq/bytechef-workflows.git | The URL to the Git repository.                                                      |
-| ATLAS_WORKFLOW-REPOSITORY_GIT_BRANCH       | string  | master                                               | The Git repository branch to use.                                                   |
-| ATLAS_WORKFLOW-REPOSITORY_GIT_USERNAME     | string  |                                                      | The git username.                                                                   |
-| ATLAS_WORKFLOW-REPOSITORY_GIT_PASSWORD     | string  |                                                      | The git password.                                                                   |
-| ATLAS_WORKFLOW-REPOSITORY_GIT_SEARCH-PATHS | string  |                                                      | Comma-separated list of folders within the git repo that are scanned for workflows. |
+| WORKFLOW_WORKFLOW-REPOSITORY_GIT_ENABLED      | boolean | false                                                |                                                                                     |
+| WORKFLOW_WORKFLOW-REPOSITORY_GIT_URL          | string  | https://github.com/bytechefhq/bytechef-workflows.git | The URL to the Git repository.                                                      |
+| WORKFLOW_WORKFLOW-REPOSITORY_GIT_BRANCH       | string  | master                                               | The Git repository branch to use.                                                   |
+| WORKFLOW_WORKFLOW-REPOSITORY_GIT_USERNAME     | string  |                                                      | The git username.                                                                   |
+| WORKFLOW_WORKFLOW-REPOSITORY_GIT_PASSWORD     | string  |                                                      | The git password.                                                                   |
+| WORKFLOW_WORKFLOW-REPOSITORY_GIT_SEARCH-PATHS | string  |                                                      | Comma-separated list of folders within the git repo that are scanned for workflows. |
 
 ## Worker
 
 | Variable                                | Type   | Default | Description                                                                                                                                                                                                                                                                                                                                                                                                         |
 |:----------------------------------------|:-------|:-------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ATLAS_WORKER_SUBSCRIPTIONS_TASKS        | number | 10     | When worker is enabled, subscribe to the default `tasks` queue with 10 concurrent consumers.                                                                                                                                                                                                                                                                                                                          |
-| ATLAS_WORKER_SUBSCRIPTIONS_[queue name] | string |        | You may also route workflow tasks to other arbitrarily named task queues by specifying the "node" property on any given task. E.g. node: captions will route to the captions queue which a worker would subscribe to with `ATLAS_WORKER_SUBSCRIPTIONS_CAPTIONS`. Note: queue must be created before tasks can be routed to it. ByteChef will create the queue if it isn't already there when the worker bootstraps. |
+| WORKFLOW_WORKER_SUBSCRIPTIONS_TASKS        | number | 10     | When worker is enabled, subscribe to the default `tasks` queue with 10 concurrent consumers.                                                                                                                                                                                                                                                                                                                          |
+| WORKFLOW_WORKER_SUBSCRIPTIONS_[queue name] | string |        | You may also route workflow tasks to other arbitrarily named task queues by specifying the "node" property on any given task. E.g. node: captions will route to the captions queue which a worker would subscribe to with `ATLAS_WORKER_SUBSCRIPTIONS_CAPTIONS`. Note: queue must be created before tasks can be routed to it. ByteChef will create the queue if it isn't already there when the worker bootstraps. |
 
 ## Storage
 
 | Variable                             | Type   | Default             | Description                                                        |
 |:-------------------------------------|:-------|:--------------------|:-------------------------------------------------------------------|
-| HERMES_FILE_STORAGE_PROVIDER         | enum: `filesystem` | filesystem                | The environment for storing files used during workflow executions. |
-| HERMES_FILE_STORAGE_FILE_STORAGE_DIR | string | /tmp/bytechef/files | The path to directory for storing files.                           |
+| FILE_STORAGE_PROVIDER         | enum: `filesystem` | filesystem                | The environment for storing files used during workflow executions. |
+| FILE_STORAGE_FILE_STORAGE_DIR | string | /tmp/bytechef/files | The path to directory for storing files.                           |

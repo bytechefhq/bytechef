@@ -37,7 +37,7 @@ For a step-by-step guide on ByteChef Cloud, [see the docs](https://docs.bytechef
 ### Try using Docker
 Want to give ByteChef a quick spin on your local machine? You can run the following command from your terminal to have ByteChef up and running right away.
 
-```shellTaskHandler
+```bashTaskHandler
 docker run \
   --name bytechef \
   --restart unless-stopped \
