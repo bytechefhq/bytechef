@@ -1,8 +1,8 @@
 import {
-    GetProjectWorkflowExecutionRequest,
-    GetProjectWorkflowExecutionsRequest,
-    ProjectWorkflowExecutionModel,
-    ProjectWorkflowExecutionsApi,
+    ExecutionModel,
+    GetExecutionRequest,
+    GetExecutionsRequest,
+    ProjectExecutionsApi,
 } from '@/middleware/helios/execution';
 import {useQuery} from '@tanstack/react-query';
 import {
@@ -39,11 +39,11 @@ export const ProjectKeys = {
         'projectWorkflows',
     ],
     projects: ['projects'] as const,
-    workflowExecution: (request: GetProjectWorkflowExecutionRequest) => [
+    workflowExecution: (request: GetExecutionRequest) => [
         'workflowExecution',
         request,
     ],
-    workflowExecutions: (filter: GetProjectWorkflowExecutionsRequest) => [
+    workflowExecutions: (filter: GetExecutionsRequest) => [
         'workflowExecutions',
         filter,
     ],
@@ -101,23 +101,18 @@ export const useGetProjectWorkflowsQuery = (id: number) =>
         new ProjectWorkflowsApi().getProjectWorkflows({id})
     );
 
-export const useGetProjectWorkflowExecutionsQuery = (
-    request: GetProjectWorkflowExecutionsRequest
-) =>
+export const useGetExecutionsQuery = (request: GetExecutionsRequest) =>
     useQuery<PageModel, Error>(ProjectKeys.workflowExecutions(request), () =>
-        new ProjectWorkflowExecutionsApi().getProjectWorkflowExecutions(request)
+        new ProjectExecutionsApi().getExecutions(request)
     );
 
 export const useGetWorkflowExecutionQuery = (
-    request: GetProjectWorkflowExecutionRequest,
+    request: GetExecutionRequest,
     isEnabled: boolean
 ) =>
-    useQuery<ProjectWorkflowExecutionModel, Error>(
+    useQuery<ExecutionModel, Error>(
         ProjectKeys.workflowExecution(request),
-        () =>
-            new ProjectWorkflowExecutionsApi().getProjectWorkflowExecution(
-                request
-            ),
+        () => new ProjectExecutionsApi().getExecution(request),
         {
             enabled: isEnabled,
         }
