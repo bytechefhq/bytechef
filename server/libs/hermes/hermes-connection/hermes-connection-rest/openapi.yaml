@@ -92,11 +92,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  description: TODO
-                  type: string
+              $ref: '#/components/schemas/Connection'
         required: true
       responses:
         "200":
@@ -119,12 +115,15 @@ components:
         authorizationName:
           description: TODO
           type: string
+          readOnly: true
         componentName:
           description: TODO
           type: string
+          readOnly: true
         componentVersion:
           description: TODO
           type: integer
+          readOnly: true
         createdBy:
           description: TODO
           type: string
@@ -156,3 +155,7 @@ components:
           type: object
           additionalProperties:
             type: object
+          readOnly: true
+        version:
+          type: integer
+          format: int32
