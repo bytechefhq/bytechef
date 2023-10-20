@@ -17,8 +17,17 @@
 
 package com.bytechef.component.pipedrive;
 
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
+
 /**
- * @author Ivica Cardic
+ * Provides the base test implementation for the REST based component.
+ *
+ * @generated
  */
-public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler {
+public abstract class AbstractPipedriveComponentHandlerTest {
+    @Test
+    public void testGetDefinition() {
+        JsonFileAssert.assertEquals("definition/pipedrive_v1.json", new PipedriveComponentHandler().getDefinition());
+    }
 }
