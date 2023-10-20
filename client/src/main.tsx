@@ -16,13 +16,13 @@ if (process.env.NODE_ENV === 'mock') {
 function renderApp() {
     const container = document.getElementById('root') as HTMLDivElement;
     const root = createRoot(container);
-
     const queryClient = new QueryClient();
 
     root.render(
         <React.StrictMode>
             <QueryClientProvider client={queryClient}>
                 <RouterProvider router={router} />
+
                 <ReactQueryDevtools
                     initialIsOpen={false}
                     position={'bottom-right'}

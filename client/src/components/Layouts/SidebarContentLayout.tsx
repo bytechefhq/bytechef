@@ -4,16 +4,20 @@ import {XMarkIcon} from '@heroicons/react/24/outline';
 import PageHeader from '../PageHeader/PageHeader';
 
 type Props = {
+    headerProps: {
+        subTitle: string;
+        buttonLabel?: string;
+        buttonOnClick?: () => void;
+        right?: ReactNode;
+    };
     sidebar?: ReactNode;
     title: string;
-    subTitle: string; //TODO define function
     topRight?: ReactNode;
 };
 
 export const SidebarContentLayout: React.FC<PropsWithChildren<Props>> = ({
+    headerProps,
     title,
-    subTitle,
-    topRight,
     sidebar,
     children,
 }) => {
@@ -94,49 +98,32 @@ export const SidebarContentLayout: React.FC<PropsWithChildren<Props>> = ({
                 </Dialog>
             </Transition.Root>
 
-            {/* Static sidebar for desktop */}
             <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col">
-                {/* Sidebar component, swap this element with another sidebar if you like */}
                 <nav className="flex h-full flex-col border-gray-200 bg-gray-50 px-4 dark:bg-gray-700">
-                    <PageHeader title={title} bold={true} />
+                    <h1
+                        aria-labelledby="primary-heading"
+                        className="p-4 text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-200"
+                    >
+                        {title}
+                    </h1>
 
                     <div>{sidebar}</div>
                 </nav>
             </aside>
 
-            {/* Content area */}
             <div className="h-full md:pl-72">
                 <div className="flex h-full flex-col px-6">
-                    {/*<div className="sticky top-0 z-10 flex h-16 shrink-0 bg-white">*/}
-                    {/*  <button*/}
-                    {/*    type="button"*/}
-                    {/*    className="border-gray-200 px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 md:hidden"*/}
-                    {/*    onClick={() => setSidebarOpen(true)}*/}
-                    {/*  >*/}
-                    {/*    <span className="sr-only">Open sidebar</span>*/}
-                    {/*    <Bars3BottomLeftIcon className="h-6 w-6" aria-hidden="true" />*/}
-                    {/*  </button>*/}
-                    {/*</div>*/}
-
-                    <PageHeader title={subTitle} right={topRight} />
+                    <PageHeader
+                        buttonLabel={headerProps.buttonLabel}
+                        buttonOnClick={headerProps.buttonOnClick}
+                        right={headerProps.right}
+                        title={headerProps.subTitle}
+                    />
 
                     <main className="flex flex-1 overflow-y-auto">
-                        {/* Primary column */}
-
-                        <section
-                            aria-labelledby="primary-heading"
-                            className="flex h-full min-w-0 flex-1 flex-col lg:order-last"
-                        >
+                        <section className="flex h-full min-w-0 flex-1 flex-col lg:order-last">
                             {children}
                         </section>
-
-                        {/*Secondary column (hidden on smaller screens)*/}
-                        {/*<aside className="hidden lg:order-first lg:block lg:flex-shrink-0">*/}
-                        {/*  <div className="relative flex h-full w-96 flex-col overflow-y-auto border-l border-r border-gray-50 bg-white">*/}
-                        {/*    /!* Your content *!/*/}
-                        {/*    hh*/}
-                        {/*  </div>*/}
-                        {/*</aside>*/}
                     </main>
                 </div>
             </div>

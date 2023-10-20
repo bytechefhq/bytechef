@@ -16,6 +16,7 @@ export function MobileTopNavigation({
                         alt="ByteChef"
                     />
                 </div>
+
                 <div>
                     <button
                         type="button"
@@ -23,6 +24,7 @@ export function MobileTopNavigation({
                         onClick={() => setMobileMenuOpen(true)}
                     >
                         <span className="sr-only">Open sidebar</span>
+
                         <Bars3Icon className="h-6 w-6" aria-hidden="true" />
                     </button>
                 </div>

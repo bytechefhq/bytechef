@@ -17,13 +17,16 @@ export function DesktopSidebar({
             <div className="flex w-[64px] flex-col">
                 <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-gray-100 dark:bg-gray-800">
                     <div className="flex-1">
-                        <div className="flex items-center justify-center py-4">
-                            <img
-                                className="h-8 w-auto"
-                                src={reactLogo}
-                                alt="ByteChef"
-                            />
-                        </div>
+                        <Link to={''}>
+                            <div className="flex items-center justify-center py-4">
+                                <img
+                                    className="h-8 w-auto"
+                                    src={reactLogo}
+                                    alt="ByteChef"
+                                />
+                            </div>
+                        </Link>
+
                         <nav
                             aria-label="Sidebar"
                             className="flex flex-col items-center py-3"
@@ -38,11 +41,13 @@ export function DesktopSidebar({
                                         className="h-7 w-7"
                                         aria-hidden="true"
                                     />
+
                                     <span className="sr-only">{item.name}</span>
                                 </Link>
                             ))}
                         </nav>
                     </div>
+
                     <div className="flex shrink-0 justify-center py-4">
                         <Link to={'/settings'}>
                             <Avatar size={'small'} />
