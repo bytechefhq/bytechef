@@ -12,7 +12,9 @@ const Footer: React.FC<{
     return (
         <div>
             <Category category={category} />
+
             <TagList tag={tag} button={button} />
+
             <Date date={date} />
         </div>
     );

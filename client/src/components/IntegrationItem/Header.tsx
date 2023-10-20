@@ -11,7 +11,9 @@ const Header: React.FC<{
     return (
         <div>
             <Name name={name} />
+
             <Status status={status} />
+
             <DropdownTrigger dropdownTrigger={dropdownTrigger} />
         </div>
     );
