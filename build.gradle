@@ -8,6 +8,12 @@ plugins {
     id "pmd"
 }
 
+versionCatalogUpdate {
+    keep {
+        versions = ["checkstyle", "org-springframework-cloud-dependencies", "pmd", "spotbugs"]
+    }
+}
+
 subprojects {
     apply plugin: "checkstyle"
     apply plugin: "com.diffplug.spotless"
