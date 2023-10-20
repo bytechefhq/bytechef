@@ -18,11 +18,8 @@
 package com.bytechef.hermes.component.registrar.handler;
 
 import com.bytechef.commons.util.MapValueUtils;
-import com.bytechef.event.EventPublisher;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
-import com.bytechef.hermes.component.ContextImpl;
-import com.bytechef.hermes.component.InputParametersImpl;
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestContext;
@@ -38,16 +35,12 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookHeaders
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookParameters;
-import com.bytechef.hermes.component.definition.WebhookBodyImpl;
-import com.bytechef.hermes.component.definition.WebhookHeadersImpl;
-import com.bytechef.hermes.component.definition.WebhookParametersImpl;
 import com.bytechef.hermes.component.util.ComponentContextSupplier;
-import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.constant.MetadataConstants;
 import com.bytechef.hermes.data.storage.domain.DataStorage.Scope;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
-import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
-import com.bytechef.hermes.file.storage.service.FileStorageService;
+import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
+import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactory;
 import com.bytechef.hermes.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.excepton.TriggerExecutionException;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
@@ -66,12 +59,6 @@ import static com.bytechef.hermes.component.definition.TriggerDefinition.Webhook
  */
 public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
 
-    static {
-        MapValueUtils.addConverter(new WebhookBodyImpl.WebhookBodyConverter());
-        MapValueUtils.addConverter(new WebhookHeadersImpl.WebhookHeadersConverter());
-        MapValueUtils.addConverter(new WebhookParametersImpl.WebhookParametersConverter());
-    }
-
     private static final String BODY = "body";
     private static final String HEADERS = "headers";
     private static final String METHOD = "method";
@@ -79,34 +66,28 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
     private static final String PATH = "path";
 
     private final ComponentDefinitionFactory componentDefinitionFactory;
-    private final ConnectionDefinitionService connectionDefinitionService;
-    private final ConnectionService connectionService;
+    private final ContextFactory contextFactory;
     private final DataStorageService datStorageService;
-    private final EventPublisher eventPublisher;
-    private final FileStorageService fileStorageService;
+    private final InputParametersFactory inputParametersFactory;
     private final TriggerDefinition triggerDefinition;
 
     @SuppressFBWarnings("EI")
     public DefaultComponentTriggerHandler(
-        ComponentDefinitionFactory componentDefinitionFactory, ConnectionDefinitionService connectionDefinitionService,
-        ConnectionService connectionService, DataStorageService datStorageService, EventPublisher eventPublisher,
-        FileStorageService fileStorageService, TriggerDefinition triggerDefinition) {
+        ComponentDefinitionFactory componentDefinitionFactory, ContextFactory contextFactory,
+        DataStorageService datStorageService, InputParametersFactory inputParametersFactory,
+        TriggerDefinition triggerDefinition) {
 
         this.componentDefinitionFactory = componentDefinitionFactory;
-        this.connectionDefinitionService = connectionDefinitionService;
-        this.connectionService = connectionService;
+        this.contextFactory = contextFactory;
         this.datStorageService = datStorageService;
-        this.eventPublisher = eventPublisher;
-        this.fileStorageService = fileStorageService;
+        this.inputParametersFactory = inputParametersFactory;
         this.triggerDefinition = triggerDefinition;
     }
 
     @Override
     public Object handle(TriggerExecution triggerExecution) throws TriggerExecutionException {
-        TriggerContext context = new ContextImpl(
-            connectionDefinitionService,
-            MapValueUtils.getMap(triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS),
-            connectionService, eventPublisher, fileStorageService, null);
+        TriggerContext context = contextFactory.createTriggerContext(
+            MapValueUtils.getMap(triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS));
 
         return ComponentContextSupplier.get(
             context, componentDefinitionFactory.getDefinition(), () -> doHandle(triggerExecution, context));
@@ -131,7 +112,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
 
             WebhookOutput webhookOutput = dynamicWebhookRequestFunction.apply(
                 new DynamicWebhookRequestContext(
-                    triggerContext, new InputParametersImpl(triggerExecution.getParameters()),
+                    triggerContext, inputParametersFactory.createInputParameters(triggerExecution.getParameters()),
                     MapValueUtils.get(triggerExecution.getParameters(), HEADERS, WebhookHeaders.class),
                     MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
                     MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
@@ -150,7 +131,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
 
             WebhookOutput webhookOutput = staticWebhookRequestFunction.apply(
                 new StaticWebhookRequestContext(
-                    triggerContext, new InputParametersImpl(triggerExecution.getParameters()),
+                    triggerContext, inputParametersFactory.createInputParameters(triggerExecution.getParameters()),
                     MapValueUtils.get(triggerExecution.getParameters(), HEADERS, WebhookHeaders.class),
                     MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
                     MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),
@@ -163,7 +144,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
 
             PollOutput pollOutput = pollFunction.apply(
                 new PollContext(
-                    triggerContext, new InputParametersImpl(triggerExecution.getParameters()),
+                    triggerContext, inputParametersFactory.createInputParameters(triggerExecution.getParameters()),
                     OptionalUtils.orElse(
                         datStorageService.fetchValue(
                             Scope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(),
@@ -176,7 +157,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
             while (pollOutput.pollImmediately()) {
                 pollOutput = pollFunction.apply(
                     new PollContext(
-                        triggerContext, new InputParametersImpl(triggerExecution.getParameters()),
+                        triggerContext, inputParametersFactory.createInputParameters(triggerExecution.getParameters()),
                         pollOutput.closureParameters()));
 
                 records.addAll(pollOutput.records());
@@ -198,7 +179,7 @@ public class DefaultComponentTriggerHandler implements TriggerHandler<Object> {
 
     private Boolean validateWebhook(TriggerContext triggerContext, TriggerExecution triggerExecution) {
         WebhookValidateContext context = new WebhookValidateContext(
-            triggerContext, new InputParametersImpl(triggerExecution.getParameters()),
+            triggerContext, inputParametersFactory.createInputParameters(triggerExecution.getParameters()),
             MapValueUtils.get(triggerExecution.getParameters(), HEADERS, WebhookHeaders.class),
             MapValueUtils.get(triggerExecution.getParameters(), PARAMETERS, WebhookParameters.class),
             MapValueUtils.get(triggerExecution.getParameters(), BODY, WebhookBody.class),

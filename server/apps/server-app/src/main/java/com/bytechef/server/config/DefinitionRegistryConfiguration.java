@@ -18,9 +18,14 @@
 package com.bytechef.server.config;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
+import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
+import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactory;
+import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactoryImpl;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacadeImpl;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
@@ -33,7 +38,8 @@ import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionS
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionServiceImpl;
-import com.bytechef.hermes.definition.registry.util.ContextConnectionFactory;
+import com.bytechef.hermes.definition.registry.component.factory.ContextConnectionFactory;
+import com.bytechef.hermes.file.storage.service.FileStorageService;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -79,6 +85,20 @@ public class DefinitionRegistryConfiguration {
         ConnectionDefinitionService connectionDefinitionService) {
 
         return new ContextConnectionFactory(componentDefinitionService, connectionDefinitionService);
+    }
+
+    @Bean
+    ContextFactory contextFactory(
+        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
+        EventPublisher eventPublisher, FileStorageService fileStorageService) {
+
+        return new ContextFactoryImpl(
+            connectionDefinitionService, connectionService, eventPublisher, fileStorageService);
+    }
+
+    @Bean
+    InputParametersFactory inputParametersFactory() {
+        return new InputParametersFactoryImpl();
     }
 
     @Bean

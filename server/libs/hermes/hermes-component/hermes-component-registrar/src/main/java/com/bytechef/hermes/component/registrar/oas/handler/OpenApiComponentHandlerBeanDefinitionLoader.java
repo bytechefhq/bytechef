@@ -39,10 +39,7 @@ public class OpenApiComponentHandlerBeanDefinitionLoader
 
         return BeanDefinitionBuilder.genericBeanDefinition(OpenApiComponentActionTaskHandler.class)
             .addConstructorArgValue(actionDefinition)
-            .addConstructorArgReference("connectionDefinitionService")
-            .addConstructorArgReference("connectionService")
-            .addConstructorArgReference("eventPublisher")
-            .addConstructorArgReference("fileStorageService")
+            .addConstructorArgReference("contextFactory")
             .addConstructorArgValue(openApiComponentHandler)
             .getBeanDefinition();
     }

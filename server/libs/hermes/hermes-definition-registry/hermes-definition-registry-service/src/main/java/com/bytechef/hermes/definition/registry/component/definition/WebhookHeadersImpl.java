@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.definition;
+package com.bytechef.hermes.definition.registry.component.definition;
 
 import com.bytechef.commons.util.MapValueUtils;
-import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookParameters;
+import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookHeaders;
 import org.springframework.core.convert.converter.Converter;
 
 import java.util.HashMap;
@@ -27,38 +27,38 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public class WebhookParametersImpl implements WebhookParameters {
+public class WebhookHeadersImpl implements WebhookHeaders {
 
-    private final Map<String, String[]> parameters;
+    private final Map<String, String[]> headers;
 
-    public WebhookParametersImpl(Map<String, String[]> parameters) {
-        this.parameters = new HashMap<>(parameters);
+    public WebhookHeadersImpl(Map<String, String[]> headers) {
+        this.headers = new HashMap<>(headers);
     }
 
     @Override
     public String getValue(String name) {
-        String[] values = parameters.get(name);
+        String[] values = headers.get(name);
 
         return values == null || values.length == 0 ? null : values[0];
     }
 
     @Override
     public String[] getValues(String name) {
-        return parameters.get(name);
+        return headers.get(name);
     }
 
     @Override
     public String toString() {
-        return "WebhookParametersImpl{" +
-            "parameters=" + parameters +
+        return "WebhookHeadersImpl{" +
+            "headers=" + headers +
             '}';
     }
 
-    public static class WebhookParametersConverter implements Converter<Map<String, Object>, WebhookParameters> {
+    public static class WebhookHeadersConverter implements Converter<Map<String, Object>, WebhookHeaders> {
 
         @Override
-        public WebhookParameters convert(Map<String, Object> source) {
-            return new WebhookParametersImpl(MapValueUtils.getMap(source, "parameters"));
+        public WebhookHeaders convert(Map<String, Object> source) {
+            return new WebhookHeadersImpl(MapValueUtils.getMap(source, "headers"));
         }
     }
 }

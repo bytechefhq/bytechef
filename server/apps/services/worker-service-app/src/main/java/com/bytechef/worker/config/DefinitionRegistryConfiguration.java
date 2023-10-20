@@ -17,11 +17,16 @@
 
 package com.bytechef.worker.config;
 
+import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
+import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
+import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactory;
+import com.bytechef.hermes.definition.registry.component.factory.InputParametersFactoryImpl;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.facade.ComponentDefinitionFacade;
@@ -38,7 +43,8 @@ import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServi
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.definition.registry.service.TriggerDefinitionServiceImpl;
-import com.bytechef.hermes.definition.registry.util.ContextConnectionFactory;
+import com.bytechef.hermes.definition.registry.component.factory.ContextConnectionFactory;
+import com.bytechef.hermes.file.storage.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
@@ -129,6 +135,20 @@ public class DefinitionRegistryConfiguration {
         ConnectionDefinitionService connectionDefinitionService) {
 
         return new ContextConnectionFactory(componentDefinitionService, connectionDefinitionService);
+    }
+
+    @Bean
+    ContextFactory contextFactory(
+        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
+        EventPublisher eventPublisher, FileStorageService fileStorageService) {
+
+        return new ContextFactoryImpl(
+            connectionDefinitionService, connectionService, eventPublisher, fileStorageService);
+    }
+
+    @Bean
+    InputParametersFactory inputParametersFactory() {
+        return new InputParametersFactoryImpl();
     }
 
     @Bean

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.definition;
+package com.bytechef.hermes.definition.registry.component.definition;
 
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;

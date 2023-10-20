@@ -37,6 +37,8 @@ import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.constant.MetadataConstants;
+import com.bytechef.hermes.definition.registry.component.factory.ContextFactory;
+import com.bytechef.hermes.definition.registry.component.factory.ContextFactoryImpl;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServiceImpl;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
@@ -118,7 +120,7 @@ public class OpenApiComponentActionTaskHandlerIntTest {
     private Connection connection;
 
     @Autowired
-    private ConnectionDefinitionService connectionDefinitionService;
+    private ContextFactory contextFactory;
 
     @BeforeEach
     public void beforeEach() {
@@ -799,8 +801,7 @@ public class OpenApiComponentActionTaskHandlerIntTest {
 
     private OpenApiComponentActionTaskHandler createOpenApiComponentHandler(String actionName) {
         return new OpenApiComponentActionTaskHandler(
-            getActionDefinition(actionName), connectionDefinitionService, connectionService,
-            null, FILE_STORAGE_SERVICE, PETSTORE_COMPONENT_HANDLER);
+            getActionDefinition(actionName), contextFactory, PETSTORE_COMPONENT_HANDLER);
     }
 
     private ActionDefinition getActionDefinition(String actionName) {
@@ -842,6 +843,14 @@ public class OpenApiComponentActionTaskHandlerIntTest {
         @Bean
         ConnectionDefinitionService connectionDefinitionService() {
             return new ConnectionDefinitionServiceImpl(List.of(PETSTORE_COMPONENT_HANDLER.getDefinition()));
+        }
+
+        @Bean
+        ContextFactory contextFactory(
+            ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService) {
+
+            return new ContextFactoryImpl(
+                connectionDefinitionService, connectionService, e -> {}, FILE_STORAGE_SERVICE);
         }
 
         @EnableCaching
