@@ -3,21 +3,19 @@ import {useQuery} from '@tanstack/react-query';
 import {
     ComponentDefinitionBasicModel,
     ComponentDefinitionsApi,
+    GetComponentDefinitionsRequest,
 } from '../middleware/definition-registry';
 
-interface Request {
-    connectionDefinitions?: boolean;
-    connectionInstances?: boolean;
-}
-
 export const ComponentDefinitionKeys = {
-    componentDefinitions: (request?: Request) => [
+    componentDefinitions: (request?: GetComponentDefinitionsRequest) => [
         'componentDefinitions',
         request,
     ],
 };
 
-export const useGetComponentDefinitionsQuery = (request?: Request) =>
+export const useGetComponentDefinitionsQuery = (
+    request?: GetComponentDefinitionsRequest
+) =>
     useQuery<ComponentDefinitionBasicModel[], Error>(
         ComponentDefinitionKeys.componentDefinitions(request),
         () => new ComponentDefinitionsApi().getComponentDefinitions(request)

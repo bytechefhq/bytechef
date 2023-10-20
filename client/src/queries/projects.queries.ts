@@ -5,6 +5,9 @@ import {
     PageModel,
     ProjectCategoriesApi,
     ProjectExecutionsApi,
+    ProjectInstanceModel,
+    ProjectInstanceTagsApi,
+    ProjectInstancesApi,
     ProjectModel,
     ProjectTagsApi,
     ProjectsApi,
@@ -16,6 +19,7 @@ import {WorkflowModel} from '../middleware/workflow';
 export const ProjectKeys = {
     project: (id: number) => ['project', id],
     projectCategories: ['projectCategories'] as const,
+    projectInstanceTags: ['projectInstanceTags'] as const,
     projectList: (filters: {categoryIds?: number[]; tagIds?: number[]}) => [
         ...ProjectKeys.projects,
         filters,
@@ -26,17 +30,35 @@ export const ProjectKeys = {
         id,
         'projectWorkflows',
     ],
+    projectInstanceList: (filters: {
+        projectIds?: number[];
+        tagIds?: number[];
+    }) => [...ProjectKeys.projectInstances, filters],
+    projectInstances: ['projectInstances'] as const,
     projects: ['projects'] as const,
     projectExecutions: (filter: GetProjectExecutionsRequest) => [
         'projectExecutions',
         filter,
     ],
-    projectInstances: ['projectInstances'] as const,
 };
 
 export const useGetProjectCategoriesQuery = () =>
     useQuery<CategoryModel[], Error>(ProjectKeys.projectCategories, () =>
         new ProjectCategoriesApi().getProjectCategories()
+    );
+
+export const useGetProjectInstancesQuery = (filters: {
+    projectIds?: number[];
+    tagIds?: number[];
+}) =>
+    useQuery<ProjectInstanceModel[], Error>(
+        ProjectKeys.projectInstanceList(filters),
+        () => new ProjectInstancesApi().getProjectInstances(filters)
+    );
+
+export const useGetProjectInstanceTagsQuery = () =>
+    useQuery<TagModel[], Error>(ProjectKeys.projectInstanceTags, () =>
+        new ProjectInstanceTagsApi().getProjectInstanceTags()
     );
 
 export const useGetProjectTagsQuery = () =>
@@ -55,6 +77,7 @@ export const useGetProjectQuery = (id: number, initialData?: ProjectModel) =>
 
 export const useGetProjectsQuery = (filters: {
     categoryIds?: number[];
+    projectInstances?: boolean;
     tagIds?: number[];
 }) =>
     useQuery<ProjectModel[], Error>(ProjectKeys.projectList(filters), () =>
