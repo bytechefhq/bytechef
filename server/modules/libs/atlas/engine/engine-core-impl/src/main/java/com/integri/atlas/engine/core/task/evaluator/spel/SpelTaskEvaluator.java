@@ -19,11 +19,9 @@
 package com.integri.atlas.engine.core.task.evaluator.spel;
 
 import com.integri.atlas.engine.core.context.Context;
-import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.SimpleTaskExecution;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.evaluator.TaskEvaluator;
-import com.integri.atlas.engine.core.xml.XMLHelper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -86,10 +84,6 @@ public class SpelTaskEvaluator implements TaskEvaluator {
         map.put("now", new Now());
         map.put("dateFormat", new DateFormat());
         map.put("config", new Config(aBuilder.environment));
-        map.put("readJSON", new ReadJSON(aBuilder.jsonHelper));
-        map.put("readXML", new ReadXML(aBuilder.xmlHelper));
-        map.put("writeJSON", new WriteJSON(aBuilder.jsonHelper));
-        map.put("writeXML", new WriteXML(aBuilder.xmlHelper));
         map.putAll(aBuilder.methodExecutors);
         methodExecutors = Collections.unmodifiableMap(map);
     }
@@ -178,8 +172,6 @@ public class SpelTaskEvaluator implements TaskEvaluator {
 
         private final Map<String, MethodExecutor> methodExecutors = new HashMap<>();
         private Environment environment = new EmptyEnvironment();
-        private JSONHelper jsonHelper;
-        private XMLHelper xmlHelper;
 
         public Builder environment(Environment aEnvironment) {
             environment = aEnvironment;
@@ -188,18 +180,6 @@ public class SpelTaskEvaluator implements TaskEvaluator {
 
         public Builder methodExecutor(String aMethodName, MethodExecutor aMethodExecutor) {
             methodExecutors.put(aMethodName, aMethodExecutor);
-            return this;
-        }
-
-        public Builder jsonHelper(JSONHelper jsonHelper) {
-            this.jsonHelper = jsonHelper;
-
-            return this;
-        }
-
-        public Builder xmlHelper(XMLHelper xmlHelper) {
-            this.xmlHelper = xmlHelper;
-
             return this;
         }
 
