@@ -14,9 +14,8 @@ dependencies {
     implementation libs.springdoc.openapi.ui
     implementation libs.springdoc.openapi.webflux.ui
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
-    implementation project(":server:libs:core:commons:commons-utils")
     implementation project(":server:libs:core:discovery:discovery-config")
     implementation project(":server:libs:core:discovery:discovery-redis")
 
-    testImplementation project(":server:libs:test-support")
+    testImplementation project(":server:libs:test:test-int-support")
 }
