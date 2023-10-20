@@ -21,6 +21,7 @@ package com.bytechef.atlas.coordinator.task.dispatcher;
 
 import com.bytechef.atlas.task.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,9 +35,10 @@ public class TaskDispatcherChain implements TaskDispatcher<Task> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void dispatch(Task task) {
         for (TaskDispatcherResolver taskDispatcherResolver : taskDispatcherResolvers) {
-            TaskDispatcher taskDispatcher = taskDispatcherResolver.resolve(task);
+            TaskDispatcher<Task> taskDispatcher = (TaskDispatcher<Task>) taskDispatcherResolver.resolve(task);
 
             if (taskDispatcher != null) {
                 taskDispatcher.dispatch(task);
@@ -49,6 +51,6 @@ public class TaskDispatcherChain implements TaskDispatcher<Task> {
     }
 
     public void setTaskDispatcherResolvers(List<TaskDispatcherResolver> taskDispatcherResolvers) {
-        this.taskDispatcherResolvers = taskDispatcherResolvers;
+        this.taskDispatcherResolvers = new ArrayList<>(taskDispatcherResolvers);
     }
 }

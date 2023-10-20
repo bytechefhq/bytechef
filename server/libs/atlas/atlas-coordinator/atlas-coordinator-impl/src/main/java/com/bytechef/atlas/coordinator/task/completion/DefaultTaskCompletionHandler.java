@@ -62,6 +62,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private final TaskExecutionService taskExecutionService;
     private final WorkflowService workflowService;
 
+    @SuppressFBWarnings("EI")
     public DefaultTaskCompletionHandler(
         ContextService contextService, EventPublisher eventPublisher, JobExecutor jobExecutor, JobService jobService,
         TaskExecutionService taskExecutionService, WorkflowService workflowService) {
