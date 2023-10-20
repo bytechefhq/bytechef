@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.scheduler.web.rest;
 
-import com.bytechef.hermes.scheduler.TriggerScheduler;
+import com.bytechef.hermes.scheduler.TaskScheduler;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
@@ -35,10 +35,10 @@ import java.time.LocalDateTime;
 @RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
 public class TriggerSchedulerController {
 
-    private final TriggerScheduler triggerScheduler;
+    private final TaskScheduler taskScheduler;
 
-    public TriggerSchedulerController(TriggerScheduler triggerScheduler) {
-        this.triggerScheduler = triggerScheduler;
+    public TriggerSchedulerController(TaskScheduler taskScheduler) {
+        this.taskScheduler = taskScheduler;
     }
 
     @RequestMapping(
@@ -47,8 +47,8 @@ public class TriggerSchedulerController {
         consumes = {
             "application/json"
         })
-    void cancelDynamicWebhookRefreshTask(@Valid @RequestBody WorkflowExecutionId workflowExecutionId) {
-        triggerScheduler.cancelDynamicWebhookRefreshTask(workflowExecutionId);
+    void cancelDynamicWebhookRefreshTask(@Valid @RequestBody String workflowExecutionId) {
+        taskScheduler.cancelRefreshDynamicWebhookTriggerTask(workflowExecutionId);
     }
 
     @RequestMapping(
@@ -57,8 +57,8 @@ public class TriggerSchedulerController {
         consumes = {
             "application/json"
         })
-    void cancelPollTask(@Valid @RequestBody WorkflowExecutionId workflowExecutionId) {
-        triggerScheduler.cancelPollTask(workflowExecutionId);
+    void cancelPollTask(@Valid @RequestBody String workflowExecutionId) {
+        taskScheduler.cancelPollTriggerTask(workflowExecutionId);
     }
 
     @RequestMapping(
@@ -70,7 +70,7 @@ public class TriggerSchedulerController {
     void scheduleDynamicWebhookRefreshTask(
         @Valid @RequestBody DynamicWebhookRefreshOneTimeTaskRequest dynamicWebhookRefreshOneTimeTaskRequest) {
 
-        triggerScheduler.scheduleDynamicWebhookRefreshTask(
+        taskScheduler.scheduleRefreshDynamicWebhookTriggerTask(
             dynamicWebhookRefreshOneTimeTaskRequest.workflowExecutionId,
             dynamicWebhookRefreshOneTimeTaskRequest.webhookExpirationDate,
             dynamicWebhookRefreshOneTimeTaskRequest.componentName,
@@ -84,7 +84,7 @@ public class TriggerSchedulerController {
             "application/json"
         })
     void schedulePollTask(@Valid @RequestBody WorkflowExecutionId workflowExecutionId) {
-        triggerScheduler.schedulePollTask(workflowExecutionId);
+        taskScheduler.schedulePollTriggerTask(workflowExecutionId);
     }
 
     @SuppressFBWarnings("EI")

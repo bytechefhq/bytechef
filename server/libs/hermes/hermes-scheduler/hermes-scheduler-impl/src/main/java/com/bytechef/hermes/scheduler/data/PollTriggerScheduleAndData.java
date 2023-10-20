@@ -15,26 +15,26 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.schedule.data;
+package com.bytechef.hermes.scheduler.data;
 
+import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import com.github.kagkarlsson.scheduler.task.helper.ScheduleAndData;
 import com.github.kagkarlsson.scheduler.task.schedule.Schedule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.Serializable;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public class WorkflowScheduleAndData implements ScheduleAndData {
+public class PollTriggerScheduleAndData implements ScheduleAndData {
 
     private final Data data;
     private final Schedule schedule;
 
     @SuppressFBWarnings("EI")
-    public WorkflowScheduleAndData(Schedule schedule, Map<String, Object> output, String workflowExecutionId) {
-        this.data = new Data(output, workflowExecutionId);
+    public PollTriggerScheduleAndData(Schedule schedule, WorkflowExecutionId workflowExecutionId) {
+        this.data = new Data(workflowExecutionId, null, 0);
         this.schedule = schedule;
     }
 
@@ -50,13 +50,14 @@ public class WorkflowScheduleAndData implements ScheduleAndData {
 
     @Override
     public String toString() {
-        return "WorkflowScheduleAndData{" +
+        return "PollTriggerScheduleAndData{" +
             "data=" + data +
             ", schedule=" + schedule +
             '}';
     }
 
     @SuppressFBWarnings("EI")
-    public record Data(Map<String, Object> output, String workflowExecutionId) implements Serializable {
+    public record Data(WorkflowExecutionId workflowExecutionId, String componentName, int componentVersion)
+        implements Serializable {
     }
 }
