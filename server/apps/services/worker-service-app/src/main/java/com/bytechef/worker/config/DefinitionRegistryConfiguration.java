@@ -17,6 +17,7 @@
 
 package com.bytechef.worker.config;
 
+import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
@@ -77,6 +78,18 @@ public class DefinitionRegistryConfiguration {
         @Qualifier("workerRSocketRequesterBuilder") RSocketRequester.Builder rSocketRequesterBuilder) {
 
         return new ComponentDefinitionFacadeRSocketClient(discoveryClient, rSocketRequesterBuilder);
+    }
+
+    @Bean
+    List<ComponentDefinition> componentDefinitions(List<ComponentDefinitionFactory> componentDefinitionFactories) {
+        return componentDefinitionFactories.stream()
+            .map(ComponentDefinitionFactory::getDefinition)
+            .sorted((o1, o2) -> {
+                String o1Name = o1.getName();
+
+                return o1Name.compareTo(o2.getName());
+            })
+            .toList();
     }
 
     @Bean
