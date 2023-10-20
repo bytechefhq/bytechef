@@ -31,67 +31,80 @@ import {
     ResourcesModelFromJSONTyped,
     ResourcesModelToJSON,
 } from './ResourcesModel';
+import type { TriggerTypeModel } from './TriggerTypeModel';
+import {
+    TriggerTypeModelFromJSON,
+    TriggerTypeModelFromJSONTyped,
+    TriggerTypeModelToJSON,
+} from './TriggerTypeModel';
 
 /**
- * An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.
+ * A trigger definition defines ways to trigger workflows from the outside services.
  * @export
- * @interface ActionDefinitionModel
+ * @interface TriggerDefinitionModel
  */
-export interface ActionDefinitionModel {
+export interface TriggerDefinitionModel {
     /**
      * 
      * @type {DisplayModel}
-     * @memberof ActionDefinitionModel
+     * @memberof TriggerDefinitionModel
      */
     display: DisplayModel;
     /**
      * The example value of the action's output.
      * @type {object}
-     * @memberof ActionDefinitionModel
+     * @memberof TriggerDefinitionModel
      */
     exampleOutput?: object;
     /**
      * The action name.
      * @type {string}
-     * @memberof ActionDefinitionModel
+     * @memberof TriggerDefinitionModel
      */
     name: string;
     /**
      * The output schema of an execution result.
      * @type {Array<PropertyModel>}
-     * @memberof ActionDefinitionModel
+     * @memberof TriggerDefinitionModel
      */
     outputSchema?: Array<PropertyModel>;
     /**
      * The list of action properties.
      * @type {Array<PropertyModel>}
-     * @memberof ActionDefinitionModel
+     * @memberof TriggerDefinitionModel
      */
     properties?: Array<PropertyModel>;
     /**
      * 
      * @type {ResourcesModel}
-     * @memberof ActionDefinitionModel
+     * @memberof TriggerDefinitionModel
      */
     resources?: ResourcesModel;
+    /**
+     * 
+     * @type {TriggerTypeModel}
+     * @memberof TriggerDefinitionModel
+     */
+    type: TriggerTypeModel;
 }
 
 /**
- * Check if a given object implements the ActionDefinitionModel interface.
+ * Check if a given object implements the TriggerDefinitionModel interface.
  */
-export function instanceOfActionDefinitionModel(value: object): boolean {
+export function instanceOfTriggerDefinitionModel(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "display" in value;
     isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "type" in value;
 
     return isInstance;
 }
 
-export function ActionDefinitionModelFromJSON(json: any): ActionDefinitionModel {
-    return ActionDefinitionModelFromJSONTyped(json, false);
+export function TriggerDefinitionModelFromJSON(json: any): TriggerDefinitionModel {
+    return TriggerDefinitionModelFromJSONTyped(json, false);
 }
 
-export function ActionDefinitionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ActionDefinitionModel {
+export function TriggerDefinitionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): TriggerDefinitionModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -103,10 +116,11 @@ export function ActionDefinitionModelFromJSONTyped(json: any, ignoreDiscriminato
         'outputSchema': !exists(json, 'outputSchema') ? undefined : ((json['outputSchema'] as Array<any>).map(PropertyModelFromJSON)),
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
+        'type': TriggerTypeModelFromJSON(json['type']),
     };
 }
 
-export function ActionDefinitionModelToJSON(value?: ActionDefinitionModel | null): any {
+export function TriggerDefinitionModelToJSON(value?: TriggerDefinitionModel | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -121,6 +135,7 @@ export function ActionDefinitionModelToJSON(value?: ActionDefinitionModel | null
         'outputSchema': value.outputSchema === undefined ? undefined : ((value.outputSchema as Array<any>).map(PropertyModelToJSON)),
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
         'resources': ResourcesModelToJSON(value.resources),
+        'type': TriggerTypeModelToJSON(value.type),
     };
 }
 

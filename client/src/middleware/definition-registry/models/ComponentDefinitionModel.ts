@@ -13,18 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { ActionDefinitionModel } from './ActionDefinitionModel';
+import type { ActionDefinitionBasicModel } from './ActionDefinitionBasicModel';
 import {
-    ActionDefinitionModelFromJSON,
-    ActionDefinitionModelFromJSONTyped,
-    ActionDefinitionModelToJSON,
-} from './ActionDefinitionModel';
-import type { ConnectionDefinitionModel } from './ConnectionDefinitionModel';
+    ActionDefinitionBasicModelFromJSON,
+    ActionDefinitionBasicModelFromJSONTyped,
+    ActionDefinitionBasicModelToJSON,
+} from './ActionDefinitionBasicModel';
+import type { ConnectionDefinitionBasicModel } from './ConnectionDefinitionBasicModel';
 import {
-    ConnectionDefinitionModelFromJSON,
-    ConnectionDefinitionModelFromJSONTyped,
-    ConnectionDefinitionModelToJSON,
-} from './ConnectionDefinitionModel';
+    ConnectionDefinitionBasicModelFromJSON,
+    ConnectionDefinitionBasicModelFromJSONTyped,
+    ConnectionDefinitionBasicModelToJSON,
+} from './ConnectionDefinitionBasicModel';
 import type { DisplayModel } from './DisplayModel';
 import {
     DisplayModelFromJSON,
@@ -37,6 +37,12 @@ import {
     ResourcesModelFromJSONTyped,
     ResourcesModelToJSON,
 } from './ResourcesModel';
+import type { TriggerDefinitionBasicModel } from './TriggerDefinitionBasicModel';
+import {
+    TriggerDefinitionBasicModelFromJSON,
+    TriggerDefinitionBasicModelFromJSONTyped,
+    TriggerDefinitionBasicModelToJSON,
+} from './TriggerDefinitionBasicModel';
 
 /**
  * A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.
@@ -46,28 +52,28 @@ import {
 export interface ComponentDefinitionModel {
     /**
      * The list of all available actions the component can perform.
-     * @type {Array<ActionDefinitionModel>}
+     * @type {Array<ActionDefinitionBasicModel>}
      * @memberof ComponentDefinitionModel
      */
-    actions?: Array<ActionDefinitionModel>;
+    actions?: Array<ActionDefinitionBasicModel>;
     /**
      * 
-     * @type {ConnectionDefinitionModel}
+     * @type {ConnectionDefinitionBasicModel}
      * @memberof ComponentDefinitionModel
      */
-    connection?: ConnectionDefinitionModel;
+    connection?: ConnectionDefinitionBasicModel;
     /**
      * 
      * @type {DisplayModel}
      * @memberof ComponentDefinitionModel
      */
-    display?: DisplayModel;
+    display: DisplayModel;
     /**
      * The name.
      * @type {string}
      * @memberof ComponentDefinitionModel
      */
-    name?: string;
+    name: string;
     /**
      * 
      * @type {ResourcesModel}
@@ -75,11 +81,17 @@ export interface ComponentDefinitionModel {
      */
     resources?: ResourcesModel;
     /**
+     * The list of all available triggers the component can perform.
+     * @type {Array<TriggerDefinitionBasicModel>}
+     * @memberof ComponentDefinitionModel
+     */
+    triggers?: Array<TriggerDefinitionBasicModel>;
+    /**
      * The version of a component.
      * @type {number}
      * @memberof ComponentDefinitionModel
      */
-    version?: number;
+    version: number;
 }
 
 /**
@@ -87,6 +99,9 @@ export interface ComponentDefinitionModel {
  */
 export function instanceOfComponentDefinitionModel(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "display" in value;
+    isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "version" in value;
 
     return isInstance;
 }
@@ -101,12 +116,13 @@ export function ComponentDefinitionModelFromJSONTyped(json: any, ignoreDiscrimin
     }
     return {
         
-        'actions': !exists(json, 'actions') ? undefined : ((json['actions'] as Array<any>).map(ActionDefinitionModelFromJSON)),
-        'connection': !exists(json, 'connection') ? undefined : ConnectionDefinitionModelFromJSON(json['connection']),
-        'display': !exists(json, 'display') ? undefined : DisplayModelFromJSON(json['display']),
-        'name': !exists(json, 'name') ? undefined : json['name'],
+        'actions': !exists(json, 'actions') ? undefined : ((json['actions'] as Array<any>).map(ActionDefinitionBasicModelFromJSON)),
+        'connection': !exists(json, 'connection') ? undefined : ConnectionDefinitionBasicModelFromJSON(json['connection']),
+        'display': DisplayModelFromJSON(json['display']),
+        'name': json['name'],
         'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
-        'version': !exists(json, 'version') ? undefined : json['version'],
+        'triggers': !exists(json, 'triggers') ? undefined : ((json['triggers'] as Array<any>).map(TriggerDefinitionBasicModelFromJSON)),
+        'version': json['version'],
     };
 }
 
@@ -119,11 +135,12 @@ export function ComponentDefinitionModelToJSON(value?: ComponentDefinitionModel 
     }
     return {
         
-        'actions': value.actions === undefined ? undefined : ((value.actions as Array<any>).map(ActionDefinitionModelToJSON)),
-        'connection': ConnectionDefinitionModelToJSON(value.connection),
+        'actions': value.actions === undefined ? undefined : ((value.actions as Array<any>).map(ActionDefinitionBasicModelToJSON)),
+        'connection': ConnectionDefinitionBasicModelToJSON(value.connection),
         'display': DisplayModelToJSON(value.display),
         'name': value.name,
         'resources': ResourcesModelToJSON(value.resources),
+        'triggers': value.triggers === undefined ? undefined : ((value.triggers as Array<any>).map(TriggerDefinitionBasicModelToJSON)),
         'version': value.version,
     };
 }

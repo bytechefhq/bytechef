@@ -1,6 +1,8 @@
+apis/ActionDefinitionsApi.ts
 apis/ComponentDefinitionsApi.ts
 apis/ConnectionDefinitionsApi.ts
 apis/TaskDispatcherDefinitionsApi.ts
+apis/TriggerDefinitionsApi.ts
 apis/index.ts
 index.ts
 models/ActionDefinitionBasicModel.ts
@@ -12,7 +14,6 @@ models/AuthorizationTypeModel.ts
 models/BooleanPropertyModel.ts
 models/ComponentDefinitionBasicModel.ts
 models/ComponentDefinitionModel.ts
-models/ComponentDefinitionWithBasicActionsModel.ts
 models/ConnectionDefinitionBasicModel.ts
 models/ConnectionDefinitionModel.ts
 models/ControlTypeModel.ts
@@ -37,7 +38,11 @@ models/PropertyModel.ts
 models/PropertyTypeModel.ts
 models/ResourcesModel.ts
 models/StringPropertyModel.ts
+models/TaskDispatcherDefinitionBasicModel.ts
 models/TaskDispatcherDefinitionModel.ts
+models/TriggerDefinitionBasicModel.ts
+models/TriggerDefinitionModel.ts
+models/TriggerTypeModel.ts
 models/ValuePropertyAllOfModel.ts
 models/ValuePropertyModel.ts
 models/index.ts

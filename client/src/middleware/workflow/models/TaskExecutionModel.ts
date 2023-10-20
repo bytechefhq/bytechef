@@ -121,7 +121,7 @@ export interface TaskExecutionModel {
      * @type {number}
      * @memberof TaskExecutionModel
      */
-    readonly retry?: number;
+    readonly maxRetries?: number;
     /**
      * The number of times that a task has been retried.
      * @type {number}
@@ -229,7 +229,7 @@ export function TaskExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: 
         'parentId': !exists(json, 'parentId') ? undefined : json['parentId'],
         'priority': json['priority'],
         'progress': !exists(json, 'progress') ? undefined : json['progress'],
-        'retry': !exists(json, 'retry') ? undefined : json['retry'],
+        'maxRetries': !exists(json, 'maxRetries') ? undefined : json['maxRetries'],
         'retryAttempts': !exists(json, 'retryAttempts') ? undefined : json['retryAttempts'],
         'retryDelay': !exists(json, 'retryDelay') ? undefined : json['retryDelay'],
         'retryDelayFactor': !exists(json, 'retryDelayFactor') ? undefined : json['retryDelayFactor'],

@@ -19,6 +19,12 @@ import {
     DisplayModelFromJSONTyped,
     DisplayModelToJSON,
 } from './DisplayModel';
+import type { ResourcesModel } from './ResourcesModel';
+import {
+    ResourcesModelFromJSON,
+    ResourcesModelFromJSONTyped,
+    ResourcesModelToJSON,
+} from './ResourcesModel';
 
 /**
  * A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.
@@ -39,11 +45,11 @@ export interface ComponentDefinitionBasicModel {
      */
     name: string;
     /**
-     * The version of a component.
-     * @type {number}
+     * 
+     * @type {ResourcesModel}
      * @memberof ComponentDefinitionBasicModel
      */
-    version: number;
+    resources?: ResourcesModel;
 }
 
 /**
@@ -53,7 +59,6 @@ export function instanceOfComponentDefinitionBasicModel(value: object): boolean 
     let isInstance = true;
     isInstance = isInstance && "display" in value;
     isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "version" in value;
 
     return isInstance;
 }
@@ -70,7 +75,7 @@ export function ComponentDefinitionBasicModelFromJSONTyped(json: any, ignoreDisc
         
         'display': DisplayModelFromJSON(json['display']),
         'name': json['name'],
-        'version': json['version'],
+        'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
     };
 }
 
@@ -85,7 +90,7 @@ export function ComponentDefinitionBasicModelToJSON(value?: ComponentDefinitionB
         
         'display': DisplayModelToJSON(value.display),
         'name': value.name,
-        'version': value.version,
+        'resources': ResourcesModelToJSON(value.resources),
     };
 }
 

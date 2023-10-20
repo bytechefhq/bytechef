@@ -27,54 +27,47 @@ import {
 } from './ResourcesModel';
 
 /**
- * Definition of a connection to an outside service.
+ * A task dispatcher defines a strategy for dispatching tasks to be executed.
  * @export
- * @interface ConnectionDefinitionBasicModel
+ * @interface TaskDispatcherDefinitionBasicModel
  */
-export interface ConnectionDefinitionBasicModel {
+export interface TaskDispatcherDefinitionBasicModel {
     /**
      * 
      * @type {DisplayModel}
-     * @memberof ConnectionDefinitionBasicModel
+     * @memberof TaskDispatcherDefinitionBasicModel
      */
     display: DisplayModel;
     /**
-     * The connection name.
+     * The task dispatcher name..
      * @type {string}
-     * @memberof ConnectionDefinitionBasicModel
+     * @memberof TaskDispatcherDefinitionBasicModel
      */
     name: string;
     /**
      * 
      * @type {ResourcesModel}
-     * @memberof ConnectionDefinitionBasicModel
+     * @memberof TaskDispatcherDefinitionBasicModel
      */
     resources?: ResourcesModel;
-    /**
-     * The version of a connection.
-     * @type {number}
-     * @memberof ConnectionDefinitionBasicModel
-     */
-    version: number;
 }
 
 /**
- * Check if a given object implements the ConnectionDefinitionBasicModel interface.
+ * Check if a given object implements the TaskDispatcherDefinitionBasicModel interface.
  */
-export function instanceOfConnectionDefinitionBasicModel(value: object): boolean {
+export function instanceOfTaskDispatcherDefinitionBasicModel(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "display" in value;
     isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "version" in value;
 
     return isInstance;
 }
 
-export function ConnectionDefinitionBasicModelFromJSON(json: any): ConnectionDefinitionBasicModel {
-    return ConnectionDefinitionBasicModelFromJSONTyped(json, false);
+export function TaskDispatcherDefinitionBasicModelFromJSON(json: any): TaskDispatcherDefinitionBasicModel {
+    return TaskDispatcherDefinitionBasicModelFromJSONTyped(json, false);
 }
 
-export function ConnectionDefinitionBasicModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): ConnectionDefinitionBasicModel {
+export function TaskDispatcherDefinitionBasicModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): TaskDispatcherDefinitionBasicModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -83,11 +76,10 @@ export function ConnectionDefinitionBasicModelFromJSONTyped(json: any, ignoreDis
         'display': DisplayModelFromJSON(json['display']),
         'name': json['name'],
         'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
-        'version': json['version'],
     };
 }
 
-export function ConnectionDefinitionBasicModelToJSON(value?: ConnectionDefinitionBasicModel | null): any {
+export function TaskDispatcherDefinitionBasicModelToJSON(value?: TaskDispatcherDefinitionBasicModel | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -99,7 +91,6 @@ export function ConnectionDefinitionBasicModelToJSON(value?: ConnectionDefinitio
         'display': DisplayModelToJSON(value.display),
         'name': value.name,
         'resources': ResourcesModelToJSON(value.resources),
-        'version': value.version,
     };
 }
 

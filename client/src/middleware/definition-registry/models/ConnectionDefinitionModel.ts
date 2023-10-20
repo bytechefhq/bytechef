@@ -63,17 +63,17 @@ export interface ConnectionDefinitionModel {
      */
     baseUri?: string;
     /**
-     * The name of a component this connection can be used for.
-     * @type {string}
-     * @memberof ConnectionDefinitionModel
-     */
-    componentName?: string;
-    /**
      * 
      * @type {DisplayModel}
      * @memberof ConnectionDefinitionModel
      */
-    componentDisplay?: DisplayModel;
+    display: DisplayModel;
+    /**
+     * The connection name.
+     * @type {string}
+     * @memberof ConnectionDefinitionModel
+     */
+    name: string;
     /**
      * The properties of the connection.
      * @type {Array<PropertyModel>}
@@ -86,6 +86,12 @@ export interface ConnectionDefinitionModel {
      * @memberof ConnectionDefinitionModel
      */
     resources?: ResourcesModel;
+    /**
+     * The version of a connection.
+     * @type {number}
+     * @memberof ConnectionDefinitionModel
+     */
+    version: number;
 }
 
 /**
@@ -93,6 +99,9 @@ export interface ConnectionDefinitionModel {
  */
 export function instanceOfConnectionDefinitionModel(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "display" in value;
+    isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "version" in value;
 
     return isInstance;
 }
@@ -110,10 +119,11 @@ export function ConnectionDefinitionModelFromJSONTyped(json: any, ignoreDiscrimi
         'authorizationRequired': !exists(json, 'authorizationRequired') ? undefined : json['authorizationRequired'],
         'authorizations': !exists(json, 'authorizations') ? undefined : ((json['authorizations'] as Array<any>).map(AuthorizationModelFromJSON)),
         'baseUri': !exists(json, 'baseUri') ? undefined : json['baseUri'],
-        'componentName': !exists(json, 'componentName') ? undefined : json['componentName'],
-        'componentDisplay': !exists(json, 'componentDisplay') ? undefined : DisplayModelFromJSON(json['componentDisplay']),
+        'display': DisplayModelFromJSON(json['display']),
+        'name': json['name'],
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
+        'version': json['version'],
     };
 }
 
@@ -129,10 +139,11 @@ export function ConnectionDefinitionModelToJSON(value?: ConnectionDefinitionMode
         'authorizationRequired': value.authorizationRequired,
         'authorizations': value.authorizations === undefined ? undefined : ((value.authorizations as Array<any>).map(AuthorizationModelToJSON)),
         'baseUri': value.baseUri,
-        'componentName': value.componentName,
-        'componentDisplay': DisplayModelToJSON(value.componentDisplay),
+        'display': DisplayModelToJSON(value.display),
+        'name': value.name,
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
         'resources': ResourcesModelToJSON(value.resources),
+        'version': value.version,
     };
 }
 
