@@ -37,7 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatException;
 
 /**
  * @author Ivica Cardic
@@ -150,11 +149,8 @@ public class IntegrationServiceIntTest {
         integrationRepository.save(integration);
 
         assertThat(integrationService.getIntegrations(null, tag.getId())).hasSize(1);
-
         assertThat(integrationService.getIntegrations(null, Long.MAX_VALUE)).hasSize(0);
-
-        assertThatException()
-            .isThrownBy(() -> integrationService.getIntegrations(Long.MAX_VALUE, Long.MAX_VALUE));
+        assertThat(integrationService.getIntegrations(Long.MAX_VALUE, Long.MAX_VALUE)).hasSize(0);
     }
 
     @Test
