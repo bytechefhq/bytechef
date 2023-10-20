@@ -2,8 +2,8 @@ import {useGetIntegrationsQuery} from '../../queries/integrations.queries';
 import React from 'react';
 import {IntegrationItem} from 'components/IntegrationItem/IntegrationItem';
 
-export const IntegrationList: React.FC = () => {
     const {isLoading, error, data: items} = useGetIntegrationsQuery();
+const IntegrationList: React.FC = () => {
 
     return (
         <div>
@@ -31,3 +31,5 @@ export const IntegrationList: React.FC = () => {
         </div>
     );
 };
+
+export default IntegrationList;

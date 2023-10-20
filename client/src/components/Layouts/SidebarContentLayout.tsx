@@ -15,7 +15,7 @@ type Props = {
     topRight?: ReactNode;
 };
 
-export const SidebarContentLayout: React.FC<PropsWithChildren<Props>> = ({
+const SidebarContentLayout: React.FC<PropsWithChildren<Props>> = ({
     headerProps,
     title,
     sidebar,
@@ -130,3 +130,5 @@ export const SidebarContentLayout: React.FC<PropsWithChildren<Props>> = ({
         </>
     );
 };
+
+export default SidebarContentLayout;

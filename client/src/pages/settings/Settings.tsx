@@ -1,7 +1,7 @@
 import {CogIcon} from '@heroicons/react/24/outline';
 import ThemeSwitcher from '../../components/ThemeSwitcher/ThemeSwitcher';
 import cx from 'classnames';
-import {SidebarContentLayout} from '../../components/Layouts/SidebarContentLayout';
+import SidebarContentLayout from '../../components/Layouts/SidebarContentLayout';
 
 const navigation = [{name: 'Display', href: '#', icon: CogIcon, current: true}];
 
