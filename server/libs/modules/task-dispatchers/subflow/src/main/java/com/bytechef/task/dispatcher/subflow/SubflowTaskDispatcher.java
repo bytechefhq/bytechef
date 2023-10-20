@@ -19,7 +19,7 @@
 
 package com.bytechef.task.dispatcher.subflow;
 
-import static com.bytechef.hermes.task.dispatcher.constants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
 import static com.bytechef.task.dispatcher.subflow.constants.SubflowTaskDispatcherConstants.SUBFLOW;
 
 import com.bytechef.atlas.constants.WorkflowConstants;
