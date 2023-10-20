@@ -4,7 +4,10 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import {ComponentDefinitionModel} from '@/middleware/hermes/configuration';
+import {
+    ComponentDefinitionBasicModel,
+    ComponentDefinitionModel,
+} from '@/middleware/hermes/configuration';
 import {PropertyType} from '@/types/projectTypes';
 import {DataPillType} from '@/types/types';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -56,12 +59,20 @@ type CurrentComponentType =
       } & ComponentDefinitionModel)
     | undefined;
 
-const NodeDetailsDialog = () => {
+const NodeDetailsDialog = ({
+    componentDefinitions,
+}: {
+    componentDefinitions: Array<ComponentDefinitionBasicModel>;
+}) => {
     const [activeTab, setActiveTab] = useState('description');
     const [currentActionName, setCurrentActionName] = useState('');
 
     const {currentNode, nodeDetailsDialogOpen, setNodeDetailsDialogOpen} =
         useNodeDetailsDialogStore();
+
+    const {data: currentComponentDefinition} = useGetComponentDefinitionQuery({
+        componentName: currentNode.originNodeName || currentNode.name,
+    });
 
     const {
         componentActions,
@@ -71,15 +82,7 @@ const NodeDetailsDialog = () => {
         setDataPills,
     } = useWorkflowDefinitionStore();
 
-    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
-        connectionDefinitions: true,
-    });
-
     let currentComponent: CurrentComponentType;
-
-    const {data: currentComponentDefinition} = useGetComponentDefinitionQuery({
-        componentName: currentNode.originNodeName || currentNode.name,
-    });
 
     if (currentComponentDefinition) {
         currentComponent = currentComponentDefinition;
@@ -107,7 +110,7 @@ const NodeDetailsDialog = () => {
             !!currentComponent?.actions
         );
 
-    const componentDefinitionNames = componentDefinitions?.map(
+    const componentDefinitionNames = componentDefinitions.map(
         (component) => component.name
     );
 
@@ -213,6 +216,35 @@ const NodeDetailsDialog = () => {
         }
     });
 
+    const selectsWithOptions = currentAction?.properties?.find(
+        (property: PropertyType) =>
+            property.controlType === 'SELECT' && property.options?.length
+    );
+
+    const componentTabs = tabs.filter((tab) => {
+        const {name} = tab;
+
+        const componentHasConnection =
+            currentComponent?.name &&
+            componentDefinitionNames?.includes(currentComponent.name);
+
+        if (
+            (name === 'connection' && !componentHasConnection) ||
+            (name === 'output' && !currentAction?.outputSchema) ||
+            (name === 'properties' &&
+                (!currentAction?.properties?.length || !selectsWithOptions))
+        ) {
+            return;
+        } else {
+            return tab;
+        }
+    });
+
+    const showPropertiesTabContent =
+        activeTab === 'properties' &&
+        currentAction?.properties &&
+        selectsWithOptions;
+
     useEffect(() => {
         if (availableDataPills) {
             setDataPills(availableDataPills.flat(Infinity));
@@ -238,12 +270,17 @@ const NodeDetailsDialog = () => {
         ) {
             setActiveTab('description');
         }
+
+        if (activeTab === 'properties' && !showPropertiesTabContent) {
+            setActiveTab('description');
+        }
     }, [
         activeTab,
         componentDefinitionNames,
         currentAction,
         currentActionFetched,
         currentComponent?.name,
+        showPropertiesTabContent,
     ]);
 
     useEffect(() => {
@@ -285,24 +322,6 @@ const NodeDetailsDialog = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeTab, currentAction, currentActionFetched]);
-
-    const componentTabs = tabs.filter((tab) => {
-        const {name} = tab;
-
-        const componentHasConnection =
-            currentComponent?.name &&
-            componentDefinitionNames?.includes(currentComponent.name);
-
-        if (
-            (name === 'connection' && !componentHasConnection) ||
-            (name === 'output' && !currentAction?.outputSchema) ||
-            (name === 'properties' && !currentAction?.properties?.length)
-        ) {
-            return;
-        } else {
-            return tab;
-        }
-    });
 
     return (
         <Dialog.Root
@@ -372,7 +391,7 @@ const NodeDetailsDialog = () => {
                                             <Button
                                                 className={twMerge(
                                                     'grow justify-center whitespace-nowrap rounded-none border-0 border-b-2 border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
-                                                    activeTab === tab.name &&
+                                                    activeTab === tab?.name &&
                                                         'border-blue-500 text-blue-500 hover:text-blue-500'
                                                 )}
                                                 key={tab.name}
@@ -394,23 +413,17 @@ const NodeDetailsDialog = () => {
                                             />
                                         )}
 
-                                        {activeTab === 'properties' &&
-                                            !!currentAction?.properties
-                                                ?.length && (
-                                                <Properties
-                                                    actionName={
-                                                        currentActionName
-                                                    }
-                                                    customClassName="p-4 overflow-y-auto relative"
-                                                    dataPills={dataPills}
-                                                    properties={
-                                                        currentAction.properties
-                                                    }
-                                                    mention={
-                                                        !!dataPills?.length
-                                                    }
-                                                />
-                                            )}
+                                        {showPropertiesTabContent && (
+                                            <Properties
+                                                actionName={currentActionName}
+                                                customClassName="p-4 overflow-y-auto relative"
+                                                dataPills={dataPills}
+                                                properties={
+                                                    currentAction.properties!
+                                                }
+                                                mention={!!dataPills?.length}
+                                            />
+                                        )}
 
                                         {activeTab === 'connection' &&
                                             currentComponent.connection && (
