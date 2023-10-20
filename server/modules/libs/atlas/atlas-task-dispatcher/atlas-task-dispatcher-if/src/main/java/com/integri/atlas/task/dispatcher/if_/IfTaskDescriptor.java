@@ -145,7 +145,7 @@ public class IfTaskDescriptor implements TaskDescriptor {
                 .displayName("Combine")
                 .options(
                     option("All", "all", "Only if all conditions are met, the workflow goes into \"true\" branch."),
-                    option("Any", "any", "If all conditions are met, the workflow goes into \"true\" branch.")
+                    option("Any", "any", "If any condition is met, the workflow goes into \"true\" branch.")
                 )
                 .description(
                     """
