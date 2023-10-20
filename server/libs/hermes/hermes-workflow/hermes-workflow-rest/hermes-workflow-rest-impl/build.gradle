@@ -45,5 +45,6 @@ dependencies {
     implementation "org.springframework:spring-web"
     implementation project(":server:libs:core:commons:commons-util")
 
+    testImplementation "org.springframework:spring-webflux"
     testImplementation "org.springframework.boot:spring-boot-starter-web"
 }

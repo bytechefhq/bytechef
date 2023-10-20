@@ -22,7 +22,8 @@ import com.bytechef.category.web.rest.model.CategoryModel;
 import com.bytechef.dione.integration.facade.IntegrationFacade;
 import com.bytechef.dione.integration.web.rest.config.IntegrationRestTestConfiguration;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,6 +31,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 
 import java.util.List;
 
@@ -38,7 +41,6 @@ import static org.mockito.Mockito.when;
 /**
  * @author Ivica Cardic
  */
-@Disabled
 @ContextConfiguration(classes = IntegrationRestTestConfiguration.class)
 @WebMvcTest(value = IntegrationController.class)
 public class IntegrationCategoryControllerIntTest {
@@ -47,7 +49,16 @@ public class IntegrationCategoryControllerIntTest {
     private IntegrationFacade integrationFacade;
 
     @Autowired
+    private MockMvc mockMvc;
+
     private WebTestClient webTestClient;
+
+    @BeforeEach
+    public void setup() {
+        this.webTestClient = MockMvcWebTestClient
+            .bindTo(mockMvc)
+            .build();
+    }
 
     @Test
     public void testGetIntegrationCategories() {

@@ -55,5 +55,6 @@ dependencies {
     implementation libs.io.swagger.core.v3.swagger.annotations
     implementation project(":server:libs:core:commons:commons-util")
 
+    testImplementation "org.springframework:spring-webflux"
     testImplementation "org.springframework.boot:spring-boot-starter-web"
 }
