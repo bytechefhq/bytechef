@@ -81,8 +81,8 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
         Map<String, Object> selectedCase = resolveCase(taskExecution);
 
         if (selectedCase.containsKey(TASKS)) {
-            List<WorkflowTask> subWorkflowTasks = MapValueUtils.getList(selectedCase, TASKS, WorkflowTask.class,
-                Collections.emptyList());
+            List<WorkflowTask> subWorkflowTasks = MapValueUtils.getList(
+                selectedCase, TASKS, WorkflowTask.class, Collections.emptyList());
 
             if (subWorkflowTasks.isEmpty()) {
                 taskExecution.setStartDate(LocalDateTime.now());
@@ -102,13 +102,14 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
                     .build();
 
                 Map<String, Object> context = contextService.peek(
-                    taskExecution.getId(), Context.Classname.TASK_EXECUTION);
+                    Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION);
 
                 subTaskExecution.evaluate(context);
 
                 subTaskExecution = taskExecutionService.create(subTaskExecution);
 
-                contextService.push(subTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
+                contextService.push(
+                    Objects.requireNonNull(subTaskExecution.getId()), Context.Classname.TASK_EXECUTION, context);
 
                 taskDispatcher.dispatch(subTaskExecution);
             }

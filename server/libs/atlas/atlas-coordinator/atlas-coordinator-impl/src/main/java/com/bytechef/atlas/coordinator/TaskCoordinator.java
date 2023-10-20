@@ -37,6 +37,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import com.bytechef.commons.util.ExceptionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -82,7 +83,7 @@ public class TaskCoordinator {
 
         jobExecutor.execute(job);
 
-        eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
+        eventPublisher.publishEvent(new JobStatusWorkflowEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
 
         if (log.isDebugEnabled()) {
             log.debug("Job id={}, label='{}' started", job.getId(), job.getLabel());
@@ -98,7 +99,7 @@ public class TaskCoordinator {
     public void stop(Long jobId) {
         Job job = jobService.setStatusToStopped(jobId);
 
-        eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
+        eventPublisher.publishEvent(new JobStatusWorkflowEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
 
         List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
 
@@ -111,7 +112,9 @@ public class TaskCoordinator {
             taskExecutionService.update(currentTaskExecution);
 
             taskDispatcher.dispatch(
-                new CancelControlTask(currentTaskExecution.getJobId(), currentTaskExecution.getId()));
+                new CancelControlTask(
+                    Objects.requireNonNull(currentTaskExecution.getJobId()),
+                    Objects.requireNonNull(currentTaskExecution.getId())));
         }
 
         if (log.isDebugEnabled()) {

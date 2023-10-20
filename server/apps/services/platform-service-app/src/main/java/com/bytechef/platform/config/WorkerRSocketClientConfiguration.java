@@ -44,11 +44,12 @@ public class WorkerRSocketClientConfiguration {
 
     @Bean
     TaskHandlerAccessor taskHandlerAccessor() {
-        return type -> (TaskHandler<Object>) taskExecution -> taskHandlerRSocketClient.handle(type, taskExecution);
+        return type -> (TaskHandler<?>) taskExecution -> taskHandlerRSocketClient.handle(type, taskExecution);
     }
 
     @Bean
     TriggerHandlerAccessor triggerHandlerAccessor() {
-        return type -> (TriggerHandler) triggerExecution -> triggerHandlerRSocketClient.handle(type, triggerExecution);
+        return type -> (TriggerHandler<?>) triggerExecution -> triggerHandlerRSocketClient.handle(type,
+            triggerExecution);
     }
 }

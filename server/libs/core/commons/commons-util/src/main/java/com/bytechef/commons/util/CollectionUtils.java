@@ -22,7 +22,6 @@ import org.springframework.util.Assert;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -38,32 +37,11 @@ public final class CollectionUtils {
     private CollectionUtils() {
     }
 
-    public static <T> boolean anyMatch(Collection<T> items, Predicate<? super T> predicate) {
-        return items.stream()
-            .anyMatch(predicate);
-    }
-
-    public static <T> List<T> concat(List<T> list1, List<T> list2) {
-        Assert.notNull(list1, "'list1' must not be null");
-        Assert.notNull(list2, "'list2' must not be null");
-
-        return Stream.concat(list1.stream(), list2.stream())
-            .toList();
-    }
-
     public static <T> List<T> concat(List<T> list1, T item) {
         Assert.notNull(list1, "'list1' must not be null");
         Assert.notNull(item, "'item' must not be null");
 
         return Stream.concat(list1.stream(), Stream.of(item))
-            .toList();
-    }
-
-    public static <T> List<T> concat(List<T> list, Stream<T> stream) {
-        Assert.notNull(list, "'list' must not be null");
-        Assert.notNull(stream, "'stream' must not be null");
-
-        return Stream.concat(list.stream(), stream)
             .toList();
     }
 
@@ -114,15 +92,6 @@ public final class CollectionUtils {
             .toList();
     }
 
-    public static <T, U> List<U> filter(
-        List<T> list, Predicate<? super T> filter, Function<? super T, ? extends U> mapper) {
-
-        return list.stream()
-            .filter(filter)
-            .map(item -> (U) mapper.apply(item))
-            .toList();
-    }
-
     public static <T> T findFirstOrElse(Collection<T> list, Predicate<? super T> filter, T elseObject) {
         Assert.notNull(list, "'list' must not be null");
         Assert.notNull(filter, "'filter' must not be null");
@@ -132,45 +101,6 @@ public final class CollectionUtils {
                 .filter(filter)
                 .findFirst(),
             elseObject);
-    }
-
-    public static <T, U, V extends U> U findFirstOrElse(
-        Collection<T> list, Predicate<? super T> filter, Function<? super T, V> mapper, V elseObject) {
-
-        Assert.notNull(list, "'list' must not be null");
-        Assert.notNull(filter, "'filter' must not be null");
-        Assert.notNull(mapper, "'mapper' must not be null");
-
-        Optional<V> optional = list.stream()
-            .filter(filter)
-            .map(mapper)
-            .findFirst();
-
-        return OptionalUtils.orElse(optional, elseObject);
-    }
-
-    public static <T, R> List<R> flatMap(
-        List<T> list, Function<? super T, ? extends Stream<? extends R>> mapper) {
-
-        Assert.notNull(list, "'list' must not be null");
-        Assert.notNull(mapper, "'mapper' must not be null");
-
-        return list.stream()
-            .flatMap(mapper)
-            .toList();
-    }
-
-    public static <T, R> List<R> flatMap(
-        List<T> list, Function<? super T, ? extends Stream<? extends R>> mapper, Predicate<? super R> filter) {
-
-        Assert.notNull(list, "'list' must not be null");
-        Assert.notNull(mapper, "'mapper' must not be null");
-        Assert.notNull(filter, "'filter' must not be null");
-
-        return list.stream()
-            .flatMap(mapper)
-            .filter(filter)
-            .toList();
     }
 
     public static <T> T getFirst(Collection<T> list, Predicate<? super T> filter) {
@@ -217,29 +147,6 @@ public final class CollectionUtils {
 
         return list.stream()
             .map(mapper)
-            .toList();
-    }
-
-    public static <T, R> List<R> map(List<T> list, Function<? super T, R> mapper, Predicate<? super R> filter) {
-        Assert.notNull(list, "'list' must not be null");
-        Assert.notNull(mapper, "'mapper' must not be null");
-        Assert.notNull(filter, "'filter' must not be null");
-
-        return list.stream()
-            .map(mapper)
-            .filter(filter)
-            .toList();
-    }
-
-    public static <T, R> List<R> mapDistinct(List<T> list, Function<? super T, R> mapper, Predicate<? super R> filter) {
-        Assert.notNull(list, "'list' must not be null");
-        Assert.notNull(mapper, "'mapper' must not be null");
-        Assert.notNull(filter, "'filter' must not be null");
-
-        return list.stream()
-            .map(mapper)
-            .filter(filter)
-            .distinct()
             .toList();
     }
 
