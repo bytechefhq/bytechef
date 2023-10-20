@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.remote.web.rest.service;
+package com.bytechef.hermes.configuration.remote.web.rest.service;
 
-import com.bytechef.hermes.connection.service.OAuth2Service;
+import com.bytechef.hermes.configuration.service.OAuth2Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;

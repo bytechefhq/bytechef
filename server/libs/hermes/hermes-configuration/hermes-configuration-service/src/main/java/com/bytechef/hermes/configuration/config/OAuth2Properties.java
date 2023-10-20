@@ -17,7 +17,7 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.hermes.connection.config;
+package com.bytechef.hermes.configuration.config;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.context.properties.ConfigurationProperties;

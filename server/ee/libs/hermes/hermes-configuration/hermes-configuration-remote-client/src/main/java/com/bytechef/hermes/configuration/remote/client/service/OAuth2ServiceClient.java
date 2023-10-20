@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.remote.client.service;
+package com.bytechef.hermes.configuration.remote.client.service;
 
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
-import com.bytechef.hermes.connection.service.OAuth2Service;
+import com.bytechef.hermes.configuration.service.OAuth2Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;

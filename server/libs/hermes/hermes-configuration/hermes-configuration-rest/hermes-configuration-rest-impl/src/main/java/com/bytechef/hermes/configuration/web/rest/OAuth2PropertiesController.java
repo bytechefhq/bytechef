@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.connection.web.rest;
+package com.bytechef.hermes.configuration.web.rest;
 
-import com.bytechef.hermes.connection.service.OAuth2Service;
-import com.bytechef.hermes.connection.web.rest.model.OAuth2PropertiesModel;
+import com.bytechef.hermes.configuration.service.OAuth2Service;
+import com.bytechef.hermes.configuration.web.rest.model.OAuth2PropertiesModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
