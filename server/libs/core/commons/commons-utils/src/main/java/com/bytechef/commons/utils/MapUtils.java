@@ -21,12 +21,18 @@ import java.lang.reflect.ParameterizedType;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.ResolvableType;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.util.Assert;
 
@@ -39,7 +45,15 @@ public class MapUtils {
 
     private static final DefaultConversionService conversionService = new DefaultConversionService();
 
-    public static Object get(Map<String, Object> map, String key) {
+    public static boolean containsKey(Map<String, Object> map, String key) {
+        Assert.notNull(map, "Map cannot be null");
+
+        return map.containsKey(key);
+    }
+
+    public static Object get(Map<String, ?> map, String key) {
+        Assert.notNull(map, "Map cannot be null");
+
         return map.get(key);
     }
 
@@ -53,14 +67,25 @@ public class MapUtils {
         return conversionService.convert(value, returnType);
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> T get(Map<String, Object> map, String key, ParameterizedTypeReference<T> returnType) {
+        return get(map, key, (Class<T>) ((ParameterizedType) returnType.getType()).getRawType());
+    }
+
     public static <T> T get(Map<String, Object> map, String key, Class<T> returnType, T defaultValue) {
-        Object value = get(map, key);
+        T value = get(map, key, returnType);
 
         if (value == null) {
             return defaultValue;
         }
 
-        return conversionService.convert(value, returnType);
+        return value;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T get(
+            Map<String, Object> map, String key, ParameterizedTypeReference<T> returnType, T defaultValue) {
+        return get(map, key, (Class<T>) ((ParameterizedType) returnType.getType()).getRawType(), defaultValue);
     }
 
     @SuppressWarnings("unchecked")
@@ -82,6 +107,7 @@ public class MapUtils {
 
     public static boolean getBoolean(Map<String, Object> map, String key, boolean defaultValue) {
         Boolean value = getBoolean(map, key);
+
         return value != null ? value : defaultValue;
     }
 
@@ -99,6 +125,16 @@ public class MapUtils {
         }
 
         return (Date) value;
+    }
+
+    public static Date getDate(Map<String, Object> map, String key, Date defaultValue) {
+        Date date = getDate(map, key);
+
+        if (date == null) {
+            date = defaultValue;
+        }
+
+        return date;
     }
 
     public static Double getDouble(Map<String, Object> map, String key) {
@@ -119,10 +155,10 @@ public class MapUtils {
         return Duration.parse("PT" + value);
     }
 
-    public static Duration getDuration(Map<String, Object> map, String key, String defaultDuration) {
+    public static Duration getDuration(Map<String, Object> map, String key, Duration defaultDuration) {
         Duration value = getDuration(map, key);
 
-        return value != null ? value : Duration.parse("PT" + defaultDuration);
+        return value != null ? value : defaultDuration;
     }
 
     public static Float getFloat(Map<String, Object> map, String key) {
@@ -157,11 +193,6 @@ public class MapUtils {
         return Collections.unmodifiableList(typedList);
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> List<T> getList(Map<String, Object> map, String key, ParameterizedTypeReference<T> elementType) {
-        return getList(map, key, (Class<T>) ((ParameterizedType) elementType.getType()).getRawType());
-    }
-
     public static <T> List<T> getList(Map<String, Object> map, String key, Class<T> elementType, List<T> defaultValue) {
         List<T> list = getList(map, key, elementType);
 
@@ -169,9 +200,84 @@ public class MapUtils {
     }
 
     @SuppressWarnings("unchecked")
+    public static <T> List<T> getList(Map<String, Object> map, String key, ParameterizedTypeReference<T> elementType) {
+
+        return getList(map, key, (Class<T>) ResolvableType.forType(elementType).getRawClass());
+    }
+
+    @SuppressWarnings("unchecked")
     public static <T> List<T> getList(
             Map<String, Object> map, String key, ParameterizedTypeReference<T> elementType, List<T> defaultValue) {
-        return getList(map, key, (Class<T>) ((ParameterizedType) elementType.getType()).getRawType(), defaultValue);
+
+        List<T> list =
+                getList(map, key, (Class<T>) ResolvableType.forType(elementType).getRawClass(), defaultValue);
+
+        return list != null ? list : defaultValue;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<Object> getList(
+            Map<String, Object> map, String key, List<Class<?>> elementTypes, List<Object> defaultValue) {
+
+        List<Object> list = get(map, key, List.class);
+
+        if (list == null) {
+            list = defaultValue;
+        } else {
+            list = list.stream()
+                    .map(value -> {
+                        for (Class<?> elementType : elementTypes) {
+                            if (conversionService.canConvert(value.getClass(), elementType)) {
+                                value = conversionService.convert(value, elementType);
+                            }
+                        }
+
+                        return value;
+                    })
+                    .toList();
+        }
+
+        return list;
+    }
+
+    public static LocalDate getLocalDate(Map<String, Object> map, String key) {
+        Object value = get(map, key);
+
+        if (value instanceof String) {
+            return LocalDate.parse((String) value, DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT));
+        }
+
+        return (LocalDate) value;
+    }
+
+    public static LocalDate getLocalDate(Map<String, Object> map, String key, LocalDate defaultValue) {
+        LocalDate localDate = getLocalDate(map, key);
+
+        if (localDate == null) {
+            localDate = defaultValue;
+        }
+
+        return localDate;
+    }
+
+    public static LocalDateTime getLocalDateTime(Map<String, Object> map, String key) {
+        Object value = get(map, key);
+
+        if (value instanceof String) {
+            return LocalDateTime.parse((String) value, DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT));
+        }
+
+        return (LocalDateTime) value;
+    }
+
+    public static LocalDateTime getLocalDateTime(Map<String, Object> map, String key, LocalDateTime defaultValue) {
+        LocalDateTime localDateTime = getLocalDateTime(map, key);
+
+        if (localDateTime == null) {
+            localDateTime = defaultValue;
+        }
+
+        return localDateTime;
     }
 
     public static Long getLong(Map<String, Object> map, String key) {
@@ -183,8 +289,8 @@ public class MapUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<String, Object> getMap(Map<String, Object> map, String key) {
-        Map<String, Object> value = (Map<String, Object>) get(map, key);
+    public static <V> Map<String, V> getMap(Map<String, Object> map, String key) {
+        Map<String, V> value = (Map<String, V>) get(map, key, Map.class);
 
         if (value == null) {
             return null;
@@ -193,22 +299,40 @@ public class MapUtils {
         return Collections.unmodifiableMap(value);
     }
 
-    public static Map<String, Object> getMap(Map<String, Object> map, String key, Map<String, Object> defaultValue) {
-        Map<String, Object> value = getMap(map, key);
+    public static <V> Map<String, V> getMap(Map<String, Object> map, String key, Map<String, V> defaultValue) {
+        Map<String, V> value = getMap(map, key);
 
         return value != null ? value : defaultValue;
     }
 
-    public static String getRequiredString(Map<String, Object> map, String key) {
-        String value = getString(map, key);
+    public static Map<String, Object> getMap(
+            Map<String, Object> map, String key, List<Class<?>> valueTypes, Map<String, Object> defaultValue) {
+        Map<String, Object> mapValue = getMap(map, key);
 
-        Assert.notNull(value, "Unknown key: " + key);
+        if (mapValue == null) {
+            mapValue = defaultValue;
+        } else {
+            mapValue = mapValue.entrySet().stream()
+                    .map(entry -> {
+                        for (Class<?> valueType : valueTypes) {
+                            if (entry.getValue() != null
+                                    && conversionService.canConvert(
+                                            entry.getValue().getClass(), valueType)) {
+                                entry = Map.entry(
+                                        entry.getKey(), conversionService.convert(entry.getValue(), valueType));
+                            }
+                        }
 
-        return value;
+                        return entry;
+                    })
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }
+
+        return mapValue;
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T getRequired(Map<String, Object> map, String key) {
+    public static <T> T getRequired(Map<String, ?> map, String key) {
         T value = (T) get(map, key);
 
         Assert.notNull(value, "Unknown key: " + key);
@@ -224,13 +348,81 @@ public class MapUtils {
         return value;
     }
 
+    public static Boolean getRequiredBoolean(Map<String, Object> map, String key) {
+        Boolean value = getBoolean(map, key);
+
+        Assert.notNull(value, "Unknown key: " + key);
+
+        return value;
+    }
+
+    public static Date getRequiredDate(Map<String, Object> map, String key) {
+        Date value = getDate(map, key);
+
+        Assert.notNull(value, "Unknown key: " + key);
+
+        return value;
+    }
+
+    public static Double getRequiredDouble(Map<String, Object> map, String key) {
+        Double value = getDouble(map, key);
+
+        Assert.notNull(value, "Unknown key: " + key);
+
+        return value;
+    }
+
+    public static Float getRequiredFloat(Map<String, Object> map, String key) {
+        Float value = getFloat(map, key);
+
+        Assert.notNull(value, "Unknown key: " + key);
+
+        return value;
+    }
+
+    public static Integer getRequiredInteger(Map<String, Object> map, String key) {
+        Integer value = getInteger(map, key);
+
+        Assert.notNull(value, "Unknown key: " + key);
+
+        return value;
+    }
+
+    public static LocalDate getRequiredLocalDate(Map<String, Object> map, String key) {
+        LocalDate value = getLocalDate(map, key);
+
+        Assert.notNull(value, "Unknown key: " + key);
+
+        return value;
+    }
+
+    public static LocalDateTime getRequiredLocalDateTime(Map<String, Object> map, String key) {
+        LocalDateTime value = getLocalDateTime(map, key);
+
+        Assert.notNull(value, "Unknown key: " + key);
+
+        return value;
+    }
+
+    public static String getRequiredString(Map<String, Object> map, String key) {
+        String value = getString(map, key);
+
+        Assert.notNull(value, "Unknown key: " + key);
+
+        return value;
+    }
+
     public static String getString(Map<String, Object> map, String key) {
-        return conversionService.convert(get(map, key), String.class);
+        return get(map, key, String.class);
     }
 
     public static String getString(Map<String, Object> map, String key, String defaultValue) {
         String value = getString(map, key);
 
         return value != null ? value : defaultValue;
+    }
+
+    public static void addConverter(Converter<?, ?> converter) {
+        conversionService.addConverter(converter);
     }
 }
