@@ -43,7 +43,7 @@ export interface ConnectionModel {
      * @type {number}
      * @memberof ConnectionModel
      */
-    readonly componentVersion: number;
+    readonly connectionVersion: number;
     /**
      * TODO
      * @type {string}
@@ -106,7 +106,7 @@ export interface ConnectionModel {
 export function instanceOfConnectionModel(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "componentName" in value;
-    isInstance = isInstance && "componentVersion" in value;
+    isInstance = isInstance && "connectionVersion" in value;
     isInstance = isInstance && "name" in value;
     isInstance = isInstance && "parameters" in value;
 
@@ -125,7 +125,7 @@ export function ConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boo
         
         'authorizationName': !exists(json, 'authorizationName') ? undefined : json['authorizationName'],
         'componentName': json['componentName'],
-        'componentVersion': json['componentVersion'],
+        'connectionVersion': json['connectionVersion'],
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'name': json['name'],
