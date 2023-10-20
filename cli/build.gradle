@@ -1,4 +1,6 @@
 plugins {
+    id "com.bytechef.java-application-conventions"
+    id "com.bytechef.java-library-conventions"
     id "org.sonarqube"
 }
 
@@ -19,4 +21,21 @@ subprojects {
     apply plugin: "org.sonarqube"
 
     apply from: "${rootDir}/gradle/sonar.gradle"
+
+    dependencies {
+        annotationProcessor libs.picocli.codegen
+
+        implementation libs.handlebars
+        implementation libs.logback.core
+        implementation libs.logback.classic
+        implementation libs.picocli
+        implementation libs.swagger.parser
+
+        testImplementation libs.jupiter.engine
+
+        constraints {
+            implementation libs.logback.core
+            implementation libs.logback.classic
+        }
+    }
 }
