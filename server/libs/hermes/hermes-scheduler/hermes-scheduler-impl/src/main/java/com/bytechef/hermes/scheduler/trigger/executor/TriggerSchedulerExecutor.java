@@ -50,7 +50,7 @@ public class TriggerSchedulerExecutor {
     }
 
     public void poll(WorkflowExecutionId workflowExecutionId) {
-        messageBroker.send(TriggerMessageRoute.TRIGGERS_REQUESTS, workflowExecutionId);
+        messageBroker.send(TriggerMessageRoute.TRIGGERS_POLLS, workflowExecutionId);
     }
 
     public LocalDateTime refreshDynamicWebhook(
@@ -73,7 +73,7 @@ public class TriggerSchedulerExecutor {
         return webhookExpirationDate;
     }
 
-    public void executeWorkflow(WorkflowExecutionId workflowExecutionId, Map<String, Object> output) {
+    public void triggerWorkflow(WorkflowExecutionId workflowExecutionId, Map<String, Object> output) {
         TriggerExecution triggerExecution = TriggerExecution.builder()
             .output(output)
             .workflowExecutionId(workflowExecutionId)
