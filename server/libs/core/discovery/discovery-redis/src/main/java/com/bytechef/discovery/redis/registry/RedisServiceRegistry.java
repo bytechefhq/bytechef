@@ -40,12 +40,12 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
     }
 
     @Override
-    public void register(RedisRegistration registration) {
-        String serviceId = registration.getServiceId();
+    public void register(RedisRegistration redisRegistration) {
+        String serviceId = redisRegistration.getServiceId();
 
         ListOperations<String, String> listOperations = redisTemplate.opsForList();
 
-        listOperations.leftPush(serviceId, registration.getHost() + ":" + registration.getPort());
+        listOperations.leftPush(serviceId, redisRegistration.getHost() + ":" + redisRegistration.getPort());
     }
 
     @Override

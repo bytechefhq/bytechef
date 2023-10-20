@@ -58,7 +58,7 @@ public class KafkaMessageBroker implements MessageBroker {
         }
     }
 
-    public void setKafkaTemplate(KafkaTemplate<Integer, Object> akafkaTemplate) {
-        kafkaTemplate = akafkaTemplate;
+    public void setKafkaTemplate(KafkaTemplate<Integer, Object> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
     }
 }

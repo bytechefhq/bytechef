@@ -19,6 +19,7 @@ package com.bytechef.atlas.worker.config;
 
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.config.MessageBrokerConfigurer;
+import com.bytechef.atlas.message.broker.config.MessageBrokerListenerRegistrar;
 import com.bytechef.atlas.worker.Worker;
 import com.bytechef.autoconfigure.annotation.ConditionalOnWorker;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -46,17 +47,22 @@ public class WorkerMessageBrokerConfiguration implements ApplicationContextAware
     }
 
     @Bean
-    MessageBrokerConfigurer<?> workerMessageBrokerConfigurer() {
-        return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            Worker worker = applicationContext.getBean(Worker.class);
+    MessageBrokerConfigurer workerMessageBrokerConfigurer() {
+        return new MessageBrokerConfigurer() {
+            @Override
+            public <T> void configure(
+                T listenerEndpointRegistrar, MessageBrokerListenerRegistrar<T> messageBrokerListenerRegistrar) {
 
-            Map<String, Object> subscriptions = workerProperties.getSubscriptions();
+                Worker worker = applicationContext.getBean(Worker.class);
 
-            subscriptions.forEach((k, v) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, k, Integer.parseInt((String) v), worker, "handle"));
+                Map<String, Object> subscriptions = workerProperties.getSubscriptions();
 
-            messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, Queues.CONTROL, 1, worker, "handle");
+                subscriptions.forEach((k, v) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
+                    listenerEndpointRegistrar, k, Integer.parseInt((String) v), worker, "handle"));
+
+                messageBrokerListenerRegistrar.registerListenerEndpoint(
+                    listenerEndpointRegistrar, Queues.CONTROL, 1, worker, "handle");
+            }
         };
     }
 
