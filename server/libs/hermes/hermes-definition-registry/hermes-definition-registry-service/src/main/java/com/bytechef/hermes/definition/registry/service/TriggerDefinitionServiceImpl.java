@@ -67,8 +67,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public void executeDynamicWebhookDisable(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> triggerParameters, String workflowExecutionId,
+        String triggerName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
+        String authorizationName, Map<String, ?> triggerParameters, String workflowExecutionId,
         DynamicWebhookEnableOutput output) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
@@ -87,8 +87,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> triggerParameters, String webhookUrl,
+        String triggerName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
+        String authorizationName, Map<String, ?> triggerParameters, String webhookUrl,
         String workflowExecutionId) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
@@ -121,7 +121,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public List<? extends ValuePropertyDTO<?>> executeDynamicProperties(
         String propertyName, String triggerName, String componentName, int componentVersion,
-        Map<String, Object> triggerParameters, String authorizationName, Map<String, Object> connectionParameters) {
+        Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters) {
 
         DynamicPropertiesProperty property = (DynamicPropertiesProperty) componentDefinitionRegistry.getTriggerProperty(
             propertyName, triggerName, componentName, componentVersion);
@@ -142,8 +142,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public String executeEditorDescription(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
-        String authorizationName, Map<String, Object> connectionParameters) {
+        String triggerName, String componentName, int componentVersion, Map<String, ?> triggerParameters,
+        String authorizationName, Map<String, ?> connectionParameters) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
@@ -165,8 +165,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public void executeListenerDisable(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> triggerParameters, String workflowExecutionId) {
+        String triggerName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
+        String authorizationName, Map<String, ?> triggerParameters, String workflowExecutionId) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
             triggerName, componentName, componentVersion);
@@ -181,8 +181,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public void executeListenerEnable(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> connectionParameters,
-        String authorizationName, Map<String, Object> triggerParameters, String workflowExecutionId) {
+        String triggerName, String componentName, int componentVersion, Map<String, ?> connectionParameters,
+        String authorizationName, Map<String, ?> triggerParameters, String workflowExecutionId) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
             triggerName, componentName, componentVersion);
@@ -198,7 +198,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     @Override
     public List<OptionDTO> executeOptions(
         String propertyName, String triggerName, String componentName, int componentVersion,
-        Map<String, Object> triggerParameters, String authorizationName, Map<String, Object> connectionParameters) {
+        Map<String, ?> triggerParameters, String authorizationName, Map<String, ?> connectionParameters) {
 
         DynamicOptionsProperty dynamicOptionsProperty = (DynamicOptionsProperty) componentDefinitionRegistry
             .getTriggerProperty(propertyName, triggerName, componentName, componentVersion);
@@ -218,8 +218,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public List<? extends ValuePropertyDTO<?>> executeOutputSchema(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
-        String authorizationName, Map<String, Object> connectionParameters) {
+        String triggerName, String componentName, int componentVersion, Map<String, ?> triggerParameters,
+        String authorizationName, Map<String, ?> connectionParameters) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
             triggerName, componentName, componentVersion);
@@ -240,8 +240,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     @Override
     public Object executeSampleOutput(
-        String triggerName, String componentName, int componentVersion, Map<String, Object> triggerParameters,
-        String authorizationName, Map<String, Object> connectionParameters) {
+        String triggerName, String componentName, int componentVersion, Map<String, ?> triggerParameters,
+        String authorizationName, Map<String, ?> connectionParameters) {
 
         TriggerDefinition triggerDefinition = componentDefinitionRegistry.getTriggerDefinition(
             triggerName, componentName, componentVersion);

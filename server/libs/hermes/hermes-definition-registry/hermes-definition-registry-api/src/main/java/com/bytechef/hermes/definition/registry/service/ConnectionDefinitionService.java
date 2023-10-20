@@ -35,17 +35,15 @@ public interface ConnectionDefinitionService {
     boolean connectionExists(String componentName, int connectionVersion);
 
     void executeAuthorizationApply(
-        String componentName, int connectionVersion, Map<String, Object> connectionParameters,
-        String authorizationName,
+        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName,
         AuthorizationContext authorizationContext);
 
     AuthorizationCallbackResponse executeAuthorizationCallback(
-        String componentName, int connectionVersion, Map<String, Object> connectionParameters,
-        String authorizationName,
+        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName,
         String redirectUri);
 
     Optional<String> fetchBaseUri(
-        String componentName, int connectionVersion, Map<String, Object> connectionParameters);
+        String componentName, int connectionVersion, Map<String, ?> connectionParameters);
 
     AuthorizationType getAuthorizationType(String authorizationName, String componentName, int connectionVersion);
 
@@ -56,6 +54,5 @@ public interface ConnectionDefinitionService {
     List<ConnectionDefinitionDTO> getConnectionDefinitions();
 
     OAuth2AuthorizationParametersDTO getOAuth2Parameters(
-        String componentName, int connectionVersion, Map<String, Object> connectionParameters,
-        String authorizationName);
+        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName);
 }

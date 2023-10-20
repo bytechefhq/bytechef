@@ -324,7 +324,7 @@ public final class TaskExecution
     }
 
     @JsonIgnore
-    public Map<String, Object> getParameters() {
+    public Map<String, ?> getParameters() {
         Objects.requireNonNull(workflowTask);
 
         return workflowTask.getParameters();

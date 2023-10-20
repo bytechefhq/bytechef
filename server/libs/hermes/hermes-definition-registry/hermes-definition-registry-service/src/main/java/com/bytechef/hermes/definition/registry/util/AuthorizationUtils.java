@@ -38,7 +38,7 @@ public class AuthorizationUtils {
     public static Authorization.ApplyConsumer getDefaultApply(Authorization.AuthorizationType type) {
         return switch (type) {
             case API_KEY -> (
-                Map<String, Object> connectionInputParameters, AuthorizationContext authorizationContext) -> {
+                Map<String, ?> connectionInputParameters, AuthorizationContext authorizationContext) -> {
 
                 String addTo = MapValueUtils.getString(
                     connectionInputParameters, Authorization.ADD_TO, ApiTokenLocation.HEADER.name());
@@ -60,12 +60,12 @@ public class AuthorizationUtils {
                 }
             };
             case BASIC_AUTH, DIGEST_AUTH -> (
-                Map<String, Object> connectionInputParameters,
+                Map<String, ?> connectionInputParameters,
                 AuthorizationContext authorizationContext) -> authorizationContext.setUsernamePassword(
                     MapValueUtils.getString(connectionInputParameters, Authorization.USERNAME),
                     MapValueUtils.getString(connectionInputParameters, Authorization.PASSWORD));
             case BEARER_TOKEN -> (
-                Map<String, Object> connectionInputParameters,
+                Map<String, ?> connectionInputParameters,
                 AuthorizationContext authorizationContext) -> authorizationContext.setHeaders(
                     Map.of(
                         Authorization.AUTHORIZATION,
@@ -73,10 +73,10 @@ public class AuthorizationUtils {
                             Authorization.BEARER + " " +
                                 MapValueUtils.getString(connectionInputParameters, Authorization.TOKEN))));
             case CUSTOM -> (
-                Map<String, Object> connectionInputParameters, AuthorizationContext authorizationContext) -> {};
+                Map<String, ?> connectionInputParameters, AuthorizationContext authorizationContext) -> {};
             case OAUTH2_AUTHORIZATION_CODE, OAUTH2_AUTHORIZATION_CODE_PKCE, OAUTH2_CLIENT_CREDENTIALS,
                 OAUTH2_IMPLICIT_CODE, OAUTH2_RESOURCE_OWNER_PASSWORD -> (
-                    Map<String, Object> connectionInputParameters,
+                    Map<String, ?> connectionInputParameters,
                     AuthorizationContext authorizationContext) -> authorizationContext
                         .setHeaders(
                             Map.of(
@@ -90,19 +90,19 @@ public class AuthorizationUtils {
         };
     }
 
-    public static String getDefaultAuthorizationUrl(Map<String, Object> connectionInputParameters) {
+    public static String getDefaultAuthorizationUrl(Map<String, ?> connectionInputParameters) {
         return MapValueUtils.getString(connectionInputParameters, Authorization.AUTHORIZATION_URL);
     }
 
-    public static String getDefaultBaseUri(Map<String, Object> connectionInputParameters) {
+    public static String getDefaultBaseUri(Map<String, ?> connectionInputParameters) {
         return MapValueUtils.getString(connectionInputParameters, ConnectionDefinition.BASE_URI);
     }
 
-    public static String getDefaultClientId(Map<String, Object> connectionInputParameters) {
+    public static String getDefaultClientId(Map<String, ?> connectionInputParameters) {
         return MapValueUtils.getString(connectionInputParameters, Authorization.CLIENT_ID);
     }
 
-    public static String getDefaultClientSecret(Map<String, Object> connectionInputParameters) {
+    public static String getDefaultClientSecret(Map<String, ?> connectionInputParameters) {
         return MapValueUtils.getString(connectionInputParameters, Authorization.CLIENT_SECRET);
     }
 
@@ -122,7 +122,7 @@ public class AuthorizationUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<String> getDefaultScopes(Map<String, Object> connectionInputParameters) {
+    public static List<String> getDefaultScopes(Map<String, ?> connectionInputParameters) {
         Object scopes = MapValueUtils.get(connectionInputParameters, Authorization.SCOPES);
 
         if (scopes == null) {
@@ -138,7 +138,7 @@ public class AuthorizationUtils {
         }
     }
 
-    public static String getDefaultTokenUrl(Map<String, Object> connectionInputParameters) {
+    public static String getDefaultTokenUrl(Map<String, ?> connectionInputParameters) {
         return MapValueUtils.getString(connectionInputParameters, Authorization.TOKEN_URL);
     }
 }

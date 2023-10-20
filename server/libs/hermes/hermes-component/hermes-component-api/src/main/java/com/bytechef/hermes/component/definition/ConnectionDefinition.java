@@ -95,7 +95,7 @@ public sealed interface ConnectionDefinition permits ModifiableConnectionDefinit
          * @param connectionInputParameters
          * @return
          */
-        String apply(Map<String, Object> connectionInputParameters);
+        String apply(Map<String, ?> connectionInputParameters);
     }
 
     /**
@@ -108,6 +108,6 @@ public sealed interface ConnectionDefinition permits ModifiableConnectionDefinit
          *
          * @param connectionInputParameters
          */
-        void accept(Map<String, Object> connectionInputParameters);
+        void accept(Map<String, ?> connectionInputParameters);
     }
 }

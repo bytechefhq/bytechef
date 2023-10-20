@@ -39,14 +39,14 @@ public class OAuth2Properties {
     private Map<String, OAuth2App> predefinedApps = new HashMap<>();
     private String redirectUri;
 
-    public Map<String, Object> checkPredefinedApp(String componentName, Map<String, Object> connectionParameters) {
-        if (!StringUtils.hasText((String) connectionParameters.get(Authorization.CLIENT_ID))) {
-            connectionParameters = new HashMap<>(connectionParameters);
+    public Map<String, ?> checkPredefinedApp(String componentName, Map<String, ?> connectionParameters) {
+        Map<String, Object> newConnectionParameters = new HashMap<>(connectionParameters);
 
+        if (!StringUtils.hasText((String) connectionParameters.get(Authorization.CLIENT_ID))) {
             if (predefinedApps.containsKey(componentName)) {
                 OAuth2Properties.OAuth2App oAuth2App = predefinedApps.get(componentName);
 
-                connectionParameters.putAll(
+                newConnectionParameters.putAll(
                     Map.of(
                         Authorization.CLIENT_ID, oAuth2App.clientId(),
                         Authorization.CLIENT_SECRET, oAuth2App.clientSecret()));
@@ -56,7 +56,7 @@ public class OAuth2Properties {
             }
         }
 
-        return connectionParameters;
+        return newConnectionParameters;
     }
 
     public Map<String, OAuth2App> getPredefinedApps() {
