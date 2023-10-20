@@ -73,8 +73,9 @@ public class HttpClientTaskHandler {
 
             HttpResponse<?> httpResponse = httpClientHelper.send(
                 getRequestMethod(),
-                resolveURI(taskExecution.getRequiredString(URI), queryParamsFactory.getQueryParams(taskExecution)),
+                taskExecution.getRequiredString(URI),
                 httpHeaders,
+                queryParamsFactory.getQueryParams(taskExecution),
                 httpBodyFactory.getBodyPublisher(taskExecution, httpHeaders),
                 httpBodyFactory.getBodyHandler(taskExecution),
                 taskExecution.get(Constants.AUTH, TaskAuth.class)
@@ -84,14 +85,6 @@ public class HttpClientTaskHandler {
         }
 
         protected abstract RequestMethod getRequestMethod();
-
-        private String resolveURI(String uri, String queryParameters) {
-            if (queryParameters.isEmpty()) {
-                return uri;
-            }
-
-            return uri + '?' + queryParameters;
-        }
     }
 
     @Component(HTTP_CLIENT + "/" + VERSION_1_0 + "/" + DELETE)

@@ -24,7 +24,6 @@ import com.integri.atlas.engine.task.execution.TaskExecution;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,29 +33,17 @@ import org.springframework.stereotype.Component;
 public class HttpQueryParamsFactory {
 
     @SuppressWarnings("unchecked")
-    public String getQueryParams(TaskExecution taskExecution) {
-        String queryParams = "";
+    public List<HttpQueryParam> getQueryParams(TaskExecution taskExecution) {
+        List<HttpQueryParam> queryParams = new ArrayList<>();
 
         if (taskExecution.containsKey(PROPERTY_QUERY_PARAMETERS)) {
-            queryParams = fromQueryParameters(taskExecution.get(PROPERTY_QUERY_PARAMETERS, List.class));
+            List<Map<String, String>> queryParameters = taskExecution.get(PROPERTY_QUERY_PARAMETERS, List.class);
+
+            for (Map<String, String> queryParameter : queryParameters) {
+                queryParams.add(new HttpQueryParam(queryParameter.get(KEY), queryParameter.get(VALUE)));
+            }
         }
 
         return queryParams;
-    }
-
-    private String fromQueryParameters(List<Map<String, String>> queryParameters) {
-        List<String> queryParameterList = new ArrayList<>();
-
-        StringBuilder sb = new StringBuilder();
-
-        for (Map<String, String> parameter : queryParameters) {
-            sb.append(parameter.get(KEY));
-            sb.append("=");
-            sb.append(parameter.get(VALUE));
-
-            queryParameterList.add(sb.toString());
-        }
-
-        return StringUtils.join(queryParameterList, "&");
     }
 }

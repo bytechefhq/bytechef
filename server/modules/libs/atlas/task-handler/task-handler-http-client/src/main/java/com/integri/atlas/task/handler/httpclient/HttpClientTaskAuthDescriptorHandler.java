@@ -19,6 +19,7 @@ package com.integri.atlas.task.handler.httpclient;
 import static com.integri.atlas.task.descriptor.model.DSL.STRING_PROPERTY;
 import static com.integri.atlas.task.descriptor.model.DSL.createTaskAuthDescriptor;
 import static com.integri.atlas.task.descriptor.model.DSL.option;
+import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.*;
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.ADD_TO;
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.AuthType.API_KEY;
 import static com.integri.atlas.task.handler.httpclient.HttpClientTaskConstants.AuthType.BASIC_AUTH;
@@ -55,8 +56,8 @@ public class HttpClientTaskAuthDescriptorHandler implements TaskAuthDescriptorHa
                     .displayName("Add to")
                     .required(true)
                     .options(
-                        option("Header", HttpClientTaskConstants.ApiTokenLocation.HEADER.name()),
-                        option("QueryParams", HttpClientTaskConstants.ApiTokenLocation.QUERY_PARAMS.name())
+                        option("Header", ApiTokenLocation.HEADER.name()),
+                        option("QueryParams", ApiTokenLocation.QUERY_PARAMS.name())
                     )
                     .required(true)
             ),

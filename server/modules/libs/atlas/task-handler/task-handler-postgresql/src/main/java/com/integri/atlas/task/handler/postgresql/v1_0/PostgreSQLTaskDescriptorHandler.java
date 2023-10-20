@@ -20,10 +20,10 @@ import static com.integri.atlas.task.descriptor.model.DSL.option;
 import static com.integri.atlas.task.handler.postgresql.PostgreSQLTaskConstants.POSTGRESQL;
 import static com.integri.atlas.task.handler.postgresql.PostgreSQLTaskConstants.VERSION_1_0;
 
-import com.integri.atlas.task.jdbc.commons.JdbcTaskConstants;
 import com.integri.atlas.task.descriptor.handler.TaskDescriptorHandler;
 import com.integri.atlas.task.descriptor.model.DSL;
 import com.integri.atlas.task.descriptor.model.TaskDescriptor;
+import com.integri.atlas.task.jdbc.commons.JdbcTaskConstants;
 import org.springframework.stereotype.Component;
 
 /**
