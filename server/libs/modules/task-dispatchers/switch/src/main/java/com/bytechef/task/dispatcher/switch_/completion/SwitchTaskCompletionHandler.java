@@ -121,7 +121,7 @@ public class SwitchTaskCompletionHandler implements TaskCompletionHandler {
 
             TaskExecution evaluatedSubTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-            evaluatedSubTaskExecution = taskExecutionService.add(evaluatedSubTaskExecution);
+            evaluatedSubTaskExecution = taskExecutionService.create(evaluatedSubTaskExecution);
 
             taskDispatcher.dispatch(evaluatedSubTaskExecution);
         }

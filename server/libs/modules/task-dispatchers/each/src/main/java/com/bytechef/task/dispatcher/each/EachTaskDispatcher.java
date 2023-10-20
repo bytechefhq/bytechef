@@ -108,7 +108,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
                 TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(iterateeTaskExecution, context);
 
-                evaluatedTaskExecution = taskExecutionService.add(evaluatedTaskExecution);
+                evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
 
                 taskDispatcher.dispatch(evaluatedTaskExecution);
             }

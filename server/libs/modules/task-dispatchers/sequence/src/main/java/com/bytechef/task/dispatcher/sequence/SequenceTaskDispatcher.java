@@ -91,7 +91,7 @@ public class SequenceTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
             TaskExecution evaluatedTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
-            evaluatedTaskExecution = taskExecutionService.add(evaluatedTaskExecution);
+            evaluatedTaskExecution = taskExecutionService.create(evaluatedTaskExecution);
 
             taskDispatcher.dispatch(evaluatedTaskExecution);
         } else {
