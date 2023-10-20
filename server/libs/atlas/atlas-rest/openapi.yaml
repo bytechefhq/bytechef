@@ -191,7 +191,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Workflow'
+              allOf:
+                - $ref: '#/components/schemas/Workflow'
+                - type: object
+                  properties:
+                    providerType:
+                      type: string
+                      enum:
+                        - JDBC
         required: true
       responses:
         "200":
@@ -281,6 +288,10 @@ components:
     Job:
       description: Represents an execution of a workflow.
       type: object
+      required:
+        - priority
+        - startTime
+        - status
       properties:
         createdBy:
           description: The created by.
@@ -383,6 +394,11 @@ components:
     TaskExecution:
       description: Adds execution semantics to the task.
       type: object
+      required:
+          - jobId
+          - priority
+          - startTime
+          - status
       properties:
         createdBy:
           description: The created by.
@@ -520,6 +536,10 @@ components:
           type: string
           format: date-time
           readOnly: true
+        providerType:
+          description: The type of the provider which stores the workflow definition.
+          type: string
+          readOnly: true
         outputs:
           description: The workflow's list of expected outputs.
           type: array
@@ -574,6 +594,8 @@ components:
     WorkflowTask:
       description: Represents a definition of the task.
       type: object
+      required:
+          - name
       properties:
         finalize:
           description: The (optional) list of tasks that are to be executed after execution of this task -- regardless of whether it had failed or not.
