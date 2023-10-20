@@ -22,7 +22,8 @@ import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.test.annotation.EmbeddedSql;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ public class IntegrationRepositoryIntTest {
     @Test
     @SuppressFBWarnings("NP")
     public void testCreate() {
-        Integration integration = integrationRepository.save(getIntegration(Collections.emptyList()));
+        Integration integration = integrationRepository.save(getIntegration(Collections.emptySet()));
 
         Assertions.assertEquals(
             integration, integrationRepository.findById(integration.getId())
@@ -51,7 +52,7 @@ public class IntegrationRepositoryIntTest {
     @Test
     @SuppressFBWarnings("NP")
     public void testDelete() {
-        Integration integration = getIntegration(Collections.emptyList());
+        Integration integration = getIntegration(Collections.emptySet());
 
         integration = integrationRepository.save(integration);
 
@@ -70,7 +71,7 @@ public class IntegrationRepositoryIntTest {
     @Test
     @SuppressFBWarnings("NP")
     public void testFindById() {
-        Integration integration = getIntegration(Collections.emptyList());
+        Integration integration = getIntegration(Collections.emptySet());
 
         integration = integrationRepository.save(integration);
 
@@ -79,14 +80,14 @@ public class IntegrationRepositoryIntTest {
 
         Assertions.assertEquals(resultIntegration, integration);
 
-        integration = getIntegration(List.of("workflowId"));
+        integration = getIntegration(Set.of("workflowId"));
 
         integration = integrationRepository.save(integration);
 
         resultIntegration = integrationRepository.findById(integration.getId())
             .orElseThrow();
 
-        Assertions.assertEquals(resultIntegration.getIntegrationWorkflows(), integration.getIntegrationWorkflows());
+        Assertions.assertEquals(resultIntegration.getWorkflowIds(), integration.getWorkflowIds());
 
         resultIntegration.removeWorkflow("workflowId");
 
@@ -95,14 +96,14 @@ public class IntegrationRepositoryIntTest {
         resultIntegration = integrationRepository.findById(integration.getId())
             .orElseThrow();
 
-        Assertions.assertEquals(0, resultIntegration.getIntegrationWorkflows()
+        Assertions.assertEquals(0, resultIntegration.getWorkflowIds()
             .size());
     }
 
     @Test
     @SuppressFBWarnings("NP")
     public void testUpdate() {
-        Integration integration = integrationRepository.save(getIntegration(List.of("workflow1")));
+        Integration integration = integrationRepository.save(getIntegration(Set.of("workflow1")));
 
         integration.addWorkflow("workflow2");
         integration.setName("name2");
@@ -113,11 +114,18 @@ public class IntegrationRepositoryIntTest {
             .get();
 
         Assertions.assertEquals("name2", updatedIntegration.getName());
-        Assertions.assertEquals(2, updatedIntegration.getIntegrationWorkflows()
+        Assertions.assertEquals(2, updatedIntegration.getWorkflowIds()
             .size());
     }
 
-    private static Integration getIntegration(List<String> workflowIds) {
-        return new Integration("name", "description", workflowIds);
+    private static Integration getIntegration(Set<String> workflowIds) {
+        Integration integration = new Integration();
+
+        integration.setWorkflowIds(workflowIds);
+
+        integration.setDescription("name");
+        integration.setName("name");
+
+        return integration;
     }
 }

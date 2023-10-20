@@ -19,9 +19,16 @@ package com.bytechef.hermes.integration.service;
 
 import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.repository.IntegrationRepository;
+
 import java.util.List;
+import java.util.Set;
 import java.util.stream.StreamSupport;
+
+import com.bytechef.tag.domain.Tag;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author Ivica Cardic
@@ -36,19 +43,33 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public Integration create(Integration integration) {
-        integration.setId(null);
+    public Integration create(
+        @NonNull String name, String description, String category, @NonNull Set<String> workflowIds, Set<Tag> tags) {
+        Assert.notNull(name, "'name' must not be null.");
+        Assert.notEmpty(workflowIds, "'workflowIds' must not be empty.");
+
+        Integration integration = new Integration();
+
+        integration.setCategory(category);
+        integration.setDescription(description);
+        integration.setName(name);
+        integration.setTags(tags);
+        integration.setWorkflowIds(workflowIds);
 
         return integrationRepository.save(integration);
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(@NonNull Long id) {
+        Assert.notNull(id, "'id' must not be null.");
+
         integrationRepository.deleteById(id);
     }
 
     @Override
-    public Integration getIntegration(String id) {
+    public Integration getIntegration(@NonNull Long id) {
+        Assert.notNull(id, "'id' must not be null.");
+
         return integrationRepository.findById(id)
             .orElseThrow();
     }
@@ -61,7 +82,31 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public Integration update(Integration integration) {
+    public Integration update(
+        @NonNull Long id, String name, String description, String category, Set<String> workflowIds, Set<Tag> tags) {
+
+        Integration integration = getIntegration(id);
+
+        if (name != null) {
+            integration.setName(name);
+        }
+
+        if (category != null) {
+            integration.setCategory(category);
+        }
+
+        if (description != null) {
+            integration.setDescription(description);
+        }
+
+        if (tags != null) {
+            integration.setTags(tags);
+        }
+
+        if (!CollectionUtils.isEmpty(workflowIds)) {
+            integration.setWorkflowIds(workflowIds);
+        }
+
         return integrationRepository.save(integration);
     }
 }

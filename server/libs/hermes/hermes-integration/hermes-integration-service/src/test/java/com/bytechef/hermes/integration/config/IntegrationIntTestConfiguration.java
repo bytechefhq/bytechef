@@ -44,7 +44,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration"
+        "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration", "com.bytechef.tag"
     })
 @EnableAutoConfiguration
 @Import({
@@ -68,7 +68,8 @@ public class IntegrationIntTestConfiguration {
     @EnableJdbcAuditing
     @EnableJdbcRepositories(
         basePackages = {
-            "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration.repository"
+            "com.bytechef.atlas.repository.jdbc", "com.bytechef.hermes.integration.repository",
+            "com.bytechef.tag.repository"
         })
     @TestConfiguration
     public static class JdbcRepositoriesConfiguration {
